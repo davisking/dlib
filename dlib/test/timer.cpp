@@ -39,6 +39,7 @@ namespace
         void delayed_add()
         {
             dlib::sleep(1000);
+            print_spinner();
             add();
         }
 
@@ -48,6 +49,7 @@ namespace
             timestamp = ts.get_timestamp();
             dlog << LTRACE << "in set_timestamp(), time is " << timestamp;
             dlib::sleep(1);
+            print_spinner();
             m.unlock();
         }
     };
@@ -76,6 +78,7 @@ namespace
             t1.start();
 
             dlib::sleep(60);
+            print_spinner();
             t1.stop_and_wait();
 
             dlib::uint64 cur_time = h.ts.get_timestamp();
@@ -213,6 +216,7 @@ namespace
                 DLIB_TEST(t3.is_running() == true);
 
                 dlib::sleep(1100);
+                print_spinner();
                 // this should allow the timers to trigger 8 times
                 t1.stop();
                 t2.stop();
@@ -224,20 +228,27 @@ namespace
             }
 
 
+            t1.stop_and_wait();
+
             h.count = 0;
             t1.start();
             dlib::sleep(300);
+            print_spinner();
             DLIB_TEST_MSG(h.count == 0,h.count);
             t1.set_delay_time(400);
             dlib::sleep(200);
+            print_spinner();
             DLIB_TEST_MSG(h.count == 1,h.count);
             dlib::sleep(250);
+            print_spinner();
             DLIB_TEST_MSG(h.count == 1,h.count);
             dlib::sleep(100);
+            print_spinner();
             DLIB_TEST_MSG(h.count == 2,h.count);
             t1.set_delay_time(2000);
             DLIB_TEST_MSG(h.count == 2,h.count);
             dlib::sleep(1000);
+            print_spinner();
             DLIB_TEST_MSG(h.count == 2,h.count);
             t1.clear();
 
@@ -251,6 +262,7 @@ namespace
             DLIB_TEST(t3.delay_time() == 1000);
             DLIB_TEST_MSG(h.count == 0,h.count);
             dlib::sleep(200);
+            print_spinner();
             DLIB_TEST(t3.is_running() == false);
             DLIB_TEST(t3.delay_time() == 1000);
             DLIB_TEST_MSG(h.count == 0,h.count);
@@ -263,6 +275,7 @@ namespace
                 t4.start();
                 DLIB_TEST_MSG(h.count == 0,h.count);
                 dlib::sleep(400);
+                print_spinner();
                 DLIB_TEST_MSG(h.count == 0,h.count);
                 t4.stop_and_wait();
                 DLIB_TEST_MSG(h.count == 1,h.count);
@@ -276,6 +289,7 @@ namespace
                 t4.start();
                 DLIB_TEST_MSG(h.count == 0,h.count);
                 dlib::sleep(400);
+                print_spinner();
                 DLIB_TEST_MSG(h.count == 0,h.count);
                 t4.clear();
                 DLIB_TEST(t4.is_running() == false);
@@ -292,6 +306,7 @@ namespace
                 t5.start();
                 DLIB_TEST_MSG(h.count == 0,h.count);
                 dlib::sleep(400);
+                print_spinner();
                 DLIB_TEST_MSG(h.count == 0,h.count);
             }
             DLIB_TEST_MSG(h.count == 1,h.count);
