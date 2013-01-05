@@ -149,10 +149,11 @@ namespace dlib
             - image_type       == is an implementation of array2d/array2d_kernel_abstract.h
             - label_image_type == is an implementation of array2d/array2d_kernel_abstract.h
               and it must contain integers.
-            - is_background(img, point(c,r)) is a legal expression that evaluates to bool.
+            - is_background(img, point(c,r)) is a legal expression that evaluates to a bool.
+            - is_connected(img, point(c,r), point(c2,r2)) is a legal expression that
+              evaluates to a bool.
             - get_neighbors(point(c,r), neighbors) is a legal expression where neighbors 
               is of type std::vector<point>.
-            - is_connected(img, point(c,r), point(c2,r2)) is a valid expression.
             - is_same_object(img, label_img) == false
         ensures
             - This function labels each of the connected blobs in img with a unique integer 
