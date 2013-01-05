@@ -288,9 +288,6 @@ function BigToggle(node)
             <a name="top" />
             <div id="entire_page">
             <a href="http://dlib.net"><img src="dlib-logo.png"/></a>
-            <xsl:if test="$is_chm != 'true'">
-               <a href="http://sourceforge.net/project/platformdownload.php?group_id=130373"><img style="float:right" src="download-dlib.png"/></a>
-            </xsl:if>
 
             <table bgcolor="white" height="100%" bordercolor="{$background_color}" 
                 CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px">
