@@ -6,6 +6,7 @@
 #include "../uintn.h"
 
 #include <sstream>
+#include <cstring>
 
 namespace dlib
 {
@@ -461,6 +462,7 @@ namespace dlib
 
 
 
+        bool write_length = false;
         bool at_end = false;
         std::streambuf& inputbuf = *input.rdbuf();
         while(!at_end)
@@ -473,7 +475,12 @@ namespace dlib
             {
                 at_end = true;
                 unsigned char* temp2 = temp;
-                unsigned char* end = temp+56;
+                unsigned char* end;
+                if (num < 56)
+                    end = temp+56;
+                else
+                    end = temp+64;
+
                 temp2 += num;
 
                 // apply padding
@@ -486,38 +493,42 @@ namespace dlib
                 }
 
 
-                // make len the number of bits in the original message
-                // but first multiply len by 8 and since len is only 32 bits the number might
-                // overflow so we will carry out the multiplication manually and end up with
-                // the result in the base 65536 number with three digits
-                // result = low + high*65536 + upper*65536*65536
-                unsigned long low = len & 0xFFFF;
-                unsigned long high = len >> 16;
-                unsigned long upper;
-                unsigned long tmp;
-                tmp = low * 8;
-                low = tmp & 0xFFFF;
-                tmp = high * 8 + (tmp>>16);
-                high = tmp & 0xFFFF;
-                upper = tmp >> 16;
-                
+                if (num < 56)
+                {
+                    write_length = true;
+                    // make len the number of bits in the original message
+                    // but first multiply len by 8 and since len is only 32 bits the number might
+                    // overflow so we will carry out the multiplication manually and end up with
+                    // the result in the base 65536 number with three digits
+                    // result = low + high*65536 + upper*65536*65536
+                    unsigned long low = len & 0xFFFF;
+                    unsigned long high = len >> 16;
+                    unsigned long upper;
+                    unsigned long tmp;
+                    tmp = low * 8;
+                    low = tmp & 0xFFFF;
+                    tmp = high * 8 + (tmp>>16);
+                    high = tmp & 0xFFFF;
+                    upper = tmp >> 16;
 
-                // append the length
-                *temp2 = static_cast<unsigned char>(low&0xFF);
-                ++temp2;
-                *temp2 = static_cast<unsigned char>((low>>8)&0xFF);
-                ++temp2;
-                *temp2 = static_cast<unsigned char>((high)&0xFF);
-                ++temp2;
-                *temp2 = static_cast<unsigned char>((high>>8)&0xFF);
-                ++temp2;
-                *temp2 = static_cast<unsigned char>((upper)&0xFF);;
-                ++temp2;
-                *temp2 = static_cast<unsigned char>((upper>>8)&0xFF);;
-                ++temp2;
-                *temp2 = 0;
-                ++temp2;
-                *temp2 = 0;
+
+                    // append the length
+                    *temp2 = static_cast<unsigned char>(low&0xFF);
+                    ++temp2;
+                    *temp2 = static_cast<unsigned char>((low>>8)&0xFF);
+                    ++temp2;
+                    *temp2 = static_cast<unsigned char>((high)&0xFF);
+                    ++temp2;
+                    *temp2 = static_cast<unsigned char>((high>>8)&0xFF);
+                    ++temp2;
+                    *temp2 = static_cast<unsigned char>((upper)&0xFF);;
+                    ++temp2;
+                    *temp2 = static_cast<unsigned char>((upper>>8)&0xFF);;
+                    ++temp2;
+                    *temp2 = 0;
+                    ++temp2;
+                    *temp2 = 0;
+                }
 
 
             }
@@ -540,6 +551,29 @@ namespace dlib
             uint32 cc = c;
             uint32 dd = d;
 
+
+            scramble_block(a,b,c,d,x);
+
+
+            a = a + aa;
+            b = b + bb;
+            c = c + cc;
+            d = d + dd;
+
+        }
+
+        if (!write_length)
+        {
+            uint64 temp = len*8;
+
+            uint32 aa = a;
+            uint32 bb = b;
+            uint32 cc = c;
+            uint32 dd = d;
+
+            std::memset(x, 0, sizeof(x));
+            x[15] = (temp>>32);
+            x[14] = (temp&0xFFFFFFFF);
 
             scramble_block(a,b,c,d,x);
 

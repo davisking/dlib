@@ -35,6 +35,16 @@ namespace
         DLIB_TEST(md5 ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") == "d174ab98d277d9f5a5611c2c9f419d9f");
         DLIB_TEST(md5 ("12345678901234567890123456789012345678901234567890123456789012345678901234567890") == "57edf4a22be3c955ac49da2e2107b67a");
 
+        // make sure the two versions of md5() always agree
+        for (int num = 0; num < 2000; ++num)
+        {
+            std::string temp;
+            for (int i = 0; i < num; ++i)
+                temp += 'a';
+
+            istringstream str(temp);
+            DLIB_TEST(md5(temp) == md5(str));
+        }
 
     }
 
