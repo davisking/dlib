@@ -73,6 +73,7 @@ Bug fixes:
      some compilers.
 
 Other:
+   - dlib now has an excellent new logo thanks to Yasser Asmi. 
    - Added a new documentation page for the various linear algebra tools in dlib.
    - The following objects were turned into single implementation components:
      sockstreambuf, timeout, member_function_pointer, xml_parser, linker,
