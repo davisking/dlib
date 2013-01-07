@@ -28,24 +28,24 @@ New Features:
       - Added a method to the server object that lets a user set the graceful close timeout
         time to something other than the default of 500ms.
    - Linear Algebra
-      - Added gaussian_randm()
-      - Added an overload of sparse_matrix_vector_multiply() that multiplies a dense matrix
-        with a sparse vector.
-      - Added the find_affine_transform() routine.
-      - Made toMat() work with the matrix object in addition to array2d style images.
+      - Added the gaussian_randm() function.
+      - Added the find_affine_transform() function.
       - Added the mat() function.  It combines the array_to_matrix(), vector_to_matrix(),
         pointer_to_column_vector(), and pointer_to_matrix() methods all into one convenient
         interface.   mat() also works for Armadillo and Eigen matrices.
       - Added STL style begin() and end() methods to matrix and matrix_exp.
+      - Added an overload of sparse_matrix_vector_multiply() that multiplies a dense matrix
+        with a sparse vector.
+      - Made toMat() work with the matrix object in addition to array2d style images.
    - Graphical User Interface Tools
-      - Added draw_solid_convex_polygon()
+      - Added draw_solid_convex_polygon().
       - Added an overload of draw_image() that's useful for drawing images and doing
         interpolation at the same time.
       - Added the on_view_changed() callback to zoomable_region and scrollable_region widgets.
-   - Added parse_trees_to_string() and parse_trees_to_string_tagged()
+   - Added parse_trees_to_string() and parse_trees_to_string_tagged().
    - Added lambda function support to the timeout object.
-   - Added the vectorstream object
-   - Added the parse_xml() routines
+   - Added the vectorstream object.
+   - Added the parse_xml() routines.
    - Added a group name feature to the command line parser.  Now it is possible to make
      print_options() print related options in named groups. 
    - Added the following new hashing functions: murmur_hash3_128bit_3(),
@@ -71,7 +71,7 @@ Bug fixes:
 
 Other:
    - dlib now has an excellent new logo thanks to Yasser Asmi. 
-   - Added a new documentation page for the various linear algebra tools in dlib.
+   - Added a new documentation page for the various linear algebra tools.
    - The following objects were turned into single implementation components:
      sockstreambuf, timeout, member_function_pointer, xml_parser, linker,
      bound_function_pointer, and timer.
