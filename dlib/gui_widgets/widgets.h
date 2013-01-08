@@ -3430,6 +3430,26 @@ namespace dlib
             orect_selected_event_handler = event_handler_;
         }
 
+        template <
+            typename T
+            >
+        void set_image_clicked_handler (
+            T& object,
+            void (T::*event_handler_)(const point& p, bool is_double_click)
+        )
+        {
+            auto_mutex M(m);
+            image_clicked_handler = make_mfp(object,event_handler_);
+        }
+
+        void set_image_clicked_handler (
+            const any_function<void(const point& p, bool is_double_click)>& event_handler_
+        )
+        {
+            auto_mutex M(m);
+            image_clicked_handler = event_handler_;
+        }
+
         void add_labelable_part_name (
             const std::string& name
         );
@@ -3512,6 +3532,7 @@ namespace dlib
         std::string default_rect_label;
         any_function<void()> event_handler;
         any_function<void(const overlay_rect& orect)> orect_selected_event_handler;
+        any_function<void(const point& p, bool is_double_click)> image_clicked_handler;
         popup_menu_region parts_menu;
         point last_right_click_pos;
         const int part_width;
@@ -3538,7 +3559,33 @@ namespace dlib
         template < typename image_type >
         image_window(
             const image_type& img
-        ) : gui_img(*this) { set_image(img); show(); }
+        ) : 
+            gui_img(*this), 
+            window_has_closed(false),
+            have_last_click(false),
+            clicked_signaler(this->wm) 
+        {  
+            gui_img.set_image_clicked_handler(*this, &image_window::on_image_clicked);
+            set_image(img); 
+            show(); 
+        }
+        
+        template < typename image_type >
+        image_window(
+            const image_type& img,
+            const std::string& title
+        ) : 
+            gui_img(*this), 
+            window_has_closed(false),
+            have_last_click(false),
+            clicked_signaler(this->wm) 
+        {  
+            gui_img.set_image_clicked_handler(*this, &image_window::on_image_clicked);
+            set_image(img); 
+            set_title(title);
+            show(); 
+        }
+        
 
         ~image_window(
         );
@@ -3688,9 +3735,28 @@ namespace dlib
         void clear_overlay (
         );
 
+        bool get_next_double_click (
+            point& p
+        ); 
+        /*!
+            ensures
+                - This function blocks until the user double clicks on the image
+                  or the window is closed by the user.
+                - if (this function returns true) then
+                    - #p == the next place the user clicked
+        !*/
+
     private:
 
+        virtual base_window::on_close_return_code on_window_close(
+        );
+
         void on_window_resized(
+        );
+        
+        void on_image_clicked (
+            const point& p,
+            bool is_double_click
         );
 
         // restricted functions
@@ -3699,6 +3765,10 @@ namespace dlib
 
         image_display gui_img;
         rectangle image_rect;
+        bool window_has_closed;
+        bool have_last_click;
+        point last_clicked_point;
+        rsignaler clicked_signaler;
     };
 
 // ----------------------------------------------------------------------------------------

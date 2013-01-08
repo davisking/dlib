@@ -2750,6 +2750,44 @@ namespace dlib
                 - std::bad_alloc
         */
 
+        template <
+            typename T
+            >
+        void set_image_clicked_handler (
+            T& object,
+            void (T::*event_handler)(const point& p, bool is_double_click)
+        );
+        /*
+            requires
+                - event_handler is a valid pointer to a member function in T 
+            ensures
+                - The event_handler function is called on object when the user clicks
+                  anywhere on the image.  When they do so this callback is called with the
+                  location of the image pixel which was clicked.  The is_double_click bool
+                  will also tell you if it was a double click or single click.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        */
+
+        void set_image_clicked_handler (
+            const any_function<void(const point& p, bool is_double_click)>& event_handler
+        );
+        /*
+            ensures
+                - The event_handler function is called when the user clicks anywhere on the
+                  image.  When they do so this callback is called with the location of the
+                  image pixel which was clicked.  The is_double_click bool will also tell
+                  you if it was a double click or single click.
+                - Any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this event at a
+                  time)
+            throws
+                - std::bad_alloc
+        */
+
     private:
 
         // restricted functions
@@ -2795,6 +2833,22 @@ namespace dlib
             ensures
                 - this object is properly initialized 
                 - #*this window is now displaying the given image img.
+        !*/
+
+        template < typename image_type>
+        image_window(
+            const image_type& img,
+            const std::string& title
+        );
+        /*!
+            requires
+                - image_type == an implementation of array2d/array2d_kernel_abstract.h or
+                  a dlib::matrix or something convertible to a matrix via mat()
+                - pixel_traits<typename image_type::type> must be defined 
+            ensures
+                - this object is properly initialized 
+                - #*this window is now displaying the given image img.
+                - The title of the window will be set to the given title string.
         !*/
 
         ~image_window(
@@ -2963,6 +3017,17 @@ namespace dlib
         /*!
             ensures
                 - removes all overlays from this object.  
+        !*/
+
+        bool get_next_double_click (
+            point& p
+        ); 
+        /*!
+            ensures
+                - This function blocks until the user double clicks on the image
+                  or the window is closed by the user.
+                - if (this function returns true) then
+                    - #p == the next image pixel the user clicked.  
         !*/
 
     private:

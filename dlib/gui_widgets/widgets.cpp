@@ -6085,6 +6085,20 @@ namespace dlib
         if (rect.contains(x,y) == false || hidden || !enabled)
             return;
 
+        if (image_clicked_handler.is_set())
+        {
+            const point origin(total_rect().tl_corner());
+            point p(x,y);
+            p -= origin;
+            if (zoom_in_scale != 1)
+                p = p/(double)zoom_in_scale;
+            else if (zoom_out_scale != 1)
+                p = p*(double)zoom_out_scale;
+
+            if (dlib::get_rect(img).contains(p))
+                image_clicked_handler(p, is_double_click);
+        }
+
         if (btn == base_window::RIGHT && rect_is_selected)
         {
             last_right_click_pos = point(x,y);
@@ -6433,8 +6447,13 @@ namespace dlib
     image_window::
     image_window(
     ) :
-        gui_img(*this)
+        gui_img(*this),
+        window_has_closed(false),
+        have_last_click(false),
+        clicked_signaler(this->wm)
     {
+
+        gui_img.set_image_clicked_handler(*this, &image_window::on_image_clicked);
         // show this window on the screen
         show();
     } 
@@ -6449,6 +6468,56 @@ namespace dlib
         // objects to ensure that no events will be sent to this window while 
         // it is being destructed.  
         close_window();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    base_window::on_close_return_code image_window::
+    on_window_close(
+    )
+    {
+        window_has_closed = true;
+        clicked_signaler.broadcast();
+        return base_window::CLOSE_WINDOW;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    bool image_window::
+    get_next_double_click (
+        point& p
+    ) 
+    {
+        auto_mutex lock(wm);
+        while (have_last_click == false && !window_has_closed)
+        {
+            clicked_signaler.wait();
+        }
+
+        if (window_has_closed)
+            return false;
+
+        // Mark that we are taking the point click so the next call to get_next_click()
+        // will have to wait for another click.
+        have_last_click = false;
+        p = last_clicked_point;
+        return true;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_window::
+    on_image_clicked (
+        const point& p,
+        bool is_double_click
+    )
+    {
+        if (is_double_click)
+        {
+            have_last_click = true;
+            last_clicked_point = p;
+            clicked_signaler.signal();
+        }
     }
 
 // ----------------------------------------------------------------------------------------
