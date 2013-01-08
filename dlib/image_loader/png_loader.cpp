@@ -12,6 +12,7 @@
 #include "png_loader.h"
 #include <png.h>
 #include "../string.h"
+#include "../byte_orderer.h"
 
 namespace dlib
 {
@@ -155,7 +156,11 @@ namespace dlib
         png_init_io( ld_->png_ptr_, fp );
         png_set_sig_bytes( ld_->png_ptr_, 8 );
         // flags force one byte per channel output
-        png_read_png( ld_->png_ptr_, ld_->info_ptr_, PNG_TRANSFORM_PACKING, NULL );
+        byte_orderer bo;
+        int png_transforms = PNG_TRANSFORM_PACKING;
+        if (bo.host_is_little_endian())
+            png_transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
+        png_read_png( ld_->png_ptr_, ld_->info_ptr_, png_transforms, NULL );
         height_ = png_get_image_height( ld_->png_ptr_, ld_->info_ptr_ );
         width_ = png_get_image_width( ld_->png_ptr_, ld_->info_ptr_ );
         bit_depth_ = png_get_bit_depth( ld_->png_ptr_, ld_->info_ptr_ );
