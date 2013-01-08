@@ -225,7 +225,7 @@ namespace dlib
 
                 - z_order_value == z_order()
 
-                - if (this drawable has been added to the partent window's sets and
+                - if (this drawable has been added to the parent window's sets and
                   binary search tree) then
                     - enabled_events == true
                 - else
