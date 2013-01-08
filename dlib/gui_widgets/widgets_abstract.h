@@ -2761,7 +2761,7 @@ namespace dlib
             requires
                 - event_handler is a valid pointer to a member function in T 
             ensures
-                - The event_handler function is called on object when the user clicks
+                - The event_handler function is called on object when the user left clicks
                   anywhere on the image.  When they do so this callback is called with the
                   location of the image pixel which was clicked.  The is_double_click bool
                   will also tell you if it was a double click or single click.
@@ -2777,10 +2777,10 @@ namespace dlib
         );
         /*
             ensures
-                - The event_handler function is called when the user clicks anywhere on the
-                  image.  When they do so this callback is called with the location of the
-                  image pixel which was clicked.  The is_double_click bool will also tell
-                  you if it was a double click or single click.
+                - The event_handler function is called when the user left clicks anywhere
+                  on the image.  When they do so this callback is called with the location
+                  of the image pixel which was clicked.  The is_double_click bool will also
+                  tell you if it was a double click or single click.
                 - Any previous calls to this function are overridden by this new call.
                   (i.e. you can only have one event handler associated with this event at a
                   time)
@@ -3024,8 +3024,8 @@ namespace dlib
         ); 
         /*!
             ensures
-                - This function blocks until the user double clicks on the image
-                  or the window is closed by the user.
+                - This function blocks until the user double left clicks on the image or
+                  the window is closed by the user.
                 - if (this function returns true) then
                     - #p == the next image pixel the user clicked.  
         !*/
