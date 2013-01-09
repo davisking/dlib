@@ -61,14 +61,13 @@ int main(int argc, char** argv)
         // Now we would like to see what our images look like.  So lets use a 
         // window to display them on the screen.  (Note that you can zoom into 
         // the window by holding CTRL and scrolling the mouse wheel)
-        image_window my_window(edge_image);
+        image_window my_window(edge_image, "Normal Edge Image");
 
         // We can also easily display the edge_image as a heatmap like so.
         image_window win_hot(heatmap(edge_image, 255));
-        win_hot.set_title("heatmap version of edge image");
 
         // also make a window to display the original image
-        image_window my_window2(img);
+        image_window my_window2(img, "Original Image");
 
         // wait until the user closes the windows before we let the program 
         // terminate.
