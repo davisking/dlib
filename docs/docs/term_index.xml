@@ -332,6 +332,7 @@
          <term file="ml.html" name="vector_normalizer_pca"/>
          <term file="ml.html" name="discriminant_pca"/>
          <term file="ml.html" name="sammon_projection"/>
+         <term file="ml.html" name="cca"/>
          <term file="dlib/statistics/dpca_abstract.h.html" name="discriminant_pca_error"/>
          <term file="ml.html" name="kkmeans"/>
          <term file="ml.html" name="find_clusters_using_kmeans"/>
@@ -488,6 +489,7 @@
          <term link="dlib/matrix/matrix_la_abstract.h.html#svd" name="singular value decomposition"/>
          <term file="dlib/matrix/matrix_la_abstract.h.html" name="svd2"/>
          <term file="dlib/matrix/matrix_la_abstract.h.html" name="svd3"/>
+         <term file="dlib/matrix/matrix_la_abstract.h.html" name="svd_fast"/>
          <term file="dlib/matrix/matrix_la_abstract.h.html" name="det"/>
          <term file="dlib/matrix/matrix_la_abstract.h.html" name="trace"/>
          <term file="dlib/matrix/matrix_la_abstract.h.html" name="chol"/>

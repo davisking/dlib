@@ -190,6 +190,10 @@
                   <link>dlib/matrix/matrix_la_abstract.h.html#svd3</link>
                </item>
                <item>
+                  <name>svd_fast</name>
+                  <link>dlib/matrix/matrix_la_abstract.h.html#svd_fast</link>
+               </item>
+               <item>
                   <name>det</name>
                   <link>dlib/matrix/matrix_la_abstract.h.html#det</link>
                </item>
