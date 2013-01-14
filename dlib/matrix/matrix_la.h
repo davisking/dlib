@@ -816,6 +816,224 @@ convergence:
     }
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void find_matrix_range (
+        const matrix<T>& A,
+        unsigned long l,
+        matrix<T>& Q,
+        unsigned long q = 0
+    )
+    /*!
+        requires
+            - A.nr() >= l
+        ensures
+            - #Q.nr() == A.nr() 
+            - #Q.nc() == l
+            - #Q == an orthonormal matrix whose range approximates the range of the
+              matrix A.  
+            - This function implements the randomized subspace iteration defined 
+              in the algorithm 4.4 box of the paper: 
+                Finding Structure with Randomness: Probabilistic Algorithms for
+                Constructing Approximate Matrix Decompositions by Halko et al.
+            - q defines the number of extra subspace iterations this algorithm will
+              perform.  Often q == 0 is fine, but performing more iterations can lead to a
+              more accurate approximation of the range of A if A has slowly decaying
+              singular values.  In these cases, using a q of 1 or 2 is good.
+    !*/
+    {
+        DLIB_ASSERT(A.nr() >= (long)l, "Invalid inputs were given to this function.");
+        matrix<T> G = matrix_cast<T>(gaussian_randm(A.nc(), l));
+        matrix<T> Y = A*G;
+
+        Q = qr_decomposition<matrix<T> >(Y).get_q();
+
+        // Do some extra iterations of the power method to make sure we get Q into the 
+        // span of the most important singular vectors of A.
+        if (q != 0)
+        {
+            matrix<T> Z;
+            for (unsigned long itr = 0; itr < q; ++itr)
+            {
+                Z = trans(A)*Q;
+                Z = qr_decomposition<matrix<T> >(Z).get_q();
+
+                Y = A*Z;
+                Q = qr_decomposition<matrix<T> >(Y).get_q();
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void svd_fast (
+        const matrix<T>& A,
+        matrix<T>& u,
+        matrix<T,0,1>& w,
+        matrix<T>& v,
+        unsigned long l,
+        unsigned long q = 0
+    )
+    {
+        const unsigned long k = std::min(l, std::min<unsigned long>(A.nr(),A.nc()));
+
+        DLIB_ASSERT(l > 0 && A.size() > 0, 
+            "\t void svd_fast()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t l: " << l 
+            << "\n\t A.size(): " << A.size() 
+            );
+
+        matrix<T> Q;
+        find_matrix_range(A, k, Q, q);
+
+        // Compute trans(B) = trans(Q)*A.   The reason we store B transposed
+        // is so that when we take its SVD later using svd3() it doesn't consume
+        // a whole lot of RAM.  That is, we make sure the square matrix coming out
+        // of svd3() has size lxl rather than the potentially much larger nxn.
+        matrix<T> B = trans(A)*Q;
+        svd3(B, v,w,u);
+        u = Q*u;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename sparse_vector_type, typename T>
+    void find_matrix_range (
+        const std::vector<sparse_vector_type>& A,
+        unsigned long l,
+        matrix<T>& Q,
+        unsigned long q = 0
+    )
+    /*!
+        requires
+            - A.size() >= l
+        ensures
+            - #Q.nr() == A.size()
+            - #Q.nc() == l
+            - #Q == an orthonormal matrix whose range approximates the range of the
+              matrix A.  In this case, we interpret A as a matrix of A.size() rows,
+              where each row is defined by a sparse vector.
+            - This function implements the randomized subspace iteration defined 
+              in the algorithm 4.4 box of the paper: 
+                Finding Structure with Randomness: Probabilistic Algorithms for
+                Constructing Approximate Matrix Decompositions by Halko et al.
+            - q defines the number of extra subspace iterations this algorithm will
+              perform.  Often q == 0 is fine, but performing more iterations can lead to a
+              more accurate approximation of the range of A if A has slowly decaying
+              singular values.  In these cases, using a q of 1 or 2 is good.
+    !*/
+    {
+        DLIB_ASSERT(A.size() >= l, "Invalid inputs were given to this function.");
+        matrix<T> Y(A.size(), l);
+
+        // Compute Y = A*gaussian_randm()
+        for (long r = 0; r < Y.nr(); ++r)
+        {
+            for (long c = 0; c < Y.nc(); ++c)
+            {
+                Y(r,c) = dot(A[r], gaussian_randm(std::numeric_limits<long>::max(), 1, c));
+            }
+        }
+
+        Q = qr_decomposition<matrix<T> >(Y).get_q();
+
+        // Do some extra iterations of the power method to make sure we get Q into the 
+        // span of the most important singular vectors of A.
+        if (q != 0)
+        {
+            const unsigned long n = max_index_plus_one(A);
+            matrix<T> Z(n, l);
+            for (unsigned long itr = 0; itr < q; ++itr)
+            {
+                // Compute Z = trans(A)*Q
+                Z = 0;
+                for (unsigned long m = 0; m < A.size(); ++m)
+                {
+                    for (unsigned long r = 0; r < l; ++r)
+                    {
+                        typename sparse_vector_type::const_iterator i;
+                        for (i = A[m].begin(); i != A[m].end(); ++i)
+                        {
+                            const unsigned long c = i->first;
+                            const T val = i->second;
+
+                            Z(c,r) += Q(m,r)*val;
+                        }
+                    }
+                }
+
+                Z = qr_decomposition<matrix<T> >(Z).get_q();
+
+                // Compute Y = A*Z
+                for (long r = 0; r < Y.nr(); ++r)
+                {
+                    for (long c = 0; c < Y.nc(); ++c)
+                    {
+                        Y(r,c) = dot(A[r], colm(Z,c));
+                    }
+                }
+
+                Q = qr_decomposition<matrix<T> >(Y).get_q();
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename sparse_vector_type, typename T>
+    void svd_fast (
+        const std::vector<sparse_vector_type>& A,
+        matrix<T>& u,
+        matrix<T,0,1>& w,
+        matrix<T>& v,
+        unsigned long l,
+        unsigned long q = 0
+    )
+    {
+        const long n = max_index_plus_one(A);
+        const unsigned long k = std::min(l, std::min<unsigned long>(A.size(),n));
+
+        DLIB_ASSERT(l > 0 && A.size() > 0 && n > 0, 
+            "\t void svd_fast()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t l: " << l 
+            << "\n\t n (i.e. max_index_plus_one(A)): " << n 
+            << "\n\t A.size(): " << A.size() 
+            );
+
+        matrix<T> Q;
+        find_matrix_range(A, k, Q, q);
+
+        // Compute trans(B) = trans(Q)*A.   The reason we store B transposed
+        // is so that when we take its SVD later using svd3() it doesn't consume
+        // a whole lot of RAM.  That is, we make sure the square matrix coming out
+        // of svd3() has size lxl rather than the potentially much larger nxn.
+        matrix<T> B(n,k);
+        B = 0;
+        for (unsigned long m = 0; m < A.size(); ++m)
+        {
+            for (unsigned long r = 0; r < k; ++r)
+            {
+                typename sparse_vector_type::const_iterator i;
+                for (i = A[m].begin(); i != A[m].end(); ++i)
+                {
+                    const unsigned long c = i->first;
+                    const T val = i->second;
+
+                    B(c,r) += Q(m,r)*val;
+                }
+            }
+        }
+
+        svd3(B, v,w,u);
+        u = Q*u;
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template <
         typename EXP,

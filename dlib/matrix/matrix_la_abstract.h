@@ -135,6 +135,108 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename T
+        >
+    void svd_fast (
+        const matrix<T>& A,
+        matrix<T>& u,
+        matrix<T,0,1>& w,
+        matrix<T>& v,
+        unsigned long l,
+        unsigned long q = 0
+    );
+    /*!
+        requires
+            - l > 0
+            - A.size() > 0 
+              (i.e. A can't be an empty matrix)
+        ensures
+            - computes the singular value decomposition of A.  
+            - Lets define some constants we use to document the behavior of svd_fast():
+                - Let m = A.nr()
+                - Let n = A.nc() 
+                - Let k = min(l, min(m,n))
+                - Therefore, A represents an m by n matrix and svd_fast() is designed
+                  to find a rank-k representation of it.
+            - if (the rank of A is <= k) then 
+                - A == #u*diagm(#w)*trans(#v)
+            - else
+                - A is approximated by #u*diagm(#w)*trans(#v)
+                  (i.e. In this case A can't be represented with a rank-k matrix, so the
+                  matrix you get by trying to reconstruct A from the output of the SVD is
+                  not exactly the same.)
+            - trans(#u)*#u == identity matrix
+            - trans(#v)*#v == identity matrix
+            - #w == the top k singular values of the matrix A (in no particular order).  
+            - #u.nr() == m 
+            - #u.nc() == k 
+            - #w.nr() == k 
+            - #w.nc() == 1 
+            - #v.nr() == n 
+            - #v.nc() == k 
+            - This function implements the randomized subspace iteration defined in the
+              algorithm 4.4 and 5.1 boxes of the paper: 
+                Finding Structure with Randomness: Probabilistic Algorithms for
+                Constructing Approximate Matrix Decompositions by Halko et al.
+              Therefore, it is very fast and suitable for use with very large matrices.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename sparse_vector_type, 
+        typename T
+        >
+    void svd_fast (
+        const std::vector<sparse_vector_type>& A,
+        matrix<T>& u,
+        matrix<T,0,1>& w,
+        matrix<T>& v,
+        unsigned long l,
+        unsigned long q = 0
+    );
+    /*!
+        requires
+            - A contains a set of sparse vectors.  See dlib/svm/sparse_vector_abstract.h
+              for a definition of what constitutes a sparse vector.
+            - l > 0
+            - max_index_plus_one(A) > 0
+              (i.e. A can't be an empty matrix)
+        ensures
+            - computes the singular value decomposition of A.  In this case, we interpret A
+              as a matrix of A.size() rows, where each row is defined by a sparse vector.
+            - Lets define some constants we use to document the behavior of svd_fast():
+                - Let m = A.size()
+                - Let n = max_index_plus_one(A)
+                - Let k = min(l, min(m,n))
+                - Therefore, A represents an m by n matrix and svd_fast() is designed
+                  to find a rank-k representation of it.
+            - if (the rank of A is <= k) then 
+                - A == #u*diagm(#w)*trans(#v)
+            - else
+                - A is approximated by #u*diagm(#w)*trans(#v)
+                  (i.e. In this case A can't be represented with a rank-k matrix, so the
+                  matrix you get by trying to reconstruct A from the output of the SVD is
+                  not exactly the same.)
+            - trans(#u)*#u == identity matrix
+            - trans(#v)*#v == identity matrix
+            - #w == the top k singular values of the matrix A (in no particular order).  
+            - #u.nr() == m 
+            - #u.nc() == k 
+            - #w.nr() == k 
+            - #w.nc() == 1 
+            - #v.nr() == n 
+            - #v.nc() == k 
+            - This function implements the randomized subspace iteration defined in the
+              algorithm 4.4 and 5.1 boxes of the paper: 
+                Finding Structure with Randomness: Probabilistic Algorithms for
+                Constructing Approximate Matrix Decompositions by Halko et al.
+              Therefore, it is very fast and suitable for use with very large matrices.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix real_eigenvalues (
         const matrix_exp& m
     );
