@@ -20,6 +20,15 @@ namespace dlib
         const matrix<T>& R
     )
     {
+        DLIB_ASSERT( L.size() > 0 && R.size() > 0 && L.nr() == R.nr(), 
+            "\t matrix compute_correlations()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t L.size(): " << L.size()
+            << "\n\t R.size(): " << R.size()
+            << "\n\t L.nr():   " << L.nr()
+            << "\n\t R.nr():   " << R.nr()
+            );
+
         matrix<T> A, B, C;
         A = diag(trans(R)*L);
         B = sqrt(diag(trans(L)*L));
@@ -89,6 +98,16 @@ namespace dlib
         unsigned long q = 2
     )
     {
+        DLIB_ASSERT( num_correlations > 0 && L.size() > 0 && R.size() > 0 && L.nr() == R.nr(), 
+            "\t matrix cca()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t num_correlations: " << num_correlations 
+            << "\n\t L.size(): " << L.size()
+            << "\n\t R.size(): " << R.size()
+            << "\n\t L.nr():   " << L.nr()
+            << "\n\t R.nr():   " << R.nr()
+            );
+
         using std::min;
         const unsigned long n = min(num_correlations, (unsigned long)min(R.nr(),min(L.nc(), R.nc())));
         return impl_cca(L,R,Ltrans, Rtrans, num_correlations, extra_rank, q, n); 
@@ -107,6 +126,17 @@ namespace dlib
         unsigned long q = 2
     )
     {
+        DLIB_ASSERT( num_correlations > 0 && L.size() == R.size() && 
+                     max_index_plus_one(L) > 0 && max_index_plus_one(R) > 0, 
+            "\t matrix cca()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t num_correlations: " << num_correlations 
+            << "\n\t L.size(): " << L.size()
+            << "\n\t R.size(): " << R.size()
+            << "\n\t max_index_plus_one(L):   " << max_index_plus_one(L)
+            << "\n\t max_index_plus_one(R):   " << max_index_plus_one(R)
+            );
+
         using std::min;
         const unsigned long n = min(max_index_plus_one(L), max_index_plus_one(R));
         const unsigned long num_output_correlations = min(num_correlations, min(R.size(),n));
