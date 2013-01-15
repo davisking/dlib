@@ -5,6 +5,7 @@
 
 #include "matrix_la_abstract.h"
 #include "matrix_utilities.h"
+#include "../sparse_vector.h"
 
 // The 4 decomposition objects described in the matrix_la_abstract.h file are
 // actually implemented in the following 4 files.  

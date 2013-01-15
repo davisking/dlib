@@ -945,14 +945,14 @@ namespace dlib
         { 
             rgb_pixel temp;
             // convert target hsi pixel to rgb
-            assign(temp,dest);
+            assign_pixel_helpers::assign(temp,dest);
 
             // now assign the rgb_alpha value to our temp rgb pixel
-            assign(temp,src);
+            assign_pixel_helpers::assign(temp,src);
 
             // now we can just go assign the new rgb value to the
             // hsi pixel
-            assign(dest,temp);
+            assign_pixel_helpers::assign(dest,temp);
         }
 
     }

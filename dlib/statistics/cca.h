@@ -6,6 +6,7 @@
 #include "cca_abstract.h"
 #include "../algs.h"
 #include "../matrix.h"
+#include "../sparse_vector.h"
 
 namespace dlib
 {
