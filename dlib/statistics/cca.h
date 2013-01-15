@@ -65,8 +65,16 @@ namespace dlib
         svd_fast(L, Ul, Dl, Vl, num_correlations+extra_rank, q);
         svd_fast(R, Ur, Dr, Vr, num_correlations+extra_rank, q);
 
-        // This matrix is really small so we can do a normal full SVD on it.
-        svd3(trans(Ul)*Ur, U, D, V);
+        // Zero out singular values that are essentially zero so they don't cause numerical
+        // difficulties in the code below.
+        const double eps = std::numeric_limits<T>::epsilon()*std::max(max(Dr),max(Dl))*100;
+        Dl = round_zeros(Dl,eps);
+        Dr = round_zeros(Dr,eps);
+
+        // This matrix is really small so we can do a normal full SVD on it.  Note that we
+        // also throw away the columns of Ul and Ur corresponding to zero singular values.
+        svd3(diagm(Dl>0)*tmp(trans(Ul)*Ur)*diagm(Dr>0), U, D, V);
+
         // now throw away extra columns of the transformations.  We do this in a way
         // that keeps the directions that have the highest correlations.
         matrix<T,0,1> temp = D;
