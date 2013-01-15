@@ -148,7 +148,7 @@ namespace dlib
 
         using std::min;
         const unsigned long n = min(max_index_plus_one(L), max_index_plus_one(R));
-        const unsigned long num_output_correlations = min(num_correlations, min(R.size(),n));
+        const unsigned long num_output_correlations = min(num_correlations, std::min<unsigned long>(R.size(),n));
         return impl_cca(L,R,Ltrans, Rtrans, num_correlations, extra_rank, q, num_output_correlations); 
     }
 
