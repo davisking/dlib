@@ -808,6 +808,43 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename alloc>
+    void serialize (
+        const std::vector<bool,alloc>& item,
+        std::ostream& out
+    )
+    {
+        std::vector<unsigned char> temp(item.size());
+        for (unsigned long i = 0; i < item.size(); ++i)
+        {
+            if (item[i])
+                temp[i] = '1';
+            else
+                temp[i] = '0';
+        }
+        serialize(temp, out);
+    }
+
+    template <typename alloc>
+    void deserialize (
+        std::vector<bool,alloc>& item,
+        std::istream& in 
+    )
+    {
+        std::vector<unsigned char> temp;
+        deserialize(temp, in);
+        item.resize(temp.size());
+        for (unsigned long i = 0; i < temp.size(); ++i)
+        {
+            if (temp[i] == '1')
+                item[i] = true;
+            else
+                item[i] = false;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <typename T, typename alloc>
     void serialize (
         const std::vector<T,alloc>& item,

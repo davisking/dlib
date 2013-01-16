@@ -530,6 +530,32 @@ namespace
         }
     }
 
+    void test_vector_bool (
+    )
+    {
+        std::vector<bool> a, b;
+
+        a.push_back(true);
+        a.push_back(true);
+        a.push_back(false);
+        a.push_back(true);
+        a.push_back(false);
+        a.push_back(true);
+
+        ostringstream sout;
+        dlib::serialize(a, sout);
+        istringstream sin(sout.str());
+
+        dlib::deserialize(b, sin);
+
+
+        DLIB_TEST(a.size() == b.size());
+        DLIB_TEST(a.size() == 6);
+        for (unsigned long i = 0; i < a.size(); ++i)
+        {
+            DLIB_TEST(a[i] == b[i]);
+        }
+    }
 
 
     class serialize_tester : public tester
@@ -554,6 +580,7 @@ namespace
             test_vector<char>();
             test_vector<unsigned char>();
             test_vector<int>();
+            test_vector_bool();
         }
     } a;
 
