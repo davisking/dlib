@@ -528,6 +528,14 @@ namespace
         {
             DLIB_TEST(a[i] == b[i]);
         }
+
+        std::vector<T> c;
+        sout.str("");
+        dlib::serialize(c, sout);
+        sin.str(sout.str());
+        dlib::deserialize(a, sin);
+        DLIB_TEST(a.size() == 0);
+        DLIB_TEST(c.size() == 0);
     }
 
     void test_vector_bool (

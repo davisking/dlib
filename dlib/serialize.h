@@ -893,7 +893,8 @@ namespace dlib
         { 
             const unsigned long size = static_cast<unsigned long>(item.size());
             serialize(size,out); 
-            out.write(&item[0], item.size());
+            if (item.size() != 0)
+                out.write(&item[0], item.size());
         }
         catch (serialization_error& e)
         { throw serialization_error(e.info + "\n   while serializing object of type std::vector"); }
@@ -910,7 +911,8 @@ namespace dlib
             unsigned long size;
             deserialize(size,in); 
             item.resize(size);
-            in.read(&item[0], item.size());
+            if (item.size() != 0)
+                in.read(&item[0], item.size());
         }
         catch (serialization_error& e)
         { throw serialization_error(e.info + "\n   while deserializing object of type std::vector"); }
@@ -928,7 +930,8 @@ namespace dlib
         { 
             const unsigned long size = static_cast<unsigned long>(item.size());
             serialize(size,out); 
-            out.write((char*)&item[0], item.size());
+            if (item.size() != 0)
+                out.write((char*)&item[0], item.size());
         }
         catch (serialization_error& e)
         { throw serialization_error(e.info + "\n   while serializing object of type std::vector"); }
@@ -945,7 +948,8 @@ namespace dlib
             unsigned long size;
             deserialize(size,in); 
             item.resize(size);
-            in.read((char*)&item[0], item.size());
+            if (item.size() != 0)
+                in.read((char*)&item[0], item.size());
         }
         catch (serialization_error& e)
         { throw serialization_error(e.info + "\n   while deserializing object of type std::vector"); }
