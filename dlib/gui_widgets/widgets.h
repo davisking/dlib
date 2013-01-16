@@ -3599,16 +3599,24 @@ namespace dlib
             auto_mutex M(wm);
             gui_img.set_image(img); 
 
-            const rectangle r = gui_img.get_image_display_rect();
-            if (image_rect != r)
+            // Only ever mess with the size of the window if the user is giving us an image
+            // that is a different size.  Otherwise we assume that they will have already
+            // sized the window to whatever they feel is reasonable for an image of the
+            // current size.  
+            if (previous_image_size != get_rect(img))
             {
-                // set the size of this window to match the size of the input image
-                set_size(r.width()+padding*2,r.height()+padding*2);
+                const rectangle r = gui_img.get_image_display_rect();
+                if (image_rect != r)
+                {
+                    // set the size of this window to match the size of the input image
+                    set_size(r.width()+padding*2,r.height()+padding*2);
 
-                // call this to make sure everything else is setup properly
-                on_window_resized();
+                    // call this to make sure everything else is setup properly
+                    on_window_resized();
 
-                image_rect = r;
+                    image_rect = r;
+                }
+                previous_image_size = get_rect(img);
             }
         }
 
@@ -3765,6 +3773,7 @@ namespace dlib
 
         image_display gui_img;
         rectangle image_rect;
+        rectangle previous_image_size;
         bool window_has_closed;
         bool have_last_click;
         point last_clicked_point;
