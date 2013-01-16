@@ -6091,9 +6091,9 @@ namespace dlib
             point p(x,y);
             p -= origin;
             if (zoom_in_scale != 1)
-                p = p/(double)zoom_in_scale;
+                p = p/zoom_in_scale;
             else if (zoom_out_scale != 1)
-                p = p*(double)zoom_out_scale;
+                p = p*zoom_out_scale;
 
             if (dlib::get_rect(img).contains(p))
                 image_clicked_handler(p, is_double_click);
