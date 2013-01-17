@@ -227,7 +227,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT(A.nc() == alpha.size() &&
+        DLIB_ASSERT(A.nc() == alpha.size() &&
                      Q.nr() == Q.nc() &&
                      is_col_vector(b) &&
                      is_col_vector(alpha) &&
