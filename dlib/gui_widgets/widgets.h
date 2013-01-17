@@ -3755,7 +3755,7 @@ namespace dlib
         ) 
         {
             unsigned long mouse_button;
-            return get_next_double_click(p, mouse_btn);
+            return get_next_double_click(p, mouse_button);
         }
 
     private:
