@@ -3024,10 +3024,25 @@ namespace dlib
         ); 
         /*!
             ensures
-                - This function blocks until the user double left clicks on the image or
-                  the window is closed by the user.
+                - This function blocks until the user double clicks on the image or the
+                  window is closed by the user.
                 - if (this function returns true) then
                     - #p == the next image pixel the user clicked.  
+        !*/
+
+        bool get_next_double_click (
+            point& p,
+            unsigned long& mouse_button
+        ); 
+        /*!
+            ensures
+                - This function blocks until the user double clicks on the image or the
+                  window is closed by the user.
+                - if (this function returns true) then
+                    - #p == the next image pixel the user clicked.  
+                    - #mouse_button == the mouse button which was used to double click.
+                      This will be either dlib::base_window::LEFT,
+                      dlib::base_window::MIDDLE, or dlib::base_window::RIGHT
         !*/
 
     private:

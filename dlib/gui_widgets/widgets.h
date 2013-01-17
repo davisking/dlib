@@ -3435,7 +3435,7 @@ namespace dlib
             >
         void set_image_clicked_handler (
             T& object,
-            void (T::*event_handler_)(const point& p, bool is_double_click)
+            void (T::*event_handler_)(const point& p, bool is_double_click, unsigned long btn)
         )
         {
             auto_mutex M(m);
@@ -3443,7 +3443,7 @@ namespace dlib
         }
 
         void set_image_clicked_handler (
-            const any_function<void(const point& p, bool is_double_click)>& event_handler_
+            const any_function<void(const point& p, bool is_double_click, unsigned long btn)>& event_handler_
         )
         {
             auto_mutex M(m);
@@ -3532,7 +3532,7 @@ namespace dlib
         std::string default_rect_label;
         any_function<void()> event_handler;
         any_function<void(const overlay_rect& orect)> orect_selected_event_handler;
-        any_function<void(const point& p, bool is_double_click)> image_clicked_handler;
+        any_function<void(const point& p, bool is_double_click, unsigned long btn)> image_clicked_handler;
         popup_menu_region parts_menu;
         point last_right_click_pos;
         const int part_width;
@@ -3563,6 +3563,7 @@ namespace dlib
             gui_img(*this), 
             window_has_closed(false),
             have_last_click(false),
+            mouse_btn(0),
             clicked_signaler(this->wm) 
         {  
             gui_img.set_image_clicked_handler(*this, &image_window::on_image_clicked);
@@ -3578,6 +3579,7 @@ namespace dlib
             gui_img(*this), 
             window_has_closed(false),
             have_last_click(false),
+            mouse_btn(0),
             clicked_signaler(this->wm) 
         {  
             gui_img.set_image_clicked_handler(*this, &image_window::on_image_clicked);
@@ -3744,15 +3746,17 @@ namespace dlib
         );
 
         bool get_next_double_click (
-            point& p
+            point& p,
+            unsigned long& mouse_button
         ); 
-        /*!
-            ensures
-                - This function blocks until the user double clicks on the image
-                  or the window is closed by the user.
-                - if (this function returns true) then
-                    - #p == the next place the user clicked
-        !*/
+
+        bool get_next_double_click (
+            point& p
+        ) 
+        {
+            unsigned long mouse_button;
+            return get_next_double_click(p, mouse_btn);
+        }
 
     private:
 
@@ -3764,7 +3768,8 @@ namespace dlib
         
         void on_image_clicked (
             const point& p,
-            bool is_double_click
+            bool is_double_click,
+            unsigned long btn
         );
 
         // restricted functions
@@ -3777,6 +3782,7 @@ namespace dlib
         bool window_has_closed;
         bool have_last_click;
         point last_clicked_point;
+        unsigned long mouse_btn;
         rsignaler clicked_signaler;
     };
 

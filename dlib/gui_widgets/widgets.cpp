@@ -6096,7 +6096,7 @@ namespace dlib
                 p = p*zoom_out_scale;
 
             if (dlib::get_rect(img).contains(p))
-                image_clicked_handler(p, is_double_click);
+                image_clicked_handler(p, is_double_click, btn);
         }
 
         if (btn == base_window::RIGHT && rect_is_selected)
@@ -6450,6 +6450,7 @@ namespace dlib
         gui_img(*this),
         window_has_closed(false),
         have_last_click(false),
+        mouse_btn(0),
         clicked_signaler(this->wm)
     {
 
@@ -6485,7 +6486,8 @@ namespace dlib
 
     bool image_window::
     get_next_double_click (
-        point& p
+        point& p,
+        unsigned long& mouse_button 
     ) 
     {
         auto_mutex lock(wm);
@@ -6500,6 +6502,7 @@ namespace dlib
         // Mark that we are taking the point click so the next call to get_next_click()
         // will have to wait for another click.
         have_last_click = false;
+        mouse_button = mouse_btn;
         p = last_clicked_point;
         return true;
     }
@@ -6509,13 +6512,15 @@ namespace dlib
     void image_window::
     on_image_clicked (
         const point& p,
-        bool is_double_click
+        bool is_double_click,
+        unsigned long btn
     )
     {
         if (is_double_click)
         {
             have_last_click = true;
             last_clicked_point = p;
+            mouse_btn = btn;
             clicked_signaler.signal();
         }
     }
