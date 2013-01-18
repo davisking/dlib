@@ -132,6 +132,43 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    inline double platt_score (
+        const std::pair<double,double>& params,
+        const double score
+    );
+    /*!
+        ensures
+            - returns 1/(1 + std::exp(params.first*score + params.second))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename alloc>
+    std::pair<T,T> learn_platt_scaling (
+        const std::vector<T,alloc>& scores,
+        const std::vector<T,alloc>& labels
+    );
+    /*!
+        requires
+            - T should be either float, double, or long double 
+            - is_binary_classification_problem(scores,labels) == true
+        ensures
+            - This function learns to map scalar values into well calibrated probabilities
+              using Platt scaling.  In particular, it returns a params object such that:
+                - for all valid i:
+                    - platt_score(params,scores[i]) == the scaled version of the scalar value
+                      scores[i].  That is, the output is a number between 0 and 1.
+            - This function is an implementation of the algorithm described in the following
+              papers: 
+                Probabilistic Outputs for Support Vector Machines and Comparisons to
+                Regularized Likelihood Methods by John C. Platt.  March 26, 1999
+
+                A Note on Platt's Probabilistic Outputs for Support Vector Machines
+                by Hsuan-Tien Lin, Chih-Jen Lin, and Ruby C. Weng
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename trainer_type,
         typename sample_vector_type,
@@ -156,6 +193,7 @@ namespace dlib
             - The parameters of the probability model are estimated by performing k-fold 
               cross validation. 
             - The number of folds used is given by the folds argument.
+            - This function is implemented using learn_platt_scaling()
         throws
             - any exceptions thrown by trainer.train()
             - std::bad_alloc

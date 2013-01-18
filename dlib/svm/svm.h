@@ -559,6 +559,77 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline double platt_score (
+        const std::pair<double,double>& params,
+        const double score
+    )
+    {
+        return 1/(1 + std::exp(params.first*score + params.second));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename alloc>
+    std::pair<T,T> learn_platt_scaling (
+        const std::vector<T,alloc>& scores,
+        const std::vector<T,alloc>& labels
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(is_binary_classification_problem(scores,labels) == true,
+            "\t std::pair<T,T> learn_platt_scaling()"
+            << "\n\t invalid inputs were given to this function"
+            << "\n\t scores.size(): " << scores.size() 
+            << "\n\t labels.size(): " << labels.size() 
+            << "\n\t is_binary_classification_problem(scores,labels): " << is_binary_classification_problem(scores,labels)
+            );
+
+        const T prior0 = sum(mat(labels)>0); 
+        const T prior1 = sum(mat(labels)<0);
+        const T hi_target = (prior1+1)/(prior1+2);
+        const T lo_target = 1.0/(prior0+2);
+
+        std::vector<T,alloc> target;
+        for (unsigned long i = 0; i < labels.size(); ++i)
+        {
+            // if this was a positive example
+            if (labels[i] == +1.0)
+            {
+                target.push_back(hi_target);
+            }
+            else if (labels[i] == -1.0)
+            {
+                target.push_back(lo_target);
+            }
+            else
+            {
+                throw dlib::error("invalid input labels to the learn_platt_scaling() function.");
+            }
+        }
+
+        // Now find the maximum likelihood parameters of the sigmoid.  
+
+        prob_impl::objective<std::vector<T,alloc> > obj(scores, target);
+        prob_impl::der<std::vector<T,alloc> > obj_der(scores, target);
+        prob_impl::hessian<std::vector<T,alloc> > obj_hessian(scores, target);
+
+        matrix<double,2,1> val;
+        val = 0;
+        find_min(newton_search_strategy(obj_hessian),
+                 objective_delta_stop_strategy(),
+                 obj,
+                 obj_der,
+                 val,
+                 0);
+
+        const double A = val(0);
+        const double B = val(1);
+
+        return std::make_pair(A,B);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename trainer_type,
         typename sample_vector_type,
@@ -617,18 +688,10 @@ namespace dlib
         x_train.resize(num_pos_train_samples + num_neg_train_samples);
         y_train.resize(num_pos_train_samples + num_neg_train_samples);
 
-        typedef std::vector<scalar_type > dvector;
-
-        dvector out;
-        dvector target;
+        std::vector<scalar_type> out, out_label;
 
         long pos_idx = 0;
         long neg_idx = 0;
-
-        const scalar_type prior0 = num_pos_test_samples*folds; 
-        const scalar_type prior1 = num_neg_test_samples*folds; 
-        const scalar_type hi_target = (prior1+1)/(prior1+2);
-        const scalar_type lo_target = 1.0/(prior0+2);
 
         for (long i = 0; i < folds; ++i)
         {
@@ -695,40 +758,15 @@ namespace dlib
             for (unsigned long i = 0; i < x_test.size(); ++i)
             {
                 out.push_back(d(x_test[i]));
-                // if this was a positive example
-                if (y_test[i] == +1.0)
-                {
-                    target.push_back(hi_target);
-                }
-                else if (y_test[i] == -1.0)
-                {
-                    target.push_back(lo_target);
-                }
-                else
-                {
-                    throw dlib::error("invalid input labels to the train_probabilistic_decision_function() function");
-                }
+                out_label.push_back(y_test[i]);
             }
 
         } // for (long i = 0; i < folds; ++i)
 
-        // Now find the maximum likelihood parameters of the sigmoid.  
+        std::pair<scalar_type,scalar_type> params = learn_platt_scaling(out, out_label);
 
-        prob_impl::objective<dvector> obj(out, target);
-        prob_impl::der<dvector> obj_der(out, target);
-        prob_impl::hessian<dvector> obj_hessian(out, target);
-
-        matrix<double,2,1> val;
-        val = 0;
-        find_min(newton_search_strategy(obj_hessian),
-                 objective_delta_stop_strategy(),
-                 obj,
-                 obj_der,
-                 val,
-                 0);
-
-        const double A = val(0);
-        const double B = val(1);
+        const double A = params.first;
+        const double B = params.second;
 
         return probabilistic_function<typename trainer_type::trained_function_type>( A, B, trainer.train(x,y) );
     }
