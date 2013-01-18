@@ -559,7 +559,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline double platt_score (
+    inline double platt_scale (
         const std::pair<double,double>& params,
         const double score
     )

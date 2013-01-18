@@ -132,7 +132,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    inline double platt_score (
+    inline double platt_scale (
         const std::pair<double,double>& params,
         const double score
     );
@@ -156,7 +156,7 @@ namespace dlib
             - This function learns to map scalar values into well calibrated probabilities
               using Platt scaling.  In particular, it returns a params object such that:
                 - for all valid i:
-                    - platt_score(params,scores[i]) == the scaled version of the scalar value
+                    - platt_scale(params,scores[i]) == the scaled version of the scalar value
                       scores[i].  That is, the output is a number between 0 and 1.
             - This function is an implementation of the algorithm described in the following
               papers: 
