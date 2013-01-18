@@ -132,7 +132,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    inline double platt_scale (
+    double platt_scale (
         const std::pair<double,double>& params,
         const double score
     );
@@ -144,7 +144,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T, typename alloc>
-    std::pair<T,T> learn_platt_scaling (
+    std::pair<double,double> learn_platt_scaling (
         const std::vector<T,alloc>& scores,
         const std::vector<T,alloc>& labels
     );
@@ -154,10 +154,12 @@ namespace dlib
             - is_binary_classification_problem(scores,labels) == true
         ensures
             - This function learns to map scalar values into well calibrated probabilities
-              using Platt scaling.  In particular, it returns a params object such that:
-                - for all valid i:
-                    - platt_scale(params,scores[i]) == the scaled version of the scalar value
-                      scores[i].  That is, the output is a number between 0 and 1.
+              using Platt scaling.  In particular, it returns a params object such that, 
+              for all valid i:
+                - platt_scale(params,scores[i]) == the scaled version of the scalar value
+                  scores[i].  That is, the output is a number between 0 and 1.  In
+                  particular, platt_scale(params,scores[i]) is meant to represent the
+                  probability that labels[i] == +1.
             - This function is an implementation of the algorithm described in the following
               papers: 
                 Probabilistic Outputs for Support Vector Machines and Comparisons to

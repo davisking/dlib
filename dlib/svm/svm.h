@@ -570,7 +570,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T, typename alloc>
-    std::pair<T,T> learn_platt_scaling (
+    std::pair<double,double> learn_platt_scaling (
         const std::vector<T,alloc>& scores,
         const std::vector<T,alloc>& labels
     )
