@@ -38,6 +38,8 @@
          <term file="dlib/optimization/optimization_line_search_abstract.h.html" name="optimize_single_variable_failure"/>
          <term file="dlib/optimization/optimization_bobyqa_abstract.h.html" name="bobyqa_failure"/>
          <term file="dlib/optimization/optimization_oca_abstract.h.html" name="oca_problem"/>
+         <term file="dlib/svm/svm_abstract.h.html" name="platt_scale"/>
+         <term file="ml.html" name="learn_platt_scaling"/>
          <term file="ml.html" name="structural_svm_problem"/>
          <term file="ml.html" name="structural_svm_problem_threaded"/>
          <term file="ml.html" name="structural_svm_object_detection_problem"/>
