@@ -910,6 +910,63 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename T
+        >
+    void make_sparse_vector_inplace(
+        T& vect
+    )
+    {
+        vect = make_sparse_vector(vect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename U,
+        typename alloc
+        >
+    void make_sparse_vector_inplace (
+        std::vector<std::pair<T,U>,alloc>& vect
+    )
+    {
+        if (vect.size() > 0)
+        {
+            std::sort(vect.begin(), vect.end());
+
+            // merge duplicates
+            for (unsigned long i = 1; i < vect.size(); ++i)
+            {
+                // if we found a duplicate
+                if (vect[i-1].first == vect[i].first)
+                {
+                    // now start collapsing and merging the vector
+                    unsigned long j = i-1;
+                    for (unsigned long k = i; k < vect.size(); ++k)
+                    {
+                        if (vect[j].first == vect[k].first)
+                        {
+                            vect[j].second += vect[k].second;
+                        }
+                        else
+                        {
+                            ++j;
+                            vect[j] = vect[k];
+                        }
+                    }
+
+
+                    // we removed elements when we merged so we need to adjust the size.
+                    vect.resize(j+1);
+                    return;
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <typename EXP, typename T, long NR, long NC, typename MM, typename L>
     void sparse_matrix_vector_multiply (
         const std::vector<sample_pair>& edges,

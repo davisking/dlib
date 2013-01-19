@@ -515,6 +515,24 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename T
+        >
+    void make_sparse_vector_inplace(
+        T& vect
+    );
+    /*!
+        requires
+            - v is an unsorted sparse vector
+        ensures
+            - vect == make_sparse_vector(vect)
+            - This function is just an optimized version of make_sparse_vector(), in
+              particular, when T is a std::vector<std::pair<>> type it is much more
+              efficient.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename EXP, 
         typename T, 
         long NR, 

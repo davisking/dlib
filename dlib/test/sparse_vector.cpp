@@ -112,6 +112,34 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_make_sparse_vector_inplace()
+    {
+        std::vector<std::pair<unsigned long,double> > vect;
+        vect.push_back(make_pair(4,1));
+        vect.push_back(make_pair(0,1));
+        vect.push_back(make_pair(4,1));
+        vect.push_back(make_pair(3,1));
+        vect.push_back(make_pair(8,1));
+        vect.push_back(make_pair(8,1));
+        vect.push_back(make_pair(8,1));
+        vect.push_back(make_pair(8,1));
+
+        make_sparse_vector_inplace(vect);
+
+        DLIB_TEST(vect.size() == 4);
+        DLIB_TEST(vect[0].first == 0);
+        DLIB_TEST(vect[1].first == 3);
+        DLIB_TEST(vect[2].first == 4);
+        DLIB_TEST(vect[3].first == 8);
+
+        DLIB_TEST(vect[0].second == 1);
+        DLIB_TEST(vect[1].second == 1);
+        DLIB_TEST(vect[2].second == 2);
+        DLIB_TEST(vect[3].second == 4);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class sparse_vector_tester : public tester
     {
     public:
@@ -129,6 +157,8 @@ namespace
         void perform_test (
         )
         {
+            test_make_sparse_vector_inplace();
+
             std::map<unsigned int, double> v;
             v[4] = 8;
             v[2] = -4;
