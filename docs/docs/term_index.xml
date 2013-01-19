@@ -257,6 +257,8 @@
             <term link="dlib/svm/ranking_tools_abstract.h.html#max_index_plus_one" name="for ranking_pairs"/>
          </term>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="sparse_matrix_vector_multiply"/>
+         <term file="dlib/svm/sparse_vector_abstract.h.html" name="make_sparse_vector"/>
+         <term file="dlib/svm/sparse_vector_abstract.h.html" name="make_sparse_vector_inplace"/>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="add_to"/>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="subtract_from"/>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="assign"/>

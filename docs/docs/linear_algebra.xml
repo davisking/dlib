@@ -652,6 +652,10 @@
             <link>dlib/svm/sparse_vector_abstract.h.html#make_sparse_vector</link>
          </item> 
          <item>
+            <name>make_sparse_vector_inplace</name>
+            <link>dlib/svm/sparse_vector_abstract.h.html#make_sparse_vector_inplace</link>
+         </item> 
+         <item>
             <name>sparse_matrix_vector_multiply</name>
             <link>dlib/svm/sparse_vector_abstract.h.html#sparse_matrix_vector_multiply</link>
          </item> 
