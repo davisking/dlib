@@ -30,11 +30,12 @@ namespace
         return temp;
     }
 
-    std::vector<std::map<unsigned long, double> > mat_to_sparse (
-        const matrix<double>& A
+    template <typename T>
+    std::vector<std::map<unsigned long, T> > mat_to_sparse (
+        const matrix<T>& A
     )
     {
-        std::vector<std::map<unsigned long,double> > temp(A.nr());
+        std::vector<std::map<unsigned long,T> > temp(A.nr());
         for (long r = 0; r < A.nr(); ++r)
         {
             for (long c = 0; c < A.nc(); ++c)
@@ -47,8 +48,9 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    matrix<double> rm_zeros (
-        const matrix<double>& m
+    template <typename EXP>
+    matrix<typename EXP::type> rm_zeros (
+        const matrix_exp<EXP>& m
     )
     {
         // Do this to avoid trying to correlate super small numbers that are really just
