@@ -62,6 +62,10 @@ namespace dlib
         const matrix_type get_q (
         ) const;
 
+        void get_q (
+            matrix_type& Q
+        ) const;
+
         template <typename EXP>
         const matrix_type solve (
             const matrix_exp<EXP>& B
@@ -258,27 +262,38 @@ namespace dlib
     get_q(
     ) const
     {
+        matrix_type Q;
+        get_q(Q);
+        return Q;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename matrix_exp_type>
+    void qr_decomposition<matrix_exp_type>::
+    get_q(
+        matrix_type& X
+    ) const
+    {
 #ifdef DLIB_USE_LAPACK
-        matrix<type,0,0,mem_manager_type,column_major_layout> X;
         // Take only the first n columns of an identity matrix.  This way
         // X ends up being an m by n matrix.
         X = colm(identity_matrix<type>(m), range(0,n-1));
 
         // Compute Y = Q*X 
         lapack::ormqr('L','N', QR_, tau, X);
-        return X;
 
 #else
         long i=0, j=0, k=0;
 
-        matrix_type Q(m,n);
+        X.set_size(m,n);
         for (k = n-1; k >= 0; k--) 
         {
             for (i = 0; i < m; i++) 
             {
-                Q(i,k) = 0.0;
+                X(i,k) = 0.0;
             }
-            Q(k,k) = 1.0;
+            X(k,k) = 1.0;
             for (j = k; j < n; j++) 
             {
                 if (QR_(k,k) != 0) 
@@ -286,17 +301,16 @@ namespace dlib
                     type s = 0.0;
                     for (i = k; i < m; i++) 
                     {
-                        s += QR_(i,k)*Q(i,j);
+                        s += QR_(i,k)*X(i,j);
                     }
                     s = -s/QR_(k,k);
                     for (i = k; i < m; i++) 
                     {
-                        Q(i,j) += s*QR_(i,k);
+                        X(i,j) += s*QR_(i,k);
                     }
                 }
             }
         }
-        return Q;
 #endif
     }
 

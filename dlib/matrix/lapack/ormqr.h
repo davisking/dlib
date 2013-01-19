@@ -151,19 +151,44 @@ namespace dlib
             typename T, 
             long NR1, long NR2, long NR3,
             long NC1, long NC2, long NC3,
-            typename MM
+            typename MM,
+            typename C_LAYOUT
             >
         int ormqr (
             char side, 
             char trans,
             const matrix<T,NR1,NC1,MM,column_major_layout>& a,
             const matrix<T,NR2,NC2,MM,column_major_layout>& tau,
-            matrix<T,NR3,NC3,MM,column_major_layout>& c 
+            matrix<T,NR3,NC3,MM,C_LAYOUT>& c 
         )
         {
-            const long m = c.nr();
-            const long n = c.nc();
+            long m = c.nr();
+            long n = c.nc();
             const long k = a.nc();
+            long ldc;
+            if (is_same_type<C_LAYOUT,column_major_layout>::value)
+            {
+                ldc = c.nr();
+            }
+            else
+            {
+                // Since lapack expects c to be in column major layout we have to 
+                // do something to make this work.  Since a row major layout matrix
+                // will look just like a transposed C we can just swap a few things around.
+
+                ldc = c.nc();
+                swap(m,n);
+
+                if (side == 'L')
+                    side = 'R';
+                else
+                    side = 'L';
+
+                if (trans == 'T')
+                    trans = 'N';
+                else
+                    trans = 'T';
+            }
 
             matrix<T,0,1,MM,column_major_layout> work;
 
@@ -171,7 +196,7 @@ namespace dlib
             T work_size = 1;
             int info = binding::ormqr(side, trans, m, n, 
                                       k, &a(0,0), a.nr(), &tau(0,0),
-                                      &c(0,0), c.nr(), &work_size, -1);
+                                      &c(0,0), ldc, &work_size, -1);
 
             if (info != 0)
                 return info;
@@ -182,7 +207,7 @@ namespace dlib
             // compute the actual result 
             info = binding::ormqr(side, trans, m, n, 
                                   k, &a(0,0), a.nr(), &tau(0,0),
-                                  &c(0,0), c.nr(), &work(0,0), work.size());
+                                  &c(0,0), ldc, &work(0,0), work.size());
 
             return info;
         }

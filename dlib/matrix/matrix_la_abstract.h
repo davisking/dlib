@@ -688,6 +688,16 @@ namespace dlib
                     - Q.nc() == nc()
         !*/
 
+        void get_q (
+            matrix_type& Q
+        ) const;
+        /*!
+            ensures
+                - #Q == get_q()
+                - This function exists to allow a user to get the Q matrix without the
+                  overhead of returning a matrix by value.
+        !*/
+
         template <typename EXP>
         const matrix_type solve (
             const matrix_exp<EXP>& B
