@@ -817,6 +817,22 @@ convergence:
     }
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        long NR,
+        long NC,
+        typename MM,
+        typename L
+        >
+    void orthogonalize (
+        matrix<T,NR,NC,MM,L>& m
+    )
+    {
+        qr_decomposition<matrix<T,NR,NC,MM,L> >(m).get_q(m);
+    }
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
@@ -845,23 +861,21 @@ convergence:
     !*/
     {
         DLIB_ASSERT(A.nr() >= (long)l, "Invalid inputs were given to this function.");
-        matrix<T> G = matrix_cast<T>(gaussian_randm(A.nc(), l));
-        matrix<T> Y = A*G;
+        Q = A*matrix_cast<T>(gaussian_randm(A.nc(), l));
 
-        Q = qr_decomposition<matrix<T> >(Y).get_q();
+        orthogonalize(Q);
 
         // Do some extra iterations of the power method to make sure we get Q into the 
         // span of the most important singular vectors of A.
         if (q != 0)
         {
-            matrix<T> Z;
             for (unsigned long itr = 0; itr < q; ++itr)
             {
-                Z = trans(A)*Q;
-                Z = qr_decomposition<matrix<T> >(Z).get_q();
+                Q = trans(A)*Q;
+                orthogonalize(Q);
 
-                Y = A*Z;
-                Q = qr_decomposition<matrix<T> >(Y).get_q();
+                Q = A*Q;
+                orthogonalize(Q);
             }
         }
     }
@@ -928,27 +942,27 @@ convergence:
     !*/
     {
         DLIB_ASSERT(A.size() >= l, "Invalid inputs were given to this function.");
-        matrix<T> Y(A.size(), l);
+        Q.set_size(A.size(), l);
 
-        // Compute Y = A*gaussian_randm()
-        for (long r = 0; r < Y.nr(); ++r)
+        // Compute Q = A*gaussian_randm()
+        for (long r = 0; r < Q.nr(); ++r)
         {
-            for (long c = 0; c < Y.nc(); ++c)
+            for (long c = 0; c < Q.nc(); ++c)
             {
-                Y(r,c) = dot(A[r], gaussian_randm(std::numeric_limits<long>::max(), 1, c));
+                Q(r,c) = dot(A[r], gaussian_randm(std::numeric_limits<long>::max(), 1, c));
             }
         }
 
-        Q = qr_decomposition<matrix<T> >(Y).get_q();
+        orthogonalize(Q);
 
         // Do some extra iterations of the power method to make sure we get Q into the 
         // span of the most important singular vectors of A.
         if (q != 0)
         {
             const unsigned long n = max_index_plus_one(A);
-            matrix<T> Z(n, l);
             for (unsigned long itr = 0; itr < q; ++itr)
             {
+                matrix<T> Z(n, l);
                 // Compute Z = trans(A)*Q
                 Z = 0;
                 for (unsigned long m = 0; m < A.size(); ++m)
@@ -966,18 +980,21 @@ convergence:
                     }
                 }
 
-                Z = qr_decomposition<matrix<T> >(Z).get_q();
+                Q.set_size(0,0); // free RAM
+                orthogonalize(Z);
 
-                // Compute Y = A*Z
-                for (long r = 0; r < Y.nr(); ++r)
+                // Compute Q = A*Z
+                Q.set_size(A.size(), l);
+                for (long r = 0; r < Q.nr(); ++r)
                 {
-                    for (long c = 0; c < Y.nc(); ++c)
+                    for (long c = 0; c < Q.nc(); ++c)
                     {
-                        Y(r,c) = dot(A[r], colm(Z,c));
+                        Q(r,c) = dot(A[r], colm(Z,c));
                     }
                 }
 
-                Q = qr_decomposition<matrix<T> >(Y).get_q();
+                Z.set_size(0,0); // free RAM
+                orthogonalize(Q);
             }
         }
     }

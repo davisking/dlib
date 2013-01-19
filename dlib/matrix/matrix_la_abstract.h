@@ -237,6 +237,30 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename T,
+        long NR,
+        long NC,
+        typename MM,
+        typename L
+        >
+    void orthogonalize (
+        matrix<T,NR,NC,MM,L>& m
+    );
+    /*!
+        requires
+            - m.nr() >= m.nc()
+            - m.size() > 0
+        ensures
+            - #m == an orthogonal matrix with the same dimensions as m.  In particular,
+              the columns of #m have the same span as the columns of m.
+            - trans(#m)*#m == identity matrix
+            - This function is just shorthand for performing the QR decomposition of m
+              and then storing the Q factor into #m.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix real_eigenvalues (
         const matrix_exp& m
     );
