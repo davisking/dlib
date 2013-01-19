@@ -494,6 +494,7 @@
          <term file="dlib/matrix/matrix_la_abstract.h.html" name="svd2"/>
          <term file="dlib/matrix/matrix_la_abstract.h.html" name="svd3"/>
          <term file="dlib/matrix/matrix_la_abstract.h.html" name="svd_fast"/>
+         <term file="dlib/matrix/matrix_la_abstract.h.html" name="orthogonalize"/>
          <term file="dlib/matrix/matrix_la_abstract.h.html" name="det"/>
          <term file="dlib/matrix/matrix_la_abstract.h.html" name="trace"/>
          <term file="dlib/matrix/matrix_la_abstract.h.html" name="chol"/>
