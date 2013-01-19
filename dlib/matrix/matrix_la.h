@@ -889,7 +889,7 @@ convergence:
         matrix<T,0,1>& w,
         matrix<T>& v,
         unsigned long l,
-        unsigned long q = 0
+        unsigned long q = 1
     )
     {
         const unsigned long k = std::min(l, std::min<unsigned long>(A.nr(),A.nc()));
@@ -1008,7 +1008,7 @@ convergence:
         matrix<T,0,1>& w,
         matrix<T>& v,
         unsigned long l,
-        unsigned long q = 0
+        unsigned long q = 1
     )
     {
         const long n = max_index_plus_one(A);

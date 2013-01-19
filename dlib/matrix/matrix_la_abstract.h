@@ -144,7 +144,7 @@ namespace dlib
         matrix<T,0,1>& w,
         matrix<T>& v,
         unsigned long l,
-        unsigned long q = 0
+        unsigned long q = 1
     );
     /*!
         requires
@@ -194,7 +194,7 @@ namespace dlib
         matrix<T,0,1>& w,
         matrix<T>& v,
         unsigned long l,
-        unsigned long q = 0
+        unsigned long q = 1
     );
     /*!
         requires
