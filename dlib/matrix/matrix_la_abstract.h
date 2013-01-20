@@ -141,7 +141,7 @@ namespace dlib
     void svd_fast (
         const matrix<T>& A,
         matrix<T>& u,
-        matrix<T,0,1>& w,
+        matrix<T>& w,
         matrix<T>& v,
         unsigned long l,
         unsigned long q = 1
@@ -191,7 +191,7 @@ namespace dlib
     void svd_fast (
         const std::vector<sparse_vector_type>& A,
         matrix<T>& u,
-        matrix<T,0,1>& w,
+        matrix<T>& w,
         matrix<T>& v,
         unsigned long l,
         unsigned long q = 1
