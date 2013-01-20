@@ -172,7 +172,7 @@ namespace
                 // non-matching pairs of projections.
                 const double corr_rot1_error = max(abs(compute_correlations(rm_zeros(L*rotate<0,1>(Ltrans)), rm_zeros(R*Rtrans))));
                 dlog << LINFO << "corr_rot1_error: "<< corr_rot1_error;
-                DLIB_TEST(std::abs(corr_rot1_error) < 1e-11);
+                DLIB_TEST(std::abs(corr_rot1_error) < 1e-10);
             }
             // Matching projection directions should be correlated with the amount of
             // correlation indicated by the return value of cca().
@@ -191,7 +191,7 @@ namespace
                 // non-matching pairs of projections.
                 const double corr_rot1_error = max(abs(compute_correlations(rm_zeros(L*rotate<0,1>(Ltrans)), rm_zeros(R*Rtrans))));
                 dlog << LINFO << "corr_rot1_error: "<< corr_rot1_error;
-                DLIB_TEST(std::abs(corr_rot1_error) < 1e-11);
+                DLIB_TEST(std::abs(corr_rot1_error) < 1e-10);
             }
             // Matching projection directions should be correlated with the amount of
             // correlation indicated by the return value of cca().
@@ -232,7 +232,7 @@ namespace
                 // non-matching pairs of projections.
                 const double corr_rot1_error = max(abs(compute_correlations(rm_zeros(L*rotate<0,1>(Ltrans)), rm_zeros(R*Rtrans))));
                 dlog << LINFO << "corr_rot1_error: "<< corr_rot1_error;
-                DLIB_TEST(std::abs(corr_rot1_error) < 1e-11);
+                DLIB_TEST(std::abs(corr_rot1_error) < 1e-10);
             }
             // Matching projection directions should be correlated with the amount of
             // correlation indicated by the return value of cca().
@@ -255,7 +255,7 @@ namespace
                 // non-matching pairs of projections.
                 const double corr_rot1_error = max(abs(compute_correlations(rm_zeros(L*rotate<0,1>(Ltrans)), rm_zeros(R*Rtrans))));
                 dlog << LINFO << "corr_rot1_error: "<< corr_rot1_error;
-                DLIB_TEST(std::abs(corr_rot1_error) < 1e-11);
+                DLIB_TEST(std::abs(corr_rot1_error) < 1e-10);
             }
             // Matching projection directions should be correlated with the amount of
             // correlation indicated by the return value of cca().
