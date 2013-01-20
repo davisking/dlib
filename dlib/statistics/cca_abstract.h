@@ -25,7 +25,7 @@ namespace dlib
         ensures
             - This function treats L and R as sequences of paired row vectors.  It
               then computes the correlation values between the elements of these 
-              row vectors.  In particular, we return a matrix COR such that:
+              row vectors.  In particular, we return a vector COR such that:
                 - COR.size() == L.nc()
                 - for all valid i:
                     - COR(i) == the correlation coefficient between the following 
