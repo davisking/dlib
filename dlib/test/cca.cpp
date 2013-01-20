@@ -166,6 +166,16 @@ namespace
             DLIB_TEST(Ltrans.nc() == Rtrans.nc());
             dlog << LINFO << "correlations: "<< trans(correlations);
 
+            if (Ltrans.nc() > 1)
+            {
+                // The CCA projection directions are supposed to be uncorrelated for
+                // non-matching pairs of projections.
+                const double corr_rot1_error = max(abs(compute_correlations(rm_zeros(L*rotate<0,1>(Ltrans)), rm_zeros(R*Rtrans))));
+                dlog << LINFO << "corr_rot1_error: "<< corr_rot1_error;
+                DLIB_TEST(std::abs(corr_rot1_error) < 1e-11);
+            }
+            // Matching projection directions should be correlated with the amount of
+            // correlation indicated by the return value of cca().
             const double corr_error = max(abs(compute_correlations(rm_zeros(L*Ltrans), rm_zeros(R*Rtrans)) - correlations));
             dlog << LINFO << "correlation error: "<< corr_error;
             DLIB_TEST(corr_error < 1e-13);
@@ -175,6 +185,16 @@ namespace
             DLIB_TEST(Ltrans.nc() == Rtrans.nc());
             dlog << LINFO << "correlations: "<< trans(correlations);
 
+            if (Ltrans.nc() > 1)
+            {
+                // The CCA projection directions are supposed to be uncorrelated for
+                // non-matching pairs of projections.
+                const double corr_rot1_error = max(abs(compute_correlations(rm_zeros(L*rotate<0,1>(Ltrans)), rm_zeros(R*Rtrans))));
+                dlog << LINFO << "corr_rot1_error: "<< corr_rot1_error;
+                DLIB_TEST(std::abs(corr_rot1_error) < 1e-11);
+            }
+            // Matching projection directions should be correlated with the amount of
+            // correlation indicated by the return value of cca().
             const double corr_error = max(abs(compute_correlations(rm_zeros(L*Ltrans), rm_zeros(R*Rtrans)) - correlations));
             dlog << LINFO << "correlation error: "<< corr_error;
             DLIB_TEST(corr_error < 1e-13);
@@ -206,6 +226,16 @@ namespace
         {
             correlations = cca(L, R, Ltrans, Rtrans, rank);
             DLIB_TEST(Ltrans.nc() == Rtrans.nc());
+            if (Ltrans.nc() > 1)
+            {
+                // The CCA projection directions are supposed to be uncorrelated for
+                // non-matching pairs of projections.
+                const double corr_rot1_error = max(abs(compute_correlations(rm_zeros(L*rotate<0,1>(Ltrans)), rm_zeros(R*Rtrans))));
+                dlog << LINFO << "corr_rot1_error: "<< corr_rot1_error;
+                DLIB_TEST(std::abs(corr_rot1_error) < 1e-11);
+            }
+            // Matching projection directions should be correlated with the amount of
+            // correlation indicated by the return value of cca().
             const double corr_error = max(abs(compute_correlations(rm_zeros(L*Ltrans), rm_zeros(R*Rtrans)) - correlations));
             dlog << LINFO << "correlation error: "<< corr_error;
             DLIB_TEST(corr_error < 1e-13);
@@ -219,6 +249,16 @@ namespace
         {
             correlations = cca(mat_to_sparse(L), mat_to_sparse(R), Ltrans, Rtrans, rank);
             DLIB_TEST(Ltrans.nc() == Rtrans.nc());
+            if (Ltrans.nc() > 1)
+            {
+                // The CCA projection directions are supposed to be uncorrelated for
+                // non-matching pairs of projections.
+                const double corr_rot1_error = max(abs(compute_correlations(rm_zeros(L*rotate<0,1>(Ltrans)), rm_zeros(R*Rtrans))));
+                dlog << LINFO << "corr_rot1_error: "<< corr_rot1_error;
+                DLIB_TEST(std::abs(corr_rot1_error) < 1e-11);
+            }
+            // Matching projection directions should be correlated with the amount of
+            // correlation indicated by the return value of cca().
             const double corr_error = max(abs(compute_correlations(rm_zeros(L*Ltrans), rm_zeros(R*Rtrans)) - correlations));
             dlog << LINFO << "correlation error: "<< corr_error;
             DLIB_TEST(corr_error < 1e-13);
