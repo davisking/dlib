@@ -74,6 +74,8 @@
          <item>md5</item> 
          <item>crc32</item> 
          <item>hash</item> 
+         <item>count_bits</item> 
+         <item>hamming_distance</item> 
          <item>murmur_hash3</item> 
          <item>murmur_hash3_128bit</item> 
          <item>gaussian_random_hash</item> 
@@ -290,6 +292,32 @@
                As an aside, the hash() for matrix objects is defined <a href="dlib/matrix/matrix_utilities_abstract.h.html#hash">here</a>.
                It has the same interface as all the others.
             </p>
+         </description>
+         
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>count_bits</name>
+         <file>dlib/hash.h</file>
+         <spec_file link="true">dlib/general_hash/count_bits_abstract.h</spec_file>
+         <description>
+            This function counts the number of bits in an unsigned integer which are
+            set to 1.
+         </description>
+         
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>hamming_distance</name>
+         <file>dlib/hash.h</file>
+         <spec_file link="true">dlib/general_hash/count_bits_abstract.h</spec_file>
+         <description>
+            This function returns the hamming distance between two unsigned integers.
+            That is, it returns the number of bits which differer in the two integers.
          </description>
          
       </component>
