@@ -6,6 +6,7 @@
 
 #include "general_hash/hash.h"
 #include "general_hash/random_hashing.h"
+#include "general_hash/count_bits.h"
 
 
 #endif // DLIB_HASh_

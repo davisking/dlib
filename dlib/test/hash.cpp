@@ -205,6 +205,55 @@ namespace
         }
     }
 
+// ----------------------------------------------------------------------------------------
+
+    uint64  slow_count_bits ( uint64 v)
+    {
+        uint64 count = 0;
+        for (int i = 0; i < 64; ++i)
+        {
+            if (v&1)
+                ++count;
+            v >>= 1;
+        }
+        return count;
+    }
+
+
+    uint32  slow_count_bits ( uint32 v)
+    {
+        uint32 count = 0;
+        for (int i = 0; i < 32; ++i)
+        {
+            if (v&1)
+                ++count;
+            v >>= 1;
+        }
+        return count;
+    }
+
+
+// ----------------------------------------------------------------------------------------
+
+    void test_hamming_stuff()
+    {
+        dlib::rand rnd;
+        for (int i = 0; i < 10000; ++i)
+        {
+            uint32 v = rnd.get_random_32bit_number();
+            uint64 v2 = rnd.get_random_64bit_number();
+            DLIB_TEST(slow_count_bits(v) == count_bits(v));
+            DLIB_TEST(slow_count_bits(v2) == count_bits(v2));
+        }
+
+        DLIB_TEST(hamming_distance((uint32)0x1F, (uint32)0x0F) == 1);
+        DLIB_TEST(hamming_distance((uint32)0x1F, (uint32)0x1F) == 0);
+        DLIB_TEST(hamming_distance((uint32)0x1F, (uint32)0x19) == 2);
+        DLIB_TEST(hamming_distance((uint32)0x2F, (uint32)0x19) == 4);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class test_hash : public tester
     {
     public:
@@ -218,6 +267,8 @@ namespace
         )
         {
             print_spinner();
+
+            test_hamming_stuff();
 
             murmur_hash_test();
             murmur_hash_128_test();
