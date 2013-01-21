@@ -26,7 +26,6 @@ namespace dlib
             const T& item
         ) const;
     };
-
     /*!
         Note that the default behavior of general hash is to attempt to cast
         an object of type T to an unsigned long and use that as the hash.
@@ -55,8 +54,8 @@ namespace dlib
         const T& item
     ) const
     {
-        // hash any types that have a conversion to unsigned long
-        return static_cast<unsigned long>(item);
+        // hash any types that have a conversion to uint64 
+        return hash(static_cast<uint64>(item));
     }
 
 
