@@ -266,6 +266,7 @@ namespace dlib
               function terminates.
             - #pairs.size() <= pairs.size()
             - is_ordered_by_index(#pairs) == true
+            - contains_duplicate_pairs(#pairs) == false
     !*/
 
 // ----------------------------------------------------------------------------------------
