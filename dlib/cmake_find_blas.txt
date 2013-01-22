@@ -70,9 +70,18 @@ if (UNIX)
 
 
    # try to find some other LAPACK libraries if we didn't find the MKL
+   set(extra_paths
+        /usr/lib64
+        /usr/lib64/atlas-sse3
+        /usr/lib64/atlas-sse2
+        /usr/lib64/atlas
+        /usr/lib/atlas-sse3
+        /usr/lib/atlas-sse2
+        /usr/lib/atlas)
+
 
    if (NOT lapack_found)
-      find_library(lapack_lib NAMES lapack lapack-3)
+      find_library(lapack_lib NAMES lapack lapack-3 PATHS ${extra_paths})
       if (lapack_lib)
          set(lapack_libraries ${lapack_lib})
          set(lapack_found 1)
@@ -85,8 +94,8 @@ if (UNIX)
    # try to find some other BLAS libraries if we didn't find the MKL
    
    if (NOT blas_found)
-      find_library(atlas_lib atlas)
-      find_library(cblas_lib cblas)
+      find_library(atlas_lib atlas PATHS ${extra_paths})
+      find_library(cblas_lib cblas PATHS ${extra_paths})
       if (atlas_lib AND cblas_lib)
          set(blas_libraries ${atlas_lib} ${cblas_lib})
          set(blas_found 1)
@@ -97,7 +106,7 @@ if (UNIX)
 
 
    if (NOT blas_found)
-      find_library(cblas_lib cblas)
+      find_library(cblas_lib cblas PATHS ${extra_paths})
       if (cblas_lib)
          set(blas_libraries ${cblas_lib})
          set(blas_found 1)
@@ -108,7 +117,7 @@ if (UNIX)
 
    
    if (NOT blas_found)
-      find_library(generic_blas blas)
+      find_library(generic_blas blas PATHS ${extra_paths})
       if (generic_blas)
          set(blas_libraries ${generic_blas})
          set(blas_found 1)
