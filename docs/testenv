@@ -18,7 +18,7 @@ echo nothing | awk '{}' > /dev/null || return_error "awk";
 echo | sed -e "s/s/r/"  > /dev/null || return_error "sed";
 htmlify 		> /dev/null || return_error "htmlify";
 echo | xargs 		> /dev/null || return_error "xargs";
-svn help 		> /dev/null || return_error "svn";
+hg  		> /dev/null || return_error "hg";
 xsltproc -V 		> /dev/null || return_error "xsltproc";
 tar --help 		> /dev/null || return_error "tar";
 zip -h 			> /dev/null || return_error "zip";
