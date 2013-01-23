@@ -103,8 +103,9 @@ namespace dlib
         {
             const long num = this->get_num_samples();
 
-            // how many samples to process in a single task (aim for 100 jobs per thread)
-            const long block_size = std::max<long>(1, num / (1+tp.num_threads_in_pool()*100));
+            // how many samples to process in a single task (aim for 4 jobs per worker)
+            const long num_workers = std::max(1UL, tp.num_threads_in_pool());
+            const long block_size = std::max(1L, num/(num_workers*4));
 
             binder b(*this, w, subgradient, total_loss);
             for (long i = 0; i < num; i+=block_size)
