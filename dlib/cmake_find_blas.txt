@@ -75,6 +75,7 @@ if (UNIX)
         /usr/lib64/atlas-sse3
         /usr/lib64/atlas-sse2
         /usr/lib64/atlas
+        /usr/lib
         /usr/lib/atlas-sse3
         /usr/lib/atlas-sse2
         /usr/lib/atlas)
