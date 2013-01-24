@@ -1,0 +1,24 @@
+#/bin/sh
+#
+#This script checks to make sure all the commands we need are 
+#present
+
+return_error()
+{
+   echo "Error, can't run the $1 command"
+   exit 1
+}
+
+./testenv
+
+echo Testing environment for needed release building utilities
+
+
+#flip -h 		> /dev/null || return_error "flip";
+unix2dos -h 		&> /dev/null || return_error "unix2dos";
+wine --help 	       &> /dev/null || return_error "wine";
+
+
+echo All needed utilities found 
+exit 0
+

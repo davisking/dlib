@@ -13,7 +13,6 @@ return_error()
 echo Testing environment for needed utilities
 
 bc -h 		> /dev/null || return_error "bc";
-flip -h 		> /dev/null || return_error "flip";
 echo nothing | awk '{}' > /dev/null || return_error "awk";
 echo | sed -e "s/s/r/"  > /dev/null || return_error "sed";
 htmlify 		> /dev/null || return_error "htmlify";
@@ -23,7 +22,6 @@ xsltproc -V 		> /dev/null || return_error "xsltproc";
 tar --help 		> /dev/null || return_error "tar";
 zip -h 			> /dev/null || return_error "zip";
 bzip2 -h 	       &> /dev/null || return_error "bzip2";
-wine --help 	       &> /dev/null || return_error "wine";
 
 
 echo All needed utilities found 
