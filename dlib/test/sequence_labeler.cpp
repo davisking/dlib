@@ -111,9 +111,9 @@ namespace
             }
 
             set_feature(num_label_states*num_label_states +
-                        y(0)*num_sample_states + x.item[position],0.4);
+                        y(0)*num_sample_states + x.item[position],0.25);
             set_feature(num_label_states*num_label_states +
-                        y(0)*num_sample_states + x.item[position],0.6);
+                        y(0)*num_sample_states + x.item[position],0.75);
         }
     };
 
@@ -416,12 +416,17 @@ namespace
         trainer_part.set_c(4);
         trainer.set_num_threads(4);
         trainer_part.set_num_threads(4);
+        trainer.set_epsilon(1e-4);
+        trainer_part.set_epsilon(1e-4);
 
 
 
         // Learn to do sequence labeling from the dataset
         sequence_labeler<feature_extractor> labeler = trainer.train(samples, labels);
         sequence_labeler<feature_extractor_partial> labeler_part = trainer_part.train(samples, labels);
+
+        dlog << LINFO << "weight disagreement:  "<< max(abs(labeler.get_weights() - labeler_part.get_weights()));
+        dlog << LINFO << "max weight magnitude: "<< max(abs(labeler.get_weights()));
 
         // Both feature extractors should be equivalent.
         DLIB_TEST(length(labeler.get_weights() - labeler_part.get_weights()) < 1e-10);
