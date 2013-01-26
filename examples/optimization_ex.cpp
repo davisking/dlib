@@ -224,7 +224,7 @@ int main()
                                                                     // printed for each iteration of optimization.
                  &rosen, &rosen_derivative, starting_point, -1);
 
-        cout << endl << starting_point << endl;
+        cout << endl << "rosen solution: \n" << starting_point << endl;
 
         starting_point = -94, 5.2;
         find_min_using_approximate_derivatives(lbfgs_search_strategy(10),
@@ -279,14 +279,14 @@ int main()
                                                objective_delta_stop_strategy(1e-7),
                                                test_function(target), starting_point, -1);
         // At this point the correct value of (3,5,1,7) should be found and stored in starting_point
-        cout << starting_point << endl;
+        cout << "test_function solution:\n" << starting_point << endl;
 
         // Now lets try it again with the conjugate gradient algorithm.
         starting_point = -4,5,99,3;
         find_min_using_approximate_derivatives(cg_search_strategy(),
                                                objective_delta_stop_strategy(1e-7),
                                                test_function(target), starting_point, -1);
-        cout << starting_point << endl;
+        cout << "test_function solution:\n" << starting_point << endl;
 
 
 
@@ -303,7 +303,7 @@ int main()
                         1e-6,  // stopping trust region radius
                         100    // max number of objective function evaluations
         );
-        cout << starting_point << endl;
+        cout << "test_function solution:\n" << starting_point << endl;
 
     }
     catch (std::exception& e)
