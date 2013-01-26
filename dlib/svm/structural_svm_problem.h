@@ -349,7 +349,7 @@ namespace dlib
         }
 
         virtual void call_separation_oracle_on_all_samples (
-            matrix_type& w,
+            const matrix_type& w,
             matrix_type& subgradient,
             scalar_type& total_loss
         ) const

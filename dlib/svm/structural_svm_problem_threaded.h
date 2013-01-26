@@ -47,7 +47,7 @@ namespace dlib
         {
             binder (
                 const structural_svm_problem_threaded& self_,
-                matrix_type& w_,
+                const matrix_type& w_,
                 matrix_type& subgradient_,
                 scalar_type& total_loss_,
                 bool buffer_subgradients_locally_
@@ -102,7 +102,7 @@ namespace dlib
             }
 
             const structural_svm_problem_threaded& self;
-            matrix_type& w;
+            const matrix_type& w;
             matrix_type& subgradient;
             scalar_type& total_loss;
             bool buffer_subgradients_locally;
@@ -110,7 +110,7 @@ namespace dlib
 
 
         virtual void call_separation_oracle_on_all_samples (
-            matrix_type& w,
+            const matrix_type& w,
             matrix_type& subgradient,
             scalar_type& total_loss
         ) const
