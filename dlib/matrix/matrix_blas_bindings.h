@@ -545,9 +545,9 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(m)
         {
 
-            if (transpose == false)
+            const int N = static_cast<int>(src.size());
+            if (transpose == false && N != 0)
             {
-                const int N = static_cast<int>(src.size());
                 if (add_to)
                 {
                     cblas_axpy(N, alpha, get_ptr(src), 1, get_ptr(dest), 1);
@@ -574,9 +574,9 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(rv)
         {
 
-            if (transpose == false)
+            const int N = static_cast<int>(src.size());
+            if (transpose == false && N != 0)
             {
-                const int N = static_cast<int>(src.size());
                 if (add_to)
                 {
                     cblas_axpy(N, alpha, get_ptr(src), 1, get_ptr(dest), 1);
@@ -603,9 +603,9 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(cv)
         {
 
-            if (transpose == false)
+            const int N = static_cast<int>(src.size());
+            if (transpose == false && N != 0)
             {
-                const int N = static_cast<int>(src.size());
                 if (add_to)
                 {
                     cblas_axpy(N, alpha, get_ptr(src), 1, get_ptr(dest), 1);
