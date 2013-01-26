@@ -212,7 +212,7 @@ namespace
             if (verbose)
                 controller.be_verbose();
             controller.add_processing_node("127.0.0.1", 12345);
-            controller.add_processing_node("127.0.0.1", 12346);
+            controller.add_processing_node("localhost:12346");
             svm_objective = controller(solver, weights);
 
 

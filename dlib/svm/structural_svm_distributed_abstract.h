@@ -88,9 +88,9 @@ namespace dlib
                         svm_struct_controller_node cont;
                         cont.set_c(100);
                         // Tell cont where the processing nodes are on your network.
-                        cont.add_processing_node("192.168.1.10", 12345);
-                        cont.add_processing_node("192.168.1.11", 12345);
-                        cont.add_processing_node("192.168.1.12", 12345);
+                        cont.add_processing_node("192.168.1.10:12345");
+                        cont.add_processing_node("192.168.1.11:12345");
+                        cont.add_processing_node("192.168.1.12:12345");
                         matrix<double> w;
                         oca solver;
                         cont(solver, w); // Run the optimization.
@@ -183,17 +183,29 @@ namespace dlib
         !*/
 
         void add_processing_node (
-            const std::string& ip,
+            const network_address& addr
+        );
+        /*!
+            requires
+                - addr.port != 0
+            ensures
+                - if (this address hasn't already been added) then
+                    - #get_num_processing_nodes() == get_num_processing_nodes() + 1
+                    - When operator() is invoked to solve the structural svm problem this
+                      object will connect to the svm_struct_processing_node located at the
+                      given network address and will include it in the distributed
+                      optimization.
+        !*/
+
+        void add_processing_node (
+            const std::string& ip_or_hostname,
             unsigned short port
         );
         /*!
+            requires
+                - port != 0
             ensures
-                - if (this port and ip haven't already been added) then
-                    - #get_num_processing_nodes() == get_num_processing_nodes() + 1
-                    - When operator() is invoked to solve the structural svm problem
-                      this object will connect to the svm_struct_processing_node located
-                      at the given IP address and port number and will include it in the
-                      distributed optimization.
+                - invokes: add_processing_node(network_address(ip_or_hostname, port))
         !*/
 
         unsigned long get_num_processing_nodes (

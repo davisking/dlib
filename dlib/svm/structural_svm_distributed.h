@@ -365,29 +365,36 @@ namespace dlib
         }
 
         void add_processing_node (
-            const std::string& ip,
-            unsigned short port
+            const network_address& addr
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(is_ip_address(ip) && port != 0,
+            DLIB_ASSERT(addr.port != 0,
                 "\t void structural_svm_problem::add_processing_node()"
                 << "\n\t Invalid inputs were given to this function"
-                << "\n\t ip:   " << ip 
-                << "\n\t port: " << port
+                << "\n\t addr.host_address:   " << addr.host_address 
+                << "\n\t addr.port: " << addr.port
                 << "\n\t this: " << this
                 );
 
-            // check if this pair is already registered
+            // check if this address is already registered
             for (unsigned long i = 0; i < nodes.size(); ++i)
             {
-                if (nodes[i] == make_pair(ip,port))
+                if (nodes[i] == addr)
                 {
                     return;
                 }
             }
+            
+            nodes.push_back(addr);
+        }
 
-            nodes.push_back(make_pair(ip,port));
+        void add_processing_node (
+            const std::string& ip_or_hostname,
+            unsigned short port
+        )
+        {
+            add_processing_node(network_address(ip_or_hostname,port));
         }
 
         unsigned long get_num_processing_nodes (
@@ -439,7 +446,7 @@ namespace dlib
             typedef matrix_type_ matrix_type;
 
             problem_type (
-                const std::vector<std::pair<std::string,unsigned short> >& nodes_,
+                const std::vector<network_address>& nodes_,
                 double eps_,
                 bool verbose_,
                 double C_
@@ -465,7 +472,7 @@ namespace dlib
                 bridges.resize(nodes.size());
                 for (unsigned long i = 0; i< bridges.size(); ++i)
                 {
-                    bridges[i].reset(new bridge(connect_to_ip_and_port(nodes[i].first,nodes[i].second), 
+                    bridges[i].reset(new bridge(connect_to(nodes[i]), 
                                                 receive(in), transmit(*out_pipes[i])));
                 }
 
@@ -605,7 +612,7 @@ namespace dlib
                 risk = total_loss + dot(subgradient,w);
             }
 
-            std::vector<std::pair<std::string,unsigned short> > nodes;
+            std::vector<network_address> nodes;
             double eps;
             mutable bool verbose;
             double C;
@@ -622,7 +629,7 @@ namespace dlib
             long num_dims;
         };
 
-        std::vector<std::pair<std::string,unsigned short> > nodes;
+        std::vector<network_address> nodes;
         double eps;
         mutable bool verbose;
         double C;
