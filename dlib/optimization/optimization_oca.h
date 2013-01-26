@@ -245,7 +245,7 @@ namespace dlib
                     // copy planes into a matrix so we can call solve_qp4_using_smo()
                     matrix<scalar_type,0,0,mem_manager_type, layout_type> planes_mat(num_nonnegative,planes.size());
                     for (unsigned long i = 0; i < planes.size(); ++i)
-                        set_rowm(planes_mat,i) = rowm(planes[i],0,num_nonnegative);
+                        set_colm(planes_mat,i) = colm(planes[i],0,num_nonnegative);
 
                     solve_qp4_using_smo(planes_mat, K, mat(bs), alpha, eps, sub_max_iter); 
                 }
