@@ -8,6 +8,7 @@
 #include "../matrix.h"
 #include "optimization_solve_qp_using_smo.h"
 #include <vector>
+#include "../sequence.h"
 
 // ----------------------------------------------------------------------------------------
 
@@ -138,7 +139,7 @@ namespace dlib
 
             const scalar_type C = problem.get_c();
 
-            matrix<scalar_type,0,0,mem_manager_type, layout_type> planes;
+            typename sequence<vect_type>::kernel_2a planes;
             std::vector<scalar_type> bs, miss_count;
 
             vect_type new_plane, alpha;
@@ -162,7 +163,8 @@ namespace dlib
                 // The flat lower bounding plane is always good to have if we know
                 // what it is.
                 bs.push_back(R_lower_bound);
-                planes = zeros_matrix(w);
+                new_plane = zeros_matrix(w);
+                planes.add(0, new_plane);
                 alpha = uniform_matrix<scalar_type>(1,1, C);
                 miss_count.push_back(0);
 
@@ -194,11 +196,8 @@ namespace dlib
                     set_rowm(new_plane, range(force_weight_to_1, new_plane.size()-1)) = 0;
                 }
 
-                if (planes.size() != 0)
-                    planes = join_rows(planes, new_plane);
-                else 
-                    planes = new_plane;
                 bs.push_back(cur_risk - dot(w,new_plane));
+                planes.add(planes.size(), new_plane);
                 miss_count.push_back(0);
 
                 // If alpha is empty then initialize it (we must always have sum(alpha) == C).  
@@ -214,21 +213,21 @@ namespace dlib
                 // report current status
                 const scalar_type risk_gap = cur_risk - (cp_obj-wnorm)/C;
                 if (counter > 0 && problem.optimization_status(cur_obj, cur_obj - cp_obj, 
-                                                               cur_risk, risk_gap, planes.nc(), counter))
+                                                               cur_risk, risk_gap, planes.size(), counter))
                 {
                     break;
                 }
 
                 // compute kernel matrix for all the planes
                 K.swap(Ktmp);
-                K.set_size(planes.nc(), planes.nc());
+                K.set_size(planes.size(), planes.size());
                 // copy over the old K matrix
                 set_subm(K, 0,0, Ktmp.nr(), Ktmp.nc()) = Ktmp;
 
                 // now add the new row and column to K
-                for (long c = 0; c < planes.nc(); ++c)
+                for (unsigned long c = 0; c < planes.size(); ++c)
                 {
-                    K(c, Ktmp.nc()) = dot(colm(planes,c), new_plane);
+                    K(c, Ktmp.nc()) = dot(planes[c], planes[planes.size()-1]);
                     K(Ktmp.nc(), c) = K(c,Ktmp.nc());
                 }
 
@@ -242,12 +241,23 @@ namespace dlib
                 // Note that we warm start this optimization by using the alpha from the last
                 // iteration as the starting point.
                 if (num_nonnegative != 0)
-                    solve_qp4_using_smo(rowm(planes,range(0,num_nonnegative-1)), K, mat(bs), alpha, eps, sub_max_iter); 
+                {
+                    // copy planes into a matrix so we can call solve_qp4_using_smo()
+                    matrix<scalar_type,0,0,mem_manager_type, layout_type> planes_mat(num_nonnegative,planes.size());
+                    for (unsigned long i = 0; i < planes.size(); ++i)
+                        set_rowm(planes_mat,i) = rowm(planes[i],0,num_nonnegative);
+
+                    solve_qp4_using_smo(planes_mat, K, mat(bs), alpha, eps, sub_max_iter); 
+                }
                 else
+                {
                     solve_qp_using_smo(K, mat(bs), alpha, eps, sub_max_iter); 
+                }
 
                 // construct the w that minimized the subproblem.
-                w = -(planes*alpha);
+                w = -alpha(0)*planes[0];
+                for (unsigned long i = 1; i < planes.size(); ++i)
+                    w -= alpha(i)*planes[i];
                 // threshold the first num_nonnegative w elements if necessary.
                 if (num_nonnegative != 0)
                     set_rowm(w,range(0,num_nonnegative-1)) = lowerbound(rowm(w,range(0,num_nonnegative-1)),0);
@@ -274,7 +284,7 @@ namespace dlib
                     miss_count.erase(miss_count.begin()+idx);
                     K = removerc(K, idx, idx);
                     alpha = remove_row(alpha,idx);
-                    planes = remove_col(planes,idx);
+                    planes.remove(idx, new_plane);
                 }
 
                 ++counter;
