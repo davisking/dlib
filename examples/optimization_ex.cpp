@@ -64,6 +64,22 @@ const column_vector rosen_derivative ( const column_vector& m)
     return res;
 }
 
+// This function computes the Hessian matrix for the rosen() fuction.  This is
+// the matrix of second derivatives.
+matrix<double> rosen_hessian (const column_vector& m)
+{
+    const double x = m(0);
+    const double y = m(1);
+
+    matrix<double> res(2,2);
+
+    // now compute the second derivatives 
+    res(0,0) = 1200*x*x - 400*y + 2; // second derivative with respect to x
+    res(1,0) = res(0,1) = -400*x;   // derivative with respect to x and y
+    res(1,1) = 200;                 // second derivative with respect to y
+    return res;
+}
+
 // ----------------------------------------------------------------------------------------
 
 class test_function
@@ -105,6 +121,34 @@ public:
 
 private:
     column_vector target;
+};
+
+// ----------------------------------------------------------------------------------------
+
+class rosen_model 
+{
+    /*!
+        This object is a "function model" which can be used with the
+        find_min_trust_region() routine.  
+    !*/
+
+public:
+    typedef ::column_vector column_vector;
+    typedef matrix<double> general_matrix;
+
+    double operator() (
+        const column_vector& x
+    ) const { return rosen(x); }
+
+    void get_derivative_and_hessian (
+        const column_vector& x,
+        column_vector& der,
+        general_matrix& hess
+    ) const
+    {
+        der = rosen_derivative(x);
+        hess = rosen_hessian(x);
+    }
 };
 
 // ----------------------------------------------------------------------------------------
@@ -153,7 +197,7 @@ int main()
                  &rosen, &rosen_derivative, starting_point, -1);
         // Once the function ends the starting_point vector will contain the optimum point 
         // of (1,1).
-        cout << starting_point << endl;
+        cout << "rosen solution:\n" << starting_point << endl;
 
 
         // Now lets try doing it again with a different starting point and the version
@@ -165,7 +209,7 @@ int main()
                                                objective_delta_stop_strategy(1e-7),
                                                &rosen, starting_point, -1);
         // Again the correct minimum point is found and stored in starting_point
-        cout << starting_point << endl;
+        cout << "rosen solution:\n" << starting_point << endl;
 
 
         // Here we repeat the same thing as above but this time using the L-BFGS 
@@ -186,8 +230,31 @@ int main()
         find_min_using_approximate_derivatives(lbfgs_search_strategy(10),
                                                objective_delta_stop_strategy(1e-7),
                                                &rosen, starting_point, -1);
-        cout << starting_point << endl;
+        cout << "rosen solution: \n"<< starting_point << endl;
 
+
+
+        // In many cases, it is useful if we also provide second derivative information
+        // to the optimizers.  Two examples of how we can do that are shown below.  
+        starting_point = 0.8, 1.3;
+        find_min(newton_search_strategy(&rosen_hessian),
+                 objective_delta_stop_strategy(1e-7),
+                 &rosen,
+                 &rosen_derivative,
+                 starting_point,
+                 -1);
+        cout << "rosen solution: \n"<< starting_point << endl;
+
+        // We can also use find_min_trust_region(), which is also a method which uses
+        // second derivatives.  For some kinds of non-convex function it may be more
+        // reliable than using a newton_search_strategy with find_min().
+        starting_point = 0.8, 1.3;
+        find_min_trust_region(objective_delta_stop_strategy(1e-7),
+            rosen_model(), 
+            starting_point, 
+            10 // initial trust region radius
+        );
+        cout << "rosen solution: \n"<< starting_point << endl;
 
 
 
