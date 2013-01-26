@@ -86,6 +86,49 @@ namespace dlib
         unsigned short port;
     };
 
+// ----------------------------------------------------------------------------------------
+
+    inline bool operator < (
+        const network_address& a,
+        const network_address& b
+    );
+    /*!
+        ensures
+            - provides a total ordering over network_address objects so you can use them in
+              the standard associative containers.  The ordering is defined such that if
+              you sorted network addresses they would sort first on the host_address string
+              and then, for network_address objects with equal host_address, they would
+              sort on the port number
+    !*/
+
+    inline bool operator== (
+        const network_address& a,
+        const network_address& b
+    );
+    /*!
+        ensures
+            - returns true if a and b contain exactly the same address and false otherwise.
+              That is, the following must be true for this function to return true:
+                - a.host_address == b.host_address
+                - a.port == b.port
+              Note that this means that two addresses which are logically equivalent but
+              written differently will not compare equal.  For example, suppose example.com
+              has the IP address 10.1.1.1.  Then network_address("10.1.1.1:80") and
+              network_address("example.com:80") really refer to the same network resource
+              but will nevertheless not compare equal since.
+    !*/
+
+    inline bool operator != (
+        const network_address& a,
+        const network_address& b
+    );
+    /*!
+        ensures
+            - returns !(a == b)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     void serialize(
         const network_address& item,
         std::ostream& out

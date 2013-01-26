@@ -46,6 +46,35 @@ namespace dlib
         unsigned short port;
     };
 
+// ----------------------------------------------------------------------------------------
+
+    inline bool operator < (
+        const network_address& a,
+        const network_address& b
+    ) 
+    {
+        if (a.host_address < b.host_address)
+            return true;
+        else if (a.host_address > b.host_address)
+            return false;
+        else if (a.port < b.port)
+            return true;
+        else
+            return false;
+    }
+
+    inline bool operator== (
+        const network_address& a,
+        const network_address& b
+    ) { return a.host_address == b.host_address && a.port == b.port; }
+
+    inline bool operator != (
+        const network_address& a,
+        const network_address& b
+    ) { return !(a == b); }
+
+// ----------------------------------------------------------------------------------------
+
     void serialize(
         const network_address& item,
         std::ostream& out
