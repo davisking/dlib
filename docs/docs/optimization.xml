@@ -245,6 +245,9 @@
                </p>
 
          </description>
+         <examples>
+            <example>optimization_ex.cpp.html</example>
+         </examples>
                                  
       </component>
 
@@ -822,6 +825,9 @@ However, for graphs with cycles, the solution may be approximate.
              Performs an unconstrained minimization of a nonlinear function using 
              a trust region method.
          </description>
+         <examples>
+            <example>optimization_ex.cpp.html</example>
+         </examples>
                                  
       </component>
 
