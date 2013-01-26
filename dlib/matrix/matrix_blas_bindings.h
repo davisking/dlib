@@ -26,21 +26,41 @@ namespace dlib
         int& counter_gemv();
         int& counter_ger();
         int& counter_dot();
+        int& counter_axpy();
+        int& counter_scal();
 
         #define DLIB_TEST_BLAS_BINDING_GEMM ++counter_gemm();
         #define DLIB_TEST_BLAS_BINDING_GEMV ++counter_gemv();
         #define DLIB_TEST_BLAS_BINDING_GER ++counter_ger();
         #define DLIB_TEST_BLAS_BINDING_DOT ++counter_dot();
+        #define DLIB_TEST_BLAS_BINDING_AXPY ++counter_axpy();
+        #define DLIB_TEST_BLAS_BINDING_SCAL ++counter_scal();
 #else
         #define DLIB_TEST_BLAS_BINDING_GEMM 
         #define DLIB_TEST_BLAS_BINDING_GEMV 
         #define DLIB_TEST_BLAS_BINDING_GER 
         #define DLIB_TEST_BLAS_BINDING_DOT 
+        #define DLIB_TEST_BLAS_BINDING_AXPY
+        #define DLIB_TEST_BLAS_BINDING_SCAL
 #endif
 
         extern "C"
         {
             // Here we declare the prototypes for the CBLAS calls used by the BLAS bindings below
+
+            void cblas_saxpy(const int N, const float alpha, const float *X,
+                            const int incX, float *Y, const int incY);
+            void cblas_daxpy(const int N, const double alpha, const double *X,
+                            const int incX, double *Y, const int incY);
+            void cblas_caxpy(const int N, const void *alpha, const void *X,
+                            const int incX, void *Y, const int incY);
+            void cblas_zaxpy(const int N, const void *alpha, const void *X,
+                            const int incX, void *Y, const int incY);
+
+            void cblas_sscal(const int N, const float alpha, float *X, const int incX);
+            void cblas_dscal(const int N, const double alpha, double *X, const int incX);
+            void cblas_cscal(const int N, const void *alpha, void *X, const int incX);
+            void cblas_zscal(const int N, const void *alpha, void *X, const int incX);
 
             void cblas_sgemm(const enum CBLAS_ORDER Order, const enum CBLAS_TRANSPOSE TransA,
                              const enum CBLAS_TRANSPOSE TransB, const int M, const int N,
@@ -115,6 +135,62 @@ namespace dlib
         }
 
     // ----------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
+
+        inline void cblas_axpy(const int N, const float alpha, const float *X,
+                        const int incX, float *Y, const int incY)
+        {
+            DLIB_TEST_BLAS_BINDING_AXPY;
+            cblas_saxpy(N, alpha, X, incX, Y, incY);
+        }
+
+        inline void cblas_axpy(const int N, const double alpha, const double *X,
+                        const int incX, double *Y, const int incY)
+        {
+            DLIB_TEST_BLAS_BINDING_AXPY;
+            cblas_daxpy(N, alpha, X, incX, Y, incY);
+        }
+
+        inline void cblas_axpy(const int N, const std::complex<float>& alpha, const std::complex<float> *X,
+                        const int incX, std::complex<float> *Y, const int incY)
+        {
+            DLIB_TEST_BLAS_BINDING_AXPY;
+            cblas_caxpy(N, &alpha, X, incX, Y, incY);
+        }
+
+        inline void cblas_axpy(const int N, const std::complex<double>& alpha, const std::complex<double> *X,
+                        const int incX, std::complex<double> *Y, const int incY)
+        {
+            DLIB_TEST_BLAS_BINDING_AXPY;
+            cblas_zaxpy(N, &alpha, X, incX, Y, incY);
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        inline void cblas_scal(const int N, const float alpha, float *X)
+        {
+            DLIB_TEST_BLAS_BINDING_SCAL;
+            cblas_sscal(N, alpha, X, 1);
+        }
+
+        inline void cblas_scal(const int N, const double alpha, double *X)
+        {
+            DLIB_TEST_BLAS_BINDING_SCAL;
+            cblas_dscal(N, alpha, X, 1);
+        }
+
+        inline void cblas_scal(const int N, const std::complex<float>& alpha, std::complex<float> *X)
+        {
+            DLIB_TEST_BLAS_BINDING_SCAL;
+            cblas_cscal(N, &alpha, X, 1);
+        }
+
+        inline void cblas_scal(const int N, const std::complex<double>& alpha, std::complex<double> *X)
+        {
+            DLIB_TEST_BLAS_BINDING_SCAL;
+            cblas_zscal(N, &alpha, X, 1);
+        }
+
     // ----------------------------------------------------------------------------------------
 
         inline void cblas_gemm( const enum CBLAS_ORDER Order, const enum CBLAS_TRANSPOSE TransA,
@@ -459,6 +535,99 @@ namespace dlib
         extern matrix<double,1,0> rv;  // general row vector
         extern matrix<double,0,1> cv;  // general column vector
         extern const double s;
+
+    // ----------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
+    //                       AXPY/SCAL overloads
+    // ----------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
+
+        DLIB_ADD_BLAS_BINDING(m)
+        {
+
+            if (transpose == false)
+            {
+                const int N = static_cast<int>(src.size());
+                if (add_to)
+                {
+                    cblas_axpy(N, alpha, get_ptr(src), 1, get_ptr(dest), 1);
+                }
+                else
+                {
+                    if (get_ptr(src) == get_ptr(dest))
+                    {
+                        cblas_scal(N, alpha, get_ptr(dest));
+                    }
+                    else
+                    {
+                        matrix_assign_default(dest, src, alpha, add_to);
+                    }
+                }
+            }
+            else
+            {
+                matrix_assign_default(dest, trans(src), alpha, add_to);
+            }
+
+        } DLIB_END_BLAS_BINDING
+
+        DLIB_ADD_BLAS_BINDING(rv)
+        {
+
+            if (transpose == false)
+            {
+                const int N = static_cast<int>(src.size());
+                if (add_to)
+                {
+                    cblas_axpy(N, alpha, get_ptr(src), 1, get_ptr(dest), 1);
+                }
+                else
+                {
+                    if (get_ptr(src) == get_ptr(dest))
+                    {
+                        cblas_scal(N, alpha, get_ptr(dest));
+                    }
+                    else
+                    {
+                        matrix_assign_default(dest, src, alpha, add_to);
+                    }
+                }
+            }
+            else
+            {
+                matrix_assign_default(dest, trans(src), alpha, add_to);
+            }
+
+        } DLIB_END_BLAS_BINDING
+
+        DLIB_ADD_BLAS_BINDING(cv)
+        {
+
+            if (transpose == false)
+            {
+                const int N = static_cast<int>(src.size());
+                if (add_to)
+                {
+                    cblas_axpy(N, alpha, get_ptr(src), 1, get_ptr(dest), 1);
+                }
+                else
+                {
+                    if (get_ptr(src) == get_ptr(dest))
+                    {
+                        cblas_scal(N, alpha, get_ptr(dest));
+                    }
+                    else
+                    {
+                        matrix_assign_default(dest, src, alpha, add_to);
+                    }
+                }
+            }
+            else
+            {
+                matrix_assign_default(dest, trans(src), alpha, add_to);
+            }
+
+        } DLIB_END_BLAS_BINDING
 
     // ----------------------------------------------------------------------------------------
     // ----------------------------------------------------------------------------------------

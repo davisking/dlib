@@ -1502,9 +1502,7 @@ namespace dlib
             const T a
         )
         {
-            const long size = data.nr()*data.nc();
-            for (long i = 0; i < size; ++i)
-                data(i) *= a;
+            *this = *this * a;
             return *this;
         }
 
@@ -1512,9 +1510,7 @@ namespace dlib
             const T a
         )
         {
-            const long size = data.nr()*data.nc();
-            for (long i = 0; i < size; ++i)
-                data(i) /= a;
+            *this = *this / a;
             return *this;
         }
 

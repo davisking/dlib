@@ -17,6 +17,7 @@ set (tests
    blas_bindings_gemv.cpp
    blas_bindings_ger.cpp
    blas_bindings_dot.cpp
+   blas_bindings_scal_axpy.cpp
    vector.cpp
    )
 
