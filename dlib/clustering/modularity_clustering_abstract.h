@@ -19,6 +19,8 @@ namespace dlib
     /*!
         requires
             - labels.size() == max_index_plus_one(edges)
+            - for all valid i:
+                - 0 <= edges[i].distance() < std::numeric_limits<double>::infinity()
         ensures
             - Interprets edges as an undirected graph.  That is, it contains the edges on
               the said graph and the sample_pair::distance() values define the edge weights
@@ -42,6 +44,8 @@ namespace dlib
     /*!
         requires
             - labels.size() == max_index_plus_one(edges)
+            - for all valid i:
+                - 0 <= edges[i].distance() < std::numeric_limits<double>::infinity()
         ensures
             - Interprets edges as a directed graph.  That is, it contains the edges on the
               said graph and the ordered_sample_pair::distance() values define the edge
@@ -72,6 +76,8 @@ namespace dlib
     /*!
         requires
             - is_ordered_by_index(edges) == true
+            - for all valid i:
+                - 0 <= edges[i].distance() < std::numeric_limits<double>::infinity()
         ensures
             - This function performs the clustering algorithm described in the paper
               Modularity and community structure in networks by M. E. J. Newman.  
@@ -99,6 +105,9 @@ namespace dlib
         const unsigned long max_iterations = 2000
     );
     /*!
+        requires
+            - for all valid i:
+                - 0 <= edges[i].distance() < std::numeric_limits<double>::infinity()
         ensures
             - This function is identical to the above newman_cluster() routine except that
               it operates on a vector of sample_pair objects instead of

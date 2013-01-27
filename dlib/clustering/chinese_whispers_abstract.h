@@ -29,7 +29,8 @@ namespace dlib
             - Interprets edges as a directed graph.  That is, it contains the edges on the
               said graph and the ordered_sample_pair::distance() values define the edge
               weights (larger values indicating a stronger edge connection between the
-              nodes).
+              nodes).  If an edge has a distance() value of infinity then it is considered
+              a "must link" edge.
             - returns the number of clusters found.
             - #labels.size() == max_index_plus_one(edges)
             - for all valid i:
