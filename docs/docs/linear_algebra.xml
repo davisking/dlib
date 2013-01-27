@@ -600,6 +600,10 @@
          <item>sparse_to_dense</item> 
 
          <item>
+            <name>dot</name>
+            <link>dlib/svm/sparse_vector_abstract.h.html#dot</link>
+         </item> 
+         <item>
             <name>distance_squared</name>
             <link>dlib/svm/sparse_vector_abstract.h.html#distance_squared</link>
          </item> 
