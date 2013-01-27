@@ -5,6 +5,7 @@
 
 #include "../matrix.h"
 #include <cmath>
+#include "../svm/sparse_vector_abstract.h"
 
 namespace dlib
 {
@@ -54,6 +55,37 @@ namespace dlib
                     - returns LEN
                 - else
                     - returns std::numeric_limits<double>::infinity()
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    struct cosine_distance 
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple function object that the cosine of the angle between
+                two vectors and returns 1 - this quantity.   Moreover, this object
+                works for both sparse and dense vectors.
+        !*/
+
+        template <typename sample_type>
+        double operator() (
+            const sample_type& a,
+            const sample_type& b
+        ) const;
+        /*!
+            requires
+                - sample_type is a dense vector (e.g. a dlib::matrix) or a sparse
+                  vector as defined at the top of dlib/svm/sparse_vector_abstract.h
+            ensures
+                - let theta = the angle between a and b.  
+                - returns 1 - cos(theta)
+                  (e.g. this function returns 0 when a and b have an angle of 0 between
+                  each other, 1 if they have a 90 degree angle, and a maximum of 2 if the
+                  vectors have a 180 degree angle between each other).
+                - zero length vectors are considered to have angles of 0 between all other
+                  vectors.
         !*/
     };
 

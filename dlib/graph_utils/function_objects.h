@@ -5,6 +5,7 @@
 
 #include "function_objects_abstract.h"
 #include "../matrix.h"
+#include "../svm/sparse_vector.h"
 #include <cmath>
 #include <limits>
 
@@ -43,6 +44,24 @@ namespace dlib
                 return len;
             else
                 return std::numeric_limits<double>::infinity();
+        }
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    struct cosine_distance 
+    {
+        template <typename sample_type>
+        double operator() (
+            const sample_type& a,
+            const sample_type& b
+        ) const
+        { 
+            const double temp = length(a)*length(b);
+            if (temp == 0)
+                return 0;
+            else
+                return 1-dot(a,b)/temp;
         }
     };
 
