@@ -416,8 +416,8 @@ namespace
         trainer_part.set_c(4);
         trainer.set_num_threads(4);
         trainer_part.set_num_threads(4);
-        trainer.set_epsilon(1e-4);
-        trainer_part.set_epsilon(1e-4);
+        trainer.set_epsilon(1e-8);
+        trainer_part.set_epsilon(1e-8);
 
 
 
@@ -429,7 +429,7 @@ namespace
         dlog << LINFO << "max weight magnitude: "<< max(abs(labeler.get_weights()));
 
         // Both feature extractors should be equivalent.
-        DLIB_TEST(length(labeler.get_weights() - labeler_part.get_weights()) < 1e-10);
+        DLIB_TEST(max(abs(labeler.get_weights() - labeler_part.get_weights())) < 1e-6);
 
     }
 
