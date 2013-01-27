@@ -82,6 +82,15 @@ namespace dlib
         long chunks_per_thread = 4
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
+            "\t void parallel_for_blocked()"
+            << "\n\t Invalid inputs were given to this function"
+            << "\n\t begin: " << begin 
+            << "\n\t end:   " << end
+            << "\n\t chunks_per_thread: " << chunks_per_thread
+            );
+
         if (tp.num_threads_in_pool() != 0)
         {
             const long num = end-begin;
@@ -115,6 +124,15 @@ namespace dlib
         long chunks_per_thread = 4
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
+            "\t void parallel_for_blocked()"
+            << "\n\t Invalid inputs were given to this function"
+            << "\n\t begin: " << begin 
+            << "\n\t end:   " << end
+            << "\n\t chunks_per_thread: " << chunks_per_thread
+            );
+
         thread_pool tp(num_threads);
         parallel_for_blocked(tp, begin, end, obj, funct, chunks_per_thread);
     }
@@ -130,6 +148,15 @@ namespace dlib
         long chunks_per_thread = 4
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
+            "\t void parallel_for_blocked()"
+            << "\n\t Invalid inputs were given to this function"
+            << "\n\t begin: " << begin 
+            << "\n\t end:   " << end
+            << "\n\t chunks_per_thread: " << chunks_per_thread
+            );
+
         impl::helper_parallel_for_funct2<T> helper(funct);
         parallel_for_blocked(tp, begin, end,  helper, &impl::helper_parallel_for_funct2<T>::run,  chunks_per_thread);
     }
@@ -145,6 +172,15 @@ namespace dlib
         long chunks_per_thread = 4
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
+            "\t void parallel_for_blocked()"
+            << "\n\t Invalid inputs were given to this function"
+            << "\n\t begin: " << begin 
+            << "\n\t end:   " << end
+            << "\n\t chunks_per_thread: " << chunks_per_thread
+            );
+
         thread_pool tp(num_threads);
         parallel_for_blocked(tp, begin, end, funct, chunks_per_thread);
     }
@@ -162,6 +198,15 @@ namespace dlib
         long chunks_per_thread = 4
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
+            "\t void parallel_for()"
+            << "\n\t Invalid inputs were given to this function"
+            << "\n\t begin: " << begin 
+            << "\n\t end:   " << end
+            << "\n\t chunks_per_thread: " << chunks_per_thread
+            );
+
         impl::helper_parallel_for<T> helper(obj, funct);
         parallel_for_blocked(tp, begin, end, helper, &impl::helper_parallel_for<T>::process_block, chunks_per_thread);
     }
@@ -178,6 +223,15 @@ namespace dlib
         long chunks_per_thread = 4
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
+            "\t void parallel_for()"
+            << "\n\t Invalid inputs were given to this function"
+            << "\n\t begin: " << begin 
+            << "\n\t end:   " << end
+            << "\n\t chunks_per_thread: " << chunks_per_thread
+            );
+
         thread_pool tp(num_threads);
         parallel_for(tp, begin, end, obj, funct, chunks_per_thread);
     }
@@ -193,6 +247,15 @@ namespace dlib
         long chunks_per_thread = 4
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
+            "\t void parallel_for()"
+            << "\n\t Invalid inputs were given to this function"
+            << "\n\t begin: " << begin 
+            << "\n\t end:   " << end
+            << "\n\t chunks_per_thread: " << chunks_per_thread
+            );
+
         impl::helper_parallel_for_funct<T> helper(funct);
         parallel_for(tp, begin, end,  helper, &impl::helper_parallel_for_funct<T>::run,  chunks_per_thread);
     }
@@ -208,6 +271,15 @@ namespace dlib
         long chunks_per_thread = 4
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
+            "\t void parallel_for()"
+            << "\n\t Invalid inputs were given to this function"
+            << "\n\t begin: " << begin 
+            << "\n\t end:   " << end
+            << "\n\t chunks_per_thread: " << chunks_per_thread
+            );
+
         thread_pool tp(num_threads);
         parallel_for(tp, begin, end, funct, chunks_per_thread);
     }
