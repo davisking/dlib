@@ -39,6 +39,8 @@ namespace dlib
               Then parallel_for_blocked() submits each of these subranges to tp for
               processing such that (obj.*funct)(begin[i], end[i]) is invoked for all valid
               values of i.
+            - This function will not perform any memory allocations or create any system
+              resources such as mutex objects.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -92,6 +94,8 @@ namespace dlib
               Then parallel_for_blocked() submits each of these subranges to tp for
               processing such that funct(begin[i], end[i]) is invoked for all valid values
               of i.
+            - This function will not perform any memory allocations or create any system
+              resources such as mutex objects.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -140,6 +144,8 @@ namespace dlib
             - Therefore, this routine invokes (obj.*funct)(i) for all i in the range
               [begin, end).  However, it does so using tp.num_threads_in_pool() parallel
               threads.
+            - This function will not perform any memory allocations or create any system
+              resources such as mutex objects.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -186,6 +192,8 @@ namespace dlib
                 }, chunks_per_thread);
             - Therefore, this routine invokes funct(i) for all i in the range [begin, end).
               However, it does so using tp.num_threads_in_pool() parallel threads.
+            - This function will not perform any memory allocations or create any system
+              resources such as mutex objects.
     !*/
 
 // ----------------------------------------------------------------------------------------
