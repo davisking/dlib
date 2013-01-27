@@ -116,11 +116,6 @@ namespace dlib
         ) const
         {
             ++num_iterations_executed;
-            const long num = this->get_num_samples();
-
-            // how many samples to process in a single task (aim for 4 jobs per worker)
-            const long num_workers = std::max(1UL, tp.num_threads_in_pool());
-            const long block_size = std::max(1L, num/(num_workers*4));
 
             const uint64 start_time = ts.get_timestamp();
 
@@ -133,13 +128,8 @@ namespace dlib
                 buffer_subgradients_locally = !buffer_subgradients_locally;
             }
 
-
             binder b(*this, w, subgradient, total_loss, buffer_subgradients_locally);
-            for (long i = 0; i < num; i+=block_size)
-            {
-                tp.add_task(b, &binder::call_oracle, i, std::min(i+block_size, num));
-            }
-            tp.wait_for_all_tasks();
+            parallel_for_blocked(tp, 0, this->get_num_samples(), b, &binder::call_oracle);
 
             const uint64 stop_time = ts.get_timestamp();
 

@@ -216,10 +216,6 @@ namespace dlib
 
                         data.num = problem.get_num_samples();
 
-                        // how many samples to process in a single task (aim for 4 jobs per worker)
-                        const long num_workers = std::max(1UL, tp.num_threads_in_pool());
-                        const long block_size = std::max(1L, data.num/(num_workers*4));
-
                         const uint64 start_time = ts.get_timestamp();
 
                         // pick fastest buffering strategy
@@ -233,11 +229,7 @@ namespace dlib
                         }
 
                         binder b(*this, req, data, buffer_subgradients_locally);
-                        for (long i = 0; i < data.num; i+=block_size)
-                        {
-                            tp.add_task(b, &binder::call_oracle, i, std::min(i + block_size, data.num));
-                        }
-                        tp.wait_for_all_tasks();
+                        parallel_for_blocked(tp, 0, data.num, b, &binder::call_oracle);
 
                         const uint64 stop_time = ts.get_timestamp();
                         if (buffer_subgradients_locally)
