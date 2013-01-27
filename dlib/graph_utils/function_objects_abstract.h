@@ -18,6 +18,11 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This is a simple function object that computes squared euclidean distance
                 between two dlib::matrix objects. 
+
+            THREAD SAFETY
+                This object has no mutable members.  Therefore, it is safe to call
+                operator() on a single instance of this object simultaneously from multiple
+                threads.
         !*/
 
         squared_euclidean_distance (
@@ -64,9 +69,14 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is a simple function object that the cosine of the angle between
-                two vectors and returns 1 - this quantity.   Moreover, this object
+                This is a simple function object that computes the cosine of the angle
+                between two vectors and returns 1 - this quantity.   Moreover, this object
                 works for both sparse and dense vectors.
+
+            THREAD SAFETY
+                This object has no mutable members.  Therefore, it is safe to call
+                operator() on a single instance of this object simultaneously from multiple
+                threads.
         !*/
 
         template <typename sample_type>
@@ -91,12 +101,47 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct negative_dot_product_distance 
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple function object that computes the dot product between two
+                vectors and returns the negation of this value.  Moreover, this object
+                works for both sparse and dense vectors.
+
+            THREAD SAFETY
+                This object has no mutable members.  Therefore, it is safe to call
+                operator() on a single instance of this object simultaneously from multiple
+                threads.
+        !*/
+
+        template <typename sample_type>
+        double operator() (
+            const sample_type& a,
+            const sample_type& b
+        ) const;
+        /*!
+            requires
+                - sample_type is a dense vector (e.g. a dlib::matrix) or a sparse
+                  vector as defined at the top of dlib/svm/sparse_vector_abstract.h
+            ensures
+                - returns -dot(a,b)
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
     struct use_weights_of_one 
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is a simple function object that takes a single argument
                 and always returns 1 
+
+            THREAD SAFETY
+                This object has no mutable members.  Therefore, it is safe to call
+                operator() on a single instance of this object simultaneously from multiple
+                threads.
         !*/
 
         template <typename edge_type>
@@ -117,6 +162,11 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This is a simple function object that takes a single argument
                 which should be an object similar to dlib::sample_pair.  
+
+            THREAD SAFETY
+                This object has no mutable members.  Therefore, it is safe to call
+                operator() on a single instance of this object simultaneously from multiple
+                threads.
         !*/
 
         use_gaussian_weights (

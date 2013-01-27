@@ -67,6 +67,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct negative_dot_product_distance 
+    {
+        template <typename sample_type>
+        double operator() (
+            const sample_type& a,
+            const sample_type& b
+        ) const
+        { 
+            return -dot(a,b);
+        }
+    };
+
+// ----------------------------------------------------------------------------------------
+
     struct use_weights_of_one 
     {
         template <typename edge_type>
