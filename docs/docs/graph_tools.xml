@@ -46,19 +46,26 @@
          <item>create_join_tree</item> 
       </section>
 
+
       <section>
-         <name>Edge List Based Graphs</name>
+         <name>Creating Edge List Based Graphs</name>
          <item>sample_pair</item>
          <item>ordered_sample_pair</item>
          <item>find_percent_shortest_edges_randomly</item>
          <item>find_k_nearest_neighbors</item>
          <item>find_approximate_k_nearest_neighbors</item>
+         <item>squared_euclidean_distance</item>
+         <item>cosine_distance</item>
+         <item>negative_dot_product_distance</item>
+      </section>
+
+      <section>
+         <name>Using Edge List Based Graphs</name>
          <item>remove_short_edges</item>
          <item>remove_duplicate_edges</item>
          <item>remove_long_edges</item>
          <item>remove_percent_longest_edges</item>
          <item>remove_percent_shortest_edges</item>
-         <item>squared_euclidean_distance</item>
          <item>use_weights_of_one</item>
          <item>use_gaussian_weights</item>
          <item>is_ordered_by_index</item>
@@ -309,6 +316,30 @@
             <example>linear_manifold_regularizer_ex.cpp.html</example>
          </examples>
 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>cosine_distance</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/function_objects_abstract.h</spec_file>
+         <description>
+                This is a simple function object that computes cosine of the angle between
+                two vectors. 
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>negative_dot_product_distance</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/function_objects_abstract.h</spec_file>
+         <description>
+                This is a simple function object that computes -dot(v1,v2) for two
+                vectors v1 and v2.
+         </description>
       </component>
 
    <!-- ************************************************************************* -->

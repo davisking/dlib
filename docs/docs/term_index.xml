@@ -265,6 +265,8 @@
 
          <term file="ml.html" name="linear_manifold_regularizer"/>
          <term file="graph_tools.html" name="squared_euclidean_distance"/>
+         <term file="graph_tools.html" name="cosine_distance"/>
+         <term file="graph_tools.html" name="negative_dot_product_distance"/>
          <term file="graph_tools.html" name="use_weights_of_one"/>
          <term file="graph_tools.html" name="use_gaussian_weights"/>
 
