@@ -32,6 +32,9 @@ namespace dlib
             if (y1 > y2)
                 swap(y1,y2);
 
+            if (x1 < 0 || x1 >= c.nc())
+                return;
+
 
             // this is a vertical line
             for (long y = y1; y <= y2; ++y)
@@ -49,6 +52,8 @@ namespace dlib
             if (x1 > x2)
                 swap(x1,x2);
 
+            if (y1 < 0 || y1 >= c.nr())
+                return;
 
             // this is a horizontal line
             for (long x = x1; x <= x2; ++x)
