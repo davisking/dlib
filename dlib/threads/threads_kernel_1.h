@@ -150,6 +150,9 @@ namespace dlib
                 // broadcast().
                 value = false;
 
+                // signal that we are awake
+                ReleaseSemaphore(hCountSema,(LONG)1,NULL);
+
                 // get a lock on the mutex for the waiters variable
                 waiters_mutex.lock();
                 // mark that one less thread will be waiting on this signaler. 
@@ -161,10 +164,11 @@ namespace dlib
             else 
             {
                 value = true;
+
+                // signal that we are awake
+                ReleaseSemaphore(hCountSema,(LONG)1,NULL);
             }
 
-            // signal that we are awake
-            ReleaseSemaphore(hCountSema,(LONG)1,NULL);
 
             // relock the associated mutex 
             m.lock();
