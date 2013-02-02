@@ -763,7 +763,7 @@ namespace dlib
 
         } // for (long i = 0; i < folds; ++i)
 
-        std::pair<scalar_type,scalar_type> params = learn_platt_scaling(out, out_label);
+        std::pair<double,double> params = learn_platt_scaling(out, out_label);
 
         const double A = params.first;
         const double B = params.second;
