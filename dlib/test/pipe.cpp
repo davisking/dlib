@@ -160,7 +160,87 @@ namespace
 
     }
 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
+    template<typename in_type, typename out_type>
+    class PipelineProcessor : private dlib::threaded_object
+    {
+    public:
+        PipelineProcessor(
+            dlib::pipe<in_type> & in,
+            dlib::pipe<out_type> & out) :
+            InPipe(in),
+            OutPipe(out),
+            InMsg(),
+            OutMsg() {
+                start();
+            }
+
+        ~PipelineProcessor() {
+            // signal the thread to stop
+            stop();
+            wait();
+        }
+
+    private:
+        dlib::pipe<in_type> & InPipe;
+        dlib::pipe<out_type> & OutPipe;
+
+        in_type InMsg;
+        out_type OutMsg;
+
+        void thread() 
+        {
+            while (!should_stop()) {
+                if(InPipe.dequeue_or_timeout(InMsg, 100)) 
+                {
+                    // if function signals ready to send OutMsg
+                    while (!OutPipe.enqueue_or_timeout(OutMsg, 100)) 
+                    {
+                        // try to send until should stop
+                        if (should_stop()) 
+                        {
+                            return;
+                        }
+                    }
+                }
+            }
+        };
+    };
+
+
+    void do_zero_size_test_with_timeouts()
+    {
+        dlog << LINFO << "in do_zero_size_test_with_timeouts()";
+        // make sure we can get though this without deadlocking
+        for (int k = 0; k < 10; ++k)
+        {
+            dlib::pipe<int> in_pipe(10);
+            dlib::pipe<float> out_pipe(0);
+            {
+                PipelineProcessor<int, float> pp(in_pipe, out_pipe);
+
+                int in = 1;
+                in_pipe.enqueue(in);
+                in = 2;
+                in_pipe.enqueue(in);
+                in = 3;
+                in_pipe.enqueue(in);
+                // sleep to make sure thread enqueued
+                dlib::sleep(100);
+
+                float out = 1.0f;
+                out_pipe.dequeue(out);
+                dlib::sleep(100);
+            }
+            print_spinner();
+        }
+
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template <
         typename pipe
@@ -598,6 +678,8 @@ namespace
         )
         {
             pipe_kernel_test<dlib::pipe<int> >();
+
+            do_zero_size_test_with_timeouts();
         }
     } a;
 
