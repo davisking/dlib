@@ -21,7 +21,7 @@
          containers without encountering the overhead of the massive copying
          that would likely result if you did the same thing with the STL.  It
          also means you can store objects that are not copyable inside these
-         containers, which is not something you can do with the STL.  
+         containers, which is not something you can do with the STL prior to C++11.  
          </p>
 
          <p>
