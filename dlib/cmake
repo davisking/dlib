@@ -1,0 +1,20 @@
+
+
+# Determine the path to dlib.
+string(REPLACE "cmake" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
+
+if (CMAKE_COMPILER_IS_GNUCXX)
+   # By default, g++ won't warn or error if you forget to return a value in a
+   # function which requires you to do so.  This option makes it give a warning
+   # for doing this. 
+   add_definitions("-Wreturn-type")
+endif()
+
+# Add folder containing dlib to the include search path.
+INCLUDE_DIRECTORIES(${dlib_path}/..)
+
+# This is really optional, but nice.  It will make sure the build mode 
+# created by cmake is always release by default.
+include(${dlib_path}/release_build_by_default)
+
+add_subdirectory(${dlib_path} dlib_build)
