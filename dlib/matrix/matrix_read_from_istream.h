@@ -59,17 +59,15 @@ namespace dlib
 
             // Eat next block of whitespace but also note if we hit the start of the next
             // line. 
-            int last_ch = 'a'; // set last_ch to anything other than '\n'
             while (next_is_whitespace(in))
             {
-                if (last_ch == '\n' && in.peek() == '\n')
+                if (at_start_of_line && in.peek() == '\n')
                 {
                     stop = true;
                     break;
                 }
 
-                last_ch = in.get();
-                if (last_ch == '\n')
+                if (in.get() == '\n')
                     at_start_of_line = true;
             }
         }

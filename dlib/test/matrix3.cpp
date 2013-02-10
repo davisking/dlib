@@ -1001,6 +1001,61 @@ namespace
     }
 
 
+    void test_matrix_IO()
+    {
+        dlib::rand rnd;
+        print_spinner();
+
+        for (int i = 0; i < 400; ++i)
+        {
+            ostringstream sout;
+            sout.precision(20);
+
+            matrix<double> m1, m2, m3;
+
+            const long r = rnd.get_random_32bit_number()%7+1;
+            const long c = rnd.get_random_32bit_number()%7+1;
+            const long num = rnd.get_random_32bit_number()%2+1;
+
+            m1 = randm(r,c,rnd);
+            sout << m1;
+            if (num != 1)
+                sout << "\n" << m1;
+
+            if (rnd.get_random_double() < 0.3)
+                sout << "   \n";
+            else if (rnd.get_random_double() < 0.3)
+                sout << "   \n\n 3 3 3 3";
+            else if (rnd.get_random_double() < 0.3)
+                sout << "   \n \n  v 3 3 3 3 3";
+
+            istringstream sin(sout.str());
+            sin >> m2;
+            DLIB_TEST_MSG(equal(m1,m2),  m1 << "\n***********\n" << m2);
+
+            if (num != 1)
+            {
+                sin >> m3;
+                DLIB_TEST_MSG(equal(m1,m3),  m1 << "\n***********\n" << m3);
+            }
+        }
+
+
+        {
+            istringstream sin(" 1 2\n3");
+            matrix<double> m;
+            DLIB_TEST(sin);
+            sin >> m;
+            DLIB_TEST(!sin);
+        }
+        {
+            istringstream sin("");
+            matrix<double> m;
+            DLIB_TEST(sin);
+            sin >> m;
+            DLIB_TEST(!sin);
+        }
+    }
 
 
 
@@ -1017,6 +1072,7 @@ namespace
         void perform_test (
         )
         {
+            test_matrix_IO();
             matrix_test();
         }
     } a;
