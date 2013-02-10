@@ -703,6 +703,34 @@ namespace dlib
             - returns out
     !*/
 
+    template <
+        typename T, 
+        long NR, 
+        long NC,
+        typename MM,
+        typename L
+        >
+    std::istream& operator>> (
+        std::istream& in,
+        matrix<T,NR,NC,MM,L>& m
+    );
+    /*!
+        ensures
+            - Tries to read a matrix from the given input stream and store it into #m.
+            - The format expected is the text format output by the above operator<<().
+              That is, the format should be a grid of text such as:
+                2 3 4
+                5 2 6 
+            - The separation between numbers can be any number of whitespace characters or
+              commas.      
+            - The matrix data is assumed to end upon the first blank line or end-of-file,
+              whichever comes first.  This means you can create an input stream with
+              multiple matrices in it by separating them with empty lines.
+            - returns in. 
+            - If there was a formatting error or something which prevents the input data
+              from being parsed into a matrix then #in.fail() == true.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <typename EXP>

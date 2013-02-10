@@ -1786,6 +1786,22 @@ namespace dlib
         return out;
     }
 
+    /*
+    template <
+        typename T, 
+        long NR, 
+        long NC,
+        typename MM,
+        typename L
+        >
+    std::istream& operator>> (
+        std::istream& in,
+        matrix<T,NR,NC,MM,L>& m
+    );
+
+    This function is defined inside the matrix_read_from_istream.h file.
+    */
+
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------

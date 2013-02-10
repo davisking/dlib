@@ -11,6 +11,7 @@
 #include "matrix/matrix_la.h"
 #include "matrix/symmetric_matrix_cache.h"
 #include "matrix/matrix_conv.h"
+#include "matrix/matrix_read_from_istream.h"
 
 #ifdef DLIB_USE_BLAS
 #include "matrix/matrix_blas_bindings.h"
