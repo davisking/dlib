@@ -3,12 +3,7 @@
 # information about it at http://www.cmake.org
 #
 
-# setting this makes CMake allow normal looking IF ELSE statements
-SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
-cmake_minimum_required(VERSION 2.4)
-if(COMMAND cmake_policy)
-   cmake_policy(SET CMP0003 NEW)
-endif(COMMAND cmake_policy)
+cmake_minimum_required(VERSION 2.6)
 
 # This variable contains a list of all the tests we are building
 # into the regression test suite.
@@ -30,14 +25,9 @@ PROJECT(${target_name})
 # cmake that they are part of our target (which is the executable named test)
 ADD_EXECUTABLE(${target_name} ../main.cpp ../tester.cpp ${tests})
 
-# add the folder containing the dlib folder to the include path
-INCLUDE_DIRECTORIES(../../..)
-
 ADD_DEFINITIONS(-DDLIB_TEST_BLAS_BINDINGS)
-# There is a CMakeLists.txt file in the dlib source folder that tells cmake
-# how to build the dlib library.  Tell cmake about that file.
-add_subdirectory(../.. dlib_build)
 
 # Tell cmake to link our target executable to dlib
+include(../../cmake)
 TARGET_LINK_LIBRARIES(${target_name} dlib )
 
