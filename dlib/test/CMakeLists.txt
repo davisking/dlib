@@ -142,26 +142,19 @@ PROJECT(${target_name})
 # cmake that they are part of our target (which is the executable named test)
 ADD_EXECUTABLE(${target_name} main.cpp tester.cpp ${tests})
 
-# add the folder containing the dlib folder to the include path
-INCLUDE_DIRECTORIES(../..)
-
 # Turn on all warnings when using gcc.
 if (CMAKE_COMPILER_IS_GNUCXX)
    add_definitions("-W -Wall")
 endif()
 
-# There is a CMakeLists.txt file in the dlib source folder that tells cmake
-# how to build the dlib library.  Tell cmake about that file.
-add_subdirectory(.. dlib_build)
+
+# Tell cmake to link our target executable to dlib.
+include(../cmake)
+TARGET_LINK_LIBRARIES(${target_name} dlib )
+
 
 if (NOT DLIB_NO_GUI_SUPPORT)
    add_subdirectory(gui)
 endif()
 
-# Tell cmake to link our target executable to the non-gui version of the dlib
-# library.  
-TARGET_LINK_LIBRARIES(${target_name} dlib )
-
-# make the default build be in "Release" mode
-include(../release_build_by_default)
 

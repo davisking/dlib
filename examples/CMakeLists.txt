@@ -4,30 +4,16 @@
 #
 
 
-# setting this makes CMake allow normal looking IF ELSE statements
-SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
-cmake_minimum_required(VERSION 2.4)
-if(COMMAND cmake_policy) 
-   cmake_policy(SET CMP0003 NEW) 
-endif()
-
-
-#set default build type to Release
-include(../dlib/release_build_by_default)
-
-
+cmake_minimum_required(VERSION 2.6)
 
 PROJECT(examples)
 
-# add the folder containing the dlib folder to the include path
-INCLUDE_DIRECTORIES(..)
+include(../dlib/cmake)
 
-
-# There is a CMakeLists.txt file in the dlib source folder that tells cmake
-# how to build the dlib library.  Tell cmake about that file.
-add_subdirectory(../dlib dlib_build)
-
-
+# We are going to use a macro to add all the example programs.  However,
+# usually you will only create one executable in your cmake projects.
+# Therefore, you would just need to invoke ADD_EXECUTABLE() and
+# TARGET_LINK_LIBRARIES() as shown below.  
 MACRO(add_example name)
    ADD_EXECUTABLE(${name} ${name}.cpp)
    TARGET_LINK_LIBRARIES(${name} dlib )
