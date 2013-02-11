@@ -164,7 +164,7 @@ void convert_pascal_v1(
             dataset.images.push_back(img);
 
         }
-        catch (exception& e)
+        catch (exception& )
         {
             cout << "Error while processing file " << parser[i] << endl << endl;
             throw;
