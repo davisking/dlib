@@ -9,6 +9,7 @@
 #include "statistics/image_feature_sampling.h"
 #include "statistics/sammon.h"
 #include "statistics/cca.h"
+#include "statistics/average_precision.h"
 
 #endif // DLIB_STATISTICs_H_ 
 
