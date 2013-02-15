@@ -340,6 +340,30 @@ namespace
             DLIB_TEST(rs1.max_n() == 50);
         }
 
+        void test_average_precision()
+        {
+            std::vector<bool> items;
+            DLIB_TEST(average_precision(items) == 1);
+            DLIB_TEST(average_precision(items,1) == 0);
+
+            items.push_back(true);
+            DLIB_TEST(average_precision(items) == 1);
+            DLIB_TEST(std::abs(average_precision(items,1) - 0.5) < 1e-14);
+
+            items.push_back(true);
+            DLIB_TEST(average_precision(items) == 1);
+            DLIB_TEST(std::abs(average_precision(items,1) - 2.0/3.0) < 1e-14);
+
+            items.push_back(false);
+
+            DLIB_TEST(average_precision(items) == 1);
+            DLIB_TEST(std::abs(average_precision(items,1) - 2.0/3.0) < 1e-14);
+
+            items.push_back(true);
+
+            DLIB_TEST(std::abs(average_precision(items) - (2.0+3.0/4.0)/3.0) < 1e-14);
+        }
+
         void perform_test (
         )
         {
@@ -350,6 +374,7 @@ namespace
             test_randomize_samples();
             test_randomize_samples2();
             another_test();
+            test_average_precision();
         }
     } a;
 
