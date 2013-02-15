@@ -2380,7 +2380,8 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <description>
             Performs k-fold cross validation on a user supplied ranking trainer object such
             as the <a href="#svm_rank_trainer">svm_rank_trainer</a>
-            and returns the fraction of ranking pairs ordered correctly. 
+            and returns the fraction of ranking pairs ordered correctly as well as the mean
+            average precision. 
          </description>
          <examples>
             <example>svm_rank_ex.cpp.html</example>
@@ -2452,7 +2453,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <spec_file link="true">dlib/svm/ranking_tools_abstract.h</spec_file>
          <description>
             Tests a <a href="#decision_function">decision_function</a>'s ability to correctly 
-            rank a dataset and returns the resulting ranking accuracy.
+            rank a dataset and returns the resulting ranking accuracy and mean average precision metrics.
          </description>
          <examples>
             <example>svm_rank_ex.cpp.html</example>
