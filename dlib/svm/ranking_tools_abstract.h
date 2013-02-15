@@ -159,7 +159,7 @@ namespace dlib
         typename ranking_function,
         typename T
         >
-    double test_ranking_function (
+    matrix<double,1,2> test_ranking_function (
         const ranking_function& funct,
         const std::vector<ranking_pair<T> >& samples
     );
@@ -171,11 +171,17 @@ namespace dlib
             - Tests the given ranking function on the supplied example ranking data and
               returns the fraction of ranking pair orderings predicted correctly.  This is
               a number in the range [0,1] where 0 means everything was incorrectly
-              predicted while 1 means everything was correctly predicted.
-            - In particular, this function returns the fraction of times that the following
-              is true:                
-                - funct(samples[k].relevant[i]) > funct(samples[k].nonrelevant[j])
-                  (for all valid i,j,k)
+              predicted while 1 means everything was correctly predicted.  This function
+              also returns the mean average precision.
+            - In particular, this function returns a matrix M summarizing the results.
+              Specifically, it returns an M such that:
+                - M(0) == the fraction of times that the following is true:                
+                    - funct(samples[k].relevant[i]) > funct(samples[k].nonrelevant[j])
+                      (for all valid i,j,k)
+                - M(1) == the mean average precision of the rankings induced by funct.
+                  (Mean average precision is a number in the range 0 to 1.  Moreover, a
+                  mean average precision of 1 means everything was correctly predicted
+                  while smaller values indicate worse rankings.)
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -184,7 +190,7 @@ namespace dlib
         typename ranking_function,
         typename T
         >
-    double test_ranking_function (
+    matrix<double,1,2> test_ranking_function (
         const ranking_function& funct,
         const ranking_pair<T>& sample
     );
@@ -206,7 +212,7 @@ namespace dlib
         typename trainer_type,
         typename T
         >
-    double cross_validate_ranking_trainer (
+    matrix<double,1,2> cross_validate_ranking_trainer (
         const trainer_type& trainer,
         const std::vector<ranking_pair<T> >& samples,
         const long folds
@@ -219,11 +225,15 @@ namespace dlib
         ensures
             - Performs k-fold cross validation by using the given trainer to solve the
               given ranking problem for the given number of folds.  Each fold is tested
-              using the output of the trainer and the average ranking accuracy from all
-              folds is returned.  
+              using the output of the trainer and the average ranking accuracy as well as
+              the mean average precision over the number of folds is returned.
             - The accuracy is computed the same way test_ranking_function() computes its
               accuracy.  Therefore, it is a number in the range [0,1] that represents the
-              fraction of times a ranking pair's ordering was predicted correctly.
+              fraction of times a ranking pair's ordering was predicted correctly.  Similarly,
+              the mean average precision is computed identically to test_ranking_function().
+              In particular, this means that this function returns a matrix M such that:
+                - M(0) == the ranking accuracy
+                - M(1) == the mean average precision
             - The number of folds used is given by the folds argument.
     !*/
 

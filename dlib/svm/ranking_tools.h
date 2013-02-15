@@ -11,6 +11,7 @@
 #include <utility>
 #include <algorithm>
 #include "sparse_vector.h"
+#include "../statistics.h"
 
 namespace dlib
 {
@@ -219,7 +220,7 @@ namespace dlib
         typename ranking_function,
         typename T
         >
-    double test_ranking_function (
+    matrix<double,1,2> test_ranking_function (
         const ranking_function& funct,
         const std::vector<ranking_pair<T> >& samples
     )
@@ -240,16 +241,36 @@ namespace dlib
         std::vector<unsigned long> rel_counts;
         std::vector<unsigned long> nonrel_counts;
 
+        running_stats<double> rs;
+        std::vector<std::pair<double,bool> > total_scores;
+        std::vector<bool> total_ranking;
+
         for (unsigned long i = 0; i < samples.size(); ++i)
         {
             rel_scores.resize(samples[i].relevant.size());
             nonrel_scores.resize(samples[i].nonrelevant.size());
+            total_scores.clear();
 
             for (unsigned long k = 0; k < rel_scores.size(); ++k)
+            {
                 rel_scores[k] = funct(samples[i].relevant[k]);
+                total_scores.push_back(std::make_pair(rel_scores[k], true));
+            }
 
             for (unsigned long k = 0; k < nonrel_scores.size(); ++k)
+            {
                 nonrel_scores[k] = funct(samples[i].nonrelevant[k]);
+                total_scores.push_back(std::make_pair(nonrel_scores[k], false));
+            }
+
+            // Now compute the average precision for this sample.  We need to sort the
+            // results and the back them into total_ranking.
+            std::sort(total_scores.rbegin(), total_scores.rend());
+            total_ranking.clear();
+            for (unsigned long i = 0; i < total_scores.size(); ++i)
+                total_ranking.push_back(total_scores[i].second);
+            rs.add(average_precision(total_ranking));
+
 
             count_ranking_inversions(rel_scores, nonrel_scores, rel_counts, nonrel_counts);
 
@@ -260,7 +281,11 @@ namespace dlib
             total_wrong += sum(mat(rel_counts));
         }
 
-        return static_cast<double>(total_pairs - total_wrong) / total_pairs;
+        const double rank_swaps = static_cast<double>(total_pairs - total_wrong) / total_pairs;
+        const double mean_average_precision = rs.mean();
+        matrix<double,1,2> res;
+        res = rank_swaps, mean_average_precision;
+        return res;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -269,7 +294,7 @@ namespace dlib
         typename ranking_function,
         typename T
         >
-    double test_ranking_function (
+    matrix<double,1,2> test_ranking_function (
         const ranking_function& funct,
         const ranking_pair<T>& sample
     )
@@ -283,7 +308,7 @@ namespace dlib
         typename trainer_type,
         typename T
         >
-    double cross_validate_ranking_trainer (
+    matrix<double,1,2> cross_validate_ranking_trainer (
         const trainer_type& trainer,
         const std::vector<ranking_pair<T> >& samples,
         const long folds
@@ -317,6 +342,9 @@ namespace dlib
         std::vector<unsigned long> rel_counts;
         std::vector<unsigned long> nonrel_counts;
 
+        running_stats<double> rs;
+        std::vector<std::pair<double,bool> > total_scores;
+        std::vector<bool> total_ranking;
 
         for (long i = 0; i < folds; ++i)
         {
@@ -347,11 +375,28 @@ namespace dlib
                 rel_scores.resize(samples_test[i].relevant.size());
                 nonrel_scores.resize(samples_test[i].nonrelevant.size());
 
+                total_scores.clear();
+
                 for (unsigned long k = 0; k < rel_scores.size(); ++k)
+                {
                     rel_scores[k] = df(samples_test[i].relevant[k]);
+                    total_scores.push_back(std::make_pair(rel_scores[k], true));
+                }
 
                 for (unsigned long k = 0; k < nonrel_scores.size(); ++k)
+                {
                     nonrel_scores[k] = df(samples_test[i].nonrelevant[k]);
+                    total_scores.push_back(std::make_pair(nonrel_scores[k], false));
+                }
+
+                // Now compute the average precision for this sample.  We need to sort the
+                // results and the back them into total_ranking.
+                std::sort(total_scores.rbegin(), total_scores.rend());
+                total_ranking.clear();
+                for (unsigned long i = 0; i < total_scores.size(); ++i)
+                    total_ranking.push_back(total_scores[i].second);
+                rs.add(average_precision(total_ranking));
+
 
                 count_ranking_inversions(rel_scores, nonrel_scores, rel_counts, nonrel_counts);
 
@@ -364,7 +409,11 @@ namespace dlib
 
         } // for (long i = 0; i < folds; ++i)
 
-        return static_cast<double>(total_pairs - total_wrong) / total_pairs;
+        const double rank_swaps = static_cast<double>(total_pairs - total_wrong) / total_pairs;
+        const double mean_average_precision = rs.mean();
+        matrix<double,1,2> res;
+        res = rank_swaps, mean_average_precision;
+        return res;
     }
 
 // ----------------------------------------------------------------------------------------

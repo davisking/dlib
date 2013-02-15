@@ -108,9 +108,11 @@ namespace
         decision_function<kernel_type> df = trainer.train(samples);
 
         dlog << LINFO << "accuracy: "<< test_ranking_function(df, samples);
-        DLIB_TEST(std::abs(test_ranking_function(df, samples) - 1.0) < 1e-14);
+        matrix<double,1,2> res;
+        res = 1,1;
+        DLIB_TEST(equal(test_ranking_function(df, samples), res));
 
-        DLIB_TEST(std::abs(test_ranking_function(trainer.train(samples[1]), samples) - 1.0) < 1e-14);
+        DLIB_TEST(equal(test_ranking_function(trainer.train(samples[1]), samples), res));
 
         trainer.set_epsilon(1e-13);
         df = trainer.train(samples);
@@ -121,10 +123,10 @@ namespace
         DLIB_TEST(length(truew - df.basis_vectors(0)) < 1e-10);
 
         dlog << LINFO << "accuracy: "<< test_ranking_function(df, samples);
-        DLIB_TEST(std::abs(test_ranking_function(df, samples) - 1.0) < 1e-14);
+        DLIB_TEST(equal(test_ranking_function(df, samples), res));
 
         dlog << LINFO << "cv-accuracy: "<< cross_validate_ranking_trainer(trainer, samples,2);
-        DLIB_TEST(std::abs(cross_validate_ranking_trainer(trainer, samples,2) - 0.7777777778) < 0.0001);
+        DLIB_TEST(std::abs(cross_validate_ranking_trainer(trainer, samples,2)(0) - 0.7777777778) < 0.0001);
 
         trainer.set_learns_nonnegative_weights(true);
         df = trainer.train(samples);
@@ -132,7 +134,7 @@ namespace
         dlog << LINFO << df.basis_vectors(0);
         DLIB_TEST(length(truew - df.basis_vectors(0)) < 1e-10);
         dlog << LINFO << "accuracy: "<< test_ranking_function(df, samples);
-        DLIB_TEST(std::abs(test_ranking_function(df, samples) - 1.0) < 1e-14);
+        DLIB_TEST(equal(test_ranking_function(df, samples), res));
 
 
         samples.clear();
@@ -141,7 +143,7 @@ namespace
         samples.push_back(p);
         samples.push_back(p);
         dlog << LINFO << "cv-accuracy: "<< cross_validate_ranking_trainer(trainer, samples,4);
-        DLIB_TEST(std::abs(cross_validate_ranking_trainer(trainer, samples,4) - 1) < 1e-12);
+        DLIB_TEST(equal(cross_validate_ranking_trainer(trainer, samples,4) , res));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -178,10 +180,13 @@ namespace
 
         decision_function<kernel_type> df = trainer.train(samples);
 
-        dlog << LINFO << "accuracy: "<< test_ranking_function(df, samples);
-        DLIB_TEST(std::abs(test_ranking_function(df, samples) - 1.0) < 1e-14);
+        matrix<double,1,2> res;
+        res = 1,1;
 
-        DLIB_TEST(std::abs(test_ranking_function(trainer.train(samples[1]), samples) - 1.0) < 1e-14);
+        dlog << LINFO << "accuracy: "<< test_ranking_function(df, samples);
+        DLIB_TEST(equal(test_ranking_function(df, samples), res));
+
+        DLIB_TEST(equal(test_ranking_function(trainer.train(samples[1]), samples), res));
 
         trainer.set_epsilon(1e-13);
         df = trainer.train(samples);
@@ -195,10 +200,10 @@ namespace
         DLIB_TEST(length(subtract(truew , df.basis_vectors(0))) < 1e-10);
 
         dlog << LINFO << "accuracy: "<< test_ranking_function(df, samples);
-        DLIB_TEST(std::abs(test_ranking_function(df, samples) - 1.0) < 1e-14);
+        DLIB_TEST(equal(test_ranking_function(df, samples), res));
 
         dlog << LINFO << "cv-accuracy: "<< cross_validate_ranking_trainer(trainer, samples,2);
-        DLIB_TEST(std::abs(cross_validate_ranking_trainer(trainer, samples,2) - 0.7777777778) < 0.0001);
+        DLIB_TEST(std::abs(cross_validate_ranking_trainer(trainer, samples,2)(0) - 0.7777777778) < 0.0001);
 
         trainer.set_learns_nonnegative_weights(true);
         df = trainer.train(samples);
@@ -209,7 +214,7 @@ namespace
         dlog << LINFO << sparse_to_dense(df.basis_vectors(0));
         DLIB_TEST(length(subtract(truew , df.basis_vectors(0))) < 1e-10);
         dlog << LINFO << "accuracy: "<< test_ranking_function(df, samples);
-        DLIB_TEST(std::abs(test_ranking_function(df, samples) - 1.0) < 1e-14);
+        DLIB_TEST(equal(test_ranking_function(df, samples), res));
 
 
         samples.clear();
@@ -218,7 +223,7 @@ namespace
         samples.push_back(p);
         samples.push_back(p);
         dlog << LINFO << "cv-accuracy: "<< cross_validate_ranking_trainer(trainer, samples,4);
-        DLIB_TEST(std::abs(cross_validate_ranking_trainer(trainer, samples,4) - 1) < 1e-12);
+        DLIB_TEST(equal(cross_validate_ranking_trainer(trainer, samples,4) , res) );
     }
 
 // ----------------------------------------------------------------------------------------
@@ -303,18 +308,20 @@ namespace
         decision_function<kernel_type> df;
         df = trainer.train(pair);
 
+        matrix<double,1,2> res;
+        res = 1,1;
         dlog << LINFO << "weights: "<< trans(df.basis_vectors(0));
-        const double acc1 = test_ranking_function(df, pair);
+        const matrix<double,1,2> acc1 = test_ranking_function(df, pair);
         dlog << LINFO << "ranking accuracy: " << acc1;
-        DLIB_TEST(std::abs(acc1 - 1) == 0);
+        DLIB_TEST(equal(acc1,res));
 
         simple_rank_trainer<kernel_type,use_dcd_trainer> strainer;
         decision_function<kernel_type> df2;
         df2 = strainer.train(pair);
         dlog << LINFO << "weights: "<< trans(df2.basis_vectors(0));
-        const double acc2 = test_ranking_function(df2, pair);
+        const matrix<double,1,2> acc2 = test_ranking_function(df2, pair);
         dlog << LINFO << "ranking accuracy: " << acc2;
-        DLIB_TEST(std::abs(acc2 - 1) == 0);
+        DLIB_TEST(equal(acc2,res));
 
         dlog << LINFO << "w error: " << max(abs(df.basis_vectors(0) - df2.basis_vectors(0)));
         dlog << LINFO << "b error: " << abs(df.b - df2.b);
