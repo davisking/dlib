@@ -292,6 +292,7 @@
          <term file="ml.html" name="ranking_pair"/>
          <term file="ml.html" name="is_ranking_problem"/>
          <term file="ml.html" name="count_ranking_inversions"/>
+         <term file="ml.html" name="average_precision"/>
          <term file="ml.html" name="test_ranking_function"/>
          <term file="ml.html" name="cross_validate_ranking_trainer"/>
          <term file="ml.html" name="svm_c_ekm_trainer"/>
