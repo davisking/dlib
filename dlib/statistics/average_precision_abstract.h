@@ -7,8 +7,14 @@
 
 namespace dlib
 {
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename alloc
+        >
     double average_precision (
-        const std::vector<bool>& items,
+        const std::vector<bool,alloc>& items,
         unsigned long missing_relevant_items = 0
     );
     /*!
@@ -28,6 +34,25 @@ namespace dlib
               precision of the ranking [true, true] if there are 2 missing relevant items
               is 0.5.
     !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T, 
+        typename alloc
+        >
+    double average_precision (
+        const std::vector<std::pair<T,bool>,alloc>& items,
+        unsigned long missing_relevant_items = 0
+    );
+    /*!
+        ensures
+            - this function is equivalent to copying the bool values from items into a
+              std::vector<bool> and then calling the above average_precision() routine on
+              it and returning the result. 
+    !*/
+
+// ----------------------------------------------------------------------------------------
 
 }
 
