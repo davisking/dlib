@@ -187,16 +187,29 @@ namespace dlib
             {
                 dlib::vector<double,2> vect, abs_vect, temp;
 
-                // now loop over 25 points in this bucket and sum their features 
-                for (long y = r; y < r+5; ++y)
+                // now loop over 25 points in this bucket and sum their features.  Note
+                // that we include 1 pixels worth of padding around the outside of each 5x5
+                // cell.  This is to help neighboring cells interpolate their counts into
+                // each other a little bit.
+                for (long y = r-1; y < r+5+1; ++y)
                 {
-                    for (long x = c; x < c+5; ++x)
+                    if (y < -10 || y >= 10)
+                        continue;
+                    for (long x = c-1; x < c+5+1; ++x)
                     {
+                        if (x < -10 || x >= 10)
+                            continue;
+
                         // get the rotated point for this extraction point
                         point p(rot(point(x,y)*scale) + center); 
 
-                        temp.x() = haar_x(img, p, 2*sc);
-                        temp.y() = haar_y(img, p, 2*sc);
+                        // Give points farther from the center of the bucket a lower weight.  
+                        const long center_r = r+2;
+                        const long center_c = c+2;
+                        const double weight = 1.0/(4+std::abs(center_r-y) + std::abs(center_c-x));
+
+                        temp.x() = weight*haar_x(img, p, 2*sc);
+                        temp.y() = weight*haar_y(img, p, 2*sc);
 
                         // rotate this vector into alignment with the surf descriptor box 
                         temp = inv_rot(temp);
