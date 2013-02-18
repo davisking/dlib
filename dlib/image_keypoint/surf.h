@@ -93,6 +93,8 @@ namespace dlib
         std::vector<double> ang;
         std::vector<dlib::vector<double,2> > samples;
 
+        const long sc = static_cast<long>(scale+0.5);
+
         // accumulate a bunch of angle and vector samples
         dlib::vector<double,2> vect;
         for (long r = -6; r <= 6; ++r)
@@ -103,8 +105,8 @@ namespace dlib
                 {
                     // compute a Gaussian weighted gradient and the gradient's angle.
                     const double gauss = gaussian(c,r, 2.5);
-                    vect.x() = gauss*haar_x(img, scale*point(c,r)+center, static_cast<long>(4*scale+0.5));
-                    vect.y() = gauss*haar_y(img, scale*point(c,r)+center, static_cast<long>(4*scale+0.5));
+                    vect.x() = gauss*haar_x(img, sc*point(c,r)+center, 4*sc);
+                    vect.y() = gauss*haar_y(img, sc*point(c,r)+center, 4*sc);
                     samples.push_back(vect);
                     ang.push_back(atan2(vect.y(), vect.x()));
                 }
@@ -163,7 +165,7 @@ namespace dlib
         matrix<double,64,1,MM,L>& des
     )
     {
-        DLIB_ASSERT(get_rect(img).contains(centered_rect(center, (unsigned long)(31*scale),(unsigned long)(31*scale))) == true &&
+        DLIB_ASSERT(get_rect(img).contains(centered_rect(center, (unsigned long)(32*scale),(unsigned long)(32*scale))) == true &&
                     scale > 0,
             "\tvoid compute_surf_descriptor(img, center, scale, angle)"
             << "\n\tAll arguments to this function must be > 0"
@@ -175,6 +177,7 @@ namespace dlib
         point_rotator rot(angle);
         point_rotator inv_rot(-angle);
 
+        const long sc = static_cast<long>(scale+0.5);
         long count = 0;
 
         // loop over the 4x4 grid of histogram buckets 
@@ -192,9 +195,8 @@ namespace dlib
                         // get the rotated point for this extraction point
                         point p(rot(point(x,y)*scale) + center); 
 
-                        const double gauss = gaussian(x,y, 3.3);
-                        temp.x() = gauss*haar_x(img, p, static_cast<long>(2*scale+0.5));
-                        temp.y() = gauss*haar_y(img, p, static_cast<long>(2*scale+0.5));
+                        temp.x() = haar_x(img, p, 2*sc);
+                        temp.y() = haar_y(img, p, 2*sc);
 
                         // rotate this vector into alignment with the surf descriptor box 
                         temp = inv_rot(temp);
@@ -252,7 +254,7 @@ namespace dlib
         for (unsigned long i = 0; i < std::min((size_t)max_points,points.size()); ++i)
         {
             // ignore points that are close to the edge of the image
-            const double border = 31;
+            const double border = 32;
             const unsigned long border_size = static_cast<unsigned long>(border*points[i].scale);
             if (get_rect(int_img).contains(centered_rect(points[i].center, border_size, border_size)))
             {

@@ -76,8 +76,8 @@ namespace dlib
             - integral_image_type == an object such as dlib::integral_image or another
               type that implements the interface defined in image_transforms/integral_image_abstract.h
             - scale > 0
-            - get_rect(img).contains(centered_rect(center, 31*scale, 31*scale)) == true
-              (i.e. center can't be within 31*scale pixels of the edge of the image)
+            - get_rect(img).contains(centered_rect(center, 32*scale, 32*scale)) == true
+              (i.e. center can't be within 32*scale pixels of the edge of the image)
         ensures
             - computes the 64 dimensional SURF descriptor vector of a box centered
               at the given center point, tilted at an angle determined by the given 
