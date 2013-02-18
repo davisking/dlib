@@ -63,7 +63,8 @@ int main(int argc, char** argv)
         for (unsigned long i = 0; i < sp.size(); ++i)
         {
             // Pull out the info from the SURF point relevant to figuring out
-            // where its rotated box should be.
+            // where its rotated box should be.  This is the box it extracted 
+            // the SURF descriptor vector from.
             const unsigned long box_size = static_cast<unsigned long>(sp[i].p.scale*20);
             const double ang = sp[i].angle;
             const point center(sp[i].p.center);
