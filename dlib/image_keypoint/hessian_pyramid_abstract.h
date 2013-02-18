@@ -73,13 +73,13 @@ namespace dlib
         !*/
 
         long get_border_size (
-            long octave
+            long interval
         ) const;
         /*!
             requires
-                - 0 <= octave < octaves()
+                - 0 <= interval < intervals()
             ensures
-                - Each octave of the pyramid has a certain sized border region where we
+                - Each interval of the pyramid has a certain sized border region where we
                   can't compute the Hessian values since they are too close to the edge
                   of the input image.  This function returns the size of that border.
         !*/
@@ -129,7 +129,7 @@ namespace dlib
             requires
                 - 0 <= octave < octaves()
                 - 0 <= interval < intervals()
-                - Let BS == get_border_size(octave): then
+                - Let BS == get_border_size(interval): then
                     - BS <= r < nr(octave)-BS
                     - BS <= c < nc(octave)-BS
             ensures
@@ -148,7 +148,7 @@ namespace dlib
             requires
                 - 0 <= octave < octaves()
                 - 0 <= interval < intervals()
-                - Let BS == get_border_size(octave): then
+                - Let BS == get_border_size(interval): then
                     - BS <= r < nr(octave)-BS
                     - BS <= c < nc(octave)-BS
             ensures
@@ -175,7 +175,12 @@ namespace dlib
                     - center == the x/y location of the center of the interest point
                       (in image space coordinates.  y gives the row and x gives the
                       column in the image)
-                    - scale == the scale at which the point was detected
+                    - scale == the scale at which the point was detected.  This is a number
+                      >= 1.  If it is 1 then it means the interest point was detected at
+                      the lowest scale in the image pyramid.  Larger numbers indicate that
+                      the interest point is from high up in the image pyramid.  For
+                      example, a scale of 4 would mean the interest point was located at a
+                      point in the pyramid where the image had been shrunk by a factor of 4.
                     - score == the determinant of the Hessian for the interest point
                     - laplacian == the sign of the laplacian for the interest point
         !*/

@@ -119,10 +119,10 @@ namespace dlib
             for (long o = 0; o < num_octaves; ++o)
             {
                 const long step_size = get_step_size(o);
-                const long border_size = get_border_size(o)*step_size;
 
                 for (long i = 0; i < num_intervals; ++i)
                 {
+                    const long border_size = get_border_size(i)*step_size;
                     const long lobe_size = static_cast<long>(std::pow(2.0, o+1.0)+0.5)*(i+1) + 1;
                     const double area_inv = 1.0/std::pow(3.0*lobe_size, 2.0);
 
@@ -178,17 +178,17 @@ namespace dlib
         }
 
         long get_border_size (
-            long octave
+            long interval 
         ) const
         {
-            DLIB_ASSERT(0 <= octave && octave < octaves(),
-                "\tlong get_border_size(octave)"
-                << "\n\tInvalid octave value"
+            DLIB_ASSERT(0 <= interval && interval < intervals(),
+                "\tlong get_border_size(interval)"
+                << "\n\tInvalid interval value"
                 << "\n\t this:   " << this
-                << "\n\t octave: " << octave 
+                << "\n\t interval: " << interval 
             );
 
-            const double lobe_size = std::pow(2.0, octave+1.0)*(num_intervals+1) + 1;
+            const double lobe_size = 2.0*(interval+1) + 1;
             const double filter_size = 3*lobe_size;
 
             const long bs = static_cast<long>(std::ceil(filter_size/2.0));
@@ -246,8 +246,8 @@ namespace dlib
         {
             DLIB_ASSERT(0 <= octave && octave < octaves() &&
                         0 <= interval && interval < intervals() &&
-                        get_border_size(octave) <= r && r < nr(octave)-get_border_size(octave) &&
-                        get_border_size(octave) <= c && c < nc(octave)-get_border_size(octave),
+                        get_border_size(interval) <= r && r < nr(octave)-get_border_size(interval) &&
+                        get_border_size(interval) <= c && c < nc(octave)-get_border_size(interval),
                 "\tdouble get_value(octave, interval, r, c)"
                 << "\n\tInvalid inputs to this function"
                 << "\n\t this:      " << this
@@ -259,7 +259,7 @@ namespace dlib
                 << "\n\t c:         " << c 
                 << "\n\t nr(octave): " << nr(octave)  
                 << "\n\t nc(octave): " << nc(octave) 
-                << "\n\t get_border_size(octave): " << get_border_size(octave) 
+                << "\n\t get_border_size(interval): " << get_border_size(interval) 
             );
 
             return std::abs(pyramid[num_intervals*octave + interval][r][c]);
@@ -274,8 +274,8 @@ namespace dlib
         {
             DLIB_ASSERT(0 <= octave && octave < octaves() &&
                         0 <= interval && interval < intervals() &&
-                        get_border_size(octave) <= r && r < nr(octave)-get_border_size(octave) &&
-                        get_border_size(octave) <= c && c < nc(octave)-get_border_size(octave),
+                        get_border_size(interval) <= r && r < nr(octave)-get_border_size(interval) &&
+                        get_border_size(interval) <= c && c < nc(octave)-get_border_size(interval),
                 "\tdouble get_laplacian(octave, interval, r, c)"
                 << "\n\tInvalid inputs to this function"
                 << "\n\t this:      " << this
@@ -287,7 +287,7 @@ namespace dlib
                 << "\n\t c:         " << c 
                 << "\n\t nr(octave): " << nr(octave)  
                 << "\n\t nc(octave): " << nc(octave) 
-                << "\n\t get_border_size(octave): " << get_border_size(octave) 
+                << "\n\t get_border_size(interval): " << get_border_size(interval) 
             );
 
             // return the sign of the laplacian
@@ -436,6 +436,11 @@ namespace dlib
                 temp.score = pyr.get_value(o,i,r,c);
                 temp.laplacian = pyr.get_laplacian(o,i,r,c);
             }
+            else
+            {
+                // this indicates to the caller that no interest point was found.
+                temp.score = -1;
+            }
 
             return temp;
         }
@@ -469,43 +474,26 @@ namespace dlib
 
             // do non-maximum suppression on all the intervals in the current octave and 
             // accumulate the results in result_points
-            for (long i = 1; i < pyr.intervals()-1;  i += 3)
+            for (long i = 1; i < pyr.intervals()-1;  i += 1)
             {
-                for (long r = border_size+1; r < nr - border_size-1; r += 3)
+                const long border_size = pyr.get_border_size(i+1);
+                for (long r = border_size+1; r < nr - border_size-1; r += 1)
                 {
-                    for (long c = border_size+1; c < nc - border_size-1; c += 3)
+                    for (long c = border_size+1; c < nc - border_size-1; c += 1)
                     {
                         double max_val = pyr.get_value(o,i,r,c);
                         long max_i = i;
                         long max_r = r;
                         long max_c = c;
 
-                        // loop over this 3x3x3 block and find the largest element
-                        for (long ii = i; ii < std::min(i + 3, pyr.intervals()-1); ++ii)
-                        {
-                            for (long rr = r; rr < std::min(r + 3, nr - border_size - 1); ++rr)
-                            {
-                                for (long cc = c; cc < std::min(c + 3, nc - border_size - 1); ++cc)
-                                {
-                                    double temp = pyr.get_value(o,ii,rr,cc);
-                                    if (temp > max_val)
-                                    {
-                                        max_val = temp;
-                                        max_i = ii;
-                                        max_r = rr;
-                                        max_c = cc;
-                                    }
-                                }
-                            }
-                        }
 
                         // If the max point we found is really a maximum in its own region and
                         // is big enough then add it to the results.
-                        if (max_val > threshold && is_maximum_in_region(pyr, o, max_i, max_r, max_c))
+                        if (max_val >= threshold && is_maximum_in_region(pyr, o, max_i, max_r, max_c))
                         {
                             //cout << max_val << endl;
                             interest_point sp = interpolate_point (pyr, o, max_i, max_r, max_c);
-                            if (sp.score > threshold)
+                            if (sp.score >= threshold)
                             {
                                 result_points.push_back(sp);
                             }
