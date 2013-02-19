@@ -33,7 +33,7 @@ namespace dlib
             const unsigned long gray = get_pixel_intensity(img[r][c]);
             if (gray != 0)
             {
-                const uint32 h = murmur_hash3(&gray, sizeof(gray));
+                const uint32 h = murmur_hash3_2(gray,0);
                 rgb_pixel pix;
                 pix.red   = static_cast<unsigned char>(h)%200 + 55;
                 pix.green = static_cast<unsigned char>(h>>8)%200 + 55;
