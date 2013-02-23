@@ -5,6 +5,7 @@
 
 #include "parallel_for_extension_abstract.h"
 #include "thread_pool_extension.h"
+#include "../console_progress_indicator.h"
 
 namespace dlib
 {
@@ -282,6 +283,160 @@ namespace dlib
 
         thread_pool tp(num_threads);
         parallel_for(tp, begin, end, funct, chunks_per_thread);
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        template <typename T>
+        class parfor_verbose_helper
+        {
+        public:
+            parfor_verbose_helper(T& obj_, void (T::*funct_)(long), long begin, long end) :
+                obj(obj_), funct(funct_), pbar(end-begin)
+            {
+                count = 0;
+                pbar.print_status(-1);
+            }
+
+            long count;
+            T& obj;
+            void (T::*funct)(long);
+            console_progress_indicator pbar;
+            mutex m;
+
+            void operator()(long i)
+            {
+                (obj.*funct)(i);
+                {
+                    auto_mutex lock(m);
+                    pbar.print_status(count++);
+                }
+            }
+        };
+
+        template <typename T>
+        class parfor_verbose_helper2
+        {
+        public:
+            parfor_verbose_helper2(const T& obj_, long begin, long end) : obj(obj_), pbar(end-begin)
+            {
+                count = 0;
+                pbar.print_status(-1);
+            }
+
+            mutable long count;
+            const T& obj;
+            mutable console_progress_indicator pbar;
+            mutex m;
+
+            void operator()(long i) const
+            {
+                obj(i);
+                {
+                    auto_mutex lock(m);
+                    pbar.print_status(count++);
+                }
+            }
+        };
+    }
+
+    template <typename T>
+    void parallel_for_verbose (
+        thread_pool& tp,
+        long begin,
+        long end,
+        T& obj,
+        void (T::*funct)(long),
+        long chunks_per_thread = 8
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
+            "\t void parallel_for_verbose()"
+            << "\n\t Invalid inputs were given to this function"
+            << "\n\t begin: " << begin 
+            << "\n\t end:   " << end
+            << "\n\t chunks_per_thread: " << chunks_per_thread
+            );
+
+        impl::parfor_verbose_helper<T> helper(obj, funct, begin, end);
+        parallel_for(tp, begin, end, helper, chunks_per_thread);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void parallel_for_verbose (
+        unsigned long num_threads,
+        long begin,
+        long end,
+        T& obj,
+        void (T::*funct)(long),
+        long chunks_per_thread = 8
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
+            "\t void parallel_for_verbose()"
+            << "\n\t Invalid inputs were given to this function"
+            << "\n\t begin: " << begin 
+            << "\n\t end:   " << end
+            << "\n\t chunks_per_thread: " << chunks_per_thread
+            );
+
+        impl::parfor_verbose_helper<T> helper(obj, funct, begin, end);
+        parallel_for(num_threads, begin, end, helper, chunks_per_thread);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void parallel_for_verbose (
+        thread_pool& tp,
+        long begin,
+        long end,
+        const T& funct,
+        long chunks_per_thread = 8
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
+            "\t void parallel_for_verbose()"
+            << "\n\t Invalid inputs were given to this function"
+            << "\n\t begin: " << begin 
+            << "\n\t end:   " << end
+            << "\n\t chunks_per_thread: " << chunks_per_thread
+            );
+
+        impl::parfor_verbose_helper2<T> helper(funct, begin, end);
+        parallel_for(tp, begin, end,  helper, chunks_per_thread);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void parallel_for_verbose (
+        unsigned long num_threads,
+        long begin,
+        long end,
+        const T& funct,
+        long chunks_per_thread = 8
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
+            "\t void parallel_for_verbose()"
+            << "\n\t Invalid inputs were given to this function"
+            << "\n\t begin: " << begin 
+            << "\n\t end:   " << end
+            << "\n\t chunks_per_thread: " << chunks_per_thread
+            );
+
+        impl::parfor_verbose_helper2<T> helper(funct, begin, end);
+        parallel_for(num_threads, begin, end, helper, chunks_per_thread);
     }
 
 // ----------------------------------------------------------------------------------------

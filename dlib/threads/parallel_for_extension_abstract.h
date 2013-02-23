@@ -217,6 +217,89 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void parallel_for_verbose (
+        thread_pool& tp,
+        long begin,
+        long end,
+        T& obj,
+        void (T::*funct)(long),
+        long chunks_per_thread = 8
+    );
+    /*!
+        requires
+            - begin <= end
+            - chunks_per_thread > 0
+        ensures
+            - This function is identical to the parallel_for() routine defined above except
+              that it will print messages to cout showing the progress in executing the
+              parallel for loop.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void parallel_for_verbose (
+        unsigned long num_threads,
+        long begin,
+        long end,
+        T& obj,
+        void (T::*funct)(long),
+        long chunks_per_thread = 8
+    );
+    /*!
+        requires
+            - begin <= end
+            - chunks_per_thread > 0
+        ensures
+            - This function is identical to the parallel_for() routine defined above except
+              that it will print messages to cout showing the progress in executing the
+              parallel for loop.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void parallel_for_verbose (
+        thread_pool& tp,
+        long begin,
+        long end,
+        const T& funct,
+        long chunks_per_thread = 8
+    );
+    /*!
+        requires
+            - begin <= end
+            - chunks_per_thread > 0
+        ensures
+            - This function is identical to the parallel_for() routine defined above except
+              that it will print messages to cout showing the progress in executing the
+              parallel for loop.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void parallel_for_verbose (
+        unsigned long num_threads,
+        long begin,
+        long end,
+        const T& funct,
+        long chunks_per_thread = 8
+    );
+    /*!
+        requires
+            - begin <= end
+            - chunks_per_thread > 0
+        ensures
+            - This function is identical to the parallel_for() routine defined above except
+              that it will print messages to cout showing the progress in executing the
+              parallel for loop.
+    !*/
+
+// ----------------------------------------------------------------------------------------
 
 }
 
