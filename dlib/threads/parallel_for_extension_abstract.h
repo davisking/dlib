@@ -17,7 +17,7 @@ namespace dlib
         long end,
         T& obj,
         void (T::*funct)(long, long),
-        long chunks_per_thread = 4
+        long chunks_per_thread = 8
     );
     /*!
         requires
@@ -52,7 +52,7 @@ namespace dlib
         long end,
         T& obj,
         void (T::*funct)(long, long),
-        long chunks_per_thread = 4
+        long chunks_per_thread = 8
     );
     /*!
         requires
@@ -72,7 +72,7 @@ namespace dlib
         long begin,
         long end,
         const T& funct,
-        long chunks_per_thread = 4
+        long chunks_per_thread = 8
     );
     /*!
         requires
@@ -106,7 +106,7 @@ namespace dlib
         long begin,
         long end,
         const T& funct,
-        long chunks_per_thread = 4
+        long chunks_per_thread = 8
     );
     /*!
         requires
@@ -128,7 +128,7 @@ namespace dlib
         long end,
         T& obj,
         void (T::*funct)(long),
-        long chunks_per_thread = 4
+        long chunks_per_thread = 8
     );
     /*!
         requires
@@ -157,7 +157,7 @@ namespace dlib
         long end,
         T& obj,
         void (T::*funct)(long),
-        long chunks_per_thread = 4
+        long chunks_per_thread = 8
     );
     /*!
         requires
@@ -177,7 +177,7 @@ namespace dlib
         long begin,
         long end,
         const T& funct,
-        long chunks_per_thread = 4
+        long chunks_per_thread = 8
     );
     /*!
         requires
@@ -204,7 +204,7 @@ namespace dlib
         long begin,
         long end,
         const T& funct,
-        long chunks_per_thread = 4
+        long chunks_per_thread = 8
     );
     /*!
         requires
