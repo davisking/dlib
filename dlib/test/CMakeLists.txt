@@ -87,6 +87,7 @@ set (tests
    optimization.cpp
    optimization_test_functions.cpp
    opt_qp_solver.cpp
+   parallel_for.cpp
    parse.cpp
    pipe.cpp
    pixel.cpp

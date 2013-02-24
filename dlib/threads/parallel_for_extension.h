@@ -100,7 +100,7 @@ namespace dlib
             const long block_size = std::max(1L, num/(num_workers*chunks_per_thread));
             for (long i = 0; i < num; i+=block_size)
             {
-                tp.add_task(obj, funct, i, std::min(i+block_size, num));
+                tp.add_task(obj, funct, begin+i, begin+std::min(i+block_size, num));
             }
             tp.wait_for_all_tasks();
         }

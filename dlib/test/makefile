@@ -102,6 +102,7 @@ SRC += one_vs_one_trainer.cpp
 SRC += optimization.cpp
 SRC += optimization_test_functions.cpp
 SRC += opt_qp_solver.cpp
+SRC += parallel_for.cpp
 SRC += parse.cpp
 SRC += pipe.cpp
 SRC += pixel.cpp
