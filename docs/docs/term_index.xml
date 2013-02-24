@@ -698,6 +698,7 @@
          <term file="api.html" name="thread_pool"/>
          <term file="api.html" name="parallel_for"/>
          <term link="api.html#parallel_for" name="parallel_for_blocked"/>
+         <term link="api.html#parallel_for" name="parallel_for_verbose"/>
          <term link="api.html#thread_pool" name="futures"/>
 
 
