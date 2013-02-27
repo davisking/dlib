@@ -301,13 +301,13 @@ namespace dlib
                 pbar.print_status(0);
             }
 
-            long count;
+            mutable long count;
             T& obj;
             void (T::*funct)(long);
-            console_progress_indicator pbar;
+            mutable console_progress_indicator pbar;
             mutex m;
 
-            void operator()(long i)
+            void operator()(long i) const
             {
                 (obj.*funct)(i);
                 {
@@ -316,7 +316,26 @@ namespace dlib
                 }
             }
 
-            void operator()(long begin, long end)
+        };
+
+        template <typename T>
+        class parfor_verbose_helper3
+        {
+        public:
+            parfor_verbose_helper3(T& obj_, void (T::*funct_)(long,long), long begin, long end) :
+                obj(obj_), funct(funct_), pbar(end-begin)
+            {
+                count = 0;
+                pbar.print_status(0);
+            }
+
+            mutable long count;
+            T& obj;
+            void (T::*funct)(long,long);
+            mutable console_progress_indicator pbar;
+            mutex m;
+
+            void operator()(long begin, long end) const
             {
                 (obj.*funct)(begin, end);
                 {
@@ -480,7 +499,7 @@ namespace dlib
             << "\n\t chunks_per_thread: " << chunks_per_thread
             );
 
-        impl::parfor_verbose_helper<T> helper(obj, funct, begin, end);
+        impl::parfor_verbose_helper3<T> helper(obj, funct, begin, end);
         parallel_for_blocked(tp, begin, end, helper, chunks_per_thread);
     }
 
@@ -505,7 +524,7 @@ namespace dlib
             << "\n\t chunks_per_thread: " << chunks_per_thread
             );
 
-        impl::parfor_verbose_helper<T> helper(obj, funct, begin, end);
+        impl::parfor_verbose_helper3<T> helper(obj, funct, begin, end);
         parallel_for_blocked(num_threads, begin, end, helper, chunks_per_thread);
     }
 
