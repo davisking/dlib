@@ -24,8 +24,8 @@ namespace dlib
             - begin <= end
             - chunks_per_thread > 0
         ensures
-            - This is a convenience function for submitting a block of jobs to a
-              thread_pool.  In particular, given the range [begin, end), this function will
+            - This is a convenience function for submitting a block of jobs to a thread_pool.  
+              In particular, given the half open range [begin, end), this function will
               split the range into approximately tp.num_threads_in_pool()*chunks_per_thread
               blocks, which it will then submit to the thread_pool.  The given thread_pool
               will then call (obj.*funct)() on each of the subranges.
@@ -38,7 +38,8 @@ namespace dlib
                 - [begin[n], end[n])
               Then parallel_for_blocked() submits each of these subranges to tp for
               processing such that (obj.*funct)(begin[i], end[i]) is invoked for all valid
-              values of i.
+              values of i.  Moreover, the subranges are non-overlapping and completely
+              cover the total range of [begin, end).
             - This function will not perform any memory allocations or create any system
               resources such as mutex objects.
     !*/
@@ -297,6 +298,89 @@ namespace dlib
             - This function is identical to the parallel_for() routine defined above except
               that it will print messages to cout showing the progress in executing the
               parallel for loop.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void parallel_for_blocked_verbose (
+        thread_pool& tp,
+        long begin,
+        long end,
+        T& obj,
+        void (T::*funct)(long,long),
+        long chunks_per_thread = 8
+    );
+    /*!
+        requires
+            - begin <= end
+            - chunks_per_thread > 0
+        ensures
+            - This function is identical to the parallel_for_blocked() routine defined
+              above except that it will print messages to cout showing the progress in
+              executing the parallel for loop.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void parallel_for_blocked_verbose (
+        unsigned long num_threads,
+        long begin,
+        long end,
+        T& obj,
+        void (T::*funct)(long,long),
+        long chunks_per_thread = 8
+    );
+    /*!
+        requires
+            - begin <= end
+            - chunks_per_thread > 0
+        ensures
+            - This function is identical to the parallel_for_blocked() routine defined
+              above except that it will print messages to cout showing the progress in
+              executing the parallel for loop.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void parallel_for_blocked_verbose (
+        thread_pool& tp,
+        long begin,
+        long end,
+        const T& funct,
+        long chunks_per_thread = 8
+    );
+    /*!
+        requires
+            - begin <= end
+            - chunks_per_thread > 0
+        ensures
+            - This function is identical to the parallel_for_blocked() routine defined
+              above except that it will print messages to cout showing the progress in
+              executing the parallel for loop.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void parallel_for_blocked_verbose (
+        unsigned long num_threads,
+        long begin,
+        long end,
+        const T& funct,
+        long chunks_per_thread = 8
+    );
+    /*!
+        requires
+            - begin <= end
+            - chunks_per_thread > 0
+        ensures
+            - This function is identical to the parallel_for_blocked() routine defined
+              above except that it will print messages to cout showing the progress in
+              executing the parallel for loop.
     !*/
 
 // ----------------------------------------------------------------------------------------
