@@ -1293,6 +1293,46 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
+    void test_segment_image()
+    {
+        print_spinner();
+        array2d<T> img(100,100);
+        for (long r = 0; r < img.nr(); ++r)
+        {
+            for (long c = 0; c < img.nc(); ++c)
+            {
+                if (c < 50 || r < 50)
+                    assign_pixel(img[r][c], 0);
+                else
+                    assign_pixel(img[r][c], 255);
+            }
+        }
+
+        array2d<unsigned long> out;
+        segment_image(img, out);
+
+        DLIB_TEST(get_rect(img) == get_rect(out));
+        const unsigned long v1 = out[0][0];
+        const unsigned long v2 = out[90][90];
+
+        for (long r = 0; r < img.nr(); ++r)
+        {
+            for (long c = 0; c < img.nc(); ++c)
+            {
+                if (c < 50 || r < 50)
+                {
+                    DLIB_TEST(out[r][c] == v1);
+                }
+                else
+                {
+                    DLIB_TEST(out[r][c] == v2);
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
 
     class image_tester : public tester
     {
@@ -1326,6 +1366,13 @@ namespace
             test_label_connected_blobs();
             test_label_connected_blobs2();
             test_downsampled_filtering();
+
+            test_segment_image<unsigned char>();
+            test_segment_image<unsigned short>();
+            test_segment_image<double>();
+            test_segment_image<int>();
+            test_segment_image<rgb_pixel>();
+            test_segment_image<rgb_alpha_pixel>();
         }
     } a;
 
