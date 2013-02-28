@@ -29,8 +29,6 @@ namespace dlib
     )
     {
         using namespace std;
-        state = new data;
-        state->count = 1;
 
 
 
@@ -40,21 +38,21 @@ namespace dlib
             // the file was not found
             throw file_not_found("Unable to find file " + name);
         }
-        state->full_name = buf;
+        state.full_name = buf;
 
 
-        string::size_type pos = state->full_name.find_last_of(directory::get_separator());
+        string::size_type pos = state.full_name.find_last_of(directory::get_separator());
         if (pos == string::npos)
         {
             // no valid full path has no separtor characters.  
             throw file_not_found("Unable to find file " + name);
         }
-        state->name = state->full_name.substr(pos+1);
+        state.name = state.full_name.substr(pos+1);
 
 
         // now find the size of this file
         struct stat64 buffer;
-        if (::stat64(state->full_name.c_str(), &buffer) ||
+        if (::stat64(state.full_name.c_str(), &buffer) ||
             S_ISDIR(buffer.st_mode))
         {
             // there was an error during the call to stat64 or
@@ -63,7 +61,7 @@ namespace dlib
         }
         else
         {
-            state->file_size = static_cast<uint64>(buffer.st_size);
+            state.file_size = static_cast<uint64>(buffer.st_size);
         }
 
     }
@@ -76,18 +74,18 @@ namespace dlib
     ) const 
     { 
         using namespace std;
-        if (state->full_name.size() == 0 && rhs.state->full_name.size() == 0)
+        if (state.full_name.size() == 0 && rhs.state.full_name.size() == 0)
             return true;
 
         // These files might have different names but actually represent the same
         // file due to the presence of symbolic links.
         char buf[PATH_MAX];
         string left, right;
-        if (realpath(state->full_name.c_str(),buf) == 0)
+        if (realpath(state.full_name.c_str(),buf) == 0)
             return false;    
         left = buf;
 
-        if (realpath(rhs.state->full_name.c_str(),buf) == 0)
+        if (realpath(rhs.state.full_name.c_str(),buf) == 0)
             return false;    
         right = buf;
 
@@ -107,8 +105,6 @@ namespace dlib
     {
         using namespace std;
 
-        state = new data;
-        state->count = 1;        
         
         char buf[PATH_MAX];
         if (realpath(name.c_str(),buf) == 0)
@@ -116,31 +112,31 @@ namespace dlib
             // the directory was not found
             throw dir_not_found("Unable to find directory " + name);
         }
-        state->full_name = buf;
+        state.full_name = buf;
   
         
         const char sep = get_separator();
-        if (is_root_path(state->full_name) == false)
+        if (is_root_path(state.full_name) == false)
         {
             // ensure that thre is not a trialing separator
-            if (state->full_name[state->full_name.size()-1] == sep)
-                state->full_name.erase(state->full_name.size()-1);
+            if (state.full_name[state.full_name.size()-1] == sep)
+                state.full_name.erase(state.full_name.size()-1);
 
             // pick out the directory name
-            string::size_type pos = state->full_name.find_last_of(sep);
-            state->name = state->full_name.substr(pos+1);
+            string::size_type pos = state.full_name.find_last_of(sep);
+            state.name = state.full_name.substr(pos+1);
         }
         else
         {
             // ensure that there is a trailing separator
-            if (state->full_name[state->full_name.size()-1] != sep)
-                state->full_name += sep;
+            if (state.full_name[state.full_name.size()-1] != sep)
+                state.full_name += sep;
         }
 
 
         struct stat64 buffer;
         // now check that this is actually a valid directory
-        if (::stat64(state->full_name.c_str(),&buffer))
+        if (::stat64(state.full_name.c_str(),&buffer))
         {
             // the directory was not found
             throw dir_not_found("Unable to find directory " + name);
@@ -169,18 +165,18 @@ namespace dlib
     ) const 
     { 
         using namespace std;
-        if (state->full_name.size() == 0 && rhs.state->full_name.size() == 0)
+        if (state.full_name.size() == 0 && rhs.state.full_name.size() == 0)
             return true;
 
         // These directories might have different names but actually represent the same
         // directory due to the presence of symbolic links.
         char buf[PATH_MAX];
         string left, right;
-        if (realpath(state->full_name.c_str(),buf) == 0)
+        if (realpath(state.full_name.c_str(),buf) == 0)
             return false;    
         left = buf;
 
-        if (realpath(rhs.state->full_name.c_str(),buf) == 0)
+        if (realpath(rhs.state.full_name.c_str(),buf) == 0)
             return false;    
         right = buf;
 
@@ -205,23 +201,23 @@ namespace dlib
 
             const char sep = get_separator();
 
-            string::size_type pos = state->full_name.find_last_of(sep);
-            temp.state->full_name = state->full_name.substr(0,pos);
+            string::size_type pos = state.full_name.find_last_of(sep);
+            temp.state.full_name = state.full_name.substr(0,pos);
 
-            if ( is_root_path(temp.state->full_name))
+            if ( is_root_path(temp.state.full_name))
             {
-                temp.state->full_name += sep;
+                temp.state.full_name += sep;
             }
             else
             {
-                pos = temp.state->full_name.find_last_of(sep);
+                pos = temp.state.full_name.find_last_of(sep);
                 if (pos != string::npos)
                 {
-                    temp.state->name = temp.state->full_name.substr(pos+1);
+                    temp.state.name = temp.state.full_name.substr(pos+1);
                 }
                 else
                 {
-                    temp.state->full_name += sep;
+                    temp.state.full_name += sep;
                 }
             }
             return temp;

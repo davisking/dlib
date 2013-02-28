@@ -30,8 +30,6 @@ namespace dlib
     )
     {
         using namespace std;
-        state = new data;
-        state->count = 1;
 
 
         char buf[3000];
@@ -41,21 +39,21 @@ namespace dlib
             // the file was not found
             throw file_not_found("Unable to find file " + name);
         }
-        state->full_name = buf;
+        state.full_name = buf;
         
 
-        string::size_type pos = state->full_name.find_last_of(directory::get_separator());
+        string::size_type pos = state.full_name.find_last_of(directory::get_separator());
         if (pos == string::npos)
         {
             // no valid full path has no separator characters.  
             throw file_not_found("Unable to find file " + name);
         }
-        state->name = state->full_name.substr(pos+1);
+        state.name = state.full_name.substr(pos+1);
 
 
         // now find the size of this file
         WIN32_FIND_DATAA data;
-        HANDLE ffind = FindFirstFileA(state->full_name.c_str(), &data);
+        HANDLE ffind = FindFirstFileA(state.full_name.c_str(), &data);
         if (ffind == INVALID_HANDLE_VALUE ||
             (data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) != 0)
         {
@@ -66,7 +64,7 @@ namespace dlib
             uint64 temp = data.nFileSizeHigh;            
             temp <<= 32;
             temp |= data.nFileSizeLow;
-            state->file_size = temp;
+            state.file_size = temp;
             FindClose(ffind);
         } 
 
@@ -81,12 +79,12 @@ namespace dlib
     { 
         using namespace std;
 
-        if (state->full_name.size() != rhs.state->full_name.size())
+        if (state.full_name.size() != rhs.state.full_name.size())
             return false;
         
         // compare the strings but ignore the case because file names
         // are not case sensitive on windows
-        return tolower(state->full_name) == tolower(rhs.state->full_name);
+        return tolower(state.full_name) == tolower(rhs.state.full_name);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -102,8 +100,6 @@ namespace dlib
     {
         using namespace std;
 
-        state = new data;
-        state->count = 1;        
         
         char buf[3000];
         char* str;
@@ -112,30 +108,30 @@ namespace dlib
             // the directory was not found
             throw dir_not_found("Unable to find directory " + name);
         }
-        state->full_name = buf;
+        state.full_name = buf;
   
         
         const char sep = get_separator();
-        if (is_root_path(state->full_name) == false)
+        if (is_root_path(state.full_name) == false)
         {
             // ensure that thre is not a trialing separator
-            if (state->full_name[state->full_name.size()-1] == sep)
-                state->full_name.erase(state->full_name.size()-1);
+            if (state.full_name[state.full_name.size()-1] == sep)
+                state.full_name.erase(state.full_name.size()-1);
 
             // pick out the directory name
-            string::size_type pos = state->full_name.find_last_of(sep);
-            state->name = state->full_name.substr(pos+1);
+            string::size_type pos = state.full_name.find_last_of(sep);
+            state.name = state.full_name.substr(pos+1);
         }
         else
         {
             // ensure that there is a trailing separator
-            if (state->full_name[state->full_name.size()-1] != sep)
-                state->full_name += sep;
+            if (state.full_name[state.full_name.size()-1] != sep)
+                state.full_name += sep;
         }
 
 
         // now check that this is actually a valid directory
-        DWORD attribs = GetFileAttributesA(state->full_name.c_str());
+        DWORD attribs = GetFileAttributesA(state.full_name.c_str());
         if (attribs == INVALID_FILE_ATTRIBUTES ||
             (attribs&FILE_ATTRIBUTE_DIRECTORY) == 0)
         {
@@ -163,12 +159,12 @@ namespace dlib
     { 
         using namespace std;
 
-        if (state->full_name.size() != rhs.state->full_name.size())
+        if (state.full_name.size() != rhs.state.full_name.size())
             return false;
 
         // compare the strings but ignore the case because file names
         // are not case sensitive on windows
-        return tolower(state->full_name) == tolower(rhs.state->full_name);
+        return tolower(state.full_name) == tolower(rhs.state.full_name);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -189,23 +185,23 @@ namespace dlib
 
             const char sep = get_separator();
 
-            string::size_type pos = state->full_name.find_last_of(sep);
-            temp.state->full_name = state->full_name.substr(0,pos);
+            string::size_type pos = state.full_name.find_last_of(sep);
+            temp.state.full_name = state.full_name.substr(0,pos);
 
-            if ( is_root_path(temp.state->full_name))
+            if ( is_root_path(temp.state.full_name))
             {
-                temp.state->full_name += sep;
+                temp.state.full_name += sep;
             }
             else
             {
-                pos = temp.state->full_name.find_last_of(sep);
+                pos = temp.state.full_name.find_last_of(sep);
                 if (pos != string::npos)
                 {
-                    temp.state->name = temp.state->full_name.substr(pos+1);
+                    temp.state.name = temp.state.full_name.substr(pos+1);
                 }
                 else
                 {
-                    temp.state->full_name += sep;
+                    temp.state.full_name += sep;
                 }
             }
             return temp;

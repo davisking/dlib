@@ -56,10 +56,6 @@ namespace dlib
                 object is constructed.  Thus if a file changes sizes after its
                 file object has been created its file object's size() method
                 will not reflect the new file size.    
-
-            THREAD SAFETY
-                This object is reference counted so use with caution in a threaded
-                environment.
         !*/
 
     public:
@@ -208,10 +204,6 @@ namespace dlib
                 the ability to traverse a directory tree.  
 
                 Note that the directories . and .. are not returned by get_dirs() 
-
-            THREAD SAFETY
-                This object is reference counted so use with caution in a threaded
-                environment.
         !*/
 
     public:
