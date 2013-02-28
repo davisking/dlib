@@ -64,7 +64,8 @@ namespace dlib
         typename in_image_type,
         typename out_image_type
         >
-    typename enable_if<is_same_type<typename in_image_type::type,uint8> >::type 
+    typename enable_if_c<is_same_type<typename in_image_type::type,uint8>::value ||
+                         is_same_type<typename in_image_type::type,uint16>::value>::type 
     segment_image (
         const in_image_type& in_img,
         out_image_type& out_img,
@@ -321,7 +322,8 @@ namespace dlib
         typename in_image_type,
         typename out_image_type
         >
-    typename disable_if<is_same_type<typename in_image_type::type,uint8> >::type 
+    typename disable_if_c<is_same_type<typename in_image_type::type,uint8>::value ||
+                         is_same_type<typename in_image_type::type,uint16>::value>::type 
     segment_image (
         const in_image_type& in_img,
         out_image_type& out_img,
