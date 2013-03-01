@@ -131,7 +131,7 @@ namespace dlib
             else if (val < std::numeric_limits<T>::infinity())
             {
                 int exp;
-                mantissa = _frexp(val, &exp)*(((uint64)1)<<digits);
+                mantissa = (int64)_frexp(val, &exp)*(((uint64)1)<<digits);
                 exponent = exp - digits;
 
                 // Compact the representation a bit by shifting off any low order bytes 
