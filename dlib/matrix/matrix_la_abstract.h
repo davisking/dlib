@@ -255,7 +255,7 @@ namespace dlib
             - #m == an orthogonal matrix with the same dimensions as m.  In particular,
               the columns of #m have the same span as the columns of m.
             - trans(#m)*#m == identity matrix
-            - This function is just shorthand for performing the QR decomposition of m
+            - This function is just shorthand for computing the QR decomposition of m
               and then storing the Q factor into #m.
     !*/
 
