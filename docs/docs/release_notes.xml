@@ -12,12 +12,61 @@
 
 <current>
 New Features:
+   - Added some features to the image display widgets to let the user easily
+     get information about where the user is clicking.  This is the
+     get_next_double_click() routine.
+   - Added svd_fast()
+   - Added cca()
+   - Added serialization support for std::vector&lt;bool&gt;.
+   - Added make_sparse_vector_inplace()
+   - added the orthogonalize() function.
+   - Added count_bits() and hamming_distance()
+   - Added parallel_for() and parallel_for_blocked()
+   - Added cosine_distance and negative_dot_product_distance
+   - Added an operator>> for matrix objects which allows you to read in ASCII
+     matrices using the format used by operator&lt;&lt;.
+   - Added average_precision()
 
 Non-Backwards Compatible Changes:
+   - Changed ranking evaluation functions to return the mean average precision
+     in addition to just raw ranking accuracy. This changes their return types
+     from double to matrix&lt;double,1,2&gt;.
+   - Generalized segment_image() so it works on any pixel type or array of
+     vectors. I also changed it's interface slightly. In particular, I removed
+     the min_diff parameter and replaced it with an explicit min_size parameter.
 
 Bug fixes:
+   - Fixed an endianness bug in the PNG I/O functions which occurred when 16bit
+     grayscale PNGs were used. libpng doesn't automatically convert from host
+     endianness to big endian as the PNG standard demands. You have to explicitly
+     tell it to do this or it will write out the 16bit pixel data in host order
+     which result in the wrong thing happening on little endian chips. Similarly
+     for reading PNGs.
+   - Fixed a bug which could potentially occur when empty std::vector&lt;char&gt; or
+     std::vector&lt;unsigned char&gt; were serialized.
+   - There was a bug in the version of draw_line() that draws directly onto an
+     array2d type image (not the one that draws onto a GUI canvas object). The
+     bug triggered whenever a perfectly horizontal or vertical line that extended
+     outside the image was drawn. This has been fixed.
+   - Fixed a bug in the Windows implementation of the signaler object, which
+     was found by Isaac Peterson. The bug caused the program to deadlock if
+     signal() or broadcast() was called at exactly the same time a
+     wait_or_timeout() function timed out.
+   - Fixed a bug in the image_window and image_display GUI tools which caused
+     them to not redraw overlay lines correctly in certain cases involving
+     non-default zoom levels.
+   - Switched randomly_color_image() to use the non-pointer based version of
+     murmur_hash3() to avoid violation of the strict aliasing rule. In
+     particular, the previous version didn't work correctly in gcc 4.7.2 when
+     optimizations were enabled.
 
 Other:
+   - Refactored the Platt scaling code a little. Now there is a function,
+     learn_platt_scaling(), that allows you to directly call the Platt scaling
+     code without supplying a trainer object.
+   - Optimized the oca and structural SVM solvers.  They are now a little bit faster 
+     than in previous dlib releases.
+   - Changed how the SURF descriptor is computed slightly to improve its accuracy.
 
 </current>
 
