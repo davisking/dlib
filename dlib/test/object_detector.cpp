@@ -258,7 +258,9 @@ namespace
             {
                 for (long c = 0; c < images[i].nc(); ++c)
                 {
-                    images[i][r][c] = put_in_range(0,255,images[i][r][c] + 10*rnd.get_random_gaussian());
+                    typedef typename image_array_type::type image_type;
+                    typedef typename image_type::type type;
+                    images[i][r][c] = (type)put_in_range(0,255,images[i][r][c] + 10*rnd.get_random_gaussian());
                 }
             }
         }
@@ -356,7 +358,9 @@ namespace
             {
                 for (long c = 0; c < images[i].nc(); ++c)
                 {
-                    images[i][r][c] = put_in_range(0,255,images[i][r][c] + 40*rnd.get_random_gaussian());
+                    typedef typename image_array_type::type image_type;
+                    typedef typename image_type::type type;
+                    images[i][r][c] = (type)put_in_range(0,255,images[i][r][c] + 40*rnd.get_random_gaussian());
                 }
             }
         }

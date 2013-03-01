@@ -483,8 +483,8 @@ namespace dlib
                 if (set1 != set2)
                 {
                     const diff_type diff = sorted_edges[i].diff;
-                    const diff_type tau1 = k/data[set1].component_size;
-                    const diff_type tau2 = k/data[set2].component_size;
+                    const diff_type tau1 = static_cast<diff_type>(k/data[set1].component_size);
+                    const diff_type tau2 = static_cast<diff_type>(k/data[set2].component_size);
 
                     const diff_type mint = std::min(data[set1].internal_diff + tau1, 
                         data[set2].internal_diff + tau2);
