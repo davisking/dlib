@@ -54,9 +54,14 @@
          <item>find_percent_shortest_edges_randomly</item>
          <item>find_k_nearest_neighbors</item>
          <item>find_approximate_k_nearest_neighbors</item>
-         <item>squared_euclidean_distance</item>
-         <item>cosine_distance</item>
-         <item>negative_dot_product_distance</item>
+         <item nolink="true">
+            <name>Distance Functions</name>
+            <sub>
+               <item>negative_dot_product_distance</item>
+               <item>squared_euclidean_distance</item>
+               <item>cosine_distance</item>
+            </sub>
+         </item>
       </section>
 
       <section>
