@@ -26,34 +26,37 @@
 
 
          <p>
-            Dlib is a cross-platform open source software library written in the C++ programming
+            Dlib is a general purpose cross-platform open source software library written in the C++ programming
             language. Its design is heavily influenced by ideas from design by contract and component-based 
             software engineering. This means it is, first and foremost, a collection of independent
             software components, each accompanied by extensive documentation and thorough debugging modes. 
          </p>
 
         <p>
-         Generally speaking, there is no focus on any specific domain in the library. It contains a variety 
-         of software objects for dealing with networking, threads (message passing, futures, etc.), 
-         graphical interfaces, complex data structures, linear algebra, machine learning, XML and text 
-         parsing, numerical optimization, Bayesian networks, and numerous other tasks.
+           Since development began in 2002, dlib has grown to include a wide
+           variety of tools.  In particular, it now contains software objects
+           for dealing with networking, threads, graphical interfaces, complex
+           data structures, linear algebra, statistical machine learning, image
+           processing, data mining, XML and text parsing, numerical
+           optimization, Bayesian networks, and numerous other tasks.  In
+           recent years, much of the development has been focused on creating 
+           a broad set of statistical machine learning tools.  However, dlib
+           remains a general purpose library and <a href="howto_contribute.html">welcomes contributions</a> of high
+           quality software components useful in any domain.
         </p>
 
         <p>
-         The most persistent theme in the library is the ubiquitous application of contract programming.  
-         You can read about this on the <a href="howto_contribute.html#1">how to contribute</a> page
-         for more information.  However, from the point of view of a user of this library it basically 
-         means there exists complete and precise documentation for every function and class in the library   
-         as well as aggressive debugging modes that can be enabled.  
-        </p>
-
-        <p>
-         I always try to make sure everything is as portable as possible.  All platform specific code is
-         confined inside the API wrappers.  Everything else is either layered on top of those wrappers
-         or is written in pure ISO standard C++.  Currently the library is known to work on OS X, 
-         MS Windows, Linux, Solaris, the BSDs, and HP-UX.  It should work on any POSIX platform but I 
-         haven't had the opportunity to test it on any others (if you have access to other platforms and
-         would like to help increase this list then let me know).
+         Part of the development philosophy of dlib is a dedication to
+         portability and ease of use.  Therefore, all code in dlib is designed
+         to be as portable as possible and similarly to not require a user to
+         configure or install anything.  To help achieve this, all platform
+         specific code is confined inside the API wrappers.  Everything else is
+         either layered on top of those wrappers or is written in pure ISO
+         standard C++.  Currently the library is known to work on OS X, MS
+         Windows, Linux, Solaris, the BSDs, and HP-UX.  It should work on any
+         POSIX platform but I haven't had the opportunity to test it on any
+         others (if you have access to other platforms and would like to help
+         increase this list then let me know).
         </p>
         <p>
          The rest of this page explains everything you need to know to get started using the library.  It 
@@ -62,13 +65,16 @@
         page.  Or if you are having trouble finding where a particular object's documentation is located you may
         be able to find it by consulting the <a href="term_index.html">index</a>.</p>
         <p>
-         The library is also covered by the very liberal Boost Software License so feel free to use it
-         however you like.         
+         The library is also covered by the very liberal Boost Software License
+         so feel free to use it any way you like.  However, if you use dlib in
+         your research then please cite <a href="faq.html#How can I cite dlib?">its Journal of Machine Learning Research paper</a> when
+         publishing.
         </p>
         <p>
-         Much of the organization and notation used in this library I learned from the 
-         <a href="http://www.cse.ohio-state.edu/~weide/sce/now/">Software Component Engineering</a>
-         course sequence at OSU.  
+           Finally, I must give some credit to the <a
+           href="http://www.cse.ohio-state.edu/~weide/rsrg/index.html">Reusable
+           Software Research Group</a> at Ohio State since they taught me much
+           of the software engineering techniques used in the creation of this library.  
         </p>
 
 

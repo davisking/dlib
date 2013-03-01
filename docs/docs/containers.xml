@@ -9,8 +9,9 @@
    <body>
          <br/><br/>
          <p>
-         Many of these containers were inspired by the RESOLVE/C++ course
-         sequence at Ohio State.  As such, many of the objects do not support
+         Many of these containers were inspired by the work of the <a
+           href="http://www.cse.ohio-state.edu/~weide/rsrg/index.html">Reusable
+           Software Research Group</a> at Ohio State.  As such, many of the objects do not support
          copying in any form, only swapping is allowed. That is, when objects
          are added or removed from most of these containers they are swapped in
          and out, not copied. 
