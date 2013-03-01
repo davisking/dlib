@@ -72,6 +72,7 @@
                   <li><a href="api.html#thread_specific_data">Thread specific data</a></li>
                   <li><a href="api.html#threaded_object">Threaded objects</a></li>
                   <li><a href="api.html#thread_function">Threaded functions</a></li>
+                  <li><a href="api.html#parallel_for">Parallel for loops</a></li>
                   <li>A <a href="api.html#thread_pool">thread_pool</a> with support for futures</li>
                </ul>
             </li>
