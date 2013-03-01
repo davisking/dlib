@@ -21,7 +21,7 @@
          <p>
             Most of the linear algebra tools deal with dense matrices.  However, there is also
             a limited amount of support for working with sparse matrices and vectors.
-            In particular, the dlib tools represent sparse vectors using the container objects
+            In particular, the dlib tools represent sparse vectors using the containers 
             in the C++ STL.  For details, see the notes at the top of 
             <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">dlib/svm/sparse_vector_abstract.h</a>.
          </p>
