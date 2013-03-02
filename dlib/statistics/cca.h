@@ -7,6 +7,7 @@
 #include "../algs.h"
 #include "../matrix.h"
 #include "../sparse_vector.h"
+#include "random_subset_selector.h"
 
 namespace dlib
 {
@@ -150,6 +151,22 @@ namespace dlib
         const unsigned long n = min(max_index_plus_one(L), max_index_plus_one(R));
         const unsigned long num_output_correlations = min(num_correlations, std::min<unsigned long>(R.size(),n));
         return impl_cca(L,R,Ltrans, Rtrans, num_correlations, extra_rank, q, num_output_correlations); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename sparse_vector_type, typename Rand_type, typename T>
+    matrix<T,0,1> cca (
+        const random_subset_selector<sparse_vector_type,Rand_type>& L,
+        const random_subset_selector<sparse_vector_type,Rand_type>& R,
+        matrix<T>& Ltrans,
+        matrix<T>& Rtrans,
+        unsigned long num_correlations,
+        unsigned long extra_rank = 5,
+        unsigned long q = 2
+    )
+    {
+        return cca(L.to_std_vector(), R.to_std_vector(), Ltrans, Rtrans, num_correlations, extra_rank, q);
     }
 
 // ----------------------------------------------------------------------------------------

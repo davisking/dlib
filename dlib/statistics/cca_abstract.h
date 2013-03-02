@@ -4,6 +4,7 @@
 #ifdef DLIB_CCA_AbSTRACT_H__
 
 #include "../matrix/matrix_la_abstract.h"
+#include "random_subset_selector_abstract.h"
 
 namespace dlib
 {
@@ -127,6 +128,37 @@ namespace dlib
             - Note that you can apply the output transforms to a sparse vector with the
               following code:
                 sparse_matrix_vector_multiply(trans(Ltrans), your_sparse_vector)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename sparse_vector_type, 
+        typename Rand_type, 
+        typename T
+        >
+    matrix<T,0,1> cca (
+        const random_subset_selector<sparse_vector_type,Rand_type>& L,
+        const random_subset_selector<sparse_vector_type,Rand_type>& R,
+        matrix<T>& Ltrans,
+        matrix<T>& Rtrans,
+        unsigned long num_correlations,
+        unsigned long extra_rank = 5,
+        unsigned long q = 2
+    );
+    /*!
+        requires
+            - num_correlations > 0
+            - L.size() == R.size()
+            - max_index_plus_one(L) > 0 && max_index_plus_one(R) > 0
+              (i.e. L and R can't represent empty matrices)
+            - L and R must contain sparse vectors (see the top of dlib/svm/sparse_vector_abstract.h
+              for a definition of sparse vector)
+        ensures
+            - returns cca(L.to_std_vector(), R.to_std_vector(), Ltrans, Rtrans, num_correlations, extra_rank, q)
+              (i.e. this is just a convenience function for calling the cca() routine when
+              your sparse vectors are contained inside a random_subset_selector rather than
+              a std::vector)
     !*/
 
 // ----------------------------------------------------------------------------------------
