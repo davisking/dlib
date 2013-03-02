@@ -115,7 +115,9 @@ namespace dlib
             - num_correlations > 0
             - L.size() == R.size()
             - max_index_plus_one(L) > 0 && max_index_plus_one(R) > 0
-              (i.e. L and R can't be a empty matrices)
+              (i.e. L and R can't represent empty matrices)
+            - L and R must contain sparse vectors (see the top of dlib/svm/sparse_vector_abstract.h
+              for a definition of sparse vector)
         ensures
             - This is just an overload of the cca() function defined above.  Except in this
               case we take a sparse representation of the input L and R matrices rather than
