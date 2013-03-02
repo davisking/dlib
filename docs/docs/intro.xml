@@ -34,7 +34,7 @@
 
         <p>
            Since development began in 2002, dlib has grown to include a wide
-           variety of tools.  In particular, it now contains software objects
+           variety of tools.  In particular, it now contains software components 
            for dealing with networking, threads, graphical interfaces, complex
            data structures, linear algebra, statistical machine learning, image
            processing, data mining, XML and text parsing, numerical
