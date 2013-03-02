@@ -12,7 +12,8 @@
 
 #ifdef _MSC_VER
 // Disable the warning about inheriting from std::iostream 'via dominance' since this warning is a warning about
-// visual studio conforming to the standard and is ignorable.  See http://connect.microsoft.com/VisualStudio/feedback/details/733720/inheriting-from-std-fstream-produces-c4250-warning
+// visual studio conforming to the standard and is ignorable.  
+// See http://connect.microsoft.com/VisualStudio/feedback/details/733720/inheriting-from-std-fstream-produces-c4250-warning
 // for further details if interested.
 #pragma warning(disable : 4250)
 #endif // _MSC_VER
@@ -30,7 +31,6 @@ namespace dlib
         ) :
             std::iostream(0)
         {
-            tie(this);
         }
 
         iosockstream( 
@@ -38,7 +38,6 @@ namespace dlib
         ) :
             std::iostream(0)
         { 
-            tie(this); 
             open(addr); 
         }
 
@@ -48,7 +47,6 @@ namespace dlib
         ) :
             std::iostream(0)
         { 
-            tie(this); 
             open(addr, timeout); 
         }
 
@@ -64,6 +62,14 @@ namespace dlib
             close();
             con.reset(connect(addr));
             buf.reset(new sockstreambuf(con.get()));
+            // Note that we use the sockstreambuf's ability to autoflush instead of 
+            // telling the iostream::tie() function to tie the stream to itself even though
+            // that should work fine.  The reason we do it this way is because there is a
+            // bug in visual studio 2012 that causes a program to crash when a stream is
+            // tied to itself and then used.  See
+            // http://connect.microsoft.com/VisualStudio/feedback/details/772293/tying-a-c-iostream-object-to-itself-causes-a-stack-overflow-in-visual-studio-2012
+            // for further details.
+            buf->flush_output_on_read();
             rdbuf(buf.get());
             clear();
         }
@@ -76,6 +82,7 @@ namespace dlib
             close(timeout);
             con.reset(connect(addr.host_address, addr.port, timeout));
             buf.reset(new sockstreambuf(con.get()));
+            buf->flush_output_on_read();
             rdbuf(buf.get());
             clear();
         }

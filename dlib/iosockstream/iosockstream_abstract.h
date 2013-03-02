@@ -18,6 +18,9 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This is an iostream object that reads/writes from a TCP network connection.
 
+                Note that any attempt to read from this stream will automatically flush the
+                stream's output buffers.  
+
             THREAD SAFETY
                 It is not safe to touch this object from more than one thread at a time.
                 Therefore, you should mutex lock it if you need to do so.  
@@ -30,9 +33,6 @@ namespace dlib
         /*!
             ensures
                 - #good() == false
-                - #tie() == this
-                  (i.e. Any attempt to read from this stream will automatically flush the
-                  stream's output buffers)
         !*/
 
         iosockstream( 
@@ -40,9 +40,6 @@ namespace dlib
         );
         /*!
             ensures
-                - #tie() == this
-                  (i.e. Any attempt to read from this stream will automatically flush the
-                  stream's output buffers)
                 - Attempts to connect to the given network address. 
                 - Calling this constructor is equivalent to calling the default constructor
                   and then invoking open(addr).
@@ -59,9 +56,6 @@ namespace dlib
         ); 
         /*!
             ensures
-                - #tie() == this
-                  (i.e. Any attempt to read from this stream will automatically flush the
-                  stream's output buffers)
                 - Attempts to connect to the given network address. 
                 - Calling this constructor is equivalent to calling the default constructor
                   and then invoking open(addr, timeout).
