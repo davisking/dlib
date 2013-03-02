@@ -64,6 +64,9 @@ namespace dlib
             update_next_add_accepts();
         }
 
+        const std::vector<T>& to_std_vector(
+        ) const { return items; }
+
         unsigned long size (
         ) const 
         {

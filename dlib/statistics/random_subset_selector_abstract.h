@@ -217,6 +217,18 @@ namespace dlib
                   this container
         !*/
 
+        const std::vector<T>& to_std_vector(
+        ) const;
+        /*!
+            ensures
+                - returns a const reference to the underlying std::vector<T> that contains
+                  all elements in this object.  That is, this function returns a vector, V,
+                  which has the following properties:  
+                    - V.size()  == this->size()
+                    - V.begin() == this->begin()
+                    - V.end()   == this->end()
+        !*/
+
         void swap (
             random_subset_selector& item
         );
