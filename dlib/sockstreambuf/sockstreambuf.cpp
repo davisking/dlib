@@ -109,6 +109,15 @@ namespace dlib
         // copy the putback characters into the putback end of the in_buffer
         std::memmove(in_buffer+(max_putback-num_put_back), gptr()-num_put_back, num_put_back);
 
+        if (flushes_output_on_read())
+        {
+            if (flush_out_buffer() == EOF)
+            {
+                // an error occurred
+                return EOF;
+            }
+        }
+
         int num = con.read(in_buffer+max_putback, in_buffer_size-max_putback);
         if (num <= 0)
         {

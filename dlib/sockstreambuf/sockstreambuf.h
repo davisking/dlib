@@ -40,7 +40,8 @@ namespace dlib
         ) :
             con(*con_),
             out_buffer(0),
-            in_buffer(0)
+            in_buffer(0),
+            autoflush(false)
         {
             init();
         }
@@ -50,7 +51,8 @@ namespace dlib
         ) :
             con(*con_),
             out_buffer(0),
-            in_buffer(0)
+            in_buffer(0),
+            autoflush(false)
         {
             init();
         }
@@ -66,6 +68,20 @@ namespace dlib
         connection* get_connection (
         ) { return &con; }
 
+        void flush_output_on_read()
+        {
+            autoflush = true;
+        }
+
+        bool flushes_output_on_read() const
+        {
+            return autoflush;
+        }
+
+        void do_not_flush_output_on_read()
+        {
+            autoflush = false;
+        }
 
     protected:
 
@@ -140,6 +156,7 @@ namespace dlib
         static const std::streamsize in_buffer_size = 10000;
         char* out_buffer;
         char* in_buffer;
+        bool autoflush;
     
     };
 

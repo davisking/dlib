@@ -53,6 +53,7 @@ namespace dlib
                 - con == a valid connection object
             ensures
                 - *this will read from and write to con
+                - #flushes_output_on_read() == false
             throws
                 - std::bad_alloc
         !*/
@@ -65,6 +66,7 @@ namespace dlib
                 - con == a valid connection object
             ensures
                 - *this will read from and write to con
+                - #flushes_output_on_read() == false
             throws
                 - std::bad_alloc
         !*/
@@ -86,6 +88,28 @@ namespace dlib
             ensures
                 - returns a pointer to the connection object which this buffer
                   reads from and writes to
+        !*/
+
+        void flush_output_on_read (
+        );
+        /*!
+            ensures
+                - #flushes_output_on_read() == true
+        !*/
+
+        bool flushes_output_on_read (
+        ) const;
+        /*!
+            ensures
+                - This function returns true if this object will flush its output buffer
+                  to the network socket before performing any network read.   
+        !*/
+
+        void do_not_flush_output_on_read (
+        );
+        /*!
+            ensures
+                - #flushes_output_on_read() == false
         !*/
 
     };

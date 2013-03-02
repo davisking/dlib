@@ -17,9 +17,14 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the interface defined in sockstreambuf_abstract.h
-                except that it doesn't do any kind of buffering at all.  It just writes
-                data directly to a connection.
+                This is an implementation of the interface defined in
+                sockstreambuf_abstract.h except that it doesn't do any kind of buffering at
+                all.  It just writes data directly to a connection.  However, note that we
+                don't implement the flushes_output_on_read() routine as this object always
+                flushes immediately (since it isn't buffers.  Moreover, it should be
+                pointed out that this object is deprecated and only present for backwards
+                compatibility with previous versions of dlib.  So you really should use the
+                sockstreambuf object instead.  
 
             INITIAL VALUE
                 con == a connection
