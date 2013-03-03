@@ -237,7 +237,7 @@ namespace dlib
     template <typename image_type>
     const std::vector<surf_point> get_surf_points (
         const image_type& img,
-        long max_points,
+        long max_points = 10000,
         double detection_threshold = 30.0
     )
     {
