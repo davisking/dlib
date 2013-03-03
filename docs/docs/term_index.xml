@@ -959,6 +959,7 @@
          </term>
 
 
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="get_next_double_click"/>
          <term file="dlib/gui_widgets/widgets_abstract.h.html" name="open_file_box"/>
          <term file="dlib/gui_widgets/widgets_abstract.h.html" name="open_existing_file_box"/>
          <term file="dlib/gui_widgets/widgets_abstract.h.html" name="save_file_box"/>
