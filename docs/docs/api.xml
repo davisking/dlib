@@ -1120,6 +1120,9 @@
                   This is a set of functions for executing the contents of a for loop in parallel.  
                   It is useful for taking advantage of multi-processor systems.  
                </description> 
+               <examples>
+                  <example>parallel_for_ex.cpp.html</example>
+               </examples>
             </extension>
 
             <extension>

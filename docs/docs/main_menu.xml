@@ -130,6 +130,10 @@
                   <link>train_object_detector.cpp.html</link>
                </item>
                <item>
+                  <name>Parallel_For_Loops</name>
+                  <link>parallel_for_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>SVM-Rank</name>
                   <link>svm_rank_ex.cpp.html</link>
                </item>
