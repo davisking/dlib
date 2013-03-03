@@ -237,13 +237,15 @@ namespace dlib
     template <typename image_type>
     const std::vector<surf_point> get_surf_points (
         const image_type& img,
-        long max_points
+        long max_points,
+        double detection_threshold = 30.0
     )
     {
-        DLIB_ASSERT(max_points > 0,
+        DLIB_ASSERT(max_points > 0 && detection_threshold >= 0,
             "\t std::vector<surf_point> get_surf_points()"
-            << "\n\t invalid arguments to this function"
-            << "\n\t max_points: " << max_points 
+            << "\n\t Invalid arguments were given to this function."
+            << "\n\t max_points:          " << max_points 
+            << "\n\t detection_threshold: " << detection_threshold 
         );
 
         // Figure out the proper scalar type we should use to work with these pixels.  
@@ -260,7 +262,7 @@ namespace dlib
 
         // now get all the interest points from the hessian pyramid
         std::vector<interest_point> points; 
-        get_interest_points(pyr, 0.10, points);
+        get_interest_points(pyr, detection_threshold, points);
         std::vector<surf_point> spoints;
 
         // sort all the points by how strong their detect is

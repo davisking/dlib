@@ -126,11 +126,13 @@ namespace dlib
     template <typename image_type>
     const std::vector<surf_point> get_surf_points (
         const image_type& img,
-        long max_points
+        long max_points,
+        double detection_threshold = 30.0
     );
     /*!
         requires
             - max_points > 0
+            - detection_threshold >= 0
             - image_type == a type that implements the array2d/array2d_kernel_abstract.h interface
             - pixel_traits<image_type::type> must be defined
         ensures
@@ -146,6 +148,7 @@ namespace dlib
                       compute_surf_descriptor())
                     - V[i].angle == the angle of the SURF box at this point (calculated using 
                       compute_dominant_angle())
+                    - V[i].p.score >= detection_threshold
     !*/
 
 // ----------------------------------------------------------------------------------------
