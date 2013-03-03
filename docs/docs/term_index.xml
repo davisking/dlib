@@ -1180,6 +1180,7 @@
          <term file="imaging.html" name="integral_image_generic"/>
          <term file="imaging.html" name="hessian_pyramid"/>
          <term file="imaging.html" name="compute_dominant_angle"/>
+         <term file="imaging.html" name="draw_surf_points"/>
          <term file="imaging.html" name="compute_surf_descriptor"/>
          <term file="imaging.html" name="hog_image"/>
          <term file="imaging.html" name="fine_hog_image"/>

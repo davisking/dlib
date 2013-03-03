@@ -116,6 +116,7 @@
                <item>interest_point</item>
                <item>surf_point</item>
                <item>compute_dominant_angle</item>
+               <item>draw_surf_points</item>
             </sub>
          </item>
 
@@ -275,6 +276,23 @@
             and allows you to compute the response of a Haar wavelet oriented along
             the Y axis.  
          </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>draw_surf_points</name>
+         <file>dlib/image_keypoint/draw_surf_points.h</file>
+         <spec_file link="true">dlib/image_keypoint/draw_surf_points_abstract.h</spec_file>
+         <description>
+            This routine adds a bunch of <a href="#surf_point">surf_point</a> objects onto
+            an <a href="dlib/gui_widgets/widgets_abstract.h.html#image_window">image_window</a>
+            object so they can be visualized.
+         </description>
+         <examples>
+            <example>surf_ex.cpp.html</example>
+         </examples>
                                  
       </component>
 
