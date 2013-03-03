@@ -5,8 +5,8 @@
     C++ Library.
 
     Normally, a for loop executes the body of the loop in a serial manner.  This means
-    that, for example, if it takes 1 second to execute the body of the loop and the loop
-    body needs to execute 10 times then it will take 10 seconds to execute the entire loop.
+    that, for example, if it takes 1 second to execute the body of the loop and the body
+    needs to execute 10 times then it will take 10 seconds to execute the entire loop.
     However, on modern multi-core computers we have the opportunity to speed this up by
     executing multiple steps of a for loop in parallel.  This example program will walk you
     though a few examples showing how to do just that.  
@@ -43,12 +43,12 @@ void example_without_using_lambda_functions();
 int main()
 {
     // We have 3 examples, each contained in a separate function.  Each example performs
-    // exactly the same computation, however, the second two do so using parallel for
-    // loops.  So the first example is here to show you what we are doing in terms of
+    // exactly the same computation, however, the second two examples do so using parallel
+    // for loops.  So the first example is here to show you what we are doing in terms of
     // classical non-parallel for loops.  Then the next two examples will illustrate two
-    // ways to write parallelize the for loops in C++.  The first, and simplest way, uses
-    // C++11 lambda functions.  Since lambda functions are a relatively recent addition to
-    // C++ we also show how to write parallel for loops without using lambda functions.
+    // ways to parallelize for loops in C++.  The first, and simplest way, uses C++11
+    // lambda functions.  However, since lambda functions are a relatively recent addition
+    // to C++ we also show how to write parallel for loops without using lambda functions.
     // This way, users who don't yet have access to a current C++ compiler can learn to
     // write parallel for loops as well.
 
@@ -80,6 +80,7 @@ void example_using_regular_non_parallel_loops()
 
 
 
+    // Assign only part of the elements in vect.
     vect.assign(10, -1);
     for (unsigned long i = 1; i < 5; ++i)
     {
@@ -90,6 +91,7 @@ void example_using_regular_non_parallel_loops()
 
 
 
+    // Sum all element sin vect.
     int sum = 0;
     vect.assign(10, 2);
     for (unsigned long i = 0; i < vect.size(); ++i)
@@ -118,7 +120,7 @@ void example_using_lambda_functions()
     vect.assign(10, -1);
     parallel_for(num_threads, 0, vect.size(), [&](long i){
         // The i variable is the loop counter as in a normal for loop.  So we simply need
-        // to place the body of the for loop right here and we get the same thing.  The
+        // to place the body of the for loop right here and we get the same behavior.  The
         // range for the for loop is determined by the 2nd and 3rd arguments to
         // parallel_for().
         vect[i] = i;
@@ -127,6 +129,7 @@ void example_using_lambda_functions()
     print(vect);
 
 
+    // Assign only part of the elements in vect.
     vect.assign(10, -1);
     parallel_for(num_threads, 1, 5, [&](long i){
         vect[i] = i;
@@ -139,7 +142,7 @@ void example_using_lambda_functions()
     // independent.  In the first two cases each iteration of the loop touched different
     // memory locations, so we didn't need to use any kind of thread synchronization.
     // However, in the summing loop we need to add some synchronization to protect the sum
-    // variable.  This is easy accomplished by creating a mutex and locking it before
+    // variable.  This is easily accomplished by creating a mutex and locking it before
     // adding to sum.  More generally, you must ensure that the bodies of your parallel for
     // loops are thread safe using whatever means is appropriate for your code.  Since a
     // parallel for loop is implemented using threads, all the usual techniques for
