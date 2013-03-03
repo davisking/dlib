@@ -376,7 +376,7 @@ void make_dataset (
         unsigned long previous_label = rnd.get_random_32bit_number()%num_label_states;
         for (unsigned long i = 0; i < sample.size(); ++i)
         {
-            unsigned long next_label, next_sample;
+            unsigned long next_label = 0, next_sample = 0;
             sample_hmm(rnd, transition_probabilities, emission_probabilities, 
                        previous_label, next_label, next_sample);
 
