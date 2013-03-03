@@ -227,7 +227,8 @@ void example_without_using_lambda_functions()
 
     int sum = 0;
     vect.assign(10, 2);
-    parallel_for(num_threads, 0, vect.size(), function_object_sum(vect, sum));
+    function_object_sum funct(vect, sum);
+    parallel_for(num_threads, 0, vect.size(), funct);
     cout << "sum: " << sum << endl;
 }
 
