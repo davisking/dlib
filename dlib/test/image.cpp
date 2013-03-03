@@ -1352,8 +1352,16 @@ namespace
                 // Lets the float_details object while we are here doing this stuff.
                 float_details temp = val;
                 T val2 = temp;
-                // for the same type we should exactly reproduce the value.
-                DLIB_TEST(val2 == val);
+                // for the same type we should exactly reproduce the value (unless
+                // it's long double and then maybe it's slightly different).
+                if (is_same_type<T,long double>::value)
+                {
+                    DLIB_TEST(std::abs(val2-val) < scale*std::numeric_limits<T>::epsilon());
+                }
+                else
+                {
+                    DLIB_TEST(val2 == val);
+                }
 
                 float valf = temp;
                 double vald = temp;
