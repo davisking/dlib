@@ -24,6 +24,8 @@ namespace
     using namespace dlib;
     using namespace std;
 
+    using dlib::array;
+
     // Declare the logger we will use in this test.  The name of the tester 
     // should start with "test."
     logger dlog("test.scan_image");

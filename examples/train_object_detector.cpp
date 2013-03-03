@@ -144,7 +144,7 @@ int main(int argc, char** argv)
                 return EXIT_FAILURE;
             }
 
-            array<array2d<unsigned char> > images;
+            dlib::array<array2d<unsigned char> > images;
             std::vector<std::vector<rectangle> > object_locations;
 
             cout << "Loading image dataset from metadata file " << parser[0] << endl;
@@ -240,7 +240,7 @@ int main(int argc, char** argv)
         object_detector<image_scanner_type> detector;
         deserialize(detector, fin);
 
-        array<array2d<unsigned char> > images;
+        dlib::array<array2d<unsigned char> > images;
         // Check if the command line argument is an XML file
         if (tolower(right_substr(parser[0],".")) == "xml")
         {

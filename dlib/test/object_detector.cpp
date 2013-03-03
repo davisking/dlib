@@ -355,7 +355,7 @@ namespace
         print_spinner();
         dlog << LINFO << "test_1()";
 
-        typedef array<array2d<unsigned char> >  grayscale_image_array_type;
+        typedef dlib::array<array2d<unsigned char> >  grayscale_image_array_type;
         grayscale_image_array_type images;
         std::vector<std::vector<rectangle> > object_locations;
         make_simple_test_data(images, object_locations);
@@ -397,7 +397,7 @@ namespace
         print_spinner();
         dlog << LINFO << "test_1m()";
 
-        typedef array<array2d<unsigned char> >  grayscale_image_array_type;
+        typedef dlib::array<array2d<unsigned char> >  grayscale_image_array_type;
         grayscale_image_array_type images;
         std::vector<std::vector<full_object_detection> > object_locations;
         make_simple_test_data(images, object_locations);
@@ -445,7 +445,7 @@ namespace
         print_spinner();
         dlog << LINFO << "test_1_fine_hog()";
 
-        typedef array<array2d<unsigned char> >  grayscale_image_array_type;
+        typedef dlib::array<array2d<unsigned char> >  grayscale_image_array_type;
         grayscale_image_array_type images;
         std::vector<std::vector<rectangle> > object_locations;
         make_simple_test_data(images, object_locations);
@@ -487,7 +487,7 @@ namespace
         print_spinner();
         dlog << LINFO << "test_1_poly()";
 
-        typedef array<array2d<unsigned char> >  grayscale_image_array_type;
+        typedef dlib::array<array2d<unsigned char> >  grayscale_image_array_type;
         grayscale_image_array_type images;
         std::vector<std::vector<rectangle> > object_locations;
         make_simple_test_data(images, object_locations);
@@ -529,7 +529,7 @@ namespace
         print_spinner();
         dlog << LINFO << "test_1_poly()";
 
-        typedef array<array2d<unsigned char> >  grayscale_image_array_type;
+        typedef dlib::array<array2d<unsigned char> >  grayscale_image_array_type;
         grayscale_image_array_type images;
         std::vector<std::vector<full_object_detection> > object_locations;
         make_simple_test_data(images, object_locations);
@@ -577,7 +577,7 @@ namespace
         print_spinner();
         dlog << LINFO << "test_1_poly_nn()";
 
-        typedef array<array2d<unsigned char> >  grayscale_image_array_type;
+        typedef dlib::array<array2d<unsigned char> >  grayscale_image_array_type;
         grayscale_image_array_type images;
         std::vector<std::vector<rectangle> > object_locations;
         make_simple_test_data(images, object_locations);
@@ -623,7 +623,7 @@ namespace
         print_spinner();
         dlog << LINFO << "test_2()";
 
-        typedef array<array2d<unsigned char> >  grayscale_image_array_type;
+        typedef dlib::array<array2d<unsigned char> >  grayscale_image_array_type;
         grayscale_image_array_type images;
         std::vector<std::vector<rectangle> > object_locations;
         make_simple_test_data(images, object_locations);
@@ -708,8 +708,8 @@ namespace
         dlog << LINFO << "test_3()";
 
 
-        typedef array<array2d<unsigned char> >  grayscale_image_array_type;
-        typedef array<funny_image>  funny_image_array_type;
+        typedef dlib::array<array2d<unsigned char> >  grayscale_image_array_type;
+        typedef dlib::array<funny_image>  funny_image_array_type;
         grayscale_image_array_type images_temp;
         funny_image_array_type images;
         std::vector<std::vector<rectangle> > object_locations;

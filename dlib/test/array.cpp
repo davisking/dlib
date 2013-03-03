@@ -18,6 +18,8 @@ namespace
     using namespace dlib;
     using namespace std;
 
+    using dlib::array;
+
     logger dlog("test.array");
 
     template <

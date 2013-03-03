@@ -101,7 +101,7 @@ int main()
     try
     {
         // The first thing we do is create the set of 3 images discussed above.  
-        array<array2d<unsigned char> > images;
+        dlib::array<array2d<unsigned char> > images;
         std::vector<std::vector<rectangle> > object_locations;
         make_simple_test_data(images, object_locations);
 
