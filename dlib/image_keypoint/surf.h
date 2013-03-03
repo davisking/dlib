@@ -246,8 +246,12 @@ namespace dlib
             << "\n\t max_points: " << max_points 
         );
 
+        // Figure out the proper scalar type we should use to work with these pixels.  
+        typedef typename pixel_traits<typename image_type::type>::basic_pixel_type bp_type;
+        typedef typename promote<bp_type>::type working_pixel_type;
+
         // make an integral image first
-        integral_image int_img;
+        integral_image_generic<working_pixel_type> int_img;
         int_img.load(img);
 
         // now make a hessian pyramid
