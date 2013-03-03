@@ -468,7 +468,6 @@ namespace dlib
 
         for (long o = 0; o < pyr.octaves(); ++o)
         {
-            const long border_size = pyr.get_border_size(o);
             const long nr = pyr.nr(o);
             const long nc = pyr.nc(o);
 
