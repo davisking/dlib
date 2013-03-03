@@ -24,7 +24,7 @@ New Features:
      matrices using the format used by operator&lt;&lt;.
    - Added serialization support for std::vector&lt;bool&gt;.
    - Added the following new minor objects and routines: average_precision(), 
-     make_sparse_vector_inplace(), orthogonalize(), count_bits(),
+     make_sparse_vector_inplace(), orthogonalize(), count_bits(), draw_surf_points(),
      hamming_distance(), cosine_distance, and negative_dot_product_distance.
 
 Non-Backwards Compatible Changes:
@@ -34,6 +34,10 @@ Non-Backwards Compatible Changes:
    - Generalized segment_image() so it works on any pixel type or array of
      vectors.  I also changed it's interface slightly.  In particular, I removed
      the min_diff parameter and replaced it with an explicit min_size parameter.
+   - Changed how the SURF descriptor is computed slightly to improve its
+     accuracy.  The interface to the user has not been changed, however, the
+     number and position of detected SURF points might be different than in
+     previous dlib versions.
 
 Bug fixes:
    - Fixed an endianness bug in the PNG I/O functions which occurred when 16bit
@@ -62,7 +66,6 @@ Other:
      code without supplying a trainer object.
    - Optimized the oca and structural SVM solvers.  They are now a little bit faster 
      than in previous dlib releases.
-   - Changed how the SURF descriptor is computed slightly to improve its accuracy.
 
 </current>
 
