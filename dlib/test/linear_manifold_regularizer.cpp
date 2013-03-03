@@ -35,7 +35,8 @@ namespace
         for (unsigned long i = 0; i < edges1.size(); ++i)
         {
             DLIB_TEST(edges1[i] == edges2[i]);
-            DLIB_TEST(edges1[i].distance() == edges2[i].distance());
+            DLIB_TEST_MSG(std::abs(edges1[i].distance() - edges2[i].distance()) < 1e-15,
+                edges1[i].distance() - edges2[i].distance());
         }
     }
 
