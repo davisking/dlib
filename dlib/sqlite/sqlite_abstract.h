@@ -117,6 +117,20 @@ namespace dlib
                 - executes the supplied SQL statement against this database
         !*/
 
+        int64 last_insert_rowid (
+        ) const;
+        /*!
+            requires
+                - is_open() == true
+            ensures
+                - Each element in a database table has a rowid which uniquely identifies
+                  it.  Therefore, this routine returns the rowid of the most recent
+                  successful INSERT into the database via this database instance.  
+                - If an INSERT has not been performed on the current database instance then
+                  the return value is 0.  This is true even if the database is not empty.
+                - See the sqlite documention for the full details on how this function
+                  behaves: http://www.sqlite.org/c3ref/last_insert_rowid.html
+        !*/
     };
 
 // ----------------------------------------------------------------------------------------

@@ -92,6 +92,12 @@ namespace dlib
             const std::string& sql_statement
         );
 
+        int64 last_insert_rowid (
+        ) const
+        {
+            return sqlite3_last_insert_rowid(db.get());
+        }
+
     private:
 
         friend class statement;
