@@ -10,6 +10,7 @@
 #include "../algs.h"
 #include <sqlite3.h>
 #include "../smart_pointers.h"
+#include "../serialize.h"
 
 // --------------------------------------------------------------------------------------------
 
