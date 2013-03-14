@@ -8,6 +8,7 @@
 #include <vector>
 #include "../geometry.h"
 #include "../disjoint_subsets.h"
+#include "../set.h"
 
 namespace dlib
 {
@@ -412,6 +413,290 @@ namespace dlib
                 out_img[r][c] = sets.find_set(idx++);
             }
         }
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+//                     Candidate object location generation code.
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        struct edge_data
+        {
+            double edge_diff;
+            unsigned long set1;  
+            unsigned long set2;
+            bool operator<(const edge_data& item) const
+            {
+                return edge_diff < item.edge_diff;
+            }
+        };
+
+        template <typename alloc>
+        void remove_duplicates (
+            std::vector<rectangle,alloc>& rects
+        )
+        {
+            std::sort(rects.begin(), rects.end(), std::less<rectangle>());
+            unsigned long num_unique = 1;
+            for (unsigned long i = 1; i < rects.size(); ++i)
+            {
+                if (rects[i] != rects[i-1])
+                {
+                    rects[num_unique++] = rects[i];
+                }
+            }
+            if (rects.size() != 0)
+                rects.resize(num_unique);
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename in_image_type,
+            typename diff_type
+            >
+        void find_basic_candidate_object_locations (
+            const in_image_type& in_img,
+            const std::vector<dlib::impl::segment_image_edge_data_T<diff_type> >& sorted_edges,
+            std::vector<rectangle>& out_rects,
+            std::vector<edge_data>& edges,
+            const double k,
+            const unsigned long min_size 
+        )
+        {
+            using namespace dlib::impl;
+            typedef typename in_image_type::type ptype;
+
+            std::vector<dlib::impl::segment_image_edge_data_T<diff_type> > rejected_edges;
+            rejected_edges.reserve(sorted_edges.size());
+
+            out_rects.clear();
+            edges.clear();
+
+            // don't bother doing anything if the image is too small
+            if (in_img.nr() < 2 || in_img.nc() < 2)
+            {
+                return;
+            }
+
+            disjoint_subsets sets;
+            sets.set_size(in_img.size());
+
+
+            std::vector<graph_image_segmentation_data_T<diff_type> > data(in_img.size());
+
+
+
+            std::pair<unsigned long,unsigned long> last_blob_edge(std::numeric_limits<unsigned long>::max(),
+                                                                  std::numeric_limits<unsigned long>::max());;
+            // now start connecting blobs together to make a minimum spanning tree.
+            for (unsigned long i = 0; i < sorted_edges.size(); ++i)
+            {
+                const unsigned long idx1 = sorted_edges[i].idx1;
+                const unsigned long idx2 = sorted_edges[i].idx2;
+
+                unsigned long set1 = sets.find_set(idx1);
+                unsigned long set2 = sets.find_set(idx2);
+                if (set1 != set2)
+                {
+                    const diff_type diff = sorted_edges[i].diff;
+                    const diff_type tau1 = k/data[set1].component_size;
+                    const diff_type tau2 = k/data[set2].component_size;
+
+                    const diff_type mint = std::min(data[set1].internal_diff + tau1, 
+                        data[set2].internal_diff + tau2);
+                    if (diff <= mint)
+                    {
+                        const unsigned long new_set = sets.merge_sets(set1, set2);
+                        data[new_set].component_size = data[set1].component_size + data[set2].component_size;
+                        data[new_set].internal_diff = diff;
+                    }
+                    else
+                    {
+                        // Don't bother keeping multiple edges from the same pair of blobs, we
+                        // only need one for what we will do later.
+                        if (std::make_pair(set1,set2) != last_blob_edge)
+                        {
+                            segment_image_edge_data_T<diff_type> temp = sorted_edges[i];
+                            temp.idx1 = set1;
+                            temp.idx2 = set2;
+                            rejected_edges.push_back(temp);
+                            last_blob_edge = std::make_pair(set1,set2);
+                        }
+                    }
+                }
+            }
+
+
+            // merge small blobs
+            for (unsigned long i = 0; i < rejected_edges.size(); ++i)
+            {
+                const unsigned long idx1 = rejected_edges[i].idx1;
+                const unsigned long idx2 = rejected_edges[i].idx2;
+
+                unsigned long set1 = sets.find_set(idx1);
+                unsigned long set2 = sets.find_set(idx2);
+                rejected_edges[i].idx1 = set1;
+                rejected_edges[i].idx2 = set2;
+                if (set1 != set2 && (data[set1].component_size < min_size || data[set2].component_size < min_size))
+                {
+                    const unsigned long new_set = sets.merge_sets(set1, set2);
+                    data[new_set].component_size = data[set1].component_size + data[set2].component_size;
+                    data[new_set].internal_diff = rejected_edges[i].diff;
+                }
+            }
+
+            // find bounding boxes of each blob
+            std::map<unsigned long, rectangle> boxes;
+            std::map<unsigned long, unsigned long> box_id_map;
+            unsigned long idx = 0;
+            for (long r = 0; r < in_img.nr(); ++r)
+            {
+                for (long c = 0; c < in_img.nc(); ++c)
+                {
+                    const unsigned long id = sets.find_set(idx++);
+                    // Accumulate the current point into its box and if it is the first point
+                    // in the box then also record the id number for this box.
+                    if ((boxes[id] += point(c,r)).area() == 1)
+                        box_id_map[id] = boxes.size()-1;
+                }
+            }
+
+            // copy boxes into out_rects
+            out_rects.resize(boxes.size());
+            for (std::map<unsigned long,rectangle>::iterator i = boxes.begin(); i != boxes.end(); ++i)
+            {
+                out_rects[box_id_map[i->first]] = i->second;
+            }
+
+            // Now find the edges between the boxes 
+            typedef dlib::memory_manager<char>::kernel_2c mm_type;
+            dlib::set<std::pair<unsigned long, unsigned long>, mm_type>::kernel_1a neighbors_final;
+            for (unsigned long i = 0; i < rejected_edges.size(); ++i)
+            {
+                const unsigned long idx1 = rejected_edges[i].idx1;
+                const unsigned long idx2 = rejected_edges[i].idx2;
+
+                unsigned long set1 = sets.find_set(idx1);
+                unsigned long set2 = sets.find_set(idx2);
+                if (set1 != set2)
+                {
+                    std::pair<unsigned long, unsigned long> p = std::make_pair(set1,set2);
+                    if (!neighbors_final.is_member(p))
+                    {
+                        neighbors_final.add(p);
+
+                        edge_data temp;
+                        const diff_type mint = std::min(data[set1].internal_diff , 
+                                                        data[set2].internal_diff );
+                        temp.edge_diff = rejected_edges[i].diff - mint;
+                        temp.set1 = box_id_map[set1];
+                        temp.set2 = box_id_map[set2];
+                        edges.push_back(temp);
+                    }
+                }
+            }
+
+            std::sort(edges.begin(), edges.end());
+        }
+    } // end namespace impl
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        typename EXP
+        >
+    void find_candidate_object_locations (
+        const in_image_type& in_img,
+        std::vector<rectangle>& rects,
+        const matrix_exp<EXP>& kvals,
+        const unsigned long min_size = 20,
+        const unsigned long max_merging_iterations = 50
+    )
+    /*!
+        requires
+            - is_vector(kvals) == true
+            - kvals.size() > 0
+    !*/
+    {
+        typedef dlib::memory_manager<char>::kernel_2c mm_type;
+        typedef dlib::set<rectangle, mm_type>::kernel_1a set_of_rects;
+
+        using namespace dlib::impl;
+        typedef typename in_image_type::type ptype;
+        typedef typename edge_diff_funct<ptype>::diff_type diff_type;
+
+
+        // don't bother doing anything if the image is too small
+        if (in_img.nr() < 2 || in_img.nc() < 2)
+        {
+            return;
+        }
+
+        std::vector<edge_data> edges;
+        std::vector<rectangle> working_rects;
+        std::vector<segment_image_edge_data_T<diff_type> > sorted_edges;
+        get_pixel_edges(in_img, sorted_edges);
+
+        disjoint_subsets sets;
+
+        for (long j = 0; j < kvals.size(); ++j)
+        {
+            const double k = kvals(j);
+
+            find_basic_candidate_object_locations(in_img, sorted_edges, working_rects, edges, k, min_size);
+            rects.insert(rects.end(), working_rects.begin(), working_rects.end());
+
+
+
+            // now iteratively merge all the rectangles we have and record the results
+            set_of_rects detected_rects;
+            bool did_merge = true;
+            for (unsigned long iter = 0; did_merge && iter < max_merging_iterations; ++iter) 
+            {
+                did_merge = false;
+                sets.clear();
+                sets.set_size(working_rects.size());
+                for (unsigned long i = 0; i < edges.size(); ++i)
+                {
+                    edge_data temp = edges[i];
+
+                    temp.set1 = sets.find_set(temp.set1);
+                    temp.set2 = sets.find_set(temp.set2);
+                    if (temp.set1 != temp.set2)
+                    {
+                        rectangle merged_rect = working_rects[temp.set1] + working_rects[temp.set2];
+                        if (!detected_rects.is_member(merged_rect))
+                        {
+                            const unsigned long new_set = sets.merge_sets(temp.set1, temp.set2);
+                            rects.push_back(merged_rect);
+                            working_rects[new_set] = merged_rect;
+                            did_merge = true;
+                            detected_rects.add(merged_rect);
+                        }
+                    }
+                }
+            }
+        }
+
+        remove_duplicates(rects);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type
+        >
+    void find_candidate_object_locations (
+        const in_image_type& in_img,
+        std::vector<rectangle>& rects
+    )
+    {
+        find_candidate_object_locations(in_img, rects, linspace(50, 200, 3));
     }
 
 // ----------------------------------------------------------------------------------------
