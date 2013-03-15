@@ -239,8 +239,8 @@
          <spec_file link="true">dlib/graph_utils/find_k_nearest_neighbors_lsh_abstract.h</spec_file>
          <description>
             This function is a simple approximate form of <a href="#find_k_nearest_neighbors">find_k_nearest_neighbors</a>.
-            It uses locality sensitive hashing to speed up the nearest neighbor computation and is
-            also capable of using a multi-core CPU.
+            It uses <a href="algorithms.html#hash_similar_angles_128">locality sensitive hashing</a> 
+            to speed up the nearest neighbor computation and is also capable of using a multi-core CPU.
          </description>
 
       </component>
