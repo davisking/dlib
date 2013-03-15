@@ -53,6 +53,7 @@
          <item>ordered_sample_pair</item>
          <item>find_percent_shortest_edges_randomly</item>
          <item>find_k_nearest_neighbors</item>
+         <item>find_k_nearest_neighbors_lsh</item>
          <item>find_approximate_k_nearest_neighbors</item>
          <item nolink="true">
             <name>Distance Functions</name>
@@ -224,7 +225,22 @@
             This is a function which finds all the k nearest neighbors of a set of points and outputs
             the result as a vector of <a href="#sample_pair">sample_pair</a> objects.  It takes O(n^2) where
             n is the number of data samples.  A faster approximate version is provided by 
-            <a href="#find_approximate_k_nearest_neighbors">find_approximate_k_nearest_neighbors</a>.
+            <a href="#find_approximate_k_nearest_neighbors">find_approximate_k_nearest_neighbors</a> 
+            and <a href="#find_k_nearest_neighbors_lsh">find_k_nearest_neighbors_lsh</a>.
+         </description>
+
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>find_k_nearest_neighbors_lsh</name>
+         <file>dlib/graph_utils_threaded.h</file>
+         <spec_file link="true">dlib/graph_utils/find_k_nearest_neighbors_lsh_abstract.h</spec_file>
+         <description>
+            This function is a simple approximate form of <a href="#find_k_nearest_neighbors">find_k_nearest_neighbors</a>.
+            It uses locality sensitive hashing to speed up the nearest neighbor computation and is
+            also capable of using a multi-core CPU.
          </description>
 
       </component>

@@ -149,6 +149,11 @@
          <term file="bayes.html" name="node_next_parent_assignment"/>
          <term file="bayes.html" name="node_cpt_filled_out"/>
 
+         <term file="algorithms.html" name="hash_samples"/>
+         <term file="algorithms.html" name="hash_similar_angles_64"/>
+         <term file="algorithms.html" name="hash_similar_angles_128"/>
+         <term file="algorithms.html" name="hash_similar_angles_256"/>
+         <term file="algorithms.html" name="hash_similar_angles_512"/>
          <term file="algorithms.html" name="projection_hash"/>
          <term file="algorithms.html" name="create_random_projection_hash"/>
          <term file="algorithms.html" name="randomly_sample_image_features"/>
@@ -241,6 +246,7 @@
          <term file="graph_tools.html" name="order_by_distance_and_index"/>
          <term file="graph_tools.html" name="find_percent_shortest_edges_randomly"/>
          <term file="graph_tools.html" name="find_k_nearest_neighbors"/>
+         <term file="graph_tools.html" name="find_k_nearest_neighbors_lsh"/>
          <term file="graph_tools.html" name="remove_short_edges"/>
          <term file="graph_tools.html" name="remove_duplicate_edges"/>
          <term file="graph_tools.html" name="is_ordered_by_index"/>
