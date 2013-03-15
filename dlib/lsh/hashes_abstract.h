@@ -15,7 +15,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for computing locality sensitive hashes that give
-                vectors with similar angles between each other similar hash values.  In
+                vectors with small angles between each other similar hash values.  In
                 particular, this object creates 64 random planes which pass though the
                 origin and uses them to create a 64bit hash.  To compute the hash for a new
                 vector, this object checks which side of each plane the vector falls on and
@@ -81,7 +81,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for computing locality sensitive hashes that give
-                vectors with similar angles between each other similar hash values.  In
+                vectors with small angles between each other similar hash values.  In
                 particular, this object creates 128 random planes which pass though the
                 origin and uses them to create a 128bit hash.  To compute the hash for a new
                 vector, this object checks which side of each plane the vector falls on and
@@ -148,7 +148,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for computing locality sensitive hashes that give
-                vectors with similar angles between each other similar hash values.  In
+                vectors with small angles between each other similar hash values.  In
                 particular, this object creates 256 random planes which pass though the
                 origin and uses them to create a 256bit hash.  To compute the hash for a new
                 vector, this object checks which side of each plane the vector falls on and
@@ -216,7 +216,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for computing locality sensitive hashes that give
-                vectors with similar angles between each other similar hash values.  In
+                vectors with small angles between each other similar hash values.  In
                 particular, this object creates 512 random planes which pass though the
                 origin and uses them to create a 512bit hash.  To compute the hash for a new
                 vector, this object checks which side of each plane the vector falls on and
