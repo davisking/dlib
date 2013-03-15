@@ -159,7 +159,8 @@ namespace dlib
         hashes.resize(samples.size());
 
         typedef impl::hash_block<vector_type,hash_function_type> block_type;
-        parallel_for(num_threads, 0, samples.size(), block_type(samples, hash_funct, hashes));
+        block_type temp(samples, hash_funct, hashes);
+        parallel_for(num_threads, 0, samples.size(), temp);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -201,7 +202,8 @@ namespace dlib
         hash_samples(samples, hash_funct, num_threads, hashes);
 
         typedef impl::scan_find_k_nearest_neighbors_lsh<vector_type, distance_function_type,hash_function_type,alloc> scan_type;
-        parallel_for(num_threads, 0, hashes.size(), scan_type(samples, dist_funct, hash_funct, k, edges, k_oversample, hashes));
+        scan_type temp(samples, dist_funct, hash_funct, k, edges, k_oversample, hashes);
+        parallel_for(num_threads, 0, hashes.size(), temp);
 
         remove_duplicate_edges(edges);
     }
