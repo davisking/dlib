@@ -42,6 +42,9 @@ namespace dlib
         ) const
         {
             const double inner = a.intersect(b).area();
+            if (inner == 0)
+                return false;
+
             const double outer = (a+b).area();
             if (inner/outer > match_thresh || 
                 inner/a.area() > overlap_thresh || 
