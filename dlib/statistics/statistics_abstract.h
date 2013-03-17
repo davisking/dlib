@@ -1,4 +1,4 @@
-// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+// Copyright (C) 2008  Davis E. King (davis@dlib.net), Steve Taylor
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_STATISTICs_ABSTRACT_
 #ifdef DLIB_STATISTICs_ABSTRACT_
@@ -121,8 +121,8 @@ namespace dlib
                 - current_n() == 0
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents something that can compute the running mean and
-                variance of a stream of real numbers.  
+                This object represents something that can compute the running mean, 
+                variance, skewness, and excess kurtosis of a stream of real numbers.  
 
                 As this object accumulates more and more numbers it will be the case
                 that each new number impacts the current mean and variance estimate
@@ -184,10 +184,13 @@ namespace dlib
         );
         /*!
             ensures
-                - updates the mean and variance stored in this object so that
-                  the new value is factored into them
-                - #mean() == mean()*current_n()/(current_n()+1) + val/(current_n()+1)
-                - #variance() == the updated variance that takes this new value into account
+                - updates the mean, variance, skewness, and kurtosis stored in this object
+                  so that the new value is factored into them.
+                - #mean() == mean()*current_n()/(current_n()+1) + val/(current_n()+1).
+                  (i.e. the updated mean value that takes the new value into account)
+                - #variance() == the updated variance that takes this new value into account.
+                - #skewness() == the updated skewness that takes this new value into account.
+                - #ex_kurtosis() == the updated kurtosis that takes this new value into account.
                 - if (current_n() < max_n()) then
                     - #current_n() == current_n() + 1
                 - else
@@ -220,6 +223,26 @@ namespace dlib
             ensures
                 - returns the unbiased sampled standard deviation of all the values
                   presented to this object so far.
+        !*/
+
+        T skewness (
+        ) const;
+        /*!
+            requires
+                - current_n() > 2
+            ensures
+                - returns the unbiased sample skewness of all the values presented 
+                  to this object so far.
+        !*/
+
+        T ex_kurtosis(
+        ) const;
+        /*!
+            requires
+                - current_n() > 3
+            ensures
+                - returns the unbiased sample kurtosis of all the values presented 
+                  to this object so far.
         !*/
 
         T max (

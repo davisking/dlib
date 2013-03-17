@@ -1,4 +1,4 @@
-// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+// Copyright (C) 2008  Davis E. King (davis@dlib.net), Steve Taylor
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_STATISTICs_
 #define DLIB_STATISTICs_
@@ -35,7 +35,10 @@ namespace dlib
         void clear()
         {
             sum = 0;
-            sum_sqr = 0;
+            sum_sqr  = 0;
+            sum_cub  = 0;
+            sum_four = 0;
+
             n = 0;
             maximum_n = std::numeric_limits<T>::max();
             min_value = std::numeric_limits<T>::infinity();
@@ -53,8 +56,10 @@ namespace dlib
             const T& val
         )
         {
-            sum     += val;
-            sum_sqr += val*val;
+            sum      += val;
+            sum_sqr  += val*val;
+            sum_cub  += cubed(val);
+            sum_four += quaded(val);
 
             if (val < min_value)
                 min_value = val;
@@ -145,6 +150,43 @@ namespace dlib
             return std::sqrt(variance());
         }
 
+        T skewness (
+        ) const
+        {  
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 2,
+                "\tT running_stats::skewness"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+            );
+
+            T temp  = 1/n;
+            T temp1 = std::sqrt(n*(n-1))/(n-2); 
+            temp    = temp1*temp*(sum_cub - 3*sum_sqr*sum*temp + 2*cubed(sum)*temp*temp)/
+                      (std::sqrt(std::pow(temp*(sum_sqr-sum*sum*temp),3)));
+
+            return temp; 
+        }
+
+        T ex_kurtosis (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 3,
+                "\tT running_stats::kurtosis"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+            );
+
+            T temp = 1/n;
+            T m4   = temp*(sum_four - 4*sum_cub*sum*temp+6*sum_sqr*sum*sum*temp*temp
+                     -3*quaded(sum)*cubed(temp));
+            T m2   = temp*(sum_sqr-sum*sum*temp);
+            temp   = (n-1)*((n+1)*m4/(m2*m2)-3*(n-1))/((n-2)*(n-3));
+
+            return temp; 
+        }
+
         T scale (
             const T& val
         ) const
@@ -175,6 +217,8 @@ namespace dlib
 
             temp.sum += rhs.sum;
             temp.sum_sqr += rhs.sum_sqr;
+            temp.sum_cub += rhs.sum_cub;
+            temp.sum_four += rhs.sum_four;
             temp.n += rhs.n;
             temp.min_value = std::min(rhs.min_value, min_value);
             temp.max_value = std::max(rhs.max_value, max_value);
@@ -196,10 +240,15 @@ namespace dlib
     private:
         T sum;
         T sum_sqr;
+        T sum_cub;
+        T sum_four;
         T n;
         T maximum_n;
         T min_value;
         T max_value;
+    
+        T cubed  (const T& val) const {return val*val*val; }
+        T quaded (const T& val) const {return val*val*val*val; }
     };
 
     template <typename T>
@@ -208,8 +257,13 @@ namespace dlib
         std::ostream& out 
     )
     {
+        int version = 2;
+        serialize(version, out);
+
         serialize(item.sum, out);
         serialize(item.sum_sqr, out);
+        serialize(item.sum_cub, out);
+        serialize(item.sum_four, out);
         serialize(item.n, out);
         serialize(item.maximum_n, out);
         serialize(item.min_value, out);
@@ -222,8 +276,15 @@ namespace dlib
         std::istream& in
     ) 
     {
+        int version = 0;
+        deserialize(version, in);
+        if (version != 2)
+            throw dlib::serialization_error("Unexpected version number found while deserializing dlib::running_stats object.");
+
         deserialize(item.sum, in);
         deserialize(item.sum_sqr, in);
+        deserialize(item.sum_cub, in);
+        deserialize(item.sum_four, in);
         deserialize(item.n, in);
         deserialize(item.maximum_n, in);
         deserialize(item.min_value, in);

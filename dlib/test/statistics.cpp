@@ -10,6 +10,8 @@
 #include <dlib/rand.h>
 #include <dlib/svm.h>
 #include <algorithm>
+#include <dlib/matrix.h>
+#include <cmath>
 
 #include "tester.h"
 
@@ -239,6 +241,90 @@ namespace
 
         }
 
+        void test_skewness_and_kurtosis_1()
+        {
+
+            dlib::rand rnum;
+            running_stats<double> rs1;
+
+            double tp = 0;
+
+            rnum.set_seed("DlibRocks");
+
+            for(int i = 0; i< 1000000; i++)
+            {
+                tp = rnum.get_random_gaussian();
+                rs1.add(tp);
+            }   
+
+            // check the unbiased skewness and excess kurtosis of one million Gaussian
+            // draws are both near zero.
+            DLIB_TEST(abs(rs1.skewness()) < 0.1);
+            DLIB_TEST(abs(rs1.ex_kurtosis()) < 0.1);
+        }
+
+        void test_skewness_and_kurtosis_2()
+        {
+
+            string str = "DlibRocks";
+
+            for(int j = 0; j<5 ; j++)
+            {
+                matrix<double,1,100000> dat;
+                dlib::rand rnum;
+                running_stats<double> rs1;
+     
+                double tp = 0;
+                double n = 100000;
+                double xb = 0;
+    
+                double sknum = 0;
+                double skdenom = 0;
+                double unbi_skew = 0;
+    
+                double exkurnum = 0;
+                double exkurdenom = 0;
+                double unbi_exkur = 0;
+
+                random_shuffle(str.begin(), str.end());
+                rnum.set_seed(str);
+
+                for(int i = 0; i<n; i++)
+                {
+                    tp = rnum.get_random_gaussian();
+                    rs1.add(tp);
+                    dat(i)=tp;
+                    xb += dat(i);
+                }   
+    
+                xb = xb/n;
+
+                for(int i = 0; i < n; i++ )
+                { 
+                    sknum += pow(dat(i) - xb,3);
+                    skdenom += pow(dat(i) - xb,2);
+                    exkurnum += pow(dat(i) - xb,4);
+                    exkurdenom += pow(dat(i)-xb,2);
+                }
+
+                sknum = sknum/n;
+                skdenom = pow(skdenom/n,1.5);
+                exkurnum = exkurnum/n;
+                exkurdenom = pow(exkurdenom/n,2);
+    
+                unbi_skew = sqrt(n*(n-1))/(n-2)*sknum/skdenom;
+                unbi_exkur = (n-1)*((n+1)*(exkurnum/exkurdenom-3)+6)/((n-2)*(n-3));
+
+                dlog << LINFO << "Skew Diff: " <<  unbi_skew - rs1.skewness();
+                dlog << LINFO << "Kur Diff: " << unbi_exkur - rs1.ex_kurtosis();
+                
+                // Test an alternative implementation of the unbiased skewness and excess
+                // kurtosis against the one in running_stats.
+                DLIB_TEST(abs(unbi_skew - rs1.skewness()) < 1e-10);
+                DLIB_TEST(abs(unbi_exkur - rs1.ex_kurtosis()) < 1e-10);
+            }
+        }
+
         void test_randomize_samples()
         {
             std::vector<unsigned int> t(15),u(15),v(15);
@@ -371,6 +457,8 @@ namespace
             test_random_subset_selector2();
             test_running_covariance();
             test_running_stats();
+            test_skewness_and_kurtosis_1();
+            test_skewness_and_kurtosis_2();
             test_randomize_samples();
             test_randomize_samples2();
             another_test();
