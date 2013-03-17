@@ -298,13 +298,20 @@ namespace dlib
                 obj(obj_), funct(funct_), pbar(end-begin)
             {
                 count = 0;
-                pbar.print_status(0);
+                wrote_to_screen = pbar.print_status(0);
+            }
+
+            ~parfor_verbose_helper()
+            {
+                if (wrote_to_screen)
+                    std::cout << std::endl;
             }
 
             mutable long count;
             T& obj;
             void (T::*funct)(long);
             mutable console_progress_indicator pbar;
+            mutable bool wrote_to_screen;
             mutex m;
 
             void operator()(long i) const
@@ -312,7 +319,7 @@ namespace dlib
                 (obj.*funct)(i);
                 {
                     auto_mutex lock(m);
-                    pbar.print_status(++count);
+                    wrote_to_screen = wrote_to_screen || pbar.print_status(++count);
                 }
             }
 
@@ -326,13 +333,20 @@ namespace dlib
                 obj(obj_), funct(funct_), pbar(end-begin)
             {
                 count = 0;
-                pbar.print_status(0);
+                wrote_to_screen = pbar.print_status(0);
+            }
+
+            ~parfor_verbose_helper3()
+            {
+                if (wrote_to_screen)
+                    std::cout << std::endl;
             }
 
             mutable long count;
             T& obj;
             void (T::*funct)(long,long);
             mutable console_progress_indicator pbar;
+            mutable bool wrote_to_screen;
             mutex m;
 
             void operator()(long begin, long end) const
@@ -341,7 +355,7 @@ namespace dlib
                 {
                     auto_mutex lock(m);
                     count += end-begin;
-                    pbar.print_status(count);
+                    wrote_to_screen = wrote_to_screen || pbar.print_status(count);
                 }
             }
         };
@@ -353,12 +367,19 @@ namespace dlib
             parfor_verbose_helper2(const T& obj_, long begin, long end) : obj(obj_), pbar(end-begin)
             {
                 count = 0;
-                pbar.print_status(0);
+                wrote_to_screen = pbar.print_status(0);
+            }
+
+            ~parfor_verbose_helper2()
+            {
+                if (wrote_to_screen)
+                    std::cout << std::endl;
             }
 
             mutable long count;
             const T& obj;
             mutable console_progress_indicator pbar;
+            mutable bool wrote_to_screen;
             mutex m;
 
             void operator()(long i) const
@@ -366,7 +387,7 @@ namespace dlib
                 obj(i);
                 {
                     auto_mutex lock(m);
-                    pbar.print_status(++count);
+                    wrote_to_screen = wrote_to_screen || pbar.print_status(++count);
                 }
             }
 
@@ -376,7 +397,7 @@ namespace dlib
                 {
                     auto_mutex lock(m);
                     count += end-begin;
-                    pbar.print_status(count);
+                    wrote_to_screen = wrote_to_screen || pbar.print_status(count);
                 }
             }
         };
@@ -403,7 +424,6 @@ namespace dlib
 
         impl::parfor_verbose_helper<T> helper(obj, funct, begin, end);
         parallel_for(tp, begin, end, helper, chunks_per_thread);
-        std::cout << std::endl;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -429,7 +449,6 @@ namespace dlib
 
         impl::parfor_verbose_helper<T> helper(obj, funct, begin, end);
         parallel_for(num_threads, begin, end, helper, chunks_per_thread);
-        std::cout << std::endl;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -454,7 +473,6 @@ namespace dlib
 
         impl::parfor_verbose_helper2<T> helper(funct, begin, end);
         parallel_for(tp, begin, end,  helper, chunks_per_thread);
-        std::cout << std::endl;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -479,7 +497,6 @@ namespace dlib
 
         impl::parfor_verbose_helper2<T> helper(funct, begin, end);
         parallel_for(num_threads, begin, end, helper, chunks_per_thread);
-        std::cout << std::endl;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -505,7 +522,6 @@ namespace dlib
 
         impl::parfor_verbose_helper3<T> helper(obj, funct, begin, end);
         parallel_for_blocked(tp, begin, end, helper, chunks_per_thread);
-        std::cout << std::endl;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -531,7 +547,6 @@ namespace dlib
 
         impl::parfor_verbose_helper3<T> helper(obj, funct, begin, end);
         parallel_for_blocked(num_threads, begin, end, helper, chunks_per_thread);
-        std::cout << std::endl;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -556,7 +571,6 @@ namespace dlib
 
         impl::parfor_verbose_helper2<T> helper(funct, begin, end);
         parallel_for_blocked(tp, begin, end,  helper, chunks_per_thread);
-        std::cout << std::endl;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -581,7 +595,6 @@ namespace dlib
 
         impl::parfor_verbose_helper2<T> helper(funct, begin, end);
         parallel_for_blocked(num_threads, begin, end, helper, chunks_per_thread);
-        std::cout << std::endl;
     }
 
 // ----------------------------------------------------------------------------------------
