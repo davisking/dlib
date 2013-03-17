@@ -9,6 +9,15 @@
    <body>
       <term_list>
 
+         <term file="algorithms.html" name="numeric_constants"/>
+         <term link="dlib/numeric_constants.h.html" name="pi"/>
+         <term link="dlib/numeric_constants.h.html" name="e"/>
+         <term link="dlib/numeric_constants.h.html" name="sqrt_2"/>
+         <term link="dlib/numeric_constants.h.html" name="sqrt_3"/>
+         <term link="dlib/numeric_constants.h.html" name="light_spd"/>
+         <term link="dlib/numeric_constants.h.html" name="newton_G"/>
+         <term link="dlib/numeric_constants.h.html" name="planck_cst"/>
+
 
          <term link="compile.html" name="DLIB_REVISION"/>
 

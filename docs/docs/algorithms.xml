@@ -35,6 +35,7 @@
          </item>
          <item>hsort_array</item> 
          <item>isort_array</item> 
+         <item>numeric_constants</item> 
          <item>put_in_range</item> 
          <item>qsort_array</item> 
          <item>square_root</item> 
@@ -618,6 +619,17 @@
                                  
       </component>
                
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>numeric_constants</name>
+         <file>dlib/numeric_constants.h</file>
+         <spec_file>dlib/numeric_constants.h</spec_file>
+         <description>
+            This is just a header file containing definitions of common numeric constants such as pi and e.
+         </description>
+      </component>
       
    <!-- ************************************************************************* -->
       
