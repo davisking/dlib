@@ -72,6 +72,7 @@ namespace std
 #include "noncopyable.h"
 #include "enable_if.h"
 #include "uintn.h"
+#include "numeric_constants.h"
 #include "memory_manager_stateless/memory_manager_stateless_kernel_1.h" // for the default memory manager
 
 
