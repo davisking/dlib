@@ -434,26 +434,6 @@ namespace dlib
             }
         };
 
-        template <typename alloc>
-        void remove_duplicates (
-            std::vector<rectangle,alloc>& rects
-        )
-        {
-            std::sort(rects.begin(), rects.end(), std::less<rectangle>());
-            unsigned long num_unique = 1;
-            for (unsigned long i = 1; i < rects.size(); ++i)
-            {
-                if (rects[i] != rects[i-1])
-                {
-                    rects[num_unique++] = rects[i];
-                }
-            }
-            if (rects.size() != 0)
-                rects.resize(num_unique);
-        }
-
-    // ------------------------------------------------------------------------------------
-
         template <
             typename in_image_type,
             typename diff_type
@@ -603,6 +583,26 @@ namespace dlib
             std::sort(edges.begin(), edges.end());
         }
     } // end namespace impl
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename alloc>
+    void remove_duplicates (
+        std::vector<rectangle,alloc>& rects
+    )
+    {
+        std::sort(rects.begin(), rects.end(), std::less<rectangle>());
+        unsigned long num_unique = 1;
+        for (unsigned long i = 1; i < rects.size(); ++i)
+        {
+            if (rects[i] != rects[i-1])
+            {
+                rects[num_unique++] = rects[i];
+            }
+        }
+        if (rects.size() != 0)
+            rects.resize(num_unique);
+    }
 
 // ----------------------------------------------------------------------------------------
 
