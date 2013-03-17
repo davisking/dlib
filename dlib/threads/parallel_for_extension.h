@@ -319,7 +319,7 @@ namespace dlib
                 (obj.*funct)(i);
                 {
                     auto_mutex lock(m);
-                    wrote_to_screen = wrote_to_screen || pbar.print_status(++count);
+                    wrote_to_screen = pbar.print_status(++count) || wrote_to_screen;
                 }
             }
 
@@ -355,7 +355,7 @@ namespace dlib
                 {
                     auto_mutex lock(m);
                     count += end-begin;
-                    wrote_to_screen = wrote_to_screen || pbar.print_status(count);
+                    wrote_to_screen = pbar.print_status(count) || wrote_to_screen;
                 }
             }
         };
@@ -387,7 +387,7 @@ namespace dlib
                 obj(i);
                 {
                     auto_mutex lock(m);
-                    wrote_to_screen = wrote_to_screen || pbar.print_status(++count);
+                    wrote_to_screen = pbar.print_status(++count) || wrote_to_screen;
                 }
             }
 
@@ -397,7 +397,7 @@ namespace dlib
                 {
                     auto_mutex lock(m);
                     count += end-begin;
-                    wrote_to_screen = wrote_to_screen || pbar.print_status(count);
+                    wrote_to_screen = pbar.print_status(count) || wrote_to_screen;
                 }
             }
         };
