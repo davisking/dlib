@@ -40,16 +40,8 @@ namespace dlib
             sum_four = 0;
 
             n = 0;
-            maximum_n = std::numeric_limits<T>::max();
             min_value = std::numeric_limits<T>::infinity();
             max_value = -std::numeric_limits<T>::infinity();
-        }
-
-        void set_max_n (
-            const T& val
-        )
-        {
-            maximum_n = val;
         }
 
         void add (
@@ -66,14 +58,7 @@ namespace dlib
             if (val > max_value)
                 max_value = val;
 
-            if (n < maximum_n)
-                ++n;
-        }
-
-        T max_n (
-        ) const
-        {
-            return maximum_n;
+            ++n;
         }
 
         T current_n (
@@ -204,15 +189,6 @@ namespace dlib
             const running_stats& rhs
         ) const
         {
-            // make sure requires clause is not broken
-            DLIB_ASSERT(max_n() == rhs.max_n(),
-                "\trunning_stats running_stats::operator+(rhs)"
-                << "\n\t invalid inputs were given to this function"
-                << "\n\t max_n():     " << max_n() 
-                << "\n\t rhs.max_n(): " << rhs.max_n() 
-                << "\n\t this:        " << this
-                );
-
             running_stats temp(*this);
 
             temp.sum += rhs.sum;
@@ -243,7 +219,6 @@ namespace dlib
         T sum_cub;
         T sum_four;
         T n;
-        T maximum_n;
         T min_value;
         T max_value;
     
@@ -265,7 +240,6 @@ namespace dlib
         serialize(item.sum_cub, out);
         serialize(item.sum_four, out);
         serialize(item.n, out);
-        serialize(item.maximum_n, out);
         serialize(item.min_value, out);
         serialize(item.max_value, out);
     }
@@ -286,7 +260,6 @@ namespace dlib
         deserialize(item.sum_cub, in);
         deserialize(item.sum_four, in);
         deserialize(item.n, in);
-        deserialize(item.maximum_n, in);
         deserialize(item.min_value, in);
         deserialize(item.max_value, in);
     }

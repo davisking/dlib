@@ -422,8 +422,6 @@ namespace
             DLIB_TEST(std::abs((rc1+rc2).covariance() - rc3.covariance()) < 1e-13);
             DLIB_TEST((rc1+rc2).current_n() == rc3.current_n());
 
-            rs1.set_max_n(50);
-            DLIB_TEST(rs1.max_n() == 50);
         }
 
         void test_average_precision()
