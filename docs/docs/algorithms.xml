@@ -443,7 +443,7 @@
          </description>
 
          <examples>
-            <example>running_stats.cpp.html</example>
+            <example>running_stats_ex.cpp.html</example>
             <example>kcentroid_ex.cpp.html</example>
          </examples>
                                  
