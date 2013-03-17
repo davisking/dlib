@@ -9,7 +9,6 @@
 #include <iostream>
 #include <vector>
 #include <dlib/statistics.h>
-#include <dlib/numeric_constants.h> // for pi
 
 using namespace std;
 using namespace dlib;
