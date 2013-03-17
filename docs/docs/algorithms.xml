@@ -438,11 +438,12 @@
          <file>dlib/statistics.h</file>
          <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
          <description>
-                This object represents something that can compute the running mean and
-                variance of a stream of real numbers.  
+                This object represents something that can compute the running mean,
+                variance, skewness, and kurtosis statistics of a stream of real numbers.  
          </description>
 
          <examples>
+            <example>running_stats.cpp.html</example>
             <example>kcentroid_ex.cpp.html</example>
          </examples>
                                  
