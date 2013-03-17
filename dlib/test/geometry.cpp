@@ -273,7 +273,6 @@ namespace
         }
 
         {
-            const double pi = 3.1415926535898;
             point p1, center;
 
             center = point(3,4);

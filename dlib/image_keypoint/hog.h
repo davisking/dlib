@@ -282,7 +282,6 @@ namespace dlib
                 }
             }
 
-            const double pi = 3.1415926535898;
 
             // loop over all the histogram cells and fill them out
             for (long rh = 1; rh < hist_cells.nr()-1; ++rh)

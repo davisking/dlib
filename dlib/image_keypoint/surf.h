@@ -88,7 +88,6 @@ namespace dlib
             << "\n\t scale:         " << scale 
         );
 
-        const double pi = 3.1415926535898;
 
         std::vector<double> ang;
         std::vector<dlib::vector<double,2> > samples;
