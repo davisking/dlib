@@ -14,9 +14,9 @@ namespace dlib
     template <
         typename T
         >
-    matrix<T,0,1> compute_correlations (
-        const matrix<T>& L,
-        const matrix<T>& R
+    matrix<typename T::type,0,1> compute_correlations (
+        const matrix_exp<T>& L,
+        const matrix_exp<T>& R
     );
     /*!
         requires
@@ -47,7 +47,8 @@ namespace dlib
         matrix<T>& Rtrans,
         unsigned long num_correlations,
         unsigned long extra_rank = 5,
-        unsigned long q = 2
+        unsigned long q = 2,
+        double regularization = 0
     );
     /*!
         requires
@@ -55,6 +56,7 @@ namespace dlib
             - L.size() > 0 
             - R.size() > 0 
             - L.nr() == R.nr()
+            - regularization >= 0
         ensures
             - This function performs a canonical correlation analysis between the row
               vectors in L and R.  That is, it finds two transformation matrices, Ltrans
@@ -83,11 +85,16 @@ namespace dlib
               problems.
             - returns an estimate of compute_correlations(L*#Ltrans, R*#Rtrans).  The
               returned vector should exactly match the output of compute_correlations()
-              when the reduced rank approximation to L and R is accurate.  However, when L
-              and/or R are higher rank than num_correlations+extra_rank the return value of
-              this function will deviate from compute_correlations(L*#Ltrans, R*#Rtrans).
-              This deviation can be used to check if the reduced rank approximation is
-              working or you need to increase extra_rank.
+              when the reduced rank approximation to L and R is accurate and regularization
+              is set to 0.  However, if this is not the case then the return value of this
+              function will deviate from compute_correlations(L*#Ltrans, R*#Rtrans).  This
+              deviation can be used to check if the reduced rank approximation is working
+              or you need to increase extra_rank.
+            - This function performs the ridge regression version of Canonical Correlation
+              Analysis when regularization is set to a value > 0.  In particular, larger
+              values indicate the solution should be more heavily regularized.  This can be
+              useful when the dimensionality of the data is larger than the number of
+              samples.
             - A good discussion of CCA can be found in the paper "Canonical Correlation
               Analysis" by David Weenink.  In particular, this function is implemented
               using equations 29 and 30 from his paper.  We also use the idea of doing CCA
@@ -109,7 +116,8 @@ namespace dlib
         matrix<T>& Rtrans,
         unsigned long num_correlations,
         unsigned long extra_rank = 5,
-        unsigned long q = 2
+        unsigned long q = 2,
+        double regularization = 0
     );
     /*!
         requires
@@ -119,6 +127,7 @@ namespace dlib
               (i.e. L and R can't represent empty matrices)
             - L and R must contain sparse vectors (see the top of dlib/svm/sparse_vector_abstract.h
               for a definition of sparse vector)
+            - regularization >= 0
         ensures
             - This is just an overload of the cca() function defined above.  Except in this
               case we take a sparse representation of the input L and R matrices rather than
@@ -144,7 +153,8 @@ namespace dlib
         matrix<T>& Rtrans,
         unsigned long num_correlations,
         unsigned long extra_rank = 5,
-        unsigned long q = 2
+        unsigned long q = 2,
+        double regularization = 0
     );
     /*!
         requires
@@ -154,6 +164,7 @@ namespace dlib
               (i.e. L and R can't represent empty matrices)
             - L and R must contain sparse vectors (see the top of dlib/svm/sparse_vector_abstract.h
               for a definition of sparse vector)
+            - regularization >= 0
         ensures
             - returns cca(L.to_std_vector(), R.to_std_vector(), Ltrans, Rtrans, num_correlations, extra_rank, q)
               (i.e. this is just a convenience function for calling the cca() routine when
