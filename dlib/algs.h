@@ -326,7 +326,7 @@ namespace dlib
         the member functions called swap) makes them compile right.
 
         So this is a workaround but not too ugly of one.  But hopefully I get get
-        rid of this in a few years.  So this function is alredy deprecated. 
+        rid of this in a few years.  So this function is already deprecated. 
 
         This also means you should NOT use this function in your own code unless
         you have to support an old buggy compiler that benefits from this hack.
