@@ -275,29 +275,8 @@ namespace dlib
             }
 #endif
 
-            test_box_overlap local_overlap_tester;
-
-            if (auto_overlap_tester)
-            {
-                std::vector<std::vector<rectangle> > mapped_rects(truth_object_detections.size());
-                for (unsigned long i = 0; i < truth_object_detections.size(); ++i)
-                {
-                    mapped_rects[i].resize(truth_object_detections[i].size());
-                    for (unsigned long j = 0; j < truth_object_detections[i].size(); ++j)
-                    {
-                        mapped_rects[i][j] = scanner.get_best_matching_rect(truth_object_detections[i][j].get_rect());
-                    }
-                }
-
-                local_overlap_tester = find_tight_overlap_tester(mapped_rects);
-            }
-            else
-            {
-                local_overlap_tester = overlap_tester;
-            }
-
             structural_svm_object_detection_problem<image_scanner_type,image_array_type > 
-                svm_prob(scanner, local_overlap_tester, images, truth_object_detections, num_threads);
+                svm_prob(scanner, overlap_tester, auto_overlap_tester, images, truth_object_detections, num_threads);
 
             if (verbose)
                 svm_prob.be_verbose();
@@ -314,7 +293,7 @@ namespace dlib
             solver(svm_prob,w);
 
             // report the results of the training.
-            return object_detector<image_scanner_type>(scanner, local_overlap_tester, w);
+            return object_detector<image_scanner_type>(scanner, svm_prob.get_overlap_tester(), w);
         }
 
         template <

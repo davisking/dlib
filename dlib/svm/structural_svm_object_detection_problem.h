@@ -37,6 +37,7 @@ namespace dlib
         structural_svm_object_detection_problem(
             const image_scanner_type& scanner,
             const test_box_overlap& overlap_tester,
+            const bool auto_overlap_tester,
             const image_array_type& images_,
             const std::vector<std::vector<full_object_detection> >& truth_object_detections_,
             unsigned long num_threads = 2
@@ -75,19 +76,34 @@ namespace dlib
                 }
             }
 #endif
-
-            scanners.set_max_size(images.size());
-            scanners.set_size(images.size());
-
+            // The purpose of the max_num_dets member variable is to give us a reasonable
+            // upper limit on the number of detections we can expect from a single image.
+            // This is used in the separation_oracle to put a hard limit on the number of
+            // detections we will consider.  We do this purely for computational reasons
+            // since otherwise we can end up wasting large amounts of time on certain
+            // pathological cases during optimization which ultimately do not influence the
+            // result.  Therefore, we for the separation oracle to only consider the
+            // max_num_dets strongest detections.
             max_num_dets = 0;
             for (unsigned long i = 0; i < truth_object_detections.size(); ++i)
             {
                 if (truth_object_detections[i].size() > max_num_dets)
                     max_num_dets = truth_object_detections[i].size();
-
-                scanners[i].copy_configuration(scanner);
             }
             max_num_dets = max_num_dets*3 + 10;
+
+            initialize_scanners(scanner, num_threads);
+
+            if (auto_overlap_tester)
+            {
+                auto_configure_overlap_tester();
+            }
+        }
+
+        test_box_overlap get_overlap_tester (
+        ) const 
+        {
+            return boxes_overlap;
         }
 
         void set_match_eps (
@@ -154,6 +170,24 @@ namespace dlib
         }
 
     private:
+
+        void auto_configure_overlap_tester(
+        )
+        {
+            std::vector<std::vector<rectangle> > mapped_rects(truth_object_detections.size());
+            for (unsigned long i = 0; i < truth_object_detections.size(); ++i)
+            {
+                mapped_rects[i].resize(truth_object_detections[i].size());
+                for (unsigned long j = 0; j < truth_object_detections[i].size(); ++j)
+                {
+                    mapped_rects[i][j] = scanners[i].get_best_matching_rect(truth_object_detections[i][j].get_rect());
+                }
+            }
+
+            boxes_overlap = find_tight_overlap_tester(mapped_rects);
+        }
+
+
         virtual long get_num_dimensions (
         ) const 
         {
@@ -172,7 +206,7 @@ namespace dlib
             feature_vector_type& psi 
         ) const 
         {
-            const image_scanner_type& scanner = get_scanner(idx);
+            const image_scanner_type& scanner = scanners[idx];
 
             psi.set_size(get_num_dimensions());
             std::vector<rectangle> mapped_rects;
@@ -268,7 +302,7 @@ namespace dlib
             feature_vector_type& psi
         ) const 
         {
-            const image_scanner_type& scanner = get_scanner(idx);
+            const image_scanner_type& scanner = scanners[idx];
 
             std::vector<std::pair<double, rectangle> > dets;
             const double thresh = current_solution(scanner.get_num_dimensions());
@@ -437,13 +471,38 @@ namespace dlib
             return std::make_pair(match,best_idx);
         }
 
-
-        const image_scanner_type& get_scanner (long idx) const
+        struct init_scanners_helper
         {
-            if (scanners[idx].is_loaded_with_image() == false)
-                scanners[idx].load(images[idx]);
+            init_scanners_helper (
+                array<image_scanner_type>& scanners_,
+                const image_array_type& images_
+            ) :
+                scanners(scanners_),
+                images(images_)
+            {}
 
-            return scanners[idx];
+            array<image_scanner_type>& scanners;
+            const image_array_type& images;
+
+            void operator() (long i ) const
+            {
+                scanners[i].load(images[i]);
+            }
+        };
+
+        void initialize_scanners (
+            const image_scanner_type& scanner,
+            unsigned long num_threads
+        )
+        {
+            scanners.set_max_size(images.size());
+            scanners.set_size(images.size());
+
+            for (unsigned long i = 0; i < scanners.size(); ++i)
+                scanners[i].copy_configuration(scanner);
+
+            // now load the images into all the scanners
+            parallel_for(num_threads, 0, scanners.size(), init_scanners_helper(scanners, images));
         }
 
 

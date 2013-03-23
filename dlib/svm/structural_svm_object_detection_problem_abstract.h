@@ -68,7 +68,7 @@ namespace dlib
                 A detection is considered a false alarm if it doesn't match with any 
                 of the ground truth rectangles or if it is a duplicate detection of a 
                 truth rectangle.  Finally, for the purposes of calculating loss, a match 
-                is determined using the following formula, rectangles A and B match 
+                is determined using the following formula where rectangles A and B match 
                 if and only if:
                     A.intersect(B).area()/(A+B).area() > get_match_eps()
         !*/
@@ -77,6 +77,7 @@ namespace dlib
         structural_svm_object_detection_problem(
             const image_scanner_type& scanner,
             const test_box_overlap& overlap_tester,
+            const bool auto_overlap_tester,
             const image_array_type& images,
             const std::vector<std::vector<full_object_detection> >& truth_object_detections,
             unsigned long num_threads = 2
@@ -95,18 +96,31 @@ namespace dlib
                   attempts to learn to predict truth_object_detections[i] based on
                   images[i].  Or in other words, this object can be used to learn a
                   parameter vector, w, such that an object_detector declared as:
-                    object_detector<image_scanner_type> detector(scanner,overlap_tester,w)
+                    object_detector<image_scanner_type> detector(scanner,get_overlap_tester(),w)
                   results in a detector object which attempts to compute the locations of
                   all the objects in truth_object_detections.  So if you called
                   detector(images[i]) you would hopefully get a list of rectangles back
                   that had truth_object_detections[i].size() elements and contained exactly
                   the rectangles indicated by truth_object_detections[i].
+                - if (auto_overlap_tester == true) then
+                    - #get_overlap_tester() == a test_box_overlap object that is configured
+                      using the find_tight_overlap_tester() routine and the contents of
+                      truth_object_detections. 
+                - else
+                    - #get_overlap_tester() == overlap_tester
                 - #get_match_eps() == 0.5
                 - This object will use num_threads threads during the optimization 
                   procedure.  You should set this parameter equal to the number of 
                   available processing cores on your machine.
                 - #get_loss_per_missed_target() == 1
                 - #get_loss_per_false_alarm() == 1
+        !*/
+
+        test_box_overlap get_overlap_tester (
+        ) const;
+        /*!
+            ensures
+                - returns the overlap tester used by this object.  
         !*/
 
         void set_match_eps (
