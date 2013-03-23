@@ -18,8 +18,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_scanner_type,
-        typename overlap_tester_type = test_box_overlap
+        typename image_scanner_type
         >
     class structural_object_detection_trainer : noncopyable
     {
@@ -27,7 +26,7 @@ namespace dlib
     public:
         typedef double scalar_type;
         typedef default_memory_manager mem_manager_type;
-        typedef object_detector<image_scanner_type,overlap_tester_type> trained_function_type;
+        typedef object_detector<image_scanner_type> trained_function_type;
 
 
         explicit structural_object_detection_trainer (
@@ -52,7 +51,7 @@ namespace dlib
 
             scanner.copy_configuration(scanner_);
 
-            auto_overlap_tester = is_same_type<overlap_tester_type,test_box_overlap>::value;
+            auto_overlap_tester = true;
         }
 
         const image_scanner_type& get_scanner (
@@ -68,19 +67,19 @@ namespace dlib
         }
 
         void set_overlap_tester (
-            const overlap_tester_type& tester
+            const test_box_overlap& tester
         )
         {
             overlap_tester = tester;
             auto_overlap_tester = false;
         }
 
-        overlap_tester_type get_overlap_tester (
+        test_box_overlap get_overlap_tester (
         ) const
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(auto_set_overlap_tester() == false,
-                "\t overlap_tester_type structural_object_detection_trainer::get_overlap_tester()"
+                "\t test_box_overlap structural_object_detection_trainer::get_overlap_tester()"
                 << "\n\t You can't call this function if the overlap tester is generated dynamically."
                 << "\n\t this: " << this
                 );
@@ -276,7 +275,7 @@ namespace dlib
             }
 #endif
 
-            overlap_tester_type local_overlap_tester;
+            test_box_overlap local_overlap_tester;
 
             if (auto_overlap_tester)
             {
@@ -297,7 +296,7 @@ namespace dlib
                 local_overlap_tester = overlap_tester;
             }
 
-            structural_svm_object_detection_problem<image_scanner_type,overlap_tester_type,image_array_type > 
+            structural_svm_object_detection_problem<image_scanner_type,image_array_type > 
                 svm_prob(scanner, local_overlap_tester, images, truth_object_detections, num_threads);
 
             if (verbose)
@@ -315,7 +314,7 @@ namespace dlib
             solver(svm_prob,w);
 
             // report the results of the training.
-            return object_detector<image_scanner_type,overlap_tester_type>(scanner, local_overlap_tester, w);
+            return object_detector<image_scanner_type>(scanner, local_overlap_tester, w);
         }
 
         template <
@@ -341,7 +340,7 @@ namespace dlib
     private:
 
         image_scanner_type scanner;
-        overlap_tester_type overlap_tester;
+        test_box_overlap overlap_tester;
 
         double C;
         oca solver;

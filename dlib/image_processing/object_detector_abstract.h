@@ -14,16 +14,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_scanner_type,
-        typename overlap_tester_type = test_box_overlap
+        typename image_scanner_type
         >
     class object_detector
     {
         /*!
-            REQUIREMENTS ON overlap_tester_type
-                overlap_tester_type must be an implementation of the test_box_overlap
-                object defined in dlib/image_processing/box_overlap_testing_abstract.h.
-
             REQUIREMENTS ON image_scanner_type
                 image_scanner_type must be an implementation of 
                 dlib/image_processing/scan_image_pyramid_abstract.h
@@ -60,7 +55,7 @@ namespace dlib
 
         object_detector (
             const image_scanner_type& scanner, 
-            const overlap_tester_type& overlap_tester,
+            const test_box_overlap& overlap_tester,
             const feature_vector_type& w 
         );
         /*!
@@ -90,7 +85,7 @@ namespace dlib
                 - returns the weight vector used by this object
         !*/
 
-        const overlap_tester_type& get_overlap_tester (
+        const test_box_overlap& get_overlap_tester (
         ) const;
         /*!
             ensures
@@ -209,9 +204,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T, typename U>
+    template <typename T>
     void serialize (
-        const object_detector<T,U>& item,
+        const object_detector<T>& item,
         std::ostream& out
     );
     /*!
@@ -220,9 +215,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T, typename U>
+    template <typename T>
     void deserialize (
-        object_detector<T,U>& item,
+        object_detector<T>& item,
         std::istream& in 
     );
     /*!

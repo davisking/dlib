@@ -15,8 +15,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_scanner_type,
-        typename overlap_tester_type = test_box_overlap
+        typename image_scanner_type
         >
     class structural_object_detection_trainer : noncopyable
     {
@@ -24,10 +23,6 @@ namespace dlib
             REQUIREMENTS ON image_scanner_type
                 image_scanner_type must be an implementation of 
                 dlib/image_processing/scan_image_pyramid_abstract.h
-
-            REQUIREMENTS ON overlap_tester_type
-                overlap_tester_type must be an implementation of the test_box_overlap
-                object defined in dlib/image_processing/box_overlap_testing_abstract.h.
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for learning to detect objects in images based on a 
@@ -41,7 +36,7 @@ namespace dlib
     public:
         typedef double scalar_type;
         typedef default_memory_manager mem_manager_type;
-        typedef object_detector<image_scanner_type,overlap_tester_type> trained_function_type;
+        typedef object_detector<image_scanner_type> trained_function_type;
 
 
         explicit structural_object_detection_trainer (
@@ -64,10 +59,7 @@ namespace dlib
                 - #get_scanner() == scanner
                   (note that only the "configuration" of scanner is copied.
                   I.e. the copy is done using copy_configuration())
-                - if (overlap_tester_type == test_box_overlap) then
-                    - #auto_set_overlap_tester() == true
-                - else
-                    - #auto_set_overlap_tester() == false
+                - #auto_set_overlap_tester() == true
         !*/
 
         const image_scanner_type& get_scanner (
@@ -92,7 +84,7 @@ namespace dlib
         !*/
 
         void set_overlap_tester (
-            const overlap_tester_type& tester
+            const test_box_overlap& tester
         );
         /*!
             ensures
@@ -100,7 +92,7 @@ namespace dlib
                 - #auto_set_overlap_tester() == false
         !*/
 
-        overlap_tester_type get_overlap_tester (
+        test_box_overlap get_overlap_tester (
         ) const;
         /*!
             requires

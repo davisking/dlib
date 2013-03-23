@@ -10,6 +10,7 @@
 #include "../string.h"
 #include "../array.h"
 #include "../image_processing/full_object_detection.h"
+#include "../image_processing/box_overlap_testing.h"
 
 namespace dlib
 {
@@ -26,7 +27,6 @@ namespace dlib
 
     template <
         typename image_scanner_type,
-        typename overlap_tester_type,
         typename image_array_type 
         >
     class structural_svm_object_detection_problem : public structural_svm_problem_threaded<matrix<double,0,1> >,
@@ -36,7 +36,7 @@ namespace dlib
 
         structural_svm_object_detection_problem(
             const image_scanner_type& scanner,
-            const overlap_tester_type& overlap_tester,
+            const test_box_overlap& overlap_tester,
             const image_array_type& images_,
             const std::vector<std::vector<full_object_detection> >& truth_object_detections_,
             unsigned long num_threads = 2
@@ -201,9 +201,9 @@ namespace dlib
                         ostringstream sout;
                         sout << "An impossible set of object labels was detected. This is happening because ";
                         sout << "the truth labels for an image contain rectangles which overlap according to the ";
-                        sout << "overlap_tester_type supplied for non-max suppression.  To resolve this, you either need to ";
-                        sout << "relax the overlap tester so it doesn't mark these rectangles as overlapping ";
-                        sout << "or adjust the truth rectangles. ";
+                        sout << "test_box_overlap object supplied for non-max suppression.  To resolve this, you ";
+                        sout << "either need to relax the test_box_overlap object so it doesn't mark these rectangles as ";
+                        sout << "overlapping or adjust the truth rectangles. ";
 
                         // make sure the above string fits nicely into a command prompt window.
                         string temp = sout.str();
@@ -447,7 +447,7 @@ namespace dlib
         }
 
 
-        overlap_tester_type boxes_overlap;
+        test_box_overlap boxes_overlap;
 
         mutable array<image_scanner_type> scanners;
 

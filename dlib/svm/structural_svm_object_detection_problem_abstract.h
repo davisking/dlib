@@ -7,6 +7,7 @@
 #include "structural_svm_problem_threaded_abstract.h"
 #include <sstream>
 #include "../image_processing/full_object_detection_abstract.h"
+#include "../image_processing/box_overlap_testing.h"
 
 namespace dlib
 {
@@ -21,9 +22,9 @@ namespace dlib
                 when it detects that the image_scanner_type it is working with is incapable
                 of representing the truth rectangles it has been asked to predict.  
 
-                This kind of problem can happen when the overlap_tester_type indicates that
-                two ground truth rectangles overlap and are therefore not allowed to both
-                be output at the same time.  Or alternatively, if there are not enough
+                This kind of problem can happen when the test_box_overlap object indicates
+                that two ground truth rectangles overlap and are therefore not allowed to
+                both be output at the same time.  Or alternatively, if there are not enough
                 detection templates to cover the variety of truth rectangle shapes.
         !*/
     };
@@ -32,7 +33,6 @@ namespace dlib
 
     template <
         typename image_scanner_type,
-        typename overlap_tester_type,
         typename image_array_type 
         >
     class structural_svm_object_detection_problem : public structural_svm_problem_threaded<matrix<double,0,1> >,
@@ -42,10 +42,6 @@ namespace dlib
             REQUIREMENTS ON image_scanner_type
                 image_scanner_type must be an implementation of 
                 dlib/image_processing/scan_image_pyramid_abstract.h
-
-            REQUIREMENTS ON overlap_tester_type
-                overlap_tester_type must be an implementation of the test_box_overlap
-                object defined in dlib/image_processing/box_overlap_testing_abstract.h.
 
             REQUIREMENTS ON image_array_type
                 image_array_type must be an implementation of dlib/array/array_kernel_abstract.h 
@@ -80,7 +76,7 @@ namespace dlib
 
         structural_svm_object_detection_problem(
             const image_scanner_type& scanner,
-            const overlap_tester_type& overlap_tester,
+            const test_box_overlap& overlap_tester,
             const image_array_type& images,
             const std::vector<std::vector<full_object_detection> >& truth_object_detections,
             unsigned long num_threads = 2
@@ -99,7 +95,7 @@ namespace dlib
                   attempts to learn to predict truth_object_detections[i] based on
                   images[i].  Or in other words, this object can be used to learn a
                   parameter vector, w, such that an object_detector declared as:
-                    object_detector<image_scanner_type,overlap_tester_type> detector(scanner,overlap_tester,w)
+                    object_detector<image_scanner_type> detector(scanner,overlap_tester,w)
                   results in a detector object which attempts to compute the locations of
                   all the objects in truth_object_detections.  So if you called
                   detector(images[i]) you would hopefully get a list of rectangles back
