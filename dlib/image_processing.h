@@ -9,6 +9,7 @@
 #include "image_processing/object_detector.h"
 #include "image_processing/box_overlap_testing.h"
 #include "image_processing/scan_image_pyramid_tools.h"
+#include "image_processing/setup_hashed_features.h"
 #include "image_processing/scan_image_boxes.h"
 
 #endif // DLIB_IMAGE_PROCESSInG_H___

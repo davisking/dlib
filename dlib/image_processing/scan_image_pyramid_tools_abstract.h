@@ -4,85 +4,11 @@
 #ifdef DLIB_SCAN_IMaGE_PYRAMID_TOOLS_ABSTRACT_H__
 
 #include "scan_image_pyramid_abstract.h"
-#include "../lsh/projection_hash_abstract.h"
-#include "../image_keypoint/hashed_feature_image_abstract.h"
+#include <vector>
+#include "../geometry.h"
 
 namespace dlib
 {
-
-// ----------------------------------------------------------------------------------------
-
-    class image_hash_construction_failure : public error
-    {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This is the exception object used by the routines in this file.
-        !*/
-    };
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename image_array,
-        typename pyramid,
-        typename feature_extractor
-        >
-    void setup_hashed_features (
-        scan_image_pyramid<pyramid, hashed_feature_image<feature_extractor, projection_hash> >& scanner,
-        const image_array& images,
-        const feature_extractor& fe,
-        int bits,
-        unsigned long num_samples = 200000
-    );
-    /*!
-        requires
-            - 0 < bits <= 32
-            - num_samples > 1
-            - images.size() > 0
-            - it must be valid to pass images[0] into scanner.load().
-              (also, image_array must be an implementation of dlib/array/array_kernel_abstract.h)
-        ensures
-            - Creates a projection_hash suitable for hashing the feature vectors produced by
-              fe and then configures scanner to use this hash function.
-            - The hash function will map vectors into integers in the range [0, pow(2,bits))
-            - The hash function will be setup so that it hashes a random sample of num_samples
-              vectors from fe such that each bin ends up with roughly the same number of 
-              elements in it.
-        throws
-            - image_hash_construction_failure
-              This exception is thrown if there is a problem creating the projection_hash.
-              This should only happen the images are so small they contain less than 2
-              feature vectors.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename image_array,
-        typename pyramid,
-        typename feature_extractor
-        >
-    void setup_hashed_features (
-        scan_image_pyramid<pyramid, hashed_feature_image<feature_extractor, projection_hash> >& scanner,
-        const image_array& images,
-        int bits,
-        unsigned long num_samples = 200000
-    );
-    /*!
-        requires
-            - 0 < bits <= 32
-            - num_samples > 1
-            - images.size() > 0
-            - it must be valid to pass images[0] into scanner.load().
-              (also, image_array must be an implementation of dlib/array/array_kernel_abstract.h)
-        ensures
-            - performs: setup_hashed_features(scanner, images, feature_extractor(), bits, num_samples)
-        throws
-            - image_hash_construction_failure
-              This exception is thrown if there is a problem creating the projection_hash.
-              This should only happen the images are so small they contain less than 2
-              feature vectors.
-    !*/
 
 // ----------------------------------------------------------------------------------------
 
@@ -179,6 +105,9 @@ namespace dlib
             - this function is identical to setup_grid_detection_templates() except
               that it also outputs the selected detection templates to standard out.
     !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SCAN_IMaGE_PYRAMID_TOOLS_ABSTRACT_H__
