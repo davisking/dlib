@@ -66,7 +66,6 @@
          <item>running_covariance</item> 
          <item>random_subset_selector</item> 
          <item>randomly_subsample</item> 
-         <item>randomly_sample_image_features</item> 
 
       </section>
 
@@ -561,20 +560,6 @@
          <description>
             This is a set of convenience functions for 
             creating <a href="#random_subset_selector">random subsets</a> of data.
-         </description>
-                                 
-      </component>
-      
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>randomly_sample_image_features</name>
-         <file>dlib/statistics.h</file>
-         <spec_file link="true">dlib/statistics/image_feature_sampling_abstract.h</spec_file>
-         <description>
-            Given a feature extractor such as the <a href="imaging.html#hog_image">hog_image</a>,
-            this routine selects a random subsample of local image feature vectors 
-            from a set of images.  
          </description>
                                  
       </component>

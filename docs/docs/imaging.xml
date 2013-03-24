@@ -127,6 +127,7 @@
          <item>poly_image</item>
          <item>hashed_feature_image</item>
          <item>nearest_neighbor_feature_image</item>
+         <item>randomly_sample_image_features</item> 
       </section>
 
 
@@ -1853,6 +1854,20 @@
                                  
       </component>
             
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>randomly_sample_image_features</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/image_feature_sampling_abstract.h</spec_file>
+         <description>
+            Given a feature extractor such as the <a href="#hog_image">hog_image</a>,
+            this routine selects a random subsample of local image feature vectors 
+            from a set of images.  
+         </description>
+                                 
+      </component>
+      
    <!-- ************************************************************************* -->
 
    </components>

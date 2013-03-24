@@ -165,7 +165,7 @@
          <term file="algorithms.html" name="hash_similar_angles_512"/>
          <term file="algorithms.html" name="projection_hash"/>
          <term file="algorithms.html" name="create_random_projection_hash"/>
-         <term file="algorithms.html" name="randomly_sample_image_features"/>
+         <term file="imaging.html" name="randomly_sample_image_features"/>
          <term file="algorithms.html" name="disjoint_subsets"/>
          <term link="algorithms.html#disjoint_subsets" name="union-find"/>
          <term file="linear_algebra.html" name="rectangle"/>
