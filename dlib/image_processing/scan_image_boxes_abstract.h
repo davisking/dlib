@@ -79,7 +79,7 @@ namespace dlib
                 of localizing each object present.  The localization is in the form of the
                 bounding box around each object of interest.  
 
-                Unlike the scan_image_boxes object which scans a fixed sized window over
+                Unlike the scan_image_pyramid object which scans a fixed sized window over
                 an image pyramid, the scan_image_boxes tool allows you to define your own
                 list of "candidate object locations" which should be evaluated.  This is
                 simply a list of rectangle objects which might contain objects of interest.
