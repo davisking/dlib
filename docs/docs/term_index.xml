@@ -1221,6 +1221,8 @@
 
          <term file="imaging.html" name="scan_image"/>
          <term file="imaging.html" name="scan_image_pyramid"/>
+         <term file="imaging.html" name="scan_image_boxes"/>
+         <term file="dlib/image_processing/scan_image_boxes_abstract.h.html" name="default_box_generator"/>
          <term file="imaging.html" name="compute_box_dimensions"/>
          <term file="imaging.html" name="create_single_box_detection_template"/>
          <term file="imaging.html" name="create_overlapped_2x2_detection_template"/>

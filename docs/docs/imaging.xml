@@ -85,6 +85,7 @@
          <item>scan_image_movable_parts</item>
          <item>find_points_above_thresh</item>
          <item>scan_image_pyramid</item>
+         <item>scan_image_boxes</item>
          <item>find_candidate_object_locations</item>
          <item>test_box_overlap</item>
          <item nolink="true">
@@ -1634,6 +1635,45 @@
    <!-- ************************************************************************* -->
 
       <component>
+         <name>scan_image_boxes</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/scan_image_boxes_abstract.h</spec_file>
+         <description>        
+            This object is a tool for running a classifier over an image with the goal
+            of localizing each object present.  The localization is in the form of the
+            bounding box around each object of interest.  
+
+            <p>
+            Unlike the <a href="#scan_image_pyramid">scan_image_pyramid</a> object which scans a
+            fixed sized window over an image pyramid, the scan_image_boxes tool allows you to
+            define your own list of "candidate object locations" which should be evaluated.
+            This is simply a list of rectangle objects which might contain objects of
+            interest.  The scan_image_boxes object will then evaluate the classifier at each
+            of these locations and return the subset of rectangles which appear to have
+            objects in them.    
+            </p>
+
+            This object can also be understood as a general tool for implementing the spatial
+            pyramid models described in the paper:
+            <blockquote>
+               Beyond Bags of Features: Spatial Pyramid Matching for Recognizing 
+               Natural Scene Categories by Svetlana Lazebnik, Cordelia Schmid, 
+               and Jean Ponce
+            </blockquote>
+
+            <br/><br/>
+            The following feature extractors can be used with the scan_image_boxes object:
+            <ul style="margin-top:0em"> 
+               <li><a href="#hashed_feature_image">hashed_feature_image</a></li>
+               <li><a href="#nearest_neighbor_feature_image">nearest_neighbor_feature_image</a></li>
+            </ul>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
          <name>full_object_detection</name>
          <file>dlib/image_processing.h</file>
          <spec_file link="true">dlib/image_processing/full_object_detection_abstract.h</spec_file>
@@ -1651,13 +1691,15 @@
          <file>dlib/image_processing.h</file>
          <spec_file link="true">dlib/image_processing/object_detector_abstract.h</spec_file>
          <description>        
-                This object is a tool for detecting the positions of objects in 
-                an image.  In particular, it is a simple container to aggregate 
-                an instance of the <a href="#scan_image_pyramid">scan_image_pyramid</a> 
-                class, the weight vector needed by scan_image_pyramid, and  
-                an instance of <a href="#test_box_overlap">test_box_overlap</a>.  The test_box_overlap 
-                object is used to perform non-max suppression on the output of the 
-                scan_image_pyramid object.  
+                This object is a tool for detecting the positions of objects in an image.  In
+                particular, it is a simple container to aggregate an instance of the <a
+                href="#scan_image_pyramid">scan_image_pyramid</a> or <a
+                href="#scan_image_boxes">scan_image_boxes</a> classes, the weight vector
+                needed by one of these image scanners, and finally an instance of
+                <a href="#test_box_overlap">test_box_overlap</a>.  The test_box_overlap object
+                is used to perform non-max suppression on the output of the image scanner
+                object.  
+
                 <p>
                    Note that you can use the 
                    <a href="ml.html#structural_object_detection_trainer">structural_object_detection_trainer</a>
