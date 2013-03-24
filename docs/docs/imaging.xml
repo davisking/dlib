@@ -88,6 +88,7 @@
          <item>scan_image_boxes</item>
          <item>find_candidate_object_locations</item>
          <item>test_box_overlap</item>
+         <item>setup_hashed_features</item>
          <item nolink="true">
             <name>Scan Image Pyramid Tools</name>
             <sub>
@@ -99,7 +100,6 @@
                <item>determine_object_boxes</item>
                <item>setup_grid_detection_templates</item>
                <item>setup_grid_detection_templates_verbose</item>
-               <item>setup_hashed_features</item>
             </sub>
          </item>
       </section>
