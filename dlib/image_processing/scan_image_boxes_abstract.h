@@ -7,7 +7,7 @@
 #include "../geometry.h"
 #include "../image_processing.h"
 #include "../array2d.h"
-#include "full_object_detection.h"
+#include "full_object_detection_abstract.h"
 #include "../image_transforms/segment_image_abstract.h"
 #include <vector>
 
