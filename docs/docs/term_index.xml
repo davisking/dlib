@@ -1124,6 +1124,8 @@
 
          <term file="imaging.html" name="label_connected_blobs"/>
          <term file="imaging.html" name="segment_image"/>
+         <term file="imaging.html" name="find_candidate_object_locations"/>
+         <term file="dlib/image_transforms/segment_image_abstract.h.html" name="remove_duplicates"/>
          <term file="imaging.html" name="neighbors_8"/>
          <term file="imaging.html" name="neighbors_4"/>
          <term file="imaging.html" name="connected_if_both_not_zero"/>

@@ -85,6 +85,7 @@
          <item>scan_image_movable_parts</item>
          <item>find_points_above_thresh</item>
          <item>scan_image_pyramid</item>
+         <item>find_candidate_object_locations</item>
          <item>test_box_overlap</item>
          <item nolink="true">
             <name>Scan Image Pyramid Tools</name>
@@ -1430,6 +1431,28 @@
               <blockquote>
                Efficient Graph-Based Image Segmentation by Felzenszwalb and Huttenlocher.
               </blockquote>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_candidate_object_locations</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/segment_image_abstract.h</spec_file>
+         <description>        
+              This function takes an input image and generates a set of candidate
+              rectangles which are expected to bound any objects in the image.  It does
+              this by running a version of the <a href="#segment_image">segment_image</a> routine on the image and
+              then reports rectangles containing each of the segments as well as rectangles
+              containing unions of adjacent segments.  The basic idea is described in the
+              paper: 
+              <blockquote>
+                  Segmentation as Selective Search for Object Recognition by Koen E. A. van de Sande, et al.
+              </blockquote>
+              Note that this function deviates from what is described in the paper slightly. 
+              See the code for details.
          </description>
                                  
       </component>
