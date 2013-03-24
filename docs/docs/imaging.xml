@@ -1841,7 +1841,7 @@
       <component>
          <name>setup_hashed_features</name>
          <file>dlib/image_processing.h</file>
-         <spec_file link="true">dlib/image_processing/scan_image_pyramid_tools_abstract.h</spec_file>
+         <spec_file link="true">dlib/image_processing/setup_hashed_features_abstract.h</spec_file>
          <description>        
             This is a tool for configuring the <a href="#hashed_feature_image">hashed_feature_image</a> object
             with a random <a href="algorithms.html#projection_hash">projection hash</a>. 
