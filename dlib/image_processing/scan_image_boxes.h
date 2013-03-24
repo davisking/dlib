@@ -29,10 +29,6 @@ namespace dlib
             rects.clear();
             find_candidate_object_locations(img, rects);
         }
-
-        void copy_configuration (
-            const default_box_generator&
-        ){}
     };
 
     inline void serialize(const default_box_generator&, std::ostream& ) {}
@@ -341,7 +337,7 @@ namespace dlib
         const box_generator& bg 
     )
     {
-        detect_boxes.copy_configuration(bg);
+        detect_boxes = bg;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -356,7 +352,7 @@ namespace dlib
     )
     {
         feats.copy_configuration(item.feats);
-        detect_boxes.copy_configuration(item.detect_boxes);
+        detect_boxes = item.detect_boxes;
         num_spatial_pyramid_levels = item.num_spatial_pyramid_levels;
     }
 
