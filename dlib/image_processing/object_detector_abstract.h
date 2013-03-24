@@ -21,15 +21,16 @@ namespace dlib
         /*!
             REQUIREMENTS ON image_scanner_type
                 image_scanner_type must be an implementation of 
-                dlib/image_processing/scan_image_pyramid_abstract.h
+                dlib/image_processing/scan_image_pyramid_abstract.h or 
+                dlib/image_processing/scan_image_boxes_abstract.h 
 
             WHAT THIS OBJECT REPRESENTS
-                This object is a tool for detecting the positions of objects in 
-                an image.  In particular, it is a simple container to aggregate 
-                an instance of the scan_image_pyramid class, the weight vector 
-                needed by scan_image_pyramid, and finally an instance of 
-                test_box_overlap.  The test_box_overlap object is used to perform 
-                non-max suppression on the output of the scan_image_pyramid object.  
+                This object is a tool for detecting the positions of objects in an image.
+                In particular, it is a simple container to aggregate an instance of the
+                scan_image_pyramid or scan_image_boxes classes, the weight vector needed by
+                one of these image scanners, and finally an instance of test_box_overlap.
+                The test_box_overlap object is used to perform non-max suppression on the
+                output of the image scanner object.  
         !*/
     public:
         typedef typename image_scanner_type::feature_vector_type feature_vector_type;

@@ -41,7 +41,8 @@ namespace dlib
         /*!
             REQUIREMENTS ON image_scanner_type
                 image_scanner_type must be an implementation of 
-                dlib/image_processing/scan_image_pyramid_abstract.h
+                dlib/image_processing/scan_image_pyramid_abstract.h or
+                dlib/image_processing/scan_image_boxes_abstract.h
 
             REQUIREMENTS ON image_array_type
                 image_array_type must be an implementation of dlib/array/array_kernel_abstract.h 
@@ -49,7 +50,7 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for learning the parameter vector needed to use
-                a scan_image_pyramid object.  
+                a scan_image_pyramid or scan_image_boxes object.  
 
                 It learns the parameter vector by formulating the problem as a structural 
                 SVM problem.  The general approach is similar to the method discussed in 

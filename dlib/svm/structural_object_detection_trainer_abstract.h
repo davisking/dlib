@@ -22,7 +22,8 @@ namespace dlib
         /*!
             REQUIREMENTS ON image_scanner_type
                 image_scanner_type must be an implementation of 
-                dlib/image_processing/scan_image_pyramid_abstract.h
+                dlib/image_processing/scan_image_pyramid_abstract.h or
+                dlib/image_processing/scan_image_boxes_abstract.h
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for learning to detect objects in images based on a 
