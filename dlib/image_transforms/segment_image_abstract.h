@@ -3,6 +3,9 @@
 #undef DLIB_SEGMENT_ImAGE_ABSTRACT_H__
 #ifdef DLIB_SEGMENT_ImAGE_ABSTRACT_H__
 
+#include <vector>
+#include "../matrix.h"
+
 namespace dlib
 {
 
@@ -43,6 +46,65 @@ namespace dlib
               guaranteed that all output segments will have at least min_size pixels in
               them (unless the whole image contains fewer than min_size pixels, in this
               case the entire image will be put into a single segment).
+    !*/
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        typename EXP
+        >
+    void find_candidate_object_locations (
+        const in_image_type& in_img,
+        std::vector<rectangle>& rects,
+        const matrix_exp<EXP>& kvals = linspace(50, 200, 3),
+        const unsigned long min_size = 20,
+        const unsigned long max_merging_iterations = 50
+    );
+    /*!
+        requires
+            - is_vector(kvals) == true
+            - kvals.size() > 0
+        ensures
+            - This function takes an input image and generates a set of candidate
+              rectangles which are expected to bound any objects in the image.  It does
+              this by running a version of the segment_image() routine on the image and
+              then reports rectangles containing each of the segments as well as rectangles
+              containing unions of adjacent segments.  The basic idea is described in the
+              paper: 
+                  Segmentation as Selective Search for Object Recognition by Koen E. A. van de Sande, et al.
+              Note that this function deviates from what is described in the paper slightly. 
+              See the code for details.
+            - The basic segmentation is performed kvals.size() times, each time with the k
+              parameter (see segment_image() and the Felzenszwalb paper for details on k)
+              set to a different value from kvals.   
+            - All the rectangles output by this function will have an area >= min_size.
+            - There are max_merging_iterations rounds of neighboring blob merging.
+              Therefore, this parameter has some effect on the number of output rectangles
+              you get, with larger values of the parameter giving more output rectangles.
+            - This function appends the output rectangles into #rects.  This means that any
+              rectangles in rects before this function was called will still be in there
+              after it terminates.  Note further that #rects will not contain any duplicate
+              rectangles.  That is, for all valid i and j where i != j it will be true
+              that:
+                - #rects[i] != rects[j]
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename alloc
+        >
+    void remove_duplicates (
+        std::vector<rectangle,alloc>& rects
+    );
+    /*!
+        ensures
+            - This function finds any duplicate rectangles in rects and removes the extra
+              instances.  This way, the result is that rects contains only unique rectangle
+              instances.
     !*/
 
 // ----------------------------------------------------------------------------------------
