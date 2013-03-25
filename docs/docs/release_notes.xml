@@ -12,6 +12,19 @@
 
 <current>
 New Features:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="18.1" date="Mar 25, 2013">
+New Features:
    - Added svd_fast(), a routine for computing a singular value decomposition of very 
      large matrices.
    - Added cca(), a routine for doing canonical correlation analysis on very large 
@@ -70,7 +83,7 @@ Other:
    - Optimized the oca and structural SVM solvers.  They are now a little bit faster 
      than in previous dlib releases.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
