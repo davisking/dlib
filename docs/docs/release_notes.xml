@@ -32,7 +32,7 @@ Non-Backwards Compatible Changes:
      in addition to just raw ranking accuracy. This changes their return types
      from double to matrix&lt;double,1,2&gt;.
    - Generalized segment_image() so it works on any pixel type or array of
-     vectors.  I also changed it's interface slightly.  In particular, I removed
+     vectors.  I also changed its interface slightly.  In particular, I removed
      the min_diff parameter and replaced it with an explicit min_size parameter.
    - Changed how the SURF descriptor is computed slightly to improve its
      accuracy.  The interface to the user has not been changed, however, the
@@ -59,6 +59,9 @@ Bug fixes:
      murmur_hash3() to avoid violation of the strict aliasing rule. In
      particular, the previous version didn't work correctly in gcc 4.7.2 when
      optimizations were enabled.
+   - Visual Studio 2012's iostreams library has a bug which caused the
+     iosockstream to crash on use.  This version of dlib has been changed to
+     avoid triggering this bug.
 
 Other:
    - Refactored the Platt scaling code a little. Now there is a function,
@@ -927,7 +930,7 @@ Bug fixes:
   - Fixed a bug in scale_columns.  It said it didn't have any destructive aliasing 
     when in fact it destructively aliased its second argument.
   - Fixed a bug in the random number generator where setting the seed back to ""
-    didn't result in the object going back to it's initial state.
+    didn't result in the object going back to its initial state.
 
 Other:
   - Reorganized the matrix expression code.  It's now much simpler and the
