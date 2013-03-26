@@ -567,6 +567,9 @@ namespace dlib
 
         rectangle mapped_rect = get_best_matching_rect(obj.get_rect());
         mapped_rect = feats.image_to_feat_space(mapped_rect).intersect(get_rect(feats));
+        if (mapped_rect.is_empty())
+            return;
+
         std::vector<rectangle> regions;
         get_feature_extraction_regions(mapped_rect, regions);
 
@@ -574,7 +577,7 @@ namespace dlib
         for (unsigned long j = 0; j < regions.size(); ++j)
         {
             const rectangle rect = regions[j];
-            DLIB_CASSERT(get_rect(feats).contains(regions[j]),"");
+            DLIB_CASSERT(get_rect(feats).contains(regions[j]),regions[j] << "   " << mapped_rect);
 
             const unsigned long template_region_id = j;
             const unsigned long offset = feats.get_num_dimensions()*template_region_id;
