@@ -194,11 +194,17 @@ namespace dlib
         );
         /*!
             ensures
-                - Let BASE_BG denote the box_generator object used internally for candidate
-                  box generation.  Then this function performs:
-                    BASE_BG = bg;
+                - #get_box_generator() == bg
                   (i.e. this function allows you to configure the parameters of the
                   underlying box generator used by a scan_image_boxes object)
+        !*/
+
+        const box_generator& get_box_generator (
+        ) const;
+        /*!
+            ensures
+                - returns the box_generator used by this object to generate candidate
+                  object locations.
         !*/
 
         void copy_configuration (

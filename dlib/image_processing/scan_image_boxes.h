@@ -71,6 +71,9 @@ namespace dlib
             const box_generator& bg
         );
 
+        const box_generator& get_box_generator (
+        ) const { return detect_boxes; } 
+
         inline void copy_configuration (
             const scan_image_boxes& item
         );
