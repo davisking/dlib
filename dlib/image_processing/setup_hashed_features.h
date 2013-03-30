@@ -107,10 +107,11 @@ namespace dlib
 
     template <
         typename image_array,
-        typename feature_extractor
+        typename feature_extractor,
+        typename box_generator
         >
     void setup_hashed_features (
-        scan_image_boxes<hashed_feature_image<feature_extractor, projection_hash> >& scanner,
+        scan_image_boxes<hashed_feature_image<feature_extractor, projection_hash>,box_generator >& scanner,
         const image_array& images,
         const feature_extractor& fe,
         int bits,
@@ -148,10 +149,11 @@ namespace dlib
 
     template <
         typename image_array,
-        typename feature_extractor
+        typename feature_extractor,
+        typename box_generator
         >
     void setup_hashed_features (
-        scan_image_boxes<hashed_feature_image<feature_extractor, projection_hash> >& scanner,
+        scan_image_boxes<hashed_feature_image<feature_extractor, projection_hash>,box_generator>& scanner,
         const image_array& images,
         int bits,
         unsigned long num_samples = 200000
