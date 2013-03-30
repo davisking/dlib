@@ -15,7 +15,7 @@
 #include <dlib/dir_nav.h>
 
 
-const char* VERSION = "0.4";
+const char* VERSION = "0.5";
 
 
 
@@ -122,23 +122,29 @@ int main(int argc, char** argv)
         command_line_parser parser;
 
         parser.add_option("h","Displays this information.");
+        parser.add_option("v","Display version.");
+
+        parser.set_group_name("Creating XML files");
         parser.add_option("c","Create an XML file named <arg> listing a set of images.",1);
         parser.add_option("r","Search directories recursively for images.");
-        parser.add_option("l","List all the labels in the given XML file.");
-        parser.add_option("rename", "Rename all labels of <arg1> to <arg2>.",2);
-        parser.add_option("v","Display version.");
-        parser.add_option("parts","The display will allow image parts to be labeled.  The set of allowable parts "
-                          "defined in a space separated list contained in <arg>.",1);
         parser.add_option("convert","Convert foreign image Annotations from <arg> format to the imglab format. "
                           "Supported formats: pascal-xml, pascal-v1, idl.",1);
 
+        parser.set_group_name("Viewing/Editing XML files");
+        parser.add_option("l","List all the labels in the given XML file.");
+        parser.add_option("rename", "Rename all labels of <arg1> to <arg2>.",2);
+        parser.add_option("parts","The display will allow image parts to be labeled.  The set of allowable parts "
+                          "defined in a space separated list contained in <arg>.",1);
+        parser.add_option("rmdiff","Remove boxes marked as difficult.");
+
         parser.parse(argc, argv);
 
-        const char* singles[] = {"h","c","r","l","convert","parts"};
+        const char* singles[] = {"h","c","r","l","convert","parts","rmdiff"};
         parser.check_one_time_options(singles);
         const char* c_sub_ops[] = {"r", "convert"};
         parser.check_sub_options("c", c_sub_ops);
         parser.check_incompatible_options("c", "l");
+        parser.check_incompatible_options("c", "rmdiff");
         parser.check_incompatible_options("c", "rename");
         parser.check_incompatible_options("c", "parts");
         parser.check_incompatible_options("l", "rename");
@@ -146,6 +152,7 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("convert", "l");
         parser.check_incompatible_options("convert", "rename");
         parser.check_incompatible_options("convert", "parts");
+        parser.check_incompatible_options("rmdiff", "rename");
         const char* convert_args[] = {"pascal-xml","pascal-v1","idl"};
         parser.check_option_arg_range("convert", convert_args);
 
@@ -181,6 +188,30 @@ int main(int argc, char** argv)
             {
                 create_new_dataset(parser);
             }
+            return EXIT_SUCCESS;
+        }
+        
+        if (parser.option("rmdiff"))
+        {
+            if (parser.number_of_arguments() != 1)
+            {
+                cerr << "The --rmdiff option requires you to give one XML file on the command line." << endl;
+                return EXIT_FAILURE;
+            }
+
+            dlib::image_dataset_metadata::dataset data;
+            load_image_dataset_metadata(data, parser[0]);
+            for (unsigned long i = 0; i < data.images.size(); ++i)
+            {
+                std::vector<dlib::image_dataset_metadata::box> boxes;
+                for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
+                {
+                    if (!data.images[i].boxes[j].difficult)
+                        boxes.push_back(data.images[i].boxes[j]);
+                }
+                data.images[i].boxes = boxes;
+            }
+            save_image_dataset_metadata(data, parser[0]);
             return EXIT_SUCCESS;
         }
 
