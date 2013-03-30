@@ -556,6 +556,10 @@
                   <link>dlib/matrix/matrix_utilities_abstract.h.html#linspace</link>
                </item>
                <item>
+                  <name>linpiece</name>
+                  <link>dlib/matrix/matrix_utilities_abstract.h.html#linpiece</link>
+               </item>
+               <item>
                   <name>logspace</name>
                   <link>dlib/matrix/matrix_utilities_abstract.h.html#logspace</link>
                </item>

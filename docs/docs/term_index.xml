@@ -448,6 +448,7 @@
 
 
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="linspace"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="linpiece"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="logspace"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="cartesian_product"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="randm"/>
