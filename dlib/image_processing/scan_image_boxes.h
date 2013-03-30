@@ -225,6 +225,9 @@ namespace dlib
         bool loaded_with_image;
         unsigned int num_spatial_pyramid_levels;
         box_generator detect_boxes;
+
+        const long box_sizedims;
+        const long box_maxsize;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -278,7 +281,9 @@ namespace dlib
     scan_image_boxes (
     ) :
         loaded_with_image(false),
-        num_spatial_pyramid_levels(3)
+        num_spatial_pyramid_levels(3),
+        box_sizedims(20),
+        box_maxsize(1200)
     {
     }
 
@@ -405,7 +410,7 @@ namespace dlib
     get_num_dimensions (
     ) const
     {
-        return feats.get_num_dimensions()*get_num_components_per_detection_template();
+        return feats.get_num_dimensions()*get_num_components_per_detection_template() + box_sizedims*2;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -443,7 +448,7 @@ namespace dlib
         // build saliency images  
         for (unsigned long i = 0; i < saliency_images.size(); ++i)
         {
-            const unsigned long offset = feats.get_num_dimensions()*i;
+            const unsigned long offset = 2*box_sizedims + feats.get_num_dimensions()*i;
 
             // make the basic saliency image for the i-th feature extraction region
             for (long r = 0; r < feats.nr(); ++r)
@@ -483,6 +488,12 @@ namespace dlib
                     << "   getrect:" << get_rect(saliency_images[k]) << "  region:" << regions[k] << "    rect: "<< rect);
                 score += saliency_images[k].get_sum_of_area(regions[k]);
             }
+            const double width = search_rects[i].width();
+            const double height = search_rects[i].height();
+
+            score += dot(linpiece(width,  linspace(0, box_maxsize, box_sizedims+1)), rowm(w, range(0,box_sizedims-1)));
+            score += dot(linpiece(height, linspace(0, box_maxsize, box_sizedims+1)), rowm(w, range(box_sizedims,2*box_sizedims-1)));
+
             if (score >= thresh)
             {
                 dets.push_back(std::make_pair(score, search_rects[i]));
@@ -568,8 +579,8 @@ namespace dlib
 
 
 
-        rectangle mapped_rect = get_best_matching_rect(obj.get_rect());
-        mapped_rect = feats.image_to_feat_space(mapped_rect).intersect(get_rect(feats));
+        const rectangle best_rect = get_best_matching_rect(obj.get_rect());
+        const rectangle mapped_rect = feats.image_to_feat_space(best_rect).intersect(get_rect(feats));
         if (mapped_rect.is_empty())
             return;
 
@@ -583,7 +594,7 @@ namespace dlib
             DLIB_CASSERT(get_rect(feats).contains(regions[j]),regions[j] << "   " << mapped_rect);
 
             const unsigned long template_region_id = j;
-            const unsigned long offset = feats.get_num_dimensions()*template_region_id;
+            const unsigned long offset = box_sizedims*2 + feats.get_num_dimensions()*template_region_id;
             for (long r = rect.top(); r <= rect.bottom(); ++r)
             {
                 for (long c = rect.left(); c <= rect.right(); ++c)
@@ -596,6 +607,11 @@ namespace dlib
                 }
             }
         }
+
+        const double width = best_rect.width();
+        const double height = best_rect.height();
+        set_rowm(psi, range(0,box_sizedims-1))              += linpiece(width,  linspace(0, box_maxsize, box_sizedims+1));
+        set_rowm(psi, range(box_sizedims,box_sizedims*2-1)) += linpiece(height, linspace(0, box_maxsize, box_sizedims+1));
     }
 
 // ----------------------------------------------------------------------------------------
