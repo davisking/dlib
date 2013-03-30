@@ -392,6 +392,37 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp linpiece (
+        const double val,
+        const matrix_exp& joints
+    );
+    /*!
+        requires
+            - is_vector(joints) == true
+            - joints.size() >= 2
+            - for all valid i < j:
+                - joints(i) < joints(j)
+        ensures
+            - linpiece() is useful for creating piecewise linear functions of val.  For
+              example, if w is a parameter vector then you can represent a piecewise linear
+              function of val as: f(val) = dot(w, linpiece(val, linspace(0,100,5))).  In
+              this case, f(val) is piecewise linear on the intervals [0,25], [25,50],
+              [50,75], [75,100].  Moreover, w(i) defines the derivative of f(val) in the
+              i-th interval.  Finally, outside the interval [0,100] f(val) has a derivative
+              of zero and f(0) == 0.
+            - To be precise, this function returns a column vector L such that:
+                - L.size() == joints.size()-1
+                - is_col_vector(L) == true
+                - L contains the same type of elements as joints.
+                - for all valid i:
+                - if (joints(i) < val)
+                    - L(i) == min(val,joints(i+1)) - joints(i)
+                - else
+                    - L(i) == 0
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         long R,
         long C

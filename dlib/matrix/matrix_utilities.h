@@ -3645,6 +3645,69 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
+    template <typename M>
+    struct op_linpiece  
+    {
+        op_linpiece(const double val_, const M& joints_) : joints(joints_), val(val_){}
+
+        const M& joints;
+        const double val;
+
+        const static long cost = 10; 
+
+        const static long NR = (M::NR*M::NC==0) ? (0) : (M::NR*M::NC-1); 
+        const static long NC = 1; 
+        typedef typename M::type type;
+        typedef default_memory_manager mem_manager_type;
+        typedef row_major_layout layout_type;
+
+        typedef type const_ret_type;
+        const_ret_type apply (long i, long ) const 
+        { 
+            if (joints(i) < val)
+                return std::min<type>(val,joints(i+1)) - joints(i);
+            else
+                return 0;
+        }
+
+        long nr () const { return joints.size()-1; }
+        long nc () const { return 1; }
+
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return joints.aliases(item); }
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return joints.aliases(item); }
+    }; 
+
+    template < typename EXP >
+    const matrix_op<op_linpiece<EXP> > linpiece (
+        const double val,
+        const matrix_exp<EXP>& joints
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(is_vector(joints) && joints.size() >= 2, 
+            "\t matrix_exp linpiece()"
+            << "\n\t Invalid inputs were given to this function "
+            << "\n\t is_vector(joints): " << is_vector(joints) 
+            << "\n\t joints.size():     " << joints.size() 
+            );
+#ifdef ENABLE_ASSERTS
+        for (long i = 1; i < joints.size(); ++i)
+        {
+            DLIB_ASSERT(joints(i-1) < joints(i), 
+                "\t matrix_exp linpiece()"
+                << "\n\t Invalid inputs were given to this function "
+                << "\n\t joints("<<i-1<<"): " << joints(i-1) 
+                << "\n\t joints("<<i<<"): " << joints(i) 
+            );
+        }
+#endif
+        
+        typedef op_linpiece<EXP> op;
+        return matrix_op<op>(op(val,joints.ref()));
+    }
+
+// ----------------------------------------------------------------------------------------
     
     inline const matrix_log_range_exp<double> logspace (
         double start,

@@ -1015,6 +1015,54 @@ namespace
         DLIB_TEST(max(abs(mat(v8) - mat(a2))) == 0);
     }
 
+    void test_linpiece()
+    {
+        matrix<double,0,1> temp = linpiece(5, linspace(-1, 9, 2));
+        DLIB_CASSERT(temp.size() == 1,"");
+        DLIB_CASSERT(std::abs(temp(0) - 6) < 1e-13,"");
+
+        temp = linpiece(5, linspace(-1, 9, 6));
+        DLIB_CASSERT(temp.size() == 5,"");
+        DLIB_CASSERT(std::abs(temp(0) - 2) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(1) - 2) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(2) - 2) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(3) - 0) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(4) - 0) < 1e-13,"");
+
+        temp = linpiece(4, linspace(-1, 9, 6));
+        DLIB_CASSERT(temp.size() == 5,"");
+        DLIB_CASSERT(std::abs(temp(0) - 2) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(1) - 2) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(2) - 1) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(3) - 0) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(4) - 0) < 1e-13,"");
+
+        temp = linpiece(40, linspace(-1, 9, 6));
+        DLIB_CASSERT(temp.size() == 5,"");
+        DLIB_CASSERT(std::abs(temp(0) - 2) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(1) - 2) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(2) - 2) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(3) - 2) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(4) - 2) < 1e-13,"");
+
+        temp = linpiece(-40, linspace(-1, 9, 6));
+        DLIB_CASSERT(temp.size() == 5,"");
+        DLIB_CASSERT(std::abs(temp(0) - 0) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(1) - 0) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(2) - 0) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(3) - 0) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(4) - 0) < 1e-13,"");
+
+        temp = linpiece(0, linspace(-1, 9, 6));
+        DLIB_CASSERT(temp.size() == 5,"");
+        DLIB_CASSERT(std::abs(temp(0) - 1) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(1) - 0) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(2) - 0) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(3) - 0) < 1e-13,"");
+        DLIB_CASSERT(std::abs(temp(4) - 0) < 1e-13,"");
+
+    }
+
     class matrix_tester : public tester
     {
     public:
@@ -1038,6 +1086,7 @@ namespace
                 matrix_test();
 
             test_complex();
+            test_linpiece();
         }
     } a;
 
