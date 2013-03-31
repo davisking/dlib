@@ -153,15 +153,19 @@ namespace dlib
                     - #dets.size() == the number of detected objects.
                     - #dets[i].first gives the "detection confidence", of the i-th 
                       detection.  This is the detection value output by the scanner 
-                      minus the threshold, therefore this is a value > 0.
+                      minus the threshold. 
                     - #dets[i].second == the bounding box for the i-th detection.
                 - #get_scanner() will have been loaded with img. Therefore, you can call
                   #get_scanner().get_feature_vector() to obtain the feature vectors or
                   #get_scanner().get_full_object_detection() to get the
                   full_object_detections for the resulting object detection boxes.
-                - The detection threshold is adjusted by having adjust_threshold added
-                  to it.  Therefore, an adjust_threshold value > 0 makes detecting
-                  objects harder while a negative one makes it easier.
+                - The detection threshold is adjusted by having adjust_threshold added to
+                  it.  Therefore, an adjust_threshold value > 0 makes detecting objects
+                  harder while a negative one makes it easier.  Moreover, the following
+                  will be true for all valid i:
+                    - #dets[i].first >= adjust_threshold
+                  This means that, for example, you can obtain all possible detections as
+                  outputs by setting adjust_threshold equal to negative infinity.
         !*/
 
         template <

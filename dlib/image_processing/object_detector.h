@@ -293,10 +293,10 @@ namespace dlib
         if (w.size() != 0)
         {
             std::vector<std::pair<double, rectangle> > dets;
-            const double thresh = w(scanner.get_num_dimensions()) + adjust_threshold;
+            const double thresh = w(scanner.get_num_dimensions());
 
             scanner.load(img);
-            scanner.detect(w, dets, thresh);
+            scanner.detect(w, dets, thresh + adjust_threshold);
 
             for (unsigned long i = 0; i < dets.size(); ++i)
             {
