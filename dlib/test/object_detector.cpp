@@ -373,7 +373,7 @@ namespace
 
         matrix<double> res = test_object_detection_function(detector, images, object_locations);
         dlog << LINFO << "Test detector (precision,recall): " << res;
-        DLIB_TEST(sum(res) == 2);
+        DLIB_TEST(sum(res) == 3);
 
         {
             ostringstream sout;
@@ -383,7 +383,7 @@ namespace
             deserialize(d2, sin);
             matrix<double> res = test_object_detection_function(d2, images, object_locations);
             dlog << LINFO << "Test detector (precision,recall): " << res;
-            DLIB_TEST(sum(res) == 2);
+            DLIB_TEST(sum(res) == 3);
 
             validate_some_object_detector_stuff(images, detector);
         }
@@ -421,7 +421,7 @@ namespace
 
         matrix<double> res = test_object_detection_function(detector, images, object_locations);
         dlog << LINFO << "Test detector (precision,recall): " << res;
-        DLIB_TEST(sum(res) == 2);
+        DLIB_TEST(sum(res) == 3);
 
         {
             ostringstream sout;
@@ -431,7 +431,7 @@ namespace
             deserialize(d2, sin);
             matrix<double> res = test_object_detection_function(d2, images, object_locations);
             dlog << LINFO << "Test detector (precision,recall): " << res;
-            DLIB_TEST(sum(res) == 2);
+            DLIB_TEST(sum(res) == 3);
 
             validate_some_object_detector_stuff(images, detector);
         }
@@ -463,7 +463,7 @@ namespace
 
         matrix<double> res = test_object_detection_function(detector, images, object_locations);
         dlog << LINFO << "Test detector (precision,recall): " << res;
-        DLIB_TEST(sum(res) == 2);
+        DLIB_TEST(sum(res) == 3);
 
         {
             ostringstream sout;
@@ -473,7 +473,7 @@ namespace
             deserialize(d2, sin);
             matrix<double> res = test_object_detection_function(d2, images, object_locations);
             dlog << LINFO << "Test detector (precision,recall): " << res;
-            DLIB_TEST(sum(res) == 2);
+            DLIB_TEST(sum(res) == 3);
 
             validate_some_object_detector_stuff(images, detector);
         }
@@ -505,7 +505,7 @@ namespace
 
         matrix<double> res = test_object_detection_function(detector, images, object_locations);
         dlog << LINFO << "Test detector (precision,recall): " << res;
-        DLIB_TEST(sum(res) == 2);
+        DLIB_TEST(sum(res) == 3);
 
         {
             ostringstream sout;
@@ -515,7 +515,7 @@ namespace
             deserialize(d2, sin);
             matrix<double> res = test_object_detection_function(d2, images, object_locations);
             dlog << LINFO << "Test detector (precision,recall): " << res;
-            DLIB_TEST(sum(res) == 2);
+            DLIB_TEST(sum(res) == 3);
 
             validate_some_object_detector_stuff(images, detector);
         }
@@ -553,7 +553,7 @@ namespace
 
         matrix<double> res = test_object_detection_function(detector, images, object_locations);
         dlog << LINFO << "Test detector (precision,recall): " << res;
-        DLIB_TEST(sum(res) == 2);
+        DLIB_TEST(sum(res) == 3);
 
         {
             ostringstream sout;
@@ -563,7 +563,7 @@ namespace
             deserialize(d2, sin);
             matrix<double> res = test_object_detection_function(d2, images, object_locations);
             dlog << LINFO << "Test detector (precision,recall): " << res;
-            DLIB_TEST(sum(res) == 2);
+            DLIB_TEST(sum(res) == 3);
 
             validate_some_object_detector_stuff(images, detector);
         }
@@ -599,7 +599,7 @@ namespace
 
         matrix<double> res = test_object_detection_function(detector, images, object_locations);
         dlog << LINFO << "Test detector (precision,recall): " << res;
-        DLIB_TEST(sum(res) == 2);
+        DLIB_TEST(sum(res) == 3);
 
         {
             ostringstream sout;
@@ -609,7 +609,7 @@ namespace
             deserialize(d2, sin);
             matrix<double> res = test_object_detection_function(d2, images, object_locations);
             dlog << LINFO << "Test detector (precision,recall): " << res;
-            DLIB_TEST(sum(res) == 2);
+            DLIB_TEST(sum(res) == 3);
 
             validate_some_object_detector_stuff(images, detector);
         }
@@ -639,11 +639,11 @@ namespace
 
         matrix<double> res = test_object_detection_function(detector, images, object_locations);
         dlog << LINFO << "Test detector (precision,recall): " << res;
-        DLIB_TEST(sum(res) == 2);
+        DLIB_TEST(sum(res) == 3);
 
         res = cross_validate_object_detection_trainer(trainer, images, object_locations, 3);
         dlog << LINFO << "3-fold cross validation (precision,recall): " << res;
-        DLIB_TEST(sum(res) == 2);
+        DLIB_TEST(sum(res) == 3);
 
         {
             ostringstream sout;
@@ -653,7 +653,7 @@ namespace
             deserialize(d2, sin);
             matrix<double> res = test_object_detection_function(d2, images, object_locations);
             dlog << LINFO << "Test detector (precision,recall): " << res;
-            DLIB_TEST(sum(res) == 2);
+            DLIB_TEST(sum(res) == 3);
             validate_some_object_detector_stuff(images, detector);
         }
     }
@@ -731,11 +731,11 @@ namespace
 
         matrix<double> res = test_object_detection_function(detector, images, object_locations);
         dlog << LINFO << "Test detector (precision,recall): " << res;
-        DLIB_TEST(sum(res) == 2);
+        DLIB_TEST(sum(res) == 3);
 
         res = cross_validate_object_detection_trainer(trainer, images, object_locations, 3);
         dlog << LINFO << "3-fold cross validation (precision,recall): " << res;
-        DLIB_TEST(sum(res) == 2);
+        DLIB_TEST(sum(res) == 3);
 
         {
             ostringstream sout;
@@ -745,7 +745,7 @@ namespace
             deserialize(d2, sin);
             matrix<double> res = test_object_detection_function(d2, images, object_locations);
             dlog << LINFO << "Test detector (precision,recall): " << res;
-            DLIB_TEST(sum(res) == 2);
+            DLIB_TEST(sum(res) == 3);
         }
     }
 
