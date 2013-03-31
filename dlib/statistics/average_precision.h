@@ -28,16 +28,27 @@ namespace dlib
     )
     {
         using namespace dlib::impl;
-        double precision_sum = 0;
         double relevant_count = 0;
+        // find the precision values
+        std::vector<double> precision;
         for (unsigned long i = 0; i < items.size(); ++i)
         {
             if (get_bool_part(items[i]))
             {
                 ++relevant_count;
-                precision_sum += relevant_count / (i+1);
+                precision.push_back(relevant_count / (i+1));
             }
         }
+
+        double precision_sum = 0;
+        double max_val = 0;
+        // now sum over the interpolated precision values
+        for (std::vector<double>::reverse_iterator i = precision.rbegin(); i != precision.rend(); ++i)
+        {
+            max_val = std::max(max_val, *i);
+            precision_sum += max_val;
+        }
+
 
         relevant_count += missing_relevant_items;
 

@@ -446,6 +446,11 @@ namespace
             items.push_back(true);
 
             DLIB_TEST(std::abs(average_precision(items) - (2.0+3.0/4.0)/3.0) < 1e-14);
+
+            items.push_back(true);
+
+            DLIB_TEST(std::abs(average_precision(items)   - (2.0 + 4.0/5.0 + 4.0/5.0)/4.0) < 1e-14);
+            DLIB_TEST(std::abs(average_precision(items,1) - (2.0 + 4.0/5.0 + 4.0/5.0)/5.0) < 1e-14);
         }
 
         void perform_test (
