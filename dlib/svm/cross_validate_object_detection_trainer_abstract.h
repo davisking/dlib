@@ -17,7 +17,7 @@ namespace dlib
         typename object_detector_type,
         typename image_array_type
         >
-    const matrix<double,1,2> test_object_detection_function (
+    const matrix<double,1,3> test_object_detection_function (
         object_detector_type& detector,
         const image_array_type& images,
         const std::vector<std::vector<full_object_detection> >& truth_dets,
@@ -32,9 +32,10 @@ namespace dlib
             - image_array_type must be an implementation of dlib/array/array_kernel_abstract.h 
               and it must contain objects which can be accepted by detector().
         ensures
-            - Tests the given detector against the supplied object detection problem
-              and returns the precision and recall.  Note that the task is to predict, 
-              for each images[i], the set of object locations given by truth_dets[i].
+            - Tests the given detector against the supplied object detection problem and
+              returns the precision, recall, and mean average precision.  Note that the
+              task is to predict, for each images[i], the set of object locations given by
+              truth_dets[i].
             - In particular, returns a matrix M such that:  
                 - M(0) == the precision of the detector object.  This is a number
                   in the range [0,1] which measures the fraction of detector outputs
@@ -42,10 +43,18 @@ namespace dlib
                   never produces any false alarms while a value of 0 means it only
                   produces false alarms.
                 - M(1) == the recall of the detector object.  This is a number in the
-                  range [0,1] which measure the fraction of targets found by the
+                  range [0,1] which measures the fraction of targets found by the
                   detector.  A value of 1 means the detector found all the targets
                   in truth_dets while a value of 0 means the detector didn't locate
                   any of the targets.
+                - M(2) == the mean average precision of the detector object.  This is a
+                  number in the range [0,1] which measures the overall quality of the
+                  detector when the detector is asked to output a ranked listing of all
+                  possible detections.  In particular, this is accomplished by setting the
+                  detection threshold such that all possible detections are output.  Then
+                  the detections are ordered by their detection score and we use the
+                  average_precision() routine to score each ranked listing, finally setting
+                  M(2) to the mean value over all test images.
                 - The rule for deciding if a detector output, D, matches a truth rectangle,
                   T, is the following:
                     T and R match if and only if: T.intersect(R).area()/(T+R).area() > overlap_eps
@@ -55,7 +64,7 @@ namespace dlib
         typename object_detector_type,
         typename image_array_type
         >
-    const matrix<double,1,2> test_object_detection_function (
+    const matrix<double,1,3> test_object_detection_function (
         object_detector_type& detector,
         const image_array_type& images,
         const std::vector<std::vector<rectangle> >& truth_dets,
@@ -77,7 +86,7 @@ namespace dlib
         typename trainer_type,
         typename image_array_type
         >
-    const matrix<double,1,2> cross_validate_object_detection_trainer (
+    const matrix<double,1,3> cross_validate_object_detection_trainer (
         const trainer_type& trainer,
         const image_array_type& images,
         const std::vector<std::vector<full_object_detection> >& truth_dets,
@@ -94,19 +103,19 @@ namespace dlib
               and it must contain objects which can be accepted by detector().
             - it is legal to call trainer.train(images, truth_dets)
         ensures
-            - Performs k-fold cross-validation by using the given trainer to solve an 
-              object detection problem for the given number of folds.  Each fold is tested 
-              using the output of the trainer and a matrix summarizing the results is 
-              returned.  The matrix contains the precision and recall of the trained 
-              detectors and is defined identically to the test_object_detection_function()
-              routine defined at the top of this file.
+            - Performs k-fold cross-validation by using the given trainer to solve an
+              object detection problem for the given number of folds.  Each fold is tested
+              using the output of the trainer and a matrix summarizing the results is
+              returned.  The matrix contains the precision, recall, and mean average
+              precision of the trained detectors and is defined identically to the
+              test_object_detection_function() routine defined at the top of this file.
     !*/
 
     template <
         typename trainer_type,
         typename image_array_type
         >
-    const matrix<double,1,2> cross_validate_object_detection_trainer (
+    const matrix<double,1,3> cross_validate_object_detection_trainer (
         const trainer_type& trainer,
         const image_array_type& images,
         const std::vector<std::vector<rectangle> >& truth_dets,
