@@ -253,7 +253,7 @@ struct example_op_vector_to_matrix
     const static long NC = 1; // We do know that it only has one column (since it's a vector)
     typedef T type;
     // Since the std::vector doesn't use a dlib memory manager we list the default one here.
-    typedef memory_manager<char>::kernel_1a mem_manager_type;
+    typedef default_memory_manager mem_manager_type;
     // The layout type also doesn't really matter in this case.  So we list row_major_layout
     // since it is a good default.
     typedef row_major_layout layout_type;
