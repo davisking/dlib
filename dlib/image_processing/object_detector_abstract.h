@@ -151,9 +151,9 @@ namespace dlib
                       come first.  E.g. element 0 is the best detection, element 1 
                       the next best, and so on.
                     - #dets.size() == the number of detected objects.
-                    - #dets[i].first gives the "detection confidence", of the i-th 
-                      detection.  This is the detection value output by the scanner 
-                      minus the threshold. 
+                    - #dets[i].first gives the "detection confidence", of the i-th
+                      detection.  This is the detection value output by the scanner minus
+                      the threshold value stored at the end of the weight vector in get_w(). 
                     - #dets[i].second == the bounding box for the i-th detection.
                 - #get_scanner() will have been loaded with img. Therefore, you can call
                   #get_scanner().get_feature_vector() to obtain the feature vectors or
