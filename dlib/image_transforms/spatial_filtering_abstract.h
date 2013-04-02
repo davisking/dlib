@@ -168,6 +168,7 @@ namespace dlib
         long NR,
         long NC,
         typename T,
+        typename U,
         typename in_image_type
         >
     inline void separable_3x3_filter_block_grayscale (
@@ -175,15 +176,15 @@ namespace dlib
         const in_image_type& img,
         const long& r,
         const long& c,
-        const T& fe1, 
-        const T& fm,  
-        const T& fe2 
+        const U& fe1, 
+        const U& fm,  
+        const U& fe2 
     );
     /*!
         requires
             - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
             - pixel_traits<typename in_image_type::type> must be defined 
-            - T should be a scalar type
+            - T and U should be scalar types
             - shrink_rect(get_rect(img),1).contains(c,r)
             - shrink_rect(get_rect(img),1).contains(c+NC-1,r+NR-1)
         ensures

@@ -409,6 +409,7 @@ namespace dlib
         long NR,
         long NC,
         typename T,
+        typename U,
         typename in_image_type
         >
     inline void separable_3x3_filter_block_grayscale (
@@ -416,9 +417,9 @@ namespace dlib
         const in_image_type& img,
         const long& r,
         const long& c,
-        const T& fe1, // separable filter end
-        const T& fm,  // separable filter middle 
-        const T& fe2 // separable filter end 2
+        const U& fe1, // separable filter end
+        const U& fm,  // separable filter middle 
+        const U& fe2 // separable filter end 2
     ) 
     {
         // make sure requires clause is not broken
@@ -477,7 +478,7 @@ namespace dlib
         // make sure requires clause is not broken
         DLIB_ASSERT(shrink_rect(get_rect(img),1).contains(c,r) &&
                     shrink_rect(get_rect(img),1).contains(c+NC-1,r+NR-1),
-            "\t void separable_3x3_filter_block_grayscale()"
+            "\t void separable_3x3_filter_block_rgb()"
             << "\n\t The sub-window doesn't fit inside the given image."
             << "\n\t get_rect(img):       " << get_rect(img) 
             << "\n\t (c,r):               " << point(c,r) 
