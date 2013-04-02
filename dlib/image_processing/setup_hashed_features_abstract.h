@@ -7,6 +7,7 @@
 #include "scan_image_boxes_abstract.h"
 #include "../lsh/projection_hash_abstract.h"
 #include "../image_keypoint/hashed_feature_image_abstract.h"
+#include "../image_keypoint/binned_vector_feature_image_abstract.h"
 
 namespace dlib
 {
@@ -27,9 +28,10 @@ namespace dlib
         typename image_array,
         typename pyramid,
         typename feature_extractor
+        template <typename feature_extractor, typename hash> class feature_image
         >
     void setup_hashed_features (
-        scan_image_pyramid<pyramid, hashed_feature_image<feature_extractor, projection_hash> >& scanner,
+        scan_image_pyramid<pyramid, feature_image<feature_extractor, projection_hash> >& scanner,
         const image_array& images,
         const feature_extractor& fe,
         int bits,
@@ -42,6 +44,8 @@ namespace dlib
             - images.size() > 0
             - it must be valid to pass images[0] into scanner.load().
               (also, image_array must be an implementation of dlib/array/array_kernel_abstract.h)
+            - feature_image == must be either hashed_feature_image, binned_vector_feature_image,
+              or a type with a compatible interface.
         ensures
             - Creates a projection_hash suitable for hashing the feature vectors produced by
               fe and then configures scanner to use this hash function.
@@ -62,9 +66,10 @@ namespace dlib
         typename image_array,
         typename pyramid,
         typename feature_extractor
+        template <typename feature_extractor, typename hash> class feature_image
         >
     void setup_hashed_features (
-        scan_image_pyramid<pyramid, hashed_feature_image<feature_extractor, projection_hash> >& scanner,
+        scan_image_pyramid<pyramid, feature_image<feature_extractor, projection_hash> >& scanner,
         const image_array& images,
         int bits,
         unsigned long num_samples = 200000
@@ -76,6 +81,8 @@ namespace dlib
             - images.size() > 0
             - it must be valid to pass images[0] into scanner.load().
               (also, image_array must be an implementation of dlib/array/array_kernel_abstract.h)
+            - feature_image == must be either hashed_feature_image, binned_vector_feature_image,
+              or a type with a compatible interface.
         ensures
             - performs: setup_hashed_features(scanner, images, feature_extractor(), bits, num_samples)
         throws
@@ -93,10 +100,11 @@ namespace dlib
     template <
         typename image_array,
         typename feature_extractor,
+        template <typename feature_extractor, typename hash> class feature_image
         typename box_generator
         >
     void setup_hashed_features (
-        scan_image_boxes<hashed_feature_image<feature_extractor, projection_hash>,box_generator>& scanner,
+        scan_image_boxes<feature_image<feature_extractor, projection_hash>,box_generator>& scanner,
         const image_array& images,
         const feature_extractor& fe,
         int bits,
@@ -109,6 +117,8 @@ namespace dlib
             - images.size() > 0
             - it must be valid to pass images[0] into scanner.load().
               (also, image_array must be an implementation of dlib/array/array_kernel_abstract.h)
+            - feature_image == must be either hashed_feature_image, binned_vector_feature_image,
+              or a type with a compatible interface.
         ensures
             - Creates a projection_hash suitable for hashing the feature vectors produced by
               fe and then configures scanner to use this hash function.
@@ -128,10 +138,11 @@ namespace dlib
     template <
         typename image_array,
         typename feature_extractor,
+        template <typename feature_extractor, typename hash> class feature_image
         typename box_generator
         >
     void setup_hashed_features (
-        scan_image_boxes<hashed_feature_image<feature_extractor, projection_hash>,box_generator>& scanner,
+        scan_image_boxes<feature_image<feature_extractor, projection_hash>,box_generator>& scanner,
         const image_array& images,
         int bits,
         unsigned long num_samples = 200000
@@ -143,6 +154,8 @@ namespace dlib
             - images.size() > 0
             - it must be valid to pass images[0] into scanner.load().
               (also, image_array must be an implementation of dlib/array/array_kernel_abstract.h)
+            - feature_image == must be either hashed_feature_image, binned_vector_feature_image,
+              or a type with a compatible interface.
         ensures
             - performs: setup_hashed_features(scanner, images, feature_extractor(), bits, num_samples)
         throws

@@ -10,6 +10,7 @@
 #include "image_keypoint/fine_hog_image.h"
 #include "image_keypoint/hashed_feature_image.h"
 #include "image_keypoint/nearest_neighbor_feature_image.h"
+#include "image_keypoint/binned_vector_feature_image.h"
 
 #endif // DLIB_IMAGE_KEYPOINt_H_
 
