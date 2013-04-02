@@ -34,7 +34,7 @@ namespace dlib
         typename image_array,
         typename pyramid,
         typename feature_extractor,
-        template <typename feature_extractor, typename hash> class feature_image
+        template <typename fe, typename hash> class feature_image
         >
     void setup_hashed_features (
         scan_image_pyramid<pyramid, feature_image<feature_extractor, projection_hash> >& scanner,
@@ -77,7 +77,7 @@ namespace dlib
         typename image_array,
         typename pyramid,
         typename feature_extractor,
-        template <typename feature_extractor, typename hash> class feature_image
+        template <typename fe, typename hash> class feature_image
         >
     void setup_hashed_features (
         scan_image_pyramid<pyramid, feature_image<feature_extractor, projection_hash> >& scanner,
@@ -110,7 +110,7 @@ namespace dlib
     template <
         typename image_array,
         typename feature_extractor,
-        template <typename feature_extractor, typename hash> class feature_image,
+        template <typename fe, typename hash> class feature_image,
         typename box_generator
         >
     void setup_hashed_features (
@@ -153,7 +153,7 @@ namespace dlib
     template <
         typename image_array,
         typename feature_extractor,
-        template <typename feature_extractor, typename hash> class feature_image,
+        template <typename fe, typename hash> class feature_image,
         typename box_generator
         >
     void setup_hashed_features (
