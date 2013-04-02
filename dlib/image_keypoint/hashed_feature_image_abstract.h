@@ -237,10 +237,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T
+        typename T,
+        typename U
         >
     void serialize (
-        const hashed_feature_image<T>& item,
+        const hashed_feature_image<T,U>& item,
         std::ostream& out
     );
     /*!
@@ -250,10 +251,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T
+        typename T,
+        typename U
         >
     void deserialize (
-        hashed_feature_image<T>& item,
+        hashed_feature_image<T,U>& item,
         std::istream& in 
     );
     /*!
