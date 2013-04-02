@@ -116,7 +116,8 @@ namespace dlib
             typename image_type
             >
         std::vector<rectangle> operator() (
-            const image_type& img
+            const image_type& img,
+            const adjust_threshold = 0
         );
         /*!
             requires
@@ -131,6 +132,11 @@ namespace dlib
                   #get_scanner().get_feature_vector() to obtain the feature vectors or
                   #get_scanner().get_full_object_detection() to get the
                   full_object_detections for the resulting object detection boxes.
+                - The detection threshold is adjusted by having adjust_threshold added to
+                  it.  Therefore, an adjust_threshold value > 0 makes detecting objects
+                  harder while a negative value makes it easier.  This means that, for
+                  example, you can obtain the maximum possible number of detections by
+                  setting adjust_threshold equal to negative infinity.
         !*/
 
         template <
@@ -161,11 +167,11 @@ namespace dlib
                   full_object_detections for the resulting object detection boxes.
                 - The detection threshold is adjusted by having adjust_threshold added to
                   it.  Therefore, an adjust_threshold value > 0 makes detecting objects
-                  harder while a negative one makes it easier.  Moreover, the following
+                  harder while a negative value makes it easier.  Moreover, the following
                   will be true for all valid i:
                     - #dets[i].first >= adjust_threshold
-                  This means that, for example, you can obtain all possible detections as
-                  outputs by setting adjust_threshold equal to negative infinity.
+                  This means that, for example, you can obtain the maximum possible number
+                  of detections by setting adjust_threshold equal to negative infinity.
         !*/
 
         template <

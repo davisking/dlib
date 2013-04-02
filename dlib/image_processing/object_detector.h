@@ -52,7 +52,8 @@ namespace dlib
             typename image_type
             >
         std::vector<rectangle> operator() (
-            const image_type& img
+            const image_type& img,
+            double adjust_threshold = 0
         );
 
         template <
@@ -250,7 +251,8 @@ namespace dlib
         >
     std::vector<rectangle> object_detector<image_scanner_type>::
     operator() (
-        const image_type& img
+        const image_type& img,
+        double adjust_threshold
     ) 
     {
         std::vector<rectangle> final_dets;
@@ -260,7 +262,7 @@ namespace dlib
             const double thresh = w(scanner.get_num_dimensions());
 
             scanner.load(img);
-            scanner.detect(w, dets, thresh);
+            scanner.detect(w, dets, thresh + adjust_threshold);
 
             for (unsigned long i = 0; i < dets.size(); ++i)
             {
