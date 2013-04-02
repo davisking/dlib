@@ -339,7 +339,10 @@ namespace dlib
                   function returns a number which defines a hard upper limit on the number of
                   detections allowed by a single scan.  This means that the total number of
                   possible detections produced by detect() is get_max_detections_per_template()*
-                  get_num_detection_templates()*(number of image pyramid layers).
+                  get_num_detection_templates()*(number of image pyramid layers).  Additionally, 
+                  if the maximum number of detections is reached during a scan then this object 
+                  will return a random subsample of all detections which are above the detection 
+                  threshold.
         !*/
 
         void set_max_detections_per_template (
