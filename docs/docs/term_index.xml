@@ -1204,6 +1204,7 @@
          <term file="imaging.html" name="fine_hog_image"/>
          <term file="imaging.html" name="poly_image"/>
          <term file="imaging.html" name="hashed_feature_image"/>
+         <term file="imaging.html" name="binned_vector_feature_image"/>
          <term file="imaging.html" name="nearest_neighbor_feature_image"/>
          <term file="imaging.html" name="haar_x"/>
          <term file="imaging.html" name="haar_y"/>

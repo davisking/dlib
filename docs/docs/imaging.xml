@@ -126,6 +126,7 @@
          <item>fine_hog_image</item>
          <item>poly_image</item>
          <item>hashed_feature_image</item>
+         <item>binned_vector_feature_image</item>
          <item>nearest_neighbor_feature_image</item>
          <item>randomly_sample_image_features</item> 
       </section>
@@ -428,6 +429,40 @@
             <example>train_object_detector.cpp.html</example>
          </examples>
                                  
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>binned_vector_feature_image</name>
+         <file>dlib/image_keypoint.h</file>
+         <spec_file link="true">dlib/image_keypoint/binned_vector_feature_image_abstract.h</spec_file>
+         <description>
+                This object is a tool for performing image feature extraction.  In
+                particular, it wraps another image feature extractor and converts the
+                wrapped image feature vectors into a high dimensional sparse vector.  For
+                example, if the lower level feature extractor outputs the vector [3,4,5]
+                and this vector is hashed into the second bin of four bins then the output
+                sparse vector is:
+                <blockquote>
+                    [0,0,0,0, 3,4,5,1, 0,0,0,0, 0,0,0,0]. 
+                </blockquote>
+                That is, the output vector has a dimensionality that is equal to the number
+                of hash bins times the dimensionality of the lower level vector plus one.
+                The value in the extra dimension concatenated onto the end of the vector is
+                always a constant value of of 1 and serves as a bias value.  This means
+                that, if there are N hash bins, these vectors are capable of representing N
+                different linear functions, each operating on the vectors that fall into
+                their corresponding hash bin.
+
+               <br/><br/>
+                The following feature extractors can be wrapped by the binned_vector_feature_image:
+               <ul style="margin-top:0em"> 
+                  <li><a href="#hog_image">hog_image</a></li>
+                  <li><a href="#fine_hog_image">fine_hog_image</a></li>
+                  <li><a href="#poly_image">poly_image</a></li>
+               </ul>
+         </description>
       </component>
 
    <!-- ************************************************************************* -->
@@ -1623,6 +1658,7 @@
                The following feature extractors can be used with the scan_image_pyramid object:
                <ul style="margin-top:0em"> 
                   <li><a href="#hashed_feature_image">hashed_feature_image</a></li>
+                  <li><a href="#binned_vector_feature_image">binned_vector_feature_image</a></li>
                   <li><a href="#nearest_neighbor_feature_image">nearest_neighbor_feature_image</a></li>
                </ul>
          </description>
@@ -1666,6 +1702,7 @@
             The following feature extractors can be used with the scan_image_boxes object:
             <ul style="margin-top:0em"> 
                <li><a href="#hashed_feature_image">hashed_feature_image</a></li>
+               <li><a href="#binned_vector_feature_image">binned_vector_feature_image</a></li>
                <li><a href="#nearest_neighbor_feature_image">nearest_neighbor_feature_image</a></li>
             </ul>
          </description>
@@ -1844,7 +1881,8 @@
          <file>dlib/image_processing.h</file>
          <spec_file link="true">dlib/image_processing/setup_hashed_features_abstract.h</spec_file>
          <description>        
-            This is a tool for configuring the <a href="#hashed_feature_image">hashed_feature_image</a> object
+            This is a tool for configuring the <a href="#hashed_feature_image">hashed_feature_image</a>
+            or <a href="#binned_vector_feature_image">binned_vector_feature_image</a> object
             with a random <a href="algorithms.html#projection_hash">projection hash</a>. 
          </description>
          <examples>
