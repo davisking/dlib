@@ -176,7 +176,8 @@ namespace dlib
             rectangle& mapped_rect,
             detection_template& best_template,
             rectangle& object_box,
-            unsigned long& best_level
+            unsigned long& best_level,
+            unsigned long& detection_template_idx
         ) const;
 
         double get_match_score (
@@ -580,7 +581,7 @@ namespace dlib
             << "\n\t this: " << this
             );
 
-        return feats_config.get_num_dimensions()*get_num_components_per_detection_template();
+        return feats_config.get_num_dimensions()*get_num_components_per_detection_template() + get_num_detection_templates();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -661,7 +662,7 @@ namespace dlib
             for (unsigned long i = 0; i < saliency_images.size(); ++i)
             {
                 saliency_images[i].set_size(feats[l].nr(), feats[l].nc());
-                const unsigned long offset = feats_config.get_num_dimensions()*i;
+                const unsigned long offset = get_num_detection_templates() + feats_config.get_num_dimensions()*i;
 
                 // build saliency images for pyramid level l 
                 for (long r = 0; r < feats[l].nr(); ++r)
@@ -702,14 +703,21 @@ namespace dlib
                 rectangle scaled_object_box = feats[l].image_to_feat_space(det_templates[i].object_box);
                 scaled_object_box = centered_rect(point(0,0),scaled_object_box.width(), scaled_object_box.height());
 
+                // Each detection template gets its own special threshold in addition to
+                // the global detection threshold.  This allows us to model the fact that
+                // some detection templates might be more prone to false alarming or since
+                // their size is different naturally require a larger or smaller threshold
+                // (since they integrate over a larger or smaller region of the image).
+                const double template_specific_thresh = w(i);
+
                 scan_image_movable_parts(point_dets, saliency_images, scaled_object_box,
                                          stationary_region_rects, movable_region_rects,
-                                         thresh, max_dets_per_template); 
+                                         thresh+template_specific_thresh, max_dets_per_template); 
 
                 // convert all the point detections into rectangles at the original image scale and coordinate system
                 for (unsigned long j = 0; j < point_dets.size(); ++j)
                 {
-                    const double score = point_dets[j].first;
+                    const double score = point_dets[j].first+template_specific_thresh;
                     point p = point_dets[j].second;
                     p = feats[l].feat_to_image_space(p);
                     rectangle rect = translate_rect(det_templates[i].object_box, p);
@@ -744,8 +752,8 @@ namespace dlib
 
         rectangle mapped_rect, object_box;
         detection_template best_template;
-        unsigned long best_level;
-        get_mapped_rect_and_metadata(max_pyramid_levels, rect, mapped_rect, best_template, object_box, best_level);
+        unsigned long best_level, junk;
+        get_mapped_rect_and_metadata(max_pyramid_levels, rect, mapped_rect, best_template, object_box, best_level, junk);
         return mapped_rect;
     }
 
@@ -762,7 +770,8 @@ namespace dlib
         rectangle& mapped_rect,
         detection_template& best_template,
         rectangle& object_box,
-        unsigned long& best_level
+        unsigned long& best_level,
+        unsigned long& detection_template_idx
     ) const
     {
         pyramid_type pyr;
@@ -799,6 +808,7 @@ namespace dlib
                     best_match_score = match_score;
                     best_level = l;
                     best_template = det_templates[t];
+                    detection_template_idx = t;
                 }
             }
         }
@@ -849,9 +859,9 @@ namespace dlib
 
         rectangle mapped_rect;
         detection_template best_template;
-        unsigned long best_level;
+        unsigned long best_level, junk;
         rectangle object_box;
-        get_mapped_rect_and_metadata(feats.size(), rect, mapped_rect, best_template, object_box, best_level);
+        get_mapped_rect_and_metadata(feats.size(), rect, mapped_rect, best_template, object_box, best_level, junk);
 
         Pyramid_type pyr;
 
@@ -978,9 +988,11 @@ namespace dlib
 
         rectangle mapped_rect;
         detection_template best_template;
-        unsigned long best_level;
+        unsigned long best_level, detection_template_idx;
         rectangle object_box;
-        get_mapped_rect_and_metadata (feats.size(), obj.get_rect(), mapped_rect, best_template, object_box, best_level);
+        get_mapped_rect_and_metadata(feats.size(), obj.get_rect(), mapped_rect, best_template, object_box, best_level, detection_template_idx);
+
+        psi(detection_template_idx) += 1;
 
         Pyramid_type pyr;
 
@@ -1010,7 +1022,7 @@ namespace dlib
         {
             const rectangle rect = rects[j].intersect(get_rect(feats[best_level]));
             const unsigned long template_region_id = j;
-            const unsigned long offset = feats_config.get_num_dimensions()*template_region_id;
+            const unsigned long offset = get_num_detection_templates() + feats_config.get_num_dimensions()*template_region_id;
             for (long r = rect.top(); r <= rect.bottom(); ++r)
             {
                 for (long c = rect.left(); c <= rect.right(); ++c)
