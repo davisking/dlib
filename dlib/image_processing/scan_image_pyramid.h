@@ -717,7 +717,7 @@ namespace dlib
                 // convert all the point detections into rectangles at the original image scale and coordinate system
                 for (unsigned long j = 0; j < point_dets.size(); ++j)
                 {
-                    const double score = point_dets[j].first+template_specific_thresh;
+                    const double score = point_dets[j].first-template_specific_thresh;
                     point p = point_dets[j].second;
                     p = feats[l].feat_to_image_space(p);
                     rectangle rect = translate_rect(det_templates[i].object_box, p);
@@ -883,7 +883,7 @@ namespace dlib
                                              part_rect.height()/2).intersect(get_rect(feats[best_level]));
 
             saliency_image.set_size(area.height(), area.width());
-            const unsigned long offset = feats_config.get_num_dimensions()*(i+get_num_stationary_components_per_detection_template());
+            const unsigned long offset = get_num_detection_templates() + feats_config.get_num_dimensions()*(i+get_num_stationary_components_per_detection_template());
 
             // build saliency image for pyramid level best_level 
             for (long r = area.top(); r <= area.bottom(); ++r)
@@ -992,7 +992,7 @@ namespace dlib
         rectangle object_box;
         get_mapped_rect_and_metadata(feats.size(), obj.get_rect(), mapped_rect, best_template, object_box, best_level, detection_template_idx);
 
-        psi(detection_template_idx) += 1;
+        psi(detection_template_idx) -= 1;
 
         Pyramid_type pyr;
 
