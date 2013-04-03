@@ -21,7 +21,8 @@ namespace dlib
         object_detector_type& detector,
         const image_array_type& images,
         const std::vector<std::vector<full_object_detection> >& truth_dets,
-        const double overlap_eps = 0.5
+        const double overlap_eps = 0.5,
+        const double adjust_threshold = 0
     );
     /*!
         requires
@@ -49,15 +50,20 @@ namespace dlib
                   any of the targets.
                 - M(2) == the mean average precision of the detector object.  This is a
                   number in the range [0,1] which measures the overall quality of the
-                  detector when the detector is asked to output a ranked listing of all
-                  possible detections.  In particular, this is accomplished by setting the
-                  detection threshold such that all possible detections are output.  Then
-                  the detections are ordered by their detection score and we use the
-                  average_precision() routine to score each ranked listing, finally setting
-                  M(2) to the mean value over all test images.
+                  detector.  We do this by taking all the detections output by the detector
+                  and ordering them by their detection score.  Then we use the
+                  average_precision() routine to score the ranked listing.  Finally we set
+                  M(2) to the mean value over all test images.  
                 - The rule for deciding if a detector output, D, matches a truth rectangle,
                   T, is the following:
                     T and R match if and only if: T.intersect(R).area()/(T+R).area() > overlap_eps
+                - Note that you can use the adjust_threshold argument to raise or lower the
+                  detection threshold.  This value is passed into the identically named
+                  argument to the detector object and therefore influences the number of
+                  output detections.  It can be useful, for example, to lower the detection
+                  threshold because it results in more detections being output by the
+                  detector, and therefore provides more information in the ranking,
+                  possibly raising the mean average precision.
     !*/
 
     template <
@@ -68,7 +74,8 @@ namespace dlib
         object_detector_type& detector,
         const image_array_type& images,
         const std::vector<std::vector<rectangle> >& truth_dets,
-        const double overlap_eps = 0.5
+        const double overlap_eps = 0.5,
+        const double adjust_threshold = 0
     );
     /*!
         requires
@@ -91,7 +98,8 @@ namespace dlib
         const image_array_type& images,
         const std::vector<std::vector<full_object_detection> >& truth_dets,
         const long folds,
-        const double overlap_eps = 0.5
+        const double overlap_eps = 0.5,
+        const double adjust_threshold = 0
     );
     /*!
         requires
@@ -120,7 +128,8 @@ namespace dlib
         const image_array_type& images,
         const std::vector<std::vector<rectangle> >& truth_dets,
         const long folds,
-        const double overlap_eps = 0.5
+        const double overlap_eps = 0.5,
+        const double adjust_threshold = 0
     );
     /*!
         requires

@@ -79,15 +79,6 @@ namespace dlib
             return count;
         }
 
-        inline unsigned long number_of_truth_hits (
-            const std::vector<full_object_detection>& truth_boxes,
-            const std::vector<rectangle>& boxes,
-            const double overlap_eps
-        )
-        {
-            double ap;
-            return number_of_truth_hits(truth_boxes, boxes, overlap_eps, ap);
-        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -100,7 +91,8 @@ namespace dlib
         object_detector_type& detector,
         const image_array_type& images,
         const std::vector<std::vector<full_object_detection> >& truth_dets,
-        const double overlap_eps = 0.5
+        const double overlap_eps = 0.5,
+        const double adjust_threshold = 0
     )
     {
         // make sure requires clause is not broken
@@ -121,25 +113,12 @@ namespace dlib
 
         for (unsigned long i = 0; i < images.size(); ++i)
         {
-            std::vector<std::pair<double,rectangle> > all_dets;
-            detector(images[i], all_dets, -std::numeric_limits<double>::infinity());
-            std::vector<rectangle> hits;
-            for (unsigned long k = 0; k < all_dets.size(); ++k)
-            {
-                if (all_dets[k].first >= 0)
-                    hits.push_back(all_dets[k].second);
-            }
+            const std::vector<rectangle>& hits = detector(images[i], adjust_threshold);
 
-            total_hits += hits.size();
-            correct_hits += impl::number_of_truth_hits(truth_dets[i], hits, overlap_eps);
-            total_true_targets += truth_dets[i].size();
-
-            // now get the average precision 
-            hits.clear();
-            for (unsigned long k = 0; k < all_dets.size(); ++k)
-                hits.push_back(all_dets[k].second);
             double ap;
-            impl::number_of_truth_hits(truth_dets[i], hits, overlap_eps, ap);
+            total_hits += hits.size();
+            correct_hits += impl::number_of_truth_hits(truth_dets[i], hits, overlap_eps, ap);
+            total_true_targets += truth_dets[i].size();
             map.add(ap);
         }
 
@@ -169,7 +148,8 @@ namespace dlib
         object_detector_type& detector,
         const image_array_type& images,
         const std::vector<std::vector<rectangle> >& truth_dets,
-        const double overlap_eps = 0.5
+        const double overlap_eps = 0.5,
+        const double adjust_threshold = 0
     )
     {
         // convert into a list of regular rectangles.
@@ -182,7 +162,7 @@ namespace dlib
             }
         }
 
-        return test_object_detection_function(detector, images, rects, overlap_eps);
+        return test_object_detection_function(detector, images, rects, overlap_eps, adjust_threshold);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -241,7 +221,8 @@ namespace dlib
         const image_array_type& images,
         const std::vector<std::vector<full_object_detection> >& truth_dets,
         const long folds,
-        const double overlap_eps = 0.5
+        const double overlap_eps = 0.5,
+        const double adjust_threshold = 0
     )
     {
         // make sure requires clause is not broken
@@ -285,25 +266,12 @@ namespace dlib
             typename trainer_type::trained_function_type detector = trainer.train(array_subset, training_rects);
             for (unsigned long i = 0; i < test_idx_set.size(); ++i)
             {
-                std::vector<std::pair<double,rectangle> > all_dets;
-                detector(images[test_idx_set[i]], all_dets, -std::numeric_limits<double>::infinity());
-                std::vector<rectangle> hits;
-                for (unsigned long k = 0; k < all_dets.size(); ++k)
-                {
-                    if (all_dets[k].first >= 0)
-                        hits.push_back(all_dets[k].second);
-                }
+                const std::vector<rectangle>& hits = detector(images[test_idx_set[i]], adjust_threshold);
 
-                total_hits += hits.size();
-                correct_hits += impl::number_of_truth_hits(truth_dets[test_idx_set[i]], hits, overlap_eps);
-                total_true_targets += truth_dets[test_idx_set[i]].size();
-
-                // now get the average precision 
-                hits.clear();
-                for (unsigned long k = 0; k < all_dets.size(); ++k)
-                    hits.push_back(all_dets[k].second);
                 double ap;
-                impl::number_of_truth_hits(truth_dets[test_idx_set[i]], hits, overlap_eps, ap);
+                total_hits += hits.size();
+                correct_hits += impl::number_of_truth_hits(truth_dets[test_idx_set[i]], hits, overlap_eps, ap);
+                total_true_targets += truth_dets[test_idx_set[i]].size();
                 map.add(ap);
             }
 
@@ -337,7 +305,8 @@ namespace dlib
         const image_array_type& images,
         const std::vector<std::vector<rectangle> >& truth_dets,
         const long folds,
-        const double overlap_eps = 0.5
+        const double overlap_eps = 0.5,
+        const double adjust_threshold = 0
     )
     {
         // convert into a list of regular rectangles.
@@ -350,7 +319,7 @@ namespace dlib
             }
         }
 
-        return cross_validate_object_detection_trainer(trainer, images, dets, folds, overlap_eps);
+        return cross_validate_object_detection_trainer(trainer, images, dets, folds, overlap_eps, adjust_threshold);
     }
 
 // ----------------------------------------------------------------------------------------
