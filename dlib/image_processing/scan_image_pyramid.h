@@ -234,7 +234,7 @@ namespace dlib
         std::ostream& out
     )
     {
-        int version = 2;
+        int version = 3;
         serialize(version, out);
         serialize(item.feats_config, out);
         serialize(item.feats, out);
@@ -255,7 +255,7 @@ namespace dlib
     {
         int version = 0;
         deserialize(version, in);
-        if (version != 2)
+        if (version != 3)
             throw serialization_error("Unsupported version found when deserializing a scan_image_pyramid object.");
 
         deserialize(item.feats_config, in);
