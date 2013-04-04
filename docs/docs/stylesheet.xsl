@@ -940,10 +940,12 @@ function BigToggle(node)
    <xsl:template name="term_list_go">
       <xsl:param name="num"/>
       <xsl:if test="$num &lt; 27">
-            <ul>
                <xsl:variable name="cur_letter" select="substring($ucletters, $num, 1)"/>
 
+               <div style="padding:1em"> 
+               <div style="display: inline-block;width:100% ">
                <a name="{$cur_letter}"/>
+               
                <h1><xsl:value-of select="$cur_letter"/></h1>
                <xsl:for-each select="term">
                <xsl:sort order="ascending" select="translate(@name,$lcletters, $ucletters)"/>
@@ -952,33 +954,33 @@ function BigToggle(node)
                <xsl:if test="$cur_letter = substring(translate(@name,$lcletters, $ucletters),1,1)">
                <xsl:choose>
                   <xsl:when test="@link">
-                     <li id="term"><div id='{$line}'><div id='name'><a href="{@link}"><xsl:value-of select="@name"/></a></div>
+                     <div id='{$line}'><div id='name'><a href="{@link}"><xsl:value-of select="@name"/></a></div>
                      <div id='inc'><xsl:if test='@include'>#include &lt;<xsl:value-of select="@include"/>&gt;</xsl:if></div>
-                     </div></li>
+                     </div>
                   </xsl:when>
                   <xsl:when test="@file">
-                     <li id="term"><div id='{$line}'><div id='name'><a href="{@file}#{@name}"><xsl:value-of select="@name"/></a></div>
+                     <div id='{$line}'><div id='name'><a href="{@file}#{@name}"><xsl:value-of select="@name"/></a></div>
                      <div id='inc'><xsl:if test='@include'>#include &lt;<xsl:value-of select="@include"/>&gt;</xsl:if></div>
-                     </div></li>
+                     </div>
                   </xsl:when>
                   <xsl:otherwise>
-                     <li id="term"> <xsl:value-of select="@name"/>
-                        <ul>
+                      <xsl:value-of select="@name"/>
+                      <div style="padding-left: 50px;">
                         <xsl:for-each select="term">
                         <xsl:sort order="ascending" select="translate(@name,$lcletters, $ucletters)"/> 
                         <xsl:variable name="alt2" select="1+(($alt+position()) mod 2)"/>
                         <xsl:variable name="line2" select="concat('line',format-number($alt2,'0'))"/>
-                           <li id="term"><div id='{$line2}'><div id='name'><a href="{@link}"><xsl:value-of select="@name"/></a></div>
+                           <div id='{$line2}'><div id='name'><a href="{@link}"><xsl:value-of select="@name"/></a></div>
                            <div id='inc'><xsl:if test='@include'>#include &lt;<xsl:value-of select="@include"/>&gt;</xsl:if></div>
-                           </div></li>
+                           </div>
                         </xsl:for-each>
-                        </ul>
-                     </li>
+                      </div>
                   </xsl:otherwise>
                </xsl:choose>
                </xsl:if>
                </xsl:for-each>
-            </ul>
+               </div>
+               </div>
 
       <xsl:call-template name="term_list_go" >
          <xsl:with-param name="num" select="$num + 1"/>
