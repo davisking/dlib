@@ -955,12 +955,12 @@ function BigToggle(node)
                <xsl:choose>
                   <xsl:when test="@link">
                      <div id='{$line}'><div id='name'><a href="{@link}"><xsl:value-of select="@name"/></a></div>
-                     <div id='inc'><xsl:if test='@include'>#include &lt;<xsl:value-of select="@include"/>&gt;</xsl:if></div>
+                     <div id='inc'><xsl:if test='@include'><b>#include &lt;<xsl:value-of select="@include"/>&gt;</b></xsl:if></div>
                      </div>
                   </xsl:when>
                   <xsl:when test="@file">
                      <div id='{$line}'><div id='name'><a href="{@file}#{@name}"><xsl:value-of select="@name"/></a></div>
-                     <div id='inc'><xsl:if test='@include'>#include &lt;<xsl:value-of select="@include"/>&gt;</xsl:if></div>
+                     <div id='inc'><xsl:if test='@include'><b>#include &lt;<xsl:value-of select="@include"/>&gt;</b></xsl:if></div>
                      </div>
                   </xsl:when>
                   <xsl:otherwise>
@@ -971,7 +971,7 @@ function BigToggle(node)
                         <xsl:variable name="alt2" select="1+(($alt+position()) mod 2)"/>
                         <xsl:variable name="line2" select="concat('line',format-number($alt2,'0'))"/>
                            <div id='{$line2}'><div id='name'><a href="{@link}"><xsl:value-of select="@name"/></a></div>
-                           <div id='inc'><xsl:if test='@include'>#include &lt;<xsl:value-of select="@include"/>&gt;</xsl:if></div>
+                           <div id='inc'><xsl:if test='@include'><b>#include &lt;<xsl:value-of select="@include"/>&gt;</b></xsl:if></div>
                            </div>
                         </xsl:for-each>
                       </div>
