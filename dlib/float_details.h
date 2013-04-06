@@ -15,8 +15,14 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
         !*/
 
+        float_details(
+            int64 man,
+            int16 exp
+        ) : mantissa(man), exponent(exp)
+        {}
+
         float_details() :
-            exponent(0), mantissa(0)
+            mantissa(0), exponent(0)
         {}
 
         const static int16 is_inf  = 32000;
@@ -35,8 +41,8 @@ namespace dlib
         operator float       () const { return convert_to_T<float>(); }
         operator long double () const { return convert_to_T<long double>(); }
 
-        int16 exponent;
         int64 mantissa;
+        int16 exponent;
 
     private:
 
