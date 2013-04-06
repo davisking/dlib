@@ -465,8 +465,8 @@ namespace dlib
         std::ostream& out
     )
     {
-        serialize(item.exponent, out);
         serialize(item.mantissa, out);
+        serialize(item.exponent, out);
     }
 
     inline void deserialize(
@@ -474,8 +474,8 @@ namespace dlib
         std::istream& in 
     )
     {
-        deserialize(item.exponent, in);
         deserialize(item.mantissa, in);
+        deserialize(item.exponent, in);
     }
 
 // ----------------------------------------------------------------------------------------
