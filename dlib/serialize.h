@@ -112,7 +112,11 @@
             and tells you how many of the following bytes are part of the encoded
             number.
 
-
+    FLOATING POINT SERIALIZATION FORMAT
+        To serialize a floating point value we convert it into a float_details object and
+        then serialize the exponent and mantissa values using dlib's integral serialization
+        format.  Therefore, the output is first the exponent and then the mantissa.  Note that
+        the mantissa is a signed integer (i.e. there is not a separate sign bit).
 !*/
 
 
@@ -134,6 +138,7 @@
 #include "unicode.h"
 #include "unicode.h"
 #include "byte_orderer.h"
+#include "float_details.h"
 
 namespace dlib
 {
@@ -455,30 +460,43 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline void serialize(
+        const float_details& item,
+        std::ostream& out
+    )
+    {
+        serialize(item.exponent, out);
+        serialize(item.mantissa, out);
+    }
+
+    inline void deserialize(
+        float_details& item,
+        std::istream& in 
+    )
+    {
+        deserialize(item.exponent, in);
+        deserialize(item.mantissa, in);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <typename T>
-    inline bool serialize_floating_point (
+    inline void serialize_floating_point (
         const T& item,
         std::ostream& out
     )
     { 
-        std::ios::fmtflags oldflags = out.flags();  
-        out.flags(); 
-        std::streamsize ss = out.precision(35); 
-        if (item == std::numeric_limits<T>::infinity())
-            out << "inf ";
-        else if (item == -std::numeric_limits<T>::infinity())
-            out << "ninf ";
-        else if (item < std::numeric_limits<T>::infinity())
-            out << item << ' '; 
-        else
-            out << "NaN ";
-        out.flags(oldflags); 
-        out.precision(ss); 
-        return (!out);
+        try
+        {
+            float_details temp = item;
+            serialize(temp, out);
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while serializing a floating point number."); }
     }
 
     template <typename T>
-    inline bool deserialize_floating_point (
+    inline bool old_deserialize_floating_point (
         T& item,
         std::istream& in 
     )
@@ -517,40 +535,66 @@ namespace dlib
         return (in.get() != ' ');
     }
 
+    template <typename T>
+    inline void deserialize_floating_point (
+        T& item,
+        std::istream& in 
+    )
+    {
+        // check if the serialized data uses the older ASCII based format.  We can check
+        // this easily because the new format starts with the integer control byte which
+        // always has 0 bits in the positions corresponding to the bitmask 0x70.  Moreover,
+        // since the previous format used ASCII numbers we know that no valid bytes can
+        // have bit values of one in the positions indicated 0x70.  So this test looks at
+        // the first byte and checks if the serialized data uses the old format or the new
+        // format.
+        if ((in.rdbuf()->sgetc()&0x70) == 0)
+        {
+            try
+            {
+                // Use the fast and compact binary serialization format.
+                float_details temp;
+                deserialize(temp, in);
+                item = temp;
+            }
+            catch (serialization_error& e)
+            { throw serialization_error(e.info + "\n   while deserializing a floating point number."); }
+        }
+        else
+        {
+            if (old_deserialize_floating_point(item, in))
+                throw serialization_error("Error deserializing a floating point number.");
+        }
+    }
+
     inline void serialize ( const float& item, std::ostream& out) 
     { 
-        if (serialize_floating_point(item,out))
-            throw serialization_error("Error serializing object of type float"); 
+        serialize_floating_point(item,out);
     }
 
     inline void deserialize (float& item, std::istream& in) 
     { 
-        if (deserialize_floating_point(item,in))
-            throw serialization_error("Error deserializing object of type float");
+        deserialize_floating_point(item,in);
     }
 
     inline void serialize ( const double& item, std::ostream& out) 
     { 
-        if (serialize_floating_point(item,out))
-            throw serialization_error("Error serializing object of type double"); 
+        serialize_floating_point(item,out);
     }
 
     inline void deserialize (double& item, std::istream& in) 
     { 
-        if (deserialize_floating_point(item,in))
-            throw serialization_error("Error deserializing object of type double");
+        deserialize_floating_point(item,in);
     }
 
     inline void serialize ( const long double& item, std::ostream& out) 
     { 
-        if (serialize_floating_point(item,out))
-            throw serialization_error("Error serializing object of type long double"); 
+        serialize_floating_point(item,out);
     }
 
     inline void deserialize ( long double& item, std::istream& in) 
     { 
-        if (deserialize_floating_point(item,in))
-            throw serialization_error("Error deserializing object of type long double");
+        deserialize_floating_point(item,in);
     }
 
 // ----------------------------------------------------------------------------------------
