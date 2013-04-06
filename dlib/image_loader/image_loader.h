@@ -14,6 +14,7 @@
 #include "../uintn.h"
 #include "../image_transforms/assign_image.h"
 #include <algorithm>
+#include "../vectorstream.h"
 
 namespace dlib
 {
@@ -576,180 +577,243 @@ namespace dlib
             else
                 image.clear();
 
-            typedef entropy_decoder::kernel_2a decoder_type;
-            decoder_type decoder;
-            decoder.set_stream(in);
-
-            entropy_decoder_model<256,decoder_type>::kernel_5a edm(decoder);
-            unsigned long symbol;
-            rgb_pixel p_rgb;
-            rgb_alpha_pixel p_rgba;
-            hsi_pixel p_hsi;
-            switch (type)
+            if (type != grayscale_float)
             {
-                case rgb_alpha_paeth:
+                typedef entropy_decoder::kernel_2a decoder_type;
+                decoder_type decoder;
+                decoder.set_stream(in);
 
-                    for (long r = 0; r < image.nr(); ++r)
-                    {
-                        for (long c = 0; c < image.nc(); ++c)
-                        {
-                            p_rgba = predictor_rgb_alpha_paeth(image,r,c);
-                            edm.decode(symbol);
-                            p_rgba.red += static_cast<unsigned char>(symbol);
+                entropy_decoder_model<256,decoder_type>::kernel_5a edm(decoder);
+                unsigned long symbol;
+                rgb_pixel p_rgb;
+                rgb_alpha_pixel p_rgba;
+                hsi_pixel p_hsi;
+                switch (type)
+                {
+                    case rgb_alpha_paeth:
 
-                            edm.decode(symbol);
-                            p_rgba.green += static_cast<unsigned char>(symbol);
-
-                            edm.decode(symbol);
-                            p_rgba.blue += static_cast<unsigned char>(symbol);
-
-                            edm.decode(symbol);
-                            p_rgba.alpha += static_cast<unsigned char>(symbol);
-
-                            assign_pixel(image[r][c],p_rgba);
-                        }
-                    }
-                    break;
-
-                case rgb_alpha:
-
-                    for (long r = 0; r < image.nr(); ++r)
-                    {
-                        for (long c = 0; c < image.nc(); ++c)
-                        {
-                            p_rgba = predictor_rgb_alpha(image,r,c);
-                            edm.decode(symbol);
-                            p_rgba.red += static_cast<unsigned char>(symbol);
-
-                            edm.decode(symbol);
-                            p_rgba.green += static_cast<unsigned char>(symbol);
-
-                            edm.decode(symbol);
-                            p_rgba.blue += static_cast<unsigned char>(symbol);
-
-                            edm.decode(symbol);
-                            p_rgba.alpha += static_cast<unsigned char>(symbol);
-
-                            assign_pixel(image[r][c],p_rgba);
-                        }
-                    }
-                    break;
-
-                case rgb_paeth:
-
-                    for (long r = 0; r < image.nr(); ++r)
-                    {
-                        for (long c = 0; c < image.nc(); ++c)
-                        {
-                            p_rgb = predictor_rgb_paeth(image,r,c);
-                            edm.decode(symbol);
-                            p_rgb.red += static_cast<unsigned char>(symbol);
-
-                            edm.decode(symbol);
-                            p_rgb.green += static_cast<unsigned char>(symbol);
-
-                            edm.decode(symbol);
-                            p_rgb.blue += static_cast<unsigned char>(symbol);
-
-                            assign_pixel(image[r][c],p_rgb);
-                        }
-                    }
-                    break;
-
-                case rgb:
-
-                    for (long r = 0; r < image.nr(); ++r)
-                    {
-                        for (long c = 0; c < image.nc(); ++c)
-                        {
-                            p_rgb = predictor_rgb(image,r,c);
-                            edm.decode(symbol);
-                            p_rgb.red += static_cast<unsigned char>(symbol);
-
-                            edm.decode(symbol);
-                            p_rgb.green += static_cast<unsigned char>(symbol);
-
-                            edm.decode(symbol);
-                            p_rgb.blue += static_cast<unsigned char>(symbol);
-
-                            assign_pixel(image[r][c],p_rgb);
-                        }
-                    }
-                    break;
-
-                case hsi:
-
-                    for (long r = 0; r < image.nr(); ++r)
-                    {
-                        for (long c = 0; c < image.nc(); ++c)
-                        {
-                            p_hsi = predictor_hsi(image,r,c);
-                            edm.decode(symbol);
-                            p_hsi.h += static_cast<unsigned char>(symbol);
-
-                            edm.decode(symbol);
-                            p_hsi.s += static_cast<unsigned char>(symbol);
-
-                            edm.decode(symbol);
-                            p_hsi.i += static_cast<unsigned char>(symbol);
-
-                            assign_pixel(image[r][c],p_hsi);
-                        }
-                    }
-                    break;
-
-                case grayscale:
-                    {
-                        unsigned char p;
                         for (long r = 0; r < image.nr(); ++r)
                         {
                             for (long c = 0; c < image.nc(); ++c)
                             {
+                                p_rgba = predictor_rgb_alpha_paeth(image,r,c);
                                 edm.decode(symbol);
-                                p = static_cast<unsigned char>(symbol);
-                                p +=  predictor_grayscale(image,r,c);
-                                assign_pixel(image[r][c],p);
+                                p_rgba.red += static_cast<unsigned char>(symbol);
+
+                                edm.decode(symbol);
+                                p_rgba.green += static_cast<unsigned char>(symbol);
+
+                                edm.decode(symbol);
+                                p_rgba.blue += static_cast<unsigned char>(symbol);
+
+                                edm.decode(symbol);
+                                p_rgba.alpha += static_cast<unsigned char>(symbol);
+
+                                assign_pixel(image[r][c],p_rgba);
                             }
                         }
-                    }
-                    break;
+                        break;
 
-                case grayscale_16bit:
-                    {
-                        uint16 p;
+                    case rgb_alpha:
+
                         for (long r = 0; r < image.nr(); ++r)
                         {
                             for (long c = 0; c < image.nc(); ++c)
                             {
+                                p_rgba = predictor_rgb_alpha(image,r,c);
                                 edm.decode(symbol);
-                                p = static_cast<uint16>(symbol);
-                                p <<= 8;
-                                edm.decode(symbol);
-                                p |= static_cast<uint16>(symbol);
+                                p_rgba.red += static_cast<unsigned char>(symbol);
 
-                                p +=  predictor_grayscale_16(image,r,c);
-                                assign_pixel(image[r][c],p);
+                                edm.decode(symbol);
+                                p_rgba.green += static_cast<unsigned char>(symbol);
+
+                                edm.decode(symbol);
+                                p_rgba.blue += static_cast<unsigned char>(symbol);
+
+                                edm.decode(symbol);
+                                p_rgba.alpha += static_cast<unsigned char>(symbol);
+
+                                assign_pixel(image[r][c],p_rgba);
                             }
                         }
-                    }
-                    break;
+                        break;
 
-                default:
+                    case rgb_paeth:
+
+                        for (long r = 0; r < image.nr(); ++r)
+                        {
+                            for (long c = 0; c < image.nc(); ++c)
+                            {
+                                p_rgb = predictor_rgb_paeth(image,r,c);
+                                edm.decode(symbol);
+                                p_rgb.red += static_cast<unsigned char>(symbol);
+
+                                edm.decode(symbol);
+                                p_rgb.green += static_cast<unsigned char>(symbol);
+
+                                edm.decode(symbol);
+                                p_rgb.blue += static_cast<unsigned char>(symbol);
+
+                                assign_pixel(image[r][c],p_rgb);
+                            }
+                        }
+                        break;
+
+                    case rgb:
+
+                        for (long r = 0; r < image.nr(); ++r)
+                        {
+                            for (long c = 0; c < image.nc(); ++c)
+                            {
+                                p_rgb = predictor_rgb(image,r,c);
+                                edm.decode(symbol);
+                                p_rgb.red += static_cast<unsigned char>(symbol);
+
+                                edm.decode(symbol);
+                                p_rgb.green += static_cast<unsigned char>(symbol);
+
+                                edm.decode(symbol);
+                                p_rgb.blue += static_cast<unsigned char>(symbol);
+
+                                assign_pixel(image[r][c],p_rgb);
+                            }
+                        }
+                        break;
+
+                    case hsi:
+
+                        for (long r = 0; r < image.nr(); ++r)
+                        {
+                            for (long c = 0; c < image.nc(); ++c)
+                            {
+                                p_hsi = predictor_hsi(image,r,c);
+                                edm.decode(symbol);
+                                p_hsi.h += static_cast<unsigned char>(symbol);
+
+                                edm.decode(symbol);
+                                p_hsi.s += static_cast<unsigned char>(symbol);
+
+                                edm.decode(symbol);
+                                p_hsi.i += static_cast<unsigned char>(symbol);
+
+                                assign_pixel(image[r][c],p_hsi);
+                            }
+                        }
+                        break;
+
+                    case grayscale:
+                        {
+                            unsigned char p;
+                            for (long r = 0; r < image.nr(); ++r)
+                            {
+                                for (long c = 0; c < image.nc(); ++c)
+                                {
+                                    edm.decode(symbol);
+                                    p = static_cast<unsigned char>(symbol);
+                                    p +=  predictor_grayscale(image,r,c);
+                                    assign_pixel(image[r][c],p);
+                                }
+                            }
+                        }
+                        break;
+
+                    case grayscale_16bit:
+                        {
+                            uint16 p;
+                            for (long r = 0; r < image.nr(); ++r)
+                            {
+                                for (long c = 0; c < image.nc(); ++c)
+                                {
+                                    edm.decode(symbol);
+                                    p = static_cast<uint16>(symbol);
+                                    p <<= 8;
+                                    edm.decode(symbol);
+                                    p |= static_cast<uint16>(symbol);
+
+                                    p +=  predictor_grayscale_16(image,r,c);
+                                    assign_pixel(image[r][c],p);
+                                }
+                            }
+                        }
+                        break;
+
+                    default:
+                        throw image_load_error("corruption detected in the dng file");
+                } // switch (type)
+
+                edm.decode(symbol);
+                if (symbol != dng_magic_byte)
                     throw image_load_error("corruption detected in the dng file");
-            } // switch (type)
+                edm.decode(symbol);
+                if (symbol != dng_magic_byte)
+                    throw image_load_error("corruption detected in the dng file");
+                edm.decode(symbol);
+                if (symbol != dng_magic_byte)
+                    throw image_load_error("corruption detected in the dng file");
+                edm.decode(symbol);
+                if (symbol != dng_magic_byte)
+                    throw image_load_error("corruption detected in the dng file");
+            }
+            else // if this is a grayscale_float type image
+            {
+                std::vector<int64> man(image.size());
+                std::vector<char> expbuf;
+                // get the mantissa data
+                for (unsigned long i = 0; i < man.size(); ++i)
+                    deserialize(man[i], in);
+                // get the compressed exponent data
+                deserialize(expbuf, in);
+                typedef entropy_decoder::kernel_2a decoder_type;
+                typedef entropy_decoder_model<256,decoder_type>::kernel_4a edm_exp_type; 
+                vectorstream inexp(expbuf);
+                decoder_type decoder;
+                decoder.set_stream(inexp);
 
-            edm.decode(symbol);
-            if (symbol != dng_magic_byte)
-                throw image_load_error("corruption detected in the dng file");
-            edm.decode(symbol);
-            if (symbol != dng_magic_byte)
-                throw image_load_error("corruption detected in the dng file");
-            edm.decode(symbol);
-            if (symbol != dng_magic_byte)
-                throw image_load_error("corruption detected in the dng file");
-            edm.decode(symbol);
-            if (symbol != dng_magic_byte)
-                throw image_load_error("corruption detected in the dng file");
+                edm_exp_type edm_exp(decoder);
+                float_details prev;
+                unsigned long i = 0;
+                // fill out the image 
+                for (long r = 0; r < image.nr(); ++r)
+                {
+                    for (long c = 0; c < image.nc(); ++c)
+                    {
+                        unsigned long exp1, exp2;
+                        edm_exp.decode(exp1);
+                        edm_exp.decode(exp2);
+
+                        float_details cur(man[i++],(exp2<<8) | exp1);
+                        cur.exponent += prev.exponent;
+                        cur.mantissa += prev.mantissa;
+                        prev = cur;
+                        
+                        // Only use long double precision if the target image contains long
+                        // doubles because it's slower to use those.
+                        if (!is_same_type<typename image_type::type,long double>::value)
+                        {
+                            double temp = cur;
+                            assign_pixel(image[r][c],temp);
+                        }
+                        else
+                        {
+                            long double temp = cur;
+                            assign_pixel(image[r][c],temp);
+                        }
+                    }
+                }
+                unsigned long symbol;
+                edm_exp.decode(symbol);
+                if (symbol != dng_magic_byte)
+                    throw image_load_error("corruption detected in the dng file");
+                edm_exp.decode(symbol);
+                if (symbol != dng_magic_byte)
+                    throw image_load_error("corruption detected in the dng file");
+                edm_exp.decode(symbol);
+                if (symbol != dng_magic_byte)
+                    throw image_load_error("corruption detected in the dng file");
+                edm_exp.decode(symbol);
+                if (symbol != dng_magic_byte)
+                    throw image_load_error("corruption detected in the dng file");
+            }
         }
         catch (...)
         {

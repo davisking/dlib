@@ -20,7 +20,8 @@ namespace dlib
             rgb_paeth,
             rgb_alpha,
             rgb_alpha_paeth,
-            grayscale_16bit
+            grayscale_16bit,
+            grayscale_float
         };
 
         const unsigned long dng_magic_byte = 100;

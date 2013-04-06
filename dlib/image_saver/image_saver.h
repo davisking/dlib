@@ -15,6 +15,8 @@
 #include "dng_shared.h"
 #include "../uintn.h"
 #include "../dir_nav.h"
+#include "../float_details.h"
+#include "../vectorstream.h"
 
 namespace dlib
 {
@@ -249,13 +251,73 @@ namespace dlib
                 false,
                 pixel_traits<typename image_type::type>::rgb_alpha,
                 false,
-                pixel_traits<typename image_type::type>::grayscale && sizeof(typename image_type::type) != 1
+                pixel_traits<typename image_type::type>::grayscale && sizeof(typename image_type::type) != 1 && 
+                    !is_float_type<typename image_type::type>::value,
+                is_float_type<typename image_type::type>::value
                 >::value
             >
         struct save_dng_helper;
 
         typedef entropy_encoder::kernel_2a encoder_type;
         typedef entropy_encoder_model<256,encoder_type>::kernel_5a eem_type; 
+
+        typedef entropy_encoder_model<256,encoder_type>::kernel_4a eem_exp_type; 
+
+        template <typename image_type >
+        struct save_dng_helper<image_type, grayscale_float>
+        {
+            static void save_dng (
+                const image_type& image,
+                std::ostream& out 
+            )
+            {
+                out.write("DNG",3);
+                unsigned long version = 1;
+                serialize(version,out);
+                unsigned long type = grayscale_float;
+                serialize(type,out);
+                serialize(image.nc(),out);
+                serialize(image.nr(),out);
+
+
+                // Write the compressed exponent data into expbuf.  We will append it
+                // to the stream at the end of the loops.
+                std::vector<char> expbuf;
+                expbuf.reserve(image.size()*2);
+                vectorstream outexp(expbuf);
+                encoder_type encoder;
+                encoder.set_stream(outexp);
+
+                eem_exp_type eem_exp(encoder);
+                float_details prev;
+                for (long r = 0; r < image.nr(); ++r)
+                {
+                    for (long c = 0; c < image.nc(); ++c)
+                    {
+                        float_details cur = image[r][c];
+                        int16 exp = cur.exponent-prev.exponent;
+                        int64 man = cur.mantissa-prev.mantissa;
+                        prev = cur;
+
+                        unsigned char ebyte1 = exp&0xFF;
+                        unsigned char ebyte2 = exp>>8;
+                        eem_exp.encode(ebyte1);
+                        eem_exp.encode(ebyte2);
+
+                        serialize(man, out);
+                    }
+                }
+                // write out the magic byte to mark the end of the compressed data.
+                eem_exp.encode(dng_magic_byte);
+                eem_exp.encode(dng_magic_byte);
+                eem_exp.encode(dng_magic_byte);
+                eem_exp.encode(dng_magic_byte);
+
+                encoder.clear();
+                serialize(expbuf, out);
+            }
+        };
+
 
         template <typename image_type >
         struct save_dng_helper<image_type, grayscale_16bit>
