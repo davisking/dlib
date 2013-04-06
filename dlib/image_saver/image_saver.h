@@ -325,7 +325,8 @@ namespace dlib
                     {
                         unsigned char cur;
                         assign_pixel(cur, image[r][c]);
-                        eem.encode(cur - predictor_grayscale(image,r,c));
+                        cur -= predictor_grayscale(image,r,c);
+                        eem.encode(cur);
                     }
                 }
                 // write out the magic byte to mark the end of the data

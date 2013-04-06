@@ -488,7 +488,7 @@ namespace
             {
                 for (long c = 0; c < 15; ++c)
                 {
-                    img[r][c] = static_cast<unsigned char>(r*14 + c);
+                    img[r][c] = static_cast<unsigned char>(r*14 + c*111);
                 }
             }
 
@@ -514,7 +514,7 @@ namespace
                 {
                     for (long c = 0; c < 15; ++c)
                     {
-                        DLIB_TEST(img[r][c] == r*14 + c);
+                        DLIB_TEST(img[r][c] == static_cast<unsigned char>(r*14 + c*111));
                     }
                 }
 
@@ -532,7 +532,7 @@ namespace
                 {
                     for (long c = 0; c < 15; ++c)
                     {
-                        DLIB_TEST(img[r][c] == r*14 + c);
+                        DLIB_TEST(img[r][c] == static_cast<unsigned char>(r*14 + c*111));
                     }
                 }
             }
