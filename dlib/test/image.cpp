@@ -1394,6 +1394,29 @@ namespace
         DLIB_TEST(max(abs(mat(img) - matrix_cast<T>(mat(img3)))) < scale*std::numeric_limits<long double>::epsilon());
     }
 
+    void test_dng_float_int()
+    {
+        dlog << LINFO << "in test_dng_float_int";
+        print_spinner();
+
+        array2d<uint16> img;
+        assign_image(img, gaussian_randm(101,100)*10000);
+
+        ostringstream sout;
+        save_dng(img, sout);
+        istringstream sin(sout.str());
+        array2d<double> img2;
+        load_dng(img2, sin);
+        sout.clear(); sout.str("");
+
+        save_dng(img2, sout);
+        sin.clear(); sin.str(sout.str());
+        array2d<uint16> img3;
+        load_dng(img3, sin);
+
+        // this whole thing should have been totally lossless.
+        DLIB_TEST(mat(img) == mat(img3));
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -1443,6 +1466,8 @@ namespace
             test_dng_floats<float>(1e30);
             test_dng_floats<double>(1e30);
             test_dng_floats<long double>(1e30);
+
+            test_dng_float_int();
         }
     } a;
 
