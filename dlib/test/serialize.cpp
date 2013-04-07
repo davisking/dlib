@@ -402,7 +402,8 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    // This function returns the contents of the file 'stuff.bin'
+    // This function returns the contents of the file 'stuff.bin' but using the old 
+    // floating point serialization format.
     const std::string get_decoded_string()
     {
         dlib::base64::kernel_1a base64_coder;
@@ -418,6 +419,38 @@ namespace
         sout << "8PBcmLMJ7bFdzplwhrjuxtm4NfEOi6Rl9sU44AXycYgJd0+uH+dyoI9X3co5b3YWJtjvdVeztNAr";
         sout << "BfSPfR6oAVNfiMBG7QA=";
 
+
+        // Put the data into the istream sin
+        sin.str(sout.str());
+        sout.str("");
+
+        // Decode the base64 text into its compressed binary form
+        base64_coder.decode(sin,sout);
+        sin.clear();
+        sin.str(sout.str());
+        sout.str("");
+
+        // Decompress the data into its original form
+        compressor.decompress(sin,sout);
+
+        // Return the decoded and decompressed data
+        return sout.str();
+    }
+
+
+    // This function returns the contents of the file 'stuff.bin' but using the new 
+    // floating point serialization format.
+    const std::string get_decoded_string2()
+    {
+        dlib::base64 base64_coder;
+        dlib::compress_stream::kernel_1ea compressor;
+        std::ostringstream sout;
+        std::istringstream sin;
+
+        // The base64 encoded data from the file 'stuff.bin' we want to decode and return.
+        sout << "AVaifX9zEbXa9aocsrcRuvnNqzZLptZ5mRd46xScCIfX6sq/46hG9JwIInElG50EtJKJY/+jAWit";
+        sout << "TpDBWrxBz124JRLsBz62h0D3Tqgnd8zygRx7t33Ybw40o07MrhzNEHgYavUukaPje5by78JIWHgk";
+        sout << "l7nb/TK+9ndVLrAThJ4v+GiPT3kh9H1tAAAAAQhbLa06pQjhrnjTXcRox1ZBEAV9/q1zAA==";
 
         // Put the data into the istream sin
         sin.str(sout.str());
@@ -481,11 +514,19 @@ namespace
 
         sin.clear();
         sin.str(get_decoded_string());
-
         deserialize(obj,sin);
         obj.assert_in_state_1();
         deserialize(obj,sin);
         obj.assert_in_state_2();
+
+
+        sin.clear();
+        sin.str(get_decoded_string2());
+        deserialize(obj,sin);
+        obj.assert_in_state_1();
+        deserialize(obj,sin);
+        obj.assert_in_state_2();
+
 
         /*
         // This is the code that produced the encoded data stored in the get_decoded_string() function
