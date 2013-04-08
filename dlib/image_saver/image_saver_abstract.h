@@ -92,7 +92,7 @@ namespace dlib
               corner of the image.
             - This routine can save images containing any type of pixel.  However, the DNG
               format can natively store only the following pixel types: rgb_pixel,
-              hsi_pixel, rgb_alpha_pixel, uint8, uint16, float, double, and long double.
+              hsi_pixel, rgb_alpha_pixel, uint8, uint16, float, and double.
               All other pixel types will be converted into one of these types as
               appropriate before being saved to disk.
         throws
