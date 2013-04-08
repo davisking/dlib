@@ -836,8 +836,8 @@
             <p>
                This routine can save images containing any type of pixel.  However, the DNG format
                can natively store only the following pixel types: <b>rgb_pixel</b>, <b>hsi_pixel</b>,
-               <b>rgb_alpha_pixel</b>, <b>uint8</b>, <b>uint16</b>, <b>float</b>, <b>double</b>, 
-               and <b>long double</b>.  All other pixel types will be converted
+               <b>rgb_alpha_pixel</b>, <b>uint8</b>, <b>uint16</b>, <b>float</b>, and <b>double</b>.  
+               All other pixel types will be converted
                into one of these types as appropriate before being saved to disk.
             </p>
 
