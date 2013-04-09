@@ -84,12 +84,14 @@ int main()
         */
 
 
-        // If we want an overall measure of ranking accuracy, we can find out
-        // how often a non-relevant vector was ranked ahead of a relevant
-        // vector using test_ranking_function().  In this case, it returns a
-        // value of 1, indicating that the rank function outputs a perfect
-        // ranking.
-        cout << "accuracy: " << test_ranking_function(rank, data) << endl;
+        // If we want an overall measure of ranking accuracy we can compute the
+        // ordering accuracy and mean average precision values by calling
+        // test_ranking_function().  In this case, the ordering accuracy tells
+        // us how often a non-relevant vector was ranked ahead of a relevant
+        // vector.  This function will return a 1 by 2 matrix containing these
+        // measures.  In this case, it returns 1 1 indicating that the rank
+        // function outputs a perfect ranking.
+        cout << "testing (ordering accuracy, mean average precision): " << test_ranking_function(rank, data) << endl;
 
         // We can also see the ranking weights:
         cout << "learned ranking weights: \n" << rank.basis_vectors(0) << endl;
@@ -135,8 +137,10 @@ int main()
         // splitting the queries up into folds.  That is, it lets the trainer
         // train on a subset of ranking_pair instances and tests on the rest.
         // It does this over 4 different splits and returns the overall ranking
-        // accuracy based on the held out data.
-        cout << "cv-accuracy: "<< cross_validate_ranking_trainer(trainer, queries, 4) << endl;
+        // accuracy based on the held out data.  Just like test_ranking_function(),
+        // it reports both the ordering accuracy and mean average precision.
+        cout << "cross-validation (ordering accuracy, mean average precision): " 
+             << cross_validate_ranking_trainer(trainer, queries, 4) << endl;
 
     }
     catch (std::exception& e)
