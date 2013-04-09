@@ -216,6 +216,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        inline bool compare_first_reverse_second (
+            const std::pair<double,bool>& a,
+            const std::pair<double,bool>& b
+        )
+        {
+            if (a.first < b.first)
+                return true;
+            else if (a.first > b.first)
+                return false;
+            else if (a.second == true)
+                return true;
+            else
+                return false;
+        }
+    }
+
     template <
         typename ranking_function,
         typename T
@@ -264,8 +282,11 @@ namespace dlib
             }
 
             // Now compute the average precision for this sample.  We need to sort the
-            // results and the back them into total_ranking.
-            std::sort(total_scores.rbegin(), total_scores.rend());
+            // results and the back them into total_ranking.  Note that we sort them so
+            // that, if you get a block of ranking values that are all equal, the elements
+            // marked as true will come last.  This prevents a ranking from outputting a
+            // constant value for everything and still getting a good MAP score.
+            std::sort(total_scores.rbegin(), total_scores.rend(), impl::compare_first_reverse_second);
             total_ranking.clear();
             for (unsigned long i = 0; i < total_scores.size(); ++i)
                 total_ranking.push_back(total_scores[i].second);
@@ -390,8 +411,11 @@ namespace dlib
                 }
 
                 // Now compute the average precision for this sample.  We need to sort the
-                // results and the back them into total_ranking.
-                std::sort(total_scores.rbegin(), total_scores.rend());
+                // results and the back them into total_ranking.  Note that we sort them so
+                // that, if you get a block of ranking values that are all equal, the elements
+                // marked as true will come last.  This prevents a ranking from outputting a
+                // constant value for everything and still getting a good MAP score.
+                std::sort(total_scores.rbegin(), total_scores.rend(), impl::compare_first_reverse_second);
                 total_ranking.clear();
                 for (unsigned long i = 0; i < total_scores.size(); ++i)
                     total_ranking.push_back(total_scores[i].second);

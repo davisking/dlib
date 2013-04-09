@@ -181,7 +181,8 @@ namespace dlib
                 - M(1) == the mean average precision of the rankings induced by funct.
                   (Mean average precision is a number in the range 0 to 1.  Moreover, a
                   mean average precision of 1 means everything was correctly predicted
-                  while smaller values indicate worse rankings.)
+                  while smaller values indicate worse rankings.  See the documentation
+                  for average_precision() for details of its computation.)
     !*/
 
 // ----------------------------------------------------------------------------------------
