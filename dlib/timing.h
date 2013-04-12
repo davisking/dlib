@@ -9,6 +9,8 @@
 
 #include <iostream>
 
+// ----------------------------------------------------------------------------------------
+
 /*!A timing
 
     This set of functions is useful for determining how much time is spent
@@ -39,7 +41,33 @@
             block #2: 10.0 seconds
 
     So we spent 5 seconds in block #1 and 10 seconds in block #2
+
+
+
+    Additionally, note that you can use an RAII style timing block object.  For
+    example, if we wanted to find out how much time we spent in a loop a convenient
+    way to do this would be as follows:
+
+    int main()
+    {
+        using namespace dlib::timing;
+        for (int i = 0; i < 10; ++i)
+        {
+            block tb(1, "main loop");
+
+            dlib::sleep(1500);
+        } 
+
+        print();
+    }
+
+    This program would output:
+        Timing report: 
+            block main loop: 15.0 seconds
+
 !*/
+
+// ----------------------------------------------------------------------------------------
 
 namespace dlib
 {
