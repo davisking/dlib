@@ -67,10 +67,11 @@ namespace dlib
         requires
             - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
             - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename out_image_type::type>::grayscale == true  
-            - pixel_traits<typename in_image_type::type>::has_alpha == false
-            - pixel_traits<typename out_image_type::type>::has_alpha == false 
+            - pixel_traits<typename in_image_type::type>::max() <= 65535 
+            - pixel_traits<typename in_image_type::type>::has_alpha   == false
             - pixel_traits<typename in_image_type::type>::is_unsigned == true 
+            - pixel_traits<typename out_image_type::type>::grayscale  == true  
+            - pixel_traits<typename out_image_type::type>::has_alpha  == false 
             - pixel_traits<typename out_image_type::type>::is_unsigned == true 
         ensures
             - #out_img == the thresholded version of in_img (in_img is converted to a grayscale
