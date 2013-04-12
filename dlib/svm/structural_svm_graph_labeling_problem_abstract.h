@@ -55,6 +55,20 @@ namespace dlib
                     - All vectors have non-zero size.  That is, they have more than 0 dimensions.
     !*/
 
+    template <
+        typename graph_type
+        >
+    bool is_graph_labeling_problem (
+        const dlib::array<graph_type>& samples,
+        const std::vector<std::vector<bool> >& labels,
+        std::string& reason_for_failure
+    );
+    /*!
+        This function is identical to the above version of is_graph_labeling_problem()
+        except that if it returns false it will populate reason_for_failure with a message
+        describing why the graph is not a valid learning problem.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <
