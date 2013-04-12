@@ -93,6 +93,12 @@ namespace dlib
             return m*p + b;
         }
 
+        const matrix<double,2,2>& get_m(
+        ) const { return m; }
+
+        const dlib::vector<double,2>& get_b(
+        ) const { return b; }
+
     private:
         matrix<double,2,2> m;
         dlib::vector<double,2> b;

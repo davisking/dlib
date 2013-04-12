@@ -26,6 +26,8 @@ namespace dlib
         );
         /*!
             ensures
+                - #get_m() == m
+                - #get_b() == b
                 - When (*this)(p) is invoked it will return a point P such that:
                     - P == m*p + b
         !*/
@@ -37,6 +39,20 @@ namespace dlib
             ensures
                 - applies the affine transformation defined by this object's constructor
                   to p and returns the result.
+        !*/
+
+        const matrix<double,2,2>& get_m(
+        ) const;
+        /*!
+            ensures
+                - returns the transformation matrix used by this object.
+        !*/
+
+        const dlib::vector<double,2>& get_b(
+        ) const;
+        /*!
+            ensures
+                - returns the offset vector used by this object.
         !*/
 
     };
