@@ -17,7 +17,7 @@ namespace dlib
 
     namespace impl
     {
-        bool matches_rect (
+        inline bool matches_rect (
             const std::vector<rectangle>& rects,
             const rectangle& rect,
             const double eps
@@ -33,7 +33,7 @@ namespace dlib
             return false;
         }
 
-        rectangle get_best_matching_rect (
+        inline rectangle get_best_matching_rect (
             const std::vector<rectangle>& rects,
             const rectangle& rect
         ) 
