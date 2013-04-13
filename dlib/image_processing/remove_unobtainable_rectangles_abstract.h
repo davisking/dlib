@@ -33,7 +33,7 @@ namespace dlib
               as object detections since it only considers a limited subset of all possible
               object positions.  Moreover, the structural_object_detection_trainer requires
               its input training data to not contain any object positions which are unobtainable
-              by its scanner object.  Therefore, the remove_unobtainable_rectangles() is a tool
+              by its scanner object.  Therefore, remove_unobtainable_rectangles() is a tool
               to filter out these unobtainable rectangles from the training data before giving
               it to a structural_object_detection_trainer.
             - This function interprets object_locations[i] as the set of object positions for
@@ -65,7 +65,7 @@ namespace dlib
               as object detections since it only considers a limited subset of all possible
               object positions.  Moreover, the structural_object_detection_trainer requires
               its input training data to not contain any object positions which are unobtainable
-              by its scanner object.  Therefore, the remove_unobtainable_rectangles() is a tool
+              by its scanner object.  Therefore, remove_unobtainable_rectangles() is a tool
               to filter out these unobtainable rectangles from the training data before giving
               it to a structural_object_detection_trainer.
             - This function interprets object_locations[i] as the set of object positions for
