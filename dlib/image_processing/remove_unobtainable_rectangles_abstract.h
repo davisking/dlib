@@ -3,7 +3,6 @@
 #undef DLIB_REMOVE_UnOBTAINABLE_RECTANGLES_ABSTRACT_H__
 #ifdef DLIB_REMOVE_UnOBTAINABLE_RECTANGLES_ABSTRACT_H__
 
-#include "remove_unobtainable_rectangles_abstract.h"
 #include "scan_image_pyramid_abstract.h"
 #include "scan_image_boxes_abstract.h"
 #include "../svm/structural_object_detection_trainer_abstract.h"
