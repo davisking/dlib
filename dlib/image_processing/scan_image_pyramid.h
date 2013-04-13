@@ -243,6 +243,7 @@ namespace dlib
         serialize(item.max_pyramid_levels, out);
         serialize(item.min_pyramid_layer_width, out);
         serialize(item.min_pyramid_layer_height, out);
+        serialize(item.get_num_dimensions(), out);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -265,6 +266,15 @@ namespace dlib
         deserialize(item.max_pyramid_levels, in);
         deserialize(item.min_pyramid_layer_width, in);
         deserialize(item.min_pyramid_layer_height, in);
+
+        // When developing some feature extractor, it's easy to accidentally change its
+        // number of dimensions and then try to deserialize data from an older version of
+        // your extractor into the current code.  This check is here to catch that kind of
+        // user error.
+        long dims;
+        deserialize(dims, in);
+        if (item.get_num_dimensions() != dims)
+            throw serialization_error("Number of dimensions in serialized scan_image_pyramid don't match the expected number.");
     }
 
 // ----------------------------------------------------------------------------------------
