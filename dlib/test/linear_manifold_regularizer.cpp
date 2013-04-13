@@ -40,10 +40,11 @@ namespace
         }
     }
 
+    template <typename scalar_type>
     void test_knn_lsh_sparse()
     {
         dlib::rand rnd;
-        std::vector<std::map<unsigned long,double> > samples;
+        std::vector<std::map<unsigned long,scalar_type> > samples;
         samples.resize(20);
         for (unsigned int i = 0; i < samples.size(); ++i)
         {
@@ -57,10 +58,11 @@ namespace
         test_find_k_nearest_neighbors_lsh<hash_similar_angles_512>(samples);
     }
 
+    template <typename scalar_type>
     void test_knn_lsh_dense()
     {
         dlib::rand rnd;
-        std::vector<matrix<double,0,1> > samples;
+        std::vector<matrix<scalar_type,0,1> > samples;
         samples.resize(20);
         for (unsigned int i = 0; i < samples.size(); ++i)
         {
@@ -386,8 +388,10 @@ namespace
             }
             test_knn1();
             test_knn2();
-            test_knn_lsh_sparse();
-            test_knn_lsh_dense();
+            test_knn_lsh_sparse<double>();
+            test_knn_lsh_sparse<float>();
+            test_knn_lsh_dense<double>();
+            test_knn_lsh_dense<float>();
 
         }
     };

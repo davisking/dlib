@@ -57,10 +57,11 @@ namespace dlib
             const matrix_exp<EXP>& v
         ) const
         {
+            typedef typename EXP::type T;
             uint64 temp = 0;
             for (unsigned long i = 0; i < 64; ++i)
             {
-                if (dot(gaussian_randm(v.size(),1,i+seed*64), v) > 0)
+                if (dot(matrix_cast<T>(gaussian_randm(v.size(),1,i+seed*64)), v) > 0)
                     temp |= 1;
                 temp <<= 1;
             }
