@@ -88,6 +88,7 @@
          <item>scan_image_boxes</item>
          <item>find_candidate_object_locations</item>
          <item>test_box_overlap</item>
+         <item>remove_unobtainable_rectangles</item>
          <item>setup_hashed_features</item>
          <item nolink="true">
             <name>Scan Image Pyramid Tools</name>
@@ -1761,6 +1762,26 @@
          <description>        
             This object is a simple function object for determining if two 
             <a href="linear_algebra.html#rectangle">rectangles</a> overlap.  
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>remove_unobtainable_rectangles</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/remove_unobtainable_rectangles_abstract.h</spec_file>
+         <description>        
+            Recall that the <a href="#scan_image_pyramid">scan_image_pyramid</a> and 
+            <a href="#scan_image_boxes">scan_image_boxes</a> objects can't produce
+            all possible rectangles as object detections since they only
+            consider a limited subset of all possible object positions.
+            Therefore, when training an object detector that uses these tools
+            you must make sure the training data does not contain any object
+            locations that are unobtainable by the image scanning model.
+            The remove_unobtainable_rectangles() routine is a tool to filter out
+            these unobtainable rectangles from the training.
          </description>
                                  
       </component>

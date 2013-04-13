@@ -1215,6 +1215,7 @@
          <term file="imaging.html" name="surf_point"              include="dlib/image_keypoint.h"/>
 
          <term file="imaging.html" name="test_box_overlap"        include="dlib/image_processing.h"/>
+         <term file="imaging.html" name="remove_unobtainable_rectangles"        include="dlib/image_processing.h"/>
          <term file="imaging.html" name="object_detector"         include="dlib/image_processing.h"/>
          <term file="imaging.html" name="full_object_detection"   include="dlib/image_processing.h"/>
          <term file="dlib/image_processing/full_object_detection_abstract.h.html" name="all_parts_in_rect" include="dlib/image_processing.h"/>
