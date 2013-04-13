@@ -136,19 +136,19 @@ int main()
 
     sample(0) = 3.123;
     sample(1) = 2;
-    cout << "This sample should be >= 0 and it is classified as a " << learned_function(sample) << endl;
+    cout << "This is a +1 class example, the classifier output is " << learned_function(sample) << endl;
 
     sample(0) = 3.123;
     sample(1) = 9.3545;
-    cout << "This sample should be >= 0 and it is classified as a " << learned_function(sample) << endl;
+    cout << "This is a +1 class example, the classifier output is " << learned_function(sample) << endl;
 
     sample(0) = 13.123;
     sample(1) = 9.3545;
-    cout << "This sample should be < 0 and it is classified as a " << learned_function(sample) << endl;
+    cout << "This is a -1 class example, the classifier output is " << learned_function(sample) << endl;
 
     sample(0) = 13.123;
     sample(1) = 0;
-    cout << "This sample should be < 0 and it is classified as a " << learned_function(sample) << endl;
+    cout << "This is a -1 class example, the classifier output is " << learned_function(sample) << endl;
 
 
     // We can also train a decision function that reports a well conditioned probability 
@@ -174,19 +174,23 @@ int main()
 
     sample(0) = 3.123;
     sample(1) = 2;
-    cout << "This +1 example should have high probability.  Its probability is: " << learned_pfunct(sample) << endl;
+    cout << "This +1 class example should have high probability.  Its probability is: " 
+         << learned_pfunct(sample) << endl;
 
     sample(0) = 3.123;
     sample(1) = 9.3545;
-    cout << "This +1 example should have high probability.  Its probability is: " << learned_pfunct(sample) << endl;
+    cout << "This +1 class example should have high probability.  Its probability is: " 
+         << learned_pfunct(sample) << endl;
 
     sample(0) = 13.123;
     sample(1) = 9.3545;
-    cout << "This -1 example should have low probability.  Its probability is: " << learned_pfunct(sample) << endl;
+    cout << "This -1 class example should have low probability.  Its probability is: " 
+         << learned_pfunct(sample) << endl;
 
     sample(0) = 13.123;
     sample(1) = 0;
-    cout << "This -1 example should have low probability.  Its probability is: " << learned_pfunct(sample) << endl;
+    cout << "This -1 class example should have low probability.  Its probability is: " 
+         << learned_pfunct(sample) << endl;
 
 
 
