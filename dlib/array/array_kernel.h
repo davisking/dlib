@@ -89,6 +89,19 @@ namespace dlib
             _at_start(true)
         {}
 
+        explicit array (
+            unsigned long new_size
+        ) :
+            array_size(0),
+            max_array_size(0),
+            array_elements(0),
+            pos(0),
+            last_pos(0),
+            _at_start(true)
+        {
+            resize(new_size);
+        }
+
         ~array (
         ); 
 

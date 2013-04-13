@@ -64,6 +64,19 @@ namespace dlib
                     - std::bad_alloc or any exception thrown by T's constructor
             !*/
 
+            explicit array (
+                unsigned long new_size
+            );
+            /*!
+                ensures 
+                    - #*this is properly initialized
+                    - #size() == new_size
+                    - #max_size() == new_size
+                    - All elements of the array will have initial values for their type.
+                throws
+                    - std::bad_alloc or any exception thrown by T's constructor
+            !*/
+
             ~array (
             ); 
             /*!

@@ -42,6 +42,11 @@ namespace
         array a1, a2;
 
         {
+            array a4(4);
+            DLIB_TEST(a4.size() == 4);
+        }
+
+        {
             array a1, a2;
 
             for (int k = 1; k < 100000; k += 1000)
