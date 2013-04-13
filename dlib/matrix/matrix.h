@@ -1694,8 +1694,12 @@ namespace dlib
     {
         try
         {
-            serialize(item.nr(),out);
-            serialize(item.nc(),out);
+            // The reason the serialization is a little funny is because we are trying to
+            // maintain backwards compatibility with an older serialization format used by
+            // dlib while also encoding things in a way that lets the array2d and matrix
+            // objects have compatible serialization formats.
+            serialize(-item.nr(),out);
+            serialize(-item.nc(),out);
             for (long r = 0; r < item.nr(); ++r)
             {
                 for (long c = 0; c < item.nc(); ++c)
@@ -1727,6 +1731,13 @@ namespace dlib
             long nr, nc;
             deserialize(nr,in); 
             deserialize(nc,in); 
+
+            // this is the newer serialization format
+            if (nr < 0 || nc < 0)
+            {
+                nr *= -1;
+                nc *= -1;
+            }
 
             if (NR != 0 && nr != NR)
                 throw serialization_error("Error while deserializing a dlib::matrix.  Invalid rows");

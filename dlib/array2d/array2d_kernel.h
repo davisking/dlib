@@ -364,8 +364,12 @@ namespace dlib
     {
         try
         {
-            serialize(item.nc(),out);
-            serialize(item.nr(),out);
+            // The reason the serialization is a little funny is because we are trying to
+            // maintain backwards compatibility with an older serialization format used by
+            // dlib while also encoding things in a way that lets the array2d and matrix
+            // objects have compatible serialization formats.
+            serialize(-item.nr(),out);
+            serialize(-item.nc(),out);
 
             item.reset();
             while (item.move_next())
@@ -389,9 +393,20 @@ namespace dlib
     {
         try
         {
-            long nc, nr;
-            deserialize(nc,in);
+            long nr, nc;
             deserialize(nr,in);
+            deserialize(nc,in);
+
+            // this is the newer serialization format
+            if (nr < 0 || nc < 0)
+            {
+                nr *= -1;
+                nc *= -1;
+            }
+            else
+            {
+                std::swap(nr,nc);
+            }
 
             item.set_size(nr,nc);
 

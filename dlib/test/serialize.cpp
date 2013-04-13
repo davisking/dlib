@@ -11,8 +11,31 @@
 #include <cstdlib>
 #include <ctime>
 #include <dlib/serialize.h>
+#include <dlib/image_transforms.h>
 
 #include "tester.h"
+
+namespace dlib
+{
+    static bool operator!=(const rgb_pixel& a, const rgb_pixel& b)
+    {
+        return !(a.red==b.red && a.green==b.green && a.blue==b.blue);
+    }
+    static bool operator!=(const bgr_pixel& a, const bgr_pixel& b)
+    {
+        return !(a.red==b.red && a.green==b.green && a.blue==b.blue);
+    }
+
+    static bool operator!=(const hsi_pixel& a, const hsi_pixel& b)
+    {
+        return !(a.h==b.h && a.s==b.s && a.i==b.i);
+    }
+    static bool operator!=(const rgb_alpha_pixel& a, const rgb_alpha_pixel& b)
+    {
+        return !(a.red==b.red && a.green==b.green && a.blue==b.blue && a.alpha==b.alpha);
+    }
+
+}
 
 namespace  
 {
@@ -606,6 +629,290 @@ namespace
         }
     }
 
+// ----------------------------------------------------------------------------------------
+
+    // This function returns the contents of the file 'matarray.dat'
+    const std::string get_decoded_string_matarray_old()
+    {
+        dlib::base64 base64_coder;
+        dlib::compress_stream::kernel_1ea compressor;
+        std::ostringstream sout;
+        std::istringstream sin;
+
+        // The base64 encoded data from the file 'matarray.dat' we want to decode and return.
+        sout << "AW852sEbTIeV+m/wLUcKJKPW+6IclviUWZcFh1daDZ0N1GEsXBXYsBKzd156yMx/t+/cCJ72d2cY";
+        sout << "jVpBEcAbMvd7Xhk5rXTHBZEjKPchuJJFKO9IQ1iXT54bO3OfiB1UlBWrGipP4Mm3iW9YdijOrBA9";
+        sout << "fodGeONYdO9P4b9400xpetxH7rHjTvR3tWtdvyrlN3G8PlyPtt/aGvZ+KRSGcYWQ+CBt1KSl0wA=";
+
+        // Put the data into the istream sin
+        sin.str(sout.str());
+        sout.str("");
+
+        // Decode the base64 text into its compressed binary form
+        base64_coder.decode(sin,sout);
+        sin.clear();
+        sin.str(sout.str());
+        sout.str("");
+
+        // Decompress the data into its original form
+        compressor.decompress(sin,sout);
+
+        // Return the decoded and decompressed data
+        return sout.str();
+    }
+
+    // This function returns the contents of the file 'matarray.dat'
+    const std::string get_decoded_string_matarray()
+    {
+        dlib::base64 base64_coder;
+        dlib::compress_stream::kernel_1ea compressor;
+        std::ostringstream sout;
+        std::istringstream sin;
+
+        // The base64 encoded data from the file 'matarray.dat' we want to decode and return.
+        sout << "gO6XH2WGbm8Xaw3a5FJbh3V823W6P2Qk/vHaAAAAARcaCBHub1vfzjWzQXEVcRlrGH04oVeKAZFt";
+        sout << "/5ek6yVNlafP4XqHfIG/pKXO1yM6kPY1+N2tnFud9qU9So1ki9C+25/uTxZtPnj/O0LdfYPkUclf";
+        sout << "EDnHwLwm4hfTSHRAcjuQYSW7OFOrbOJoQCIkU0xPTayAScN6Vmk8OWetDYgZszAS0tFAGpGAAAA=";
+
+        // Put the data into the istream sin
+        sin.str(sout.str());
+        sout.str("");
+
+        // Decode the base64 text into its compressed binary form
+        base64_coder.decode(sin,sout);
+        sin.clear();
+        sin.str(sout.str());
+        sout.str("");
+
+        // Decompress the data into its original form
+        compressor.decompress(sin,sout);
+
+        // Return the decoded and decompressed data
+        return sout.str();
+    }
+
+    void setup_mats_and_arrays (
+        array2d<int>& a,
+        matrix<int>& m,
+        array2d<unsigned char>&  img1,
+        array2d<rgb_pixel>&      img2,
+        array2d<bgr_pixel>&      img3,
+        array2d<rgb_alpha_pixel>& img4,
+        array2d<hsi_pixel>&      img5
+    )
+    {
+        a.set_size(3,5);
+        int cnt = 0;
+        for (long r = 0; r < a.nr(); ++r)
+        {
+            for (long c = 0; c < a.nc(); ++c)
+            {
+                a[r][c] = cnt++;
+            }
+        }
+        m = mat(a);
+
+        img1.set_size(3,5);
+        img2.set_size(3,5);
+        img3.set_size(3,5);
+        img4.set_size(3,5);
+        img5.set_size(3,5);
+
+        assign_all_pixels(img1, 0);
+        assign_all_pixels(img2, 0);
+        assign_all_pixels(img3, 0);
+        assign_all_pixels(img4, 0);
+        assign_all_pixels(img5, 0);
+
+        unsigned char pcnt = 0;
+        for (long r = 0; r < img1.nr(); ++r)
+        {
+            for (long c = 0; c < img1.nc(); ++c)
+            {
+                rgb_alpha_pixel temp;
+                temp.red = pcnt++;
+                temp.green = pcnt++;
+                temp.blue = pcnt++;
+                temp.alpha = pcnt++;
+                assign_pixel(img1[r][c], temp);
+                assign_pixel(img2[r][c], temp);
+                assign_pixel(img3[r][c], temp);
+                assign_pixel(img4[r][c], temp);
+                assign_pixel(img5[r][c], temp);
+            }
+        }
+
+    }
+
+
+    void test_deserialize(
+        std::istream& fin
+    )
+    {
+        array2d<int> a;
+        matrix<int> m;
+        array2d<unsigned char>  img1;
+        array2d<rgb_pixel>      img2;
+        array2d<bgr_pixel>      img3;
+        array2d<rgb_alpha_pixel> img4;
+        array2d<hsi_pixel>      img5;
+        setup_mats_and_arrays(a,m,img1,img2,img3,img4,img5);
+
+
+        array2d<unsigned char>  img1_;
+        array2d<rgb_pixel>      img2_;
+        array2d<bgr_pixel>      img3_;
+        array2d<rgb_alpha_pixel> img4_;
+        array2d<hsi_pixel>      img5_;
+
+        matrix<int> m_;
+        array2d<int> a_;
+
+        deserialize(a_, fin); DLIB_TEST(mat(a_) == mat(a));
+        deserialize(m_, fin); DLIB_TEST(mat(m_) == mat(m));
+        deserialize(a_, fin); DLIB_TEST(mat(a_) == mat(a));
+        deserialize(m_, fin); DLIB_TEST(mat(m_) == mat(m));
+
+        deserialize(img1_, fin); DLIB_TEST(mat(img1_) == mat(img1));
+        deserialize(img2_, fin); DLIB_TEST(mat(img2_) == mat(img2));
+        deserialize(img3_, fin); DLIB_TEST(mat(img3_) == mat(img3));
+        deserialize(img4_, fin); DLIB_TEST(mat(img4_) == mat(img4));
+        deserialize(img5_, fin); DLIB_TEST(mat(img5_) == mat(img5));
+    }
+
+    void test_deserialize_all_array2d(
+        std::istream& fin
+    )
+    {
+        array2d<int> a;
+        matrix<int> m;
+        array2d<unsigned char>  img1;
+        array2d<rgb_pixel>      img2;
+        array2d<bgr_pixel>      img3;
+        array2d<rgb_alpha_pixel> img4;
+        array2d<hsi_pixel>      img5;
+        setup_mats_and_arrays(a,m,img1,img2,img3,img4,img5);
+
+
+        array2d<unsigned char>  img1_;
+        array2d<rgb_pixel>      img2_;
+        array2d<bgr_pixel>      img3_;
+        array2d<rgb_alpha_pixel> img4_;
+        array2d<hsi_pixel>      img5_;
+
+        array2d<int> m_;
+        array2d<int> a_;
+
+        deserialize(a_, fin); DLIB_TEST(mat(a_) == mat(a));
+        deserialize(m_, fin); DLIB_TEST(mat(m_) == mat(m));
+        deserialize(a_, fin); DLIB_TEST(mat(a_) == mat(a));
+        deserialize(m_, fin); DLIB_TEST(mat(m_) == mat(m));
+
+        deserialize(img1_, fin); DLIB_TEST(mat(img1_) == mat(img1));
+        deserialize(img2_, fin); DLIB_TEST(mat(img2_) == mat(img2));
+        deserialize(img3_, fin); DLIB_TEST(mat(img3_) == mat(img3));
+        deserialize(img4_, fin); DLIB_TEST(mat(img4_) == mat(img4));
+        deserialize(img5_, fin); DLIB_TEST(mat(img5_) == mat(img5));
+    }
+
+    void test_deserialize_all_matrix(
+        std::istream& fin
+    )
+    {
+        array2d<int> a;
+        matrix<int> m;
+        array2d<unsigned char>  img1;
+        array2d<rgb_pixel>      img2;
+        array2d<bgr_pixel>      img3;
+        array2d<rgb_alpha_pixel> img4;
+        array2d<hsi_pixel>      img5;
+        setup_mats_and_arrays(a,m,img1,img2,img3,img4,img5);
+
+
+        matrix<unsigned char>  img1_;
+        matrix<rgb_pixel>      img2_;
+        matrix<bgr_pixel>      img3_;
+        matrix<rgb_alpha_pixel> img4_;
+        matrix<hsi_pixel>      img5_;
+
+        matrix<int> m_;
+        matrix<int> a_;
+
+        deserialize(a_, fin); DLIB_TEST(mat(a_) == mat(a));
+        deserialize(m_, fin); DLIB_TEST(mat(m_) == mat(m));
+        deserialize(a_, fin); DLIB_TEST(mat(a_) == mat(a));
+        deserialize(m_, fin); DLIB_TEST(mat(m_) == mat(m));
+
+        deserialize(img1_, fin); DLIB_TEST(mat(img1_) == mat(img1));
+        deserialize(img2_, fin); DLIB_TEST(mat(img2_) == mat(img2));
+        deserialize(img3_, fin); DLIB_TEST(mat(img3_) == mat(img3));
+        deserialize(img4_, fin); DLIB_TEST(mat(img4_) == mat(img4));
+        deserialize(img5_, fin); DLIB_TEST(mat(img5_) == mat(img5));
+    }
+
+    void test_array2d_and_matrix_serialization()
+    {
+        ostringstream sout;
+        array2d<int> a;
+        matrix<int> m;
+        array2d<unsigned char>  img1;
+        array2d<rgb_pixel>      img2;
+        array2d<bgr_pixel>      img3;
+        array2d<rgb_alpha_pixel> img4;
+        array2d<hsi_pixel>      img5;
+        setup_mats_and_arrays(a,m,img1,img2,img3,img4,img5);
+
+        serialize(a, sout);
+        serialize(m, sout);
+        serialize(a, sout);
+        serialize(m, sout);
+
+        serialize(img1, sout);
+        serialize(img2, sout);
+        serialize(img3, sout);
+        serialize(img4, sout);
+        serialize(img5, sout);
+
+    // --------------------
+
+        {
+            istringstream sin(sout.str());
+            test_deserialize(sin);
+        }
+        {
+            istringstream sin(sout.str());
+            test_deserialize_all_array2d(sin);
+        }
+        {
+            istringstream sin(sout.str());
+            test_deserialize_all_matrix(sin);
+        }
+
+
+        {
+            istringstream sin(get_decoded_string_matarray());
+            test_deserialize(sin);
+        }
+        {
+            istringstream sin(get_decoded_string_matarray());
+            test_deserialize_all_array2d(sin);
+        }
+        {
+            istringstream sin(get_decoded_string_matarray());
+            test_deserialize_all_matrix(sin);
+        }
+
+
+        {
+            // Make sure we can still deserialize the serialization 
+            // format for array2d and matrix objects used by older versions 
+            // of dlib.
+            istringstream sin(get_decoded_string_matarray_old());
+            test_deserialize(sin);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
 
     class serialize_tester : public tester
     {
@@ -630,6 +937,7 @@ namespace
             test_vector<unsigned char>();
             test_vector<int>();
             test_vector_bool();
+            test_array2d_and_matrix_serialization();
         }
     } a;
 

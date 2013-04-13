@@ -672,7 +672,9 @@ namespace dlib
         std::ostream& out
     );   
     /*!
-        Provides serialization support 
+        Provides serialization support.  Note that the serialization formats used by the
+        dlib::matrix and dlib::array2d objects are compatible.  That means you can load the
+        serialized data from one into another and it will work properly.
     !*/
 
     template <
