@@ -97,7 +97,8 @@ namespace dlib
         array<image_type,MM>& images,
         std::vector<std::vector<full_object_detection> >& object_locations,
         const std::string& filename,
-        const std::string& label 
+        const std::string& label,
+        bool skip_empty_images = false
     )
     {
         images.clear();
@@ -144,11 +145,10 @@ namespace dlib
             ret_parts_list.push_back(*i);
         }
 
-        images.resize(data.images.size());
+        image_type img;
         std::vector<full_object_detection> object_dets;
         for (unsigned long i = 0; i < data.images.size(); ++i)
         {
-            load_image(images[i], data.images[i].filename);
             object_dets.clear();
             for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
             {
@@ -167,7 +167,13 @@ namespace dlib
                     object_dets.push_back(full_object_detection(data.images[i].boxes[j].rect, partlist));
                 }
             }
-            object_locations.push_back(object_dets);
+
+            if (!skip_empty_images || object_dets.size() != 0)
+            {
+                object_locations.push_back(object_dets);
+                load_image(img, data.images[i].filename);
+                images.push_back(img);
+            }
         }
 
         set_current_dir(old_working_dir);

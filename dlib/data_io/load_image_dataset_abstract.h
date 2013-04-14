@@ -82,7 +82,8 @@ namespace dlib
         array<image_type,MM>& images,
         std::vector<std::vector<full_object_detection> >& object_locations,
         const std::string& filename,
-        const std::string& label 
+        const std::string& label,
+        bool skip_empty_images = false
     );
     /*!
         requires
@@ -95,7 +96,8 @@ namespace dlib
             - The difference between this function and the version of load_image_dataset()
               defined above is that this version will also load object part information and
               thus fully populates the full_object_detection objects.
-            - #images.size() == the number of images in the metadata file
+            - #images.size() == The number of images loaded from the metadata file.  This
+              is all the images listed in the file unless skip_empty_images is set to true.
             - #images.size() == #object_locations.size()
             - This routine is capable of loading any image format which can be read
               by the load_image() routine.
@@ -105,6 +107,9 @@ namespace dlib
                 - #images[i] == a copy of the ith image from the dataset.
                 - #object_locations[i] == a vector of all the object detections associated
                   with #images[i]. 
+                - if (skip_empty_images == true) then
+                    - #object_locations[i].size() != 0
+                      (i.e. only images with detection boxes in them will be loaded.)
                 - for all valid j:
                     - #object_locations[i][j].num_parts() == RETURNED_PARTS.size()
                     - for all valid k:
