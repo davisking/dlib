@@ -659,6 +659,7 @@
          <term link="dlib/platform.h.html" name="HPUX"      include="dlib/platform.h"/>
          <term link="dlib/platform.h.html" name="WIN32"     include="dlib/platform.h"/>
 
+         <term link="dlib/float_details.h.html" name="float_details"     include="dlib/float_details.h"/>
          <term file="other.html" name="copy_functor"        include="dlib/algs.h"/>
          <term file="other.html" name="deserialize"         include="dlib/serialize.h"/>
          <term file="other.html" name="error"               include="dlib/error.h"/>
