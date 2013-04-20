@@ -44,7 +44,7 @@ namespace dlib
             if (data.size() == 0)
                 return;
 
-            const unsigned long num = static_cast<unsigned long>(std::log(data.size())/std::log(2.0) + 0.5);
+            const unsigned long num = static_cast<unsigned long>(std::log((double)data.size())/std::log(2.0) + 0.5);
             for (unsigned long i = 0; i < (unsigned long)data.size(); ++i)
             {
                 outdata(impl::reverse_bits(i,num)) = data(i);
