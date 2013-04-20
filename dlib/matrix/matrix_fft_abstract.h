@@ -47,7 +47,8 @@ namespace dlib
                 - ifft(D) == D
             - if DLIB_USE_FFTW is #defined then this function will use the very fast fftw
               library when given double precision matrices instead of dlib's default fft
-              implementation.
+              implementation.  Note that you must also link to the fftw3 library to use
+              this feature.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -74,7 +75,8 @@ namespace dlib
                 - fft(D) == data 
             - if DLIB_USE_FFTW is #defined then this function will use the very fast fftw
               library when given double precision matrices instead of dlib's default fft
-              implementation.
+              implementation.  Note that you must also link to the fftw3 library to use
+              this feature.
     !*/
 
 // ----------------------------------------------------------------------------------------
