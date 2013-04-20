@@ -68,6 +68,8 @@ if (NOT TARGET dlib)
    "Disable this if you don't want to link against libjpeg" )
    set (DLIB_LINK_WITH_SQLITE3_STR
    "Disable this if you don't want to link against sqlite3" )
+   set (DLIB_LINK_WITH_FFTW_STR
+   "Disable this if you don't want to link against fftw" )
 
    option(DLIB_ISO_CPP_ONLY ${DLIB_ISO_CPP_ONLY_STR} OFF)
    option(DLIB_NO_GUI_SUPPORT ${DLIB_NO_GUI_SUPPORT_STR} OFF)
@@ -78,6 +80,7 @@ if (NOT TARGET dlib)
    option(DLIB_LINK_WITH_LIBPNG ${DLIB_LINK_WITH_LIBPNG_STR} ON)
    option(DLIB_LINK_WITH_LIBJPEG ${DLIB_LINK_WITH_LIBJPEG_STR} ON)
    option(DLIB_LINK_WITH_SQLITE3 ${DLIB_LINK_WITH_SQLITE3_STR} ON)
+   option(DLIB_LINK_WITH_FFTW ${DLIB_LINK_WITH_FFTW_STR} ON)
 
 
    add_library(dlib STATIC all/source.cpp )
@@ -212,6 +215,22 @@ if (NOT TARGET dlib)
             set(DLIB_LINK_WITH_SQLITE3 OFF CACHE STRING ${DLIB_LINK_WITH_SQLITE3_STR} FORCE )
          endif()
          mark_as_advanced(sqlite sqlite_path sqlite_path2)
+      endif()
+
+
+
+      if (DLIB_LINK_WITH_FFTW)
+         find_library(fftw fftw3)
+         # make sure fftw3.h is in the include path
+         find_path(fftw_path fftw3.h)
+         if (fftw AND fftw_path)
+            get_filename_component(fftw_path2 ${fftw_path} PATH CACHE)
+            include_directories(${fftw_path2})
+            set(dlib_needed_libraries ${dlib_needed_libraries} ${fftw} )
+         else()
+            set(DLIB_LINK_WITH_FFTW OFF CACHE STRING ${DLIB_LINK_WITH_SQLITE3_STR} FORCE )
+         endif()
+         mark_as_advanced(fftw fftw_path fftw_path2)
       endif()
 
 
