@@ -3564,7 +3564,8 @@ namespace dlib
             window_has_closed(false),
             have_last_click(false),
             mouse_btn(0),
-            clicked_signaler(this->wm) 
+            clicked_signaler(this->wm),
+            have_last_keypress(false)
         {  
             gui_img.set_image_clicked_handler(*this, &image_window::on_image_clicked);
             set_image(img); 
@@ -3580,7 +3581,8 @@ namespace dlib
             window_has_closed(false),
             have_last_click(false),
             mouse_btn(0),
-            clicked_signaler(this->wm) 
+            clicked_signaler(this->wm),
+            have_last_keypress(false)
         {  
             gui_img.set_image_clicked_handler(*this, &image_window::on_image_clicked);
             set_image(img); 
@@ -3758,6 +3760,21 @@ namespace dlib
             return get_next_double_click(p, mouse_button);
         }
 
+        bool get_next_keypress (
+            unsigned long& key,
+            bool& is_printable,
+            unsigned long& state
+        );
+
+        bool get_next_keypress (
+            unsigned long& key,
+            bool& is_printable
+        )
+        {
+            unsigned long state;
+            return get_next_keypress(key,is_printable,state);
+        }
+
     private:
 
         virtual base_window::on_close_return_code on_window_close(
@@ -3772,6 +3789,12 @@ namespace dlib
             unsigned long btn
         );
 
+        virtual void on_keydown (
+            unsigned long key,
+            bool is_printable,
+            unsigned long state
+        );
+
         // restricted functions
         image_window(image_window&);
         image_window& operator= (image_window&);
@@ -3784,6 +3807,11 @@ namespace dlib
         point last_clicked_point;
         unsigned long mouse_btn;
         rsignaler clicked_signaler;
+
+        bool have_last_keypress;
+        unsigned long next_key;
+        bool next_is_printable;
+        unsigned long next_state;
     };
 
 // ----------------------------------------------------------------------------------------

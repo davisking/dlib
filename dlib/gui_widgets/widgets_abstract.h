@@ -3045,6 +3045,35 @@ namespace dlib
                       dlib::base_window::MIDDLE, or dlib::base_window::RIGHT
         !*/
 
+        bool get_next_keypress (
+            unsigned long& key,
+            bool& is_printable,
+            unsigned long& state
+        );
+        /*!
+            ensures
+                - This function blocks until the user presses a keyboard key or the
+                  window is closed by the user.
+                - if (this function returns true) then
+                    - The keyboard button press is recorded into #key, #is_printable, and
+                      #state.  In particular, these variables are populated with the three
+                      identically named arguments to the base_window::on_keydown(key,is_printable,state) 
+                      event.
+        !*/
+
+
+        bool get_next_keypress (
+            unsigned long& key,
+            bool& is_printable
+        );
+        /*!
+            ensures
+                - This function blocks until the user presses a keyboard key or the
+                  window is closed by the user.
+                - This function is the equivalent to calling get_next_keypress(key,is_printable,temp) 
+                  and then discarding temp.
+        !*/
+
     private:
 
         // restricted functions

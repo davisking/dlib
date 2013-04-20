@@ -6483,6 +6483,51 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     bool image_window::
+    get_next_keypress (
+        unsigned long& key,
+        bool& is_printable,
+        unsigned long& state
+    ) 
+    {
+        auto_mutex lock(wm);
+        while (have_last_keypress == false && !window_has_closed)
+        {
+            clicked_signaler.wait();
+        }
+
+        if (window_has_closed)
+            return false;
+
+        // Mark that we are taking the key click so the next call to get_next_keypress()
+        // will have to wait for another click.
+        have_last_keypress = false;
+        key = next_key;
+        is_printable = next_is_printable;
+        state = next_state;
+        return true;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_window::
+    on_keydown (
+        unsigned long key,
+        bool is_printable,
+        unsigned long state
+    )
+    {
+        dlib::base_window::on_keydown(key,is_printable,state);
+
+        have_last_keypress = true;
+        next_key = key;
+        next_is_printable = is_printable;
+        next_state = state;
+        clicked_signaler.signal();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    bool image_window::
     get_next_double_click (
         point& p,
         unsigned long& mouse_button 
@@ -6497,8 +6542,8 @@ namespace dlib
         if (window_has_closed)
             return false;
 
-        // Mark that we are taking the point click so the next call to get_next_click()
-        // will have to wait for another click.
+        // Mark that we are taking the point click so the next call to
+        // get_next_double_click() will have to wait for another click.
         have_last_click = false;
         mouse_button = mouse_btn;
         p = last_clicked_point;
