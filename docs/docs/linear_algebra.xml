@@ -391,6 +391,14 @@
             <name>Other_Utilities</name>
             <sub>
                <item>
+                  <name>fft</name>
+                  <link>dlib/matrix/matrix_fft_abstract.h.html#fft</link>
+               </item>
+               <item>
+                  <name>ifft</name>
+                  <link>dlib/matrix/matrix_fft_abstract.h.html#ifft</link>
+               </item>
+               <item>
                   <name>is_col_vector</name>
                   <link>dlib/matrix/matrix_utilities_abstract.h.html#is_col_vector</link>
                </item>

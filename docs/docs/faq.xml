@@ -120,6 +120,9 @@ row_vect.set_size(5);
             use them. However, CMake will try to link against them
             automatically if they are installed.</li><br/>
 
+            <li><b>FFTW</b> is used by the fft() and ifft() routines if you #define DLIB_USE_FFTW and
+            link to fftw3.  Otherwise dlib uses its own slower default implementation.  </li><br/>
+
             <li><b>SQLite</b> is used by the <a href="other.html#database">database</a> object.  In
             fact, it is just a wrapper around SQLite's C interface which simplifies its use (e.g. 
             makes resource management use RAII).</li>

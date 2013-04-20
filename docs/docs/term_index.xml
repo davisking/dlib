@@ -497,6 +497,9 @@
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="is_vector"          include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="is_row_vector"      include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="is_col_vector"      include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_fft_abstract.h.html" name="fft"                      include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_fft_abstract.h.html" name="ifft"                     include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_fft_abstract.h.html" name="is_power_of_two"          include="dlib/matrix.h"/>
 
 
          <term file="dlib/matrix/matrix_la_abstract.h.html" name="lu_decomposition"          include="dlib/matrix.h"/>
