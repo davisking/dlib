@@ -59,6 +59,7 @@
         - std::complex
         - dlib::uint64
         - dlib::int64
+        - float_details
         - enumerable<T> where T is a serializable type
         - map_pair<D,R> where D and R are both serializable types.
         - C style arrays of serializable types
@@ -75,6 +76,7 @@
         - std::complex
         - dlib::uint64
         - dlib::int64
+        - float_details
         - C style arrays of serializable types
         - Google protocol buffer objects.
 
@@ -111,6 +113,10 @@
             The 4 low order bits of the control byte represent an unsigned number
             and tells you how many of the following bytes are part of the encoded
             number.
+
+    bool SERIALIZATION FORMAT
+        A bool value is serialized as the single byte character '1' or '0' in ASCII.
+        Where '1' indicates true and '0' indicates false.
 
     FLOATING POINT SERIALIZATION FORMAT
         To serialize a floating point value we convert it into a float_details object and
