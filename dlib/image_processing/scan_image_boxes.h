@@ -209,7 +209,7 @@ namespace dlib
 
             for (unsigned int l = 1; l <= num_spatial_pyramid_levels; ++l)
             {
-                const int cells = (int)std::pow(2.0, l-1);
+                const int cells = (int)std::pow(2.0, l-1.0);
                 add_grid_rects(regions, rect, cells, cells);
             }
         }
@@ -217,7 +217,7 @@ namespace dlib
         unsigned int get_num_components_per_detection_template(
         ) const
         {
-            return (unsigned int)(std::pow(4.0,num_spatial_pyramid_levels)-1)/3;
+            return (unsigned int)(std::pow(4.0,(double)num_spatial_pyramid_levels)-1)/3;
         }
 
         feature_extractor_type feats;
