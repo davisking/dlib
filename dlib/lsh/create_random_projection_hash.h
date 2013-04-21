@@ -8,6 +8,7 @@
 #include "../matrix.h"
 #include "../rand.h"
 #include "../statistics.h"
+#include "../svm.h"
 #include <vector>
 
 namespace dlib
@@ -111,6 +112,87 @@ namespace dlib
 
 
         return projection_hash(proj, offset);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename vector_type
+        >
+    projection_hash create_max_margin_projection_hash (
+        const vector_type& v,
+        const int bits,
+        const double C = 10
+    ) 
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(0 < bits && bits <= 32 &&
+                    v.size() > 1,
+            "\t projection_hash create_max_margin_projection_hash()"
+            << "\n\t Invalid arguments were given to this function."
+            << "\n\t bits: " << bits
+            << "\n\t v.size(): " << v.size() 
+            );
+
+#ifdef ENABLE_ASSERTS
+        for (unsigned long i = 0; i < v.size(); ++i)
+        {
+            DLIB_ASSERT(v[0].size() == v[i].size() && v[i].size() > 0 && is_col_vector(v[i]), 
+                    "\t projection_hash create_max_margin_projection_hash()"
+                   << "\n\t Invalid arguments were given to this function."
+                   << "\n\t m(0).size(): " << v[0].size()
+                   << "\n\t m("<<i<<").size(): " << v[i].size() 
+                   << "\n\t is_col_vector(v["<<i<<"]): " << is_col_vector(v[i]) 
+                );
+        }
+#endif
+
+        running_covariance<matrix<double> > rc;
+        for (unsigned long i = 0; i < v.size(); ++i)
+            rc.add(matrix_cast<double>(v[i]));
+
+        // compute a whitening matrix
+        matrix<double> whiten = trans(chol(pinv(rc.covariance())));
+        const matrix<double,0,1> meanval = whiten*rc.mean();
+
+        dlib::rand rnd;
+
+
+        typedef matrix<double,0,1> sample_type;
+        random_subset_selector<sample_type> training_samples;
+        random_subset_selector<double> training_labels;
+        // We set this up to use enough samples to cover the vector space used by elements
+        // of v.  
+        training_samples.set_max_size(v[0].size()*10);
+        training_labels.set_max_size(v[0].size()*10);
+
+        matrix<double> proj(bits, v[0].size());
+        matrix<double,0,1> offset(bits);
+
+        // learn the random planes and put them into proj and offset.
+        for (int itr = 0; itr < offset.size(); ++itr)
+        {
+            training_samples.make_empty();
+            training_labels.make_empty();
+            // pick random training data and give each sample a random label.
+            for (unsigned long i = 0; i < v.size(); ++i)
+            {
+                training_samples.add(whiten*v[i]-meanval);
+                if (rnd.get_random_double() > 0.5)
+                    training_labels.add(+1);
+                else
+                    training_labels.add(-1);
+            }
+
+            svm_c_linear_dcd_trainer<linear_kernel<sample_type> > trainer;
+            trainer.set_c(C);
+            decision_function<linear_kernel<sample_type> > df = trainer.train(training_samples, training_labels);
+            offset(itr) = -df.b;
+            set_rowm(proj,itr) = trans(df.basis_vectors(0));
+        }
+
+
+        return projection_hash(proj*whiten, offset-proj*meanval);
     }
 
 // ----------------------------------------------------------------------------------------
