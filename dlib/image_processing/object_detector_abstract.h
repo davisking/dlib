@@ -221,7 +221,13 @@ namespace dlib
         std::ostream& out
     );
     /*!
-        provides serialization support
+        provides serialization support.  Note that this function only saves the
+        configuration part of item.get_scanner().  That is, we use the scanner's
+        copy_configuration() function to get a copy of the scanner that doesn't contain any
+        loaded image data and we then save just the configuration part of the scanner.
+        This means that any serialized object_detectors won't remember any images they have
+        processed but will otherwise contain all their state and be able to detect objects
+        in new images.
     !*/
 
 // ----------------------------------------------------------------------------------------
