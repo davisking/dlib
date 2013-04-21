@@ -96,7 +96,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT( is_learning_problem(images,truth_dets) == true &&
+        DLIB_CASSERT( is_learning_problem(images,truth_dets) == true &&
                      0 < overlap_eps && overlap_eps <= 1,
                     "\t matrix test_object_detection_function()"
                     << "\n\t invalid inputs were given to this function"
@@ -226,7 +226,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT( is_learning_problem(images,truth_dets) == true &&
+        DLIB_CASSERT( is_learning_problem(images,truth_dets) == true &&
                      0 < overlap_eps && overlap_eps <= 1 &&
                      1 < folds && folds <= static_cast<long>(images.size()),
                     "\t matrix cross_validate_object_detection_trainer()"
