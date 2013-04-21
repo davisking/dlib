@@ -165,6 +165,7 @@
          <term file="algorithms.html" name="hash_similar_angles_512"       include="dlib/lsh.h"/>
          <term file="algorithms.html" name="projection_hash"               include="dlib/lsh.h"/>
          <term file="algorithms.html" name="create_random_projection_hash" include="dlib/lsh.h"/>
+         <term file="algorithms.html" name="create_max_margin_projection_hash" include="dlib/lsh.h"/>
          <term file="imaging.html" name="randomly_sample_image_features"   include="dlib/statistics.h"/>
          <term file="algorithms.html" name="disjoint_subsets"              include="dlib/disjoint_subsets.h"/>
          <term link="algorithms.html#disjoint_subsets" name="union-find"   include="dlib/disjoint_subsets.h"/>
