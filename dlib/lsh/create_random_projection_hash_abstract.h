@@ -33,10 +33,12 @@ namespace dlib
         ensures
             - returns a hash function H such that:
                 - H.num_hash_bins() == pow(2,bits)
-                - H will be setup so that it hashes the contents of v such that
-                  each bin ends up with roughly the same number of elements
-                  in it.  This is accomplished by picking random hyperplanes 
-                  passing though the data.
+                - H will be setup so that it hashes the contents of v such that each bin
+                  ends up with roughly the same number of elements in it.  This is
+                  accomplished by picking random hyperplanes passing though the data.  In
+                  particular, each plane normal vector is filled with Gaussian random
+                  numbers and we also perform basic centering to ensure the plane passes
+                  though the data.
     !*/
 
 // ----------------------------------------------------------------------------------------
