@@ -490,12 +490,9 @@ namespace dlib
             if (rect.is_empty())
                 continue;
             get_feature_extraction_regions(rect, regions);
-            DLIB_CASSERT(saliency_images.size() == regions.size(),"");
             double score = 0;
             for (unsigned long k = 0; k < regions.size(); ++k)
             {
-                DLIB_CASSERT(get_rect(saliency_images[k]).contains(regions[k]), search_rects[i] 
-                    << "   getrect:" << get_rect(saliency_images[k]) << "  region:" << regions[k] << "    rect: "<< rect);
                 score += saliency_images[k].get_sum_of_area(regions[k]);
             }
             const double width = search_rects[i].width();
@@ -601,7 +598,6 @@ namespace dlib
         for (unsigned long j = 0; j < regions.size(); ++j)
         {
             const rectangle rect = regions[j];
-            DLIB_CASSERT(get_rect(feats).contains(regions[j]),regions[j] << "   " << mapped_rect);
 
             const unsigned long template_region_id = j;
             const unsigned long offset = box_sizedims*2 + feats.get_num_dimensions()*template_region_id;
