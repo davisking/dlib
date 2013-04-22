@@ -682,8 +682,8 @@ namespace
                 dlib::vector<double,2> p = randm(2,1,rnd)*1000;
                 from_points.push_back(p);
                 to_points.push_back(tran(p) + (randm(2,1,rnd)-0.5)*error_rate);
-                DLIB_TEST(length(traninv(tran(p))-p) <= 1e-6);
-                DLIB_TEST(length(tran(traninv(p))-p) <= 1e-6);
+                DLIB_TEST(length(traninv(tran(p))-p) <= 1e-5);
+                DLIB_TEST(length(tran(traninv(p))-p) <= 1e-5);
             }
 
 
