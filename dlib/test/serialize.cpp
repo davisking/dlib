@@ -643,8 +643,9 @@ namespace
         sout << "AW852sEbTIeV+m/wLUcKJKPW+6IclviUWZcFh1daDZ0blDjPNTgPx0Lv56sIEwlG4I6C5OJzJBkZ";
         sout << "PvczLjS7IEKh6eg7amNOyEexsQSgojL1oMe2gDEfkyInUGPJV90sNS0cvp/hIB134V8JCTYUP6vH";
         sout << "9qpegLSIIQG+/NjLWyK2472vC88BJfKgkL3CPLMjQwB3tB928FNLbESDLIvpnb6q9ve68iuoyZZt";
-        sout << "z3TTJxHW3MIdgzuhNomvPxfo/Q+7lC/PnxRNGDS9P5AS+4sF3szB4GJJw+SGFsfKdUYYvz3qumOV";
-        sout << "1USIxW0ETWvkEeiYnjXeR3w=";
+        sout << "z3TTJxHW3MIdgzuhNomvPxfo/Q+7lC/Orj0FewUX90al6DckwzOtLVRidh/ZKpsQsxzJYQGkjdX5";
+        sout << "mDzzXKqQb3Y3DnzEmwtRD9CUON3iRv1r26gHWLYorrYA";
+
 
         // Put the data into the istream sin
         sin.str(sout.str());
@@ -675,8 +676,9 @@ namespace
         sout << "gO6XH2WGbm8Xaw3a5FJbh3V823W6P2Qk/vHaAAAAARccIppHWdmViaKby7JA5PQvXjYMWUYvXRHv";
         sout << "xPdURZl1un3CT/rjT11Yry0y3+1W7GBmfBJ0gVFKGdiGuqoNAMtmzL/ll3YfEQ7ED7aB33aDTktw";
         sout << "AWVkHT+gqTbKwjP+8YvB3s3ziK640ITOAWazAghKDVl7AHGn+fjq29paBZMczuJofl8FinZUhwa9";
-        sout << "Ol5gdAEQa6VZDmJUeo2soTJcEDpkW9L8ChtK9VUpSEi1HhsE7pz1Om5cqBs59Jg1WO694ueR40dD";
-        sout << "KRlxhlwQ9eR1lDpxDZx/wgA=";
+        sout << "Ol5gdAEQa6VZDmJUeo2soTJcEDpkW9LkRmXvjQkyEHfEHQNFDfQq4p2U+dHz4lOKlcj3VzQIeG/s";
+        sout << "oxa9KhJND4aQ5xeNUUHUzFBU3XhQHlyDIn/RNdX/ZwA=";
+
 
         // Put the data into the istream sin
         sin.str(sout.str());
@@ -742,10 +744,18 @@ namespace
                 assign_pixel(img2[r][c], temp);
                 assign_pixel(img3[r][c], temp);
                 assign_pixel(img4[r][c], temp);
-                assign_pixel(img5[r][c], temp);
             }
         }
 
+        for (long r = 0; r < img5.nr(); ++r)
+        {
+            for (long c = 0; c < img5.nc(); ++c)
+            {
+                img5[r][c].h = pcnt++;
+                img5[r][c].s = pcnt++;
+                img5[r][c].i = pcnt++;
+            }
+        }
     }
 
 
