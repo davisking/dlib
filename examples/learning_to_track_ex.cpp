@@ -161,7 +161,7 @@ void initialize_object_properties()
 // So here is our function that samples a detection from our simulated sensor.  You tell it
 // what object you want to sample a detection from and it returns a detection from that
 // object.
-detection sample_detection_from_sensor(unsigned long object_id)
+detection sample_detection_from_sensor(long object_id)
 {
     DLIB_CASSERT(object_id < num_objects, 
         "You can't ask to sample a detection from an object that doesn't exist."); 
@@ -230,7 +230,7 @@ track_history make_random_tracking_data_for_training()
 
 // ----------------------------------------------------------------------------------------
 
-std::vector<detection> make_random_detections(unsigned long num_dets)
+std::vector<detection> make_random_detections(long num_dets)
 {
     /*
         Finally, when we test the tracker we learned we will need to sample regular old

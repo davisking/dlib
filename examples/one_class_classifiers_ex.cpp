@@ -222,7 +222,7 @@ int main()
     // the algorithms have identified the sinc() curve.  The hotter the pixel looks, the
     // larger the value coming out of the decision function and therefore the more "normal"
     // it is according to the classifier.
-    const double size = 500;
+    const long size = 500;
     array2d<double> img1(size,size);
     array2d<double> img2(size,size);
     for (long r = 0; r < img1.nr(); ++r)
