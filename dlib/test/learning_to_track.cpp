@@ -113,7 +113,7 @@ namespace
     }
 
     template <typename detection>
-    detection sample_detection_from_sensor(unsigned long object_id)
+    detection sample_detection_from_sensor(long object_id)
     {
         DLIB_CASSERT(object_id < num_objects, 
             "You can't ask to sample a detection from an object that doesn't exist."); 
@@ -179,7 +179,7 @@ namespace
 // ----------------------------------------------------------------------------------------
 
     template <typename detection>
-    std::vector<detection> make_random_detections(unsigned long num_dets)
+    std::vector<detection> make_random_detections(long num_dets)
     {
         DLIB_CASSERT(num_dets <= num_objects, 
             "You can't ask for more detections than there are objects in our little simulation."); 

@@ -52,7 +52,7 @@ namespace dlib
             extract_fhog_features(img,hog,cell_size,filter_rows_padding,filter_cols_padding);
         }
 
-        inline long get_num_planes (
+        inline unsigned long get_num_planes (
         ) const
         {
             return 31;

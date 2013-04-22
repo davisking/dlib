@@ -31,7 +31,7 @@ namespace dlib
 
             dlib::rand rnd;
             std::vector<track_type> tracks;
-            std::map<label_type,unsigned long> track_idx; // tracks[track_idx[id]] == track with ID id.
+            std::map<label_type,long> track_idx; // tracks[track_idx[id]] == track with ID id.
 
             for (unsigned long j = 0; j < samples.size(); ++j)
             {
