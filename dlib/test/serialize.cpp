@@ -640,9 +640,11 @@ namespace
         std::istringstream sin;
 
         // The base64 encoded data from the file 'matarray.dat' we want to decode and return.
-        sout << "AW852sEbTIeV+m/wLUcKJKPW+6IclviUWZcFh1daDZ0N1GEsXBXYsBKzd156yMx/t+/cCJ72d2cY";
-        sout << "jVpBEcAbMvd7Xhk5rXTHBZEjKPchuJJFKO9IQ1iXT54bO3OfiB1UlBWrGipP4Mm3iW9YdijOrBA9";
-        sout << "fodGeONYdO9P4b9400xpetxH7rHjTvR3tWtdvyrlN3G8PlyPtt/aGvZ+KRSGcYWQ+CBt1KSl0wA=";
+        sout << "AW852sEbTIeV+m/wLUcKJKPW+6IclviUWZcFh1daDZ0blDjPNTgPx0Lv56sIEwlG4I6C5OJzJBkZ";
+        sout << "PvczLjS7IEKh6eg7amNOyEexsQSgojL1oMe2gDEfkyInUGPJV90sNS0cvp/hIB134V8JCTYUP6vH";
+        sout << "9qpegLSIIQG+/NjLWyK2472vC88BJfKgkL3CPLMjQwB3tB928FNLbESDLIvpnb6q9ve68iuoyZZt";
+        sout << "z3TTJxHW3MIdgzuhNomvPxfo/Q+7lC/PnxRNGDS9P5AS+4sF3szB4GJJw+SGFsfKdUYYvz3qumOV";
+        sout << "1USIxW0ETWvkEeiYnjXeR3w=";
 
         // Put the data into the istream sin
         sin.str(sout.str());
@@ -670,9 +672,11 @@ namespace
         std::istringstream sin;
 
         // The base64 encoded data from the file 'matarray.dat' we want to decode and return.
-        sout << "gO6XH2WGbm8Xaw3a5FJbh3V823W6P2Qk/vHaAAAAARcaCBHub1vfzjWzQXEVcRlrGH04oVeKAZFt";
-        sout << "/5ek6yVNlafP4XqHfIG/pKXO1yM6kPY1+N2tnFud9qU9So1ki9C+25/uTxZtPnj/O0LdfYPkUclf";
-        sout << "EDnHwLwm4hfTSHRAcjuQYSW7OFOrbOJoQCIkU0xPTayAScN6Vmk8OWetDYgZszAS0tFAGpGAAAA=";
+        sout << "gO6XH2WGbm8Xaw3a5FJbh3V823W6P2Qk/vHaAAAAARccIppHWdmViaKby7JA5PQvXjYMWUYvXRHv";
+        sout << "xPdURZl1un3CT/rjT11Yry0y3+1W7GBmfBJ0gVFKGdiGuqoNAMtmzL/ll3YfEQ7ED7aB33aDTktw";
+        sout << "AWVkHT+gqTbKwjP+8YvB3s3ziK640ITOAWazAghKDVl7AHGn+fjq29paBZMczuJofl8FinZUhwa9";
+        sout << "Ol5gdAEQa6VZDmJUeo2soTJcEDpkW9L8ChtK9VUpSEi1HhsE7pz1Om5cqBs59Jg1WO694ueR40dD";
+        sout << "KRlxhlwQ9eR1lDpxDZx/wgA=";
 
         // Put the data into the istream sin
         sin.str(sout.str());
@@ -733,7 +737,7 @@ namespace
                 temp.red = pcnt++;
                 temp.green = pcnt++;
                 temp.blue = pcnt++;
-                temp.alpha = pcnt++;
+                temp.alpha = 150+pcnt++;
                 assign_pixel(img1[r][c], temp);
                 assign_pixel(img2[r][c], temp);
                 assign_pixel(img3[r][c], temp);
