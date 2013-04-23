@@ -12,12 +12,66 @@
 
 <current>
 New Features:
+   - Object Detection Tools:
+      - Added another image scanning tool similar to scan_image_pyramid.  This
+        is the new scan_image_boxes object.  It allows a user to easily specify
+        an arbitrary set of object boxes which should be checked by an object
+        detector rather than scanning a fixed sized window over the image as is
+        done by the scan_image_pyramid tool.  This allows more flexible scanning 
+        strategies.  For example, it is now possible to use the selective search 
+        method implemented by the new find_candidate_object_locations() routine.  
+      - Added the binned_vector_feature_image.
+      - Upgraded the object_detector so that you can use the adjust_threshold
+        argument for all versions of the operator() method.
+      - Added remove_unobtainable_rectangles()
+   - Hashing Tools:
+      - Added a set of new locality sensitive hashing functions meant for use
+        with larger vectors and higher bit sizes than the current LSH tools.
+        These are the new hash_similar_angles_xxx objects.
+      - Added find_k_nearest_neighbors_lsh() and hash_samples()
+      - Added create_max_margin_projection_hash()
+   - New Matrix Routines: linpiece(), fft(), and ifft()
+   - Added numeric constants and additional statistics to the running_stats
+     object.  This code was contributed by Steve Taylor.
+   - Added the image_window::get_next_keypress() routine.  This tool allows a
+     user to easily find out which keyboard key the user is pressing.
 
 Non-Backwards Compatible Changes:
+   - Changed the object_detector interface slightly.  In particular, it no
+     longer adds the adjust_threshold argument to the output scores.    
+   - The object detector testing functions now output mean average precision in
+     addition to precision and recall.
+   - Changed how dlib does serialization in a number of ways:
+      - The running_stats and scan_image_pyramid objects have had their
+        serialization format changed in a way that breaks backwards
+        compatibility.  This means serialized versions of these objects can't be
+        loaded by the new version of dlib.
+      - Changed the format dlib uses when it serializes floating point values.
+        Previously, we used an ASCII based format.  Dlib now uses a much more
+        efficient binary format. However, the deserialization routines have
+        been made backwards compatible with the previous format. So dlib can
+        still deserialize older data but older software won't be able to read
+        the new format.
+      - Changed the serialization formats for the matrix and array2d objects so
+        that either object can be deserialized into the other. This was done in a
+        way that is backwards compatible with previous versions of dlib. That is,
+        we can still load data serialized by previous dlib versions. However,
+        older versions of dlib can't load the new serialization format.
 
 Bug fixes:
+   - Fixed a bug in save_dng() that happened sometimes when saving images with
+     unsigned char pixels.
+   - The test_ranking_function() and cross_validate_ranking_trainer() routines
+     computed incorrect MAP scores when the learned function output a constant
+     value for all samples.  This has been fixed.
 
 Other:
+   - Gave load_image_dataset() the ability to skip images that don't have any
+     ground truth boxes.
+   - Changed average_precision() to use interpolated precision. So now it uses
+     the same metric as the one used by the Pascal VOC challenge.
+   - Upgraded the dng image format so it can natively store floating point
+     pixel types without any information loss.
 
 </current>
 
