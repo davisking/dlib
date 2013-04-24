@@ -193,6 +193,7 @@
          <name>Colormaps</name>
          <item>randomly_color_image</item>
          <item>heatmap</item>
+         <item>jet</item>
       </section>
  
       <section>
@@ -682,11 +683,29 @@
          <spec_file link="true">dlib/image_transforms/colormaps_abstract.h</spec_file>
          <description>
             Converts a grayscale image into a heatmap.  This is useful if you want
-            to display a grayscale image with more than 256 values.   
+            to display a grayscale image with more than 256 values.  In particular,
+            this function uses the following color mapping:
+            <br/><img src="heatmap.png"/>
          </description>
          <examples>
             <example>image_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>jet</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/colormaps_abstract.h</spec_file>
+         <description>
+            Converts a grayscale image into an image using the jet color
+            scheme.  This is useful if you want to display a grayscale image
+            with more than 256 values.   In particular, this function uses the
+            following color mapping:
+            <br/><img src="jet.png"/>
+         </description>
                                  
       </component>
             
