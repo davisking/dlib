@@ -177,7 +177,7 @@ void bind_svm_c_trainer()
     {
         typedef svm_c_trainer<sparse_radial_basis_kernel<sparse_vect> > T;
         setup_trainer2<T>("svm_c_trainer_sparse_radial_basis")
-            .add_property("gamma", get_gamma, set_gamma);
+            .add_property("gamma", get_gamma_sparse, set_gamma_sparse);
         def("cross_validate_trainer", _cross_validate_trainer<T>);
         def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>);
     }
