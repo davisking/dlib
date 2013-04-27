@@ -9,6 +9,7 @@
 
 #include <dlib/string.h>
 #include "serialize_pickle.h"
+#include "pyassert.h"
 
 using namespace std;
 using namespace dlib;
@@ -95,6 +96,8 @@ string sparse_vector__repr__ (const std::vector<std::pair<unsigned long,double> 
     return sout.str();
 }
 
+template <typename T>
+void resize(T& v, unsigned long n) { v.resize(n); }
 
 void bind_basic_types() 
 {
@@ -103,10 +106,14 @@ void bind_basic_types()
         .def("__init__", make_constructor(&array_from_object))
         .def("__str__", array__str__)
         .def("__repr__", array__repr__)
+        .def("clear", &std::vector<double>::clear)
+        .def("resize", resize<std::vector<double> >)
         .def_pickle(serialize_pickle<std::vector<double> >());
 
     class_<std::vector<matrix<double,0,1> > >("vectors")
         .def(vector_indexing_suite<std::vector<matrix<double,0,1> > >())
+        .def("clear", &std::vector<matrix<double,0,1> >::clear)
+        .def("resize", resize<std::vector<matrix<double,0,1> > >)
         .def_pickle(serialize_pickle<std::vector<matrix<double,0,1> > >());
 
     typedef pair<unsigned long,double> pair_type;
@@ -122,10 +129,14 @@ void bind_basic_types()
         .def(vector_indexing_suite<std::vector<pair_type> >())
         .def("__str__", sparse_vector__str__)
         .def("__repr__", sparse_vector__repr__)
+        .def("clear", &std::vector<pair_type >::clear)
+        .def("resize", resize<std::vector<pair_type > >)
         .def_pickle(serialize_pickle<std::vector<pair_type> >());
 
     class_<std::vector<std::vector<pair_type> > >("sparse_vectors")
         .def(vector_indexing_suite<std::vector<std::vector<pair_type> > >())
+        .def("clear", &std::vector<std::vector<pair_type> >::clear)
+        .def("resize", resize<std::vector<std::vector<pair_type> > >)
         .def_pickle(serialize_pickle<std::vector<std::vector<pair_type> > >());
 
 }

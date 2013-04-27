@@ -107,11 +107,13 @@ void bind_vector()
 {
     class_<cv>("vector", init<>())
         .def("set_size", &cv_set_size)
+        .def("resize", &cv_set_size)
         .def("__init__", make_constructor(&cv_from_object))
         .def("__repr__", &cv__repr__)
         .def("__str__", &cv__str__)
         .def("__len__", &cv__len__)
         .def("__getitem__", &cv__getitem__)
+        .def("__setitem__", &cv__setitem__)
         .add_property("shape", &cv_get_matrix_size)
         .def_pickle(serialize_pickle<cv>());
 }

@@ -80,14 +80,10 @@ class_<trainer_type> setup_trainer (
     return class_<trainer_type>(name.c_str())
         .def("train", train<trainer_type>)
         .def("set_c", set_c<trainer_type>)
-        .def("set_c_class1", set_c_class1<trainer_type>)
-        .def("set_c_class2", set_c_class2<trainer_type>)
-        .def("get_c_class1", get_c_class1<trainer_type>)
-        .def("get_c_class2", get_c_class2<trainer_type>)
-        .def("get_epsilon", get_epsilon<trainer_type>)
-        .def("set_epsilon", set_epsilon<trainer_type>)
-        .def("get_cache_size", get_cache_size<trainer_type>)
-        .def("set_cache_size", set_cache_size<trainer_type>);
+        .add_property("c_class1", get_c_class1<trainer_type>, set_c_class1<trainer_type>)
+        .add_property("c_class2", get_c_class2<trainer_type>, set_c_class2<trainer_type>)
+        .add_property("epsilon", get_epsilon<trainer_type>, set_epsilon<trainer_type>)
+        .add_property("cache_size", get_cache_size<trainer_type>, set_cache_size<trainer_type>);
 }
 
 void set_gamma (
@@ -128,12 +124,10 @@ double get_gamma_sparse (
 void bind_svm_c_trainer()
 {
     setup_trainer<svm_c_trainer<radial_basis_kernel<sample_type> > >("svm_c_trainer_radial_basis")
-        .def("set_gamma", set_gamma)
-        .def("get_gamma", get_gamma);
+        .add_property("gamma", get_gamma, set_gamma);
 
     setup_trainer<svm_c_trainer<sparse_radial_basis_kernel<sparse_vect> > >("svm_c_trainer_sparse_radial_basis")
-        .def("set_gamma", set_gamma_sparse)
-        .def("get_gamma", get_gamma_sparse);
+        .add_property("gamma", get_gamma, set_gamma);
 
     setup_trainer<svm_c_trainer<histogram_intersection_kernel<sample_type> > >("svm_c_trainer_histogram_intersection");
 

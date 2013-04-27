@@ -71,6 +71,20 @@ typename df_type::scalar_type get_bias(
     return df.b;
 }
 
+template <typename df_type>
+void set_bias(
+    df_type& df,
+    double b
+)
+{
+    if (df.basis_vectors.size() == 0)
+    {
+        PyErr_SetString( PyExc_ValueError, "Decision function is empty." );                                            
+        boost::python::throw_error_already_set();   
+    }
+    df.b = b;
+}
+
 template <typename kernel_type>
 void add_linear_df (
     const std::string name
@@ -79,8 +93,8 @@ void add_linear_df (
     typedef decision_function<kernel_type> df_type;
     class_<df_type>(name.c_str())
         .def("predict", predict<df_type>)
-        .def("get_weights", get_weights<df_type>)
-        .def("get_bias", get_bias<df_type>)
+        .add_property("weights", &get_weights<df_type>)
+        .add_property("bias", get_bias<df_type>, set_bias<df_type>)
         .def_pickle(serialize_pickle<df_type>());
 }
 

@@ -7,6 +7,7 @@ void bind_svm_c_trainer();
 void bind_decision_functions();
 void bind_basic_types();
 void bind_other();
+void bind_svm_rank_trainer();
 
 
 BOOST_PYTHON_MODULE(dlib)
@@ -17,4 +18,5 @@ BOOST_PYTHON_MODULE(dlib)
     bind_decision_functions();
     bind_basic_types();
     bind_other();
+    bind_svm_rank_trainer();
 }
