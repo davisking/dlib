@@ -34,8 +34,9 @@ struct serialize_pickle : boost::python::pickle_suite
             throw_error_already_set();
         }
 
-        std::string& data = extract<std::string&>(state[0]);
-        std::istringstream sin(data);
+        str data = extract<str>(state[0]);
+        std::string temp(extract<const char*>(data), len(data));
+        std::istringstream sin(temp);
         deserialize(item, sin);
     }
 };

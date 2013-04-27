@@ -21,9 +21,6 @@ void bind_kernel(
     class_<trainer>("svm_c_trainer")
         .def("train", &trainer::template train<std::vector<sample_type>,std::vector<double> >);
 
-    typedef decision_function<kernel_type> df;
-    class_<df>("df")
-        .def("predict", &df::operator());
 }
 
 

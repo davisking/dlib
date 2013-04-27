@@ -17,10 +17,29 @@ void cv_set_size(cv& m, long s)
     m = 0;
 }
 
-string cv__str__(cv& c)
+string cv__str__(const cv& v)
 {
     ostringstream sout;
-    sout << c;
+    for (long i = 0; i < v.size(); ++i)
+    {
+        sout << v(i);
+        if (i+1 < v.size())
+            sout << "\n";
+    }
+    return sout.str();
+}
+
+string cv__repr__ (const cv& v)
+{
+    std::ostringstream sout;
+    sout << "dlib.vector([";
+    for (unsigned long i = 0; i < v.size(); ++i)
+    {
+        sout << v(i);
+        if (i+1 < v.size())
+            sout << ", ";
+    }
+    sout << "])";
     return sout.str();
 }
 
@@ -89,7 +108,7 @@ void bind_vector()
     class_<cv>("vector", init<>())
         .def("set_size", &cv_set_size)
         .def("__init__", make_constructor(&cv_from_object))
-        .def("__repr__", &cv__str__)
+        .def("__repr__", &cv__repr__)
         .def("__str__", &cv__str__)
         .def("__len__", &cv__len__)
         .def("__getitem__", &cv__getitem__)

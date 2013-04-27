@@ -18,15 +18,101 @@ using namespace boost::python;
 void bind_matrix();
 void bind_vector();
 void bind_svm_c_trainer();
+void bind_decision_functions();
+
+boost::shared_ptr<std::vector<double> > array_from_object(object obj)
+{
+    extract<long> thesize(obj);
+    if (thesize.check())
+    {
+        long nr = thesize;
+        boost::shared_ptr<std::vector<double> > temp(new std::vector<double>(nr));
+        return temp;
+    }
+    else
+    {
+        const long nr = len(obj);
+        boost::shared_ptr<std::vector<double> > temp(new std::vector<double>(nr));
+        for ( long r = 0; r < nr; ++r)
+        {
+            (*temp)[r] = extract<double>(obj[r]);
+        }
+        return temp;
+    }
+}
+
+string array__str__ (const std::vector<double>& v)
+{
+    std::ostringstream sout;
+    for (unsigned long i = 0; i < v.size(); ++i)
+    {
+        sout << v[i];
+        if (i+1 < v.size())
+            sout << "\n";
+    }
+    return sout.str();
+}
+
+string array__repr__ (const std::vector<double>& v)
+{
+    std::ostringstream sout;
+    sout << "dlib.array([";
+    for (unsigned long i = 0; i < v.size(); ++i)
+    {
+        sout << v[i];
+        if (i+1 < v.size())
+            sout << ", ";
+    }
+    sout << "])";
+    return sout.str();
+}
+
+string pair__str__ (const std::pair<unsigned long,double>& p)
+{
+    std::ostringstream sout;
+    sout << p.first << ": " << p.second;
+    return sout.str();
+}
+
+string pair__repr__ (const std::pair<unsigned long,double>& p)
+{
+    std::ostringstream sout;
+    sout << "dlib.pair(" << p.first << ", " << p.second << ")";
+    return sout.str();
+}
+
+string sparse_vector__str__ (const std::vector<std::pair<unsigned long,double> >& v)
+{
+    std::ostringstream sout;
+    for (unsigned long i = 0; i < v.size(); ++i)
+    {
+        sout << v[i].first << ": " << v[i].second;
+        if (i+1 < v.size())
+            sout << "\n";
+    }
+    return sout.str();
+}
+
+string sparse_vector__repr__ (const std::vector<std::pair<unsigned long,double> >& v)
+{
+    std::ostringstream sout;
+    sout << "< dlib.sparse_vector containing: \n" << sparse_vector__str__(v) << " >";
+    return sout.str();
+}
+
 
 BOOST_PYTHON_MODULE(dlib)
 {
     bind_matrix();
     bind_vector();
     bind_svm_c_trainer();
+    bind_decision_functions();
 
-    class_<std::vector<double> >("array")
+    class_<std::vector<double> >("array", init<>())
         .def(vector_indexing_suite<std::vector<double> >())
+        .def("__init__", make_constructor(&array_from_object))
+        .def("__str__", array__str__)
+        .def("__repr__", array__repr__)
         .def_pickle(serialize_pickle<std::vector<double> >());
 
     class_<std::vector<matrix<double,0,1> > >("vectors")
@@ -34,14 +120,18 @@ BOOST_PYTHON_MODULE(dlib)
         .def_pickle(serialize_pickle<std::vector<matrix<double,0,1> > >());
 
     typedef pair<unsigned long,double> pair_type;
-    class_<pair_type>("pair", "help message", init<>() )
+    class_<pair_type>("pair", "This object is used to represent the elements of a sparse_vector.", init<>() )
         .def(init<unsigned long,double>())
-        .def_readwrite("first",&pair_type::first, "THE FIRST, LOVE IT!")
-        .def_readwrite("second",&pair_type::second)
+        .def_readwrite("first",&pair_type::first, "This field represents the index/dimension number.")
+        .def_readwrite("second",&pair_type::second, "This field contains the value in a vector at dimension specified by the first field.")
+        .def("__str__", pair__str__)
+        .def("__repr__", pair__repr__)
         .def_pickle(serialize_pickle<pair_type>());
 
     class_<std::vector<pair_type> >("sparse_vector")
         .def(vector_indexing_suite<std::vector<pair_type> >())
+        .def("__str__", sparse_vector__str__)
+        .def("__repr__", sparse_vector__repr__)
         .def_pickle(serialize_pickle<std::vector<pair_type> >());
 
     class_<std::vector<std::vector<pair_type> > >("sparse_vectors")

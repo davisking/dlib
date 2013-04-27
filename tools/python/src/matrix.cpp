@@ -2,6 +2,7 @@
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
 #include <dlib/matrix.h>
+#include <dlib/string.h>
 #include "serialize_pickle.h"
 
 
@@ -16,15 +17,29 @@ void matrix_set_size(matrix<double>& m, long nr, long nc)
     m = 0;
 }
 
+string matrix_double__repr__(matrix<double>& c)
+{
+    ostringstream sout;
+    sout << "< dlib.matrix containing: \n";
+    sout << c;
+    return trim(sout.str()) + " >";
+}
+
 string matrix_double__str__(matrix<double>& c)
 {
     ostringstream sout;
     sout << c;
-    return sout.str();
+    return trim(sout.str());
 }
 
 boost::shared_ptr<matrix<double> > make_matrix_from_size(long nr, long nc)
 {
+    if (nr < 0 || nc < 0)
+    {
+        PyErr_SetString( PyExc_IndexError, "Input dimensions can't be negative." 
+        );                                            
+        boost::python::throw_error_already_set();   
+    }
     boost::shared_ptr<matrix<double> > temp(new matrix<double>(nr,nc));
     *temp = 0;
     return temp;
@@ -89,6 +104,13 @@ string mat_row__str__(mat_row& c)
     return sout.str();
 }
 
+string mat_row__repr__(mat_row& c)
+{
+    ostringstream sout;
+    sout << "< matrix row: " << mat(c.data,1, c.size);
+    return trim(sout.str()) + " >";
+}
+
 long mat_row__len__(mat_row& m)
 {
     return m.size;
@@ -130,7 +152,7 @@ void bind_matrix()
 {
     class_<mat_row>("_row")
         .def("__len__", &mat_row__len__)
-        .def("__repr__", &mat_row__str__)
+        .def("__repr__", &mat_row__repr__)
         .def("__str__", &mat_row__str__)
         .def("__setitem__", &mat_row__setitem__)
         .def("__getitem__", &mat_row__getitem__);
@@ -139,7 +161,7 @@ void bind_matrix()
         .def("__init__", make_constructor(&make_matrix_from_size))
         .def("set_size", &matrix_set_size)
         .def("__init__", make_constructor(&from_object))
-        .def("__repr__", &matrix_double__str__)
+        .def("__repr__", &matrix_double__repr__)
         .def("__str__", &matrix_double__str__)
         .def("__len__", &matrix_double__len__)
         .def("__getitem__", &matrix_double__getitem__, with_custodian_and_ward_postcall<0,1>())
