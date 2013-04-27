@@ -9,4 +9,6 @@ add_python_module(dlib
    src/vector.cpp
    src/svm_c_trainer.cpp
    src/decision_funcions.cpp
+   src/other.cpp
+   src/basic.cpp
    )
