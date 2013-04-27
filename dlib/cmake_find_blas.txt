@@ -46,26 +46,41 @@ if (UNIX)
 
    include(CheckLibraryExists)
 
-   # Search for the needed libraries from the MKL
-   find_library(mkl_core mkl_core ${mkl_search_path})
-   find_library(mkl_thread mkl_intel_thread ${mkl_search_path})
-   find_library(mkl_iomp iomp5 ${mkl_search_path})
 
-   #MKL also needs pthreads so search for that as well
-   find_library(mkl_pthread pthread ${mkl_search_path})
-
-   mark_as_advanced( mkl_intel mkl_core mkl_thread mkl_iomp mkl_pthread)
-
-   
+   # Search for the needed libraries from the MKL.  We will try to link against the mkl_rt
+   # file first since this way avoids linking bugs in some cases.
+   find_library(mkl_rt mkl_rt ${mkl_search_path})
+   mark_as_advanced(  mkl_rt )
    # if we found the MKL 
-   #if (mkl_mkl AND mkl_core AND mkl_guide AND mkl_pthread)
-   if (mkl_intel AND mkl_core AND mkl_thread AND mkl_iomp AND mkl_pthread)
-      set(blas_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
-      set(lapack_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
+   if ( mkl_rt)
+      set(blas_libraries  ${mkl_rt} )
+      set(lapack_libraries  ${mkl_rt} )
       set(blas_found 1)
       set(lapack_found 1)
       set(found_intel_mkl 1)
       message(STATUS "Found Intel MKL BLAS/LAPACK library")
+   endif()
+
+
+
+   if (NOT found_intel_mkl)
+      # Search for the needed libraries from the MKL.  This time try looking for a different
+      # set of MKL files and try to link against those.
+      find_library(mkl_core mkl_core ${mkl_search_path})
+      find_library(mkl_thread mkl_intel_thread ${mkl_search_path})
+      find_library(mkl_iomp iomp5 ${mkl_search_path})
+      find_library(mkl_pthread pthread ${mkl_search_path})
+
+      mark_as_advanced( mkl_intel mkl_core mkl_thread mkl_iomp mkl_pthread)
+      # If we found the MKL 
+      if (mkl_intel AND mkl_core AND mkl_thread AND mkl_iomp AND mkl_pthread)
+         set(blas_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
+         set(lapack_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
+         set(blas_found 1)
+         set(lapack_found 1)
+         set(found_intel_mkl 1)
+         message(STATUS "Found Intel MKL BLAS/LAPACK library")
+      endif()
    endif()
 
 
