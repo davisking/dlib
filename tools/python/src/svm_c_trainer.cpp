@@ -83,7 +83,16 @@ class_<trainer_type> setup_trainer (
         .def("set_c", set_c<trainer_type>)
         .add_property("c_class1", get_c_class1<trainer_type>, set_c_class1<trainer_type>)
         .add_property("c_class2", get_c_class2<trainer_type>, set_c_class2<trainer_type>)
-        .add_property("epsilon", get_epsilon<trainer_type>, set_epsilon<trainer_type>)
+        .add_property("epsilon", get_epsilon<trainer_type>, set_epsilon<trainer_type>);
+}
+
+template <typename trainer_type>
+class_<trainer_type> setup_trainer2 (
+    const std::string& name
+)
+{
+
+    return setup_trainer<trainer_type>(name)
         .add_property("cache_size", get_cache_size<trainer_type>, set_cache_size<trainer_type>);
 }
 
@@ -157,23 +166,61 @@ const binary_test _cross_validate_trainer_t (
 
 void bind_svm_c_trainer()
 {
-    setup_trainer<svm_c_trainer<radial_basis_kernel<sample_type> > >("svm_c_trainer_radial_basis")
-        .add_property("gamma", get_gamma, set_gamma);
-    def("cross_validate_trainer", _cross_validate_trainer<svm_c_trainer<radial_basis_kernel<sample_type> > >);
-    def("cross_validate_trainer_threaded", _cross_validate_trainer_t<svm_c_trainer<radial_basis_kernel<sample_type> > >);
+    {
+        typedef svm_c_trainer<radial_basis_kernel<sample_type> > T;
+        setup_trainer2<T>("svm_c_trainer_radial_basis")
+            .add_property("gamma", get_gamma, set_gamma);
+        def("cross_validate_trainer", _cross_validate_trainer<T>);
+        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>);
+    }
 
-    setup_trainer<svm_c_trainer<sparse_radial_basis_kernel<sparse_vect> > >("svm_c_trainer_sparse_radial_basis")
-        .add_property("gamma", get_gamma, set_gamma);
-    def("cross_validate_trainer", _cross_validate_trainer<svm_c_trainer<sparse_radial_basis_kernel<sparse_vect> > >);
-    def("cross_validate_trainer_threaded", _cross_validate_trainer_t<svm_c_trainer<sparse_radial_basis_kernel<sparse_vect> > >);
+    {
+        typedef svm_c_trainer<sparse_radial_basis_kernel<sparse_vect> > T;
+        setup_trainer2<T>("svm_c_trainer_sparse_radial_basis")
+            .add_property("gamma", get_gamma, set_gamma);
+        def("cross_validate_trainer", _cross_validate_trainer<T>);
+        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>);
+    }
 
-    setup_trainer<svm_c_trainer<histogram_intersection_kernel<sample_type> > >("svm_c_trainer_histogram_intersection");
-    def("cross_validate_trainer", _cross_validate_trainer<svm_c_trainer<histogram_intersection_kernel<sample_type> > >);
-    def("cross_validate_trainer_threaded", _cross_validate_trainer_t<svm_c_trainer<histogram_intersection_kernel<sample_type> > >);
+    {
+        typedef svm_c_trainer<histogram_intersection_kernel<sample_type> > T;
+        setup_trainer2<T>("svm_c_trainer_histogram_intersection");
+        def("cross_validate_trainer", _cross_validate_trainer<T>);
+        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>);
+    }
 
-    setup_trainer<svm_c_trainer<sparse_histogram_intersection_kernel<sparse_vect> > >("svm_c_trainer_sparse_histogram_intersection");
-    def("cross_validate_trainer", _cross_validate_trainer<svm_c_trainer<sparse_histogram_intersection_kernel<sparse_vect> >  >);
-    def("cross_validate_trainer_threaded", _cross_validate_trainer_t<svm_c_trainer<sparse_histogram_intersection_kernel<sparse_vect> >  >);
+    {
+        typedef svm_c_trainer<sparse_histogram_intersection_kernel<sparse_vect> > T;
+        setup_trainer2<T>("svm_c_trainer_sparse_histogram_intersection");
+        def("cross_validate_trainer", _cross_validate_trainer<T>);
+        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>);
+    }
+
+    {
+        typedef svm_c_linear_trainer<linear_kernel<sample_type> > T;
+        setup_trainer<T>("svm_c_trainer_linear")
+            .add_property("max_iterations", &T::get_max_iterations, &T::set_max_iterations)
+            .add_property("force_last_weight_to_1", &T::forces_last_weight_to_1, &T::force_last_weight_to_1)
+            .add_property("learns_nonnegative_weights", &T::learns_nonnegative_weights, &T::set_learns_nonnegative_weights)
+            .def("be_verbose", &T::be_verbose)
+            .def("be_quiet", &T::be_quiet);
+
+        def("cross_validate_trainer", _cross_validate_trainer<T>);
+        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>);
+    }
+
+    {
+        typedef svm_c_linear_trainer<sparse_linear_kernel<sparse_vect> > T;
+        setup_trainer<T>("svm_c_trainer_sparse_linear")
+            .add_property("max_iterations", &T::get_max_iterations, &T::set_max_iterations)
+            .add_property("force_last_weight_to_1", &T::forces_last_weight_to_1, &T::force_last_weight_to_1)
+            .add_property("learns_nonnegative_weights", &T::learns_nonnegative_weights, &T::set_learns_nonnegative_weights)
+            .def("be_verbose", &T::be_verbose)
+            .def("be_quiet", &T::be_quiet);
+
+        def("cross_validate_trainer", _cross_validate_trainer<T>);
+        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>);
+    }
 }
 
 
