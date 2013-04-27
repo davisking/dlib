@@ -1,4 +1,5 @@
 
+#include "testing_results.h"
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
 #include "serialize_pickle.h"
@@ -100,18 +101,6 @@ void add_linear_df (
 
 // ----------------------------------------------------------------------------------------
 
-struct binary_test
-{
-    binary_test() : class1_accuracy(0), class2_accuracy(0) {}
-    binary_test(
-        const matrix<double,1,2>& m
-    ) : class1_accuracy(m(0)),
-        class2_accuracy(m(1)) {}
-
-    double class1_accuracy;
-    double class2_accuracy;
-};
-
 std::string binary_test__str__(const binary_test& item)
 {
     std::ostringstream sout;
@@ -120,18 +109,6 @@ std::string binary_test__str__(const binary_test& item)
 }
 std::string binary_test__repr__(const binary_test& item) { return "< " + binary_test__str__(item) + " >";}
 
-struct regression_test 
-{
-    regression_test() : mean_squared_error(0), R_squared(0) {}
-    regression_test(
-        const matrix<double,1,2>& m
-    ) : mean_squared_error(m(0)),
-        R_squared(m(1)) {}
-
-    double mean_squared_error;
-    double R_squared;
-};
-
 std::string regression_test__str__(const regression_test& item)
 {
     std::ostringstream sout;
@@ -139,18 +116,6 @@ std::string regression_test__str__(const regression_test& item)
     return sout.str();
 }
 std::string regression_test__repr__(const regression_test& item) { return "< " + regression_test__str__(item) + " >";}
-
-struct ranking_test 
-{
-    ranking_test() : ranking_accuracy(0), mean_ap(0) {}
-    ranking_test(
-        const matrix<double,1,2>& m
-    ) : ranking_accuracy(m(0)),
-        mean_ap(m(1)) {}
-
-    double ranking_accuracy;
-    double mean_ap;
-};
 
 std::string ranking_test__str__(const ranking_test& item)
 {

@@ -1,9 +1,10 @@
 
+#include "testing_results.h"
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
 #include <dlib/matrix.h>
 #include "serialize_pickle.h"
-#include <dlib/svm.h>
+#include <dlib/svm_threaded.h>
 #include "pyassert.h"
 
 using namespace dlib;
@@ -118,6 +119,39 @@ double get_gamma_sparse (
     return trainer.get_kernel().gamma;
 }
 
+// ----------------------------------------------------------------------------------------
+
+template <
+    typename trainer_type
+    >
+const binary_test _cross_validate_trainer (
+    const trainer_type& trainer,
+    const std::vector<typename trainer_type::sample_type>& x,
+    const std::vector<double>& y,
+    const long folds
+)
+{
+    pyassert(is_binary_classification_problem(x,y), "Training data does not make a valid training set.");
+    pyassert(1 < folds && folds <= x.size(), "Invalid number of folds given.");
+    return cross_validate_trainer(trainer, x, y, folds);
+}
+
+template <
+    typename trainer_type
+    >
+const binary_test _cross_validate_trainer_t (
+    const trainer_type& trainer,
+    const std::vector<typename trainer_type::sample_type>& x,
+    const std::vector<double>& y,
+    const unsigned long folds,
+    const unsigned long num_threads
+)
+{
+    pyassert(is_binary_classification_problem(x,y), "Training data does not make a valid training set.");
+    pyassert(1 < folds && folds <= x.size(), "Invalid number of folds given.");
+    pyassert(1 < num_threads, "The number of threads specified must not be zero.");
+    return cross_validate_trainer_threaded(trainer, x, y, folds, num_threads);
+}
 
 // ----------------------------------------------------------------------------------------
 
@@ -125,13 +159,21 @@ void bind_svm_c_trainer()
 {
     setup_trainer<svm_c_trainer<radial_basis_kernel<sample_type> > >("svm_c_trainer_radial_basis")
         .add_property("gamma", get_gamma, set_gamma);
+    def("cross_validate_trainer", _cross_validate_trainer<svm_c_trainer<radial_basis_kernel<sample_type> > >);
+    def("cross_validate_trainer_threaded", _cross_validate_trainer_t<svm_c_trainer<radial_basis_kernel<sample_type> > >);
 
     setup_trainer<svm_c_trainer<sparse_radial_basis_kernel<sparse_vect> > >("svm_c_trainer_sparse_radial_basis")
         .add_property("gamma", get_gamma, set_gamma);
+    def("cross_validate_trainer", _cross_validate_trainer<svm_c_trainer<sparse_radial_basis_kernel<sparse_vect> > >);
+    def("cross_validate_trainer_threaded", _cross_validate_trainer_t<svm_c_trainer<sparse_radial_basis_kernel<sparse_vect> > >);
 
     setup_trainer<svm_c_trainer<histogram_intersection_kernel<sample_type> > >("svm_c_trainer_histogram_intersection");
+    def("cross_validate_trainer", _cross_validate_trainer<svm_c_trainer<histogram_intersection_kernel<sample_type> > >);
+    def("cross_validate_trainer_threaded", _cross_validate_trainer_t<svm_c_trainer<histogram_intersection_kernel<sample_type> > >);
 
     setup_trainer<svm_c_trainer<sparse_histogram_intersection_kernel<sparse_vect> > >("svm_c_trainer_sparse_histogram_intersection");
+    def("cross_validate_trainer", _cross_validate_trainer<svm_c_trainer<sparse_histogram_intersection_kernel<sparse_vect> >  >);
+    def("cross_validate_trainer_threaded", _cross_validate_trainer_t<svm_c_trainer<sparse_histogram_intersection_kernel<sparse_vect> >  >);
 }
 
 

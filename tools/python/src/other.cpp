@@ -13,12 +13,17 @@ tuple get_training_data()
     std::vector<double> labels;
 
     sample_type samp(3);
-    samp = 1,2,3;
-    samples.push_back(samp);
-    labels.push_back(+1);
-    samp = -1,-2,-3;
-    samples.push_back(samp);
-    labels.push_back(-1);
+
+    for (int i = 0; i < 10; ++i)
+    {
+        samp = 1,2,3;
+        samples.push_back(samp);
+        labels.push_back(+1);
+
+        samp = -1,-2,-3;
+        samples.push_back(samp);
+        labels.push_back(-1);
+    }
 
     return make_tuple(samples, labels);
 }
