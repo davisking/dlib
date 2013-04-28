@@ -652,7 +652,7 @@ namespace dlib
     );
     /*!
         requires
-            - max_index_plus_one(v) < m.nc()
+            - max_index_plus_one(v) <= m.nc()
             - v == an unsorted sparse vector
         ensures
             - #result == m*v
@@ -671,7 +671,7 @@ namespace dlib
     );
     /*!
         requires
-            - max_index_plus_one(v) < m.nc()
+            - max_index_plus_one(v) <= m.nc()
             - v == an unsorted sparse vector
         ensures
             - returns m*v
