@@ -4,11 +4,13 @@
 #include <dlib/matrix.h>
 #include <dlib/string.h>
 #include "serialize_pickle.h"
+#include <boost/python/args.hpp>
 
 
 using namespace dlib;
-using namespace std;
 using namespace boost::python;
+using std::string;
+using std::ostringstream;
 
 
 void matrix_set_size(matrix<double>& m, long nr, long nc)
@@ -159,10 +161,12 @@ void bind_matrix()
 
     class_<matrix<double> >("matrix", init<>())
         .def("__init__", make_constructor(&make_matrix_from_size))
-        .def("set_size", &matrix_set_size)
+        .def("set_size", &matrix_set_size, (arg("rows"), arg("cols")), "Set the size of the matrix to the given number of rows and columns.")
         .def("__init__", make_constructor(&from_object))
         .def("__repr__", &matrix_double__repr__)
         .def("__str__", &matrix_double__str__)
+        .def("nr", &matrix<double>::nr, "Return the number of rows in the matrix.")
+        .def("nc", &matrix<double>::nc, "Return the number of columns in the matrix.")
         .def("__len__", &matrix_double__len__)
         .def("__getitem__", &matrix_double__getitem__, with_custodian_and_ward_postcall<0,1>())
         .add_property("shape", &get_matrix_size)
