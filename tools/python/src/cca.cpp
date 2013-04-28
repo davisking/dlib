@@ -48,7 +48,7 @@ matrix<double,0,1> apply_cca_transform (
     const sparse_vect& v
 )
 {
-    pyassert(max_index_plus_one(v) <= m.nr(), "Invalid Inputs");
+    pyassert((long)max_index_plus_one(v) <= m.nr(), "Invalid Inputs");
     return sparse_matrix_vector_multiply(trans(m), v);
 }
 

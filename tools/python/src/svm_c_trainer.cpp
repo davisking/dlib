@@ -137,7 +137,7 @@ const binary_test _cross_validate_trainer (
     const trainer_type& trainer,
     const std::vector<typename trainer_type::sample_type>& x,
     const std::vector<double>& y,
-    const long folds
+    const unsigned long folds
 )
 {
     pyassert(is_binary_classification_problem(x,y), "Training data does not make a valid training set.");

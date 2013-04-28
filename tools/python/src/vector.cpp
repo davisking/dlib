@@ -33,7 +33,7 @@ string cv__repr__ (const cv& v)
 {
     std::ostringstream sout;
     sout << "dlib.vector([";
-    for (unsigned long i = 0; i < v.size(); ++i)
+    for (long i = 0; i < v.size(); ++i)
     {
         sout << v(i);
         if (i+1 < v.size())
