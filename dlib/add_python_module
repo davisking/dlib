@@ -6,8 +6,8 @@
 # for an example.
 
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} 
-        " C:/Program Files(x86)/boost/boost_1_*"  
-        " C:/Program Files/boost/boost_1_*" )
+        "C:/Program Files (x86)/boost/boost_1_*"  
+        "C:/Program Files/boost/boost_1_*" )
 
 #SET(Boost_USE_STATIC_LIBS OFF)
 #SET(Boost_USE_MULTITHREADED ON)
