@@ -144,6 +144,10 @@ namespace
         samples.push_back(p);
         dlog << LINFO << "cv-accuracy: "<< cross_validate_ranking_trainer(trainer, samples,4);
         DLIB_TEST(equal(cross_validate_ranking_trainer(trainer, samples,4) , res));
+
+        df.basis_vectors(0) = 0;
+        dlog << LINFO << "BAD RANKING:" << test_ranking_function(df, samples);
+        DLIB_TEST(test_ranking_function(df, samples)(1) < 0.5);
     }
 
 // ----------------------------------------------------------------------------------------
