@@ -48,8 +48,9 @@ namespace dlib
         ) :
             samples(samples_),
             labels(labels_),
-            Cpos(C_pos),
-            Cneg(C_neg),
+            C(std::min(C_pos,C_neg)),
+            Cpos(C_pos/C),
+            Cneg(C_neg/C),
             be_verbose(be_verbose_),
             eps(eps_),
             max_iterations(max_iter)
@@ -61,7 +62,7 @@ namespace dlib
         virtual scalar_type get_c (
         ) const 
         {
-            return 1;
+            return C;
         }
 
         virtual long get_num_dimensions (
@@ -292,6 +293,7 @@ namespace dlib
 
         const in_sample_vector_type& samples;
         const in_scalar_vector_type& labels;
+        const scalar_type C;
         const scalar_type Cpos;
         const scalar_type Cneg;
 
@@ -349,7 +351,7 @@ namespace dlib
             Cpos = 1;
             Cneg = 1;
             verbose = false;
-            eps = 0.001;
+            eps = 0.0001;
             max_iterations = 10000;
             learn_nonnegative_weights = false;
             last_weight_1 = false;
@@ -370,7 +372,7 @@ namespace dlib
             Cpos = C;
             Cneg = C;
             verbose = false;
-            eps = 0.001;
+            eps = 0.0001;
             max_iterations = 10000;
             learn_nonnegative_weights = false;
             last_weight_1 = false;

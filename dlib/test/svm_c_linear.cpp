@@ -110,7 +110,7 @@ namespace
         svm_c_linear_trainer<sparse_linear_kernel<sparse_sample_type> > trainer;
         trainer.set_c(1e4);
         //trainer.be_verbose();
-        trainer.set_epsilon(1e-8);
+        trainer.set_epsilon(1e-11);
 
 
         double obj;
@@ -182,13 +182,13 @@ namespace
         svm_c_linear_trainer<linear_kernel<sample_type> > trainer;
         trainer.set_c(1e4);
         //trainer.be_verbose();
-        trainer.set_epsilon(1e-8);
+        trainer.set_epsilon(1e-11);
 
 
         double obj;
         decision_function<linear_kernel<sample_type> > df = trainer.train(samples, labels, obj);
         dlog << LDEBUG << "obj: "<< obj;
-        DLIB_TEST_MSG(abs(obj - 0.72222222222) < 1e-8, obj);
+        DLIB_TEST_MSG(abs(obj - 0.72222222222) < 1e-8, abs(obj - 0.72222222222));
         // There shouldn't be any margin violations since this dataset is so trivial.  So that means the objective
         // should be exactly the squared norm of the decision plane (times 0.5).
         DLIB_TEST_MSG(abs(length_squared(df.basis_vectors(0))*0.5 + df.b*df.b*0.5 - 0.72222222222) < 1e-8, 
