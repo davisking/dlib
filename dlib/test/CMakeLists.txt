@@ -124,15 +124,16 @@ set (tests
    svm.cpp
    svm_multiclass_linear.cpp
    svm_struct.cpp
+   svr_linear_trainer.cpp
    symmetric_matrix_cache.cpp
    thread_pool.cpp
    threads.cpp
    timer.cpp
    tokenizer.cpp
    trust_region.cpp
-   vectorstream.cpp
    tuple.cpp
    type_safe_union.cpp
+   vectorstream.cpp
    )
 
 # create a variable called target_name and set it to the string "test"
