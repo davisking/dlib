@@ -316,6 +316,7 @@
          <term file="ml.html" name="krr_trainer"                                    include="dlib/svm.h"/>
          <term file="ml.html" name="rr_trainer"                                     include="dlib/svm.h"/>
          <term file="ml.html" name="svr_trainer"                                    include="dlib/svm.h"/>
+         <term file="ml.html" name="svr_linear_trainer"                             include="dlib/svm.h"/>
          <term file="ml.html" name="rvm_regression_trainer"                         include="dlib/svm.h"/>
          <term file="ml.html" name="rbf_network_trainer"                            include="dlib/svm.h"/>
          <term file="ml.html" name="reduced"                                        include="dlib/svm.h"/>
