@@ -242,10 +242,10 @@ namespace dlib
                 the example_feature_extractor discussed above.
 
             WHAT THIS OBJECT REPRESENTS
-                This object is a tool for doing sequence labeling.  In particular,
-                it is capable of representing sequence labeling models such as
-                those produced by Hidden Markov SVMs or Conditional Random fields.
-                See the following papers for an introduction to these techniques:
+                This object is a tool for doing sequence labeling.  In particular, it is
+                capable of representing sequence labeling models such as those produced by
+                Hidden Markov SVMs or Chain Structured Conditional Random fields.  See the
+                following papers for an introduction to these techniques:
                     - Hidden Markov Support Vector Machines by 
                       Y. Altun, I. Tsochantaridis, T. Hofmann
                     - Shallow Parsing with Conditional Random Fields by 
