@@ -38,8 +38,8 @@ namespace dlib
                 method of this class.
 
             THREAD SAFETY
-                Instances of this object should be thread safe, that is, it should 
-                be safe for multiple threads to make concurrent calls to the member 
+                Instances of this object are required to be threadsafe, that is, it should
+                be safe for multiple threads to make concurrent calls to the member
                 functions of this object.
 
         !*/
