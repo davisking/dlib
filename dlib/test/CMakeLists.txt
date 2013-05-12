@@ -104,6 +104,7 @@ set (tests
    scan_image.cpp
    sequence.cpp
    sequence_labeler.cpp
+   sequence_segmenter.cpp
    serialize.cpp
    set.cpp
    sldf.cpp

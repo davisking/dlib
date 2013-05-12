@@ -119,6 +119,7 @@ SRC += sammon.cpp
 SRC += scan_image.cpp
 SRC += sequence.cpp
 SRC += sequence_labeler.cpp
+SRC += sequence_segmenter.cpp
 SRC += serialize.cpp
 SRC += set.cpp
 SRC += sldf.cpp
