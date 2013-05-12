@@ -351,7 +351,7 @@ namespace dlib
             Cpos = 1;
             Cneg = 1;
             verbose = false;
-            eps = 0.0001;
+            eps = 0.001;
             max_iterations = 10000;
             learn_nonnegative_weights = false;
             last_weight_1 = false;
@@ -372,7 +372,7 @@ namespace dlib
             Cpos = C;
             Cneg = C;
             verbose = false;
-            eps = 0.0001;
+            eps = 0.001;
             max_iterations = 10000;
             learn_nonnegative_weights = false;
             last_weight_1 = false;

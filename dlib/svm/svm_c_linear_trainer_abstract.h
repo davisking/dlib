@@ -49,7 +49,7 @@ namespace dlib
                 - #get_oca() == oca() (i.e. an instance of oca with default parameters) 
                 - #get_c_class1() == 1
                 - #get_c_class2() == 1
-                - #get_epsilon() == 0.0001
+                - #get_epsilon() == 0.001
                 - this object will not be verbose unless be_verbose() is called
                 - #get_max_iterations() == 10000
                 - #learns_nonnegative_weights() == false
@@ -68,7 +68,7 @@ namespace dlib
                 - #get_oca() == oca() (i.e. an instance of oca with default parameters) 
                 - #get_c_class1() == C
                 - #get_c_class2() == C
-                - #get_epsilon() == 0.0001
+                - #get_epsilon() == 0.001
                 - this object will not be verbose unless be_verbose() is called
                 - #get_max_iterations() == 10000
                 - #learns_nonnegative_weights() == false
