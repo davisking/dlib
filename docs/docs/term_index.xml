@@ -60,6 +60,10 @@
          <term file="ml.html" name="structural_svm_sequence_labeling_problem"                      include="dlib/svm_threaded.h"/>
          <term file="ml.html" name="structural_sequence_labeling_trainer"                          include="dlib/svm_threaded.h"/>
 
+         <term file="ml.html" name="sequence_segmenter"                                              include="dlib/svm.h"/>
+         <term file="dlib/svm/sequence_segmenter_abstract.h.html" name="total_feature_vector_size"   include="dlib/svm.h"/>
+         <term file="ml.html" name="structural_sequence_segmentation_trainer"                          include="dlib/svm_threaded.h"/>
+
          <term file="ml.html" name="is_forced_assignment_problem"          include="dlib/svm.h"/>
          <term file="ml.html" name="is_assignment_problem"                 include="dlib/svm.h"/>
          <term file="ml.html" name="is_graph_labeling_problem"             include="dlib/svm_threaded.h"/>
@@ -298,6 +302,7 @@
          <term file="ml.html" name="simplify_linear_decision_function"              include="dlib/svm.h"/>
          <term file="ml.html" name="is_binary_classification_problem"               include="dlib/svm.h"/>
          <term file="ml.html" name="is_sequence_labeling_problem"                   include="dlib/svm.h"/>
+         <term file="ml.html" name="is_sequence_segmentation_problem"               include="dlib/svm.h"/>
          <term file="ml.html" name="is_learning_problem"                            include="dlib/svm.h"/>
          <term file="ml.html" name="svm_nu_trainer"                                 include="dlib/svm.h"/>
          <term file="ml.html" name="svm_c_trainer"                                  include="dlib/svm.h"/>
@@ -329,6 +334,7 @@
          <term file="ml.html" name="cross_validate_trainer"                         include="dlib/svm.h"/>
          <term file="ml.html" name="cross_validate_object_detection_trainer"        include="dlib/svm.h"/>
          <term file="ml.html" name="cross_validate_sequence_labeler"                include="dlib/svm.h"/>
+         <term file="ml.html" name="cross_validate_sequence_segmenter"              include="dlib/svm.h"/>
          <term file="ml.html" name="cross_validate_trainer_threaded"                include="dlib/svm_threaded.h"/>
          <term file="ml.html" name="cross_validate_multiclass_trainer"              include="dlib/svm.h"/>
          <term file="dlib/svm/cross_validate_multiclass_trainer_abstract.h.html" name="cross_validation_error"    include="dlib/svm.h"/>
@@ -338,6 +344,7 @@
          <term file="ml.html" name="test_multiclass_decision_function"              include="dlib/svm.h"/>
          <term file="ml.html" name="test_regression_function"                       include="dlib/svm.h"/>
          <term file="ml.html" name="test_sequence_labeler"                          include="dlib/svm.h"/>
+         <term file="ml.html" name="test_sequence_segmenter"                        include="dlib/svm.h"/>
          <term link="ml.html#svm_nu_trainer" name="support vector machine"          include="dlib/svm.h"/>
          <term link="ml.html#rvm_trainer" name="relevance vector machine"           include="dlib/svm.h"/>
          <term link="ml.html#krr_trainer" name="kernel ridge regression"            include="dlib/svm.h"/>

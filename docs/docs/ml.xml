@@ -116,6 +116,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          </item>
          <item>structural_object_detection_trainer</item> 
          <item>structural_sequence_labeling_trainer</item> 
+         <item>structural_sequence_segmentation_trainer</item> 
          <item>structural_assignment_trainer</item> 
          <item>structural_graph_labeling_trainer</item> 
          <item>svm_rank_trainer</item> 
@@ -161,6 +162,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>cross_validate_multiclass_trainer</item> 
          <item>cross_validate_regression_trainer</item> 
          <item>cross_validate_sequence_labeler</item> 
+         <item>cross_validate_sequence_segmenter</item> 
          <item>cross_validate_assignment_trainer</item> 
          <item>cross_validate_graph_labeling_trainer</item> 
          <item>cross_validate_ranking_trainer</item> 
@@ -169,6 +171,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>test_regression_function</item> 
          <item>test_object_detection_function</item> 
          <item>test_sequence_labeler</item>
+         <item>test_sequence_segmenter</item>
          <item>test_assignment_function</item>
          <item>test_graph_labeling_function</item>
          <item>test_ranking_function</item>
@@ -218,6 +221,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>multiclass_linear_decision_function</item>
          <item>one_vs_all_decision_function</item>
          <item>sequence_labeler</item>
+         <item>sequence_segmenter</item>
          <item>assignment_function</item>
          <item>graph_labeler</item>
       </section>
@@ -239,6 +243,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>randomize_samples</item> 
          <item>is_binary_classification_problem</item> 
          <item>is_sequence_labeling_problem</item> 
+         <item>is_sequence_segmentation_problem</item> 
          <item>is_graph_labeling_problem</item> 
          <item>is_assignment_problem</item> 
          <item>is_forced_assignment_problem</item> 
@@ -1450,6 +1455,29 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
    <!-- ************************************************************************* -->
       
       <component>
+         <name>sequence_segmenter</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/sequence_segmenter_abstract.h</spec_file>
+         <description>
+                This object is a tool for segmenting a sequence of objects into a set of
+                non-overlapping chunks.  An example sequence segmentation task is to take
+                English sentences and identify all the named entities.  In this example,
+                you would be using a sequence_segmenter to find all the chunks of
+                contiguous words which refer to proper names.
+
+               <p>
+                The sequence_segmenter is implemented using the BIO (Begin, Inside,
+                Outside) sequence tagging model.  Moreover, the sequence tagging is done
+                internally using a <a href="#sequence_labeler">sequence_labeler</a> object 
+                and therefore sequence_segmenter objects are examples of chain structured
+                conditional random field style sequence taggers. 
+               </p>
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>assignment_function</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/assignment_function_abstract.h</spec_file>
@@ -1724,6 +1752,19 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <description>
             This function takes a set of training data for a sequence labeling problem
             and reports back if it could possibly be a well formed sequence labeling problem.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>is_sequence_segmentation_problem</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <description>
+            This function takes a set of training data for a sequence segmentation problem
+            and reports back if it could possibly be a well formed sequence segmentation problem.
          </description>
                                  
       </component>
@@ -2360,6 +2401,19 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
    <!-- ************************************************************************* -->
       
       <component>
+         <name>cross_validate_sequence_segmenter</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/cross_validate_sequence_segmenter_abstract.h</spec_file>
+         <description>
+            Performs k-fold cross validation on a user supplied sequence segmentation trainer object such
+            as the <a href="#structural_sequence_segmentation_trainer">structural_sequence_segmentation_trainer</a>
+            and returns the resulting precision, recall, and F1-score. 
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>cross_validate_assignment_trainer</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/cross_validate_assignment_trainer_abstract.h</spec_file>
@@ -2423,6 +2477,18 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             <example>sequence_labeler_ex.cpp.html</example>
          </examples>
                                  
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>test_sequence_segmenter</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/cross_validate_sequence_segmenter_abstract.h</spec_file>
+         <description>
+            Tests a <a href="#sequence_segmenter">sequence_segmenter</a> on a set of data 
+            and returns the resulting precision, recall, and F1-score.
+         </description>
       </component>
       
    <!-- ************************************************************************* -->
@@ -2727,6 +2793,24 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <examples>
             <example>sequence_labeler_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>structural_sequence_segmentation_trainer</name>
+         <file>dlib/svm_threaded.h</file>
+         <spec_file link="true">dlib/svm/structural_sequence_segmentation_trainer_abstract.h</spec_file>
+         <description>
+                This object is a tool for learning to do sequence segmentation based on a
+                set of training data.  The training procedure produces a <a href="#sequence_segmenter">sequence_segmenter</a>
+                object which can be used to identify the sub-segments of new data sequences.
+               <p>
+                  This object internally uses the <a href="#structural_sequence_labeling_trainer">structural_sequence_labeling_trainer</a> 
+                  to solve the learning problem.  
+               </p>
+         </description>
                                  
       </component>
       
