@@ -235,6 +235,13 @@ namespace dlib
                 << "\n\t weights.size(): " << weights.size() 
                 << "\n\t this: " << this
                 );
+            DLIB_ASSERT(fe.window_size() >= 1 && fe.num_features() >= 1,
+                "\t sequence_segmenter::sequence_segmenter()"
+                << "\n\t An invalid feature extractor was supplied."
+                << "\n\t fe.window_size():  " << fe.window_size() 
+                << "\n\t fe.num_features(): " << fe.num_features() 
+                << "\n\t this: " << this
+            );
         }
 
         const feature_extractor& get_feature_extractor (
