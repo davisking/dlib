@@ -48,9 +48,9 @@ namespace dlib
                     PSI(x,y) == sum_i XI(x, y_{i-1}, y_{i}, i)
                 where the sum is taken over all the elements in the sequence.  At each
                 element we extract a feature vector, XI(), that is expected to encode
-                important details of what the i-th position of the sequence looks like in
-                the context of the current and previous labels.  To do this, XI() is
-                allowed to look at any part of the input sequence x, the current and
+                important details describing what the i-th position of the sequence looks
+                like in the context of the current and previous labels.  To do this, XI()
+                is allowed to look at any part of the input sequence x, the current and
                 previous labels, and of course it must also know the position in question, i.  
                 
                 The sequence_segmenter simplifies this further by decomposing XI() into
@@ -61,12 +61,12 @@ namespace dlib
                 independent of any labeling.  We denote this feature vector by ZI(x,i), where
                 x is the sequence and i is the position in question.  
                 
-                For example, suppose we use a window size of 3, then we can put this all
+                For example, suppose we use a window size of 3, then we can put all this 
                 together and define XI() in terms of ZI().  To do this, we can think of
                 XI() as containing 12*3 slots which contain either a zero vector or a ZI()
                 vector.  Each combination of window position and labeling has a different
                 slot.  To explain further, consider the following examples where we have
-                annotated on the which parts of XI() correspond to each slot.  
+                annotated which parts of XI() correspond to each slot.  
 
                 If the previous and current label are both B and we use a window size of 3
                 then XI() would be instantiated as:
