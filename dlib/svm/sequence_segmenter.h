@@ -188,6 +188,7 @@ namespace dlib
 
         sequence_segmenter()
         {
+#ifdef ENABLE_ASSERTS
             const feature_extractor& fe = labeler.get_feature_extractor().fe;
             DLIB_ASSERT(fe.window_size() >= 1 && fe.num_features() >= 1,
                 "\t sequence_segmenter::sequence_segmenter()"
@@ -196,6 +197,7 @@ namespace dlib
                 << "\n\t fe.num_features(): " << fe.num_features() 
                 << "\n\t this: " << this
             );
+#endif
         }
 
         explicit sequence_segmenter(
@@ -203,6 +205,7 @@ namespace dlib
         ) : 
             labeler(weights)
         {
+#ifdef ENABLE_ASSERTS
             const feature_extractor& fe = labeler.get_feature_extractor().fe;
             // make sure requires clause is not broken
             DLIB_ASSERT(total_feature_vector_size(fe) == (unsigned long)weights.size(),
@@ -219,6 +222,7 @@ namespace dlib
                 << "\n\t fe.num_features(): " << fe.num_features() 
                 << "\n\t this: " << this
             );
+#endif
         }
 
         sequence_segmenter(
