@@ -201,6 +201,49 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename sequence_type 
+        >
+    bool is_sequence_segmentation_problem (
+        const std::vector<sequence_type>& samples,
+        const std::vector<std::vector<std::pair<unsigned long,unsigned long> > >& segments
+    )
+    {
+        if (is_learning_problem(samples, segments))
+        {
+            for (unsigned long i = 0; i < samples.size(); ++i)
+            {
+                // Make sure the segments are inside samples[i] and don't overlap with each
+                // other.
+                std::vector<bool> hits(samples[i].size(), false);
+                for (unsigned long j = 0; j < segments[i].size(); ++j)
+                {
+                    const unsigned long begin = segments[i][j].first;
+                    const unsigned long end = segments[i][j].second;
+                    // if the segment is outside the sequence
+                    if (end > samples[i].size())
+                        return false;
+
+                    if (begin > end)
+                        return false;
+
+                    // check for overlap
+                    for (unsigned long k = begin; k < end; ++k)
+                    {
+                        if (hits[k])
+                            return false;
+                        hits[k] = true;
+                    }
+                }
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename lhs_type, 
         typename rhs_type
         >
