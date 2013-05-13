@@ -111,17 +111,17 @@ namespace dlib
                                       0]         /  
 
 
-                If the previous label is O and the current label is I and we use a window
+                If the previous label is I and the current label is O and we use a window
                 size of 3 then XI() would be instantiated as:
-                    XI(x, O, I, i) = [0          \ 
+                    XI(x, I, O, i) = [0          \ 
                                       0           > If current label is B
                                       0          /  
-                                      ZI(x,i-1)  \                        
-                                      ZI(x,i)     > If current label is I 
-                                      ZI(x,i+1)  /                        
                                       0          \                        
-                                      0           > If current label is O 
-                                      0          /  
+                                      0           > If current label is I 
+                                      0          /                        
+                                      ZI(x,i-1)  \                        
+                                      ZI(x,i)     > If current label is O 
+                                      ZI(x,i+1)  /  
 
                                       0          \ 
                                       0           > If previous label is B and current label is B
@@ -139,16 +139,16 @@ namespace dlib
                                       0          \                        
                                       0           > If previous label is I and current label is I 
                                       0          /                        
-                                      0          \                        
-                                      0           > If previous label is I and current label is O 
-                                      0          /  
+                                      ZI(x,i-1)  \                        
+                                      ZI(x,i)     > If previous label is I and current label is O 
+                                      ZI(x,i+1)  /  
                                                                                                    
                                       0          \ 
                                       0           > If previous label is O and current label is B
                                       0          /  
-                                      ZI(x,i-1)  \                        
-                                      ZI(x,i)     > If previous label is O and current label is I 
-                                      ZI(x,i+1)  /                        
+                                      0          \                        
+                                      0           > If previous label is O and current label is I 
+                                      0          /                        
                                       0          \                        
                                       0           > If previous label is O and current label is O 
                                       0]         /  
