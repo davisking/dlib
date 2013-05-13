@@ -223,7 +223,7 @@ namespace dlib
                     if (end > samples[i].size())
                         return false;
 
-                    if (begin > end)
+                    if (begin >= end)
                         return false;
 
                     // check for overlap

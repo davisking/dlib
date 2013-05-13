@@ -101,7 +101,7 @@ namespace dlib
                         - We interpret segments[i][j] as defining a half open range
                           starting with segments[i][j].first and ending just before
                           segments[i][j].second.
-                        - segments[i][j].first <= segments[i][j].second
+                        - segments[i][j].first < segments[i][j].second
                         - segments[i][j].second <= samples[i].size()
                           (i.e. Each segment must be contained within its associated sequence)
                         - segments[i][j] does not overlap with any of the other ranges in
