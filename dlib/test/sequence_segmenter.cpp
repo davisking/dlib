@@ -20,9 +20,13 @@ namespace
 
     dlib::rand rnd;
 
+    template <bool use_BIO_model_, bool use_high_order_features_>
     class unigram_extractor
     {
     public:
+
+        const static bool use_BIO_model = use_BIO_model_;
+        const static bool use_high_order_features = use_high_order_features_;
 
         typedef std::vector<unsigned long> sequence_type; 
 
@@ -64,12 +68,14 @@ namespace
 
     };
 
-    void serialize(const unigram_extractor& item , std::ostream& out )
+    template <bool use_BIO_model_, bool use_high_order_features_>
+    void serialize(const unigram_extractor<use_BIO_model_,use_high_order_features_>& item , std::ostream& out )
     {
         serialize(item.feats, out);
     }
 
-    void deserialize(unigram_extractor& item, std::istream& in)
+    template <bool use_BIO_model_, bool use_high_order_features_>
+    void deserialize(unigram_extractor<use_BIO_model_,use_high_order_features_>& item, std::istream& in)
     {
         deserialize(item.feats, in);
     }
@@ -89,7 +95,7 @@ namespace
         labels.resize(dataset_size);
 
 
-        unigram_extractor fe;
+        unigram_extractor<true,true> fe;
         dlib::rand rnd;
 
         for (unsigned long iter = 0; iter < dataset_size; ++iter)
@@ -161,22 +167,27 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    template <bool use_BIO_model, bool use_high_order_features>
     void do_test()
     {
+        dlog << LINFO << "use_BIO_model: "<< use_BIO_model;
+        dlog << LINFO << "use_high_order_features: "<< use_high_order_features;
+
         std::vector<std::vector<unsigned long> > samples;
         std::vector<std::vector<std::pair<unsigned long,unsigned long> > > segments;
         make_dataset2( samples, segments, 200);
 
         print_spinner();
+        typedef unigram_extractor<use_BIO_model,use_high_order_features> fe_type;
 
-        unigram_extractor fe_temp;
-        unigram_extractor fe_temp2;
-        structural_sequence_segmentation_trainer<unigram_extractor> trainer(fe_temp2);
+        fe_type fe_temp;
+        fe_type fe_temp2;
+        structural_sequence_segmentation_trainer<fe_type> trainer(fe_temp2);
         trainer.set_c(4);
         trainer.set_num_threads(1);
 
 
-        sequence_segmenter<unigram_extractor> labeler = trainer.train(samples, segments);
+        sequence_segmenter<fe_type> labeler = trainer.train(samples, segments);
 
         print_spinner();
 
@@ -215,7 +226,7 @@ namespace
         ostringstream sout;
         serialize(labeler, sout);
         istringstream sin(sout.str());
-        sequence_segmenter<unigram_extractor> labeler2;
+        sequence_segmenter<fe_type> labeler2;
         deserialize(labeler2, sin);
 
         res = test_sequence_segmenter(labeler2, samples, segments);
@@ -238,7 +249,10 @@ namespace
         void perform_test (
         )
         {
-            do_test();
+            do_test<true,true>();
+            do_test<true,false>();
+            do_test<false,true>();
+            do_test<false,false>();
         }
     } a;
 

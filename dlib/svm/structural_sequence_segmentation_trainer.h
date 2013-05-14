@@ -142,20 +142,50 @@ namespace dlib
                         << "\n\t this: " << this
             );
 
-            // convert y into tagged BIO labels
             std::vector<std::vector<unsigned long> > labels(y.size());
-            for (unsigned long i = 0; i < labels.size(); ++i)
+            if (feature_extractor::use_BIO_model)
             {
-                labels[i].resize(x[i].size(), impl_ss::OUTSIDE);
-                for (unsigned long j = 0; j < y[i].size(); ++j)
+                // convert y into tagged BIO labels
+                for (unsigned long i = 0; i < labels.size(); ++i)
                 {
-                    const unsigned long begin = y[i][j].first;
-                    const unsigned long end = y[i][j].second;
-                    if (begin != end)
+                    labels[i].resize(x[i].size(), impl_ss::OUTSIDE);
+                    for (unsigned long j = 0; j < y[i].size(); ++j)
                     {
-                        labels[i][begin] = impl_ss::BEGIN;
-                        for (unsigned long k = begin+1; k < end; ++k)
-                            labels[i][k] = impl_ss::INSIDE;
+                        const unsigned long begin = y[i][j].first;
+                        const unsigned long end = y[i][j].second;
+                        if (begin != end)
+                        {
+                            labels[i][begin] = impl_ss::BEGIN;
+                            for (unsigned long k = begin+1; k < end; ++k)
+                                labels[i][k] = impl_ss::INSIDE;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // convert y into tagged BILOU labels
+                for (unsigned long i = 0; i < labels.size(); ++i)
+                {
+                    labels[i].resize(x[i].size(), impl_ss::OUTSIDE);
+                    for (unsigned long j = 0; j < y[i].size(); ++j)
+                    {
+                        const unsigned long begin = y[i][j].first;
+                        const unsigned long end = y[i][j].second;
+                        if (begin != end)
+                        {
+                            if (begin+1==end)
+                            {
+                                labels[i][begin] = impl_ss::UNIT;
+                            }
+                            else
+                            {
+                                labels[i][begin] = impl_ss::BEGIN;
+                                for (unsigned long k = begin+1; k+1 < end; ++k)
+                                    labels[i][k] = impl_ss::INSIDE;
+                                labels[i][end-1] = impl_ss::LAST;
+                            }
+                        }
                     }
                 }
             }

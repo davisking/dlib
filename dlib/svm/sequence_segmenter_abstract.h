@@ -26,25 +26,30 @@ namespace dlib
                 Where w is a parameter vector and the label sequence defines a segmentation
                 of x.
 
-                Recall that a sequence_segmenter uses the BIO tagging model and is also an
-                instantiation of the dlib::sequence_labeler.  This means that each element
-                of the label sequence y takes on one of three possible values (B, I, or O)
-                and together these labels define a segmentation of the sequence.  For example, 
-                to represent a segmentation of the sequence of words "The dog ran to Bob Jones" 
-                where only "Bob Jones" was segmented out we would use the label sequence OOOOBI.
+                Recall that a sequence_segmenter uses the BIO or BILOU tagging model and is
+                also an instantiation of the dlib::sequence_labeler.  Selecting to use the
+                BIO model means that each element of the label sequence y takes on one of
+                three possible values (B, I, or O) and together these labels define a
+                segmentation of the sequence.  For example, to represent a segmentation of
+                the sequence of words "The dog ran to Bob Jones" where only "Bob Jones" was
+                segmented out we would use the label sequence OOOOBI.  The BILOU model is
+                similar except that it uses five different labels and each segment is
+                labeled as U, BL, BIL, BIIL, BIIIL, and so on depending on its length.
+                Therefore, the BILOU model is able to more explicitly model the ends of the
+                segments than the BIO model, but has more parameters to estimate.
                 
-                Keeping this in mind, the purpose of a sequence_segmenter is to take care
-                of the bookkeeping associated with creating BIO tagging models for
-                segmentation tasks.  In particular, it presents the user with a simplified
-                version of the interface used by the dlib::sequence_labeler.  It does this
-                by completely hiding the BIO tags from the user and instead exposes an
-                explicit sub-segment based labeling representation.  It also simplifies the
-                construction of the PSI() feature vector. 
+                Keeping all this in mind, the purpose of a sequence_segmenter is to take
+                care of the bookkeeping associated with creating BIO/BILOU tagging models
+                for segmentation tasks.  In particular, it presents the user with a
+                simplified version of the interface used by the dlib::sequence_labeler.  It
+                does this by completely hiding the BIO/BILOU tags from the user and instead
+                exposes an explicit sub-segment based labeling representation.  It also
+                simplifies the construction of the PSI() feature vector. 
 
                 Like in the dlib::sequence_labeler, PSI() is a sum of feature vectors, each
                 derived from the entire input sequence x but only part of the label
                 sequence y.  In the case of the sequence_segmenter, we use an order one
-                model Markov.  This means that that 
+                model Markov.  This means that 
                     PSI(x,y) == sum_i XI(x, y_{i-1}, y_{i}, i)
                 where the sum is taken over all the elements in the sequence.  At each
                 element we extract a feature vector, XI(), that is expected to encode
@@ -61,12 +66,12 @@ namespace dlib
                 independent of any labeling.  We denote this feature vector by ZI(x,i), where
                 x is the sequence and i is the position in question.  
                 
-                For example, suppose we use a window size of 3, then we can put all this 
-                together and define XI() in terms of ZI().  To do this, we can think of
-                XI() as containing 12*3 slots which contain either a zero vector or a ZI()
-                vector.  Each combination of window position and labeling has a different
-                slot.  To explain further, consider the following examples where we have
-                annotated which parts of XI() correspond to each slot.  
+                For example, suppose we use a window size of 3 and BIO tags, then we can
+                put all this together and define XI() in terms of ZI().  To do this, we can
+                think of XI() as containing 12*3 slots which contain either a zero vector
+                or a ZI() vector.  Each combination of window position and labeling has a
+                different slot.  To explain further, consider the following examples where
+                we have annotated which parts of XI() correspond to each slot.  
 
                 If the previous and current label are both B and we use a window size of 3
                 then XI() would be instantiated as:
@@ -152,7 +157,10 @@ namespace dlib
                                       0          \                        
                                       0           > If previous label is O and current label is O 
                                       0]         /  
-
+                    
+                    If we had instead used the BILOU tagging model the XI() vector would
+                    have been similarly defined except that there would be 5*5+5 slots for
+                    the various label combination instead of 3*3+3.
 
                     Finally, while not shown here, we also include nine indicator features
                     in XI() to model label transitions.  
@@ -167,6 +175,19 @@ namespace dlib
         // This should be the type used to represent an input sequence.  It can be
         // anything so long as it has a .size() which returns the length of the sequence.
         typedef the_type_used_to_represent_a_sequence sequence_type;
+
+        // If you want to use the BIO tagging model then set this bool to true.  Set it to
+        // false to use the BILOU tagging model.
+        const static bool use_BIO_model = true;
+
+        // In the WHAT THIS OBJECT REPRESENTS section above we discussed how we model the
+        // conjunction of the previous label and the window around each position.  Doing
+        // this greatly expands the size of the parameter vector w.  You can optionally
+        // disable these higher order features by setting the use_high_order_features bool
+        // to false.  This will cause XI() to include only slots which are independent of
+        // the previous label. 
+        const static bool use_high_order_features = true;
+
 
         example_feature_extractor (
         ); 
@@ -257,9 +278,8 @@ namespace dlib
             - fe must be an object that implements an interface compatible with the
               example_feature_extractor discussed above.
         ensures
-            - returns 3*3 + 12*fe.num_features()*fe.window_size()
-              (i.e. returns the dimensionality of the PSI() vector defined by the given
-              feature extractor.
+            - returns the dimensionality of the PSI() vector defined by the given feature
+              extractor.  
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -283,10 +303,11 @@ namespace dlib
                 contiguous words which refer to proper names.
 
                 The sequence_segmenter is implemented using the BIO (Begin, Inside,
-                Outside) sequence tagging model.  Moreover, the sequence tagging is done
-                internally using a dlib::sequence_labeler object and therefore
-                sequence_segmenter objects are examples of chain structured conditional
-                random field style sequence taggers. 
+                Outside) or BILOU (Begin, Inside, Last, Outside, Unit) sequence tagging
+                model.  Moreover, the sequence tagging is done internally using a
+                dlib::sequence_labeler object and therefore sequence_segmenter objects are
+                examples of chain structured conditional random field style sequence
+                taggers. 
 
             THREAD SAFETY
                 It is always safe to use distinct instances of this object in different

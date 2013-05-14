@@ -16,9 +16,13 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        // BIO/BILOU labels
         const unsigned int BEGIN   = 0;
         const unsigned int INSIDE  = 1;
         const unsigned int OUTSIDE = 2;
+        const unsigned int LAST    = 3;
+        const unsigned int UNIT    = 4;
+
 
     // ------------------------------------------------------------------------------------
 
@@ -52,13 +56,11 @@ namespace dlib
 
             unsigned long num_features() const
             {
-
-                const int base_dims = fe.num_features();
-                return num_labels()*(
-                    num_labels() +  // previous and current label
-                    base_dims*fe.window_size() + // window around current element
-                    num_labels()*base_dims*fe.window_size() // window around current element in conjunction with previous label
-                );
+                const unsigned long NL = ss_feature_extractor::use_BIO_model ? 3 : 5;
+                if (ss_feature_extractor::use_high_order_features)
+                    return NL*NL + (NL*NL+NL)*fe.num_features()*fe.window_size();
+                else
+                    return NL*NL + NL*fe.num_features()*fe.window_size();
             }
 
             unsigned long order() const 
@@ -68,7 +70,10 @@ namespace dlib
 
             unsigned long num_labels() const 
             { 
-                return 3; 
+                if (ss_feature_extractor::use_BIO_model)
+                    return 3;
+                else
+                    return 5;
             }
 
         private:
@@ -113,10 +118,58 @@ namespace dlib
                 unsigned long 
             ) const
             {
-                // Don't allow BIO label patterns that don't correspond to a sensical
-                // segmentation. 
-                if (y.size() > 1 && y(0) == INSIDE && y(1) == OUTSIDE)
-                    return true;
+                if (ss_feature_extractor::use_BIO_model)
+                {
+                    // Don't allow BIO label patterns that don't correspond to a sensical
+                    // segmentation. 
+                    if (y.size() > 1 && y(0) == INSIDE && y(1) == OUTSIDE)
+                        return true;
+                    if (y.size() == 1 && y(0) == INSIDE)
+                        return true;
+                }
+                else
+                {
+                    // Don't allow BILOU label patterns that don't correspond to a sensical
+                    // segmentation. 
+                    if (y.size() > 1)
+                    {
+                        if (y(1) == BEGIN && y(0) == OUTSIDE)
+                            return true;
+                        if (y(1) == BEGIN && y(0) == UNIT)
+                            return true;
+                        if (y(1) == BEGIN && y(0) == BEGIN)
+                            return true;
+
+                        if (y(1) == INSIDE && y(0) == BEGIN)
+                            return true;
+                        if (y(1) == INSIDE && y(0) == OUTSIDE)
+                            return true;
+                        if (y(1) == INSIDE && y(0) == UNIT)
+                            return true;
+
+                        if (y(1) == OUTSIDE && y(0) == INSIDE)
+                            return true;
+                        if (y(1) == OUTSIDE && y(0) == LAST)
+                            return true;
+
+                        if (y(1) == LAST && y(0) == INSIDE)
+                            return true;
+                        if (y(1) == LAST && y(0) == LAST)
+                            return true;
+
+                        if (y(1) == UNIT && y(0) == INSIDE)
+                            return true;
+                        if (y(1) == UNIT && y(0) == LAST)
+                            return true;
+                    }
+                    else
+                    {
+                        if (y(0) == INSIDE)
+                            return true;
+                        if (y(0) == LAST)
+                            return true;
+                    }
+                }
                 return false;
             }
 
@@ -146,7 +199,8 @@ namespace dlib
                         const unsigned long off1 = y(0)*base_dims;
                         dot_functor<feature_setter> fs1(set_feature, offset+off1);
                         fe.get_features(fs1, x, pos);
-                        if (y.size() > 1)
+
+                        if (ss_feature_extractor::use_high_order_features && y.size() > 1)
                         {
                             const unsigned long off2 = num_labels()*base_dims + (y(0)*num_labels()+y(1))*base_dims;
                             dot_functor<feature_setter> fs2(set_feature, offset+off2);
@@ -154,7 +208,10 @@ namespace dlib
                         }
                     }
 
-                    offset += num_labels()*(base_dims + num_labels()*base_dims);
+                    if (ss_feature_extractor::use_high_order_features)
+                        offset += num_labels()*base_dims + num_labels()*num_labels()*base_dims;
+                    else
+                        offset += num_labels()*base_dims;
                 }
 
             }
@@ -171,7 +228,11 @@ namespace dlib
         const feature_extractor& fe
     )
     {
-        return 3*3 + 12*fe.num_features()*fe.window_size();
+        const unsigned long NL = feature_extractor::use_BIO_model ? 3 : 5;
+        if (feature_extractor::use_high_order_features)
+            return NL*NL + (NL*NL+NL)*fe.num_features()*fe.window_size();
+        else
+            return NL*NL + NL*fe.num_features()*fe.window_size();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -272,18 +333,41 @@ namespace dlib
             std::vector<unsigned long> labels;
             labeler.label_sequence(x, labels);
 
-            // Convert from BIO tagging to the explicit segments representation.
-            for (unsigned long i = 0; i < labels.size(); ++i)
+            if (feature_extractor::use_BIO_model)
             {
-                if (labels[i] == impl_ss::BEGIN)
+                // Convert from BIO tagging to the explicit segments representation.
+                for (unsigned long i = 0; i < labels.size(); ++i)
                 {
-                    const unsigned long begin = i;
-                    ++i;
-                    while (i < labels.size() && labels[i] == impl_ss::INSIDE)
+                    if (labels[i] == impl_ss::BEGIN)
+                    {
+                        const unsigned long begin = i;
                         ++i;
+                        while (i < labels.size() && labels[i] == impl_ss::INSIDE)
+                            ++i;
 
-                    y.push_back(std::make_pair(begin, i));
-                    --i;
+                        y.push_back(std::make_pair(begin, i));
+                        --i;
+                    }
+                }
+            }
+            else
+            {
+                // Convert from BILOU tagging to the explicit segments representation.
+                for (unsigned long i = 0; i < labels.size(); ++i)
+                {
+                    if (labels[i] == impl_ss::BEGIN)
+                    {
+                        const unsigned long begin = i;
+                        ++i;
+                        while (i < labels.size() && labels[i] == impl_ss::INSIDE)
+                            ++i;
+
+                        y.push_back(std::make_pair(begin, i+1));
+                    }
+                    else if (labels[i] == impl_ss::UNIT)
+                    {
+                        y.push_back(std::make_pair(i, i+1));
+                    }
                 }
             }
         }
