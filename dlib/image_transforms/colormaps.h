@@ -125,6 +125,18 @@ namespace dlib
         return matrix_op<op>(op(img,max_val,min_val));
     }
 
+    template <
+        typename image_type
+        >
+    const matrix_op<op_heatmap<image_type> >  
+    heatmap (
+        const image_type& img
+    )
+    {
+        typedef op_heatmap<image_type> op;
+        return matrix_op<op>(op(img,max(mat(img)),0));
+    }
+
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
@@ -207,6 +219,18 @@ namespace dlib
     {
         typedef op_jet<image_type> op;
         return matrix_op<op>(op(img,max_val,min_val));
+    }
+
+    template <
+        typename image_type
+        >
+    const matrix_op<op_jet<image_type> >  
+    jet (
+        const image_type& img
+    )
+    {
+        typedef op_jet<image_type> op;
+        return matrix_op<op>(op(img,max(mat(img)),0));
     }
 
 // ----------------------------------------------------------------------------------------

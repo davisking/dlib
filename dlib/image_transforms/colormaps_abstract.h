@@ -11,6 +11,7 @@ namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template <
         typename image_type
@@ -31,6 +32,7 @@ namespace dlib
             - The returned matrix will have the same dimensions as img.
     !*/
 
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -59,6 +61,23 @@ namespace dlib
     template <
         typename image_type
         >
+    const matrix_exp heatmap (
+        const image_type& img
+    );
+    /*!
+        requires
+            - image_type is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<image_type::type> must be defined
+        ensures
+            - returns heatmap(img, max(mat(img)), 0)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
     const matrix_exp jet (
         const image_type& img,
         double max_val,
@@ -77,6 +96,23 @@ namespace dlib
             - The returned matrix will have the same dimensions as img.
     !*/
 
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    const matrix_exp jet (
+        const image_type& img
+    );
+    /*!
+        requires
+            - image_type is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<image_type::type> must be defined
+        ensures
+            - returns jet(img, max(mat(img)), 0)
+    !*/
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
 }
