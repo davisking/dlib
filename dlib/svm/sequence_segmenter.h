@@ -44,6 +44,22 @@ namespace dlib
             feature_extractor() {}
             feature_extractor(const ss_feature_extractor& ss_fe_) : fe(ss_fe_) {}
 
+            unsigned long num_nonnegative_weights (
+            ) const
+            {
+                const unsigned long NL = ss_feature_extractor::use_BIO_model ? 3 : 5;
+                if (ss_feature_extractor::allow_negative_weights)
+                {
+                    return 0;
+                }
+                else
+                {
+                    // We make everything non-negative except for the label transition
+                    // features.
+                    return num_features() - NL*NL;
+                }
+            }
+
             friend void serialize(const feature_extractor& item, std::ostream& out) 
             {
                 serialize(item.fe, out);
@@ -181,12 +197,7 @@ namespace dlib
                 unsigned long position
             ) const
             {
-                // Pull out an indicator feature for the type of transition between the
-                // previous label and the current label.
-                if (y.size() > 1)
-                    set_feature(y(1)*num_labels() + y(0));
-
-                unsigned long offset = num_labels()*num_labels();
+                unsigned long offset = 0;
 
                 const int window_size = fe.window_size();
 
@@ -214,6 +225,10 @@ namespace dlib
                         offset += num_labels()*base_dims;
                 }
 
+                // Pull out an indicator feature for the type of transition between the
+                // previous label and the current label.
+                if (y.size() > 1)
+                    set_feature(offset + y(1)*num_labels() + y(0));
             }
         };
 

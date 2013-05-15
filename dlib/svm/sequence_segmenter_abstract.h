@@ -162,8 +162,10 @@ namespace dlib
                     have been similarly defined except that there would be 5*5+5 slots for
                     the various label combination instead of 3*3+3.
 
-                    Finally, while not shown here, we also include nine indicator features
-                    in XI() to model label transitions.  
+                    Finally, while not shown here, we also include indicator features in
+                    XI() to model label transitions.  These are 9 extra features in the
+                    case of the BIO tagging model and 25 extra in the case of the BILOU
+                    tagging model.
 
             THREAD SAFETY
                 Instances of this object are required to be threadsafe, that is, it should
@@ -187,6 +189,13 @@ namespace dlib
         // to false.  This will cause XI() to include only slots which are independent of
         // the previous label. 
         const static bool use_high_order_features = true;
+
+        // You use a tool like the structural_sequence_segmentation_trainer to learn the
+        // weight vector needed by a sequence_segmenter.  You can tell the trainer to force
+        // all the elements of the weight vector corresponding to ZI() to be non-negative.
+        // This is all the elements of w except for the elements corresponding to the label
+        // transition indicator features.  To do this, just set allow_negative_weights to false.  
+        const static bool allow_negative_weights = true;
 
 
         example_feature_extractor (
