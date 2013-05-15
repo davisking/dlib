@@ -311,12 +311,11 @@ namespace dlib
                 you would be using a sequence_segmenter to find all the chunks of
                 contiguous words which refer to proper names.
 
-                The sequence_segmenter is implemented using the BIO (Begin, Inside,
-                Outside) or BILOU (Begin, Inside, Last, Outside, Unit) sequence tagging
-                model.  Moreover, the sequence tagging is done internally using a
-                dlib::sequence_labeler object and therefore sequence_segmenter objects are
-                examples of chain structured conditional random field style sequence
-                taggers. 
+                Internally, the sequence_segmenter uses the BIO (Begin, Inside, Outside) or
+                BILOU (Begin, Inside, Last, Outside, Unit) sequence tagging model.
+                Moreover, it is implemented using a dlib::sequence_labeler object and
+                therefore sequence_segmenter objects are examples of chain structured
+                conditional random field style sequence taggers. 
 
             THREAD SAFETY
                 It is always safe to use distinct instances of this object in different
