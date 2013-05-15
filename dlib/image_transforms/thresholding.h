@@ -218,8 +218,9 @@ namespace dlib
         }
 
         out_img.set_size(in_img.nr(),in_img.nc());
+        assign_all_pixels(out_img, off_pixel);
 
-        const long size = 100;
+        const long size = 1000;
         long rstack[size];
         long cstack[size];
 
