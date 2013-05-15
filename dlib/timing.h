@@ -133,7 +133,7 @@ namespace dlib
                     name = name_buf(i,"");
                 else 
                     name = cast_to_string(i);
-                max_name_length = std::max(max_name_length, name.size());
+                max_name_length = std::max<unsigned long>(max_name_length, name.size());
             }
 
             for (int i = 0; i < TIME_SLOTS; ++i)
