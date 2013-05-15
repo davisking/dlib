@@ -63,8 +63,10 @@ int main(int argc, char** argv)
         // the window by holding CTRL and scrolling the mouse wheel)
         image_window my_window(edge_image, "Normal Edge Image");
 
-        // We can also easily display the edge_image as a heatmap like so.
-        image_window win_hot(heatmap(edge_image, 255));
+        // We can also easily display the edge_image as a heatmap or using the jet color
+        // scheme like so.
+        image_window win_hot(heatmap(edge_image));
+        image_window win_jet(jet(edge_image));
 
         // also make a window to display the original image
         image_window my_window2(img, "Original Image");
