@@ -19,7 +19,8 @@ namespace dlib
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h or
+              a dlib::matrix
             - pixel_traits<typename image_type::type> is defined  
             - image.size() != 0
         ensures

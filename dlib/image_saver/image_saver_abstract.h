@@ -29,7 +29,8 @@ namespace dlib
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h or
+              a dlib::matrix
             - pixel_traits<typename image_type::type> is defined  
         ensures
             - writes the image to the out stream in the Microsoft Windows BMP format.
@@ -57,7 +58,8 @@ namespace dlib
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h or
+              a dlib::matrix
             - pixel_traits<typename image_type::type> is defined  
         ensures
             - opens the file indicated by file_name with an output file stream named fout
@@ -83,7 +85,8 @@ namespace dlib
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h or
+              a dlib::matrix
             - pixel_traits<typename image_type::type> is defined  
         ensures
             - writes the image to the out stream in the dlib dng format.
@@ -111,7 +114,8 @@ namespace dlib
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h or
+              a dlib::matrix
             - pixel_traits<typename image_type::type> is defined  
         ensures
             - opens the file indicated by file_name with an output file stream named fout 

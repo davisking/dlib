@@ -9,6 +9,8 @@
 #include <vector>
 #include <string>
 #include "../pixel.h"
+#include "../matrix/matrix_exp.h"
+#include "../image_transforms/assign_image.h"
 
 namespace dlib
 {
@@ -38,7 +40,7 @@ namespace dlib
     template <
         typename image_type
         >
-    void save_png(
+    typename disable_if<is_matrix<image_type> >::type save_png(
         const image_type& img,
         const std::string& file_name
     )
@@ -130,6 +132,24 @@ namespace dlib
 #endif
 
     }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP 
+        >
+    void save_png(
+        const matrix_exp<EXP>& img,
+        const std::string& file_name
+    )
+    {
+        array2d<typename EXP::type> temp;
+        assign_image(temp, img);
+        save_png(temp, file_name);
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #ifdef NO_MAKEFILE

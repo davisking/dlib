@@ -17,6 +17,8 @@
 #include "../dir_nav.h"
 #include "../float_details.h"
 #include "../vectorstream.h"
+#include "../matrix/matrix_exp.h"
+#include "../image_transforms/assign_image.h"
 
 namespace dlib
 {
@@ -229,12 +231,25 @@ namespace dlib
     template <
         typename image_type 
         >
-    inline void save_bmp (
+    inline typename disable_if<is_matrix<image_type> >::type save_bmp (
         const image_type& image,
         std::ostream& out
     )
     {
         save_bmp_helper<image_type>::save_bmp(image,out);
+    }
+
+    template <
+        typename EXP 
+        >
+    inline void save_bmp (
+        const matrix_exp<EXP>& image,
+        std::ostream& out
+    )
+    {
+        array2d<typename EXP::type> temp;
+        assign_image(temp, image);
+        save_bmp_helper<array2d<typename EXP::type> >::save_bmp(temp,out);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -578,13 +593,27 @@ namespace dlib
     template <
         typename image_type 
         >
-    inline void save_dng (
+    inline typename disable_if<is_matrix<image_type> >::type save_dng (
         const image_type& image,
         std::ostream& out
     )
     {
         using namespace dng_helpers_namespace;
         save_dng_helper<image_type>::save_dng(image,out);
+    }
+
+    template <
+        typename EXP 
+        >
+    inline void save_dng (
+        const matrix_exp<EXP>& image,
+        std::ostream& out
+    )
+    {
+        array2d<typename EXP::type> temp;
+        assign_image(temp, image);
+        using namespace dng_helpers_namespace;
+        save_dng_helper<array2d<typename EXP::type> >::save_dng(temp,out);
     }
 
 // ----------------------------------------------------------------------------------------
