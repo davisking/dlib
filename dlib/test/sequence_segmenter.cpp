@@ -265,10 +265,10 @@ namespace
 // ----------------------------------------------------------------------------------------
 
 
-    class test_sequence_segmenter : public tester
+    class unit_test_sequence_segmenter : public tester
     {
     public:
-        test_sequence_segmenter (
+        unit_test_sequence_segmenter (
         ) :
             tester ("test_sequence_segmenter",
                 "Runs tests on the sequence segmenting code.")
