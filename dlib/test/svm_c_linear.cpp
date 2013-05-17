@@ -116,7 +116,7 @@ namespace
         double obj;
         decision_function<sparse_linear_kernel<sparse_sample_type> > df = trainer.train(samples, labels, obj);
         dlog << LDEBUG << "obj: "<< obj;
-        DLIB_TEST_MSG(abs(obj - 0.72222222222) < 1e-8, obj);
+        DLIB_TEST_MSG(abs(obj - 0.72222222222) < 1e-7, obj);
 
         DLIB_TEST(abs(df(samples[0]) - (-1)) < 1e-6);
         DLIB_TEST(abs(df(samples[1]) - (-1)) < 1e-6);
@@ -188,10 +188,10 @@ namespace
         double obj;
         decision_function<linear_kernel<sample_type> > df = trainer.train(samples, labels, obj);
         dlog << LDEBUG << "obj: "<< obj;
-        DLIB_TEST_MSG(abs(obj - 0.72222222222) < 1e-8, abs(obj - 0.72222222222));
+        DLIB_TEST_MSG(abs(obj - 0.72222222222) < 1e-7, abs(obj - 0.72222222222));
         // There shouldn't be any margin violations since this dataset is so trivial.  So that means the objective
         // should be exactly the squared norm of the decision plane (times 0.5).
-        DLIB_TEST_MSG(abs(length_squared(df.basis_vectors(0))*0.5 + df.b*df.b*0.5 - 0.72222222222) < 1e-8, 
+        DLIB_TEST_MSG(abs(length_squared(df.basis_vectors(0))*0.5 + df.b*df.b*0.5 - 0.72222222222) < 1e-7, 
                       length_squared(df.basis_vectors(0))*0.5 + df.b*df.b*0.5);
 
         DLIB_TEST(abs(df(samples[0]) - (-1)) < 1e-6);
