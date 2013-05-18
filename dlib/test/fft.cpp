@@ -79,6 +79,23 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_random_real_ffts()
+    {
+        print_spinner();
+        for (int iter = 0; iter < 10; ++iter)
+        {
+            for (int size = 1; size <= 64; size *= 2)
+            {
+                const matrix<complex<double>,0,1> m1 = complex_matrix(real(rand_complex(size)));
+                const matrix<complex<float>,0,1> fm1 = matrix_cast<complex<float> >(complex_matrix(real(rand_complex(size))));
+
+                DLIB_TEST(max(norm(ifft(fft(complex_matrix(real(m1))))-m1)) < 1e-16);
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class test_fft : public tester
     {
     public:
@@ -93,6 +110,7 @@ namespace
         {
             test_against_saved_good_ffts();
             test_random_ffts();
+            test_random_real_ffts();
         }
     } a;
 

@@ -22,18 +22,13 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename T, 
-        long NR, 
-        long NC, 
-        typename MM, 
-        typename L
-        >
-    matrix<std::complex<T>,NR,NC,MM,L> fft (
-        const matrix<std::complex<T>,NR,NC,MM,L>& data
-    );
+    template <typename EXP>
+    typename EXP::matrix_type fft (
+        const matrix_exp<EXP>& data
+    );  
     /*!
         requires
+            - data contains elements of type std::complex<>
             - is_vector(data) == true
             - is_power_of_two(data.size()) == true
         ensures
@@ -53,18 +48,13 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename T, 
-        long NR, 
-        long NC, 
-        typename MM, 
-        typename L
-        >
-    matrix<std::complex<T>,NR,NC,MM,L> ifft (
-        const matrix<std::complex<T>,NR,NC,MM,L>& data 
-    );
+    template <typename EXP>
+    typename EXP::matrix_type ifft (
+        const matrix_exp<EXP>& data
+    );  
     /*!
         requires
+            - data contains elements of type std::complex<>
             - is_vector(data) == true
             - is_power_of_two(data.size()) == true
         ensures
