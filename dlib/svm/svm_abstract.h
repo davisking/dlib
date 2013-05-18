@@ -94,6 +94,9 @@ namespace dlib
     );
     /*!
         ensures
+            - Note that a sequence segmentation problem is a task where you are given a
+              sequence of objects (e.g. words in a sentence) and your task is to find
+              certain types of sub-sequences (e.g. proper names).
             - returns true if all of the following are true and false otherwise:
                 - is_learning_problem(samples, segments) == true
                 - for all valid i:
