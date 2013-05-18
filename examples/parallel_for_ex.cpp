@@ -177,7 +177,7 @@ void example_using_lambda_functions()
 
 struct function_object
 {
-    function_object( std::vector<int>& vect ) : vect(vect) {}
+    function_object( std::vector<int>& vect_ ) : vect(vect_) {}
 
     std::vector<int>& vect;
 
@@ -190,7 +190,7 @@ struct function_object
 
 struct function_object_sum
 {
-    function_object_sum( const std::vector<int>& vect, int& sum_ ) : vect(vect), sum(sum_) {}
+    function_object_sum( const std::vector<int>& vect_, int& sum_ ) : vect(vect_), sum(sum_) {}
 
     const std::vector<int>& vect;
     int& sum;
