@@ -78,7 +78,7 @@ namespace dlib
         !*/
 
         void set_epsilon (
-            scalar_type eps_
+            scalar_type eps
         );
         /*!
             requires
@@ -100,7 +100,7 @@ namespace dlib
         !*/
 
         void set_epsilon_insensitivity (
-            scalar_type eps_
+            scalar_type eps
         );
         /*!
             requires
@@ -222,7 +222,7 @@ namespace dlib
         !*/
 
         void set_c (
-            scalar_type C_ 
+            scalar_type C 
         );
         /*!
             requires
