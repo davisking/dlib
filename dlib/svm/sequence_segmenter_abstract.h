@@ -163,9 +163,9 @@ namespace dlib
                     the various label combination instead of 12*3.
 
                     Finally, while not shown here, we also include indicator features in
-                    XI() to model label transitions.  These are 9 extra features in the
-                    case of the BIO tagging model and 25 extra in the case of the BILOU
-                    tagging model.
+                    XI() to model label transitions and individual label biases.  These are
+                    12 extra features in the case of the BIO tagging model and 30 extra in
+                    the case of the BILOU tagging model.
 
             THREAD SAFETY
                 Instances of this object are required to be threadsafe, that is, it should

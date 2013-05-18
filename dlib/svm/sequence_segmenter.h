@@ -74,9 +74,9 @@ namespace dlib
             {
                 const unsigned long NL = ss_feature_extractor::use_BIO_model ? 3 : 5;
                 if (ss_feature_extractor::use_high_order_features)
-                    return NL*NL + (NL*NL+NL)*fe.num_features()*fe.window_size();
+                    return NL + NL*NL + (NL*NL+NL)*fe.num_features()*fe.window_size();
                 else
-                    return NL*NL + NL*fe.num_features()*fe.window_size();
+                    return NL + NL*NL + NL*fe.num_features()*fe.window_size();
             }
 
             unsigned long order() const 
@@ -229,6 +229,11 @@ namespace dlib
                 // previous label and the current label.
                 if (y.size() > 1)
                     set_feature(offset + y(1)*num_labels() + y(0));
+
+                offset += num_labels()*num_labels();
+                // pull out an indicator feature for the current label.  This is the per
+                // label bias.
+                set_feature(offset + y(0));
             }
         };
 
@@ -245,9 +250,9 @@ namespace dlib
     {
         const unsigned long NL = feature_extractor::use_BIO_model ? 3 : 5;
         if (feature_extractor::use_high_order_features)
-            return NL*NL + (NL*NL+NL)*fe.num_features()*fe.window_size();
+            return NL + NL*NL + (NL*NL+NL)*fe.num_features()*fe.window_size();
         else
-            return NL*NL + NL*fe.num_features()*fe.window_size();
+            return NL + NL*NL + NL*fe.num_features()*fe.window_size();
     }
 
 // ----------------------------------------------------------------------------------------
