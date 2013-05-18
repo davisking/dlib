@@ -363,6 +363,19 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline rectangle intersect (
+        const rectangle& a,
+        const rectangle& b
+    ) { return a.intersect(b); }
+
+// ----------------------------------------------------------------------------------------
+
+    inline unsigned long area (
+        const rectangle& a
+    ) { return a.area(); }
+
+// ----------------------------------------------------------------------------------------
+
     inline point center (
         const dlib::rectangle& rect
     )
