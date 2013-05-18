@@ -49,7 +49,7 @@ namespace dlib
                 Like in the dlib::sequence_labeler, PSI() is a sum of feature vectors, each
                 derived from the entire input sequence x but only part of the label
                 sequence y.  In the case of the sequence_segmenter, we use an order one
-                model Markov.  This means that 
+                Markov model.  This means that 
                     PSI(x,y) == sum_i XI(x, y_{i-1}, y_{i}, i)
                 where the sum is taken over all the elements in the sequence.  At each
                 element we extract a feature vector, XI(), that is expected to encode
@@ -159,8 +159,8 @@ namespace dlib
                                       0]         /  
                     
                     If we had instead used the BILOU tagging model the XI() vector would
-                    have been similarly defined except that there would be 5*5+5 slots for
-                    the various label combination instead of 3*3+3.
+                    have been similarly defined except that there would be 30*3 slots for
+                    the various label combination instead of 12*3.
 
                     Finally, while not shown here, we also include indicator features in
                     XI() to model label transitions.  These are 9 extra features in the
@@ -396,6 +396,8 @@ namespace dlib
                           x[Y[i].first], x[Y[i].first+1], ..., x[Y[i].second-1]
                         - Y[i].first < x.size()
                         - Y[i].second <= x.size()
+                        - Y[i].first < Y[i].second
+                          (i.e. This function never outputs empty segments)
         !*/
 
         void segment_sequence (
