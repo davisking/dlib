@@ -37,6 +37,15 @@ namespace dlib
             return dlib::vector<double,2>(x,y);
         }
 
+        const matrix<double,2,2> get_m(
+        ) const 
+        { 
+            matrix<double,2,2> temp;
+            temp = cos_angle, -sin_angle,
+                   sin_angle, cos_angle;
+            return temp; 
+        }
+
     private:
         double sin_angle;
         double cos_angle;
@@ -67,6 +76,18 @@ namespace dlib
 
             return dlib::vector<double,2>(x,y) + translate;
         }
+
+        const matrix<double,2,2> get_m(
+        ) const 
+        { 
+            matrix<double,2,2> temp;
+            temp = cos_angle, -sin_angle,
+                   sin_angle, cos_angle;
+            return temp; 
+        }
+
+        const dlib::vector<double,2> get_b(
+        ) const { return translate; }
 
     private:
         double sin_angle;

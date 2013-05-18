@@ -112,8 +112,24 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - rotates p, then translates it and returns the result
+                - rotates p, then translates it and returns the result.  The output
+                  of this function is therefore equal to get_m()*p + get_b().
         !*/
+
+        const matrix<double,2,2> get_m(
+        ) const;
+        /*!
+            ensures
+                - returns the transformation matrix used by this object.
+        !*/
+
+        const dlib::vector<double,2> get_b(
+        ) const;
+        /*!
+            ensures
+                - returns the offset vector used by this object.
+        !*/
+
     };
 
 // ----------------------------------------------------------------------------------------
@@ -145,7 +161,15 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - rotates p and returns the result
+                - rotates p and returns the result. The output of this function is
+                  therefore equal to get_m()*p.
+        !*/
+
+        const matrix<double,2,2> get_m(
+        ) const;
+        /*!
+            ensures
+                - returns the transformation matrix used by this object.
         !*/
     };
 

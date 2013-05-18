@@ -294,6 +294,8 @@ namespace
             point_rotator rot(pi/2);
             DLIB_TEST(rot(point(1,0)) == point(0,1));
             DLIB_TEST(rot(point(0,1)) == point(-1,0));
+            DLIB_TEST(point(rot.get_m()*(dlib::vector<double,2>(1,0))) == point(0,1));
+            DLIB_TEST(point(rot.get_m()*(dlib::vector<double,2>(0,1))) == point(-1,0));
         }
 
         {
