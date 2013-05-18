@@ -391,6 +391,14 @@ namespace dlib
         {
             int version = 1;
             serialize(version, out);
+
+            // Save these just so we can compare them when we deserialize and make
+            // sure the feature_extractor being used is compatible with the model being
+            // loaded.
+            serialize(feature_extractor::use_BIO_model, out);
+            serialize(feature_extractor::use_high_order_features, out);
+            serialize(total_feature_vector_size(item.get_feature_extractor()), out);
+
             serialize(item.labeler, out);
         }
 
@@ -400,6 +408,30 @@ namespace dlib
             deserialize(version, in);
             if (version != 1)
                 throw serialization_error("Unexpected version found while deserializing dlib::sequence_segmenter.");
+
+            // Try to check if the saved model is compatible with the current feature
+            // extractor.
+            bool use_BIO_model, use_high_order_features;
+            unsigned long dims;
+            deserialize(use_BIO_model, in);
+            deserialize(use_high_order_features, in);
+            deserialize(dims, in);
+            if (use_BIO_model != feature_extractor::use_BIO_model)
+            {
+                throw serialization_error("Incompatible feature extractor found while deserializing "
+                    "dlib::sequence_segmenter. Wrong value of use_BIO_model.");
+            }
+            if (use_high_order_features != feature_extractor::use_high_order_features)
+            {
+                throw serialization_error("Incompatible feature extractor found while deserializing "
+                    "dlib::sequence_segmenter. Wrong value of use_high_order_features.");
+            }
+            if (dims != total_feature_vector_size(item.get_feature_extractor()))
+            {
+                throw serialization_error("Incompatible feature extractor found while deserializing "
+                    "dlib::sequence_segmenter. Wrong value of total_feature_vector_size().");
+            }
+
             deserialize(item.labeler, in);
         }
 
