@@ -99,16 +99,14 @@ namespace dlib
               certain types of sub-sequences (e.g. proper names).
             - returns true if all of the following are true and false otherwise:
                 - is_learning_problem(samples, segments) == true
-                - for all valid i:
-                    - for all valid j:
-                        - We interpret segments[i][j] as defining a half open range
-                          starting with segments[i][j].first and ending just before
-                          segments[i][j].second.
-                        - segments[i][j].first < segments[i][j].second
-                        - segments[i][j].second <= samples[i].size()
-                          (i.e. Each segment must be contained within its associated sequence)
-                        - segments[i][j] does not overlap with any of the other ranges in
-                          segments[i].
+                - for all valid i and j:
+                    - We interpret segments[i][j] as defining a half open range starting
+                      with segments[i][j].first and ending just before segments[i][j].second.
+                    - segments[i][j].first < segments[i][j].second
+                    - segments[i][j].second <= samples[i].size()
+                      (i.e. Each segment must be contained within its associated sequence)
+                    - segments[i][j] does not overlap with any of the other ranges in
+                      segments[i].
     !*/
 
 // ----------------------------------------------------------------------------------------
