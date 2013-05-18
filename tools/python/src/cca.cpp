@@ -83,6 +83,9 @@ ensures    \n\
     - len(R) > 0     \n\
     - len(L) == len(r)    \n\
     - regularization >= 0    \n\
+    - L and R must be properly sorted sparse vectors.  This means they must list their  \n\
+      elements in ascending index order and not contain duplicate index values.  You can use \n\
+      make_sparse_vector() to ensure this is true.  \n\
 ensures    \n\
     - This function performs a canonical correlation analysis between the vectors    \n\
       in L and R.  That is, it finds two transformation matrices, Ltrans and    \n\
