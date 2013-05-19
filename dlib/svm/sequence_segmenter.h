@@ -55,8 +55,8 @@ namespace dlib
                 else
                 {
                     // We make everything non-negative except for the label transition
-                    // features.
-                    return num_features() - NL*NL;
+                    // and bias features.
+                    return num_features() - NL*NL - NL;
                 }
             }
 

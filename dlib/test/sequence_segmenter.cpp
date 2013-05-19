@@ -243,9 +243,9 @@ namespace
 
         long N;
         if (use_BIO_model)
-            N = 3*3;
+            N = 3*3+3;
         else
-            N = 5*5;
+            N = 5*5+5;
         const double min_normal_weight = min(colm(labeler2.get_weights(), 0, labeler2.get_weights().size()-N));
         const double min_trans_weight = min(labeler2.get_weights());
         dlog << LINFO << "min_normal_weight: " << min_normal_weight;

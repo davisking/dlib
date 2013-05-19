@@ -190,11 +190,11 @@ namespace dlib
         // the previous label. 
         const static bool use_high_order_features = true;
 
-        // You use a tool like the structural_sequence_segmentation_trainer to learn the
-        // weight vector needed by a sequence_segmenter.  You can tell the trainer to force
-        // all the elements of the weight vector corresponding to ZI() to be non-negative.
-        // This is all the elements of w except for the elements corresponding to the label
-        // transition indicator features.  To do this, just set allow_negative_weights to false.  
+        // You use a tool like the structural_sequence_segmentation_trainer to learn the weight
+        // vector needed by a sequence_segmenter.  You can tell the trainer to force all the
+        // elements of the weight vector corresponding to ZI() to be non-negative.  This is all
+        // the elements of w except for the elements corresponding to the label transition and
+        // bias indicator features.  To do this, just set allow_negative_weights to false.  
         const static bool allow_negative_weights = true;
 
 
