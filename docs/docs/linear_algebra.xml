@@ -590,6 +590,8 @@
          <item>point_transform</item> 
          <item>point_transform_affine</item> 
          <item>find_affine_transform</item> 
+         <item>point_transform_projective</item> 
+         <item>find_projective_transform</item> 
          <item>rotation_matrix</item> 
          <item>get_rect</item> 
          <item>centered_rect</item> 
@@ -1041,6 +1043,34 @@
          <description>        
             This is a routine that takes in two sets of points and finds the
             best <a href="#point_transform_affine">affine transformation</a>
+            that maps between them.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>point_transform_projective</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/point_transforms_abstract.h</spec_file>
+         <description>        
+            This is an object that applies a projective transformation to a <a href="#vector">vector</a> or 
+            <a href="#point">point</a>.  Note that you can use <a href="#find_projective_transform">find_projective_transform</a>
+            to easily create projective transforms from sets of point correspondences.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>find_projective_transform</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/point_transforms_abstract.h</spec_file>
+         <description>        
+            This is a routine that takes in two sets of points and finds the
+            best <a href="#point_transform_projective">projective transformation</a>
             that maps between them.
          </description>
                                  
