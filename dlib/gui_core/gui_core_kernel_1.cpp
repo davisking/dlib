@@ -182,10 +182,16 @@ namespace dlib
                 {
                     if (PostMessage(helper_window,WM_USER+QUIT_EVENT_HANDLER_THREAD,0,0)==0)
                     {
-                        dlog << LERROR << "Unable to schedule function for execution in event handling thread.";
+                        dlog << LWARN << "Unable to schedule function for execution in event handling thread.";
+                        // No point calling wait() here since the thread isn't going to
+                        // terminate gracefully in this case.  So we just let the program
+                        // end as it will and hope for the best.
                     } 
-
-                    wait();
+                    else
+                    {
+                        // wait for the event handler thread to terminate.
+                        wait();
+                    }
                 }
 
             }
