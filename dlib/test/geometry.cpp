@@ -649,6 +649,65 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    double projective_transform_pass_rate(const double error_rate)
+    {
+        print_spinner();
+        dlog << LINFO << "projective_transform_pass_rate, error_rate: "<< error_rate;
+        dlib::rand rnd;
+        running_stats<double> pass_rate;
+        for (int rounds = 0; rounds < 1000; ++rounds)
+        {
+            running_stats<double> rs, rs_true;
+            matrix<double> H = 2*(randm(3,3,rnd)-0.5);
+
+            H(0,2) = rnd.get_random_gaussian()*10;
+            H(1,2) = rnd.get_random_gaussian()*10;
+
+
+            H(2,0) = rnd.get_random_double()*2.1;
+            H(2,1) = rnd.get_random_double()*2.1;
+            H(2,2) = 1 + rnd.get_random_gaussian()*3.1; 
+
+            point_transform_projective tran(H);
+
+            const int num = rnd.get_random_32bit_number()%8 + 4;
+
+            std::vector<dlib::vector<double,2> > from_points, to_points;
+            for (int i = 0; i < num; ++i)
+            {
+                dlib::vector<double,2> p = randm(2,1,rnd)*1000;
+                from_points.push_back(p);
+                to_points.push_back(tran(p) + (randm(2,1,rnd)-0.5)*error_rate);
+            }
+
+
+            point_transform_projective tran2 = find_projective_transform(from_points, to_points);
+
+            for (unsigned long i = 0; i < from_points.size(); ++i)
+            {
+                const double err = length_squared(tran2(from_points[i]) - to_points[i]);
+                rs.add(err);
+                const double err_true = length_squared(tran(from_points[i]) - to_points[i]);
+                rs_true.add(err_true);
+            }
+
+            if ( rs.mean() < 0.01)
+            {
+                pass_rate.add(1);
+            }
+            else
+            {
+                dlog << LINFO << " errors: mean/max: " << rs.mean() << "  " << rs.max();
+                pass_rate.add(0);
+            }
+        }
+
+        dlog << LINFO << " pass_rate.mean(): "<< pass_rate.mean();
+        return pass_rate.mean();
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class geometry_tester : public tester
     {
     public:
@@ -664,6 +723,8 @@ namespace
             geometry_test();
             test_border_enumerator();
             test_find_affine_transform();
+            DLIB_TEST(projective_transform_pass_rate(0.1) > 0.99);
+            DLIB_TEST(projective_transform_pass_rate(0.0) == 1);
         }
     } a;
 

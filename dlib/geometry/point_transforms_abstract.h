@@ -83,6 +83,78 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class point_transform_projective
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an object that takes 2D points or vectors and 
+                applies a projective transformation to them.
+        !*/
+
+    public:
+
+        point_transform_projective (
+            const matrix<double,3,3>& m
+        );
+        /*!
+            ensures
+                - #get_m() == m
+        !*/
+
+        point_transform_projective (
+            const point_transform_affine& tran
+        );
+        /*!
+            ensures
+                - This object will perform exactly the same transformation as the given
+                  affine transform.
+        !*/
+
+        const dlib::vector<double,2> operator() (
+            const dlib::vector<double,2>& p
+        ) const;
+        /*!
+            ensures
+                - Applies the projective transformation defined by this object's constructor
+                  to p and returns the result.  To define this precisely:
+                    - let p_h == the point p in homogeneous coordinates.  That is:
+                        - p_h.x() == p.x()
+                        - p_h.y() == p.y()
+                        - p_h.z() == 1 
+                    - let x == get_m()*p_h 
+                    - Then this function returns the value x/x.z()
+        !*/
+
+        const matrix<double,3,3>& get_m(
+        ) const;
+        /*!
+            ensures
+                - returns the transformation matrix used by this object.
+        !*/
+
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    point_transform_projective find_projective_transform (
+        const std::vector<dlib::vector<double,2> >& from_points,
+        const std::vector<dlib::vector<double,2> >& to_points
+    );
+    /*!
+        requires
+            - from_points.size() == to_points.size()
+            - from_points.size() >= 4
+        ensures
+            - returns a point_transform_projective object, T, such that for all valid i:
+                length(T(from_points[i]) - to_points[i])
+              is minimized as often as possible.  That is, this function finds the projective
+              transform that maps points in from_points to points in to_points.  If no
+              projective transform exists which performs this mapping exactly then the one
+              which minimizes the mean squared error is selected. 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     class point_transform
     {
         /*!
