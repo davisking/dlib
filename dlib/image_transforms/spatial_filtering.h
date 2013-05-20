@@ -9,6 +9,7 @@
 #include "../assert.h"
 #include "../array2d.h"
 #include "../matrix.h"
+#include "../geometry/border_enumerator.h"
 #include <limits>
 
 namespace dlib

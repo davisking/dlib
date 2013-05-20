@@ -3,7 +3,6 @@
 #ifndef DLIB_MATRIx_ASSIGn_
 #define DLIB_MATRIx_ASSIGn_
 
-#include "../geometry.h"
 #include "matrix.h"
 #include "matrix_utilities.h"
 #include "matrix_subexp.h"

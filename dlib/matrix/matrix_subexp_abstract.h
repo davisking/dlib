@@ -4,7 +4,7 @@
 #ifdef DLIB_MATRIx_SUBEXP_ABSTRACT_
 
 #include "matrix_abstract.h"
-#include "../geometry.h"
+#include "../geometry/rectangle.h"
 
 namespace dlib
 {

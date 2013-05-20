@@ -3,7 +3,7 @@
 #ifndef DLIB_MATRIx_DEFAULT_MULTIPLY_
 #define DLIB_MATRIx_DEFAULT_MULTIPLY_
 
-#include "../geometry.h"
+#include "../geometry/rectangle.h"
 #include "matrix.h"
 #include "matrix_utilities.h"
 #include "../enable_if.h"
