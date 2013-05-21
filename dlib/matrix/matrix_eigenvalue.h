@@ -593,6 +593,8 @@ namespace dlib
                 }
                 m++;
             }
+            if (m == n)
+                --m;
 
 
             // If m == l, d(l) is an eigenvalue,
