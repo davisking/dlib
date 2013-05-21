@@ -63,6 +63,20 @@ string array__repr__ (const std::vector<double>& v)
     return sout.str();
 }
 
+string range__str__ (const std::pair<unsigned long,unsigned long>& p)
+{
+    std::ostringstream sout;
+    sout << p.first << ": " << p.second;
+    return sout.str();
+}
+
+string range__repr__ (const std::pair<unsigned long,unsigned long>& p)
+{
+    std::ostringstream sout;
+    sout << "dlib.range(" << p.first << ", " << p.second << ")";
+    return sout.str();
+}
+
 string pair__str__ (const std::pair<unsigned long,double>& p)
 {
     std::ostringstream sout;
@@ -124,6 +138,25 @@ void bind_basic_types()
         .def("resize", resize<type>)
         .def_pickle(serialize_pickle<type>());
     }
+
+    typedef pair<unsigned long,unsigned long> range_type;
+    class_<range_type>("range", "This object is used to represent a range of elements in an array.", init<>() )
+        .def(init<unsigned long,unsigned long>())
+        .def_readwrite("begin",&range_type::first, "The index of the first element in the range.")
+        .def_readwrite("end",&range_type::second, "One past the index of the last element in the range.")
+        .def("__str__", range__str__)
+        .def("__repr__", range__repr__)
+        .def_pickle(serialize_pickle<range_type>());
+
+    {
+    typedef std::vector<std::pair<unsigned long, unsigned long> > type;
+    class_<type>("ranges", "This object is an array of range objects.")
+        .def(vector_indexing_suite<type>())
+        .def("clear", &type::clear)
+        .def("resize", resize<type>)
+        .def_pickle(serialize_pickle<type>());
+    }
+
 
     typedef pair<unsigned long,double> pair_type;
     class_<pair_type>("pair", "This object is used to represent the elements of a sparse_vector.", init<>() )
