@@ -13,4 +13,5 @@ add_python_module(dlib
    src/other.cpp
    src/basic.cpp
    src/cca.cpp
+   src/sequence_segmenter.cpp
    )

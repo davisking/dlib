@@ -9,6 +9,7 @@ void bind_basic_types();
 void bind_other();
 void bind_svm_rank_trainer();
 void bind_cca();
+void bind_sequence_segmenter();
 
 
 BOOST_PYTHON_MODULE(dlib)
@@ -25,5 +26,6 @@ BOOST_PYTHON_MODULE(dlib)
     bind_other();
     bind_svm_rank_trainer();
     bind_cca();
+    bind_sequence_segmenter();
 }
 
