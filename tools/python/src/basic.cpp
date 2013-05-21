@@ -157,6 +157,15 @@ void bind_basic_types()
         .def_pickle(serialize_pickle<type>());
     }
 
+    {
+    typedef std::vector<std::vector<std::pair<unsigned long, unsigned long> > > type;
+    class_<type>("rangess", "This object is an array of arrays of range objects.")
+        .def(vector_indexing_suite<type>())
+        .def("clear", &type::clear)
+        .def("resize", resize<type>)
+        .def_pickle(serialize_pickle<type>());
+    }
+
 
     typedef pair<unsigned long,double> pair_type;
     class_<pair_type>("pair", "This object is used to represent the elements of a sparse_vector.", init<>() )
