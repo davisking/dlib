@@ -105,7 +105,7 @@ tuple cv_get_matrix_size(cv& m)
 
 void bind_vector()
 {
-    class_<cv>("vector", init<>())
+    class_<cv>("vector", "This object represents the mathematical idea of a column vector.", init<>())
         .def("set_size", &cv_set_size)
         .def("resize", &cv_set_size)
         .def("__init__", make_constructor(&cv_from_object))

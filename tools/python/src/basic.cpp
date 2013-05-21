@@ -110,11 +110,20 @@ void bind_basic_types()
         .def("resize", resize<std::vector<double> >)
         .def_pickle(serialize_pickle<std::vector<double> >());
 
-    class_<std::vector<matrix<double,0,1> > >("vectors")
+    class_<std::vector<matrix<double,0,1> > >("vectors", "This object is an array of vector objects.")
         .def(vector_indexing_suite<std::vector<matrix<double,0,1> > >())
         .def("clear", &std::vector<matrix<double,0,1> >::clear)
         .def("resize", resize<std::vector<matrix<double,0,1> > >)
         .def_pickle(serialize_pickle<std::vector<matrix<double,0,1> > >());
+
+    {
+    typedef std::vector<std::vector<matrix<double,0,1> > > type;
+    class_<type>("vectorss", "This object is an array of arrays of vector objects.")
+        .def(vector_indexing_suite<type>())
+        .def("clear", &type::clear)
+        .def("resize", resize<type>)
+        .def_pickle(serialize_pickle<type>());
+    }
 
     typedef pair<unsigned long,double> pair_type;
     class_<pair_type>("pair", "This object is used to represent the elements of a sparse_vector.", init<>() )
@@ -125,7 +134,7 @@ void bind_basic_types()
         .def("__repr__", pair__repr__)
         .def_pickle(serialize_pickle<pair_type>());
 
-    class_<std::vector<pair_type> >("sparse_vector")
+    class_<std::vector<pair_type> >("sparse_vector", "This object represents the mathematical idea of a column vector.")
         .def(vector_indexing_suite<std::vector<pair_type> >())
         .def("__str__", sparse_vector__str__)
         .def("__repr__", sparse_vector__repr__)
@@ -133,11 +142,20 @@ void bind_basic_types()
         .def("resize", resize<std::vector<pair_type > >)
         .def_pickle(serialize_pickle<std::vector<pair_type> >());
 
-    class_<std::vector<std::vector<pair_type> > >("sparse_vectors")
+    class_<std::vector<std::vector<pair_type> > >("sparse_vectors", "This object is an array of sparse_vector objects.")
         .def(vector_indexing_suite<std::vector<std::vector<pair_type> > >())
         .def("clear", &std::vector<std::vector<pair_type> >::clear)
         .def("resize", resize<std::vector<std::vector<pair_type> > >)
         .def_pickle(serialize_pickle<std::vector<std::vector<pair_type> > >());
+
+    {
+    typedef std::vector<std::vector<std::vector<pair_type> > > type;
+    class_<type>("sparse_vectorss", "This object is an array of arrays of sparse_vector objects.")
+        .def(vector_indexing_suite<type>())
+        .def("clear", &type::clear)
+        .def("resize", resize<type>)
+        .def_pickle(serialize_pickle<type>());
+    }
 
 }
 
