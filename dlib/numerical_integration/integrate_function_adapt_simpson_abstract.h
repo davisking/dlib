@@ -3,16 +3,17 @@
 #ifndef DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSON_ABSTRACT__
 #define DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSON_ABSTRACT__
 
-#include "matrix.h"
-
 templte <typename T, typename funct>
 T integrate_function_adapt_simp(const funct& f, T a, T b, T tol);
 /*!
     requires 
         - b > a
-        - tol > 0
-        - f to be real valued single variable function
+        - tol > 0, tol is a tolerance parameter that typically determines 
+                   the overall accuracy of approximated integral.  We suggest 
+                   a default value of 1e-10 for tol. 
 
+        - f to be real valued single variable function
+    
     ensures
         - returns an approximation of the integral of f over the domain [a,b] 
           using the adaptive Simpson method outlined in 

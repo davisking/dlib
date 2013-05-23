@@ -81,6 +81,7 @@ set (tests
    member_function_pointer.cpp
    metaprogramming.cpp
    multithreaded_object.cpp
+   numerical_integration.cpp
    object_detector.cpp
    oca.cpp
    one_vs_all_trainer.cpp

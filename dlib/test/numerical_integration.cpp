@@ -40,45 +40,43 @@ namespace
 
             matrix<double,23,1> m;
             double tol = 1e-10;
-            double eps = 1e-4;
+            double eps = 1e-8;
 
-            adapt_simp ad;
-
-            m(0) = ad.integrate_function_adapt_simp(&gg1, 0.0, 1.0, tol);
-            m(1) = ad.integrate_function_adapt_simp(&gg2, 0.0, 1.0, tol);
-            m(2) = ad.integrate_function_adapt_simp(&gg3, 0.0, 1.0, tol);
-            m(3) = ad.integrate_function_adapt_simp(&gg4, 0.0, 1.0, tol);
-            m(4) = ad.integrate_function_adapt_simp(&gg5, -1.0, 1.0, tol);
-            m(5) = ad.integrate_function_adapt_simp(&gg6, 0.0, 1.0, tol);
-            m(6) = ad.integrate_function_adapt_simp(&gg7, 0.0, 1.0, tol);
-            m(7) = ad.integrate_function_adapt_simp(&gg8, 0.0, 1.0, tol);
-            m(8) = ad.integrate_function_adapt_simp(&gg9, 0.0, 1.0, tol);
-            m(9) = ad.integrate_function_adapt_simp(&gg10, 0.0, 1.0, tol);
-            m(10) = ad.integrate_function_adapt_simp(&gg11, 0.0, 1.0, tol);
-            m(11) = ad.integrate_function_adapt_simp(&gg12, 1e-6, 1.0, tol);
-            m(12) = ad.integrate_function_adapt_simp(&gg13, 0.0, 10.0, tol);
-            m(13) = ad.integrate_function_adapt_simp(&gg14, 0.0, 10.0, tol);
-            m(14) = ad.integrate_function_adapt_simp(&gg15, 0.0, 10.0, tol);
-            m(15) = ad.integrate_function_adapt_simp(&gg16, 0.01, 1.0, tol);
-            m(16) = ad.integrate_function_adapt_simp(&gg17, 0.0, pi, tol);
-            m(17) = ad.integrate_function_adapt_simp(&gg18, 0.0, 1.0, tol);
-            m(18) = ad.integrate_function_adapt_simp(&gg19, -1.0, 1.0, tol);
-            m(19) = ad.integrate_function_adapt_simp(&gg20, 0.0, 1.0, tol);
-            m(20) = ad.integrate_function_adapt_simp(&gg21, 0.0, 1.0, tol);
-            m(21) = ad.integrate_function_adapt_simp(&gg22, 0.0, 5.0, tol);
+            m(0) = integrate_function_adapt_simp(&gg1, 0.0, 1.0, tol);
+            m(1) = integrate_function_adapt_simp(&gg2, 0.0, 1.0, tol);
+            m(2) = integrate_function_adapt_simp(&gg3, 0.0, 1.0, tol);
+            m(3) = integrate_function_adapt_simp(&gg4, 0.0, 1.0, tol);
+            m(4) = integrate_function_adapt_simp(&gg5, -1.0, 1.0, tol);
+            m(5) = integrate_function_adapt_simp(&gg6, 0.0, 1.0, tol);
+            m(6) = integrate_function_adapt_simp(&gg7, 0.0, 1.0, tol);
+            m(7) = integrate_function_adapt_simp(&gg8, 0.0, 1.0, tol);
+            m(8) = integrate_function_adapt_simp(&gg9, 0.0, 1.0, tol);
+            m(9) = integrate_function_adapt_simp(&gg10, 0.0, 1.0, tol);
+            m(10) = integrate_function_adapt_simp(&gg11, 0.0, 1.0, tol);
+            m(11) = integrate_function_adapt_simp(&gg12, 1e-6, 1.0, tol);
+            m(12) = integrate_function_adapt_simp(&gg13, 0.0, 10.0, tol);
+            m(13) = integrate_function_adapt_simp(&gg14, 0.0, 10.0, tol);
+            m(14) = integrate_function_adapt_simp(&gg15, 0.0, 10.0, tol);
+            m(15) = integrate_function_adapt_simp(&gg16, 0.01, 1.0, tol);
+            m(16) = integrate_function_adapt_simp(&gg17, 0.0, pi, tol);
+            m(17) = integrate_function_adapt_simp(&gg18, 0.0, 1.0, tol);
+            m(18) = integrate_function_adapt_simp(&gg19, -1.0, 1.0, tol);
+            m(19) = integrate_function_adapt_simp(&gg20, 0.0, 1.0, tol);
+            m(20) = integrate_function_adapt_simp(&gg21, 0.0, 1.0, tol);
+            m(21) = integrate_function_adapt_simp(&gg22, 0.0, 5.0, tol);
 
             // Here we compare the approximated integrals against 
             // highly accurate approximations generated either from 
             // the exact integral values or Mathematica's NIntegrate 
             // function using a working precision of 20. 
 
-            DLIB_TEST(abs(m(0) - 1.7182818284590452354) < eps);
+            DLIB_TEST(abs(m(0) - 1.7182818284590452354) < 1e-11);
             DLIB_TEST(abs(m(1) - 0.7000000000000000000) < eps);
             DLIB_TEST(abs(m(2) - 0.6666666666666666667) < eps);
             DLIB_TEST(abs(m(3) - 0.2397141133444008336) < eps);
-            DLIB_TEST(abs(m(4) - 1.5822329637296729331) < eps);
+            DLIB_TEST(abs(m(4) - 1.5822329637296729331) < 1e-12);
             DLIB_TEST(abs(m(5) - 0.4000000000000000000) < eps);
-            DLIB_TEST(abs(m(6) - 2.0000000000000000000) < eps);
+            DLIB_TEST(abs(m(6) - 2.0000000000000000000) < 1e-4);
             DLIB_TEST(abs(m(7) - 0.8669729873399110375) < eps);
             DLIB_TEST(abs(m(8) - 1.1547005383792515290) < eps);
             DLIB_TEST(abs(m(9) - 0.6931471805599453094) < eps);
@@ -89,7 +87,7 @@ namespace
             DLIB_TEST(abs(m(14) - 0.4993633810764567446) < eps);
             DLIB_TEST(abs(m(15) - 0.1121393035410217   ) < eps);
             DLIB_TEST(abs(m(16) - 0.2910187828600526985) < eps);
-            DLIB_TEST(abs(m(17) + 0.4342944819032518276) < eps);
+            DLIB_TEST(abs(m(17) + 0.4342944819032518276) < 1e-5);
             DLIB_TEST(abs(m(18) - 1.56439644406905     ) < eps);
             DLIB_TEST(abs(m(19) - 0.1634949430186372261) < eps);
             DLIB_TEST(abs(m(20) - 0.0134924856494677726) < eps);
