@@ -421,6 +421,7 @@ namespace dlib
             deserialize(use_BIO_model, in);
             deserialize(use_high_order_features, in);
             deserialize(dims, in);
+            deserialize(item.labeler, in);
             if (use_BIO_model != feature_extractor::use_BIO_model)
             {
                 throw serialization_error("Incompatible feature extractor found while deserializing "
@@ -436,8 +437,6 @@ namespace dlib
                 throw serialization_error("Incompatible feature extractor found while deserializing "
                     "dlib::sequence_segmenter. Wrong value of total_feature_vector_size().");
             }
-
-            deserialize(item.labeler, in);
         }
 
     private:
