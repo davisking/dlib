@@ -19,7 +19,7 @@
 #include <stdint.h>
 #include <dlib/matrix.h>
 #include <dlib/numeric_constants.h>
-#include <dlib/integrate_function_adapt_simpson.h>
+#include <dlib/numerical_integration.h>
 
 using namespace std;
 using namespace dlib;
