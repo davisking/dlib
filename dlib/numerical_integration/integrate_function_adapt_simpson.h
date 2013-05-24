@@ -18,7 +18,7 @@ T impl_adapt_simp_stop(const funct& f, T a, T b, T fa, T fm, T fb, T is, int cnt
     i1 = (16.0*i2 - i1)/15.0;
     T Q = 0;
 
-    if((std::abs(i1-i2) <= std::numeric_limits<double>::epsilon()) || (m <= a) || (b <= m))
+    if((std::abs(i1-i2) <= std::abs(is)) || (m <= a) || (b <= m))
     {
         Q = i1;
     }
@@ -36,7 +36,7 @@ T impl_adapt_simp_stop(const funct& f, T a, T b, T fa, T fm, T fb, T is, int cnt
 }
 
 template <typename T, typename funct>
-T integrate_function_adapt_simp(const funct& f, T a, T b, T tol = 1e-10)
+T integrate_function_adapt_simp(const funct& f, T a, T b, T tol)
 {
     T eps = std::numeric_limits<double>::epsilon();
 
@@ -58,7 +58,7 @@ T integrate_function_adapt_simp(const funct& f, T a, T b, T tol = 1e-10)
         is = b-a;
     }
 
-    is = is*tol/eps;
+    is = is*tol;
 
     int cnt = 0;
 
