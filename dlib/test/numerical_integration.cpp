@@ -73,7 +73,7 @@ namespace
             DLIB_TEST(abs(m(1) - 0.7000000000000000000) < eps);
             DLIB_TEST(abs(m(2) - 0.6666666666666666667) < eps);
             DLIB_TEST(abs(m(3) - 0.2397141133444008336) < eps);
-            DLIB_TEST(abs(m(4) - 1.5822329637296729331) < 1e-12);
+            DLIB_TEST(abs(m(4) - 1.5822329637296729331) < 1e-11);
             DLIB_TEST(abs(m(5) - 0.4000000000000000000) < eps);
             DLIB_TEST(abs(m(6) - 2.0000000000000000000) < 1e-4);
             DLIB_TEST(abs(m(7) - 0.8669729873399110375) < eps);
