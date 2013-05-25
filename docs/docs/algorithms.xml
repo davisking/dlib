@@ -38,6 +38,7 @@
          <item>numeric_constants</item> 
          <item>put_in_range</item> 
          <item>qsort_array</item> 
+         <item>integrate_function_adapt_simp</item> 
          <item>square_root</item> 
          <item nolink="true">
             <name>Set Utilities</name>
@@ -650,6 +651,27 @@
             operator[] interface.  If the quick sort becomes unstable then it switches to a heap sort.  This 
             way sorting is guaranteed to take at most N*log(N) time.
          </description>
+                                 
+      </component>
+            
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>integrate_function_adapt_simp</name>
+         <file>dlib/numerical_integration.h</file>
+         <spec_file link="true">dlib/numerical_integration/integrate_function_adapt_simpson_abstract.h</spec_file>
+         <description>
+          Computes an approximation of the integral of a real valued function using the
+          adaptive Simpson method outlined in 
+          <blockquote>
+             Gander, W. and W. Gautshi, "Adaptive
+             Quadrature -- Revisited" BIT, Vol. 40, (2000), pp.84-101
+          </blockquote>
+         </description>
+         <examples>
+            <example>integrate_function_adapt_simp_ex.cpp.html</example>
+         </examples>
                                  
       </component>
             

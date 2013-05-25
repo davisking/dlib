@@ -134,6 +134,10 @@
                   <link>parallel_for_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Numerical_Integration</name>
+                  <link>integrate_function_adapt_simp_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>SVM-Rank</name>
                   <link>svm_rank_ex.cpp.html</link>
                </item>

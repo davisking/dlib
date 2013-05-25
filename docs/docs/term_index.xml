@@ -9,6 +9,8 @@
    <body>
       <term_list>
 
+         <term file="algorithms.html" name="integrate_function_adapt_simp"       include="dlib/numerical_integration.h"/>
+
          <term file="algorithms.html" name="numeric_constants"       include="dlib/numeric_constants.h"/>
          <term link="dlib/numeric_constants.h.html" name="pi"        include="dlib/numeric_constants.h"/>
          <term link="dlib/numeric_constants.h.html" name="e"         include="dlib/numeric_constants.h"/>
@@ -17,6 +19,15 @@
          <term link="dlib/numeric_constants.h.html" name="light_spd" include="dlib/numeric_constants.h"/>
          <term link="dlib/numeric_constants.h.html" name="newton_G"  include="dlib/numeric_constants.h"/>
          <term link="dlib/numeric_constants.h.html" name="planck_cst" include="dlib/numeric_constants.h"/>
+
+         <term link="dlib/numeric_constants.h.html" name="log10_2"   include="dlib/numeric_constants.h"/>
+         <term link="dlib/numeric_constants.h.html" name="golden_ratio" include="dlib/numeric_constants.h"/>
+         <term link="dlib/numeric_constants.h.html" name="euler_gamma" include="dlib/numeric_constants.h"/>
+         <term link="dlib/numeric_constants.h.html" name="glaisher"  include="dlib/numeric_constants.h"/>
+         <term link="dlib/numeric_constants.h.html" name="catalan"   include="dlib/numeric_constants.h"/>
+         <term link="dlib/numeric_constants.h.html" name="khinchin"  include="dlib/numeric_constants.h"/>
+         <term link="dlib/numeric_constants.h.html" name="apery"     include="dlib/numeric_constants.h"/>
+
 
 
          <term link="compile.html" name="DLIB_REVISION"/>
