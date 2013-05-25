@@ -4,6 +4,7 @@
 #define DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSON__
 
 #include "integrate_function_adapt_simpson_abstract.h"
+#include "../assert.h"
 
 // ----------------------------------------------------------------------------------------
 
@@ -51,6 +52,15 @@ namespace dlib
         T tol = 1e-10
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(b > a && tol > 0,
+            "\t T integrate_function_adapt_simp()"
+            << "\n\t Invalid arguments were given to this function."
+            << "\n\t a:   " << a
+            << "\n\t b:   " << b
+            << "\n\t tol: " << tol 
+            );
+
         T eps = std::numeric_limits<T>::epsilon();
         if(tol < eps)
         {
