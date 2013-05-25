@@ -66,7 +66,7 @@ string array__repr__ (const std::vector<double>& v)
 string range__str__ (const std::pair<unsigned long,unsigned long>& p)
 {
     std::ostringstream sout;
-    sout << p.first << ": " << p.second;
+    sout << p.first << ", " << p.second;
     return sout.str();
 }
 
