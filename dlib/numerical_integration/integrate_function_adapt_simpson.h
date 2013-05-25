@@ -1,13 +1,16 @@
 // Copyright (C) 2013 Steve Taylor (steve98654@gmail.com)
 // License: Boost Software License  See LICENSE.txt for full license
-
 #ifndef DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSON__
 #define DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSON__
+
+#include "integrate_function_adapt_simpson_abstract.h"
+
+// ----------------------------------------------------------------------------------------
 
 template <typename T, typename funct>
 T impl_adapt_simp_stop(const funct& f, T a, T b, T fa, T fm, T fb, T is, int cnt)
 {
-    int MAXINT = 1000;
+    const int MAXINT = 500;
    
     T m   = (a + b)/2.0;
     T h   = (b - a)/4.0;
@@ -18,14 +21,15 @@ T impl_adapt_simp_stop(const funct& f, T a, T b, T fa, T fm, T fb, T is, int cnt
     i1 = (16.0*i2 - i1)/15.0;
     T Q = 0;
 
-    if((std::abs(i1-i2) <= std::abs(is)) || (m <= a) || (b <= m))
+    if ((std::abs(i1-i2) <= std::abs(is)) || (m <= a) || (b <= m))
     {
         Q = i1;
     }
     else 
     {
         if(cnt < MAXINT)
-        {cnt = cnt + 1;
+        {
+            cnt = cnt + 1;
 
             Q = impl_adapt_simp_stop(f,a,m,fa,fml,fm,is,cnt) 
               + impl_adapt_simp_stop(f,m,b,fm,fmr,fb,is,cnt); 
@@ -35,11 +39,17 @@ T impl_adapt_simp_stop(const funct& f, T a, T b, T fa, T fm, T fb, T is, int cnt
     return Q;
 }
 
-template <typename T, typename funct>
-T integrate_function_adapt_simp(const funct& f, T a, T b, T tol)
-{
-    T eps = std::numeric_limits<double>::epsilon();
+// ----------------------------------------------------------------------------------------
 
+template <typename T, typename funct>
+T integrate_function_adapt_simp(
+    const funct& f,
+    T a,
+    T b,
+    T tol = 1e-10
+)
+{
+    T eps = std::numeric_limits<T>::epsilon();
     if(tol < eps)
     {
         tol = eps;
@@ -50,7 +60,7 @@ T integrate_function_adapt_simp(const funct& f, T a, T b, T tol)
     const T fb = f(b);
     const T fm = f((a+b)/2);
 
-    T is =ba/8*(fa+fb+fm+ f(a + 0.9501*ba) + f(a + 0.2311*ba) + f(a + 0.6068*ba)
+    T is = ba/8*(fa+fb+fm+ f(a + 0.9501*ba) + f(a + 0.2311*ba) + f(a + 0.6068*ba)
                            + f(a + 0.4860*ba) + f(a + 0.8913*ba));
 
     if(is == 0)
@@ -62,11 +72,10 @@ T integrate_function_adapt_simp(const funct& f, T a, T b, T tol)
 
     int cnt = 0;
 
-    T tstvl = impl_adapt_simp_stop(f, a, b, fa, fm, fb, is, cnt);
-
-    return tstvl;
-
+    return impl_adapt_simp_stop(f, a, b, fa, fm, fb, is, cnt);
 }
+
+// ----------------------------------------------------------------------------------------
 
 #endif //DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSON.h__
 

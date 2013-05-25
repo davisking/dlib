@@ -68,8 +68,6 @@ int main()
     
     double tol = 1e-10;
 
-    // Here we instantiate a class which contains the numerical quadrature method.
-    //    adapt_simp ad;
 
     // Here we compute the integrals of the five functions defined above using the same 
     // tolerance level for each.
@@ -88,7 +86,7 @@ int main()
     cout << "The integral of 1/(x^2 + cos(x)^2) for in [0,pi] is " << std::setprecision(10) <<  m3  << endl;
     cout << "The integral of sin(x) for in [-pi,pi] is "           << std::setprecision(10) <<  m4  << endl;
     cout << "The integral of 1/(1+x^2) for in [0,2] is "           << std::setprecision(10) <<  m5  << endl;
-    cout << "" << endl;
+    cout << endl;
 
     return 0;
 }
