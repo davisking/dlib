@@ -1,17 +1,15 @@
-// The contents of this file are in the public domain.  See
-// LICENSE_FOR_EXAMPLE_PROGRAMS.txt
-
+// The contents of this file are in the public domain.  See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
 
-    This example demonstrates the usage of the numerical quadrature function 
-    integrate_function_adapt_simpson.  This function takes as input a single variable 
-    function, the endpoints of a domain over which the function will be integrated, and a 
-    tolerance parameter.  It outputs an approximation of the integral of this function 
-    over the specified domain.  The algorithm is based on the adaptive Simpson method outlined in: 
+    This example demonstrates the usage of the numerical quadrature function
+    integrate_function_adapt_simp().  This function takes as input a single variable
+    function, the endpoints of a domain over which the function will be integrated, and a
+    tolerance parameter.  It outputs an approximation of the integral of this function over
+    the specified domain.  The algorithm is based on the adaptive Simpson method outlined in: 
 
-    Numerical Integration method based on the adaptive Simpson method in
-    Gander, W. and W. Gautschi, "Adaptive Quadrature – Revisited,"
-    BIT, Vol. 40, 2000, pp. 84-101
+        Numerical Integration method based on the adaptive Simpson method in
+        Gander, W. and W. Gautschi, "Adaptive Quadrature – Revisited,"
+        BIT, Vol. 40, 2000, pp. 84-101
 
 */
 
@@ -24,40 +22,39 @@
 using namespace std;
 using namespace dlib;
 
-// Here we define a class that consists of the set of functions that we 
-// wish to integrate and comment in the domain of integration.
+// Here we the set of functions that we wish to integrate and comment in the domain of
+// integration.
 
 // x in [0,1]
-static double gg1(double x)
+double gg1(double x)
 {
     return pow(e,x);
 }   
 
 // x in [0,1]
-static double gg2(double x)
+double gg2(double x)
 {
     return x*x;
 }
 
 // x in [0, pi]
-static double gg3(double x)
+double gg3(double x)
 {
     return 1/(x*x + cos(x)*cos(x));
 }
 
 // x in [-pi, pi]
-static double gg4(double x)
+double gg4(double x)
 {
     return sin(x);
 }
 
 // x in [0,2]
-static double gg5(double x)
+double gg5(double x)
 {
     return 1/(1 + x*x);
 }
 
-// Examples 
 int main()
 {
     // We first define a tolerance parameter.  Roughly speaking, a lower tolerance will
