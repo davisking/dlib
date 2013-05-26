@@ -15,3 +15,5 @@ add_python_module(dlib
    src/cca.cpp
    src/sequence_segmenter.cpp
    )
+
+install_dlib_to(../../python_examples)

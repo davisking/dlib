@@ -4,6 +4,12 @@
 # The macro takes the module name as its first argument and then a list of
 # source files to compile into the module.  See ../tools/python/CMakeLists.txt
 # for an example.
+#
+# It also sets up a macro called install_${module_name}_to() where
+# ${module_name} is whatever you named your module.  This install_*_to() macro
+# takes a folder name and creates an install target that will copy the compiled
+# python module to that folder when you run "make install".  Note that the path
+# given to install_*_to() is relative to your CMakeLists.txt file.
 
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} 
         "C:/Program Files (x86)/boost/boost_1_*"  
@@ -54,5 +60,15 @@ macro(add_python_module module_name module_sources )
          OUTPUT_NAME ${module_name}
          )
    endif()
+
+   macro(install_${module_name}_to path)
+       # Determine the path to our CMakeLists.txt file.
+       string(REPLACE "CMakeLists.txt" "" base_path ${CMAKE_CURRENT_LIST_FILE})
+       INSTALL(TARGETS ${module_name}_ 
+           LIBRARY DESTINATION ${base_path}/${path}
+           )
+   endmacro()
 endmacro()
+
+
 
