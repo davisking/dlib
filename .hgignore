@@ -16,3 +16,5 @@
 ^dlib/test/makefile.bak$
 python_examples/.*.so$
 python_examples/.*.pyd$
+python_examples/.*.dll$
+python_examples/.*.lib$
