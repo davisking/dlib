@@ -14,3 +14,5 @@
 ^dlib/test/debug.txt$
 ^dlib/test/test$
 ^dlib/test/makefile.bak$
+python_examples/.*.so$
+python_examples/.*.pyd$
