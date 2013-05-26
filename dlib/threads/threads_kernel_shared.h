@@ -35,6 +35,7 @@ namespace dlib
                     - destruct == false
                     - total_count == 0
                     - function_pointer == 0
+                    - do_not_ever_destruct == false
 
                 CONVENTION
                     - data_ready is associated with the mutex data_mutex 
@@ -73,7 +74,7 @@ namespace dlib
             );
             /*!
                 ensures
-                    - if (there are no threads currently running) then
+                    - if (there are no threads currently running and we haven't set do_not_ever_destruct) then
                         - calls delete this
                     - else
                         - does nothing
@@ -156,6 +157,7 @@ namespace dlib
             signaler data_empty;        // signaler to signal when the data is empty
             bool destruct;
             signaler destructed;        // signaler to signal when a thread has ended 
+            bool do_not_ever_destruct;
 
             struct registry_type
             {

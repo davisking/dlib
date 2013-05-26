@@ -5,6 +5,7 @@
 
 #include "threads_kernel_shared.h"
 #include "../assert.h"
+#include "../platform.h"
 #include <iostream>
 
 
@@ -71,8 +72,27 @@ namespace dlib
             data_ready(data_mutex),
             data_empty(data_mutex),
             destruct(false),
-            destructed(data_mutex)
-        {}
+            destructed(data_mutex),
+            do_not_ever_destruct(false)
+        {
+#if WIN32
+            // Trying to destroy the global thread pool when we are part of a DLL and the
+            // DLL is being unloaded can sometimes lead to weird behavior.  For example, in
+            // the python interpreter you will get the interpreter to hang.  Or if we are
+            // part of a MATLAB mex file and the file is being unloaded there can also be
+            // similar weird issues.  So when we are using dlib on windows we just disable
+            // the destruction of the global thread pool since it doesn't matter anyway.
+            // It's resources will just get freed by the OS.  This is even the recommended
+            // thing to do by Microsoft (http://blogs.msdn.com/b/oldnewthing/archive/2012/01/05/10253268.aspx).
+            // 
+            // As an aside, it's worth pointing out that the reason we try and free
+            // resources on program shutdown on other operating systems is so we can have
+            // clean reports from tools like valgrind which check for memory leaks.  But
+            // trying to do this on windows is a lost cause so we give up in this case and
+            // follow the Microsoft recommendation.
+            do_not_ever_destruct = true;
+#endif // WIN32
+        }
 
 // ----------------------------------------------------------------------------------------
 
@@ -98,6 +118,9 @@ namespace dlib
         destruct_if_ready (
         )
         {
+            if (do_not_ever_destruct)
+                return;
+
             data_mutex.lock();
 
             // if there aren't any active threads, just maybe some sitting around
