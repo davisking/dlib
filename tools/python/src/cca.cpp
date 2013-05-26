@@ -54,7 +54,7 @@ matrix<double,0,1> apply_cca_transform (
 
 void bind_cca()
 {
-    class_<cca_outputs>("_cca_outputs")
+    class_<cca_outputs>("cca_outputs")
         .add_property("correlations", &cca_outputs::correlations)
         .add_property("Ltrans", &cca_outputs::Ltrans)
         .add_property("Rtrans", &cca_outputs::Rtrans);
