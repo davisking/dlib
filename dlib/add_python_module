@@ -65,9 +65,23 @@ macro(add_python_module module_name module_sources )
        # Determine the path to our CMakeLists.txt file.
        string(REPLACE "CMakeLists.txt" "" base_path ${CMAKE_CURRENT_LIST_FILE})
        INSTALL(TARGETS ${module_name}_ 
-           LIBRARY DESTINATION ${base_path}/${path}
+            DESTINATION "${base_path}/${path}"
            )
+
+       # On windows we will usually need to have the boost-python .dll files in the same folder or
+       # you will get an error about how they can't be found.  So copy the boost .dll files along with
+       # your module to the install folder to avoid this.
+       if (WIN32)
+           list(GET Boost_LIBRARIES 1 boostlibs1)
+           list(GET Boost_LIBRARIES 3 boostlibs2)
+           string(REPLACE ".lib" ".dll" boostdlls1 ${boostlibs1})
+           string(REPLACE ".lib" ".dll" boostdlls2 ${boostlibs2})
+           INSTALL(FILES ${boostdlls1} ${boostdlls2} 
+                DESTINATION "${base_path}/${path}"
+                )
+       endif()
    endmacro()
+
 endmacro()
 
 
