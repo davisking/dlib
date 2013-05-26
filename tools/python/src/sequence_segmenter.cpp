@@ -66,7 +66,7 @@ public:
         unsigned long position
     ) const
     {
-        for (long i = 0; i < x[position].size(); ++i)
+        for (unsigned long i = 0; i < x[position].size(); ++i)
         {
             set_feature(x[position][i].first, x[position][i].second);
         }
