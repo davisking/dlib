@@ -22,6 +22,7 @@ xsltproc -V 		> /dev/null || return_error "xsltproc";
 tar --help 		> /dev/null || return_error "tar";
 zip -h 			> /dev/null || return_error "zip";
 bzip2 -h 	       &> /dev/null || return_error "bzip2";
+pygmentize -h 	       &> /dev/null || return_error "pygmentize";
 
 
 echo All needed utilities found 

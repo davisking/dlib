@@ -6,6 +6,11 @@ report_failure ()
     exit 1
 }
 
+htmlify_python_file ()
+{
+    pygmentize -f html -O full,style=vs $1 > $1.html
+}
+
 htmlify_cmake ()
 {
     echo "<html><head><title>" > $1.html;
@@ -24,7 +29,17 @@ htmlify_cmake ()
         -e "s/{\([^}]*\)}/\{<font color='#BB00BB'>\1<\/font>}/g"  \
         $1 >> $1.html;
 
-    echo "</pre></body></html>" >> $1;
+    echo "</pre></body></html>" >> $1.html;
+}
+
+htmlify_python()
+{
+    FILES=`\ls $1/*.py`
+    for i in $FILES
+    do
+        htmlify_python_file ${i}
+        rm ${i}
+    done
 }
 
 get_short_revision_number()
@@ -81,12 +96,16 @@ makedocs ()
 
 # grab a clean copy of the repository 
     rm -rf docs/cache
+    rm -rf docs/web
+    rm -rf docs/chm/docs
     rm -rf cache.$$
     hg archive cache.$$ || report_failure
 # put the stuff we need into the docs/cache folder
     mkdir docs/cache
     mv cache.$$/dlib docs/cache/
     mv cache.$$/examples docs/cache/
+    mv cache.$$/python_examples docs/cache/
+    htmlify_python docs/cache/python_examples/
     mv cache.$$/tools docs/cache/
     rm -rf cache.$$
 
@@ -126,6 +145,9 @@ makedocs ()
     cp docs/cache/examples/CMakeLists.txt docs/web/examples
     mkdir docs/chm/docs/examples || report_failure 
     cp docs/cache/examples/CMakeLists.txt docs/chm/docs/examples
+    cp docs/cache/python_examples/*.py.html docs/chm/docs/
+    cp docs/cache/python_examples/*.py.html docs/web/
+
     cp docs/*.gif docs/web
     cp docs/*.gif docs/chm/docs
     cp -r docs/guipics docs/web
@@ -184,13 +206,13 @@ makedocs ()
         rm docs/stylesheet.$$.xsl
     done
 
-
-    FILES=`find docs/chm docs/web -iname "*.html" -type f`
-    for i in $FILES
-    do
-        sed -e '/<!DOCTYPE/d' ${i} > temp.$$;
-        mv temp.$$ ${i};
-    done
+# Delete doc type header stuff
+#    FILES=`find docs/chm docs/web -iname "*.html" -type f`
+#    for i in $FILES
+#    do
+#        sed -e '/<!DOCTYPE/d' ${i} > temp.$$;
+#        mv temp.$$ ${i};
+#    done
 
 
     echo Generating sitemap
