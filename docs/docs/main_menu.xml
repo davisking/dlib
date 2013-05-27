@@ -123,7 +123,16 @@
             <link>term_index.html</link>
          </item>
          <item nolink="true">
-            <name>Examples</name>
+            <name>Examples: Python</name>
+            <sub>
+               <item>
+                  <name>Sequence_Segmenter</name>
+                  <link>sequence_segmenter.py.html</link>
+               </item>
+            </sub>
+         </item>
+         <item nolink="true">
+            <name>Examples: C++</name>
             <sub>
                <item>
                   <name>Train_Object_Detector</name>
