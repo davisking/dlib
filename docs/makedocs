@@ -105,7 +105,6 @@ makedocs ()
     mv cache.$$/dlib docs/cache/
     mv cache.$$/examples docs/cache/
     mv cache.$$/python_examples docs/cache/
-    htmlify_python docs/cache/python_examples/
     mv cache.$$/tools docs/cache/
     rm -rf cache.$$
 
@@ -145,8 +144,11 @@ makedocs ()
     cp docs/cache/examples/CMakeLists.txt docs/web/examples
     mkdir docs/chm/docs/examples || report_failure 
     cp docs/cache/examples/CMakeLists.txt docs/chm/docs/examples
-    cp docs/cache/python_examples/*.py.html docs/chm/docs/
-    cp docs/cache/python_examples/*.py.html docs/web/
+    cp docs/cache/python_examples/*.py docs/chm/docs/
+    cp docs/cache/python_examples/*.py docs/web/
+
+    htmlify_python docs/chm/docs/
+    htmlify_python docs/web/
 
     cp docs/*.gif docs/web
     cp docs/*.gif docs/chm/docs
