@@ -603,17 +603,55 @@ function BigToggle(node)
       </xsl:for-each>
    </xsl:template>      
 
-   <xsl:template match="examples">
-    <BR/>Example Programs: 
+   <!-- This template outputs a length 1 string if there is a python example program -->
+   <xsl:template name="has_python_example">
       <xsl:for-each select="example">
-         <xsl:choose>
-            <xsl:when test="position() = last()">
-               <a href="{.}"><xsl:value-of select="substring-before(.,'.html')"/></a>
-            </xsl:when>
-            <xsl:otherwise>
-               <a href="{.}"><xsl:value-of select="substring-before(.,'.html')"/></a>,
-            </xsl:otherwise>
-         </xsl:choose>              
+         <xsl:if test="substring-before(.,'.py.html') != ''">1</xsl:if>
+      </xsl:for-each>
+   </xsl:template>
+   <!-- This template outputs a length 1 string if there is a C++ example program -->
+   <xsl:template name="has_cpp_example">
+      <xsl:for-each select="example">
+         <xsl:if test="substring-before(.,'.cpp.html') != ''">1</xsl:if>
+      </xsl:for-each>
+   </xsl:template>
+
+   <xsl:template match="examples">
+      <xsl:variable name="has_python"><xsl:call-template name="has_python_example"/></xsl:variable>
+      <xsl:variable name="has_cpp"><xsl:call-template name="has_cpp_example"/></xsl:variable>
+      <xsl:variable name="numpy" select="string-length($has_python)"/>
+      <xsl:variable name="numcpp" select="string-length($has_cpp)"/>
+
+      <xsl:if test="$numcpp != 0"> <BR/>C++ Example Programs: </xsl:if>
+      <xsl:for-each select="example">
+         <xsl:variable name="fname" select="substring-before(.,'.cpp.html')"/>
+         <xsl:variable name="name" select="substring-before(.,'.html')"/>
+         <xsl:if test="$fname != ''">
+            <xsl:choose>
+               <xsl:when test="position() >= last()-$numpy">
+                  <a href="{.}"><xsl:value-of select="$name"/></a>
+               </xsl:when>
+               <xsl:otherwise>
+                  <a href="{.}"><xsl:value-of select="$name"/></a>,
+               </xsl:otherwise>
+            </xsl:choose>              
+         </xsl:if>
+      </xsl:for-each>
+
+      <xsl:if test="$numpy != 0"> <BR/>Python Example Programs: </xsl:if>
+      <xsl:for-each select="example">
+         <xsl:variable name="fname" select="substring-before(.,'.py.html')"/>
+         <xsl:variable name="name" select="substring-before(.,'.html')"/>
+         <xsl:if test="$fname != ''">
+            <xsl:choose>
+               <xsl:when test="position() >= last()-$numcpp">
+                  <a href="{.}"><xsl:value-of select="$name"/></a>
+               </xsl:when>
+               <xsl:otherwise>
+                  <a href="{.}"><xsl:value-of select="$name"/></a>,
+               </xsl:otherwise>
+            </xsl:choose>              
+         </xsl:if>
       </xsl:for-each>
    </xsl:template>
 
@@ -1081,7 +1119,7 @@ function BigToggle(node)
 
    <!-- ************************************************************************* -->
    <!-- ************************************************************************* -->
-   <!-- *******    Subversion stylesheet stfuff   ******************** -->
+   <!-- *******    Subversion stylesheet stuff   ******************** -->
    <!-- ************************************************************************* -->
    <!-- ************************************************************************* -->
 
