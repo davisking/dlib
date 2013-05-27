@@ -1,5 +1,7 @@
 #!/usr/bin/python
+# The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 #
+# 
 # You need to compile the dlib python interface before you can use this
 # file.  To do this, run compile_dlib_python_module.bat.  You also need to
 # have the boost-python library installed.  On Ubuntu, this can be done easily by running
@@ -37,7 +39,6 @@ samples[0].append(inside)
 samples[0].append(outside)
 samples[0].append(outside)
 samples[0].append(outside)
-segments[0]
 segments[0].append(dlib.range(2,5))
 
 
