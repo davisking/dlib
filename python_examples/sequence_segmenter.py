@@ -1,3 +1,5 @@
+#!/usr/bin/python
+#
 # You need to compile the dlib python interface before you can use this
 # file.  To do this, run compile_dlib_python_module.bat.  You also need to
 # have the boost-python library installed.  On Ubuntu, this can be done easily by running
