@@ -12,6 +12,20 @@
 
 <current>
 New Features:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+
+<old name="18.2" date="May 30, 2013">
+New Features:
    - Object Detection Tools:
       - Added another image scanning tool similar to scan_image_pyramid.  This
         is the new scan_image_boxes object.  It allows a user to easily specify
@@ -73,7 +87,7 @@ Other:
    - Upgraded the dng image format so it can natively store floating point
      pixel types without any information loss.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
