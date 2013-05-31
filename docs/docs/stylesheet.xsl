@@ -50,6 +50,10 @@
       <html>
          <head>
          <link rel="shortcut icon" href="dlib-icon.ico"/>
+         <xsl:if test="$is_chm != 'true'">
+            <meta property="og:image" content="http://dlib.net/dlib-icon-64.png"/>
+         </xsl:if>
+
 <!-- Verify with Google -->
 <meta name="verify-v1" content="{$google_verify_id}" />
 <meta name="google-site-verification" content="{$google_verify_id2}" />
