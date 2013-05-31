@@ -77,6 +77,34 @@ string range__repr__ (const std::pair<unsigned long,unsigned long>& p)
     return sout.str();
 }
 
+struct range_iter
+{
+    std::pair<unsigned long,unsigned long> range;
+    unsigned long cur;
+
+    unsigned long next()
+    {
+        if (cur < range.second)
+        {
+            return cur++;
+        }
+        else
+        {
+            PyErr_SetString(PyExc_StopIteration, "No more data.");
+            boost::python::throw_error_already_set();
+            return 0;
+        }
+    }
+};
+
+range_iter make_range_iterator (const std::pair<unsigned long,unsigned long>& p)
+{
+    range_iter temp;
+    temp.range = p;
+    temp.cur = p.first;
+    return temp;
+}
+
 string pair__str__ (const std::pair<unsigned long,double>& p)
 {
     std::ostringstream sout;
@@ -146,7 +174,11 @@ void bind_basic_types()
         .def_readwrite("end",&range_type::second, "One past the index of the last element in the range.")
         .def("__str__", range__str__)
         .def("__repr__", range__repr__)
+        .def("__iter__", &make_range_iterator)
         .def_pickle(serialize_pickle<range_type>());
+
+    class_<range_iter>("_range_iter")
+        .def("next", &range_iter::next);
 
     {
     typedef std::vector<std::pair<unsigned long, unsigned long> > type;
