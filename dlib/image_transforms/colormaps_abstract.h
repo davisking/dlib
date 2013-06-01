@@ -69,7 +69,7 @@ namespace dlib
             - image_type is an implementation of array2d/array2d_kernel_abstract.h
             - pixel_traits<image_type::type> must be defined
         ensures
-            - returns heatmap(img, max(mat(img)), 0)
+            - returns heatmap(img, max(mat(img)), min(mat(img)))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -109,7 +109,7 @@ namespace dlib
             - image_type is an implementation of array2d/array2d_kernel_abstract.h
             - pixel_traits<image_type::type> must be defined
         ensures
-            - returns jet(img, max(mat(img)), 0)
+            - returns jet(img, max(mat(img)), min(mat(img)))
     !*/
 
 // ----------------------------------------------------------------------------------------

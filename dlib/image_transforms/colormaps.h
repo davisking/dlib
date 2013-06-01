@@ -134,7 +134,7 @@ namespace dlib
     )
     {
         typedef op_heatmap<image_type> op;
-        return matrix_op<op>(op(img,max(mat(img)),0));
+        return matrix_op<op>(op(img,max(mat(img)),min(mat(img))));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -230,7 +230,7 @@ namespace dlib
     )
     {
         typedef op_jet<image_type> op;
-        return matrix_op<op>(op(img,max(mat(img)),0));
+        return matrix_op<op>(op(img,max(mat(img)),min(mat(img))));
     }
 
 // ----------------------------------------------------------------------------------------
