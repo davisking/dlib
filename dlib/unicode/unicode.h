@@ -222,7 +222,7 @@ namespace dlib
             ) :
                 fin(fin_)
             {
-                setg(in_buffer+max_putback, 
+                this->setg(in_buffer+max_putback, 
                      in_buffer+max_putback, 
                      in_buffer+max_putback);
             }
@@ -273,7 +273,7 @@ namespace dlib
                 }
 
                 // reset in_buffer pointers
-                setg (in_buffer+(max_putback-num_put_back),
+                this->setg (in_buffer+(max_putback-num_put_back),
                       in_buffer+max_putback,
                       in_buffer+max_putback+i);
 
