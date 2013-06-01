@@ -1,7 +1,7 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
     This is an example illustrating the use of the tools in dlib for doing distribution
-    estimation or detecting anomalies using one class support vector machines. 
+    estimation or detecting anomalies using one-class support vector machines. 
 
     Unlike regular classifiers, these tools take unlabeled points and try to learn what
     parts of the feature space normally contain data samples and which do not.  Typically
@@ -9,7 +9,7 @@
     identifying "unusual" data samples.
 
     In this example, we will sample points from the sinc() function to generate our set of
-    "typical looking" points.  Then we will train some one class classifiers and use them
+    "typical looking" points.  Then we will train some one-class classifiers and use them
     to predict if new points are unusual or not.  In this case, unusual means a point is
     not from the sinc() curve.
 */
@@ -23,8 +23,7 @@
 using namespace std;
 using namespace dlib;
 
-// Here is the sinc function we will be trying to learn with the krls
-// object.
+// Here is the sinc function we will be trying to learn with the one-class SVMs 
 double sinc(double x)
 {
     if (x == 0)
@@ -42,7 +41,7 @@ int main()
     // kernel is quite effective.
     typedef radial_basis_kernel<sample_type> kernel_type;
 
-    // Now make the object responsible for training one class SVMs.
+    // Now make the object responsible for training one-class SVMs.
     svm_one_class_trainer<kernel_type> trainer;
     // Here we set the width of the radial basis kernel to 4.0.  Larger values make the
     // width smaller and give the radial basis kernel more resolution.  If you play with
@@ -61,7 +60,7 @@ int main()
         samples.push_back(m);
     }
 
-    // Now train a one class SVM.  The result is a function df() that outputs large values
+    // Now train a one-class SVM.  The result is a function df() that outputs large values
     // for points from the sinc() curve and smaller values for points that are anomalous or
     // not on the sinc() curve in our case.
     decision_function<kernel_type> df = trainer.train(samples);
@@ -109,7 +108,7 @@ int main()
         -0.264318
     */
 
-    // So we can see that in this example the one class SVM correctly indicates that 
+    // So we can see that in this example the one-class SVM correctly indicates that 
     // the non-sinc points are definitely not points from the sinc() curve.
 
 
@@ -128,7 +127,7 @@ int main()
     // what it does).  
     //
     // But putting the empirical_kernel_map aside, the most important step in turning a
-    // linear SVM into a one class SVM is the following.  We append a -1 value onto the end
+    // linear SVM into a one-class SVM is the following.  We append a -1 value onto the end
     // of each feature vector and then tell the trainer to force the weight for this
     // feature to 1.  This means that if the linear SVM assigned all other weights a value
     // of 0 then the output from a learned decision function would always be -1.  The
@@ -217,7 +216,7 @@ int main()
 
 
     // Finally, to help you visualize what is happening here we are going to plot the
-    // response of the one class classifiers on the screen.  The code below creates two
+    // response of the one-class classifiers on the screen.  The code below creates two
     // heatmap images which show the response.  In these images you can clearly see where
     // the algorithms have identified the sinc() curve.  The hotter the pixel looks, the
     // larger the value coming out of the decision function and therefore the more "normal"

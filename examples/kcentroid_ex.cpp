@@ -23,7 +23,7 @@
 using namespace std;
 using namespace dlib;
 
-// Here is the sinc function we will be trying to learn with the krls
+// Here is the sinc function we will be trying to learn with the kcentroid 
 // object.
 double sinc(double x)
 {
