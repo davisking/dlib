@@ -72,9 +72,10 @@ namespace dlib
             - #Ltrans.nc() == N 
             - #Rtrans.nr() == R.nc()
             - #Rtrans.nc() == N 
-            - No centering is applied to the L and R matrices.  Therefore, if you want a
-              CCA relative to the centered vectors then you must apply centering yourself
-              before calling cca().
+            - This function assumes the data vectors in L and R have already been centered
+              (i.e. we assume the vectors have zero means).  However, in many cases it is
+              fine to use uncentered data with cca().  But if it is important for your
+              problem then you should center your data before passing it to cca().
             - This function works with reduced rank approximations of the L and R matrices.
               This makes it fast when working with large matrices.  In particular, we use
               the svd_fast() routine to find reduced rank representations of the input
