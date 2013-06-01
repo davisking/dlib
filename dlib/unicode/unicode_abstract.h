@@ -170,35 +170,47 @@ namespace dlib
         !*/
 
         basic_utf8_ifstream (
-            const char* file_name
+            const char* file_name,
+            std::ios_base::openmode mode = std::ios::in 
         );
         /*!
             ensures
                 - tries to open the given file for reading by this stream
+                - mode is interpreted exactly the same was as the open mode
+                  argument used by std::ifstream.
         !*/
 
         basic_utf8_ifstream (
-            const std::string& file_name
+            const std::string& file_name,
+            std::ios_base::openmode mode = std::ios::in 
         );
         /*!
             ensures
                 - tries to open the given file for reading by this stream
+                - mode is interpreted exactly the same was as the open mode
+                  argument used by std::ifstream.
         !*/
 
         void open(
-            const std::string& file_name
+            const std::string& file_name,
+            std::ios_base::openmode mode = std::ios::in 
         );
         /*!
             ensures
                 - tries to open the given file for reading by this stream
+                - mode is interpreted exactly the same was as the open mode
+                  argument used by std::ifstream.
         !*/
 
         void open (
-            const char* file_name
+            const char* file_name,
+            std::ios_base::openmode mode = std::ios::in 
         );
         /*!
             ensures
                 - tries to open the given file for reading by this stream
+                - mode is interpreted exactly the same was as the open mode
+                  argument used by std::ifstream.
         !*/
 
         void close (

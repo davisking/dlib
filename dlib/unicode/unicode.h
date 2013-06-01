@@ -544,41 +544,45 @@ namespace dlib
         ) : std::basic_istream<charT>(&buf), buf(fin) {}
 
         basic_utf8_ifstream (
-            const char* file_name
+            const char* file_name,
+            std::ios_base::openmode mode = std::ios::in 
         ) : 
             std::basic_istream<charT>(&buf),
             buf(fin)
         {
-            fin.open(file_name);
+            fin.open(file_name,mode);
             // make this have the same error state as fin
             this->clear(fin.rdstate());
         }
 
         basic_utf8_ifstream (
-            const std::string& file_name
+            const std::string& file_name,
+            std::ios_base::openmode mode = std::ios::in 
         ) : 
             std::basic_istream<charT>(&buf),
             buf(fin)
         {
-            fin.open(file_name.c_str());
+            fin.open(file_name.c_str(),mode);
             // make this have the same error state as fin
             this->clear(fin.rdstate());
         }
 
         void open(
-            const std::string& file_name
+            const std::string& file_name,
+            std::ios_base::openmode mode = std::ios::in 
         )
         {
-            open(file_name.c_str());
+            open(file_name.c_str(),mode);
         }
 
         void open (
-            const char* file_name
+            const char* file_name,
+            std::ios_base::openmode mode = std::ios::in 
         )
         {
             fin.close();
             fin.clear();
-            fin.open(file_name);
+            fin.open(file_name,mode);
             // make this have the same error state as fin
             this->clear(fin.rdstate());
         }
