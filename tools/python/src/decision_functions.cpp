@@ -3,6 +3,7 @@
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
 #include "serialize_pickle.h"
+#include <boost/python/args.hpp>
 #include <dlib/svm.h>
 
 using namespace dlib;
@@ -156,6 +157,7 @@ ranking_test _test_ranking_function2 (
 
 void bind_decision_functions()
 {
+    using boost::python::arg;
     add_linear_df<linear_kernel<sample_type> >("_decision_function_linear");
     add_linear_df<sparse_linear_kernel<sparse_vect> >("_decision_function_sparse_linear");
 
@@ -172,51 +174,82 @@ void bind_decision_functions()
     add_df<sparse_sigmoid_kernel<sparse_vect> >("_decision_function_sparse_sigmoid");
 
 
-    def("test_binary_decision_function", _test_binary_decision_function<linear_kernel<sample_type> >);
-    def("test_binary_decision_function", _test_binary_decision_function<sparse_linear_kernel<sparse_vect> >);
-    def("test_binary_decision_function", _test_binary_decision_function<radial_basis_kernel<sample_type> >);
-    def("test_binary_decision_function", _test_binary_decision_function<sparse_radial_basis_kernel<sparse_vect> >);
-    def("test_binary_decision_function", _test_binary_decision_function<polynomial_kernel<sample_type> >);
-    def("test_binary_decision_function", _test_binary_decision_function<sparse_polynomial_kernel<sparse_vect> >);
-    def("test_binary_decision_function", _test_binary_decision_function<histogram_intersection_kernel<sample_type> >);
-    def("test_binary_decision_function", _test_binary_decision_function<sparse_histogram_intersection_kernel<sparse_vect> >);
-    def("test_binary_decision_function", _test_binary_decision_function<sigmoid_kernel<sample_type> >);
-    def("test_binary_decision_function", _test_binary_decision_function<sparse_sigmoid_kernel<sparse_vect> >);
+    def("test_binary_decision_function", _test_binary_decision_function<linear_kernel<sample_type> >,
+        (arg("function"), arg("samples"), arg("labels")));
+    def("test_binary_decision_function", _test_binary_decision_function<sparse_linear_kernel<sparse_vect> >,
+        (arg("function"), arg("samples"), arg("labels")));
+    def("test_binary_decision_function", _test_binary_decision_function<radial_basis_kernel<sample_type> >,
+        (arg("function"), arg("samples"), arg("labels")));
+    def("test_binary_decision_function", _test_binary_decision_function<sparse_radial_basis_kernel<sparse_vect> >,
+        (arg("function"), arg("samples"), arg("labels")));
+    def("test_binary_decision_function", _test_binary_decision_function<polynomial_kernel<sample_type> >,
+        (arg("function"), arg("samples"), arg("labels")));
+    def("test_binary_decision_function", _test_binary_decision_function<sparse_polynomial_kernel<sparse_vect> >,
+        (arg("function"), arg("samples"), arg("labels")));
+    def("test_binary_decision_function", _test_binary_decision_function<histogram_intersection_kernel<sample_type> >,
+        (arg("function"), arg("samples"), arg("labels")));
+    def("test_binary_decision_function", _test_binary_decision_function<sparse_histogram_intersection_kernel<sparse_vect> >,
+        (arg("function"), arg("samples"), arg("labels")));
+    def("test_binary_decision_function", _test_binary_decision_function<sigmoid_kernel<sample_type> >,
+        (arg("function"), arg("samples"), arg("labels")));
+    def("test_binary_decision_function", _test_binary_decision_function<sparse_sigmoid_kernel<sparse_vect> >,
+        (arg("function"), arg("samples"), arg("labels")));
 
-    def("test_regression_function", _test_regression_function<linear_kernel<sample_type> >);
-    def("test_regression_function", _test_regression_function<sparse_linear_kernel<sparse_vect> >);
-    def("test_regression_function", _test_regression_function<radial_basis_kernel<sample_type> >);
-    def("test_regression_function", _test_regression_function<sparse_radial_basis_kernel<sparse_vect> >);
-    def("test_regression_function", _test_regression_function<histogram_intersection_kernel<sample_type> >);
-    def("test_regression_function", _test_regression_function<sparse_histogram_intersection_kernel<sparse_vect> >);
-    def("test_regression_function", _test_regression_function<sigmoid_kernel<sample_type> >);
-    def("test_regression_function", _test_regression_function<sparse_sigmoid_kernel<sparse_vect> >);
-    def("test_regression_function", _test_regression_function<polynomial_kernel<sample_type> >);
-    def("test_regression_function", _test_regression_function<sparse_polynomial_kernel<sparse_vect> >);
+    def("test_regression_function", _test_regression_function<linear_kernel<sample_type> >,
+        (arg("function"), arg("samples"), arg("targets")));
+    def("test_regression_function", _test_regression_function<sparse_linear_kernel<sparse_vect> >,
+        (arg("function"), arg("samples"), arg("targets")));
+    def("test_regression_function", _test_regression_function<radial_basis_kernel<sample_type> >,
+        (arg("function"), arg("samples"), arg("targets")));
+    def("test_regression_function", _test_regression_function<sparse_radial_basis_kernel<sparse_vect> >,
+        (arg("function"), arg("samples"), arg("targets")));
+    def("test_regression_function", _test_regression_function<histogram_intersection_kernel<sample_type> >,
+        (arg("function"), arg("samples"), arg("targets")));
+    def("test_regression_function", _test_regression_function<sparse_histogram_intersection_kernel<sparse_vect> >,
+        (arg("function"), arg("samples"), arg("targets")));
+    def("test_regression_function", _test_regression_function<sigmoid_kernel<sample_type> >,
+        (arg("function"), arg("samples"), arg("targets")));
+    def("test_regression_function", _test_regression_function<sparse_sigmoid_kernel<sparse_vect> >,
+        (arg("function"), arg("samples"), arg("targets")));
+    def("test_regression_function", _test_regression_function<polynomial_kernel<sample_type> >,
+        (arg("function"), arg("samples"), arg("targets")));
+    def("test_regression_function", _test_regression_function<sparse_polynomial_kernel<sparse_vect> >,
+        (arg("function"), arg("samples"), arg("targets")));
 
-    def("test_ranking_function", _test_ranking_function1<linear_kernel<sample_type> >);
-    def("test_ranking_function", _test_ranking_function1<sparse_linear_kernel<sparse_vect> >);
-    def("test_ranking_function", _test_ranking_function2<linear_kernel<sample_type> >);
-    def("test_ranking_function", _test_ranking_function2<sparse_linear_kernel<sparse_vect> >);
+    def("test_ranking_function", _test_ranking_function1<linear_kernel<sample_type> >,
+        (arg("function"), arg("samples")));
+    def("test_ranking_function", _test_ranking_function1<sparse_linear_kernel<sparse_vect> >,
+        (arg("function"), arg("samples")));
+    def("test_ranking_function", _test_ranking_function2<linear_kernel<sample_type> >,
+        (arg("function"), arg("sample")));
+    def("test_ranking_function", _test_ranking_function2<sparse_linear_kernel<sparse_vect> >,
+        (arg("function"), arg("sample")));
 
 
     class_<binary_test>("_binary_test")
-        .add_property("class1_accuracy", &binary_test::class1_accuracy)
         .def("__str__", binary_test__str__)
         .def("__repr__", binary_test__repr__)
-        .add_property("class2_accuracy", &binary_test::class2_accuracy);
+        .add_property("class1_accuracy", &binary_test::class1_accuracy,
+            "A value between 0 and 1, measures accuracy on the +1 class.")
+        .add_property("class2_accuracy", &binary_test::class2_accuracy,
+            "A value between 0 and 1, measures accuracy on the -1 class.");
 
     class_<ranking_test>("_ranking_test")
-        .add_property("ranking_accuracy", &ranking_test::ranking_accuracy)
         .def("__str__", ranking_test__str__)
         .def("__repr__", ranking_test__repr__)
-        .add_property("mean_ap", &ranking_test::mean_ap);
+        .add_property("ranking_accuracy", &ranking_test::ranking_accuracy,
+            "A value between 0 and 1, measures the fraction of times a relevant sample was ordered before a non-relevant sample.")
+        .add_property("mean_ap", &ranking_test::mean_ap,
+            "A value between 0 and 1, measures the mean average precision of the ranking.");
 
     class_<regression_test>("_regression_test")
-        .add_property("mean_squared_error", &regression_test::mean_squared_error)
         .def("__str__", regression_test__str__)
         .def("__repr__", regression_test__repr__)
-        .add_property("R_squared", &regression_test::R_squared);
+        .add_property("mean_squared_error", &regression_test::mean_squared_error,
+            "The mean squared error of a regression function on a dataset.")
+        .add_property("R_squared", &regression_test::R_squared,
+            "A value between 0 and 1, measures the squared correlation between the output of a \n"
+            "regression function and the target values.");
 }
 
 
