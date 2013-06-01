@@ -100,9 +100,10 @@ ensures    \n\
     - returns a structure containing the Ltrans and Rtrans transformation matrices    \n\
       as well as the estimated correlations between elements of the transformed    \n\
       vectors.    \n\
-    - No centering is applied to the L and R matrices.  Therefore, if you want a    \n\
-      CCA relative to the centered vectors then you must apply centering yourself    \n\
-      before calling cca().    \n\
+    - This function assumes the data vectors in L and R have already been centered    \n\
+      (i.e. we assume the vectors have zero means).  However, in many cases it is    \n\
+      fine to use uncentered data with cca().  But if it is important for your    \n\
+      problem then you should center your data before passing it to cca().   \n\
     - This function works with reduced rank approximations of the L and R matrices.    \n\
       This makes it fast when working with large matrices.  In particular, we use    \n\
       the dlib::svd_fast() routine to find reduced rank representations of the input    \n\
