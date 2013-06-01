@@ -45,7 +45,7 @@ int main()
     svm_one_class_trainer<kernel_type> trainer;
     // Here we set the width of the radial basis kernel to 4.0.  Larger values make the
     // width smaller and give the radial basis kernel more resolution.  If you play with
-    // the value and observe the program outputs you get a more intuitive feel for what
+    // the value and observe the program output you will get a more intuitive feel for what
     // that means.
     trainer.set_kernel(kernel_type(4.0));
 
@@ -60,9 +60,9 @@ int main()
         samples.push_back(m);
     }
 
-    // Now train a one-class SVM.  The result is a function df() that outputs large values
-    // for points from the sinc() curve and smaller values for points that are anomalous or
-    // not on the sinc() curve in our case.
+    // Now train a one-class SVM.  The result is a function, df(), that outputs large
+    // values for points from the sinc() curve and smaller values for points that are
+    // anomalous (i.e. not on the sinc() curve in our case).
     decision_function<kernel_type> df = trainer.train(samples);
 
     // So for example, lets look at the output from some points on the sinc() curve.  
@@ -132,7 +132,7 @@ int main()
     // feature to 1.  This means that if the linear SVM assigned all other weights a value
     // of 0 then the output from a learned decision function would always be -1.  The
     // second step is that we ask the SVM to label each training sample with +1.  This
-    // causes the SVM set the other feature weights such that the training samples have
+    // causes the SVM to set the other feature weights such that the training samples have
     // positive outputs from the learned decision function.  But the starting bias for all
     // the points in the whole feature space is -1.  The result is that points outside our
     // training set will not be affected, so their outputs from the decision function will
@@ -161,7 +161,7 @@ int main()
 
     // The svm_c_linear_dcd_trainer is a very fast SVM solver which only works with the
     // linear_kernel.  It has the nice feature of supporting this "force_last_weight_to_1"
-    // feature we discussed above.
+    // mode we discussed above.
     svm_c_linear_dcd_trainer<linear_kernel<sample_type> > linear_trainer;
     linear_trainer.force_last_weight_to_1(true);
 
