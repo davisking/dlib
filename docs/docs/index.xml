@@ -48,20 +48,19 @@
             </ul>
             </li>
 
-            <li><b>Portable Code</b>
+            <li><b>High Quality Portable Code</b>
                <ul>
+                  <li>Good unit test coverage.  The ratio of unit test lines of code to library lines of
+                     code is about 1 to 4.</li>
+                  <li>The library is tested regularly on MS Windows, Linux, and Mac OS X systems.  However, it should 
+                     work on any POSIX system and has been used on Solaris, HPUX, and the BSDs.</li>
+                  <li>No other packages are required to use the library.  Only APIs that are
+                     provided by an out of the box OS are needed. </li> 
                   <li>There is no installation or configure step needed before you can use the library.  See the
                      <a href="compile.html">How to compile</a> page for details.</li>
                   <li>All operating system specific code is isolated inside the OS abstraction layers which are 
                      kept as small as possible.   The rest of the library is either layered on top of the OS 
                      abstraction layers or is pure ISO standard C++.  </li>
-                  <li>Big/little endian agnostic</li>
-                  <li>No other packages are required to use the library.  Only APIs that are
-                     provided by an out of the box OS are needed. </li> 
-                  <li>Good unit test coverage.  The ratio of unit test lines of code to library lines of
-                     code is about 1 to 5.</li>
-                  <li>The library is tested regularly on MS Windows, Linux, and Mac OS X systems.  However, it should 
-                     work on any POSIX system and has been used on Solaris, HPUX, and the BSDs.</li>
                </ul>
             </li>
             <li><b>Threading</b>
