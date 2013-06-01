@@ -139,6 +139,10 @@
                   <link>train_object_detector.cpp.html</link>
                </item>
                <item>
+                  <name>One_Class_Classifiers</name>
+                  <link>one_class_classifiers_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Parallel_For_Loops</name>
                   <link>parallel_for_ex.cpp.html</link>
                </item>
