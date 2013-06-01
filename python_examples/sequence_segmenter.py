@@ -62,7 +62,8 @@ training_sequences[0].append(outside) # index 6
 training_sequences[0].append(outside) # index 7
 segments[0].append(dlib.range(2,5))
 
-# Add another training sequence
+# Add another training sequence.  This one is a little longer and has two "inside" segments
+# which should be detected.
 training_sequences[1].append(outside) # index 0
 training_sequences[1].append(outside) # index 1
 training_sequences[1].append(inside)  # index 2
@@ -71,7 +72,11 @@ training_sequences[1].append(inside)  # index 4
 training_sequences[1].append(inside)  # index 5
 training_sequences[1].append(outside) # index 6
 training_sequences[1].append(outside) # index 7
+training_sequences[1].append(outside) # index 8
+training_sequences[1].append(inside)  # index 9
+training_sequences[1].append(inside)  # index 10 
 segments[1].append(dlib.range(2,6))
+segments[1].append(dlib.range(9,11))
 
 
 # Now that we have a simple training set we can train a sequence segmenter.  However, the
