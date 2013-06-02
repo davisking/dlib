@@ -37,6 +37,8 @@
          <term file="linear_algebra.html" name="mat"   include="dlib/matrix.h" />
          <term file="linear_algebra.html" name="matrix" include="dlib/matrix.h"/>
          <term file="linear_algebra.html" name="move_rect" include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="intersect" include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="area" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="translate_rect" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="resize_rect" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="resize_rect_width" include="dlib/geometry.h"/>
