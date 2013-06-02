@@ -12,12 +12,23 @@
 
 <current>
 New Features:
+   - Added jet()
+   - Added python interface to some of the machine learning tools:
+   - Added the svr_linear_trainer
+   - Added the sequence_segmenter object.
+   - Added point_transform_projective and find_projective_transform()
+   - Added integrate_function_adapt_simpson()
 
 Non-Backwards Compatible Changes:
 
 Bug fixes:
+   - Fixed a bug in hysteresis_threshold() that caused it to produce incorrect
+     outputs sometimes.
+   - Fixed a segmentation fault in the eigenvalue_decomposition object which
+     could occur when NaN valued inputs were given.
 
 Other:
+   - Made image saving routines work on matrix objects in addition to array2d objects.
 
 </current>
 
