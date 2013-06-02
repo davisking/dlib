@@ -9,25 +9,9 @@
    <body>
       <br/><br/>
 
-         <p>
-            This page documents all the machine learning algorithms present in
-            the library.  In particular, there are algorithms for performing 
-            classification, regression, clustering, sequence labeling, assignment learning,
-            rank learning, graph segmentation, object detection, anomaly detection, 
-            and feature ranking, as well as algorithms for doing more 
-            specialized computations.
-         </p>
-
-         <p> 
-            A good tutorial and introduction to the general concepts used by most of the
-            objects in this part of the library can be found in the <a href="svm_ex.cpp.html">svm example</a> program.
-            After reading this example another good one to consult would be the <a href="model_selection_ex.cpp.html">model selection</a>
-            example program.  Finally, if you came here looking for a binary classification or regression tool then I would
-            try the <a href="#krr_trainer">krr_trainer</a> first as it is generally the easiest method to use.
-         </p>
-
+         <a href="ml_guide.svg"><img src="ml_guide.svg" width="100%"/></a>
          <p>   
-            The major design goal of this portion of the library is to provide a highly modular and
+            A major design goal of this portion of the library is to provide a highly modular and
             simple architecture for dealing with kernel algorithms. Towards this end, dlib takes a generic
             programming approach using C++ templates. In particular, each algorithm is parameterized
             to allow a user to supply either one of the predefined dlib kernels (e.g. <a 
@@ -41,7 +25,6 @@
          </p>
 
 
-         <br/> 
          <h3>Paper Describing dlib Machine Learning</h3>
          <pre>
 Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09a.pdf">Dlib-ml: A Machine Learning Toolkit</a>. 
@@ -470,6 +453,11 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                 regression algorithm.  You give it samples (x,y) and it learns the function
                 f(x) == y.  For a detailed description of the algorithm read the above paper.
             </p>
+               <p>
+                  Note that if you want to use the linear kernel then you would
+                  be better off using the <a href="#rls">rls</a> object as it
+                  is optimized for this case.
+               </p>
          </description>
 
          <examples>
@@ -554,6 +542,10 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <description>
                 This is an implementation of a kernelized k-means clustering algorithm.  
                 It performs k-means clustering by using the <a href="#kcentroid">kcentroid</a> object.  
+                <p>
+                   If you want to use the linear kernel (i.e. do a normal k-means clustering) then you
+                   should use the <a href="#find_clusters_using_kmeans">find_clusters_using_kmeans</a> routine.
+                </p>
          </description>
 
          <examples>

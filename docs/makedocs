@@ -152,6 +152,8 @@ makedocs ()
 
     cp docs/*.gif docs/web
     cp docs/*.gif docs/chm/docs
+    cp docs/ml_guide.svg docs/web
+    cp docs/ml_guide.svg docs/chm/docs
     cp -r docs/guipics docs/web
     cp -r docs/guipics docs/chm/docs
     cp docs/*.html docs/web
