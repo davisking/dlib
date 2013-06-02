@@ -107,9 +107,9 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:zoom="1.4331981"
-     inkscape:cx="1024.7633"
-     inkscape:cy="595.40208"
+     inkscape:zoom="1.0134241"
+     inkscape:cx="712.89974"
+     inkscape:cy="678.44745"
      inkscape:window-x="65"
      inkscape:window-y="24"
      inkscape:window-maximized="1"
@@ -3652,15 +3652,7 @@
       <tspan
          x="654.492"
          y="82.092796"
-         id="tspan584">Do you just want</tspan>
-      <tspan
-         x="654.492"
-         y="98.092796"
-         id="tspan586">to visualize your</tspan>
-      <tspan
-         x="654.492"
-         y="114.093"
-         id="tspan588">data?</tspan>
+         id="tspan584" />
     </text>
   </g>
   <g
@@ -3710,4 +3702,23 @@
          id="tspan190">something?</tspan>
     </text>
   </g>
+  <text
+     font-size="12.8"
+     style="font-size:7.14601088px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
+     x="229.94527"
+     y="-60.327778"
+     id="text582-0">
+    <tspan
+       x="229.94527"
+       y="-60.327778"
+       id="tspan584-7">Do you just want</tspan>
+    <tspan
+       x="229.94527"
+       y="-51.395267"
+       id="tspan586-0">to visualize or</tspan>
+    <tspan
+       x="229.94527"
+       y="-42.462646"
+       id="tspan588-8">simplify your data?</tspan>
+  </text>
 </svg>
