@@ -14,7 +14,6 @@
 */
 
 #include <iostream>
-#include <stdint.h>
 #include <dlib/matrix.h>
 #include <dlib/numeric_constants.h>
 #include <dlib/numerical_integration.h>
