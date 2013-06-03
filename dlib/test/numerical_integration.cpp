@@ -161,7 +161,7 @@ namespace
 
         static double gg13(double x)
         {
-            return sqrt(50)*pow(e,-50.0*pi*x*x);
+            return sqrt(50.0)*pow(e,-50.0*pi*x*x);
         }
 
         static double gg14(double x)
