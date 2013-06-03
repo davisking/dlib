@@ -115,9 +115,9 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:zoom="0.71659905"
-     inkscape:cx="891.56171"
-     inkscape:cy="626.91407"
+     inkscape:zoom="1.0134241"
+     inkscape:cx="720.28072"
+     inkscape:cy="609.6766"
      inkscape:window-x="65"
      inkscape:window-y="24"
      inkscape:window-maximized="1"
@@ -3238,18 +3238,18 @@
   <g
      id="g1040"
      transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
-     style="stroke:#808000;stroke-opacity:1">
+     style="stroke:#808000;stroke-opacity:1;stroke-width:6.06651535;stroke-miterlimit:4;stroke-dasharray:none">
     <path
-       style="fill:none;stroke:#808000;stroke-width:4;stroke-opacity:1"
+       style="fill:none;stroke:#808000;stroke-width:6.06651535;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
        d="m 497.81,52.796 a 695.535,695.535 0 0 0 6.656,-33.5838"
        id="path1042"
        inkscape:connector-curvature="0" />
     <polygon
-       style="fill:#000000;stroke:#808000;stroke-opacity:1"
+       style="fill:#000000;stroke:#808000;stroke-opacity:1;stroke-width:6.06651535;stroke-miterlimit:4;stroke-dasharray:none"
        points="503.358,51.5649 496.146,60.108 493.639,49.2124 497.911,52.8185 "
        id="polygon1044" />
     <polygon
-       style="fill:none;stroke:#808000;stroke-width:4;stroke-opacity:1"
+       style="fill:none;stroke:#808000;stroke-width:6.06651535;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
        points="503.358,51.5649 496.146,60.108 493.639,49.2124 497.911,52.8185 "
        id="polygon1046" />
   </g>
