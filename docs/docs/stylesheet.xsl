@@ -51,7 +51,7 @@
          <head>
          <link rel="shortcut icon" href="dlib-icon.ico"/>
          <xsl:if test="$is_chm != 'true'">
-            <meta property="og:image" content="http://dlib.net/dlib-icon-64.png"/>
+            <meta property="og:image" content="http://dlib.net/dlib-logo-small.png"/>
          </xsl:if>
 
 <!-- Verify with Google -->
