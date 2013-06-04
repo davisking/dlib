@@ -920,6 +920,14 @@ namespace dlib
         return split(str,delim.c_str());
     }
 
+    inline const std::vector<std::string> split (
+        const char* str,
+        const char* delim = " \n\r\t"
+    )
+    {
+        return split(std::string(str),delim);
+    }
+
 // ----------------------------------------------------------------------------------------
 
 }
