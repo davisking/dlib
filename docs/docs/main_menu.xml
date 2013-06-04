@@ -135,6 +135,10 @@
             <name>Examples: C++</name>
             <sub>
                <item>
+                  <name>Sequence_Segmentation</name>
+                  <link>sequence_segmenter_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Train_Object_Detector</name>
                   <link>train_object_detector.cpp.html</link>
                </item>
