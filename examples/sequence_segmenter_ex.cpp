@@ -4,11 +4,12 @@
     This example shows how to use dlib to learn to perform sequence segmentation.  In a
     sequence segmentation task we are given a sequence of objects (e.g. words in a
     sentence) and we are supposed to detect certain subsequences (e.g. the names of
-    people).  In the code below we create some very simple sequence/segmentation training
-    examples and use them to learn a sequence segmentation model.  In particular, our
-    sequences will be arrays of strings and our task will be to learn to identify person
-    names.  Once we have our segmentation model we can use it to find names in new
+    people).  Therefore, in the code below we create some very simple training sequences
+    and use them to learn a sequence segmentation model.  In particular, our sequences will
+    be sentences represented as arrays of words and our task will be to learn to identify
+    person names.  Once we have our segmentation model we can use it to find names in new
     sentences as we will show.
+
 */
 
 
@@ -85,9 +86,6 @@ public:
         // The model in this example program is very simple.  Our features only look at the 
         // capitalization pattern of the words.  So we have a single feature which checks
         // if the first letter is capitalized or not.  
-
-        // if the first character of the word sentence[position] is capitalized then
-        // we set our only feature 1, otherwise it remains set to 0.
         if (isupper(sentence[position][0]))
             set_feature(0);
     }
@@ -207,6 +205,7 @@ int main()
     }
 
 
+    // Now lets test it on a new sentence and see what it detects.  
     std::vector<std::string> sentence(split("There once was a man from Nantucket whose name rhymed with Bob Bucket"));
     std::vector<std::pair<unsigned long,unsigned long> > seg = segmenter(sentence);
     for (unsigned long j = 0; j < seg.size(); ++j)
