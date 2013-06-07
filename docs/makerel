@@ -53,7 +53,6 @@ cp -r ../../docs/cache/dlib . || report_failure
 cp -r ../../docs/cache/examples . || report_failure
 cp -r ../../docs/cache/python_examples . || report_failure
 cp -r ../../docs/cache/tools . || report_failure
-scp davis@home.dlib.net:dlib_win_python/* python_examples || report_failure
 
 echo Version: $RELEASE >> dlib/README.txt
 echo "Date:    `date`" >> dlib/README.txt
@@ -72,6 +71,7 @@ tar -cf $SOURCE_TAR $RELDIR  || report_failure
 #find $RELDIR -name "*.cpp" -or -name "*.h" -or -name "*.txt" -or -name "*.html" | xargs flip -m
 find $RELDIR -name "*.cpp" -or -name "*.h" -or -name "*.txt" -or -name "*.html" | xargs unix2dos &> /dev/null 
 
+scp davis@home.dlib.net:dlib_win_python/* $RELDIR/python_examples || report_failure
 zip -r9 $SOURCE_ZIP $RELDIR > /dev/null || report_failure
 tar -C ../docs -cf $WEBPAGE web || report_failure
 bzip2 $SOURCE_TAR || report_failure
