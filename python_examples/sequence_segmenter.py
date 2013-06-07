@@ -46,12 +46,12 @@ def sentence_to_vectors(sentence):
 # Dlib also supports the use of a sparse vector representation.  This is more efficient
 # than the above form when you have very high dimensional vectors that are mostly full of
 # zeros.  In dlib, each sparse vector is represented as an array of pair objects.  Each
-# pair contains an index and value pair.  Any index in the vector not listed is implicitly
-# zero.
+# pair contains an index and value.  Any index not listed in the vector is implicitly
+# associated with a value of zero.
 def sentence_to_sparse_vectors(sentence):
-    vects = dlib.sparse_vectors()
+    vects   = dlib.sparse_vectors()
     has_cap = dlib.sparse_vector()
-    no_cap = dlib.sparse_vector()
+    no_cap  = dlib.sparse_vector()
     # make has_cap equivalent to dlib.vector([1])
     has_cap.append(dlib.pair(0,1))
     # Since we didn't add anything to no_cap it is equivalent to dlib.vector([0])
@@ -142,6 +142,9 @@ params = dlib.segmenter_params()
 params.window_size = 3
 params.use_high_order_features = True 
 params.use_BIO_model = True
+# This is the common SVM C parameter.  Larger values encourage the trainer to attempt to
+# fit the data exactly but might overfit.  In general, you determine this parameter by
+# cross-validation.
 params.C = 10
 
 # Train a model.  The model object is responsible for predicting the locations of names in
@@ -154,6 +157,10 @@ model = dlib.train_sequence_segmenter(training_sequences, segments, params)
 # it gets them all correct. 
 for i in range(len(sentences)):
     print_segment(sentences[i], model.segment_sequence(training_sequences[i]))
+
+# Lets also try segmenting a new sentence.  This will print out "Bob Bucket"
+test_sentence = "There once was a man from Nantucket whose name rhymed with Bob Bucket"
+print_segment(test_sentence, model.segment_sequence(sentence_to_vectors(test_sentence)))
 
 # We can also measure the accuracy of a model relative to some labeled data.  This
 # statement prints the precision, recall, and F1-score of the model relative to the data in
