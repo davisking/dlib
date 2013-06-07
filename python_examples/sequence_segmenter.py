@@ -2,9 +2,13 @@
 # The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 #
 # 
-# This example program shows how to use the dlib sequence segmentation tools from within a
-# python program.  In particular, we will create a simple training dataset, learn a
-# sequence segmentation model, and then test it on some sequences.  
+# This example shows how to use dlib to learn to do sequence segmentation.  In a sequence
+# segmentation task we are given a sequence of objects (e.g. words in a sentence) and we
+# are supposed to detect certain subsequences (e.g. the names of people).  Therefore, in
+# the code below we create some very simple training sequences and use them to learn a
+# sequence segmentation model.  In particular, our sequences will be sentences represented
+# as arrays of words and our task will be to learn to identify person names.  Once we have
+# our segmentation model we can use it to find names in new sentences, as we will show.
 #
 # COMPILING THE DLIB PYTHON INTERFACE
 #   You need to compile the dlib python interface before you can use this file.  To do
@@ -14,69 +18,120 @@
 
 
 import dlib
+import sys
+
+# The sequence segmentation models we work with in this example are chain structured
+# conditional random field style models.  Therefore, central to a sequence segmentation
+# model is some method for converting the elements of a sequence into feature vectors.
+# That is, while you might start out representing your sequence as an array of strings, the
+# dlib interface works in terms of arrays of feature vectors.  Each feature vector should
+# capture important information about its corresponding element in the original raw
+# sequence.  So in this example, since we work with sequences of words and want to identify
+# names, we will create feature vectors that tell us if the word is capitalized or not.  In
+# our simple data, this will be enough to identify names.  Therefore, we define
+# sentence_to_vectors() which takes a sentence represented as a string and converts it into
+# an array of words and then associates a feature vector with each word.
+def sentence_to_vectors(sentence):
+    # Create an empty array of vectors
+    vects = dlib.vectors()
+    for word in sentence.split():
+        # Our vectors are very simple 1-dimensional vectors.  The value of the single
+        # feature is 1 if the first letter of the word is capitalized and 0 otherwise.
+        if (word[0].isupper()):
+            vects.append(dlib.vector([1]))
+        else:
+            vects.append(dlib.vector([0]))
+    return vects
+
+# Dlib also supports the use of a sparse vector representation.  This is more efficient
+# than the above form when you have very high dimensional vectors that are mostly full of
+# zeros.  In dlib, each sparse vector is represented as an array of pair objects.  Each
+# pair contains an index and value pair.  Any index in the vector not listed is implicitly
+# zero.
+def sentence_to_sparse_vectors(sentence):
+    vects = dlib.sparse_vectors()
+    has_cap = dlib.sparse_vector()
+    no_cap = dlib.sparse_vector()
+    # make has_cap equivalent to dlib.vector([1])
+    has_cap.append(dlib.pair(0,1))
+    # Since we didn't add anything to no_cap it is equivalent to dlib.vector([0])
+
+    for word in sentence.split():
+        if (word[0].isupper()):
+            vects.append(has_cap)
+        else:
+            vects.append(no_cap)
+    return vects
 
 
-# In a sequence segmentation task we are given a sequence of objects (e.g. words in a
-# sentence) and we are supposed to detect certain subsequences (e.g. named entities).  In
-# the code below we create some very simple sequence/segmentation training pairs.  In
-# particular, each element of a sequence is represented by a vector which describes
-# important properties of the element.  The idea is to use vectors that contain information
-# useful for detecting whatever kind of subsequences you are interested in detecting.  
+def print_segment(sentence, names):
+    words = sentence.split()
+    for name in names:
+        for i in name:
+            sys.stdout.write(words[i] + " ")
+        sys.stdout.write("\n")
 
-# To keep this example simple we will use very simple vectors.  Specifically, each vector
-# is 2D and is either the vector [0 1] or [1 0].  Moreover, we will say that the
-# subsequences we want to detect are any runs of the [0 1] vector.  Note that the code
-# works with both dense and sparse vectors.  The following if statement constructs either
-# kind depending on the value in use_sparse_vects.
+
+
+# Now lets make some training data.  Each example is a sentence as well as a set of ranges
+# which indicate the locations of any names.   
+names = dlib.ranges()
+segments = dlib.rangess()
+sentences = []
+
+
+sentences.append("The other day I saw a man named Jim Smith")
+# We want to detect person names.  So we note that the name is located within the
+# range [8, 10).  Note that we use half open ranges to identify segments.  So in 
+# this case, the segment identifies the string "Jim Smith".
+names.append(dlib.range(8, 10))
+segments.append(names)
+names.clear() # make names empty for use again below
+
+
+sentences.append("Davis King is the main author of the dlib Library")
+names.append(dlib.range(0, 2))
+segments.append(names)
+names.clear()
+
+
+sentences.append("Bob Jones is a name and so is George Clinton")
+names.append(dlib.range(0, 2))
+names.append(dlib.range(8, 10))
+segments.append(names)
+names.clear()
+
+
+sentences.append("My dog is named Bob Barker")
+names.append(dlib.range(4, 6))
+segments.append(names)
+names.clear()
+
+
+sentences.append("ABC is an acronym but John James Smith is a name")
+names.append(dlib.range(5, 8))
+segments.append(names)
+names.clear()
+
+
+sentences.append("No names in this sentence at all")
+segments.append(names)
+names.clear()
+
+
+# Now before we can pass these training sentences to the dlib tools we need to convert them
+# into arrays of vectors as discussed above.  We can use either a sparse or dense
+# representation depending on our needs.  In this example, we show how to do it both ways.
 use_sparse_vects = False 
 if use_sparse_vects:
     training_sequences = dlib.sparse_vectorss()
-    inside = dlib.sparse_vector()
-    outside = dlib.sparse_vector()
-    # Add index/value pairs to each sparse vector.  Any index not mentioned in a sparse
-    # vector is implicitly associated with a value of zero.
-    inside.append(dlib.pair(0,1))
-    outside.append(dlib.pair(1,1))
+    for s in sentences:
+        training_sequences.append(sentence_to_sparse_vectors(s))
 else:
     training_sequences = dlib.vectorss()
-    inside = dlib.vector([0, 1])
-    outside = dlib.vector([1, 0])
+    for s in sentences:
+        training_sequences.append(sentence_to_vectors(s))
 
-# Here we make our training sequences and their annotated subsegments.  We create two
-# training sequences. 
-segments = dlib.rangess()
-training_sequences.resize(2)
-segments.resize(2)
-
-# training_sequences[0] starts out empty and we append vectors onto it.  Note that we wish
-# to detect the subsequence of "inside" vectors within the sequence.  So the output should
-# be the range (2,5).  Note that this is a "half open" range meaning that it starts with
-# the element with index 2 and ends just before the element with index 5.
-training_sequences[0].append(outside) # index 0
-training_sequences[0].append(outside) # index 1
-training_sequences[0].append(inside)  # index 2
-training_sequences[0].append(inside)  # index 3
-training_sequences[0].append(inside)  # index 4
-training_sequences[0].append(outside) # index 5
-training_sequences[0].append(outside) # index 6
-training_sequences[0].append(outside) # index 7
-segments[0].append(dlib.range(2,5))
-
-# Add another training sequence.  This one is a little longer and has two "inside" segments
-# which should be detected.
-training_sequences[1].append(outside) # index 0
-training_sequences[1].append(outside) # index 1
-training_sequences[1].append(inside)  # index 2
-training_sequences[1].append(inside)  # index 3
-training_sequences[1].append(inside)  # index 4
-training_sequences[1].append(inside)  # index 5
-training_sequences[1].append(outside) # index 6
-training_sequences[1].append(outside) # index 7
-training_sequences[1].append(outside) # index 8
-training_sequences[1].append(inside)  # index 9
-training_sequences[1].append(inside)  # index 10 
-segments[1].append(dlib.range(2,6))
-segments[1].append(dlib.range(9,11))
 
 
 # Now that we have a simple training set we can train a sequence segmenter.  However, the
@@ -84,27 +139,28 @@ segments[1].append(dlib.range(9,11))
 # determine properties of the segmentation model we will learn.  See the dlib documentation
 # for the sequence_segmenter object for a full discussion of their meanings.
 params = dlib.segmenter_params()
-params.window_size = 1
-params.use_high_order_features = False
+params.window_size = 3
+params.use_high_order_features = True 
 params.use_BIO_model = True
-params.C = 1 
+params.C = 10
 
-# Train a model
+# Train a model.  The model object is responsible for predicting the locations of names in
+# new sentences.
 model = dlib.train_sequence_segmenter(training_sequences, segments, params)
 
-# A segmenter model takes a sequence of vectors and returns an array of detected ranges.
-# So for example, we can give it the first training sequence and it will predict the
-# locations of the subsequences.  This statement will correctly print 2,5.
-print model.segment_sequence(training_sequences[0])[0]
+
+# Lets print out the things the model thinks are names.  The output is a set of ranges
+# which are predicted to contain names.  If you run this example program you will see that
+# it gets them all correct. 
+for i in range(len(sentences)):
+    print_segment(sentences[i], model.segment_sequence(training_sequences[i]))
 
 # We can also measure the accuracy of a model relative to some labeled data.  This
 # statement prints the precision, recall, and F1-score of the model relative to the data in
 # training_sequences/segments.
 print "Test on training data:", dlib.test_sequence_segmenter(model, training_sequences, segments)
 
-# We can also do n-fold cross-validation and print the resulting precision, recall, and
-# F1-score.
-num_folds = 2
-print "cross validation:", dlib.cross_validate_sequence_segmenter(training_sequences, segments, num_folds, params)
+# We can also do 5-fold cross-validation and print the resulting precision, recall, and F1-score.
+print "cross validation:", dlib.cross_validate_sequence_segmenter(training_sequences, segments, 5, params)
 
 

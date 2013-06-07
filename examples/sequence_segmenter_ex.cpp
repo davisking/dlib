@@ -1,14 +1,14 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
 
-    This example shows how to use dlib to learn to perform sequence segmentation.  In a
-    sequence segmentation task we are given a sequence of objects (e.g. words in a
-    sentence) and we are supposed to detect certain subsequences (e.g. the names of
-    people).  Therefore, in the code below we create some very simple training sequences
-    and use them to learn a sequence segmentation model.  In particular, our sequences will
-    be sentences represented as arrays of words and our task will be to learn to identify
-    person names.  Once we have our segmentation model we can use it to find names in new
-    sentences as we will show.
+    This example shows how to use dlib to learn to do sequence segmentation.  In a sequence
+    segmentation task we are given a sequence of objects (e.g. words in a sentence) and we
+    are supposed to detect certain subsequences (e.g. the names of people).  Therefore, in
+    the code below we create some very simple training sequences and use them to learn a
+    sequence segmentation model.  In particular, our sequences will be sentences
+    represented as arrays of words and our task will be to learn to identify person names.
+    Once we have our segmentation model we can use it to find names in new sentences, as we
+    will show.
 
 */
 
