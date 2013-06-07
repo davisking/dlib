@@ -158,9 +158,13 @@ model = dlib.train_sequence_segmenter(training_sequences, segments, params)
 for i in range(len(sentences)):
     print_segment(sentences[i], model.segment_sequence(training_sequences[i]))
 
-# Lets also try segmenting a new sentence.  This will print out "Bob Bucket"
+# Lets also try segmenting a new sentence.  This will print out "Bob Bucket".  Note that we
+# need to remember to use the same vector representation as we used during training.
 test_sentence = "There once was a man from Nantucket whose name rhymed with Bob Bucket"
-print_segment(test_sentence, model.segment_sequence(sentence_to_vectors(test_sentence)))
+if use_sparse_vects:
+    print_segment(test_sentence, model.segment_sequence(sentence_to_sparse_vectors(test_sentence)))
+else:
+    print_segment(test_sentence, model.segment_sequence(sentence_to_vectors(test_sentence)))
 
 # We can also measure the accuracy of a model relative to some labeled data.  This
 # statement prints the precision, recall, and F1-score of the model relative to the data in
