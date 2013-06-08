@@ -20,11 +20,12 @@ double predict (
     const typename decision_function::kernel_type::sample_type& samp
 )
 {
+    typedef typename decision_function::kernel_type::sample_type T;
     if (df.basis_vectors.size() == 0)
     {
         return 0;
     }
-    else if (df.basis_vectors(0).size() != samp.size())
+    else if (is_matrix<T>::value && df.basis_vectors(0).size() != samp.size())
     {
         std::ostringstream sout;
         sout << "Input vector should have " << df.basis_vectors(0).size() 
