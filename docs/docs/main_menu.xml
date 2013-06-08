@@ -129,6 +129,10 @@
                   <name>Sequence_Segmenter</name>
                   <link>sequence_segmenter.py.html</link>
                </item>
+               <item>
+                  <name>SVM-Rank</name>
+                  <link>svm_rank.py.html</link>
+               </item>
             </sub>
          </item>
          <item nolink="true">
