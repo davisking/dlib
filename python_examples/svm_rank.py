@@ -31,6 +31,8 @@ import dlib
 # vectors and store them into a ranking_pair object like so:
 
 data = dlib.ranking_pair()
+# Here we add two examples.  In real applications, you would want lots of
+# examples of relevant and non-relevant vectors.
 data.relevant.append(dlib.vector([1, 0]))
 data.nonrelevant.append(dlib.vector([0, 1]))
 
@@ -52,7 +54,7 @@ rank = trainer.train(data)
 # score for non-relevant vectors.  
 print "ranking score for a relevant vector:     ", rank(data.relevant[0])
 print "ranking score for a non-relevant vector: ", rank(data.nonrelevant[0])
-# These output the following:
+# The output is the following:
 #    ranking score for a relevant vector:     0.5
 #    ranking score for a non-relevant vector: -0.5
 
@@ -107,4 +109,37 @@ rank = trainer.train(queries)
 # Just like test_ranking_function(), it reports both the ordering accuracy and
 # mean average precision.
 print "cross validation results: ", dlib.cross_validate_ranking_trainer(trainer, queries, 4)
+
+
+
+# Finally, note that the ranking tools also support the use of sparse vectors in
+# addition to dense vectors (which we used above).  So if we wanted to do
+# exactly what we did in the first part of the example program above but using
+# sparse vectors we would do it like so:
+
+data = dlib.sparse_ranking_pair()
+samp = dlib.sparse_vector()
+
+# Make samp represent the same vector as dlib.vector([1, 0]).  In dlib, a sparse
+# vector is just an array of pair objects.  Each pair stores an index and a
+# value.  Moreover, the svm-ranking tools require sparse vectors to be sorted
+# and to have unique indices.  This means that the indices are listed in
+# increasing order and no index value shows up more than once.  If necessary,
+# you can use the dlib.make_sparse_vector() routine to make a sparse vector
+# object properly sorted and contain unique indices. 
+samp.append(dlib.pair(0,1))  
+data.relevant.append(samp)
+
+# Mow make samp represent the same vector as dlib.vector([0, 1])
+samp.clear()
+samp.append(dlib.pair(1,1))
+data.nonrelevant.append(samp)
+
+trainer = dlib.svm_rank_trainer_sparse()
+rank = trainer.train(data)
+print "ranking score for a relevant vector:     ", rank(data.relevant[0])
+print "ranking score for a non-relevant vector: ", rank(data.nonrelevant[0])
+# Just as before, the output is the following:
+#    ranking score for a relevant vector:     0.5
+#    ranking score for a non-relevant vector: -0.5
 
