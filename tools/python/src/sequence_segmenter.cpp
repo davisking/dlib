@@ -795,8 +795,8 @@ train_sequence_segmenter() and cross_validate_sequence_segmenter() routines.   "
         .def_pickle(serialize_pickle<segmenter_params>());
 
     class_<segmenter_type> ("segmenter_type")
-        .def("segment_sequence", &segmenter_type::segment_sequence_dense)
-        .def("segment_sequence", &segmenter_type::segment_sequence_sparse)
+        .def("__call__", &segmenter_type::segment_sequence_dense)
+        .def("__call__", &segmenter_type::segment_sequence_sparse)
         .def_readonly("weights", &segmenter_type::get_weights)
         .def_pickle(serialize_pickle<segmenter_type>());
 
