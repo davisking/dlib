@@ -53,7 +53,13 @@ void bind_other()
     using boost::python::arg;
 
     def("make_sparse_vector", _make_sparse_vector , 
-        "This function modifies its argument so that it is a properly sorted sparse vector.");
+"This function modifies its argument so that it is a properly sorted sparse vector.    \n\
+This means that the elements of the sparse vector will be ordered so that pairs    \n\
+with smaller indices come first.  Additionally, there won't be any pairs with    \n\
+identical indices.  If such pairs were present in the input sparse vector then    \n\
+their values will be added together and only one pair with their index will be    \n\
+present in the output.   " 
+        );
     def("make_sparse_vector", _make_sparse_vector2 , 
         "This function modifies a sparse_vectors object so that all elements it contains are properly sorted sparse vectors.");
 
