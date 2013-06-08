@@ -6,6 +6,8 @@
 #include <dlib/svm.h>
 #include "pyassert.h"
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
+#include "testing_results.h"
+#include <boost/python/args.hpp>
 
 using namespace dlib;
 using namespace std;
@@ -99,8 +101,26 @@ void add_ranker (
 
 // ----------------------------------------------------------------------------------------
 
+template <
+    typename trainer_type,
+    typename T
+    >
+const ranking_test _cross_ranking_validate_trainer (
+    const trainer_type& trainer,
+    const std::vector<ranking_pair<T> >& samples,
+    const unsigned long folds
+)
+{
+    pyassert(is_ranking_problem(samples), "Training data does not make a valid training set.");
+    pyassert(1 < folds && folds <= samples.size(), "Invalid number of folds given.");
+    return cross_validate_ranking_trainer(trainer, samples, folds);
+}
+
+// ----------------------------------------------------------------------------------------
+
 void bind_svm_rank_trainer()
 {
+    using boost::python::arg;
     class_<ranking_pair<sample_type> >("ranking_pair")
         .add_property("relevant", &ranking_pair<sample_type>::relevant)
         .add_property("nonrelevant", &ranking_pair<sample_type>::nonrelevant)
@@ -127,6 +147,13 @@ void bind_svm_rank_trainer()
 
     add_ranker<svm_rank_trainer<linear_kernel<sample_type> > >("svm_rank_trainer");
     add_ranker<svm_rank_trainer<sparse_linear_kernel<sparse_vect> > >("svm_rank_trainer_sparse");
+
+    def("cross_validate_ranking_trainer", &_cross_ranking_validate_trainer<
+                svm_rank_trainer<linear_kernel<sample_type> >,sample_type>,
+                (arg("trainer"), arg("samples"), arg("folds")) );
+    def("cross_validate_ranking_trainer", &_cross_ranking_validate_trainer<
+                svm_rank_trainer<sparse_linear_kernel<sparse_vect> > ,sparse_vect>,
+                (arg("trainer"), arg("samples"), arg("folds")) );
 }
 
 

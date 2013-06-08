@@ -6,6 +6,7 @@
 #include "serialize_pickle.h"
 #include <dlib/svm_threaded.h>
 #include "pyassert.h"
+#include <boost/python/args.hpp>
 
 using namespace dlib;
 using namespace std;
@@ -166,34 +167,43 @@ const binary_test _cross_validate_trainer_t (
 
 void bind_svm_c_trainer()
 {
+    using boost::python::arg;
     {
         typedef svm_c_trainer<radial_basis_kernel<sample_type> > T;
         setup_trainer2<T>("svm_c_trainer_radial_basis")
             .add_property("gamma", get_gamma, set_gamma);
-        def("cross_validate_trainer", _cross_validate_trainer<T>);
-        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>);
+        def("cross_validate_trainer", _cross_validate_trainer<T>, 
+            (arg("trainer"),arg("x"),arg("y"),arg("folds")));
+        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>, 
+            (arg("trainer"),arg("x"),arg("y"),arg("folds"),arg("num_threads")));
     }
 
     {
         typedef svm_c_trainer<sparse_radial_basis_kernel<sparse_vect> > T;
         setup_trainer2<T>("svm_c_trainer_sparse_radial_basis")
             .add_property("gamma", get_gamma_sparse, set_gamma_sparse);
-        def("cross_validate_trainer", _cross_validate_trainer<T>);
-        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>);
+        def("cross_validate_trainer", _cross_validate_trainer<T>, 
+            (arg("trainer"),arg("x"),arg("y"),arg("folds")));
+        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>, 
+            (arg("trainer"),arg("x"),arg("y"),arg("folds"),arg("num_threads")));
     }
 
     {
         typedef svm_c_trainer<histogram_intersection_kernel<sample_type> > T;
         setup_trainer2<T>("svm_c_trainer_histogram_intersection");
-        def("cross_validate_trainer", _cross_validate_trainer<T>);
-        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>);
+        def("cross_validate_trainer", _cross_validate_trainer<T>, 
+            (arg("trainer"),arg("x"),arg("y"),arg("folds")));
+        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>, 
+            (arg("trainer"),arg("x"),arg("y"),arg("folds"),arg("num_threads")));
     }
 
     {
         typedef svm_c_trainer<sparse_histogram_intersection_kernel<sparse_vect> > T;
         setup_trainer2<T>("svm_c_trainer_sparse_histogram_intersection");
-        def("cross_validate_trainer", _cross_validate_trainer<T>);
-        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>);
+        def("cross_validate_trainer", _cross_validate_trainer<T>, 
+            (arg("trainer"),arg("x"),arg("y"),arg("folds")));
+        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>, 
+            (arg("trainer"),arg("x"),arg("y"),arg("folds"),arg("num_threads")));
     }
 
     {
@@ -205,8 +215,10 @@ void bind_svm_c_trainer()
             .def("be_verbose", &T::be_verbose)
             .def("be_quiet", &T::be_quiet);
 
-        def("cross_validate_trainer", _cross_validate_trainer<T>);
-        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>);
+        def("cross_validate_trainer", _cross_validate_trainer<T>, 
+            (arg("trainer"),arg("x"),arg("y"),arg("folds")));
+        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>, 
+            (arg("trainer"),arg("x"),arg("y"),arg("folds"),arg("num_threads")));
     }
 
     {
@@ -218,8 +230,10 @@ void bind_svm_c_trainer()
             .def("be_verbose", &T::be_verbose)
             .def("be_quiet", &T::be_quiet);
 
-        def("cross_validate_trainer", _cross_validate_trainer<T>);
-        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>);
+        def("cross_validate_trainer", _cross_validate_trainer<T>, 
+            (arg("trainer"),arg("x"),arg("y"),arg("folds")));
+        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>, 
+            (arg("trainer"),arg("x"),arg("y"),arg("folds"),arg("num_threads")));
     }
 }
 
