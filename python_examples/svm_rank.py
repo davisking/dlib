@@ -130,7 +130,7 @@ samp = dlib.sparse_vector()
 samp.append(dlib.pair(0,1))  
 data.relevant.append(samp)
 
-# Mow make samp represent the same vector as dlib.vector([0, 1])
+# Now make samp represent the same vector as dlib.vector([0, 1])
 samp.clear()
 samp.append(dlib.pair(1,1))
 data.nonrelevant.append(samp)
