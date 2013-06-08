@@ -14,11 +14,12 @@
 # come to the top of the ranked list.
 #
 # COMPILING THE DLIB PYTHON INTERFACE
-#   You need to compile the dlib python interface before you can use this file.
-#   To do this, run compile_dlib_python_module.bat.  This should work on any
-#   operating system so long as you have CMake and boost-python installed.  On
-#   Ubuntu, this can be done easily by running the command: 
-#   sudo apt-get install libboost-python-dev cmake
+#   Dlib comes with a compiled python interface for python 2.7 on MS Windows.  If
+#   you are using another python version or operating system then you need to
+#   compile the dlib python interface before you can use this file.  To do this,
+#   run compile_dlib_python_module.bat.  This should work on any operating system
+#   so long as you have CMake and boost-python installed.  On Ubuntu, this can be
+#   done easily by running the command:  sudo apt-get install libboost-python-dev cmake
 
 
 import dlib
