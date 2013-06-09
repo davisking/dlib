@@ -68,7 +68,7 @@ works well on Mac OS X and Linux systems.
         <h2>Compiling on Linux From Command Line</h2>
         From within the examples folder, you can compile any of the examples with a single command like so:
 <code_box>
-g++ -O3 -I.. -lpthread -lX11 ../dlib/all/source.cpp example_program_name.cpp
+g++ -O3 -I.. ../dlib/all/source.cpp -lpthread -lX11 example_program_name.cpp
 </code_box>
         Note that not all examples require this much work.  For example, the svm_ex.cpp example
         can be compiled with just:
