@@ -163,7 +163,12 @@ if (UNIX)
 
 
    if (NOT blas_found)
-      message(STATUS "***** No BLAS library found *****")
+      message(" *****************************************************************************")
+      message(" *** No BLAS library found so using dlib's built in BLAS.  However, if you ***")
+      message(" *** install an optimized BLAS such as openblas or the Intel MKL your code ***")
+      message(" *** will run faster.  On Ubuntu you can install openblas by executing:    ***")
+      message(" ***    sudo apt-get install libopenblas-dev liblapack-dev                 ***")
+      message(" *****************************************************************************")
    endif()
 
 endif()
