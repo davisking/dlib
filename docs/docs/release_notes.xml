@@ -12,23 +12,34 @@
 
 <current>
 New Features:
-   - Added jet()
-   - Added python interface to some of the machine learning tools:
-   - Added the svr_linear_trainer
-   - Added the sequence_segmenter object.
-   - Added point_transform_projective and find_projective_transform()
-   - Added integrate_function_adapt_simpson()
+   - Machine Learning:
+      - Added the svr_linear_trainer, a tool for solving large scale support vector 
+        regression problems.
+      - Added a tool for working with BIO and BILOU style sequence taggers/segmenters.  
+        This is the new sequence_segmenter object and its associated 
+        structural_sequence_segmentation_trainer object.
+      - Added a python interface to some of the machine learning tools.  These
+        include the svm_c_trainer, svm_c_linear_trainer, svm_rank_trainer, and
+        structural_sequence_segmentation_trainer objects as well as the cca()
+        routine.  
+   - Added point_transform_projective and find_projective_transform().
+   - Added a function for numerically integrating arbitrary functions, this is the 
+     new integrate_function_adapt_simpson() routine which was contributed by 
+     Steve Taylor
+   - Added jet(), a routine for coloring images with the jet color scheme.
 
 Non-Backwards Compatible Changes:
 
 Bug fixes:
    - Fixed a bug in hysteresis_threshold() that caused it to produce incorrect
-     outputs sometimes.
+     outputs in some cases.
    - Fixed a segmentation fault in the eigenvalue_decomposition object which
      could occur when NaN valued inputs were given.
 
 Other:
    - Made image saving routines work on matrix objects in addition to array2d objects.
+   - The machine learning page now contains a flow chart to help new users
+     select a machine learning tool appropriate for their task.
 
 </current>
 
