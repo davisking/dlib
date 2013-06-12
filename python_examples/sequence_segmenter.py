@@ -77,8 +77,8 @@ def print_segment(sentence, names):
 
 # Now lets make some training data.  Each example is a sentence as well as a set of ranges
 # which indicate the locations of any names.   
-names = dlib.ranges()
-segments = dlib.rangess()
+names = dlib.ranges()     # make an array of dlib.range objects.
+segments = dlib.rangess() # make an array of arrays of dlib.range objects.
 sentences = []
 
 
@@ -126,10 +126,12 @@ names.clear()
 # representation depending on our needs.  In this example, we show how to do it both ways.
 use_sparse_vects = False 
 if use_sparse_vects:
+    # Make an array of arrays of dlib.sparse_vector objects.
     training_sequences = dlib.sparse_vectorss()
     for s in sentences:
         training_sequences.append(sentence_to_sparse_vectors(s))
 else:
+    # Make an array of arrays of dlib.vector objects.
     training_sequences = dlib.vectorss()
     for s in sentences:
         training_sequences.append(sentence_to_vectors(s))
