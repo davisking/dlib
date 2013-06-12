@@ -6449,7 +6449,8 @@ namespace dlib
         window_has_closed(false),
         have_last_click(false),
         mouse_btn(0),
-        clicked_signaler(this->wm)
+        clicked_signaler(this->wm),
+        tie_input_events(false)
     {
 
         gui_img.set_image_clicked_handler(*this, &image_window::on_image_clicked);
@@ -6490,7 +6491,8 @@ namespace dlib
     ) 
     {
         auto_mutex lock(wm);
-        while (have_last_keypress == false && !window_has_closed)
+        while (have_last_keypress == false && !window_has_closed &&
+            (have_last_click == false || !tie_input_events))
         {
             clicked_signaler.wait();
         }
@@ -6498,13 +6500,22 @@ namespace dlib
         if (window_has_closed)
             return false;
 
-        // Mark that we are taking the key click so the next call to get_next_keypress()
-        // will have to wait for another click.
-        have_last_keypress = false;
-        key = next_key;
-        is_printable = next_is_printable;
-        state = next_state;
-        return true;
+        if (have_last_keypress)
+        {
+            // Mark that we are taking the key click so the next call to get_next_keypress()
+            // will have to wait for another click.
+            have_last_keypress = false;
+            key = next_key;
+            is_printable = next_is_printable;
+            state = next_state;
+            return true;
+        }
+        else
+        {
+            key = 0;
+            is_printable = true;
+            return false;
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -6527,14 +6538,47 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    void image_window::
+    tie_events (
+    )
+    {
+        auto_mutex lock(wm);
+        tie_input_events = true;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_window::
+    untie_events (
+    )
+    {
+        auto_mutex lock(wm);
+        tie_input_events = false;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    bool image_window::
+    events_tied (
+    ) const
+    {
+        auto_mutex lock(wm);
+        return tie_input_events;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     bool image_window::
     get_next_double_click (
         point& p,
         unsigned long& mouse_button 
     ) 
     {
+        p = point(-1,-1);
+
         auto_mutex lock(wm);
-        while (have_last_click == false && !window_has_closed)
+        while (have_last_click == false && !window_has_closed &&
+            (have_last_keypress==false || !tie_input_events))
         {
             clicked_signaler.wait();
         }
@@ -6542,12 +6586,19 @@ namespace dlib
         if (window_has_closed)
             return false;
 
-        // Mark that we are taking the point click so the next call to
-        // get_next_double_click() will have to wait for another click.
-        have_last_click = false;
-        mouse_button = mouse_btn;
-        p = last_clicked_point;
-        return true;
+        if (have_last_click)
+        {
+            // Mark that we are taking the point click so the next call to
+            // get_next_double_click() will have to wait for another click.
+            have_last_click = false;
+            mouse_button = mouse_btn;
+            p = last_clicked_point;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
 // ----------------------------------------------------------------------------------------

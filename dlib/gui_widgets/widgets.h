@@ -3565,7 +3565,8 @@ namespace dlib
             have_last_click(false),
             mouse_btn(0),
             clicked_signaler(this->wm),
-            have_last_keypress(false)
+            have_last_keypress(false),
+            tie_input_events(false)
         {  
             gui_img.set_image_clicked_handler(*this, &image_window::on_image_clicked);
             set_image(img); 
@@ -3582,7 +3583,8 @@ namespace dlib
             have_last_click(false),
             mouse_btn(0),
             clicked_signaler(this->wm),
-            have_last_keypress(false)
+            have_last_keypress(false),
+            tie_input_events(false)
         {  
             gui_img.set_image_clicked_handler(*this, &image_window::on_image_clicked);
             set_image(img); 
@@ -3752,6 +3754,15 @@ namespace dlib
             unsigned long& mouse_button
         ); 
 
+        void tie_events (
+        );
+
+        void untie_events (
+        );
+
+        bool events_tied (
+        ) const;
+
         bool get_next_double_click (
             point& p
         ) 
@@ -3812,6 +3823,7 @@ namespace dlib
         unsigned long next_key;
         bool next_is_printable;
         unsigned long next_state;
+        bool tie_input_events;
     };
 
 // ----------------------------------------------------------------------------------------

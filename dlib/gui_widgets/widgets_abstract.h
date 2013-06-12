@@ -2802,6 +2802,7 @@ namespace dlib
         /*!
             INITIAL VALUE
                 - initially, this object is visible on the screen
+                - events_tied() == false
 
             WHAT THIS OBJECT REPRESENTS
                 This is a simple window that is just a container for an image_display.  
@@ -3019,15 +3020,50 @@ namespace dlib
                 - removes all overlays from this object.  
         !*/
 
+        void tie_events (
+        );
+        /*!
+            ensures
+                - #events_tied() == true
+        !*/
+
+        void untie_events (
+        );
+        /*!
+            ensures
+                - #events_tied() == false 
+        !*/
+
+        bool events_tied (
+        ) const;
+        /*!
+            ensures
+                - returns true if and only if the get_next_double_click() and
+                  get_next_keypress() events are tied together.  If they are tied it means
+                  that you can use a loop of the following form to listen for both events
+                  simultaneously:
+                    while (mywindow.get_next_double_click(p) || mywindow.get_next_keypress(key,printable))
+                    {
+                        if (p.x() < 0)
+                            // Do something with the keyboard event
+                        else
+                            // Do something with the mouse event
+                    }
+        !*/
+
         bool get_next_double_click (
             point& p
         ); 
         /*!
             ensures
                 - This function blocks until the user double clicks on the image or the
-                  window is closed by the user.
+                  window is closed by the user.  It will also unblock for a keyboard key
+                  press if events_tied() == true.
                 - if (this function returns true) then
+                    - This means the user double clicked the mouse.
                     - #p == the next image pixel the user clicked.  
+                - else
+                    - #p == point(-1,1)
         !*/
 
         bool get_next_double_click (
@@ -3037,12 +3073,17 @@ namespace dlib
         /*!
             ensures
                 - This function blocks until the user double clicks on the image or the
-                  window is closed by the user.
+                  window is closed by the user.  It will also unblock for a keyboard key
+                  press if events_tied() == true.
                 - if (this function returns true) then
+                    - This means the user double clicked the mouse.
                     - #p == the next image pixel the user clicked.  
                     - #mouse_button == the mouse button which was used to double click.
                       This will be either dlib::base_window::LEFT,
                       dlib::base_window::MIDDLE, or dlib::base_window::RIGHT
+                - else
+                    - #p == point(-1,1)
+                      (Note that this point is outside any possible image)
         !*/
 
         bool get_next_keypress (
@@ -3053,14 +3094,15 @@ namespace dlib
         /*!
             ensures
                 - This function blocks until the user presses a keyboard key or the
-                  window is closed by the user.
+                  window is closed by the user.  It will also unblock for a mouse double
+                  click if events_tied() == true.
                 - if (this function returns true) then
+                    - This means the user pressed a keyboard key.
                     - The keyboard button press is recorded into #key, #is_printable, and
                       #state.  In particular, these variables are populated with the three
                       identically named arguments to the base_window::on_keydown(key,is_printable,state) 
                       event.
         !*/
-
 
         bool get_next_keypress (
             unsigned long& key,
@@ -3069,7 +3111,8 @@ namespace dlib
         /*!
             ensures
                 - This function blocks until the user presses a keyboard key or the
-                  window is closed by the user.
+                  window is closed by the user.  It will also unblock for a mouse double
+                  click if events_tied() == true.
                 - This function is the equivalent to calling get_next_keypress(key,is_printable,temp) 
                   and then discarding temp.
         !*/
