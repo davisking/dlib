@@ -75,7 +75,7 @@ namespace dlib
             destructed(data_mutex),
             do_not_ever_destruct(false)
         {
-#if WIN32
+#ifdef WIN32
             // Trying to destroy the global thread pool when we are part of a DLL and the
             // DLL is being unloaded can sometimes lead to weird behavior.  For example, in
             // the python interpreter you will get the interpreter to hang.  Or if we are
