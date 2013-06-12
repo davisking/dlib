@@ -68,8 +68,8 @@ cd .. || report_failure
 
 tar -cf $SOURCE_TAR $RELDIR  || report_failure
 # flip everything to MS-DOS line endings 
-#find $RELDIR -name "*.cpp" -or -name "*.h" -or -name "*.txt" -or -name "*.html" | xargs flip -m
-find $RELDIR -name "*.cpp" -or -name "*.h" -or -name "*.txt" -or -name "*.html" | xargs unix2dos &> /dev/null 
+#find $RELDIR -name "*.cpp" -or -name "*.h" -or -name "*.txt" -or -name "*.html" -or -name "*.py" | xargs flip -m
+find $RELDIR -name "*.cpp" -or -name "*.h" -or -name "*.txt" -or -name "*.html" -or -name "*.py" | xargs unix2dos &> /dev/null 
 
 scp davis@home.dlib.net:dlib_win_python/* $RELDIR/python_examples || report_failure
 zip -r9 $SOURCE_ZIP $RELDIR > /dev/null || report_failure
