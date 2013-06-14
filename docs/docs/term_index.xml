@@ -30,7 +30,6 @@
 
 
 
-         <term link="compile.html" name="DLIB_REVISION"/>
 
          <term file="dlib/algs.h.html" name="stack_based_memory_block" include="dlib/algs.h"/>
 
