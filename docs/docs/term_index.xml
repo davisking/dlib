@@ -235,6 +235,7 @@
          <term file="algorithms.html" name="r_squared"                     include="dlib/statistics.h"/>
          <term file="algorithms.html" name="mean_squared_error"            include="dlib/statistics.h"/>
          <term file="algorithms.html" name="running_covariance"            include="dlib/statistics.h"/>
+         <term file="algorithms.html" name="running_cross_covariance"      include="dlib/statistics.h"/>
          <term file="algorithms.html" name="random_subset_selector"        include="dlib/statistics.h"/>
          <term file="algorithms.html" name="randomly_subsample"            include="dlib/statistics.h"/>
 

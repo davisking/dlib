@@ -65,6 +65,7 @@
          <item>r_squared</item> 
          <item>mean_squared_error</item> 
          <item>running_covariance</item> 
+         <item>running_cross_covariance</item> 
          <item>random_subset_selector</item> 
          <item>randomly_subsample</item> 
 
@@ -487,6 +488,18 @@
 
       </component>
       
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>running_cross_covariance</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
+         <description>
+                This object is a simple tool for computing the mean and
+                cross-covariance matrices of a sequence of pairs of vectors.  
+         </description>
+
+      </component>
       
    <!-- ************************************************************************* -->
 
