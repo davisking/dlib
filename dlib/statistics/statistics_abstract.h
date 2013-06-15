@@ -622,6 +622,7 @@ namespace dlib
                 - current_n() != 0 
             ensures
                 - returns the mean of all the x vectors presented to this object so far.
+                - The returned vector will have x_vector_size() dimensions.
         !*/
 
         const column_matrix mean_y (
@@ -631,6 +632,7 @@ namespace dlib
                 - current_n() != 0 
             ensures
                 - returns the mean of all the y vectors presented to this object so far.
+                - The returned vector will have y_vector_size() dimensions.
         !*/
 
         const general_matrix covariance_xy (
@@ -640,7 +642,11 @@ namespace dlib
                 - current_n() > 1
             ensures
                 - returns the unbiased sample cross-covariance matrix for all the vector
-                  pairs presented to this object so far.
+                  pairs presented to this object so far.  In particular, returns a matrix
+                  M such that:
+                    - M.nr() == x_vector_size()
+                    - M.nc() == y_vector_size()
+                    - M == the cross-covariance matrix of the data given to add().
         !*/
 
         const running_cross_covariance operator+ (
