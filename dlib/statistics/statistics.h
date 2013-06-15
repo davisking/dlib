@@ -752,6 +752,205 @@ namespace dlib
     template <
         typename matrix_type
         >
+    class running_cross_covariance
+    {
+        /*!
+            INITIAL VALUE
+                - x_vect_size == 0
+                - y_vect_size == 0
+                - total_count == 0
+
+            CONVENTION
+                - x_vect_size == x_vector_size()
+                - y_vect_size == y_vector_size()
+                - total_count == current_n() 
+
+                - if (total_count != 0)
+                    - sum_x == the sum of all x vectors given to add()
+                    - sum_y == the sum of all y vectors given to add()
+                    - total_cov == sum of all x*trans(y) given to add()
+        !*/
+
+    public:
+
+        typedef typename matrix_type::mem_manager_type mem_manager_type;
+        typedef typename matrix_type::type scalar_type;
+        typedef typename matrix_type::layout_type layout_type;
+        typedef matrix<scalar_type,0,0,mem_manager_type,layout_type> general_matrix;
+        typedef matrix<scalar_type,0,1,mem_manager_type,layout_type> column_matrix;
+
+        running_cross_covariance(
+        )
+        {
+            clear();
+        }
+
+        void clear(
+        )
+        {
+            total_count = 0;
+
+            x_vect_size = 0;
+            y_vect_size = 0;
+
+            sum_x.set_size(0);
+            sum_y.set_size(0);
+            total_cov.set_size(0,0);
+        }
+
+        long x_vector_size (
+        ) const
+        {
+            return x_vect_size;
+        }
+
+        long y_vector_size (
+        ) const
+        {
+            return y_vect_size;
+        }
+
+        long current_n (
+        ) const
+        {
+            return static_cast<long>(total_count);
+        }
+
+        template <typename EXP>
+        void add (
+            const matrix_exp<EXP>& x,
+            const matrix_exp<EXP>& y
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_col_vector(x) && (x_vector_size() == 0 || x.size() == x_vector_size()) &&
+                        is_col_vector(y) && (y_vector_size() == 0 || y.size() == y_vector_size()),
+                "\t void running_cross_covariance::add()"
+                << "\n\t Invalid inputs were given to this function"
+                << "\n\t is_col_vector(x): " << is_col_vector(x) 
+                << "\n\t x_vector_size():  " << x_vector_size() 
+                << "\n\t x.size():         " << x.size() 
+                << "\n\t is_col_vector(y): " << is_col_vector(y) 
+                << "\n\t y_vector_size():  " << y_vector_size() 
+                << "\n\t y.size():         " << y.size() 
+                << "\n\t this:             " << this
+                );
+
+            x_vect_size = x.size();
+            y_vect_size = y.size();
+            if (total_count == 0)
+            {
+                total_cov = x*trans(y);
+                sum_x = x;
+                sum_y = y;
+            }
+            else
+            {
+                total_cov += x*trans(y);
+                sum_x += x;
+                sum_y += y;
+            }
+            ++total_count;
+        }
+
+        const column_matrix mean_x (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT( current_n() != 0,
+                "\t running_cross_covariance::mean()"
+                << "\n\t This object can not execute this function in its current state."
+                << "\n\t current_n():      " << current_n() 
+                << "\n\t this:             " << this
+                );
+
+            return sum_x/total_count;
+        }
+
+        const column_matrix mean_y (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT( current_n() != 0,
+                "\t running_cross_covariance::mean()"
+                << "\n\t This object can not execute this function in its current state."
+                << "\n\t current_n():      " << current_n() 
+                << "\n\t this:             " << this
+                );
+
+            return sum_y/total_count;
+        }
+
+        const general_matrix covariance_xy (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT( current_n() > 1,
+                "\t running_cross_covariance::covariance()"
+                << "\n\t This object can not execute this function in its current state."
+                << "\n\t x_vector_size(): " << x_vector_size() 
+                << "\n\t y_vector_size(): " << y_vector_size() 
+                << "\n\t current_n():     " << current_n() 
+                << "\n\t this:            " << this
+                );
+
+            return (total_cov - sum_x*trans(sum_y)/total_count)/(total_count-1);
+        }
+
+        const running_cross_covariance operator+ (
+            const running_cross_covariance& item
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT((x_vector_size() == 0 || item.x_vector_size() == 0 || x_vector_size() == item.x_vector_size()) &&
+                        (y_vector_size() == 0 || item.y_vector_size() == 0 || y_vector_size() == item.y_vector_size()),
+                "\t running_cross_covariance running_cross_covariance::operator+()"
+                << "\n\t The two running_cross_covariance objects being added must have compatible parameters"
+                << "\n\t x_vector_size():            " << x_vector_size() 
+                << "\n\t item.x_vector_size():       " << item.x_vector_size() 
+                << "\n\t y_vector_size():            " << y_vector_size() 
+                << "\n\t item.y_vector_size():       " << item.y_vector_size() 
+                << "\n\t this:                       " << this
+                );
+
+            running_cross_covariance temp(item);
+
+            // make sure we ignore empty matrices
+            if (total_count != 0 && temp.total_count != 0)
+            {
+                temp.total_cov += total_cov;
+                temp.sum_x += sum_x;
+                temp.sum_y += sum_y;
+                temp.total_count += total_count;
+            }
+            else if (total_count != 0)
+            {
+                temp.total_cov = total_cov;
+                temp.sum_x = sum_x;
+                temp.sum_y = sum_y;
+                temp.total_count = total_count;
+            }
+
+            return temp;
+        }
+
+
+    private:
+
+        general_matrix total_cov;
+        column_matrix sum_x;
+        column_matrix sum_y;
+        scalar_type total_count;
+
+        long x_vect_size;
+        long y_vect_size;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename matrix_type
+        >
     class vector_normalizer
     {
     public:

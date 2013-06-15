@@ -527,6 +527,143 @@ namespace dlib
     template <
         typename matrix_type
         >
+    class running_cross_covariance
+    {
+        /*!
+            REQUIREMENTS ON matrix_type
+                Must be some type of dlib::matrix.
+
+            INITIAL VALUE
+                - x_vector_size() == 0
+                - y_vector_size() == 0
+                - current_n() == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a simple tool for computing the mean and cross-covariance
+                matrices of a sequence of pairs of vectors.  
+        !*/
+
+    public:
+
+        typedef typename matrix_type::mem_manager_type mem_manager_type;
+        typedef typename matrix_type::type scalar_type;
+        typedef typename matrix_type::layout_type layout_type;
+        typedef matrix<scalar_type,0,0,mem_manager_type,layout_type> general_matrix;
+        typedef matrix<scalar_type,0,1,mem_manager_type,layout_type> column_matrix;
+
+        running_cross_covariance(
+        );
+        /*!
+            ensures
+                - this object is properly initialized
+        !*/
+
+        void clear(
+        );
+        /*!
+            ensures
+                - This object has its initial value.
+                - Clears all memory of any previous data points.
+        !*/
+
+        long x_vector_size (
+        ) const;
+        /*!
+            ensures
+                - if (this object has been presented with any input vectors) then
+                    - returns the dimension of the x vectors given to this object via add().
+                - else
+                    - returns 0
+        !*/
+
+        long y_vector_size (
+        ) const;
+        /*!
+            ensures
+                - if (this object has been presented with any input vectors) then
+                    - returns the dimension of the y vectors given to this object via add().
+                - else
+                    - returns 0
+        !*/
+
+        long current_n (
+        ) const;
+        /*!
+            ensures
+                - returns the number of samples that have been presented to this object.
+        !*/
+
+        template <typename EXP>
+        void add (
+            const matrix_exp<EXP>& x,
+            const matrix_exp<EXP>& y
+        );
+        /*!
+            requires
+                - is_col_vector(x) == true
+                - is_col_vector(y) == true
+                - if (x_vector_size() != 0) then
+                    - x.size() == x_vector_size()
+                - if (y_vector_size() != 0) then
+                    - y.size() == y_vector_size()
+            ensures
+                - updates the mean and cross-covariance matrices stored in this object so
+                  that the new (x,y) vector pair is factored into them.
+                - #x_vector_size() == x.size()
+                - #y_vector_size() == y.size()
+        !*/
+
+        const column_matrix mean_x (
+        ) const;
+        /*!
+            requires
+                - current_n() != 0 
+            ensures
+                - returns the mean of all the x vectors presented to this object so far.
+        !*/
+
+        const column_matrix mean_y (
+        ) const;
+        /*!
+            requires
+                - current_n() != 0 
+            ensures
+                - returns the mean of all the y vectors presented to this object so far.
+        !*/
+
+        const general_matrix covariance_xy (
+        ) const;
+        /*!
+            requires
+                - current_n() > 1
+            ensures
+                - returns the unbiased sample cross-covariance matrix for all the vector
+                  pairs presented to this object so far.
+        !*/
+
+        const running_cross_covariance operator+ (
+            const running_cross_covariance& item
+        ) const;
+        /*!
+            requires
+                - x_vector_size() == 0 || item.x_vector_size() == 0 || x_vector_size() == item.x_vector_size()
+                  (i.e. the x_vector_size() of *this and item must match or one must be zero)
+                - y_vector_size() == 0 || item.y_vector_size() == 0 || y_vector_size() == item.y_vector_size()
+                  (i.e. the y_vector_size() of *this and item must match or one must be zero)
+            ensures
+                - returns a new running_cross_covariance object that represents the
+                  combination of all the vectors given to *this and item.  That is, this
+                  function returns a running_cross_covariance object, R, that is equivalent
+                  to what you would obtain if all calls to this->add() and item.add() had
+                  instead been done to R.
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename matrix_type
+        >
     class vector_normalizer
     {
         /*!
