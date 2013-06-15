@@ -824,7 +824,9 @@ namespace dlib
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(is_col_vector(x) && (x_vector_size() == 0 || x.size() == x_vector_size()) &&
-                        is_col_vector(y) && (y_vector_size() == 0 || y.size() == y_vector_size()),
+                        is_col_vector(y) && (y_vector_size() == 0 || y.size() == y_vector_size()) &&
+                        x.size() != 0 &&
+                        y.size() != 0,
                 "\t void running_cross_covariance::add()"
                 << "\n\t Invalid inputs were given to this function"
                 << "\n\t is_col_vector(x): " << is_col_vector(x) 

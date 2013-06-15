@@ -602,6 +602,8 @@ namespace dlib
             requires
                 - is_col_vector(x) == true
                 - is_col_vector(y) == true
+                - x.size() != 0
+                - y.size() != 0
                 - if (x_vector_size() != 0) then
                     - x.size() == x_vector_size()
                 - if (y_vector_size() != 0) then

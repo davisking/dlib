@@ -133,6 +133,44 @@ namespace
             }
         }
 
+        void test_running_cross_covariance ()
+        {
+            running_cross_covariance<matrix<double> > rcc1, rcc2;
+
+            matrix<double,0,1> xm, ym;
+            const int num = 40;
+
+            dlib::rand rnd;
+            for (int i = 0; i < num; ++i)
+            {
+                matrix<double,0,1> x = randm(4,1,rnd);
+                matrix<double,0,1> y = randm(4,1,rnd);
+
+                xm += x/num;
+                ym += y/num;
+
+                if (i < 15)
+                    rcc1.add(x,y);
+                else
+                    rcc2.add(x,y);
+            }
+
+            rnd.clear();
+            matrix<double> cov;
+            for (int i = 0; i < num; ++i)
+            {
+                matrix<double,0,1> x = randm(4,1,rnd);
+                matrix<double,0,1> y = randm(4,1,rnd);
+                cov += (x-xm)*trans(y-ym);
+            }
+            cov /= num-1;
+
+            running_cross_covariance<matrix<double> > rcc = rcc1 + rcc2;
+            DLIB_TEST(max(abs(rcc.covariance_xy()-cov)) < 1e-14);
+            DLIB_TEST(max(abs(rcc.mean_x()-xm)) < 1e-14);
+            DLIB_TEST(max(abs(rcc.mean_y()-ym)) < 1e-14);
+        }
+
         void test_running_covariance (
         )
         {
@@ -459,6 +497,7 @@ namespace
             test_random_subset_selector();
             test_random_subset_selector2();
             test_running_covariance();
+            test_running_cross_covariance();
             test_running_stats();
             test_skewness_and_kurtosis_1();
             test_skewness_and_kurtosis_2();
