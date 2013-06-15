@@ -467,7 +467,8 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - if (this object has been presented with any input vectors) then
+                - if (this object has been presented with any input vectors or
+                  set_dimension() has been called) then
                     - returns the dimension of the column vectors used with this object
                 - else
                     - returns 0
@@ -594,7 +595,8 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - if (this object has been presented with any input vectors) then
+                - if (this object has been presented with any input vectors or
+                  set_dimensions() has been called) then
                     - returns the dimension of the x vectors given to this object via add().
                 - else
                     - returns 0
@@ -604,7 +606,8 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - if (this object has been presented with any input vectors) then
+                - if (this object has been presented with any input vectors or
+                  set_dimensions() has been called) then
                     - returns the dimension of the y vectors given to this object via add().
                 - else
                     - returns 0
