@@ -6,6 +6,7 @@
 #include <limits>
 #include <cmath>
 #include "../matrix/matrix_abstract.h"
+#include "../svm/sparse_vector_abstract.h"
 
 namespace dlib
 {
@@ -472,18 +473,41 @@ namespace dlib
                     - returns 0
         !*/
 
-        void add (
-            const matrix_exp& val
+        void set_dimension (
+            long size
         );
         /*!
             requires
-                - is_col_vector(val) == true
-                - if (in_vector_size() != 0) then
-                    - val.size() == in_vector_size()
+                - size > 0
+            ensures
+                - #in_vector_size() == size
+                - #current_n() == 0
+        !*/
+
+        template <typename T>
+        void add (
+            const T& val
+        );
+        /*!
+            requires
+                - val must represent a column vector.  It can either be a dlib::matrix
+                  object or some kind of unsorted sparse vector type.  See the top of
+                  dlib/svm/sparse_vector_abstract.h for a definition of unsorted sparse vector.
+                - val must have a number of dimensions which is compatible with the current
+                  setting of in_vector_size().  In particular, this means that the
+                  following must hold:
+                    - if (val is a dlib::matrix) then 
+                        - in_vector_size() == 0 || val.size() == val_vector_size()
+                    - else
+                        - max_index_plus_one(val) <= in_vector_size()
+                        - in_vector_size() > 0 
+                          (i.e. you must call set_dimension() prior to calling add() if
+                          you want to use sparse vectors.)
             ensures
                 - updates the mean and covariance stored in this object so that
                   the new value is factored into them.
-                - #in_vector_size() == val.size()
+                - if (val is a dlib::matrix) then
+                    - #in_vector_size() == val.size()
         !*/
 
         const column_matrix mean (
@@ -586,6 +610,20 @@ namespace dlib
                     - returns 0
         !*/
 
+        void set_dimensions (
+            long x_size,
+            long y_size
+        );
+        /*!
+            requires
+                - x_size > 0
+                - y_size > 0
+            ensures
+                - #x_vector_size() == x_size
+                - #y_vector_size() == y_size
+                - #current_n() == 0
+        !*/
+
         long current_n (
         ) const;
         /*!
@@ -593,26 +631,38 @@ namespace dlib
                 - returns the number of samples that have been presented to this object.
         !*/
 
-        template <typename EXP>
+        template <typename T, typename U>
         void add (
-            const matrix_exp<EXP>& x,
-            const matrix_exp<EXP>& y
+            const T& x,
+            const U& y
         );
         /*!
             requires
-                - is_col_vector(x) == true
-                - is_col_vector(y) == true
-                - x.size() != 0
-                - y.size() != 0
-                - if (x_vector_size() != 0) then
-                    - x.size() == x_vector_size()
-                - if (y_vector_size() != 0) then
-                    - y.size() == y_vector_size()
+                - x and y must represent column vectors.  They can either be dlib::matrix
+                  objects or some kind of unsorted sparse vector type.  See the top of
+                  dlib/svm/sparse_vector_abstract.h for a definition of unsorted sparse vector.
+                - x and y must have a number of dimensions which is compatible with the
+                  current setting of x_vector_size() and y_vector_size().  In particular,
+                  this means that the following must hold:
+                    - if (x or y is a sparse vector type) then
+                        - x_vector_size() > 0 && y_vector_size() > 0
+                          (i.e. you must call set_dimensions() prior to calling add() if
+                          you want to use sparse vectors.)
+                    - if (x is a dlib::matrix) then 
+                        - x_vector_size() == 0 || x.size() == x_vector_size()
+                    - else
+                        - max_index_plus_one(x) <= x_vector_size()
+                    - if (y is a dlib::matrix) then 
+                        - y_vector_size() == 0 || y.size() == y_vector_size()
+                    - else
+                        - max_index_plus_one(y) <= y_vector_size()
             ensures
                 - updates the mean and cross-covariance matrices stored in this object so
                   that the new (x,y) vector pair is factored into them.
-                - #x_vector_size() == x.size()
-                - #y_vector_size() == y.size()
+                - if (x is a dlib::matrix) then
+                    - #x_vector_size() == x.size()
+                - if (y is a dlib::matrix) then
+                    - #y_vector_size() == y.size()
         !*/
 
         const column_matrix mean_x (

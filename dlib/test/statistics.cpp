@@ -171,6 +171,80 @@ namespace
             DLIB_TEST(max(abs(rcc.mean_y()-ym)) < 1e-14);
         }
 
+        std::map<unsigned long,double> dense_to_sparse ( 
+            const matrix<double,0,1>& x
+        )
+        {
+            std::map<unsigned long,double> temp;
+            for (long i = 0; i < x.size(); ++i)
+                temp[i] = x(i);
+            return temp;
+        }
+
+        void test_running_cross_covariance_sparse()
+        {
+            running_cross_covariance<matrix<double> > rcc1, rcc2;
+
+            running_covariance<matrix<double> > rc1, rc2;
+
+            matrix<double,0,1> xm, ym;
+            const int num = 40;
+
+            rc1.set_dimension(4);
+            rc2.set_dimension(4);
+
+            rcc1.set_dimensions(4,5);
+            rcc2.set_dimensions(4,5);
+
+            dlib::rand rnd;
+            for (int i = 0; i < num; ++i)
+            {
+                matrix<double,0,1> x = randm(4,1,rnd);
+                matrix<double,0,1> y = randm(5,1,rnd);
+
+                xm += x/num;
+                ym += y/num;
+
+                if (i < 15)
+                {
+                    rcc1.add(x,dense_to_sparse(y));
+                    rc1.add(x);
+                }
+                else if (i < 30)
+                {
+                    rcc2.add(dense_to_sparse(x),y);
+                    rc2.add(dense_to_sparse(x));
+                }
+                else
+                {
+                    rcc2.add(dense_to_sparse(x),dense_to_sparse(y));
+                    rc2.add(x);
+                }
+            }
+
+            rnd.clear();
+            matrix<double> cov, cov2;
+            for (int i = 0; i < num; ++i)
+            {
+                matrix<double,0,1> x = randm(4,1,rnd);
+                matrix<double,0,1> y = randm(5,1,rnd);
+                cov += (x-xm)*trans(y-ym);
+                cov2 += (x-xm)*trans(x-xm);
+            }
+            cov /= num-1;
+            cov2 /= num-1;
+
+            running_cross_covariance<matrix<double> > rcc = rcc1 + rcc2;
+            cout << rcc.covariance_xy()-cov << endl;
+            DLIB_TEST_MSG(max(abs(rcc.covariance_xy()-cov)) < 1e-14, max(abs(rcc.covariance_xy()-cov)));
+            DLIB_TEST(max(abs(rcc.mean_x()-xm)) < 1e-14);
+            DLIB_TEST(max(abs(rcc.mean_y()-ym)) < 1e-14);
+
+            running_covariance<matrix<double> > rc = rc1 + rc2;
+            DLIB_TEST(max(abs(rc.covariance()-cov2)) < 1e-14);
+            DLIB_TEST(max(abs(rc.mean()-xm)) < 1e-14);
+        }
+
         void test_running_covariance (
         )
         {
@@ -498,6 +572,7 @@ namespace
             test_random_subset_selector2();
             test_running_covariance();
             test_running_cross_covariance();
+            test_running_cross_covariance_sparse();
             test_running_stats();
             test_skewness_and_kurtosis_1();
             test_skewness_and_kurtosis_2();

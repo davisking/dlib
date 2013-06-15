@@ -8,6 +8,7 @@
 #include <cmath>
 #include "../algs.h"
 #include "../matrix.h"
+#include "../sparse_vector.h"
 
 namespace dlib
 {
@@ -646,9 +647,55 @@ namespace dlib
             return static_cast<long>(total_count);
         }
 
-        template <typename EXP>
-        void add (
-            const matrix_exp<EXP>& val
+        void set_dimension (
+            long size
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT( size > 0,
+                "\t void running_covariance::set_dimension()"
+                << "\n\t Invalid inputs were given to this function"
+                << "\n\t size: " << size 
+                << "\n\t this: " << this
+                );
+
+            clear();
+            vect_size = size;
+            total_sum.set_size(size);
+            total_cov.set_size(size,size);
+            total_sum = 0;
+            total_cov = 0;
+        }
+
+        template <typename T>
+        typename disable_if<is_matrix<T> >::type add (
+            const T& val
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(((long)max_index_plus_one(val) <= in_vector_size() && in_vector_size() > 0),
+                "\t void running_covariance::add()"
+                << "\n\t Invalid inputs were given to this function"
+                << "\n\t max_index_plus_one(val): " << max_index_plus_one(val) 
+                << "\n\t in_vector_size():        " << in_vector_size() 
+                << "\n\t this:                    " << this
+                );
+
+            for (typename T::const_iterator i = val.begin(); i != val.end(); ++i)
+            {
+                total_sum(i->first) += i->second;
+                for (typename T::const_iterator j = val.begin(); j != val.end(); ++j)
+                {
+                    total_cov(i->first, j->first) += i->second*j->second;
+                }
+            }
+
+            ++total_count;
+        }
+
+        template <typename T>
+        typename enable_if<is_matrix<T> >::type add (
+            const T& val
         )
         {
             // make sure requires clause is not broken
@@ -810,16 +857,149 @@ namespace dlib
             return y_vect_size;
         }
 
+        void set_dimensions (
+            long x_size,
+            long y_size
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT( x_size > 0 && y_size > 0,
+                "\t void running_cross_covariance::set_dimensions()"
+                << "\n\t Invalid inputs were given to this function"
+                << "\n\t x_size: " << x_size 
+                << "\n\t y_size: " << y_size 
+                << "\n\t this:   " << this
+                );
+
+            clear();
+            x_vect_size = x_size;
+            y_vect_size = y_size;
+            sum_x.set_size(x_size);
+            sum_y.set_size(y_size);
+            total_cov.set_size(x_size,y_size);
+
+            sum_x = 0;
+            sum_y = 0;
+            total_cov = 0;
+        }
+
         long current_n (
         ) const
         {
             return static_cast<long>(total_count);
         }
 
-        template <typename EXP>
-        void add (
-            const matrix_exp<EXP>& x,
-            const matrix_exp<EXP>& y
+        template <typename T, typename U>
+        typename enable_if_c<!is_matrix<T>::value && !is_matrix<U>::value>::type add (
+            const T& x,
+            const U& y
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT( ((long)max_index_plus_one(x) <= x_vector_size() && x_vector_size() > 0) &&
+                         ((long)max_index_plus_one(y) <= y_vector_size() && y_vector_size() > 0) ,
+                "\t void running_cross_covariance::add()"
+                << "\n\t Invalid inputs were given to this function"
+                << "\n\t max_index_plus_one(x): " << max_index_plus_one(x) 
+                << "\n\t max_index_plus_one(y): " << max_index_plus_one(y) 
+                << "\n\t x_vector_size():       " << x_vector_size() 
+                << "\n\t y_vector_size():       " << y_vector_size() 
+                << "\n\t this:                  " << this
+                );
+
+            for (typename T::const_iterator i = x.begin(); i != x.end(); ++i)
+            {
+                sum_x(i->first) += i->second;
+                for (typename U::const_iterator j = y.begin(); j != y.end(); ++j)
+                {
+                    total_cov(i->first, j->first) += i->second*j->second;
+                }
+            }
+
+            // do sum_y += y
+            for (typename U::const_iterator j = y.begin(); j != y.end(); ++j)
+            {
+                sum_y(j->first) += j->second;
+            }
+
+            ++total_count;
+        }
+
+        template <typename T, typename U>
+        typename enable_if_c<is_matrix<T>::value && !is_matrix<U>::value>::type add (
+            const T& x,
+            const U& y
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT( (is_col_vector(x) && x.size() == x_vector_size() && x_vector_size() > 0) &&
+                         ((long)max_index_plus_one(y) <= y_vector_size() && y_vector_size() > 0) ,
+                "\t void running_cross_covariance::add()"
+                << "\n\t Invalid inputs were given to this function"
+                << "\n\t is_col_vector(x):      " << is_col_vector(x) 
+                << "\n\t x.size():              " << x.size() 
+                << "\n\t max_index_plus_one(y): " << max_index_plus_one(y) 
+                << "\n\t x_vector_size():       " << x_vector_size() 
+                << "\n\t y_vector_size():       " << y_vector_size() 
+                << "\n\t this:                  " << this
+                );
+
+            sum_x += x;
+
+            for (long i = 0; i < x.size(); ++i)
+            {
+                for (typename U::const_iterator j = y.begin(); j != y.end(); ++j)
+                {
+                    total_cov(i, j->first) += x(i)*j->second;
+                }
+            }
+
+            // do sum_y += y
+            for (typename U::const_iterator j = y.begin(); j != y.end(); ++j)
+            {
+                sum_y(j->first) += j->second;
+            }
+
+            ++total_count;
+        }
+
+        template <typename T, typename U>
+        typename enable_if_c<!is_matrix<T>::value && is_matrix<U>::value>::type add (
+            const T& x,
+            const U& y
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT( ((long)max_index_plus_one(x) <= x_vector_size() && x_vector_size() > 0) &&
+                         (is_col_vector(y) && y.size() == (long)y_vector_size() && y_vector_size() > 0) ,
+                "\t void running_cross_covariance::add()"
+                << "\n\t Invalid inputs were given to this function"
+                << "\n\t max_index_plus_one(x): " << max_index_plus_one(x) 
+                << "\n\t is_col_vector(y):      " << is_col_vector(y) 
+                << "\n\t y.size():              " << y.size() 
+                << "\n\t x_vector_size():       " << x_vector_size() 
+                << "\n\t y_vector_size():       " << y_vector_size() 
+                << "\n\t this:                  " << this
+                );
+
+            for (typename T::const_iterator i = x.begin(); i != x.end(); ++i)
+            {
+                sum_x(i->first) += i->second;
+                for (long j = 0; j < y.size(); ++j)
+                {
+                    total_cov(i->first, j) += i->second*y(j);
+                }
+            }
+
+            sum_y += y;
+
+            ++total_count;
+        }
+
+        template <typename T, typename U>
+        typename enable_if_c<is_matrix<T>::value && is_matrix<U>::value>::type add (
+            const T& x,
+            const U& y
         )
         {
             // make sure requires clause is not broken
