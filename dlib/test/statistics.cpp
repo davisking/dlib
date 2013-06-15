@@ -235,7 +235,6 @@ namespace
             cov2 /= num-1;
 
             running_cross_covariance<matrix<double> > rcc = rcc1 + rcc2;
-            cout << rcc.covariance_xy()-cov << endl;
             DLIB_TEST_MSG(max(abs(rcc.covariance_xy()-cov)) < 1e-14, max(abs(rcc.covariance_xy()-cov)));
             DLIB_TEST(max(abs(rcc.mean_x()-xm)) < 1e-14);
             DLIB_TEST(max(abs(rcc.mean_y()-ym)) < 1e-14);
