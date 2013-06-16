@@ -212,6 +212,22 @@ namespace dlib
             queue_of_dirs& dirs
         ) const;
 
+        std::vector<file> get_files (
+        ) const
+        {
+            std::vector<file> temp_vector;
+            get_files(temp_vector);
+            return temp_vector;
+        }
+
+        std::vector<directory> get_dirs (
+        ) const
+        {
+            std::vector<directory> temp_vector;
+            get_dirs(temp_vector);
+            return temp_vector;
+        }
+
         const directory get_parent (
         ) const;
        
