@@ -30,16 +30,14 @@ int main(int argc, char** argv)
   
         directory test(loc);
 
-        std::vector<directory> dirs;
-        std::vector<file> files;
 
         cout << "directory: " << test.name() << endl;
         cout << "full path: " << test.full_name() << endl;        
         cout << "is root:   " << ((test.is_root())?"yes":"no") << endl;
         
         // get all directories and files in test
-        test.get_dirs(dirs);
-        test.get_files(files);
+        std::vector<directory> dirs = test.get_dirs();
+        std::vector<file> files = test.get_files();
 
         // sort the files and directories
         sort(files.begin(), files.end());
