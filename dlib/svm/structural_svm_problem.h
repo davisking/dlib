@@ -48,7 +48,10 @@ namespace dlib
             lru_count.clear();
 
             if (prob->get_max_cache_size() != 0)
+            {
                 prob->get_truth_joint_feature_vector(idx, true_psi);
+                compact_sparse_vector(true_psi);
+            }
         }
 
         void get_truth_joint_feature_vector_cached (
@@ -106,6 +109,8 @@ namespace dlib
             if (prob->get_max_cache_size() == 0)
                 return;
 
+            compact_sparse_vector(out_psi);
+
             // if the cache is full
             if (loss.size() >= prob->get_max_cache_size())
             {
@@ -129,6 +134,28 @@ namespace dlib
                 if (lru_count.size() != 0)
                     max_use = max(mat(lru_count)) + 1;
                 lru_count.push_back(max_use);
+            }
+        }
+
+        // Do nothing if T isn't actually a sparse vector
+        template <typename T> void compact_sparse_vector( T& ) const { }
+
+        template <
+            typename T,
+            typename U,
+            typename alloc
+            >
+        void compact_sparse_vector (
+            std::vector<std::pair<T,U>,alloc>& vect
+        ) const
+        {
+            // If the sparse vector has more entires than dimensions then it must have some 
+            // duplicate elements.  So compact them using make_sparse_vector_inplace().
+            if (vect.size() > (unsigned long)prob->get_num_dimensions())
+            {
+                make_sparse_vector_inplace(vect);
+                // make sure the vector doesn't use more RAM than is necessary
+                std::vector<std::pair<T,U>,alloc>(vect).swap(vect);
             }
         }
 
