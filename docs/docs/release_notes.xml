@@ -23,7 +23,7 @@ Other:
 
 <!-- **************************************************************************************  -->
 
-<old name="18.3" date="June 10, 2013">
+<old name="18.3" date="June 21, 2013">
 New Features:
    - Machine Learning:
       - Added the svr_linear_trainer, a tool for solving large scale support vector 
