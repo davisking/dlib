@@ -788,7 +788,7 @@ namespace dlib
             scalar_type best_val = dot(rowm(weights,0),x) - b(0);
             unsigned long best_idx = 0;
 
-            for (unsigned long i = 0; i < labels.size(); ++i)
+            for (unsigned long i = 1; i < labels.size(); ++i)
             {
                 scalar_type temp = dot(rowm(weights,i),x) - b(i);
                 if (temp > best_val)
