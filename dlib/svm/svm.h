@@ -627,10 +627,10 @@ namespace dlib
             << "\n\t is_binary_classification_problem(scores,labels): " << is_binary_classification_problem(scores,labels)
             );
 
-        const T prior0 = sum(mat(labels)>0); 
-        const T prior1 = sum(mat(labels)<0);
-        const T hi_target = (prior1+1)/(prior1+2);
-        const T lo_target = 1.0/(prior0+2);
+        const T num_pos = sum(mat(labels)>0); 
+        const T num_neg = sum(mat(labels)<0);
+        const T hi_target = (num_pos+1)/(num_pos+2);
+        const T lo_target = 1.0/(num_neg+2);
 
         std::vector<T,alloc> target;
         for (unsigned long i = 0; i < labels.size(); ++i)
