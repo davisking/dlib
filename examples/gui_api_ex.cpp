@@ -217,24 +217,14 @@ int main()
 
 //  ----------------------------------------------------------------------------
 
-//  If you use main() as your entry point when building a program on MS Windows then
-//  there will be a black console window associated with your application.  If you
-//  want your application to not have this console window then you need to build
-//  using the WinMain() entry point as shown below and also set your compiler to 
-//  produce a "Windows" project instead of a "Console" project.  In visual studio
-//  this can be accomplished by going to project->properties->general configuration->
-//  Linker->System->SubSystem and selecting Windows instead of Console.  
-// 
-#ifdef WIN32
-int WINAPI WinMain (
-    HINSTANCE, 
-    HINSTANCE,
-    PSTR cmds, 
-    int 
-)
-{
-    return main();
-}
+// Normally, if you built this application on MS Windows in Visual Studio you
+// would see a black console window pop up when you ran it.  The following
+// #pragma directives tell Visual Studio to not include a console window along
+// with your application.  However, if you prefer to have the console pop up as
+// well then simply remove these #pragma statements.
+#ifdef _MSC_VER
+#   pragma comment( linker, "/entry:mainCRTStartup" )
+#   pragma comment( linker, "/SUBSYSTEM:WINDOWS" )
 #endif
 
 //  ----------------------------------------------------------------------------
