@@ -1,3 +1,5 @@
+// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+// License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_SERIALIZE_PiCKLE_H__
 #define DLIB_SERIALIZE_PiCKLE_H__
 

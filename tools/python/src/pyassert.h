@@ -1,3 +1,5 @@
+// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+// License: Boost Software License   See LICENSE.txt for the full license.
 
 
 #define pyassert(_exp,_message)                                             \

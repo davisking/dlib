@@ -1,3 +1,5 @@
+// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+// License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_TESTING_ReSULTS_H__
 #define DLIB_TESTING_ReSULTS_H__
 
