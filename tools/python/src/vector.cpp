@@ -109,7 +109,7 @@ double cv__getitem__(cv& m, long r)
 cv cv__getitem2__(cv& m, slice r)
 {
     slice::range<cv::iterator> bounds;
-    bounds = r.get_indices<>(m.begin(), m.end());
+    bounds = r.get_indicies<>(m.begin(), m.end());
     long num = (bounds.stop-bounds.start+1);
     // round num up to the next multiple of bounds.step.
     if ((num%bounds.step) != 0)
