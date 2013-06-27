@@ -5,6 +5,7 @@
 #include <boost/shared_ptr.hpp>
 #include <dlib/matrix.h>
 #include "serialize_pickle.h"
+#include <boost/python/slice.hpp>
 
 
 using namespace dlib;
@@ -17,6 +18,11 @@ void cv_set_size(cv& m, long s)
 {
     m.set_size(s);
     m = 0;
+}
+
+double dotprod ( const cv& a, const cv& b)
+{
+    return dot(a,b);
 }
 
 string cv__str__(const cv& v)
@@ -100,6 +106,29 @@ double cv__getitem__(cv& m, long r)
 }
 
 
+cv cv__getitem2__(cv& m, slice r)
+{
+    slice::range<cv::iterator> bounds;
+    bounds = r.get_indices<>(m.begin(), m.end());
+    long num = (bounds.stop-bounds.start+1);
+    // round num up to the next multiple of bounds.step.
+    if ((num%bounds.step) != 0)
+        num += bounds.step - num%bounds.step;
+
+    cv temp(num/bounds.step);
+
+    if (temp.size() == 0)
+        return temp;
+    long ii = 0;
+    while(bounds.start != bounds.stop)
+    {
+        temp(ii++) = *bounds.start;
+        std::advance(bounds.start, bounds.step);
+    }
+    temp(ii) = *bounds.start;
+    return temp;
+}
+
 tuple cv_get_matrix_size(cv& m)
 {
     return make_tuple(m.nr(), m.nc());
@@ -115,8 +144,11 @@ void bind_vector()
         .def("__str__", &cv__str__)
         .def("__len__", &cv__len__)
         .def("__getitem__", &cv__getitem__)
+        .def("__getitem__", &cv__getitem2__)
         .def("__setitem__", &cv__setitem__)
         .add_property("shape", &cv_get_matrix_size)
         .def_pickle(serialize_pickle<cv>());
+
+    def("dot", dotprod, "Compute the dot product between two dense column vectors.");
 }
 
