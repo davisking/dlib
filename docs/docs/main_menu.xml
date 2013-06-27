@@ -130,6 +130,10 @@
                   <link>sequence_segmenter.py.html</link>
                </item>
                <item>
+                  <name>Structural Support Vector Machines</name>
+                  <link>svm_struct.py.html</link>
+               </item>
+               <item>
                   <name>SVM-Rank</name>
                   <link>svm_rank.py.html</link>
                </item>
