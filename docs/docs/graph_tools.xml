@@ -79,6 +79,7 @@
          <item>convert_unordered_to_ordered</item>
          <item>order_by_index</item>
          <item>order_by_distance</item>
+         <item>order_by_descending_distance</item>
          <item>order_by_distance_and_index</item>
          <item>contains_duplicate_pairs</item>
          <item>max_index_plus_one</item>
@@ -118,6 +119,20 @@
             This function provides a total ordering of <a href="#sample_pair">sample_pair</a> 
             or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects that causes
             pairs with smallest distance to be the first in a sorted list.  This function
+            can be used with std::sort().
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>order_by_descending_distance</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/sample_pair_abstract.h</spec_file>
+         <description>
+            This function provides a total ordering of <a href="#sample_pair">sample_pair</a> 
+            or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects that causes
+            pairs with largest distance to be the first in a sorted list.  This function
             can be used with std::sort().
          </description>
       </component>

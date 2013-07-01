@@ -272,6 +272,7 @@
          <term file="graph_tools.html" name="ordered_sample_pair"                include="dlib/graph_utils.h"/>
          <term file="graph_tools.html" name="order_by_index"                     include="dlib/graph_utils.h"/>
          <term file="graph_tools.html" name="order_by_distance"                  include="dlib/graph_utils.h"/>
+         <term file="graph_tools.html" name="order_by_descending_distance"       include="dlib/graph_utils.h"/>
          <term file="graph_tools.html" name="order_by_distance_and_index"        include="dlib/graph_utils.h"/>
          <term file="graph_tools.html" name="find_percent_shortest_edges_randomly" include="dlib/graph_utils.h"/>
          <term file="graph_tools.html" name="find_k_nearest_neighbors"           include="dlib/graph_utils.h"/>
