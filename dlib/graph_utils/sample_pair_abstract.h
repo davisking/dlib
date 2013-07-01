@@ -115,6 +115,20 @@ namespace dlib
     !*/
 
     template <typename T>
+    bool order_by_descending_distance (
+        const T& a,
+        const T& b
+    ) { return a.distance() > b.distance(); }
+    /*!
+        requires
+            - T is a type with an interface compatible with sample_pair.
+        ensures
+            - provides a total ordering of sample_pair objects that causes pairs with 
+              largest distance to be the first in a sorted list.  This function can be
+              used with std::sort().
+    !*/
+
+    template <typename T>
     bool order_by_distance_and_index (
         const T& a,
         const T& b

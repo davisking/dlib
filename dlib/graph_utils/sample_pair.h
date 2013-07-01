@@ -96,6 +96,15 @@ namespace dlib
     }
 
     template <typename T>
+    inline bool order_by_descending_distance (
+        const T& a,
+        const T& b
+    )
+    {
+        return a.distance() > b.distance();
+    }
+
+    template <typename T>
     bool order_by_distance_and_index (
         const T& a,
         const T& b
