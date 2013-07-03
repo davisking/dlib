@@ -84,3 +84,11 @@ problem = three_class_classifier_problem(samples, labels)
 weights = dlib.solve_structural_svm_problem(problem)
 print weights
 
+w1 = weights[0:3]
+w2 = weights[3:6]
+w3 = weights[6:9]
+
+print "scores for class 1 sample: ", dot(w1, samples[0]), dot(w2,samples[0]), dot(w3, samples[0])
+print "scores for class 2 sample: ", dot(w1, samples[1]), dot(w2,samples[1]), dot(w3, samples[1])
+print "scores for class 3 sample: ", dot(w1, samples[2]), dot(w2,samples[2]), dot(w3, samples[2])
+
