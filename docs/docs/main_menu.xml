@@ -99,6 +99,10 @@
             <chm_sub>intro.xml</chm_sub>
          </item>
          <item>
+            <name>Python API</name>
+            <link>python/index.html</link>
+         </item>
+         <item>
             <name>How to compile</name>
             <link>compile.html</link>
          </item>

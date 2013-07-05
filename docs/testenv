@@ -23,6 +23,7 @@ tar --help 		> /dev/null || return_error "tar";
 zip -h 			> /dev/null || return_error "zip";
 bzip2 -h 	       &> /dev/null || return_error "bzip2";
 pygmentize -h 	       &> /dev/null || return_error "pygmentize";
+which sphinx-build   &> /dev/null || return_error "sphinx-build";
 
 
 echo All needed utilities found 
