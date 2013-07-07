@@ -88,13 +88,15 @@ matrix<double,0,1> solve_structural_svm_problem(
     const bool be_verbose = hasattr(problem,"be_verbose") && extract<bool>(problem.attr("be_verbose"));
     const bool use_sparse_feature_vectors = hasattr(problem,"use_sparse_feature_vectors") && 
                                             extract<bool>(problem.attr("use_sparse_feature_vectors"));
+    const bool learns_nonnegative_weights = hasattr(problem,"learns_nonnegative_weights") && 
+                                            extract<bool>(problem.attr("learns_nonnegative_weights"));
 
     double eps = 0.001;
     unsigned long max_cache_size = 10;
     if (hasattr(problem, "epsilon"))
         eps = extract<double>(problem.attr("epsilon"));
     if (hasattr(problem, "max_cache_size"))
-        eps = extract<double>(problem.attr("max_cache_size"));
+        max_cache_size = extract<double>(problem.attr("max_cache_size"));
 
     const long num_samples = extract<long>(problem.attr("num_samples"));
     const long num_dimensions = extract<long>(problem.attr("num_dimensions"));
@@ -107,6 +109,7 @@ matrix<double,0,1> solve_structural_svm_problem(
         cout << "num_samples:    " << num_samples << endl;
         cout << "num_dimensions: " << num_dimensions << endl;
         cout << "use_sparse_feature_vectors: " << std::boolalpha << use_sparse_feature_vectors << endl;
+        cout << "learns_nonnegative_weights: " << std::boolalpha << learns_nonnegative_weights << endl;
         cout << endl;
     }
 
@@ -120,7 +123,10 @@ matrix<double,0,1> solve_structural_svm_problem(
 
     oca solver;
     matrix<double,0,1> w;
-    solver(prob, w);
+    if (learns_nonnegative_weights)
+        solver(prob, w, prob.get_num_dimensions());
+    else
+        solver(prob, w);
     return w;
 }
 
