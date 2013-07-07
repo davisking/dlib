@@ -2624,11 +2624,12 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                 for solving the optimization problem associated 
                 with a structural support vector machine.  A structural SVM is a supervised 
                 machine learning method for learning to predict complex outputs.  This is
-                contrasted with a binary classifier which makes only simple yes/no predictions.  
-                A structural SVM, on the other hand, can learn to predict outputs as complex
-                as entire parse trees.  To do this, it learns a function F(x,y) which measures 
-                how well a particular data sample x matches a label y.  When used for prediction,
-                the best label for a new x is given by the y which maximizes F(x,y).   
+                contrasted with a binary classifier which makes only simple yes/no
+                predictions.  A structural SVM, on the other hand, can learn to predict
+                complex outputs such as entire parse trees or DNA sequence alignments.  To
+                do this, it learns a function F(x,y) which measures how well a particular
+                data sample x matches a label y.  When used for prediction, the best label
+                for a new x is given by the y which maximizes F(x,y).   
 
                <p>
                   If you want to see example code that uses this object then take a look at
