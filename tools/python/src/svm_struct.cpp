@@ -37,7 +37,7 @@ public:
         feature_vector_type& psi 
     ) const 
     {
-        problem.attr("get_truth_joint_feature_vector")(idx,boost::ref(psi));
+        psi = extract<feature_vector_type&>(problem.attr("get_truth_joint_feature_vector")(idx));
     }
 
     virtual void separation_oracle (
@@ -47,7 +47,19 @@ public:
         feature_vector_type& psi
     ) const 
     {
-        loss = extract<double>(problem.attr("separation_oracle")(idx,boost::ref(current_solution),boost::ref(psi)));
+        object res = problem.attr("separation_oracle")(idx,boost::ref(current_solution));
+        pyassert(len(res) == 2, "separation_oracle() must return two objects, the loss and the psi vector");
+        // let the user supply the output arguments in any order.
+        if (extract<double>(res[0]).check())
+        {
+            loss = extract<double>(res[0]);
+            psi = extract<feature_vector_type&>(res[1]);
+        }
+        else
+        {
+            psi = extract<feature_vector_type&>(res[0]);
+            loss = extract<double>(res[1]);
+        }
     }
 
 private:
