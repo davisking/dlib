@@ -83,7 +83,7 @@ ensures    \n\
     - num_correlations > 0    \n\
     - len(L) > 0     \n\
     - len(R) > 0     \n\
-    - len(L) == len(r)    \n\
+    - len(L) == len(R)    \n\
     - regularization >= 0    \n\
     - L and R must be properly sorted sparse vectors.  This means they must list their  \n\
       elements in ascending index order and not contain duplicate index values.  You can use \n\
