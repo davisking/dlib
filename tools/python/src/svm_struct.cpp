@@ -134,7 +134,13 @@ matrix<double,0,1> solve_structural_svm_problem(
 
 void bind_svm_struct()
 {
-    def("solve_structural_svm_problem",solve_structural_svm_problem);
+    using boost::python::arg;
+
+    def("solve_structural_svm_problem",solve_structural_svm_problem, (arg("problem")),
+"This function solves a structural SVM problem and returns the weight vector    \n\
+that defines the solution.  See the example program python_examples/svm_struct.py    \n\
+for documentation about how to create a proper problem object.   " 
+        );
 }
 
 // ----------------------------------------------------------------------------------------
