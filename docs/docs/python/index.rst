@@ -1,6 +1,4 @@
 
-=========================
-
 .. image:: ../dlib-logo.png
    :alt: Dlib C++ Library 
    :target: http://dlib.net
