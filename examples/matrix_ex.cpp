@@ -121,6 +121,24 @@ int main()
     // The above expression prints out the value 1.2
 
 
+    // Note that you can always print a matrix to an output stream by saying:
+    cout << M << endl;
+    // which will print:
+    //   54.2  7.4 12.1 
+    //      1    2    3 
+    //    5.9 0.05    1 
+
+    // However, if you want to print using comma separators instead of spaces you can say:
+    cout << csv << M << endl;
+    // and you will instead get this as output:
+    //   54.2, 7.4, 12.1
+    //   1, 2, 3
+    //   5.9, 0.05, 1
+
+    // Conversely, you can also read in a matrix that uses either space, tab, or comma
+    // separated values by uncommenting the following:
+    // cin >> M;
+
 
 
     // -----------------------------  Comparison with MATLAB ------------------------------
