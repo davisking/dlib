@@ -1814,6 +1814,51 @@ namespace dlib
     */
 
 // ----------------------------------------------------------------------------------------
+
+    class print_matrix_as_csv_helper 
+    {
+        /*!
+            This object is used to define an io manipulator for matrix expressions.
+            In particular, this code allows you to write statements like:
+                cout << csv << yourmatrix;
+            and have it print the matrix with commas separating each element.
+        !*/
+    public:
+        print_matrix_as_csv_helper (std::ostream& out_) : out(out_) {}
+
+        template <typename EXP>
+        std::ostream& operator<< (
+            const matrix_exp<EXP>& m
+        ) 
+        {
+            for (long r = 0; r < m.nr(); ++r)
+            {
+                for (long c = 0; c < m.nc(); ++c)
+                {
+                    if (c+1 == m.nc())
+                        out << m(r,c) << "\n";
+                    else
+                        out << m(r,c) << ", ";
+                }
+            }
+            return out;
+        }
+
+    private:
+        std::ostream& out;
+    };
+
+    class print_matrix_as_csv {};
+    const print_matrix_as_csv csv;
+    inline print_matrix_as_csv_helper operator<< (
+        std::ostream& out,
+        const print_matrix_as_csv& 
+    )
+    {
+        return print_matrix_as_csv_helper(out);
+    }
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
