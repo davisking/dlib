@@ -44,7 +44,7 @@ def main():
     # Note that the correct label is predicted for each sample.
     print weights
     for i in range(len(samples)):
-        print "predicted label for sample[{}]: {}".format(i, predict_label(weights, samples[i]))
+        print "predicted label for sample[{0}]: {1}".format(i, predict_label(weights, samples[i]))
 
 def predict_label(weights, sample):
     """Given the 9-dimensional weight vector which defines a 3 class classifier, predict the
