@@ -13,7 +13,7 @@ def make_listing_files():
         name = 'dlib.'+obj
         isclass = inspect.isclass(eval(name))
         if (isclass):
-            print("* :class:`{}`".format(name), file=fc)
+            print("* :class:`{0}`".format(name), file=fc)
         else:
-            print("* :func:`{}`".format(name), file=ff)
+            print("* :func:`{0}`".format(name), file=ff)
 
