@@ -83,7 +83,26 @@ namespace dlib
                   are contained within the given rectangle.
         !*/
 
+        void swap(
+            integral_image_generic& item
+        );
+        /*!
+            ensures
+                - swaps *this and item
+        !*/
+
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template < typename T >
+    void swap (
+        integral_image_generic<T>& a,
+        integral_image_generic<T>& b
+    ) { a.swap(b); }
+    /*!
+        provides a global swap function
+    !*/ 
 
 // ----------------------------------------------------------------------------------------
 

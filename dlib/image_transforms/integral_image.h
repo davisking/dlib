@@ -94,12 +94,24 @@ namespace dlib
             return bottom_right - bottom_left - top_right + top_left;
         }
 
+        void swap(integral_image_generic& item)
+        {
+            int_img.swap(item.int_img);
+        }
+
     private:
 
         array2d<T> int_img;
-
-
     };
+
+
+    template <
+        typename T
+        >
+    void swap (
+        integral_image_generic<T>& a,
+        integral_image_generic<T>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 
