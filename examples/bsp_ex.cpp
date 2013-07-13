@@ -194,7 +194,7 @@ void bsp_job_node_0 (bsp_context& bsp, double& min_value, double& optimal_x)
         // for a lot of types by default, so we don't have to define anything for this
         // example program.  However, if you want to send an object you defined then you
         // will need to write your own serialization functions.  See the documentation for
-        // dlib's serialize() routine or the bsp_ex.cpp example program for an example.  
+        // dlib's serialize() routine or the bridge_ex.cpp example program for an example.  
         bsp.broadcast(left);
         bsp.broadcast(right);
 
