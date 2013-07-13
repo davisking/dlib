@@ -449,9 +449,7 @@ namespace dlib
         
         dets.clear();
 
-        array<integral_image_generic<double> > saliency_images;
-        saliency_images.set_max_size(get_num_components_per_detection_template());
-        saliency_images.set_size(get_num_components_per_detection_template());
+        array<integral_image_generic<double> > saliency_images(get_num_components_per_detection_template());
 
         array2d<double> temp_img(feats.nr(), feats.nc());
 
