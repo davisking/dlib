@@ -1849,7 +1849,7 @@ namespace dlib
     };
 
     class print_matrix_as_csv {};
-    const print_matrix_as_csv csv;
+    const print_matrix_as_csv csv = print_matrix_as_csv();
     inline print_matrix_as_csv_helper operator<< (
         std::ostream& out,
         const print_matrix_as_csv& 
