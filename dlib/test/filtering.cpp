@@ -46,8 +46,10 @@ namespace
             if (rnd.get_random_double() < 0.7 || count < 4)
             {
                 // make a random bump
-                dlib::vector<double,2> pp(rnd.get_random_gaussian()/3,
-                                          rnd.get_random_gaussian()/3);
+                dlib::vector<double,2> pp;
+                pp.x() = rnd.get_random_gaussian()/3;
+                pp.y() = rnd.get_random_gaussian()/3;
+
                 ++count;
                 kf.update(p+pp);
             }
