@@ -470,7 +470,8 @@ subject to the following constraint:
          <file>dlib/optimization.h</file>
          <spec_file link="true">dlib/optimization/max_cost_assignment_abstract.h</spec_file>
          <description>
-            This function is an implementation of the Hungarian algorithm (also know as the Kuhn-Munkres algorithm).
+            This function is an implementation of the Hungarian algorithm (also know as the Kuhn-Munkres algorithm) which
+            runs in O(N^3) time.
             It solves the optimal assignment problem. For example, suppose you have an equal number of workers
             and jobs and you need to decide which workers to assign to which jobs. Some workers are better at 
             certain jobs than others. So you would like to find out how to assign them all to jobs such that 
