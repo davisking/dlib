@@ -60,6 +60,7 @@ macro(add_python_module module_name module_sources )
       SET_TARGET_PROPERTIES( ${module_name}_
          PROPERTIES
          PREFIX ""
+         SUFFIX ".so"
          OUTPUT_NAME ${module_name}
          )
    endif()
