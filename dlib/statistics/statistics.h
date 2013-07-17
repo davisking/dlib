@@ -345,13 +345,7 @@ namespace dlib
                 << "\n\tthis: " << this
                 );
 
-            T temp = 1/(n-1) * (sum_xy - sum_y*sum_x/n);
-            // make sure the variance is never negative.  This might
-            // happen due to numerical errors.
-            if (temp >= 0)
-                return temp;
-            else
-                return 0;
+            return 1/(n-1) * (sum_xy - sum_y*sum_x/n);
         }
 
         T correlation (

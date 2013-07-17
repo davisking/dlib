@@ -350,6 +350,15 @@ namespace
             DLIB_TEST(std::abs(rs2.variance() - rsc1.variance_y()) < 1e-10);
             DLIB_TEST(rs2.current_n() == rsc1.current_n());
 
+            rsc1.clear();
+            rsc1.add(1, -1);
+            rsc1.add(0, 0);
+            rsc1.add(1, -1);
+            rsc1.add(0, 0);
+            rsc1.add(1, -1);
+            rsc1.add(0, 0);
+
+            DLIB_TEST(std::abs(rsc1.covariance() - -0.3) < 1e-10);
         }
 
         void test_skewness_and_kurtosis_1()
