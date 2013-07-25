@@ -207,11 +207,11 @@ int main()
         object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
 
         // We can easily test the new detector against our training data.  This print statement will indicate that it
-        // has perfect precision and recall on this simple task.  It will also print the mean average precision (MAP).
-        cout << "Test detector (precision,recall,MAP): " << test_object_detection_function(detector, images, object_locations) << endl;
+        // has perfect precision and recall on this simple task.  It will also print the average precision (AP).
+        cout << "Test detector (precision,recall,AP): " << test_object_detection_function(detector, images, object_locations) << endl;
 
         // The cross validation should also indicate perfect precision and recall.
-        cout << "3-fold cross validation (precision,recall,MAP): "
+        cout << "3-fold cross validation (precision,recall,AP): "
              << cross_validate_object_detection_trainer(trainer, images, object_locations, 3) << endl;
 
 

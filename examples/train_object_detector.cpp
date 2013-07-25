@@ -189,15 +189,14 @@ int main(int argc, char** argv)
                 fout.close();
 
                 cout << "Testing detector on training data..." << endl;
-                cout << "Test detector (precision,recall,MAP): " << test_object_detection_function(detector, images, object_locations) << endl;
+                cout << "Test detector (precision,recall,AP): " << test_object_detection_function(detector, images, object_locations) << endl;
             }
             else
             {
                 // shuffle the order of the training images
                 randomize_samples(images, object_locations);
 
-                // The cross validation should also indicate perfect precision and recall.
-                cout << num_folds << "-fold cross validation (precision,recall,MAP): "
+                cout << num_folds << "-fold cross validation (precision,recall,AP): "
                      << cross_validate_object_detection_trainer(trainer, images, object_locations, num_folds) << endl;
             }
 
@@ -252,7 +251,7 @@ int main(int argc, char** argv)
             if (parser.option("test"))
             {
                 cout << "Testing detector on data..." << endl;
-                cout << "Results (precision,recall,MAP): " << test_object_detection_function(detector, images, object_locations) << endl;
+                cout << "Results (precision,recall,AP): " << test_object_detection_function(detector, images, object_locations) << endl;
                 return EXIT_SUCCESS;
             }
         }
