@@ -295,7 +295,7 @@ namespace dlib
             T temp;
             sin >> temp;
             if (!sin) throw string_cast_error(narrow(str));
-            if (sin.get() != char_traits<charT>::eof()) throw string_cast_error(narrow(str));   
+            if (sin.get() != std::char_traits<charT>::eof()) throw string_cast_error(narrow(str));   
             return temp;
         }
     };
@@ -355,7 +355,7 @@ namespace dlib
             else                                                    \
                 sin >> temp;                                        \
             if (!sin) throw string_cast_error(narrow(str));                 \
-            if (sin.get() != char_traits<charT>::eof()) throw string_cast_error(narrow(str));     \
+            if (sin.get() != std::char_traits<charT>::eof()) throw string_cast_error(narrow(str));     \
             return temp;                                            \
         }                                                           \
     };
