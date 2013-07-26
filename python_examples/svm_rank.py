@@ -67,11 +67,14 @@ print "ranking score for a non-relevant vector: ", rank(data.nonrelevant[0])
 # metrics, indicating that the rank function outputs a perfect ranking.
 print dlib.test_ranking_function(rank, data)
 
-# We can also see the ranking weights:
+# The ranking scores are computed by taking the dot product between a learned
+# weight vector and a data vector.  If you want to see the learned weight vector
+# you can display it like so:
 print "weights: \n", rank.weights
-# In this case they are:
+# In this case the weights are:
 #  0.5 
 # -0.5 
+
 
 
 
