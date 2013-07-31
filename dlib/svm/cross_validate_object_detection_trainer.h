@@ -50,32 +50,27 @@ namespace dlib
             std::vector<bool> used(boxes.size(),false);
             for (unsigned long i = 0; i < truth_boxes.size(); ++i)
             {
-                unsigned long best_idx = 0;
-                double best_overlap = 0;
-                // Find the best box that hits truth_boxes[i]
+                bool found_match = false;
+                // Find the first box that hits truth_boxes[i]
                 for (unsigned long j = 0; j < boxes.size(); ++j)
                 {
                     if (used[j])
                         continue;
 
-                    const double overlap = truth_boxes[i].get_rect().intersect(boxes[j].second).area() / (double)(truth_boxes[i].get_rect()+boxes[j].second).area();
-                    if (overlap > best_overlap)
+                    const double overlap = truth_boxes[i].get_rect().intersect(boxes[j].second).area() / 
+                                                (double)(truth_boxes[i].get_rect()+boxes[j].second).area();
+
+                    if (overlap >= overlap_eps)
                     {
-                        best_overlap = overlap;
-                        best_idx = j;
+                        used[j] = true;
+                        ++count;
+                        found_match = true;
+                        break;
                     }
                 }
 
-                // if there was any box that hit truth_boxes[i]
-                if (best_overlap > overlap_eps)
-                {
-                    used[best_idx] = true;
-                    ++count;
-                }
-                else
-                {
+                if (!found_match)
                     ++missing_detections;
-                }
             }
 
             for (unsigned long i = 0; i < boxes.size(); ++i)
