@@ -266,12 +266,13 @@ namespace dlib
                     using namespace std;
                     ostringstream sout;
                     sout << "An impossible set of object labels was detected.  This is happening because ";
-                    sout << "none of the sliding window detection templates is capable of matching the size ";
-                    sout << "and/or shape of one of the ground truth rectangles to within the required match_eps ";
-                    sout << "amount of alignment.  To resolve this you need to either lower the match_eps, add ";
-                    sout << "another detection template which can match the offending rectangle, or adjust the ";
-                    sout << "offending truth rectangle so it can be matched by an existing detection template. ";
-                    sout << "It is also possible that the image pyramid you are using is too coarse.  E.g. if one of ";
+                    sout << "none of the object locations checked by the supplied image scanner is a close ";
+                    sout << "enough match to one of the truth boxes.  To resolve this you need to either lower the match_eps ";
+                    sout << "or adjust the settings of the image scanner so that it hits this truth box.  ";
+                    sout << "Or you could adjust the ";
+                    sout << "offending truth rectangle so it can be matched by the current image scanner.  Also, if you ";
+                    sout << "are using the scan_image_pyramid object then you could try using a finer image pyramid ";
+                    sout << "or adding more detection templates.  E.g. if one of ";
                     sout << "your existing detection templates has a matching width/height ratio and smaller area ";
                     sout << "than the offending rectangle then a finer image pyramid would probably help.";
 
