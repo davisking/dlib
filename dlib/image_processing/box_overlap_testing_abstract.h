@@ -28,8 +28,8 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_overlap_thresh() == 0.5
                 - #get_match_thresh()   == 0.5
+                - #get_overlap_thresh() == 0.5
         !*/
 
         test_box_overlap (
@@ -60,15 +60,6 @@ namespace dlib
                     - returns false
         !*/
 
-        double get_overlap_thresh (
-        ) const;
-        /*!
-            ensures
-                - returns the threshold used to determine if two rectangles overlap.  This
-                  value is the percent of a rectangle's area covered by another rectangle.
-
-        !*/
-
         double get_match_thresh (
         ) const;
         /*!
@@ -76,6 +67,15 @@ namespace dlib
                 - returns the threshold used to determine if two rectangles match.
                   Note that the match score varies from 0 to 1 and only becomes 1
                   when two rectangles are identical.
+
+        !*/
+
+        double get_overlap_thresh (
+        ) const;
+        /*!
+            ensures
+                - returns the threshold used to determine if two rectangles overlap.  This
+                  value is the percent of a rectangle's area covered by another rectangle.
 
         !*/
 
