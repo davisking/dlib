@@ -95,6 +95,45 @@ void print_all_labels (
 
 // ----------------------------------------------------------------------------------------
 
+void print_all_label_stats (
+    const dlib::image_dataset_metadata::dataset& data
+)
+{
+    std::map<std::string, running_stats<double> > area_stats, aspect_ratio;
+    std::set<std::string> labels;
+    for (unsigned long i = 0; i < data.images.size(); ++i)
+    {
+        for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
+        {
+            labels.insert(data.images[i].boxes[j].label);
+
+            area_stats[data.images[i].boxes[j].label].add(data.images[i].boxes[j].rect.area());
+            aspect_ratio[data.images[i].boxes[j].label].add(data.images[i].boxes[j].rect.width()/
+                                                    (double)data.images[i].boxes[j].rect.height());
+        }
+    }
+
+    cout << "Number of different labels: "<< labels.size() << endl << endl;
+
+    for (std::set<std::string>::iterator i = labels.begin(); i != labels.end(); ++i)
+    {
+        if (i->size() != 0)
+        {
+            cout << "Label: "<< *i << endl;
+            cout << "   number of occurrences: " << area_stats[*i].current_n() << endl;
+            cout << "   min box area:    " << area_stats[*i].min() << endl;
+            cout << "   max box area:    " << area_stats[*i].max() << endl;
+            cout << "   mean box area:   " << area_stats[*i].mean() << endl;
+            cout << "   stddev box area: " << area_stats[*i].stddev() << endl;
+            cout << "   mean width/height ratio:   " << aspect_ratio[*i].mean() << endl;
+            cout << "   stddev width/height ratio: " << aspect_ratio[*i].stddev() << endl;
+            cout << endl;
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------------------
+
 void rename_labels (
     dlib::image_dataset_metadata::dataset& data,
     const std::string& from,
@@ -132,6 +171,7 @@ int main(int argc, char** argv)
 
         parser.set_group_name("Viewing/Editing XML files");
         parser.add_option("l","List all the labels in the given XML file.");
+        parser.add_option("stats","List detailed statistics on the object labels in the given XML file.");
         parser.add_option("rename", "Rename all labels of <arg1> to <arg2>.",2);
         parser.add_option("parts","The display will allow image parts to be labeled.  The set of allowable parts "
                           "defined in a space separated list contained in <arg>.",1);
@@ -226,6 +266,20 @@ int main(int argc, char** argv)
             dlib::image_dataset_metadata::dataset data;
             load_image_dataset_metadata(data, parser[0]);
             print_all_labels(data);
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("stats"))
+        {
+            if (parser.number_of_arguments() != 1)
+            {
+                cerr << "The --stats option requires you to give one XML file on the command line." << endl;
+                return EXIT_FAILURE;
+            }
+
+            dlib::image_dataset_metadata::dataset data;
+            load_image_dataset_metadata(data, parser[0]);
+            print_all_label_stats(data);
             return EXIT_SUCCESS;
         }
 
