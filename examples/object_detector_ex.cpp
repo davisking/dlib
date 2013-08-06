@@ -173,9 +173,14 @@ int main()
 
         // The hashed_feature_image in the scanner needs to be supplied with a hash function capable 
         // of hashing the outputs of the hog_image.  Calling this function will set it up for us.  The 
-        // 10 here indicates that it will hash hog vectors into the range [0, pow(2,10)).  Therefore,
+        // 10 here indicates that it will hash HOG vectors into the range [0, pow(2,10)).  Therefore,
         // the feature vectors output by the hashed_feature_image will have dimension pow(2,10).
         setup_hashed_features(scanner, images, 10);
+        // We should also tell the scanner to use the uniform feature weighting scheme
+        // since it works best on the data in this example.  If you don't call this
+        // function then it will use a slightly different weighting scheme which can give
+        // improved results on many normal image types.
+        use_uniform_feature_weights(scanner);
 
         // We also need to setup the detection templates the scanner will use.  It is important that 
         // we add detection templates which are capable of matching all the output boxes we want to learn.
