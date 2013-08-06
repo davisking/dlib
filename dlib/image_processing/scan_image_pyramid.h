@@ -51,6 +51,9 @@ namespace dlib
             const scan_image_pyramid& item
         );
 
+        const Feature_extractor_type& get_feature_extractor (
+        ) const { return feats_config; }
+
         void add_detection_template (
             const rectangle& object_box,
             const std::vector<rectangle>& stationary_feature_extraction_regions,

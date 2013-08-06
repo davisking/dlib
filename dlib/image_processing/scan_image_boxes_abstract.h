@@ -177,16 +177,23 @@ namespace dlib
                   false otherwise.
         !*/
 
+        const feature_extractor_type& get_feature_extractor (
+        ) const;
+        /*!
+            ensures
+                - returns a const reference to the feature_extractor_type object used 
+                  internally for local feature extraction.  
+        !*/
+
         void copy_configuration(
             const feature_extractor_type& fe
         );
         /*!
             ensures
-                - Let BASE_FE denote the feature_extractor_type object used internally for
-                  local feature extraction.  Then this function performs
-                  BASE_FE.copy_configuration(fe) (i.e. this function allows you to
-                  configure the parameters of the underlying feature extractor used by a
-                  scan_image_boxes object)
+                - This function performs the equivalent of
+                  get_feature_extractor().copy_configuration(fe) (i.e. this function allows
+                  you to configure the parameters of the underlying feature extractor used
+                  by a scan_image_boxes object)
         !*/
 
         void copy_configuration(

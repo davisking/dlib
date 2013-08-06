@@ -74,6 +74,9 @@ namespace dlib
         const box_generator& get_box_generator (
         ) const { return detect_boxes; } 
 
+        const Feature_extractor_type& get_feature_extractor (
+        ) const { return feats; }
+
         inline void copy_configuration (
             const scan_image_boxes& item
         );
