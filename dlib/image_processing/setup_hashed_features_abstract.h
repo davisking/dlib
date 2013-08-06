@@ -25,6 +25,42 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename image_scanner
+        >
+    void use_uniform_feature_weights (
+        image_scanner& scanner
+    );
+    /*!
+        requires
+            - image_scanner should be either scan_image_pyramid or scan_image_boxes and
+              should use the hashed_feature_image as its local feature extractor.
+        ensures
+            - #scanner.get_feature_extractor().uses_uniform_feature_weights() == true
+              (i.e. Make the scanner's feature extractor use the uniform feature weighting
+              scheme)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_scanner
+        >
+    void use_relative_feature_weights (
+        image_scanner& scanner
+    );
+    /*!
+        requires
+            - image_scanner should be either scan_image_pyramid or scan_image_boxes and
+              should use the hashed_feature_image as its local feature extractor.
+        ensures
+            - #scanner.get_feature_extractor().uses_uniform_feature_weights() == false 
+              (i.e. Make the scanner's feature extractor use the relative feature weighting
+              scheme)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename image_array,
         typename pyramid,
         typename feature_extractor

@@ -25,6 +25,36 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_scanner
+        >
+    void use_uniform_feature_weights (
+        image_scanner& scanner
+    )
+    {
+        typename image_scanner::feature_extractor_type fe;
+        fe.copy_configuration(scanner.get_feature_extractor());
+        fe.use_uniform_feature_weights();
+        scanner.copy_configuration(fe);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_scanner
+        >
+    void use_relative_feature_weights (
+        image_scanner& scanner
+    )
+    {
+        typename image_scanner::feature_extractor_type fe;
+        fe.copy_configuration(scanner.get_feature_extractor());
+        fe.use_relative_feature_weights();
+        scanner.copy_configuration(fe);
+    }
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 //                                 stuff for scan_image_pyramid
 // ----------------------------------------------------------------------------------------
@@ -66,6 +96,7 @@ namespace dlib
         projection_hash phash = create_random_projection_hash(samps, bits);
 
         feature_image<feature_extractor, projection_hash> hfe;
+        hfe.copy_configuration(scanner.get_feature_extractor());
         hfe.set_hash(phash);
         hfe.copy_configuration(fe);
         scanner.copy_configuration(hfe);
@@ -143,6 +174,7 @@ namespace dlib
         projection_hash phash = create_random_projection_hash(samps, bits);
 
         feature_image<feature_extractor, projection_hash> hfe;
+        hfe.copy_configuration(scanner.get_feature_extractor());
         hfe.set_hash(phash);
         hfe.copy_configuration(fe);
         scanner.copy_configuration(hfe);
