@@ -28,14 +28,15 @@ namespace dlib
 
             INITIAL VALUE
                  - size() == 0
+                 - uses_uniform_feature_weights() == false
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for performing image feature extraction.  In
-                particular, it wraps another image feature extractor and converts
-                the wrapped image feature vectors into sparse indicator vectors.  It does
-                this by hashing each feature vector into the range [0, get_num_dimensions()-1]
-                and then returns a new vector which is zero everywhere except for
-                the position determined by the hash. 
+                particular, it wraps another image feature extractor and converts the
+                wrapped image feature vectors into sparse indicator vectors.  It does this
+                by hashing each feature vector into the range [0, get_num_dimensions()-1]
+                and then returns a new vector which is zero everywhere except for the
+                position determined by the hash. 
 
 
             THREAD SAFETY
@@ -153,6 +154,30 @@ namespace dlib
                   In this case, this is the number of hash bins.  That is, get_hash().num_hash_bins()
         !*/
 
+        void use_relative_feature_weights (
+        );
+        /*!
+            ensures
+                - #uses_uniform_feature_weights() == false
+        !*/
+
+        void use_uniform_feature_weights (
+        );
+        /*!
+            ensures
+                - #uses_uniform_feature_weights() == true 
+        !*/
+
+        bool uses_uniform_feature_weights (
+        ) const;
+        /*!
+            ensures
+                - returns true if this object weights each feature with a value of 1 and
+                  false if it uses a weighting of 1/N where N is the number of occurrences
+                  of the feature in an image (note that we normalize N so that it is
+                  invariant to the size of the image given to load()).
+        !*/
+
         const descriptor_type& operator() (
             long row,
             long col
@@ -169,7 +194,13 @@ namespace dlib
                 - To be precise, this function returns a sparse vector V such that:
                     - V.size() == 1 
                     - V[0].first == get_hash()(BASE_FE(row,col))
-                    - V[0].second == 1 
+                    - if (uses_uniform_feature_weights()) then
+                        - V[0].second == 1 
+                    - else
+                        - V[0].second == 1/N where N is the number of times a feature in
+                          hash bin V[0].first was observed in the image given to load().
+                          Note that we scale all the counts so that they are invariant to
+                          the size of the image.
         !*/
 
         const rectangle get_block_rect (
