@@ -105,11 +105,6 @@ namespace dlib
             std::istream& in 
         );
 
-        template <typename array_of_feats>
-        void calibrate (
-            const array_of_feats& samps 
-        );
-
     private:
 
         array2d<descriptor_type> feats;
