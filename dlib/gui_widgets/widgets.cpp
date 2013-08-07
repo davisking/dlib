@@ -5689,7 +5689,8 @@ namespace dlib
         selected_rect(0),
         default_rect_color(255,0,0,255),
         parts_menu(w),
-        part_width(15) // width part circles are drawn on the screen
+        part_width(15), // width part circles are drawn on the screen
+        overlay_editing_enabled(true)
     { 
         enable_mouse_drag();
 
@@ -6097,6 +6098,9 @@ namespace dlib
                 image_clicked_handler(p, is_double_click, btn);
         }
 
+        if (!overlay_editing_enabled)
+            return;
+
         if (btn == base_window::RIGHT && rect_is_selected)
         {
             last_right_click_pos = point(x,y);
@@ -6454,6 +6458,7 @@ namespace dlib
     {
 
         gui_img.set_image_clicked_handler(*this, &image_window::on_image_clicked);
+        gui_img.disable_overlay_editing();
         // show this window on the screen
         show();
     } 

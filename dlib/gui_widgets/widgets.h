@@ -3457,6 +3457,22 @@ namespace dlib
         void clear_labelable_part_names (
         );
 
+        void enable_overlay_editing (
+        ) { auto_mutex M(m); overlay_editing_enabled = true; }
+
+        void disable_overlay_editing (
+        ) 
+        { 
+            auto_mutex M(m); 
+            overlay_editing_enabled = false;  
+            rect_is_selected = false;
+            drawing_rect = false;
+            parent.invalidate_rectangle(rect);
+        }
+        
+        bool overlay_editing_is_enabled (
+        ) const { auto_mutex M(m); return overlay_editing_enabled; }
+
     private:
 
         void draw (
@@ -3537,6 +3553,7 @@ namespace dlib
         point last_right_click_pos;
         const int part_width;
         std::set<std::string> part_names;
+        bool overlay_editing_enabled;
 
         // restricted functions
         image_display(image_display&);        // copy constructor
@@ -3569,6 +3586,7 @@ namespace dlib
             tie_input_events(false)
         {  
             gui_img.set_image_clicked_handler(*this, &image_window::on_image_clicked);
+            gui_img.disable_overlay_editing();
             set_image(img); 
             show(); 
         }
@@ -3587,6 +3605,7 @@ namespace dlib
             tie_input_events(false)
         {  
             gui_img.set_image_clicked_handler(*this, &image_window::on_image_clicked);
+            gui_img.disable_overlay_editing();
             set_image(img); 
             set_title(title);
             show(); 

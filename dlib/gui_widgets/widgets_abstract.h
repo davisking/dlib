@@ -2324,6 +2324,7 @@ namespace dlib
                 - get_default_overlay_rect_label() == ""
                 - get_default_overlay_rect_color() == rgb_alpha_pixel(255,0,0,255) (i.e. RED)
                 - This object does not have any user labelable parts defined.
+                - overlay_editing_is_enabled() == true
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents an image inside a scrollable region.  
@@ -2678,6 +2679,29 @@ namespace dlib
                     - R.width()  == the width of the displayed image
                     - R.height() == the height of the displayed image
                     - R.tl_corner() == (0,0)
+        !*/
+
+        void enable_overlay_editing (
+        ); 
+        /*!
+            ensures
+                - #overlay_editing_is_enabled() == true
+        !*/
+
+        void disable_overlay_editing (
+        );
+        /*!
+            ensures
+                - #overlay_editing_is_enabled() == false 
+        !*/
+        
+        bool overlay_editing_is_enabled (
+        ) const; 
+        /*!
+            ensures
+                - if this function returns true then it is possible for the user to add or
+                  remove overlay objects (e.g. rectangles) using the mouse and keyboard.
+                  If it returns false then the overlay is not user editable.
         !*/
 
         template <
