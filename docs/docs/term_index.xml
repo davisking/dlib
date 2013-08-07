@@ -1270,6 +1270,8 @@
          <term file="dlib/image_processing/scan_image_abstract.h.html" name="sum_of_rects_in_images_movable_parts"       include="dlib/image_processing.h"/>
          <term file="dlib/image_processing/box_overlap_testing_abstract.h.html" name="find_tight_overlap_tester"         include="dlib/image_processing.h"/>
          <term file="dlib/image_processing/setup_hashed_features_abstract.h.html" name="image_hash_construction_failure" include="dlib/image_processing.h"/>
+         <term file="dlib/image_processing/setup_hashed_features_abstract.h.html" name="use_uniform_feature_weights"     include="dlib/image_processing.h"/>
+         <term file="dlib/image_processing/setup_hashed_features_abstract.h.html" name="use_relative_feature_weights"    include="dlib/image_processing.h"/>
 
 
 
