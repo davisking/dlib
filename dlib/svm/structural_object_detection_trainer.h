@@ -44,7 +44,7 @@ namespace dlib
             verbose = false;
             eps = 0.3;
             num_threads = 2;
-            max_cache_size = 40;
+            max_cache_size = 5;
             match_eps = 0.5;
             loss_per_missed_target = 1;
             loss_per_false_alarm = 1;

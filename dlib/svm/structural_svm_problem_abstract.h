@@ -29,7 +29,7 @@ namespace dlib
 
             INITIAL VALUE
                 - get_epsilon() == 0.001
-                - get_max_cache_size() == 10
+                - get_max_cache_size() == 5
                 - get_c() == 1
                 - This object will not be verbose
 

@@ -215,7 +215,7 @@ namespace dlib
             eps(0.001),
             verbose(false),
             skip_cache(true),
-            max_cache_size(10),
+            max_cache_size(5),
             C(1)
         {}
 

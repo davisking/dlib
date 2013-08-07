@@ -31,7 +31,7 @@ namespace dlib
             verbose = false;
             eps = 0.1;
             num_threads = 2;
-            max_cache_size = 40;
+            max_cache_size = 5;
             loss_pos = 1.0;
             loss_neg = 1.0;
         }

@@ -51,7 +51,7 @@ namespace dlib
                 - this object isn't verbose
                 - #get_epsilon() == 0.3
                 - #get_num_threads() == 2
-                - #get_max_cache_size() == 40
+                - #get_max_cache_size() == 5
                 - #get_match_eps() == 0.5
                 - #get_loss_per_missed_target() == 1
                 - #get_loss_per_false_alarm() == 1

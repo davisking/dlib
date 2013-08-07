@@ -299,7 +299,7 @@ namespace
         DLIB_TEST(trainer.forces_assignment() == false);
         DLIB_TEST(trainer.get_c() == 100);
         DLIB_TEST(trainer.get_num_threads() == 2);
-        DLIB_TEST(trainer.get_max_cache_size() == 40);
+        DLIB_TEST(trainer.get_max_cache_size() == 5);
 
 
         trainer.set_forces_assignment(force_assignment);

@@ -48,7 +48,7 @@ namespace dlib
                 - this object isn't verbose
                 - #get_epsilon() == 0.1
                 - #get_num_threads() == 2
-                - #get_max_cache_size() == 40
+                - #get_max_cache_size() == 5
                 - #get_feature_extractor() == a default initialized feature_extractor
         !*/
 
@@ -61,7 +61,7 @@ namespace dlib
                 - this object isn't verbose
                 - #get_epsilon() == 0.1
                 - #get_num_threads() == 2
-                - #get_max_cache_size() == 40
+                - #get_max_cache_size() == 5
                 - #get_feature_extractor() == fe 
         !*/
 
