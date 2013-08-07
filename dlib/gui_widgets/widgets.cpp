@@ -6527,7 +6527,7 @@ namespace dlib
         unsigned long state
     )
     {
-        dlib::base_window::on_keydown(key,is_printable,state);
+        dlib::drawable_window::on_keydown(key,is_printable,state);
 
         have_last_keypress = true;
         next_key = key;
