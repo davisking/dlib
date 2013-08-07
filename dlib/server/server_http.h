@@ -68,7 +68,7 @@ namespace dlib
     public:
         bool operator()(const std::string& a, const std::string& b) const 
         {
-            long i = 0;
+            unsigned long i = 0;
             while (i < a.size() && i < b.size())
             {
                 const int cha = std::tolower(a[i]);
