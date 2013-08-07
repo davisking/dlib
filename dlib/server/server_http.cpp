@@ -175,7 +175,7 @@ namespace dlib
         // Get the HTTP/1.1 - Ignore for now...
         read_with_limit(in, incoming.protocol);
 
-        key_value_map& incoming_headers = incoming.headers;
+        key_value_map_ci& incoming_headers = incoming.headers;
         key_value_map& cookies          = incoming.cookies;
         std::string& path               = incoming.path;
         std::string& content_type       = incoming.content_type;
@@ -333,11 +333,11 @@ namespace dlib
     {
         using namespace http_impl;
         key_value_map& new_cookies      = outgoing.cookies;
-        key_value_map& response_headers = outgoing.headers;
+        key_value_map_ci& response_headers = outgoing.headers;
 
         // only send this header if the user hasn't told us to send another kind
         bool has_content_type = false, has_location = false;
-        for(key_value_map::const_iterator ci = response_headers.begin(); ci != response_headers.end(); ++ci )
+        for(key_value_map_ci::const_iterator ci = response_headers.begin(); ci != response_headers.end(); ++ci )
         {
             if ( !has_content_type && strings_equal_ignore_case(ci->first , "content-type") )
             {
@@ -364,7 +364,7 @@ namespace dlib
         out << "HTTP/1.0 " << outgoing.http_return << " " << outgoing.http_return_status << "\r\n";
 
         // Set any new headers
-        for(key_value_map::const_iterator ci = response_headers.begin(); ci != response_headers.end(); ++ci )
+        for(key_value_map_ci::const_iterator ci = response_headers.begin(); ci != response_headers.end(); ++ci )
         {
             out << ci->first << ": " << ci->second << "\r\n";
         }

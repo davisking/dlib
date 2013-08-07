@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <cctype>
 #include <map>
 #include "../logger.h"
 #include "../string.h"
@@ -39,15 +40,15 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename Key, typename Value>
-    class constmap : public std::map<Key, Value>
+    template <typename Key, typename Value, typename Comparer = std::less<Key> >
+    class constmap : public std::map<Key, Value, Comparer>
     {
     public:
         const Value& operator[](const Key& k) const
         {
             static const Value dummy = Value();
 
-            typename std::map<Key, Value>::const_iterator ci = std::map<Key, Value>::find(k);
+            typename std::map<Key, Value, Comparer>::const_iterator ci = std::map<Key, Value, Comparer>::find(k);
 
             if ( ci == this->end() )
                 return dummy;
@@ -57,10 +58,34 @@ namespace dlib
 
         Value& operator[](const Key& k)
         {
-            return std::map<Key, Value>::operator [](k);
+            return std::map<Key, Value, Comparer>::operator [](k);
         }
     };
 
+
+    class less_case_insensitive 
+    {
+    public:
+        bool operator()(const std::string& a, const std::string& b) const 
+        {
+            long i = 0;
+            while (i < a.size() && i < b.size())
+            {
+                const int cha = std::tolower(a[i]);
+                const int chb = std::tolower(b[i]);
+                if (cha < chb)
+                    return true;
+                else if (cha > chb)
+                    return false;
+                ++i;
+            }
+            if (a.size() < b.size())
+                return true;
+            else
+                return false;
+        }
+    };
+    typedef constmap< std::string, std::string, less_case_insensitive > key_value_map_ci;
     typedef constmap< std::string, std::string > key_value_map;
 
     struct incoming_things 
@@ -86,7 +111,7 @@ namespace dlib
 
         key_value_map queries;
         key_value_map cookies;
-        key_value_map headers;
+        key_value_map_ci headers;
 
         std::string foreign_ip;
         unsigned short foreign_port;
@@ -99,7 +124,7 @@ namespace dlib
         outgoing_things() : http_return(200), http_return_status("OK") { }
 
         key_value_map  cookies;
-        key_value_map  headers;
+        key_value_map_ci  headers;
         unsigned short http_return;
         std::string    http_return_status;
     };

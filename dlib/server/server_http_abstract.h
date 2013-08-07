@@ -15,9 +15,10 @@ namespace dlib
 
     template <
         typename Key, 
-        typename Value
+        typename Value, 
+        typename Comparer = std::less<Key> 
         >
-    class constmap : public std::map<Key, Value>
+    class constmap : public std::map<Key, Value, Comparer>
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -56,6 +57,10 @@ namespace dlib
     };
 
     typedef constmap<std::string, std::string> key_value_map;
+    // This version of key_value_map treats the key string as being case-insensitive.
+    // For example, a key string of "Content-Type" would access the same element as a key
+    // of "content-type".
+    typedef constmap<std::string, std::string, less_case_insensitive> key_value_map_ci;
 
 // -----------------------------------------------------------------------------------------
 
@@ -90,13 +95,13 @@ namespace dlib
         std::string protocol;
         std::string body;
 
-        key_value_map queries;
-        key_value_map cookies;
-        key_value_map headers;
+        key_value_map    queries;
+        key_value_map    cookies;
+        key_value_map_ci headers;
 
-        std::string foreign_ip;
+        std::string    foreign_ip;
         unsigned short foreign_port;
-        std::string local_ip;
+        std::string    local_ip;
         unsigned short local_port;
     };
 
@@ -119,10 +124,10 @@ namespace dlib
                 - #http_return_status == "OK"
         !*/
 
-        key_value_map  cookies;
-        key_value_map  headers;
-        unsigned short http_return;
-        std::string    http_return_status;
+        key_value_map    cookies;
+        key_value_map_ci headers;
+        unsigned short   http_return;
+        std::string      http_return_status;
     };
 
 // -----------------------------------------------------------------------------------------
