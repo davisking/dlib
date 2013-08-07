@@ -384,6 +384,7 @@ namespace
         const rectangle object_box = compute_box_dimensions(1,35*35);
         scanner.add_detection_template(object_box, create_grid_detection_template(object_box,2,2));
         setup_hashed_features(scanner, images, 9);
+        use_uniform_feature_weights(scanner);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
         trainer.set_num_threads(4);  
         trainer.set_overlap_tester(test_box_overlap(0,0));
@@ -424,6 +425,7 @@ namespace
         typedef scan_image_boxes<feature_extractor_type> image_scanner_type;
         image_scanner_type scanner;
         setup_hashed_features(scanner, images, 9);
+        use_uniform_feature_weights(scanner);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
         trainer.set_num_threads(4);  
         trainer.set_overlap_tester(test_box_overlap(0,0));
@@ -472,6 +474,7 @@ namespace
         mboxes.push_back(centered_rect(0,0, mbox_size,mbox_size));
         scanner.add_detection_template(object_box, create_grid_detection_template(object_box,1,1), mboxes);
         setup_hashed_features(scanner, images, 9);
+        use_uniform_feature_weights(scanner);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
         trainer.set_num_threads(4);  
         trainer.set_overlap_tester(test_box_overlap(0,0));
@@ -514,6 +517,7 @@ namespace
         const rectangle object_box = compute_box_dimensions(1,35*35);
         scanner.add_detection_template(object_box, create_grid_detection_template(object_box,2,2));
         setup_hashed_features(scanner, images, 9);
+        use_uniform_feature_weights(scanner);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
         trainer.set_num_threads(4);  
         trainer.set_overlap_tester(test_box_overlap(0,0));
@@ -556,6 +560,7 @@ namespace
         const rectangle object_box = compute_box_dimensions(1,35*35);
         scanner.add_detection_template(object_box, create_grid_detection_template(object_box,2,2));
         setup_hashed_features(scanner, images, 9);
+        use_uniform_feature_weights(scanner);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
         trainer.set_num_threads(4);  
         trainer.set_overlap_tester(test_box_overlap(0,0));
@@ -604,6 +609,7 @@ namespace
         mboxes.push_back(centered_rect(0,0, mbox_size,mbox_size));
         scanner.add_detection_template(object_box, create_grid_detection_template(object_box,2,2), mboxes);
         setup_hashed_features(scanner, images, 9);
+        use_uniform_feature_weights(scanner);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
         trainer.set_num_threads(4);  
         trainer.set_overlap_tester(test_box_overlap(0,0));
