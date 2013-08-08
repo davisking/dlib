@@ -25,10 +25,10 @@ using namespace dlib;
 // want (e.g. a string or an image).  The last typedef is the type used to represent the
 // PSI vector which is part of the structural SVM model which we will explain in detail
 // later on.  But the important thing to note here is that you can use either a dense
-// representation (i.e.  a dlib::matrix object) or a sparse representation for the PSI
-// vector.   See svm_sparse_ex.cpp for an introduction to sparse vectors in dlib.  Here we
+// representation (i.e. a dlib::matrix object) or a sparse representation for the PSI
+// vector.  See svm_sparse_ex.cpp for an introduction to sparse vectors in dlib.  Here we
 // use the same type for each of these three things to keep the example program simple.
-typedef matrix<double,0,1> column_vector;       // Must be a dlib::matrix object.
+typedef matrix<double,0,1> column_vector;       // Must be a dlib::matrix type.
 typedef matrix<double,0,1> sample_type;         // Can be anything you want.
 typedef matrix<double,0,1> feature_vector_type; // Must be dlib::matrix or some kind of sparse vector.
 
@@ -135,11 +135,11 @@ class three_class_classifier_problem : public structural_svm_problem_threaded<co
         However, to keep this example program simple we use only a 3 category label output. 
        
         At test time, the best label for a new x is given by the y which maximizes F(x,y).
-        To put this into the context of the current example, F(x,y) computes the score for a
-        given sample and class label.  The predicted class label is therefore whatever value
-        of y makes F(x,y) the biggest.  This is exactly what predict_label() does.  That is,
-        it computes F(x,0), F(x,1), and F(x,2) and then reports which label has the biggest
-        value.
+        To put this into the context of the current example, F(x,y) computes the score for
+        a given sample and class label.  The predicted class label is therefore whatever
+        value of y which makes F(x,y) the biggest.  This is exactly what predict_label()
+        does.  That is, it computes F(x,0), F(x,1), and F(x,2) and then reports which label
+        has the biggest value.
        
         At a high level, a structural SVM can be thought of as searching the parameter space
         of F(x,y) for the set of parameters that make the following inequality true as often
@@ -196,7 +196,7 @@ public:
     //   - separation_oracle()
 
 
-    // Here we declare a constructor so we can populate our three_class_classifier_problem
+    // But first, we declare a constructor so we can populate our three_class_classifier_problem
     // object with the data we need to define our machine learning problem.  All we do here
     // is take in the training samples and their labels as well as a number indicating how
     // many threads the structural SVM solver will use.  You can declare this constructor
@@ -314,8 +314,8 @@ public:
     {
         // Note that the solver will use multiple threads to make concurrent calls to
         // separation_oracle(), therefore, you must implement it in a thread safe manner
-        // (or disable threading by inheriting from structural_svm_problem_abstract instead
-        // of structural_svm_problem_threaded).  However, if your separation oracle is not
+        // (or disable threading by inheriting from structural_svm_problem instead of
+        // structural_svm_problem_threaded).  However, if your separation oracle is not
         // very fast to execute you can get a very significant speed boost by using the
         // threaded solver.  In general, all you need to do to make your separation oracle
         // thread safe is to make sure it does not modify any global variables or members
@@ -356,17 +356,17 @@ public:
 
 private:
 
-    // Here we hold onto the training data by reference.  You can hold it by value or any
-    // other method you like.
+    // Here we hold onto the training data by reference.  You can hold it by value or by
+    // any other method you like.
     const std::vector<sample_type>& samples;
     const std::vector<int>& labels;
 };
     
 // ----------------------------------------------------------------------------------------
 
-// This function finally puts it all together.  In here we use the
-// three_class_classifier_problem along with dlib's oca cutting plane solver to find the
-// optimal weights given our training data.
+// This function puts it all together.  In here we use the three_class_classifier_problem
+// along with dlib's oca cutting plane solver to find the optimal weights given our
+// training data.
 column_vector train_three_class_classifier (
     const std::vector<sample_type>& samples,
     const std::vector<int>& labels
@@ -379,9 +379,9 @@ column_vector train_three_class_classifier (
     // you can set the C parameter of the structural SVM by calling set_c().
     problem.set_c(1);
 
-    // There are also a number of optional arguments: epsilon is the stopping tolerance.
-    // The optimizer will run until R(w) is within epsilon of its optimal value. If you
-    // don't set this then it defaults to 0.001.
+    // The epsilon parameter controls the stopping tolerance.  The optimizer will run until
+    // R(w) is within epsilon of its optimal value. If you don't set this then it defaults
+    // to 0.001.
     problem.set_epsilon(0.0001);
 
     // Uncomment this and the optimizer will print its progress to standard out.  You will
@@ -393,7 +393,7 @@ column_vector train_three_class_classifier (
     // separation_oracle() routine.  This parameter controls the size of that cache.
     // Bigger values use more RAM and might make the optimizer run faster.  You can also
     // disable it by setting it to 0 which is good to do when your separation_oracle is
-    // very fast.
+    // very fast.  If you don't call this function it defaults to a value of 5.
     //problem.set_max_cache_size(20);
 
     
