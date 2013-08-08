@@ -453,26 +453,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename T
-        >
-    bool is_finite (
-        const T& value
-    )
-    /*!
-        ensures
-            - returns true if value is a finite value (e.g. not infinity or NaN) and false
-              otherwise.
-    !*/
-    {
-        if (is_float_type<T>::value)
-            return -std::numeric_limits<T>::infinity() < value && value < std::numeric_limits<T>::infinity();
-        else
-            return true;
-    }
-
-// ----------------------------------------------------------------------------------------
-
     /*!A is_convertible
 
         This is a template that can be used to determine if one type is convertible 
@@ -652,6 +632,28 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
     
+    template <
+        typename T
+        >
+    typename enable_if<is_built_in_scalar_type<T>,bool>::type is_finite (
+        const T& value
+    )
+    /*!
+        requires
+            - value must be some kind of scalar type such as int or double
+        ensures
+            - returns true if value is a finite value (e.g. not infinity or NaN) and false
+              otherwise.
+    !*/
+    {
+        if (is_float_type<T>::value)
+            return -std::numeric_limits<T>::infinity() < value && value < std::numeric_limits<T>::infinity();
+        else
+            return true;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     /*!A promote 
         
         This is a template that takes one of the built in scalar types and gives you another

@@ -1208,6 +1208,7 @@ namespace
             m1 = 1;
             m2 = 1;
             m1 = m1*subm(m2,0,0,3,3);
+            DLIB_TEST(is_finite(m1));
         }
         {
             matrix<double,3,1> m1;
@@ -1253,7 +1254,21 @@ namespace
 
             DLIB_TEST(m(0) == 6);
             DLIB_TEST(m(1) == 6);
+            DLIB_TEST(is_finite(m));
         }
+
+
+        {
+            matrix<double> m(3,3);
+            m = 3;
+            m(1,1) = std::numeric_limits<double>::infinity();
+            DLIB_TEST(is_finite(m) == false);
+            m(1,1) = -std::numeric_limits<double>::infinity();
+            DLIB_TEST(is_finite(m) == false);
+            m(1,1) = 2;
+            DLIB_TEST(is_finite(m));
+        }
+
     }
 
 

@@ -65,6 +65,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename EXP>
+    inline bool is_finite (
+        const matrix_exp<EXP>& m
+    ) 
+    { 
+        for (long r = 0; r < m.nr(); ++r)
+        {
+            for (long c = 0; c < m.nc(); ++c)
+            {
+                if (!is_finite(m(r,c)))
+                    return false;
+            }
+        }
+        return true;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     namespace impl
     {
         template <typename T>
