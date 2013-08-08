@@ -264,6 +264,9 @@ namespace dlib
 
         model.get_derivative_and_hessian(x,g,h);
 
+        DLIB_ASSERT(is_finite(x), "The objective function generated non-finite outputs");
+        DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
+        DLIB_ASSERT(is_finite(h), "The objective function generated non-finite outputs");
 
         // Sometimes the loop below won't modify x because the trust region step failed.
         // This bool tells us when we are in that case.
@@ -323,6 +326,10 @@ namespace dlib
             {
                 stale_x = true;
             }
+
+            DLIB_ASSERT(is_finite(x), "The objective function generated non-finite outputs");
+            DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
+            DLIB_ASSERT(is_finite(h), "The objective function generated non-finite outputs");
         }
 
         return f_value;

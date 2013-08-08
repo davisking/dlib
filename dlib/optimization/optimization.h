@@ -188,6 +188,9 @@ namespace dlib
         double f_value = f(x);
         g = der(x);
 
+        DLIB_ASSERT(is_finite(f_value), "The objective function generated non-finite outputs");
+        DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
+
         while(stop_strategy.should_continue_search(x, f_value, g) && f_value > min_f)
         {
             s = search_strategy.get_next_direction(x, f_value, g);
@@ -202,6 +205,9 @@ namespace dlib
 
             // Take the search step indicated by the above line search
             x += alpha*s;
+
+            DLIB_ASSERT(is_finite(f_value), "The objective function generated non-finite outputs");
+            DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
         }
 
         return f_value;
@@ -249,6 +255,9 @@ namespace dlib
         double f_value = -f(x);
         g = -der(x);
 
+        DLIB_ASSERT(is_finite(f_value), "The objective function generated non-finite outputs");
+        DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
+
         while(stop_strategy.should_continue_search(x, f_value, g) && f_value > -max_f)
         {
             s = search_strategy.get_next_direction(x, f_value, g);
@@ -269,6 +278,9 @@ namespace dlib
             // from the unnegated versions of f() and der()
             g *= -1;
             f_value *= -1;
+
+            DLIB_ASSERT(is_finite(f_value), "The objective function generated non-finite outputs");
+            DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
         }
 
         return -f_value;
@@ -312,6 +324,9 @@ namespace dlib
         double f_value = f(x);
         g = derivative(f,derivative_eps)(x);
 
+        DLIB_ASSERT(is_finite(f_value), "The objective function generated non-finite outputs");
+        DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
+
         while(stop_strategy.should_continue_search(x, f_value, g) && f_value > min_f)
         {
             s = search_strategy.get_next_direction(x, f_value, g);
@@ -330,6 +345,9 @@ namespace dlib
             x += alpha*s;
 
             g = derivative(f,derivative_eps)(x);
+
+            DLIB_ASSERT(is_finite(f_value), "The objective function generated non-finite outputs");
+            DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
         }
 
         return f_value;
