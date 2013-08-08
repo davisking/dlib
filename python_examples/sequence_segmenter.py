@@ -49,7 +49,10 @@ def sentence_to_vectors(sentence):
 # than the above form when you have very high dimensional vectors that are mostly full of
 # zeros.  In dlib, each sparse vector is represented as an array of pair objects.  Each
 # pair contains an index and value.  Any index not listed in the vector is implicitly
-# associated with a value of zero.
+# associated with a value of zero.  Additionally, when using sparse vectors with
+# dlib.train_sequence_segmenter() you can use "unsorted" sparse vectors.  This means you
+# can add the index/value pairs into your sparse vectors in any order you want and don't
+# need to worry about them being in sorted order. 
 def sentence_to_sparse_vectors(sentence):
     vects   = dlib.sparse_vectors()
     has_cap = dlib.sparse_vector()

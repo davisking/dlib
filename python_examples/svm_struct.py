@@ -204,7 +204,11 @@ class three_class_classifier_problem:
         # problem.  So you need to pick a PSI that doesn't make the label maximization step
         # intractable but also still well models your problem.  
 
-        # Create a dense vector object.
+        # Create a dense vector object (note that you can also use unsorted sparse vectors
+        # (i.e.  dlib.sparse_vector objects) to represent your PSI vector.  This is useful
+        # if you have very high dimensional PSI vectors that are mostly zeros.  In the
+        # context of this example, you would simply return a dlib.sparse_vector at the end
+        # of make_psi() and the rest of the example would still work properly. ).
         psi = dlib.vector()
         # Set it to have 9 dimensions.  Note that the elements of the vector are 0
         # initialized.
