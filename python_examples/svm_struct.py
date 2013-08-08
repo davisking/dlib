@@ -6,7 +6,7 @@
 # structural SVM model for your machine learning problems.  To illustrate the process, we
 # use dlib's structural SVM solver to learn the parameters of a simple multi-class
 # classifier.  We first discuss the multi-class classifier model and then walk through
-# using the structural svm tools to find the parameters of this classification model.   
+# using the structural SVM tools to find the parameters of this classification model.   
 #
 # COMPILING THE DLIB PYTHON INTERFACE
 #   Dlib comes with a compiled python interface for python 2.7 on MS Windows.  If
