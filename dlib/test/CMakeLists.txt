@@ -160,6 +160,7 @@ TARGET_LINK_LIBRARIES(${target_name} dlib )
 
 if (NOT DLIB_NO_GUI_SUPPORT)
    add_subdirectory(gui)
+   add_subdirectory(../../examples examples_build)
 endif()
 
 
