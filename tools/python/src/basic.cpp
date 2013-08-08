@@ -210,7 +210,21 @@ void bind_basic_types()
         .def("__repr__", pair__repr__)
         .def_pickle(serialize_pickle<pair_type>());
 
-    class_<std::vector<pair_type> >("sparse_vector", "This object represents the mathematical idea of a column vector.")
+    class_<std::vector<pair_type> >("sparse_vector", 
+"This object represents the mathematical idea of a sparse column vector.  It is    \n\
+simply an array of dlib.pair objects, each representing an index/value pair in    \n\
+the vector.  Any elements of the vector which are missing are implicitly set to    \n\
+zero.      \n\
+    \n\
+Unless otherwise noted, any routines taking a sparse_vector assume the sparse    \n\
+vector is sorted and has unique elements.  That is, the index values of the    \n\
+pairs in a sparse_vector should be listed in increasing order and there should    \n\
+not be duplicates.  However, some functions work with \"unsorted\" sparse    \n\
+vectors.  These are dlib.sparse_vector objects that have either duplicate    \n\
+entries or non-sorted index values.  Note further that you can convert an    \n\
+\"unsorted\" sparse_vector into a properly sorted sparse vector by calling    \n\
+dlib.make_sparse_vector() on it.   " 
+        )
         .def(vector_indexing_suite<std::vector<pair_type> >())
         .def("__str__", sparse_vector__str__)
         .def("__repr__", sparse_vector__repr__)
