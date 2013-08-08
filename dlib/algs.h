@@ -67,6 +67,7 @@ namespace std
 #include <algorithm>    // for std::swap
 #include <new>          // for std::bad_alloc
 #include <cstdlib>
+#include <limits> // for std::numeric_limits for is_finite()
 #include "assert.h"
 #include "error.h"
 #include "noncopyable.h"
@@ -449,6 +450,26 @@ namespace dlib
     template <> struct is_float_type<float>       { const static bool value = true; };
     template <> struct is_float_type<double>      { const static bool value = true; };
     template <> struct is_float_type<long double> { const static bool value = true; };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    bool is_finite (
+        const T& value
+    )
+    /*!
+        ensures
+            - returns true if value is a finite value (e.g. not infinity or NaN) and false
+              otherwise.
+    !*/
+    {
+        if (is_float_type<T>::value)
+            return -std::numeric_limits<T>::infinity() < value && value < std::numeric_limits<T>::infinity();
+        else
+            return true;
+    }
 
 // ----------------------------------------------------------------------------------------
 
