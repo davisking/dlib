@@ -522,6 +522,10 @@
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="is_vector"          include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="is_row_vector"      include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="is_col_vector"      include="dlib/matrix.h"/>
+         <term name="is_finite">
+            <term link="dlib/matrix/matrix_utilities_abstract.h.html#is_finite" name="for matrix objects" include="dlib/matrix.h"/>
+            <term link="dlib/algs.h.html#is_finite" name="for scalar values" include="dlib/algs.h"/>
+         </term>
          <term file="dlib/matrix/matrix_fft_abstract.h.html" name="fft"                      include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_fft_abstract.h.html" name="ifft"                     include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_fft_abstract.h.html" name="is_power_of_two"          include="dlib/matrix.h"/>

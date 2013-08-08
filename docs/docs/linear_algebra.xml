@@ -411,6 +411,10 @@
                   <link>dlib/matrix/matrix_utilities_abstract.h.html#is_vector</link>
                </item>
                <item>
+                  <name>is_finite</name>
+                  <link>dlib/matrix/matrix_utilities_abstract.h.html#is_finite</link>
+               </item>
+               <item>
                   <name>const_temp_matrix</name>
                   <link>dlib/matrix/matrix_abstract.h.html#const_temp_matrix</link>
                </item>
