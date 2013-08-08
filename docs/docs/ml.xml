@@ -2631,13 +2631,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                 data sample x matches a label y.  When used for prediction, the best label
                 for a new x is given by the y which maximizes F(x,y).   
 
-               <p>
-                  If you want to see example code that uses this object then take a look at
-                  the implementation of the 
-                  <a href="dlib/svm/svm_multiclass_linear_trainer.h.html">svm_multiclass_linear_trainer</a>
-                  object.
-               </p>
-
+                <br/>
                 <br/>
 
                 For an introduction to structured support vector machines you should consult 
@@ -2668,6 +2662,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          </description>
          <examples>
             <example>svm_struct.py.html</example>
+            <example>svm_struct_ex.cpp.html</example>
          </examples>
                                  
       </component>
@@ -2685,6 +2680,9 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             have multiple computers then you can use the <a href="#svm_struct_controller_node">svm_struct_controller_node</a>
             to distribute the work across many computers.
          </description>
+         <examples>
+            <example>svm_struct_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       

@@ -147,6 +147,10 @@
             <name>Examples: C++</name>
             <sub>
                <item>
+                  <name>Structural_Support_Vector_Machines</name>
+                  <link>svm_struct_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Sequence_Segmentation</name>
                   <link>sequence_segmenter_ex.cpp.html</link>
                </item>
