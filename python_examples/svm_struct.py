@@ -91,9 +91,9 @@ class three_class_classifier_problem:
     # At test time, the best label for a new x is given by the y which maximizes F(x,y).
     # To put this into the context of the current example, F(x,y) computes the score for a
     # given sample and class label.  The predicted class label is therefore whatever value
-    # of y makes F(x,y) the biggest.  This is exactly what predict_label() does.  That is,
-    # it computes F(x,0), F(x,1), and F(x,2) and then reports which label has the biggest
-    # value.
+    # of y which makes F(x,y) the biggest.  This is exactly what predict_label() does.
+    # That is, it computes F(x,0), F(x,1), and F(x,2) and then reports which label has the
+    # biggest value.
     #
     # At a high level, a structural SVM can be thought of as searching the parameter space
     # of F(x,y) for the set of parameters that make the following inequality true as often
@@ -167,7 +167,8 @@ class three_class_classifier_problem:
     # The optimizer uses an internal cache to avoid unnecessary calls to your
     # separation_oracle() routine.  This parameter controls the size of that cache.  Bigger
     # values use more RAM and might make the optimizer run faster.  You can also disable it
-    # by setting it to 0 which is good to do when your separation_oracle is very fast.
+    # by setting it to 0 which is good to do when your separation_oracle is very fast.  If
+    # If you don't call this function it defaults to a value of 5.
     #max_cache_size = 20
 
 
