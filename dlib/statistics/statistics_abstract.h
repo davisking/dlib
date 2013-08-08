@@ -770,6 +770,7 @@ namespace dlib
                 - samples == a column matrix or something convertible to a column 
                   matrix via mat().  Also, x should contain 
                   matrix_type objects that represent nonempty column vectors.
+                - samples does not contain any infinite or NaN values
             ensures
                 - #in_vector_size() == samples(0).nr()
                 - #out_vector_size() == samples(0).nr()
@@ -928,6 +929,7 @@ namespace dlib
                 - samples == a column matrix or something convertible to a column 
                   matrix via mat().  Also, x should contain 
                   matrix_type objects that represent nonempty column vectors.
+                - samples does not contain any infinite or NaN values
             ensures
                 - This object has learned how to normalize vectors that look like
                   vectors in the given set of samples.  

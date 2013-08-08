@@ -1148,6 +1148,8 @@ namespace dlib
 
             m = mean(mat(samples));
             sd = reciprocal(sqrt(variance(mat(samples))));
+
+            DLIB_ASSERT(is_finite(m), "Some of the input vectors to vector_normalizer::train() have infinite or NaN values");
         }
 
         long in_vector_size (
@@ -1310,6 +1312,8 @@ namespace dlib
                 << "\n\tthis: " << this
                 );
             train_pca_impl(mat(samples),eps);
+
+            DLIB_ASSERT(is_finite(m), "Some of the input vectors to vector_normalizer_pca::train() have infinite or NaN values");
         }
 
         long in_vector_size (
