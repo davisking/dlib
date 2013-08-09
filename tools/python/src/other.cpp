@@ -7,6 +7,8 @@
 #include <dlib/sparse_vector.h>
 #include <boost/python/args.hpp>
 #include "pyassert.h"
+#include <dlib/optimization.h>
+#include "boost_python_utils.h"
 
 using namespace dlib;
 using namespace std;
@@ -50,9 +52,69 @@ void _save_libsvm_formatted_data (
     save_libsvm_formatted_data(file_name, samples, labels); 
 }
 
+// ----------------------------------------------------------------------------------------
+
+list _max_cost_assignment (
+    const matrix<double>& cost
+)
+{
+    // max_cost_assignment() only works with integer matrices, so convert from
+    // double to integer.
+    const double scale = (std::numeric_limits<dlib::int64>::max()/1000)/max(abs(cost));
+    matrix<dlib::int64> int_cost = matrix_cast<dlib::int64>(round(cost*scale));
+    return vector_to_python_list(max_cost_assignment(int_cost));
+}
+
+double _assignment_cost (
+    const matrix<double>& cost,
+    const list& assignment
+)
+{
+    return assignment_cost(cost, python_list_to_vector<long>(assignment));
+}
+
+// ----------------------------------------------------------------------------------------
+
 void bind_other()
 {
     using boost::python::arg;
+
+    def("max_cost_assignment", _max_cost_assignment, (arg("cost")),
+"requires    \n\
+    - cost.nr() == cost.nc()    \n\
+      (i.e. the input must be a square matrix)    \n\
+ensures    \n\
+    - Finds and returns the solution to the following optimization problem:    \n\
+    \n\
+        Maximize: f(A) == assignment_cost(cost, A)    \n\
+        Subject to the following constraints:    \n\
+            - The elements of A are unique. That is, there aren't any     \n\
+              elements of A which are equal.      \n\
+            - len(A) == cost.nr()    \n\
+    \n\
+    - Note that this function converts the input cost matrix into a 64bit fixed    \n\
+      point representation.  Therefore, you should make sure that the values in    \n\
+      your cost matrix can be accurately represented by 64bit fixed point values.    \n\
+      If this is not the case then the solution my become inaccurate due to    \n\
+      rounding error.  In general, this function will work properly when the ratio    \n\
+      of the largest to the smallest value in cost is no more than about 1e16.   " 
+        );
+
+    def("assignment_cost", _assignment_cost, (arg("cost"),arg("assignment")),
+"requires    \n\
+    - cost.nr() == cost.nc()    \n\
+      (i.e. the input must be a square matrix)    \n\
+    - for all valid i:    \n\
+        - 0 <= assignment[i] < cost.nr()    \n\
+ensures    \n\
+    - Interprets cost as a cost assignment matrix. That is, cost[i][j]     \n\
+      represents the cost of assigning i to j.      \n\
+    - Interprets assignment as a particular set of assignments. That is,    \n\
+      i is assigned to assignment[i].    \n\
+    - returns the cost of the given assignment. That is, returns    \n\
+      a number which is:    \n\
+        sum over i: cost[i][assignment[i]]   " 
+        );
 
     def("make_sparse_vector", _make_sparse_vector , 
 "This function modifies its argument so that it is a properly sorted sparse vector.    \n\
