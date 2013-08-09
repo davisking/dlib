@@ -145,7 +145,9 @@ void resize(T& v, unsigned long n) { v.resize(n); }
 
 void bind_basic_types() 
 {
-    class_<std::vector<double> >("array", init<>())
+    class_<std::vector<double> >("array", "This object represents a 1D array of floating point numbers. "
+        "Moreover, it binds directly to the C++ type std::vector<double>.", init<>() 
+        )
         .def(vector_indexing_suite<std::vector<double> >())
         .def("__init__", make_constructor(&array_from_object))
         .def("__str__", array__str__)

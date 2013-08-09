@@ -193,7 +193,8 @@ void bind_matrix()
         .def("__setitem__", &mat_row__setitem__)
         .def("__getitem__", &mat_row__getitem__);
 
-    class_<matrix<double> >("matrix", init<>())
+    class_<matrix<double> >("matrix", "This object represents a dense 2D matrix of floating point numbers."
+        "Moreover, it binds directly to the C++ type dlib::matrix<double>.", init<>())
         .def("__init__", make_constructor(&make_matrix_from_size))
         .def("set_size", &matrix_set_size, (arg("rows"), arg("cols")), "Set the size of the matrix to the given number of rows and columns.")
         .def("__init__", make_constructor(&from_object))

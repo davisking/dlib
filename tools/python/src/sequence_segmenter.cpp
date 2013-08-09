@@ -796,13 +796,15 @@ train_sequence_segmenter() and cross_validate_sequence_segmenter() routines.   "
         .def("__str__",&segmenter_params__str__)
         .def_pickle(serialize_pickle<segmenter_params>());
 
-    class_<segmenter_type> ("segmenter_type")
+    class_<segmenter_type> ("segmenter_type", "This object represents a sequence segmenter and is the type of object "
+        "returned by the dlib.train_sequence_segmenter() routine.")
         .def("__call__", &segmenter_type::segment_sequence_dense)
         .def("__call__", &segmenter_type::segment_sequence_sparse)
         .def_readonly("weights", &segmenter_type::get_weights)
         .def_pickle(serialize_pickle<segmenter_type>());
 
-    class_<segmenter_test> ("segmenter_test")
+    class_<segmenter_test> ("segmenter_test", "This object is the output of the dlib.test_sequence_segmenter() and "
+        "dlib.cross_validate_sequence_segmenter() routines.")
         .def_readwrite("precision", &segmenter_test::precision)
         .def_readwrite("recall", &segmenter_test::recall)
         .def_readwrite("f1", &segmenter_test::f1)
