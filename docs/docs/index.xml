@@ -68,7 +68,6 @@
                   <li>The library provides a portable and simple <a href="api.html#threads">threading API</a></li>
                   <li>A message passing <a href="other.html#pipe">pipe</a> for inter-thread and <a href="network.html#bridge">inter-process</a> communication</li>
                   <li>A <a href="other.html#timer">timer</a> object capable of generating events that are regularly spaced in time</li>
-                  <li><a href="api.html#thread_specific_data">Thread specific data</a></li>
                   <li><a href="api.html#threaded_object">Threaded objects</a></li>
                   <li><a href="api.html#thread_function">Threaded functions</a></li>
                   <li><a href="api.html#parallel_for">Parallel for loops</a></li>
