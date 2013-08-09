@@ -482,6 +482,9 @@ subject to the following constraint:
             </p>
 
          </description>
+         <examples>
+            <example>max_cost_assignment.py.html</example>
+         </examples>
                                  
       </component>
 

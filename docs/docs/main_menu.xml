@@ -141,6 +141,10 @@
                   <name>SVM-Rank</name>
                   <link>svm_rank.py.html</link>
                </item>
+               <item>
+                  <name>Linear_Assignment_Problems</name>
+                  <link>max_cost_assignment.py.html</link>
+               </item>
             </sub>
          </item>
          <item nolink="true">
