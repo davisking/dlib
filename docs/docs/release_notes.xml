@@ -12,12 +12,34 @@
 
 <current>
 New Features:
+   - Added Python interfaces to dlib's structural support vector machine solver and
+     Hungarian algorithm implementation.
+   - Added running_cross_covariance
+   - Added order_by_descending_distance()
+   - Added is_finite()
+   - Added the csv IO manipulator that lets you print a matrix in comma separated value
+     format.
 
 Non-Backwards Compatible Changes:
+   - Changed the object detector testing functions to output average precision instead of
+     mean average precision.
+   - Added an option to weight the features from a hashed_feature_image relative to the
+     number of times they occur in an image.  I also made it the default behavior to use
+     this relative weighting and changed the serialization format to accommodate this.
 
 Bug fixes:
+   - Fixed typo in learn_platt_scaling(). The method wasn't using the exact prior
+     suggested by Platt's paper.
+   - Fixed a bug in running_scalar_covariance that caused the covariance() and
+     correlation() methods to output the wrong answer if the covariance was negative.
 
 Other:
+   - Gave the image_window the ability to tie the mouse and keyboard events together such
+     that it is possible for a user to listen for both simultaneously.
+   - A number of changes were made to the structural_svm_problem's code which make it 
+     significantly faster in some cases.
+   - Added Steven Van Ingelgem's patch to the HTTP server which makes operations on HTTP
+     headers case-insensitive.
 
 </current>
 
