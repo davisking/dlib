@@ -7,7 +7,7 @@
 #include <dlib/string.h>
 #include "serialize_pickle.h"
 #include <boost/python/args.hpp>
-
+#include "pyassert.h"
 
 using namespace dlib;
 using namespace boost::python;
@@ -73,11 +73,43 @@ boost::shared_ptr<matrix<double> > from_object(object obj)
     return temp;
 }
 
+boost::shared_ptr<matrix<double> > from_list(list l)
+{
+    const long nr = len(l);
+    if (extract<list>(l[0]).check())
+    {
+        const long nc = len(l[0]);
+        // make sure all the other rows have the same length
+        for (long r = 1; r < nr; ++r)
+            pyassert(len(l[r]) == nc, "All rows of a matrix must have the same number of columns.");
+
+
+        boost::shared_ptr<matrix<double> > temp(new matrix<double>(nr,nc));
+        for ( long r = 0; r < nr; ++r)
+        {
+            for (long c = 0; c < nc; ++c)
+            {
+                (*temp)(r,c) = extract<double>(l[r][c]);
+            }
+        }
+        return temp;
+    }
+    else
+    {
+        // In this case we treat it like a column vector
+        boost::shared_ptr<matrix<double> > temp(new matrix<double>(nr,1));
+        for ( long r = 0; r < nr; ++r)
+        {
+            (*temp)(r) = extract<double>(l[r]);
+        }
+        return temp;
+    }
+}
+
 long matrix_double__len__(matrix<double>& c)
 {
     return c.nr();
 }
-
 
 struct mat_row
 {
@@ -165,6 +197,7 @@ void bind_matrix()
         .def("__init__", make_constructor(&make_matrix_from_size))
         .def("set_size", &matrix_set_size, (arg("rows"), arg("cols")), "Set the size of the matrix to the given number of rows and columns.")
         .def("__init__", make_constructor(&from_object))
+        .def("__init__", make_constructor(&from_list))
         .def("__repr__", &matrix_double__repr__)
         .def("__str__", &matrix_double__str__)
         .def("nr", &matrix<double>::nr, "Return the number of rows in the matrix.")
