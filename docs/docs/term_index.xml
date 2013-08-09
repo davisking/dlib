@@ -102,6 +102,7 @@
          <term file="optimization.html" name="line_search"                 include="dlib/optimization.h"/>
          <term file="optimization.html" name="find_min"                    include="dlib/optimization.h"/>
          <term file="optimization.html" name="max_cost_assignment"         include="dlib/optimization.h"/>
+         <term link="optimization.html#max_cost_assignment" name="Hungarian Algorithm"         include="dlib/optimization.h"/>
          <term file="optimization.html" name="max_sum_submatrix"           include="dlib/optimization.h"/>
          <term file="dlib/optimization/max_cost_assignment_abstract.h.html" name="assignment_cost" include="dlib/optimization.h"/>
          <term file="optimization.html" name="solve_least_squares"         include="dlib/optimization.h"/>
