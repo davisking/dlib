@@ -50,6 +50,9 @@ namespace dlib
                     - The elements of A are unique. That is, there aren't any 
                       elements of A which are equal.  
                     - A.size() == cost.nr()
+
+            - This function implements the O(N^3) version of the Hungarian algorithm 
+              where N is the number of rows in the cost matrix.
     !*/
 
 // ----------------------------------------------------------------------------------------
