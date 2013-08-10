@@ -259,9 +259,9 @@ namespace dlib
             }
 
             svd2(true, false, accum, u, w, v);
-            long i = index_of_min(w);
+            long j = index_of_min(w);
 
-            return point_transform_projective(reshape(colm(u,i),3,3)); 
+            return point_transform_projective(reshape(colm(u,j),3,3)); 
         }
 
     // ----------------------------------------------------------------------------------------

@@ -759,8 +759,8 @@ namespace dlib
                 std::vector<int64> man(image.size());
                 std::vector<char> expbuf;
                 // get the mantissa data
-                for (unsigned long i = 0; i < man.size(); ++i)
-                    deserialize(man[i], in);
+                for (unsigned long j = 0; j < man.size(); ++j)
+                    deserialize(man[j], in);
                 // get the compressed exponent data
                 deserialize(expbuf, in);
                 typedef entropy_decoder::kernel_2a decoder_type;
