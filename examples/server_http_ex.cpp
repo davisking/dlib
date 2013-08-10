@@ -72,7 +72,7 @@ class web_server : public server_http
 
         sout << "<h2>HTTP Headers the web browser sent to the server</h2>";
         // Echo out all the HTTP headers we received from the client web browser
-        for ( key_value_map::const_iterator ci = incoming.headers.begin(); ci != incoming.headers.end(); ++ci )
+        for ( key_value_map_ci::const_iterator ci = incoming.headers.begin(); ci != incoming.headers.end(); ++ci )
         {
             sout << "<br/>" << ci->first << ": " << ci->second << endl;
         }
