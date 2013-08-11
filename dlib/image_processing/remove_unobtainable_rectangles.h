@@ -169,9 +169,14 @@ namespace dlib
 
         for (unsigned long k = 0; k < images.size(); ++k)
         {
+            std::vector<rectangle> objs = object_locations[k];
+            // Don't even bother computing the candidate rectangles if there aren't any
+            // object locations for this image since there isn't anything to do anyway.
+            if (objs.size() == 0)
+                continue;
+
             bg(images[k], rects);
 
-            std::vector<rectangle> objs = object_locations[k];
 
             // First remove things that don't have any matches with the candidate object
             // locations.
