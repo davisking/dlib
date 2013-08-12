@@ -136,9 +136,15 @@ makedocs ()
     # Create python docs.  If we are making a release then stop immediately if 
     # the python docs can't be created (this happens if the .so file isn't compiled)
     if [ "$1" = "makerel" ] 
-        then
+    then
+        pushd ../python_examples
+        ./compile_dlib_python_module.bat || report_failure
+        popd
         sphinx-build -b html docs/python sphinx.$$ || report_failure
     else
+        pushd ../python_examples
+        ./compile_dlib_python_module.bat 
+        popd
         sphinx-build -b html docs/python sphinx.$$
     fi;
 
