@@ -129,9 +129,9 @@ namespace dlib
 
             template <typename EXP>
             bool reject_labeling (
-                const sequence_type& ,
+                const sequence_type& x,
                 const matrix_exp<EXP>& y,
-                unsigned long 
+                unsigned long pos
             ) const
             {
                 if (ss_feature_extractor::use_BIO_model)
@@ -177,6 +177,15 @@ namespace dlib
                             return true;
                         if (y(1) == UNIT && y(0) == LAST)
                             return true;
+
+                        // if at the end of the sequence
+                        if (pos == x.size()-1)
+                        {
+                            if (y(0) == BEGIN)
+                                return true;
+                            if (y(0) == INSIDE)
+                                return true;
+                        }
                     }
                     else
                     {
@@ -184,6 +193,13 @@ namespace dlib
                             return true;
                         if (y(0) == LAST)
                             return true;
+
+                        // if at the end of the sequence
+                        if (pos == x.size()-1)
+                        {
+                            if (y(0) == BEGIN)
+                                return true;
+                        }
                     }
                 }
                 return false;
