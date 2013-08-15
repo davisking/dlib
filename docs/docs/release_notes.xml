@@ -12,6 +12,19 @@
 
 <current>
 New Features:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="18.4" date="Aug 14, 2013">
+New Features:
    - Added Python interfaces to dlib's structural support vector machine solver and
      Hungarian algorithm implementation.
    - Added running_cross_covariance
@@ -41,7 +54,7 @@ Other:
    - Added Steven Van Ingelgem's patch to the HTTP server which makes operations on HTTP
      headers case-insensitive.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
