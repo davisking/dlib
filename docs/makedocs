@@ -11,6 +11,16 @@ htmlify_python_file ()
     pygmentize -f html -O full,style=vs $1 > $1.html
 }
 
+build_python_interface ()
+{
+    pushd ../python_examples
+    mkdir build 
+    cd build                 || report_failure
+    cmake ../../tools/python || report_failure
+    make -j4 install         || report_failure
+    popd
+}
+
 htmlify_cmake ()
 {
     echo "<html><head><title>" > $1.html;
@@ -137,14 +147,13 @@ makedocs ()
     # the python docs can't be created (this happens if the .so file isn't compiled)
     if [ "$1" = "makerel" ] 
     then
-        pushd ../python_examples
-        ./compile_dlib_python_module.bat || report_failure
-        popd
+        build_python_interface
         sphinx-build -b html docs/python sphinx.$$ || report_failure
     else
-        pushd ../python_examples
-        ./compile_dlib_python_module.bat 
-        popd
+        if [ "$1" != "fast" ]
+        then
+            build_python_interface
+        fi;
         sphinx-build -b html docs/python sphinx.$$
     fi;
 
