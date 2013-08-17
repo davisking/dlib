@@ -76,6 +76,7 @@
          <item>is_same_object</item> 
          <item>assign_zero_if_built_in_scalar_type</item>
          <item>wrap_function</item>
+         <item>DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST</item>
       </section>
 
       <section>
@@ -573,6 +574,33 @@
          </description>
                                  
       </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            <p>
+            The DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST() macro is used to define traits templates
+            that tell you if a class has a certain member function.  For example, to make a
+            test to see if a class has a public method with the signature void print(int) you
+            would say:
+            </p>
+            <blockquote>
+               <tt>DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_print, void, print, (int))</tt>
+            </blockquote>
+            Then you can check if a class, T, has this method by looking at the boolean value:
+            <blockquote>
+               <tt>has_print&lt;T&gt;::value</tt>
+            </blockquote>
+            which will be true if the member function is in the T class.
+
+         </description>
+                                 
+      </component>
+            
             
    <!-- ************************************************************************* -->
       

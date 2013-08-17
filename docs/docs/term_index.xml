@@ -658,6 +658,7 @@
          <term file="metaprogramming.html" name="is_const_type"         include="dlib/algs.h"/>
          <term file="metaprogramming.html" name="is_reference_type"     include="dlib/algs.h"/>
          <term file="metaprogramming.html" name="is_same_type"          include="dlib/algs.h"/>
+         <term file="metaprogramming.html" name="DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST"          include="dlib/algs.h"/>
          <term file="metaprogramming.html" name="is_float_type"         include="dlib/algs.h"/>
          <term file="metaprogramming.html" name="is_same_object"        include="dlib/algs.h"/>
          <term file="metaprogramming.html" name="is_convertible"        include="dlib/algs.h"/>
