@@ -277,7 +277,7 @@ namespace dlib
         long dims;
         deserialize(dims, in);
         if (item.get_num_dimensions() != dims)
-            throw serialization_error("Number of dimensions in serialized scan_image_pyramid don't match the expected number.");
+            throw serialization_error("Number of dimensions in serialized scan_image_pyramid doesn't match the expected number.");
     }
 
 // ----------------------------------------------------------------------------------------
