@@ -790,6 +790,51 @@ namespace dlib
         template <long x, long y>
         struct tmin<x,y,typename enable_if_c<(y < x)>::type> { const static long value = y; };
 
+    // ----------------------------------------------------------------------------------------
+
+#define DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(testname, returnT, funct_name, args)                        \
+    struct _two_bytes_##testname { char a[2]; };                                                       \
+    template < typename T, returnT (T::*funct)args >                                                   \
+    struct _helper_##testname { typedef char type; };                                                  \
+    template <typename T>                                                                              \
+    char _has_##testname##_helper( typename _helper_##testname<T,&T::funct_name >::type ) { return 0;} \
+    template <typename T>                                                                              \
+    _two_bytes_##testname _has_##testname##_helper(int) { return _two_bytes_##testname();}             \
+    template <typename T> struct _##testname##workaroundbug {                                          \
+                const static unsigned long U = sizeof(_has_##testname##_helper<T>('a')); };            \
+    template <typename T, unsigned long U = _##testname##workaroundbug<T>::U >                         \
+    struct testname      { static const bool value = false; };                                         \
+    template <typename T>                                                                              \
+    struct testname<T,1> { static const bool value = true; };
+    /*!A DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST
+
+        The DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST() macro is used to define traits templates
+        that tell you if a class has a certain member function.  For example, to make a
+        test to see if a class has a public method with the signature void print(int) you
+        would say:
+            DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_print, void, print, (int))
+
+        Then you can check if a class, T, has this method by looking at the boolean value:
+            has_print<T>::value 
+        which will be true if the member function is in the T class.
+
+        Note that you can test for member functions taking no arguments by simply passing
+        in empty () like so:
+            DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_print, void, print, ())
+        This would test for a member of the form:
+            void print().
+
+        To test for const member functions you would use a statement such as this:
+            DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_print, void, print, ()const)
+        This would test for a member of the form: 
+            void print() const.
+
+        To test for const templated member functions you would use a statement such as this:
+            DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_print, void, template print<int>, ())
+        This would test for a member of the form: 
+            template <typename T> void print().
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     /*!A is_function 

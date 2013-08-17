@@ -13,6 +13,35 @@ namespace
     using namespace std;
     dlib::logger dlog("test.is_same_object");
 
+    DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_booya_template, void, template booya<int>, (std::string)const);
+    DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_funct_int, void, funct, (int));
+    DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_funct_double, void, funct, (double));
+
+    class htest
+    {
+    public:
+        template <typename EXP>
+        void booya(std::string) const {}
+        void funct(double) {}
+    };
+
+    class htest2
+    {
+    public:
+
+        void funct(int) {}
+    };
+
+    void test_metaprog()
+    {
+        DLIB_TEST(has_booya_template<htest>::value  == true)
+        DLIB_TEST(has_booya_template<htest2>::value == false)
+
+        DLIB_TEST(has_funct_int<htest>::value  == false)
+        DLIB_TEST(has_funct_int<htest2>::value == true)
+        DLIB_TEST(has_funct_double<htest>::value  == true)
+        DLIB_TEST(has_funct_double<htest2>::value == false)
+    }
 
     class is_same_object_tester : public tester
     {
@@ -79,6 +108,7 @@ namespace
             go2<false>(sd, sd2);
             go2<false>(sb, sd);
 
+            test_metaprog();
         }
     };
 
