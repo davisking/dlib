@@ -326,7 +326,6 @@ namespace dlib
                 cout << endl;
             }
 
-            saved_current_risk_gap = std::max<scalar_type>(current_risk_value - current_risk_gap, 0);
             saved_current_risk_gap = current_risk_gap;
 
             bool should_stop = false;
