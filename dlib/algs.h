@@ -797,9 +797,9 @@ namespace dlib
     template < typename T, returnT (T::*funct)args >                                                   \
     struct _helper_##testname { typedef char type; };                                                  \
     template <typename T>                                                                              \
-    char _has_##testname##_helper( typename _helper_##testname<T,&T::funct_name >::type ) { return 0;} \
+    static char _has_##testname##_helper( typename _helper_##testname<T,&T::funct_name >::type ) { return 0;} \
     template <typename T>                                                                              \
-    _two_bytes_##testname _has_##testname##_helper(int) { return _two_bytes_##testname();}             \
+    static _two_bytes_##testname _has_##testname##_helper(int) { return _two_bytes_##testname();}             \
     template <typename T> struct _##testname##workaroundbug {                                          \
                 const static unsigned long U = sizeof(_has_##testname##_helper<T>('a')); };            \
     template <typename T, unsigned long U = _##testname##workaroundbug<T>::U >                         \
