@@ -18,6 +18,20 @@ build_python_interface ()
     cd build                 || report_failure
     cmake ../../tools/python || report_failure
     make -j4 install         || report_failure
+
+
+    # Check if we should run all the python examples to make sure they
+    # work without generating an error.
+    if [ $1 == "test-python" ]
+    then
+        cd ..
+        FILES=`ls *.py`
+        for f in $FILES
+        do
+            python $f > /dev/null || report_failure 
+        done
+    fi
+
     popd
 }
 
@@ -147,7 +161,7 @@ makedocs ()
     # the python docs can't be created (this happens if the .so file isn't compiled)
     if [ "$1" = "makerel" ] 
     then
-        build_python_interface
+        build_python_interface test-python
         sphinx-build -b html docs/python sphinx.$$ || report_failure
     else
         if [ "$1" != "fast" ]
