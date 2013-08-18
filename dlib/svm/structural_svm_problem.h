@@ -147,6 +147,7 @@ namespace dlib
             }
         }
 
+    private:
         // Do nothing if T isn't actually a sparse vector
         template <typename T> void compact_sparse_vector( T& ) const { }
 
