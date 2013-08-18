@@ -11,6 +11,7 @@
 #include "image_processing/scan_image_pyramid_tools.h"
 #include "image_processing/setup_hashed_features.h"
 #include "image_processing/scan_image_boxes.h"
+#include "image_processing/scan_image_custom.h"
 #include "image_processing/remove_unobtainable_rectangles.h"
 
 #endif // DLIB_IMAGE_PROCESSInG_H___
