@@ -422,6 +422,8 @@ namespace dlib
                   sliding window location.  Note that this vector is added to psi.  Note
                   also that you must use get_full_object_detection() to convert a rect from
                   detect() into the needed full_object_detection.
+                - The dimensionality of the vector added to psi is get_num_dimensions().  This
+                  means that elements of psi after psi(get_num_dimensions()-1) are not modified.
                 - Since scan_image_pyramid is a sliding window classifier system, not all
                   possible rectangles can be output by detect().  So in the case where
                   obj.get_rect() could not arise from a call to detect(), this function
