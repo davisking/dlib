@@ -86,6 +86,7 @@
          <item>find_points_above_thresh</item>
          <item>scan_image_pyramid</item>
          <item>scan_image_boxes</item>
+         <item>scan_image_custom</item>
          <item>find_candidate_object_locations</item>
          <item>test_box_overlap</item>
          <item>remove_unobtainable_rectangles</item>
@@ -1732,6 +1733,34 @@
    <!-- ************************************************************************* -->
 
       <component>
+         <name>scan_image_custom</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/scan_image_custom_abstract.h</spec_file>
+         <description>        
+            This object is a tool for running a classifier over an image with the goal
+            of localizing each object present.  The localization is in the form of the
+            bounding box around each object of interest.  
+
+            <p>
+               Unlike the <a href="#scan_image_pyramid">scan_image_pyramid</a> 
+               and <a href="#scan_image_boxes">scan_image_boxes</a> objects, this image
+                scanner delegates all the work of constructing the object feature vector to
+                a user supplied feature extraction object.  That is, scan_image_custom
+                simply asks the supplied feature extractor what boxes in the image we
+                should investigate and then asks the feature extractor for the complete
+                feature vector for each box.  That is, scan_image_custom does not apply any
+                kind of pyramiding or other higher level processing to the features coming
+                out of the feature extractor.  That means that when you use
+                scan_image_custom it is completely up to you to define the feature vector
+                used with each image box.
+            </p>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
          <name>full_object_detection</name>
          <file>dlib/image_processing.h</file>
          <spec_file link="true">dlib/image_processing/full_object_detection_abstract.h</spec_file>
@@ -1750,9 +1779,11 @@
          <spec_file link="true">dlib/image_processing/object_detector_abstract.h</spec_file>
          <description>        
                 This object is a tool for detecting the positions of objects in an image.  In
-                particular, it is a simple container to aggregate an instance of the <a
-                href="#scan_image_pyramid">scan_image_pyramid</a> or <a
-                href="#scan_image_boxes">scan_image_boxes</a> classes, the weight vector
+                particular, it is a simple container to aggregate an instance of an image
+                scanner object (either <a
+                href="#scan_image_pyramid">scan_image_pyramid</a>, <a
+                href="#scan_image_boxes">scan_image_boxes</a>, or 
+                <a href="#scan_image_custom">scan_image_custom</a>), the weight vector
                 needed by one of these image scanners, and finally an instance of
                 <a href="#test_box_overlap">test_box_overlap</a>.  The test_box_overlap object
                 is used to perform non-max suppression on the output of the image scanner

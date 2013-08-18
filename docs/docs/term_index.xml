@@ -1263,6 +1263,7 @@
          <term file="imaging.html" name="scan_image_pyramid"                     include="dlib/image_processing.h"/>
          <term file="imaging.html" name="scan_image_boxes"                       include="dlib/image_processing.h"/>
          <term file="dlib/image_processing/scan_image_boxes_abstract.h.html" name="default_box_generator" include="dlib/image_processing.h"/>
+         <term file="imaging.html" name="scan_image_custom"                      include="dlib/image_processing.h"/>
          <term file="imaging.html" name="compute_box_dimensions"                 include="dlib/image_processing.h"/>
          <term file="imaging.html" name="create_single_box_detection_template"   include="dlib/image_processing.h"/>
          <term file="imaging.html" name="create_overlapped_2x2_detection_template" include="dlib/image_processing.h"/>
