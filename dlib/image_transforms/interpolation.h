@@ -582,6 +582,60 @@ namespace dlib
 
     namespace impl
     {
+        inline rectangle flip_rect_left_right (
+            const rectangle& rect,
+            const rectangle& window 
+        )
+        {
+            rectangle temp;
+            temp.top() = rect.top();
+            temp.bottom() = rect.bottom();
+
+            const long left_dist = rect.left()-window.left();
+
+            temp.right() = window.right()-left_dist; 
+            temp.left()  = temp.right()-rect.width()+1; 
+            return temp;
+        }
+    }
+
+    template <
+        typename image_type
+        >
+    void add_image_left_right_flips (
+        dlib::array<image_type>& images,
+        std::vector<std::vector<rectangle> >& objects
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( images.size() == objects.size(),
+            "\t void add_image_left_right_flips()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t images.size():  " << images.size() 
+            << "\n\t objects.size(): " << objects.size() 
+            );
+
+        image_type temp;
+        std::vector<rectangle> rects;
+
+        const unsigned long num = images.size();
+        for (unsigned long j = 0; j < num; ++j)
+        {
+            flip_image_left_right(images[j], temp);
+
+            rects.clear();
+            for (unsigned long i = 0; i < objects[j].size(); ++i)
+                rects.push_back(impl::flip_rect_left_right(objects[j][i], get_rect(images[j])));
+
+            images.push_back(temp);
+            objects.push_back(rects);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
         class helper_pyramid_up 
         {
         public:
