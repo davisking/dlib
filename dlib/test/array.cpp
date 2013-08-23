@@ -618,6 +618,25 @@ namespace
         DLIB_TEST(dlib::is_array<array<stuff> >::value == true);
     }
 
+    void test_array_split()
+    {
+        array<int> temp(5);
+        
+        for (unsigned int i = 0; i < temp.size(); ++i)
+            temp[i] = i;
+
+        array<int> b;
+
+        split_array(temp, b, 0.5);
+        DLIB_TEST(temp.size() == 2);
+        DLIB_TEST(b.size() == 3);
+
+        DLIB_TEST(temp[0] == 0);
+        DLIB_TEST(temp[1] == 1);
+        DLIB_TEST(b[0] == 2);
+        DLIB_TEST(b[1] == 3);
+        DLIB_TEST(b[2] == 4);
+    }
 
     class array_tester : public tester
     {
@@ -639,6 +658,7 @@ namespace
             array_expand_test<array<unsigned long> >();
 
             DLIB_TEST(dlib::is_array<int>::value == false);
+            test_array_split();
         }
     } a;
 

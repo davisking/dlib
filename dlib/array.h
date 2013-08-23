@@ -4,6 +4,7 @@
 #define DLIB_ARRAy_
 
 #include "array/array_kernel.h"
+#include "array/array_tools.h"
 
 #endif // DLIB_ARRAy_
 
