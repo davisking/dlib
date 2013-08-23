@@ -202,6 +202,7 @@
 
          <term file="algorithms.html" name="median"                        include="dlib/algs.h"/>
          <term file="algorithms.html" name="qsort_array"                   include="dlib/sort.h"/>
+         <term file="algorithms.html" name="split_array"                   include="dlib/array.h"/>
          <term file="algorithms.html" name="rand"                          include="dlib/rand.h"/>
          <term link="algorithms.html#rand" name="Mersenne Twister"         include="dlib/rand.h"/>
          <term file="graph_tools.html" name="graph_contains_undirected_cycle" include="dlib/graph_utils.h"/>

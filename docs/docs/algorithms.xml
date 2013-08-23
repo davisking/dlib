@@ -38,6 +38,7 @@
          <item>numeric_constants</item> 
          <item>put_in_range</item> 
          <item>qsort_array</item> 
+         <item>split_array</item> 
          <item>integrate_function_adapt_simp</item> 
          <item>square_root</item> 
          <item nolink="true">
@@ -667,6 +668,20 @@
                                  
       </component>
             
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>split_array</name>
+         <file>dlib/array.h</file>
+         <spec_file link="true">dlib/array/array_tools_abstract.h</spec_file>
+         <description>
+            This function is used to efficiently split <a href="containers.html#array">array</a>
+            like objects into two parts.  It uses the global swap() function instead
+            of copying to move elements around, so it works on arrays of non-copyable
+            types.
+         </description>
+      </component>
       
    <!-- ************************************************************************* -->
       
