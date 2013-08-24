@@ -216,6 +216,7 @@ namespace dlib
             eps(0.001),
             verbose(false),
             skip_cache(true),
+            count_below_eps(0),
             max_cache_size(5),
             C(1)
         {}
@@ -329,26 +330,33 @@ namespace dlib
 
             saved_current_risk_gap = current_risk_gap;
 
-            bool should_stop = false;
-
             if (current_risk_gap < eps)
-                should_stop = true;
-
-            if (should_stop && !skip_cache && max_cache_size != 0)
             {
-                // Instead of stopping we shouldn't use the cache on the next iteration.  This way
-                // we can be sure to have the best solution rather than assuming the cache is up-to-date
-                // enough.
-                should_stop = false;
-                skip_cache = true;
+                // Only stop when we see that the risk gap is small enough on a non-cached
+                // iteration.
+                if (skip_cache || max_cache_size == 0)
+                    return true;
+
+                ++count_below_eps;
+
+                // Only disable the cache if we have seen a few consecutive iterations that
+                // look to have converged.
+                if (count_below_eps > 1)
+                {
+                    // Instead of stopping we shouldn't use the cache on the next iteration.  This way
+                    // we can be sure to have the best solution rather than assuming the cache is up-to-date
+                    // enough.
+                    skip_cache = true;
+                    count_below_eps = 0;
+                }
             }
             else
             {
+                count_below_eps = 0;
                 skip_cache = false;
             }
 
-
-            return should_stop;
+            return false;
         }
 
         virtual void get_risk (
@@ -429,6 +437,7 @@ namespace dlib
 
         mutable std::vector<cache_element_structural_svm<structural_svm_problem> > cache;
         mutable bool skip_cache;
+        mutable int count_below_eps;
         unsigned long max_cache_size;
 
         scalar_type C;
