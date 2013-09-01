@@ -75,6 +75,13 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    bool png_loader::is_graya() const
+    {
+        return ( color_type_ == PNG_COLOR_TYPE_GRAY_ALPHA );
+    }
+
+// ----------------------------------------------------------------------------------------
+
     bool png_loader::is_rgb() const
     {
         return ( color_type_ == PNG_COLOR_TYPE_RGB );
@@ -169,7 +176,8 @@ namespace dlib
 
         if (color_type_ != PNG_COLOR_TYPE_GRAY && 
             color_type_ != PNG_COLOR_TYPE_RGB && 
-            color_type_ != PNG_COLOR_TYPE_RGB_ALPHA )
+            color_type_ != PNG_COLOR_TYPE_RGB_ALPHA &&
+            color_type_ != PNG_COLOR_TYPE_GRAY_ALPHA)
         {
             fclose( fp );
             png_destroy_read_struct( &( ld_->png_ptr_ ), &( ld_->info_ptr_ ), &( ld_->end_info_ ) );

@@ -75,7 +75,17 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - if (this object contains a grayscale image) then
+                - if (this object contains a grayscale image without an alpha channel) then
+                    - returns true
+                - else
+                    - returns false
+        !*/
+        
+        bool is_graya(
+        ) const;
+        /*!
+            ensures
+                - if (this object contains a grayscale image with an alpha channel) then
                     - returns true
                 - else
                     - returns false
