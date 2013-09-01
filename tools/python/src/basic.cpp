@@ -140,6 +140,14 @@ string sparse_vector__repr__ (const std::vector<std::pair<unsigned long,double> 
     return sout.str();
 }
 
+unsigned long range_len(const std::pair<unsigned long, unsigned long>& r)
+{
+    if (r.second > r.first)
+        return r.second-r.first;
+    else
+        return 0;
+}
+
 template <typename T>
 void resize(T& v, unsigned long n) { v.resize(n); }
 
@@ -174,11 +182,12 @@ void bind_basic_types()
     typedef pair<unsigned long,unsigned long> range_type;
     class_<range_type>("range", "This object is used to represent a range of elements in an array.", init<>() )
         .def(init<unsigned long,unsigned long>())
-        .def_readwrite("begin",&range_type::first, "The index of the first element in the range.")
-        .def_readwrite("end",&range_type::second, "One past the index of the last element in the range.")
+        .def_readwrite("begin",&range_type::first, "The index of the first element in the range.  This is represented using an unsigned integer.")
+        .def_readwrite("end",&range_type::second, "One past the index of the last element in the range.  This is represented using an unsigned integer.")
         .def("__str__", range__str__)
         .def("__repr__", range__repr__)
         .def("__iter__", &make_range_iterator)
+        .def("__len__", &range_len)
         .def_pickle(serialize_pickle<range_type>());
 
     class_<range_iter>("_range_iter")
