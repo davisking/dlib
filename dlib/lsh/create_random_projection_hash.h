@@ -21,7 +21,8 @@ namespace dlib
         >
     projection_hash create_random_projection_hash (
         const vector_type& v,
-        const int bits
+        const int bits,
+        dlib::rand& rnd
     ) 
     {
         // make sure requires clause is not broken
@@ -65,7 +66,6 @@ namespace dlib
         std::vector<double> temp;
 
         // build a random projection matrix
-        dlib::rand rnd;
         matrix<double> proj(bits, v[0].size());
         for (long r = 0; r < proj.nr(); ++r)
             for (long c = 0; c < proj.nc(); ++c)
@@ -119,10 +119,25 @@ namespace dlib
     template <
         typename vector_type
         >
+    projection_hash create_random_projection_hash (
+        const vector_type& v,
+        const int bits
+    ) 
+    {
+        dlib::rand rnd;
+        return create_random_projection_hash(v,bits,rnd);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename vector_type
+        >
     projection_hash create_max_margin_projection_hash (
         const vector_type& v,
         const int bits,
-        const double C = 10
+        const double C,
+        dlib::rand& rnd
     ) 
     {
         // make sure requires clause is not broken
@@ -155,7 +170,6 @@ namespace dlib
         matrix<double> whiten = trans(chol(pinv(rc.covariance())));
         const matrix<double,0,1> meanval = whiten*rc.mean();
 
-        dlib::rand rnd;
 
 
         typedef matrix<double,0,1> sample_type;
@@ -193,6 +207,21 @@ namespace dlib
 
 
         return projection_hash(proj*whiten, offset-proj*meanval);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename vector_type
+        >
+    projection_hash create_max_margin_projection_hash (
+        const vector_type& v,
+        const int bits,
+        const double C = 10
+    ) 
+    {
+        dlib::rand rnd;
+        return create_max_margin_projection_hash(v,bits,C,rnd);
     }
 
 // ----------------------------------------------------------------------------------------
