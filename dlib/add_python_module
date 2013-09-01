@@ -39,10 +39,6 @@ endif()
 string(REPLACE "add_python_module" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
 include(${dlib_path}/cmake)
 
-# Make sure other python interfaces can #include the headers in
-# dclib/tools/python/src if they want to.
-INCLUDE_DIRECTORIES(${dlib_path}/../tools/python/src)
-
 # We put the extra _ on the end of the name just so it's possible to
 # have a module name of dlib and not get a conflict with the target named
 # dlib in ../dlib/cmake.  We use the target OUPUT_NAME property to ensure the
