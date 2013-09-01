@@ -1,12 +1,10 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
-#include <boost/python.hpp>
+#include <dlib/python.h>
 #include <boost/shared_ptr.hpp>
 #include <dlib/matrix.h>
-#include "serialize_pickle.h"
 #include <dlib/svm.h>
-#include "pyassert.h"
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "testing_results.h"
 #include <boost/python/args.hpp>

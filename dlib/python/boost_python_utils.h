@@ -4,6 +4,8 @@
 #define DLIB_BOOST_PYTHON_UtILS_H__
 
 #include <boost/python.hpp>
+#include <vector>
+#include <string>
 
 inline bool hasattr(
     boost::python::object obj, 

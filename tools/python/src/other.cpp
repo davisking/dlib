@@ -1,14 +1,13 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#include <boost/python.hpp>
+
+#include <dlib/python.h>
 #include <boost/shared_ptr.hpp>
 #include <dlib/matrix.h>
 #include <dlib/data_io.h>
 #include <dlib/sparse_vector.h>
 #include <boost/python/args.hpp>
-#include "pyassert.h"
 #include <dlib/optimization.h>
-#include "boost_python_utils.h"
 
 using namespace dlib;
 using namespace std;
