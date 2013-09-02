@@ -103,7 +103,7 @@ namespace dlib
                 // a proxy for the true separation oracle.  If the risk value has dropped
                 // by enough to get into the stopping condition then the best psi isn't
                 // good enough. 
-                if (best_risk + saved_current_risk_gap-prob->get_epsilon() > last_true_risk_computed)
+                if (best_risk + saved_current_risk_gap > last_true_risk_computed)
                 {
                     out_psi = psi[best_idx];
                     lru_count[best_idx] = max_lru_count + 1;
