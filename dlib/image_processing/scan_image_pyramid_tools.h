@@ -46,10 +46,19 @@ namespace dlib
 
         unsigned long max_area = 0;
 
-        // copy rects into sorted_rects and sort them in order of increasing area
+        // Copy rects into sorted_rects and sort them in order of increasing area.  But
+        // only include the rectangles that aren't already obtainable by the scanner.
         list_type sorted_rects;
         for (unsigned long i = 0; i < rects.size(); ++i)
         {
+            if (scanner.get_num_detection_templates() > 0)
+            {
+                rectangle temp = scanner.get_best_matching_rect(rects[i]);
+                const double match_score = (rects[i].intersect(temp).area())/(double)(rects[i] + temp).area();
+                // skip this rectangle if it's already matched well enough.
+                if (match_score > min_match_score)
+                    continue;
+            }
             max_area = std::max(rects[i].area(), max_area);
             sorted_rects.push_back(std::make_pair(rects[i].area(), rects[i]));
         }

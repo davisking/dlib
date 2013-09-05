@@ -26,11 +26,15 @@ namespace dlib
             - image_scanner_type == an implementation of the scan_image_pyramid
               object defined in dlib/image_processing/scan_image_pyramid_tools_abstract.h
         ensures
-            - returns a set of object boxes which, when used as detection
-              templates with the given scanner, can attain at least
-              min_match_score alignment with every element of rects.  Note that
-              the alignment between two rectangles A and B is defined as
+            - returns a set of object boxes which, when used as detection templates with
+              the given scanner, can attain at least min_match_score alignment with every
+              element of rects.  Note that the alignment between two rectangles A and B is
+              defined as:
                 (A.intersect(B).area())/(double)(A+B).area()
+            - Only elements of rects which are not already well matched by the scanner are
+              considered.  That is, if the scanner already has some detection templates in
+              it then the contents of rects will be checked against those detection
+              templates and elements with a match better than min_match_score are ignore.
     !*/
 
 // ----------------------------------------------------------------------------------------
