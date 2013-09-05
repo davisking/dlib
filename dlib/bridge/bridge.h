@@ -388,7 +388,7 @@ namespace dlib
                     {
                         if (receive_pipe)
                         {
-                            sockstreambuf::kernel_2a buf(con);
+                            sockstreambuf buf(con);
                             std::istream in(&buf);
                             typename receive_pipe_type::type item;
                             // This isn't necessary but doing it avoids a warning about
@@ -466,7 +466,7 @@ namespace dlib
 
                     try
                     {
-                        sockstreambuf::kernel_2a buf(con);
+                        sockstreambuf buf(con);
                         std::ostream out(&buf);
                         typename transmit_pipe_type::type item;
                         // This isn't necessary but doing it avoids a warning about

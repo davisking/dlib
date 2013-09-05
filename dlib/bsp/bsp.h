@@ -54,7 +54,7 @@ namespace dlib
             }
 
             scoped_ptr<connection> con;
-            sockstreambuf::kernel_2a buf;
+            sockstreambuf buf;
             std::iostream stream;
             bool terminated;
         };
