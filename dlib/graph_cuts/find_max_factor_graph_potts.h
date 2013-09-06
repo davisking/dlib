@@ -819,20 +819,22 @@ namespace dlib
     namespace impl
     {
         template <
-            typename image_type,
+            typename pixel_type1,
+            typename pixel_type2,
             typename model_type
             >
         struct potts_grid_image_pair_model
         {
-            const typename image_type::type* data1;
-            const typename image_type::type* data2;
+            const pixel_type1* data1;
+            const pixel_type2* data2;
             const model_type& model;
             const long nr_;
             const long nc_;
+            template <typename image_type1, typename image_type2>
             potts_grid_image_pair_model(
                 const model_type& model_,
-                const image_type& img1,
-                const image_type& img2
+                const image_type1& img1,
+                const image_type2& img2
             ) :
                 model(model_),
                 nr_(img1.nr()),
@@ -913,13 +915,14 @@ namespace dlib
 
     template <
         typename pair_image_model,
-        typename pixel_type,
+        typename pixel_type1,
+        typename pixel_type2,
         typename mem_manager
         >
-    impl::potts_grid_image_pair_model<array2d<pixel_type,mem_manager>, pair_image_model> make_potts_grid_problem (
+    impl::potts_grid_image_pair_model<pixel_type1, pixel_type2, pair_image_model> make_potts_grid_problem (
         const pair_image_model& model,
-        const array2d<pixel_type,mem_manager>& img1,
-        const array2d<pixel_type,mem_manager>& img2
+        const array2d<pixel_type1,mem_manager>& img1,
+        const array2d<pixel_type2,mem_manager>& img2
     )
     {
         DLIB_ASSERT(get_rect(img1) == get_rect(img2),
@@ -928,7 +931,7 @@ namespace dlib
             << "\n\t get_rect(img1): " << get_rect(img1)
             << "\n\t get_rect(img2): " << get_rect(img2)
             );
-        typedef impl::potts_grid_image_pair_model<array2d<pixel_type,mem_manager>, pair_image_model> potts_type;
+        typedef impl::potts_grid_image_pair_model<pixel_type1, pixel_type2, pair_image_model> potts_type;
         return potts_type(model,img1,img2);
     }
 

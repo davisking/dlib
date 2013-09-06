@@ -1068,6 +1068,70 @@ namespace
         DLIB_TEST(labels[3] != 0);
     }
 
+    struct potts_pair_image_model 
+    {
+        typedef double value_type;
+
+        template <typename pixel_type1, typename pixel_type2>
+        value_type factor_value (
+            const pixel_type1& ,
+            const pixel_type2& v2 
+        ) const
+        {
+            return v2;
+        }
+
+        template <typename pixel_type>
+        value_type factor_value_disagreement (
+            const pixel_type& v1,
+            const pixel_type& v2 
+        ) const
+        {
+            if (v1 == v2)
+                return 10;
+            else
+                return 0;
+        }
+    };
+
+    void test_potts_pair_grid()
+    {
+        array2d<int> img1(40,40);
+        array2d<double> img2(40,40);
+
+        assign_all_pixels(img1, -1);
+        assign_all_pixels(img2, -1);
+
+        img1[4][4] = 1000;
+
+        img2[4][3] = 1;
+        img2[4][4] = 1;
+        img2[4][5] = 1;
+        img2[3][3] = 1;
+        img2[3][4] = 1;
+        img2[3][5] = 1;
+        img2[5][3] = 1;
+        img2[5][4] = 1;
+        img2[5][5] = 1;
+
+        array2d<unsigned char> labels;
+        find_max_factor_graph_potts(make_potts_grid_problem(potts_pair_image_model(),img2,img1), labels);
+
+        dlog << LINFO << "num true labels: " << sum(matrix_cast<int>(mat(labels)!=0));
+        DLIB_TEST(sum(matrix_cast<int>(mat(labels)!=0)) == 9);
+        DLIB_TEST(sum(matrix_cast<int>(mat(labels)==0)) == (int)img1.size()-9);
+
+        DLIB_TEST(labels[4][3]);
+        DLIB_TEST(labels[4][4]);
+        DLIB_TEST(labels[4][5]);
+        DLIB_TEST(labels[3][3]);
+        DLIB_TEST(labels[3][4]);
+        DLIB_TEST(labels[3][5]);
+        DLIB_TEST(labels[5][3]);
+        DLIB_TEST(labels[5][4]);
+        DLIB_TEST(labels[5][5]);
+    }
+
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -1087,6 +1151,7 @@ namespace
         void perform_test (
         )
         {
+            test_potts_pair_grid();
             test_inf();
 
             for (int i = 0; i < 500; ++i)

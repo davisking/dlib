@@ -530,10 +530,10 @@ namespace dlib
         // must also be capable of representing signed values.
         typedef an_integer_or_real_type value_type;
 
-        template <typename pixel_type>
+        template <typename pixel_type1, typename pixel_type2>
         value_type factor_value (
-            const pixel_type& v1,
-            const pixel_type& v2 
+            const pixel_type1& v1,
+            const pixel_type2& v2 
         ) const;
         /*!
             requires
@@ -601,13 +601,14 @@ namespace dlib
 
     template <
         typename pair_image_model,
-        typename pixel_type,
+        typename pixel_type1,
+        typename pixel_type2,
         typename mem_manager
         >
     potts_grid_problem make_potts_grid_problem (
         const pair_image_model& model,
-        const array2d<pixel_type,mem_manager>& img1,
-        const array2d<pixel_type,mem_manager>& img2
+        const array2d<pixel_type1,mem_manager>& img1,
+        const array2d<pixel_type2,mem_manager>& img2
     );
     /*!
         requires
