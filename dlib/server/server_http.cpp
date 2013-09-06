@@ -126,7 +126,7 @@ namespace dlib
         ) 
         {
             using namespace std;
-            const size_t max = 16*1024;
+            const size_t max = 64*1024;
             buffer.clear();
             buffer.reserve(300);
 
@@ -136,7 +136,9 @@ namespace dlib
             }
 
             // if we quit the loop because the data is longer than expected or we hit EOF
-            if (in.peek() == EOF || buffer.size() == max)
+            if (in.peek() == EOF)
+                throw http_parse_error("HTTP field from client terminated incorrectly", 414);
+            if (buffer.size() == max)
                 throw http_parse_error("HTTP field from client is too long", 414);
 
             // Make sure the last char is the delim.
@@ -186,7 +188,7 @@ namespace dlib
         string first_part_of_header;
         string::size_type position_of_double_point;
         // now loop over all the incoming_headers
-        while (line.size() > 2)
+        while (line != "\r")
         {
             position_of_double_point = line.find_first_of(':');
             if ( position_of_double_point != string::npos )
@@ -272,7 +274,7 @@ namespace dlib
                 }
             } // no ':' in it!
             read_with_limit(in, line);
-        } // while (line.size() > 2 )
+        } // while (line != "\r")
 
 
         // If there is data being posted back to us as a query string then
