@@ -794,28 +794,17 @@ namespace dlib
         double best_match_score = -1;
 
 
-        // for all the levels
+        // Find the best matching detection template for rect
         for (unsigned long l = 0; l < number_pyramid_levels; ++l)
         {
-            // Run the center point through the feature/image space transformation just to make
-            // sure we exactly replicate the procedure for shifting an object_box used elsewhere 
-            // in this file.
             const rectangle temp = pyr.rect_down(rect,l);
             if (temp.area() <= 1) 
                 break;
-            const point origin = feats_config.feat_to_image_space(feats_config.image_to_feat_space(center(temp)));
 
+            // At this pyramid level, what matches best?
             for (unsigned long t = 0; t < det_templates.size(); ++t)
             {
-                // Map this detection template into the normal image space and see how
-                // close it is to the rect we are looking for.  We do the translation here
-                // because the rect_up() routine takes place using integer arithmetic and
-                // could potentially give slightly different results with and without the
-                // translation.
-                rectangle temp2 = translate_rect(det_templates[t].object_box, origin);
-                temp2 = pyr.rect_up(temp2, l);
-
-                const double match_score = get_match_score(temp2, rect);
+                const double match_score = get_match_score(det_templates[t].object_box, temp);
                 if (match_score > best_match_score)
                 {
                     best_match_score = match_score;
