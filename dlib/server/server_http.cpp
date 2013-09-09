@@ -130,7 +130,7 @@ namespace dlib
             buffer.clear();
             buffer.reserve(300);
 
-            while (in.peek() != delim && in.peek() != EOF && buffer.size() < max)
+            while (in.peek() != delim && in.peek() != '\n' && in.peek() != EOF && buffer.size() < max)
             {
                 buffer += (char)in.get();
             }
@@ -141,20 +141,12 @@ namespace dlib
             if (buffer.size() == max)
                 throw http_parse_error("HTTP field from client is too long", 414);
 
-            // Make sure the last char is the delim.
-            if (in.get() != delim) 
+            in.get();
+            // eat any remaining whitespace
+            if (delim == ' ')
             {
-                in.setstate(ios::badbit);
-                buffer.clear();
-            } 
-            else 
-            {
-                // Read the remaining delimiters
-                if (delim == ' ') 
-                {
-                    while (in.peek() == ' ')
-                        in.get();
-                }
+                while (in.peek() == ' ')
+                    in.get();
             }
         }
     }
