@@ -65,20 +65,6 @@
 </title>
 
 
-<xsl:if test="$is_chm != 'true'">
-<!-- Piwik -->
-<script type="text/javascript">
-var pkBaseURL = (("https:" == document.location.protocol) ? "https://apps.sourceforge.net/piwik/dclib/" : "http://apps.sourceforge.net/piwik/dclib/");
-document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
-</script><script type="text/javascript">
-piwik_action_name = '';
-piwik_idsite = 1;
-piwik_url = pkBaseURL + "piwik.php";
-piwik_log(piwik_action_name, piwik_idsite, piwik_url);
-</script>
-<object><noscript><p><img src="http://apps.sourceforge.net/piwik/dclib/piwik.php?idsite=1" alt="piwik"/></p></noscript></object>
-<!-- End Piwik Tag -->
-</xsl:if>
 
 
 
@@ -357,6 +343,21 @@ function BigToggle(node)
                <xsl:apply-templates select="questions"/>
                   
             </div>
+
+            <xsl:if test="$is_chm != 'true'">
+               <!-- Piwik -->
+               <script type="text/javascript">
+               var pkBaseURL = (("https:" == document.location.protocol) ? "https://sourceforge.net/apps/piwik/dclib/" : "http://sourceforge.net/apps/piwik/dclib/");
+               document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+               </script><script type="text/javascript">
+               try {
+               var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+               piwikTracker.trackPageView();
+               piwikTracker.enableLinkTracking();
+               } catch( err ) {}
+               </script><noscript><p><img src="http://sourceforge.net/apps/piwik/dclib/piwik.php?idsite=1" style="border:0" alt=""/></p></noscript>
+               <!-- End Piwik Tag -->
+            </xsl:if>
          </body>
       </html>
    </xsl:template>
