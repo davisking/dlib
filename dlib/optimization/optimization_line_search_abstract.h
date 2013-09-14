@@ -105,6 +105,22 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline double poly_min_extrap (
+        double f0,
+        double d0,
+        double f1
+    );
+    /*!
+        ensures
+            - let c(x) be a 2nd degree polynomial such that:
+                - c(0) == f0
+                - c(1) == f1
+                - derivative of c(x) at x==0 is d0
+            - returns the point in the range [0,1] that minimizes the polynomial c(x) 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     inline double lagrange_poly_min_extrap (
         double p1, 
         double p2,

@@ -917,6 +917,21 @@ namespace
     }
 
 
+    void test_poly_min_extract_2nd()
+    {
+        double off;
+
+        off = 0.0; DLIB_TEST(std::abs( poly_min_extrap(off*off, -2*off, (1-off)*(1-off)) - off) < 1e-13); 
+        off = 0.1; DLIB_TEST(std::abs( poly_min_extrap(off*off, -2*off, (1-off)*(1-off)) - off) < 1e-13); 
+        off = 0.2; DLIB_TEST(std::abs( poly_min_extrap(off*off, -2*off, (1-off)*(1-off)) - off) < 1e-13); 
+        off = 0.3; DLIB_TEST(std::abs( poly_min_extrap(off*off, -2*off, (1-off)*(1-off)) - off) < 1e-13); 
+        off = 0.4; DLIB_TEST(std::abs( poly_min_extrap(off*off, -2*off, (1-off)*(1-off)) - off) < 1e-13); 
+        off = 0.5; DLIB_TEST(std::abs( poly_min_extrap(off*off, -2*off, (1-off)*(1-off)) - off) < 1e-13); 
+        off = 0.6; DLIB_TEST(std::abs( poly_min_extrap(off*off, -2*off, (1-off)*(1-off)) - off) < 1e-13); 
+        off = 0.8; DLIB_TEST(std::abs( poly_min_extrap(off*off, -2*off, (1-off)*(1-off)) - off) < 1e-13); 
+        off = 0.9; DLIB_TEST(std::abs( poly_min_extrap(off*off, -2*off, (1-off)*(1-off)) - off) < 1e-13); 
+        off = 1.0; DLIB_TEST(std::abs( poly_min_extrap(off*off, -2*off, (1-off)*(1-off)) - off) < 1e-13); 
+    }
 
     class optimization_tester : public tester
     {
@@ -930,6 +945,7 @@ namespace
         void perform_test (
         )
         {
+            test_poly_min_extract_2nd();
             optimization_test();
         }
     } a;

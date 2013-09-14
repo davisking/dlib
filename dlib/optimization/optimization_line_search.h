@@ -195,6 +195,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline double poly_min_extrap (
+        double f0,
+        double d0,
+        double f1
+    )
+    {
+        const double temp = 2*(f1 - f0 - d0);
+        if (std::abs(temp) <= d0*std::numeric_limits<double>::epsilon())
+            return 0.5;
+
+        const double alpha = -d0/temp;
+
+        // now make sure the minimum is within the allowed range of (0,1) 
+        return put_in_range(0,1,alpha);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     inline double lagrange_poly_min_extrap (
         double p1, 
         double p2,
