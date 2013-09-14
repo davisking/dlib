@@ -47,6 +47,8 @@ namespace dlib
                 - #get_num_threads() == 2
                 - #get_max_cache_size() == 40
                 - #get_feature_extractor() == a default initialized feature_extractor
+                - #get_loss_per_missed_segment() == 1
+                - #get_loss_per_false_alarm() == 1
         !*/
 
         explicit structural_sequence_segmentation_trainer (
@@ -60,6 +62,8 @@ namespace dlib
                 - #get_num_threads() == 2
                 - #get_max_cache_size() == 40
                 - #get_feature_extractor() == fe 
+                - #get_loss_per_missed_segment() == 1
+                - #get_loss_per_false_alarm() == 1
         !*/
 
         const feature_extractor& get_feature_extractor (
@@ -176,6 +180,44 @@ namespace dlib
                   generalization of the resulting sequence labeler.  Larger values
                   encourage exact fitting while smaller values of C may encourage better
                   generalization. 
+        !*/
+
+        void set_loss_per_missed_segment (
+            double loss
+        );
+        /*!
+            requires
+                - loss >= 0
+            ensures
+                - #get_loss_per_missed_segment() == loss
+        !*/
+
+        double get_loss_per_missed_segment (
+        ) const;
+        /*!
+            ensures
+                - returns the amount of loss incurred for failing to detect a segment.  The
+                  larger the loss the more important it is to detect all the segments.
+        !*/
+
+
+        void set_loss_per_false_alarm (
+            double loss
+        );
+        /*!
+            requires
+                - loss >= 0
+            ensures
+                - #get_loss_per_false_alarm() == loss
+        !*/
+
+        double get_loss_per_false_alarm (
+        ) const;
+        /*!
+            ensures
+                - returns the amount of loss incurred for outputting a false detection. The
+                  larger the loss the more important it is to avoid outputting false
+                  detections.
         !*/
 
         const sequence_segmenter<feature_extractor> train(
