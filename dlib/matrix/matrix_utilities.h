@@ -2743,6 +2743,73 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename M1, typename M2, typename M3>
+    struct op_clamp_m : basic_op_mmm<M1,M2,M3>
+    {
+        op_clamp_m( const M1& m1_, const M2& m2_, const M3& m3_) : 
+            basic_op_mmm<M1,M2,M3>(m1_,m2_,m3_){}
+
+        typedef typename M1::type type;
+        typedef const typename M1::type const_ret_type;
+        const static long cost = M1::cost + M2::cost + M3::cost + 2;
+
+        const_ret_type apply (long r, long c) const
+        { 
+            const type val = this->m1(r,c);
+            const type lower = this->m2(r,c);
+            const type upper = this->m3(r,c);
+            if (val <= upper)
+            {
+                if (lower <= val)
+                    return val;
+                else
+                    return lower;
+            }
+            else 
+            {
+                return upper;
+            }
+        }
+    };
+
+    template <
+        typename EXP1,
+        typename EXP2,
+        typename EXP3
+        >
+    const matrix_op<op_clamp_m<EXP1,EXP2,EXP3> > 
+    clamp (
+        const matrix_exp<EXP1>& m,
+        const matrix_exp<EXP2>& lower, 
+        const matrix_exp<EXP3>& upper
+    )
+    {
+        COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type,typename EXP2::type>::value == true));
+        COMPILE_TIME_ASSERT((is_same_type<typename EXP2::type,typename EXP3::type>::value == true));
+        COMPILE_TIME_ASSERT(EXP1::NR == EXP2::NR || EXP1::NR == 0 || EXP2::NR == 0);
+        COMPILE_TIME_ASSERT(EXP1::NC == EXP2::NC || EXP1::NR == 0 || EXP2::NC == 0);
+        COMPILE_TIME_ASSERT(EXP2::NR == EXP3::NR || EXP2::NR == 0 || EXP3::NR == 0);
+        COMPILE_TIME_ASSERT(EXP2::NC == EXP3::NC || EXP2::NC == 0 || EXP3::NC == 0);
+        DLIB_ASSERT(m.nr() == lower.nr() &&
+                    m.nc() == lower.nc() &&
+                    m.nr() == upper.nr() &&
+                    m.nc() == upper.nc(),
+            "\tconst matrix_exp clamp(m,lower,upper)"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t m.nr():     " << m.nr()
+            << "\n\t m.nc():     " << m.nc() 
+            << "\n\t lower.nr(): " << lower.nr()
+            << "\n\t lower.nc(): " << lower.nc() 
+            << "\n\t upper.nr(): " << upper.nr()
+            << "\n\t upper.nc(): " << upper.nc() 
+            );
+
+        typedef op_clamp_m<EXP1,EXP2,EXP3> op;
+        return matrix_op<op>(op(m.ref(),lower.ref(),upper.ref()));
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <typename M>
     struct op_lowerbound : basic_op_m<M>
     {

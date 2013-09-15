@@ -1697,6 +1697,33 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp clamp (
+        const matrix_exp& m,
+        const matrix_exp& lower,
+        const matrix_exp& upper
+    );
+    /*!
+        requires
+            - m.nr() == lower.nr()
+            - m.nc() == lower.nc()
+            - m.nr() == upper.nr()
+            - m.nc() == upper.nc()
+            - m, lower, and upper all contain the same type of elements. 
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                    - if (m(r,c) > upper(r,c)) then
+                        - R(r,c) == upper(r,c)
+                    - else if (m(r,c) < lower(r,c)) then
+                        - R(r,c) == lower(r,c)
+                    - else
+                        - R(r,c) == m(r,c)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp lowerbound (
         const matrix_exp& m,
         const matrix_exp::type& thresh 
