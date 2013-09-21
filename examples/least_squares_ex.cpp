@@ -111,7 +111,7 @@ int main()
         // the approximate derivative computed using central differences (via derivative()).  
         // If this value is big then it means we probably typed the derivative function incorrectly.
         cout << "derivative error: " << length(residual_derivative(data_samples[0], params) - 
-                                               derivative(&residual)(data_samples[0], params) ) << endl;
+                                               derivative(residual)(data_samples[0], params) ) << endl;
 
 
 
@@ -126,8 +126,8 @@ int main()
         // Use the Levenberg-Marquardt method to determine the parameters which
         // minimize the sum of all squared residuals.
         solve_least_squares_lm(objective_delta_stop_strategy(1e-7).be_verbose(), 
-                               &residual,
-                               &residual_derivative,
+                               residual,
+                               residual_derivative,
                                data_samples,
                                x);
 
@@ -144,8 +144,8 @@ int main()
         // If we didn't create the residual_derivative function then we could
         // have used this method which numerically approximates the derivatives for you.
         solve_least_squares_lm(objective_delta_stop_strategy(1e-7).be_verbose(), 
-                               &residual,
-                               derivative(&residual),
+                               residual,
+                               derivative(residual),
                                data_samples,
                                x);
 
@@ -163,8 +163,8 @@ int main()
         // where the residuals don't go to zero at the solution.  So in these cases
         // it may provide a better answer.
         solve_least_squares(objective_delta_stop_strategy(1e-7).be_verbose(), 
-                            &residual,
-                            &residual_derivative,
+                            residual,
+                            residual_derivative,
                             data_samples,
                             x);
 

@@ -35,8 +35,8 @@ namespace
             ch = chebyquad_start(2);
 
             solve_least_squares(objective_delta_stop_strategy(1e-13, 80),
-                                &chebyquad_residual,
-                                derivative(&chebyquad_residual),
+                                chebyquad_residual,
+                                derivative(chebyquad_residual),
                                 range(0,ch.size()-1),
                                 ch);
 
@@ -53,8 +53,8 @@ namespace
             ch = chebyquad_start(2);
 
             solve_least_squares_lm(objective_delta_stop_strategy(1e-13, 80),
-                                &chebyquad_residual,
-                                derivative(&chebyquad_residual),
+                                chebyquad_residual,
+                                derivative(chebyquad_residual),
                                 range(0,ch.size()-1),
                                 ch);
 
@@ -73,8 +73,8 @@ namespace
             ch = chebyquad_start(2);
 
             solve_least_squares(objective_delta_stop_strategy(1e-13, 80),
-                                &chebyquad_residual,
-                                derivative(&chebyquad_residual),
+                                chebyquad_residual,
+                                derivative(chebyquad_residual),
                                 range(0,ch.size()-1),
                                 ch);
 
@@ -92,8 +92,8 @@ namespace
             ch = chebyquad_start(2);
 
             solve_least_squares_lm(objective_delta_stop_strategy(1e-13, 80),
-                                &chebyquad_residual,
-                                derivative(&chebyquad_residual),
+                                chebyquad_residual,
+                                derivative(chebyquad_residual),
                                 range(0,ch.size()-1),
                                 ch);
 
@@ -112,8 +112,8 @@ namespace
             ch = chebyquad_start(4);
 
             solve_least_squares(objective_delta_stop_strategy(1e-13, 80),
-                                &chebyquad_residual,
-                                derivative(&chebyquad_residual),
+                                chebyquad_residual,
+                                derivative(chebyquad_residual),
                                 range(0,ch.size()-1),
                                 ch);
 
@@ -131,8 +131,8 @@ namespace
             ch = chebyquad_start(4);
 
             solve_least_squares_lm(objective_delta_stop_strategy(1e-13, 80),
-                                &chebyquad_residual,
-                                derivative(&chebyquad_residual),
+                                chebyquad_residual,
+                                derivative(chebyquad_residual),
                                 range(0,ch.size()-1),
                                 ch);
 
@@ -152,8 +152,8 @@ namespace
             ch = chebyquad_start(6);
 
             solve_least_squares(objective_delta_stop_strategy(1e-13, 80),
-                                &chebyquad_residual,
-                                derivative(&chebyquad_residual),
+                                chebyquad_residual,
+                                derivative(chebyquad_residual),
                                 range(0,ch.size()-1),
                                 ch);
 
@@ -174,8 +174,8 @@ namespace
             ch = chebyquad_start(6);
 
             solve_least_squares_lm(objective_delta_stop_strategy(1e-13, 80),
-                                &chebyquad_residual,
-                                derivative(&chebyquad_residual),
+                                chebyquad_residual,
+                                derivative(chebyquad_residual),
                                 range(0,ch.size()-1),
                                 ch);
 
@@ -195,8 +195,8 @@ namespace
             ch = chebyquad_start(8);
 
             solve_least_squares(objective_delta_stop_strategy(1e-13, 80),
-                                &chebyquad_residual,
-                                derivative(&chebyquad_residual),
+                                chebyquad_residual,
+                                derivative(chebyquad_residual),
                                 range(0,ch.size()-1),
                                 ch);
 
@@ -214,8 +214,8 @@ namespace
             ch = chebyquad_start(8);
 
             solve_least_squares_lm(objective_delta_stop_strategy(1e-13, 80),
-                                &chebyquad_residual,
-                                derivative(&chebyquad_residual),
+                                chebyquad_residual,
+                                derivative(chebyquad_residual),
                                 range(0,ch.size()-1),
                                 ch);
 
@@ -239,8 +239,8 @@ namespace
             ch = brown_start();
 
             solve_least_squares(objective_delta_stop_strategy(1e-13, 300),
-                                &brown_residual,
-                                derivative(&brown_residual),
+                                brown_residual,
+                                derivative(brown_residual),
                                 range(1,20),
                                 ch);
 
@@ -258,8 +258,8 @@ namespace
             ch = brown_start();
 
             solve_least_squares_lm(objective_delta_stop_strategy(1e-13, 80),
-                                &brown_residual,
-                                derivative(&brown_residual),
+                                brown_residual,
+                                derivative(brown_residual),
                                 range(1,20),
                                 ch);
 
@@ -301,8 +301,8 @@ namespace
             ch = rosen_start<double>();
 
             solve_least_squares(objective_delta_stop_strategy(1e-13, 80),
-                                &rosen_residual_double,
-                                &rosen_residual_derivative_double,
+                                rosen_residual_double,
+                                rosen_residual_derivative_double,
                                 range(1,20),
                                 ch);
 
@@ -319,8 +319,8 @@ namespace
             ch = rosen_start<double>();
 
             solve_least_squares_lm(objective_delta_stop_strategy(1e-13, 80),
-                                &rosen_residual_double,
-                                &rosen_residual_derivative_double,
+                                rosen_residual_double,
+                                rosen_residual_derivative_double,
                                 range(1,20),
                                 ch);
 
@@ -340,8 +340,8 @@ namespace
             ch = rosen_start<double>();
 
             solve_least_squares(objective_delta_stop_strategy(1e-13, 80),
-                                &rosen_residual_double,
-                                derivative(&rosen_residual_double),
+                                rosen_residual_double,
+                                derivative(rosen_residual_double),
                                 range(1,20),
                                 ch);
 
@@ -358,8 +358,8 @@ namespace
             ch = rosen_start<float>();
 
             solve_least_squares(objective_delta_stop_strategy(1e-13, 80),
-                                &rosen_residual_float,
-                                derivative(&rosen_residual_float),
+                                rosen_residual_float,
+                                derivative(rosen_residual_float),
                                 range(1,20),
                                 ch);
 
@@ -376,8 +376,8 @@ namespace
             ch = rosen_start<float>();
 
             solve_least_squares_lm(objective_delta_stop_strategy(1e-13, 80),
-                                &rosen_residual_float,
-                                derivative(&rosen_residual_float),
+                                rosen_residual_float,
+                                derivative(rosen_residual_float),
                                 range(1,20),
                                 ch);
 
@@ -394,8 +394,8 @@ namespace
             ch = rosen_start<double>();
 
             solve_least_squares_lm(objective_delta_stop_strategy(1e-13, 80),
-                                &rosen_residual_double,
-                                derivative(&rosen_residual_double),
+                                rosen_residual_double,
+                                derivative(rosen_residual_double),
                                 range(1,20),
                                 ch);
 
@@ -412,8 +412,8 @@ namespace
             ch = rosen_big_start<double>();
 
             solve_least_squares(objective_delta_stop_strategy(1e-13, 80),
-                                &rosen_big_residual_double,
-                                derivative(&rosen_big_residual_double),
+                                rosen_big_residual_double,
+                                derivative(rosen_big_residual_double),
                                 range(1,2),
                                 ch);
 

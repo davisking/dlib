@@ -175,7 +175,7 @@ int main()
         // the results are similar.  If they are very different then you probably made a 
         // mistake.  So the first thing we do is compare the results at a test point: 
         cout << "Difference between analytic derivative and numerical approximation of derivative: " 
-              << length(derivative(&rosen)(starting_point) - rosen_derivative(starting_point)) << endl;
+              << length(derivative(rosen)(starting_point) - rosen_derivative(starting_point)) << endl;
 
 
         cout << "Find the minimum of the rosen function()" << endl;
@@ -194,7 +194,7 @@ int main()
 
         find_min(bfgs_search_strategy(),  // Use BFGS search algorithm
                  objective_delta_stop_strategy(1e-7), // Stop when the change in rosen() is less than 1e-7
-                 &rosen, &rosen_derivative, starting_point, -1);
+                 rosen, rosen_derivative, starting_point, -1);
         // Once the function ends the starting_point vector will contain the optimum point 
         // of (1,1).
         cout << "rosen solution:\n" << starting_point << endl;
@@ -207,7 +207,7 @@ int main()
         starting_point = -94, 5.2;
         find_min_using_approximate_derivatives(bfgs_search_strategy(),
                                                objective_delta_stop_strategy(1e-7),
-                                               &rosen, starting_point, -1);
+                                               rosen, starting_point, -1);
         // Again the correct minimum point is found and stored in starting_point
         cout << "rosen solution:\n" << starting_point << endl;
 
@@ -222,14 +222,14 @@ int main()
         find_min(lbfgs_search_strategy(10),  // The 10 here is basically a measure of how much memory L-BFGS will use.
                  objective_delta_stop_strategy(1e-7).be_verbose(),  // Adding be_verbose() causes a message to be 
                                                                     // printed for each iteration of optimization.
-                 &rosen, &rosen_derivative, starting_point, -1);
+                 rosen, rosen_derivative, starting_point, -1);
 
         cout << endl << "rosen solution: \n" << starting_point << endl;
 
         starting_point = -94, 5.2;
         find_min_using_approximate_derivatives(lbfgs_search_strategy(10),
                                                objective_delta_stop_strategy(1e-7),
-                                               &rosen, starting_point, -1);
+                                               rosen, starting_point, -1);
         cout << "rosen solution: \n"<< starting_point << endl;
 
 
@@ -237,10 +237,10 @@ int main()
         // In many cases, it is useful if we also provide second derivative information
         // to the optimizers.  Two examples of how we can do that are shown below.  
         starting_point = 0.8, 1.3;
-        find_min(newton_search_strategy(&rosen_hessian),
+        find_min(newton_search_strategy(rosen_hessian),
                  objective_delta_stop_strategy(1e-7),
-                 &rosen,
-                 &rosen_derivative,
+                 rosen,
+                 rosen_derivative,
                  starting_point,
                  -1);
         cout << "rosen solution: \n"<< starting_point << endl;

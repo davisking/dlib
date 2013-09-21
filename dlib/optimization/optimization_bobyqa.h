@@ -3353,14 +3353,6 @@ L210:
         const long max_f_evals
     ) 
     {
-        // You get an error on this line when you pass in a global function to this function.
-        // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.  (This check is here because gcc 4.0
-        // has a bug that causes it to silently corrupt return values from functions that
-        // invoked through a reference)
-        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
-
-
         // check the requirements.  Also split the assert up so that the error message isn't huge.
         DLIB_CASSERT(is_col_vector(x) && is_col_vector(x_lower) && is_col_vector(x_upper) &&
                     x.size() == x_lower.size() && x_lower.size() == x_upper.size() &&

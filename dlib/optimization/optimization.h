@@ -23,13 +23,6 @@ namespace dlib
     class central_differences
     {
     public:
-        // You get an error on this line when you pass in a global function to this function.
-        // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.  (This check is here because gcc 4.0
-        // has a bug that causes it to silently corrupt return values from functions that
-        // invoked through a reference)
-        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
-
         central_differences(const funct& f_, double eps_ = 1e-7) : f(f_), eps(eps_){}
 
         template <typename T>
@@ -100,13 +93,6 @@ namespace dlib
     template <typename funct>
     const central_differences<funct> derivative(const funct& f, double eps) 
     { 
-        // You get an error on this line when you pass in a global function to this function.
-        // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.  (This check is here because gcc 4.0
-        // has a bug that causes it to silently corrupt return values from functions that
-        // invoked through a reference)
-        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
-
         DLIB_ASSERT (
             eps > 0,
             "\tcentral_differences derivative(f,eps)"
@@ -122,13 +108,6 @@ namespace dlib
     class negate_function_object 
     {
     public:
-        // You get an error on this line when you pass in a global function to this function.
-        // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.  (This check is here because gcc 4.0
-        // has a bug that causes it to silently corrupt return values from functions that
-        // invoked through a reference)
-        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
-
         negate_function_object(const funct& f_) : f(f_){}
 
         template <typename T>
@@ -201,14 +180,6 @@ namespace dlib
         double min_f
     )
     {
-        // You get an error on this line when you pass in a global function to this function.
-        // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.  (This check is here because gcc 4.0
-        // has a bug that causes it to silently corrupt return values from functions that
-        // invoked through a reference)
-        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
-        COMPILE_TIME_ASSERT(is_function<funct_der>::value == false);
-
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
         DLIB_ASSERT (
             is_col_vector(x),
@@ -266,14 +237,6 @@ namespace dlib
         double max_f
     )
     {
-        // You get an error on this line when you pass in a global function to this function.
-        // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.  (This check is here because gcc 4.0
-        // has a bug that causes it to silently corrupt return values from functions that
-        // invoked through a reference)
-        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
-        COMPILE_TIME_ASSERT(is_function<funct_der>::value == false);
-
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
         DLIB_ASSERT (
             is_col_vector(x),
@@ -338,13 +301,6 @@ namespace dlib
         double derivative_eps = 1e-7
     )
     {
-        // You get an error on this line when you pass in a global function to this function.
-        // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.  (This check is here because gcc 4.0
-        // has a bug that causes it to silently corrupt return values from functions that
-        // invoked through a reference)
-        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
-
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
         DLIB_ASSERT (
             is_col_vector(x) && derivative_eps > 0,
@@ -405,13 +361,6 @@ namespace dlib
         double derivative_eps = 1e-7
     )
     {
-        // You get an error on this line when you pass in a global function to this function.
-        // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.  (This check is here because gcc 4.0
-        // has a bug that causes it to silently corrupt return values from functions that
-        // invoked through a reference)
-        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
-
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
         DLIB_ASSERT (
             is_col_vector(x) && derivative_eps > 0,

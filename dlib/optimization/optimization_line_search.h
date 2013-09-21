@@ -19,13 +19,6 @@ namespace dlib
     class line_search_funct 
     {
     public:
-        // You get an error on this line when you pass in a global function to this function.
-        // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.  (This check is here because gcc 4.0
-        // has a bug that causes it to silently corrupt return values from functions that
-        // invoked through a reference)
-        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
-
         line_search_funct(const funct& f_, const T& start_, const T& direction_) 
             : f(f_),start(start_), direction(direction_), matrix_r(0), scalar_r(0)
         {}
@@ -77,13 +70,6 @@ namespace dlib
     template <typename funct, typename T>
     const line_search_funct<funct,T> make_line_search_function(const funct& f, const T& start, const T& direction) 
     { 
-        // You get an error on this line when you pass in a global function to this function.
-        // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.  (This check is here because gcc 4.0
-        // has a bug that causes it to silently corrupt return values from functions that
-        // invoked through a reference)
-        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
-
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
         DLIB_ASSERT (
             is_col_vector(start) && is_col_vector(direction) && start.size() == direction.size(),
@@ -102,13 +88,6 @@ namespace dlib
     template <typename funct, typename T>
     const line_search_funct<funct,T> make_line_search_function(const funct& f, const T& start, const T& direction, double& f_out) 
     { 
-        // You get an error on this line when you pass in a global function to this function.
-        // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.  (This check is here because gcc 4.0
-        // has a bug that causes it to silently corrupt return values from functions that
-        // invoked through a reference)
-        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
-
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
         DLIB_ASSERT (
             is_col_vector(start) && is_col_vector(direction) && start.size() == direction.size(),
@@ -127,13 +106,6 @@ namespace dlib
     template <typename funct, typename T>
     const line_search_funct<funct,T> make_line_search_function(const funct& f, const T& start, const T& direction, T& grad_out) 
     { 
-        // You get an error on this line when you pass in a global function to this function.
-        // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.  (This check is here because gcc 4.0
-        // has a bug that causes it to silently corrupt return values from functions that
-        // invoked through a reference)
-        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
-
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
         DLIB_ASSERT (
             is_col_vector(start) && is_col_vector(direction) && start.size() == direction.size(),
@@ -269,14 +241,6 @@ namespace dlib
         unsigned long max_iter 
     )
     {
-        // You get an error on this line when you pass in a global function to this function.
-        // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.  (This check is here because gcc 4.0
-        // has a bug that causes it to silently corrupt return values from functions that
-        // invoked through a reference)
-        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
-        COMPILE_TIME_ASSERT(is_function<funct_der>::value == false);
-
         DLIB_ASSERT (
             0 < rho && rho < sigma && sigma < 1 && max_iter > 0,
             "\tdouble line_search()"
@@ -529,13 +493,6 @@ namespace dlib
         const long max_iter = 100
     )
     {
-        // You get an error on this line when you pass in a global function to this function.
-        // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.  (This check is here because gcc 4.0
-        // has a bug that causes it to silently corrupt return values from functions that
-        // invoked through a reference)
-        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
-
         DLIB_CASSERT( eps > 0 &&
                       max_iter > 1 &&
                       begin <= starting_point && starting_point <= end,
@@ -790,13 +747,6 @@ namespace dlib
         const long max_iter = 100
     )
     {
-        // You get an error on this line when you pass in a global function to this function.
-        // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.  (This check is here because gcc 4.0
-        // has a bug that causes it to silently corrupt return values from functions that
-        // invoked through a reference)
-        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
-
         return -find_min_single_variable(negate_function(f), starting_point, begin, end, eps, max_iter);
     }
 

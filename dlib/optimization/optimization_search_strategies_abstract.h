@@ -313,7 +313,7 @@ namespace dlib
 
     template <typename hessian_funct>
     newton_search_strategy_obj<hessian_funct> newton_search_strategy (
-        const hessian_funct& hessian
+        hessian_funct hessian
     ) { return newton_search_strategy_obj<hessian_funct>(hessian); }
     /*!
         ensures
