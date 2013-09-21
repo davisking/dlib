@@ -100,7 +100,10 @@
          <term file="optimization.html" name="poly_min_extrap"             include="dlib/optimization.h"/>
          <term file="optimization.html" name="lagrange_poly_min_extrap"    include="dlib/optimization.h"/>
          <term file="optimization.html" name="line_search"                 include="dlib/optimization.h"/>
+         <term file="optimization.html" name="backtracking_line_search"    include="dlib/optimization.h"/>
          <term file="optimization.html" name="find_min"                    include="dlib/optimization.h"/>
+         <term file="optimization.html" name="find_min_box_constrained"    include="dlib/optimization.h"/>
+         <term file="optimization.html" name="find_max_box_constrained"    include="dlib/optimization.h"/>
          <term file="optimization.html" name="max_cost_assignment"         include="dlib/optimization.h"/>
          <term link="optimization.html#max_cost_assignment" name="Hungarian Algorithm"         include="dlib/optimization.h"/>
          <term file="optimization.html" name="max_sum_submatrix"           include="dlib/optimization.h"/>
@@ -150,6 +153,7 @@
          <term file="optimization.html" name="objective_delta_stop_strategy"  include="dlib/optimization.h"/>
          <term file="optimization.html" name="gradient_norm_stop_strategy"    include="dlib/optimization.h"/>
          <term file="optimization.html" name="negate_function"                include="dlib/optimization.h"/>
+         <term file="optimization.html" name="clamp_function"                include="dlib/optimization.h"/>
          <term file="optimization.html" name="cg_search_strategy"             include="dlib/optimization.h"/>
          <term file="optimization.html" name="bfgs_search_strategy"           include="dlib/optimization.h"/>
          <term file="optimization.html" name="newton_search_strategy"         include="dlib/optimization.h"/>
