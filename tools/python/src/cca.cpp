@@ -113,6 +113,12 @@ ensures    \n\
       arguments to cca() to influence the accuracy of the reduced rank    \n\
       approximation.  However, the default values should work fine for most    \n\
       problems.    \n\
+    - The dimensions of the output vectors produced by L*#Ltrans or R*#Rtrans are \n\
+      ordered such that the dimensions with the highest correlations come first. \n\
+      That is, after applying the transforms produced by cca() to a set of vectors \n\
+      you will find that dimension 0 has the highest correlation, then dimension 1 \n\
+      has the next highest, and so on.  This also means that the list of estimated \n\
+      correlations returned from cca() will always be listed in decreasing order. \n\
     - This function performs the ridge regression version of Canonical Correlation    \n\
       Analysis when regularization is set to a value > 0.  In particular, larger    \n\
       values indicate the solution should be more heavily regularized.  This can be    \n\
