@@ -567,6 +567,92 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename search_strategy_type,
+        typename stop_strategy_type,
+        typename funct, 
+        typename funct_der, 
+        typename T,
+        typename EXP1,
+        typename EXP2
+        >
+    double find_max_box_constrained (
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        const funct& f, 
+        const funct_der& der, 
+        T& x,
+        const matrix_exp<EXP1>& x_lower,
+        const matrix_exp<EXP2>& x_upper
+    )
+    {
+        // make sure the requires clause is not violated
+        COMPILE_TIME_ASSERT(is_matrix<T>::value);
+        DLIB_ASSERT (
+            is_col_vector(x) && is_col_vector(x_lower) && is_col_vector(x_upper) &&
+            x.size() == x_lower.size() && x.size() == x_upper.size(),
+            "\tdouble find_max_box_constrained()"
+            << "\n\t The inputs to this function must be equal length column vectors."
+            << "\n\t is_col_vector(x):       " << is_col_vector(x)
+            << "\n\t is_col_vector(x_upper): " << is_col_vector(x_upper)
+            << "\n\t is_col_vector(x_upper): " << is_col_vector(x_upper)
+            << "\n\t x.size():               " << x.size()
+            << "\n\t x_lower.size():         " << x_lower.size()
+            << "\n\t x_upper.size():         " << x_upper.size()
+        );
+        DLIB_ASSERT (
+            min(x_upper-x_lower) > 0,
+            "\tdouble find_max_box_constrained()"
+            << "\n\t You have to supply proper box constraints to this function."
+            << "\n\r min(x_upper-x_lower): " << min(x_upper-x_lower)
+        );
+
+        // This function is basically just a copy of find_min_box_constrained() but with - put 
+        // in the right places to flip things around so that it ends up looking for the max
+        // rather than the min.
+
+        T g, s;
+        double f_value = -f(x);
+        g = -der(x);
+
+        DLIB_ASSERT(is_finite(f_value), "The objective function generated non-finite outputs");
+        DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
+
+        // gap_eps determines how close we have to get to a bound constraint before we
+        // start basically dropping it from the optimization and consider it to be an
+        // active constraint.
+        const double gap_eps = 1e-8;
+
+        while(stop_strategy.should_continue_search(x, f_value, g))
+        {
+            s = search_strategy.get_next_direction(x, f_value, zero_bounded_variables(gap_eps, g, x, g, x_lower, x_upper));
+            s = gap_step_assign_bounded_variables(gap_eps, s, x, g, x_lower, x_upper);
+
+            double alpha = backtracking_line_search(
+                        negate_function(make_line_search_function(clamp_function(f,x_lower,x_upper), x, s, f_value)),
+                        f_value,
+                        dot(g,s), // compute gradient for the line search
+                        1, 
+                        search_strategy.get_wolfe_rho(), 
+                        search_strategy.get_max_line_search_iterations());
+
+            // Take the search step indicated by the above line search
+            x = clamp(x + alpha*s, x_lower, x_upper);
+            g = -der(x);
+
+            // Don't forget to negate the output from the line search since it is  from the
+            // unnegated version of f() 
+            f_value *= -1;
+
+            DLIB_ASSERT(is_finite(f_value), "The objective function generated non-finite outputs");
+            DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
+        }
+
+        return -f_value;
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_OPTIMIZATIOn_H_

@@ -943,6 +943,71 @@ namespace
         return unorm;
     }
 
+    template <typename der_funct, typename T>
+    double unconstrained_gradient_magnitude_neg_funct (
+        const der_funct& grad,
+        const T& x,
+        const T& lower,
+        const T& upper
+    )
+    {
+        T g = grad(x);
+
+        double unorm = 0;
+
+        for (long i = 0; i < g.size(); ++i)
+        {
+            if (lower(i) < x(i) && x(i) < upper(i))
+                unorm += g(i)*g(i);
+            else if (x(i) == lower(i) && g(i) > 0)
+                unorm += g(i)*g(i);
+            else if (x(i) == upper(i) && g(i) < 0)
+                unorm += g(i)*g(i);
+        }
+
+        return unorm;
+    }
+
+    template <typename search_strategy_type>
+    double test_bound_solver_neg_rosen (dlib::rand& rnd, search_strategy_type search_strategy)
+    {
+        using namespace dlib::test_functions;
+        print_spinner();
+        matrix<double,2,1> starting_point, lower, upper, x;
+
+
+        // pick random bounds
+        lower = rnd.get_random_gaussian()+1, rnd.get_random_gaussian()+1;
+        upper = rnd.get_random_gaussian()+1, rnd.get_random_gaussian()+1;
+        while (upper(0) < lower(0)) upper(0) = rnd.get_random_gaussian()+1;
+        while (upper(1) < lower(1)) upper(1) = rnd.get_random_gaussian()+1;
+
+        starting_point = rnd.get_random_double()*(upper(0)-lower(0))+lower(0), 
+                       rnd.get_random_double()*(upper(1)-lower(1))+lower(1);
+
+        dlog << LINFO << "lower: "<< trans(lower);
+        dlog << LINFO << "upper: "<< trans(upper);
+        dlog << LINFO << "starting: "<< trans(starting_point);
+
+        x = starting_point;
+        double val = find_max_box_constrained( 
+            search_strategy,
+            objective_delta_stop_strategy(1e-16, 500), 
+            neg_rosen, der_neg_rosen, x,
+            lower,  
+            upper   
+        );
+
+        DLIB_TEST(std::abs(val - neg_rosen(x)) < 1e-14);
+        dlog << LINFO << "neg_rosen solution:\n" << x;
+
+        dlog << LINFO << "neg_rosen gradient: "<< trans(der_neg_rosen(x));
+        const double gradient_residual = unconstrained_gradient_magnitude_neg_funct(der_neg_rosen, x, lower, upper);
+        dlog << LINFO << "gradient_residual: "<< gradient_residual;
+
+        return gradient_residual;
+    }
+
     template <typename search_strategy_type>
     double test_bound_solver_rosen (dlib::rand& rnd, search_strategy_type search_strategy)
     {
@@ -965,7 +1030,7 @@ namespace
         dlog << LINFO << "starting: "<< trans(starting_point);
 
         x = starting_point;
-        find_min_box_constrained( 
+        double val = find_min_box_constrained( 
             search_strategy,
             objective_delta_stop_strategy(1e-16, 500), 
             rosen, der_rosen, x,
@@ -973,6 +1038,7 @@ namespace
             upper   
         );
 
+        DLIB_TEST(std::abs(val - rosen(x)) < 1e-14);
         dlog << LINFO << "rosen solution:\n" << x;
 
         dlog << LINFO << "rosen gradient: "<< trans(der_rosen(x));
@@ -1012,7 +1078,7 @@ namespace
         dlog << LINFO << "starting: "<< trans(starting_point);
 
         x = starting_point;
-        find_min_box_constrained( 
+        double val = find_min_box_constrained( 
             search_strategy,
             objective_delta_stop_strategy(1e-16, 500), 
             brown, brown_derivative, x,
@@ -1020,6 +1086,7 @@ namespace
             upper   
         );
 
+        DLIB_TEST(std::abs(val - brown(x)) < 1e-14);
         dlog << LINFO << "brown solution:\n" << x;
         return unconstrained_gradient_magnitude(brown_derivative, x, lower, upper);
     }
@@ -1027,10 +1094,10 @@ namespace
     template <typename search_strategy_type>
     void test_box_constrained_optimizers(search_strategy_type search_strategy)
     {
-        dlog << LINFO << "test find_min_box_constrained() on rosen";
         dlib::rand rnd;
         running_stats<double> rs;
 
+        dlog << LINFO << "test find_min_box_constrained() on rosen";
         for (int i = 0; i < 1000; ++i)
             rs.add(test_bound_solver_rosen(rnd, search_strategy));
         dlog << LINFO << "mean rosen gradient: " << rs.mean();
@@ -1046,6 +1113,16 @@ namespace
         dlog << LINFO << "max brown gradient:  " << rs.max();
         DLIB_TEST(rs.mean() < 1e-6);
         DLIB_TEST(rs.max() < 1e-4);
+
+        dlog << LINFO << "test find_max_box_constrained() on neg_rosen";
+        rs.clear();
+        for (int i = 0; i < 1000; ++i)
+            rs.add(test_bound_solver_neg_rosen(rnd, search_strategy));
+        dlog << LINFO << "mean neg_rosen gradient: " << rs.mean();
+        dlog << LINFO << "max neg_rosen gradient:  " << rs.max();
+        DLIB_TEST(rs.mean() < 1e-12);
+        DLIB_TEST(rs.max() < 1e-9);
+
     }
 
     void test_poly_min_extract_2nd()

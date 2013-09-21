@@ -332,6 +332,64 @@ namespace dlib
               the box constraints defined by x_lower and x_upper.
     !*/
 
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename search_strategy_type,
+        typename stop_strategy_type,
+        typename funct, 
+        typename funct_der, 
+        typename T,
+        typename EXP1,
+        typename EXP2
+        >
+    double find_max_box_constrained (
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        const funct& f, 
+        const funct_der& der, 
+        T& x,
+        const matrix_exp<EXP1>& x_lower,
+        const matrix_exp<EXP2>& x_upper
+    );
+    /*!
+        requires
+            - search_strategy == an object that defines a search strategy such as one 
+              of the objects from dlib/optimization/optimization_search_strategies_abstract.h
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
+            - f(x) must be a valid expression that evaluates to a double
+            - der(x) must be a valid expression that evaluates to the derivative of f() at x.
+            - is_col_vector(x) == true
+            - is_col_vector(x_lower) == true
+            - is_col_vector(x_upper) == true
+            - x.size() == x_lower.size() == x_upper.size()
+              (i.e. x, x_lower, and x_upper need to all be column vectors of the same dimensionality)
+            - min(x_upper-x_lower) > 0
+              (i.e. x_upper must contain upper bounds relative to x_lower)
+        ensures
+            - Performs a box constrained maximization of the function f() using the given
+              search_strategy and starting from the initial point x.  That is, we try to
+              find the x value that maximizes f(x) but is also within the box constraints 
+              specified by x_lower and x_upper.  That is, we ensure that #x satisfies: 
+                - min(#x - x_lower) >= 0 && min(x_upper - #x) >= 0
+            - This function uses a backtracking line search along with a gradient projection
+              to handle the box constraints.
+            - The function is optimized until stop_strategy decides that an acceptable
+              point has been found. 
+            - #x == the value of x that was found to maximize f() within the given box
+              constraints.
+            - returns f(#x). 
+            - When calling f() and der(), the input passed to them will always be inside
+              the box constraints defined by x_lower and x_upper.
+            - Note that this function solves the maximization problem by converting it 
+              into a minimization problem.  Therefore, the values of f and its derivative
+              reported to the stopping strategy will be negated.  That is, stop_strategy
+              will see -f() and -der().  All this really means is that the status messages
+              from a stopping strategy in verbose mode will display a negated objective
+              value.
+    !*/
+
 }
 
 #endif // DLIB_OPTIMIZATIOn_ABSTRACT_
