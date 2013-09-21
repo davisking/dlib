@@ -521,6 +521,35 @@ namespace dlib
         typename stop_strategy_type,
         typename funct, 
         typename funct_der, 
+        typename T
+        >
+    double find_min_box_constrained (
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        const funct& f, 
+        const funct_der& der, 
+        T& x,
+        double x_lower,
+        double x_upper
+    )
+    {
+        typedef typename T::type scalar_type;
+        return find_min_box_constrained(search_strategy,
+                                        stop_strategy,
+                                        f,
+                                        der,
+                                        x,
+                                        uniform_matrix<scalar_type>(x.size(),1,x_lower),
+                                        uniform_matrix<scalar_type>(x.size(),1,x_upper) );
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename search_strategy_type,
+        typename stop_strategy_type,
+        typename funct, 
+        typename funct_der, 
         typename T,
         typename EXP1,
         typename EXP2
@@ -598,6 +627,35 @@ namespace dlib
         }
 
         return -f_value;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename search_strategy_type,
+        typename stop_strategy_type,
+        typename funct, 
+        typename funct_der, 
+        typename T
+        >
+    double find_max_box_constrained (
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        const funct& f, 
+        const funct_der& der, 
+        T& x,
+        double x_lower,
+        double x_upper
+    )
+    {
+        typedef typename T::type scalar_type;
+        return find_max_box_constrained(search_strategy,
+                                        stop_strategy,
+                                        f,
+                                        der,
+                                        x,
+                                        uniform_matrix<scalar_type>(x.size(),1,x_lower),
+                                        uniform_matrix<scalar_type>(x.size(),1,x_upper) );
     }
 
 // ----------------------------------------------------------------------------------------

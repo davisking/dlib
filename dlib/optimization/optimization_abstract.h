@@ -339,6 +339,43 @@ namespace dlib
         typename stop_strategy_type,
         typename funct, 
         typename funct_der, 
+        typename T
+        >
+    double find_min_box_constrained (
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        const funct& f, 
+        const funct_der& der, 
+        T& x,
+        const double x_lower,
+        const double x_upper
+    );
+    /*!
+        requires
+            - search_strategy == an object that defines a search strategy such as one 
+              of the objects from dlib/optimization/optimization_search_strategies_abstract.h
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
+            - f(x) must be a valid expression that evaluates to a double
+            - der(x) must be a valid expression that evaluates to the derivative of f() at x.
+            - is_col_vector(x) == true
+            - x_lower < x_upper
+        ensures
+            - This function is identical to find_min_box_constrained() as defined above
+              except that it takes x_lower and x_upper as doubles rather than column
+              vectors.  In this case, all variables have the same lower bound of x_lower
+              and similarly have the same upper bound of x_upper.  Therefore, this is just
+              a convenience function for calling find_max_box_constrained() when all
+              variables have the same bound constraints.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename search_strategy_type,
+        typename stop_strategy_type,
+        typename funct, 
+        typename funct_der, 
         typename T,
         typename EXP1,
         typename EXP2
@@ -389,6 +426,45 @@ namespace dlib
               from a stopping strategy in verbose mode will display a negated objective
               value.
     !*/
+
+// ----------------------------------------------------------------------------------------
+    
+    template <
+        typename search_strategy_type,
+        typename stop_strategy_type,
+        typename funct, 
+        typename funct_der, 
+        typename T
+        >
+    double find_max_box_constrained (
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        const funct& f, 
+        const funct_der& der, 
+        T& x,
+        const double x_lower,
+        const double x_upper
+    );
+    /*!
+        requires
+            - search_strategy == an object that defines a search strategy such as one 
+              of the objects from dlib/optimization/optimization_search_strategies_abstract.h
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
+            - f(x) must be a valid expression that evaluates to a double
+            - der(x) must be a valid expression that evaluates to the derivative of f() at x.
+            - is_col_vector(x) == true
+            - x_lower < x_upper
+        ensures
+            - This function is identical to find_max_box_constrained() as defined above
+              except that it takes x_lower and x_upper as doubles rather than column
+              vectors.  In this case, all variables have the same lower bound of x_lower
+              and similarly have the same upper bound of x_upper.  Therefore, this is just
+              a convenience function for calling find_max_box_constrained() when all
+              variables have the same bound constraints.
+    !*/
+
+// ----------------------------------------------------------------------------------------
 
 }
 

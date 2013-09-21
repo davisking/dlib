@@ -1037,6 +1037,14 @@ namespace
             lower = rnd.get_random_double()+1, rnd.get_random_double()+1;
             lower = upper - lower;
         }
+        const bool pick_uniform_bounds = rnd.get_random_double() > 0.9;
+        if (pick_uniform_bounds)
+        {
+            double x = rnd.get_random_gaussian()*2;
+            double y = rnd.get_random_gaussian()*2;
+            lower = min(x,y);
+            upper = max(x,y);
+        }
 
         starting_point = rnd.get_random_double()*(upper(0)-lower(0))+lower(0), 
                        rnd.get_random_double()*(upper(1)-lower(1))+lower(1);
@@ -1046,13 +1054,28 @@ namespace
         dlog << LINFO << "starting: "<< trans(starting_point);
 
         x = starting_point;
-        double val = find_min_box_constrained( 
-            search_strategy,
-            objective_delta_stop_strategy(1e-16, 500), 
-            rosen, der_rosen, x,
-            lower,  
-            upper   
-        );
+        double val;
+        if (!pick_uniform_bounds)
+        {
+            val = find_min_box_constrained( 
+                search_strategy,
+                objective_delta_stop_strategy(1e-16, 500), 
+                rosen, der_rosen, x,
+                lower,  
+                upper   
+            );
+        }
+        else
+        {
+            val = find_min_box_constrained( 
+                search_strategy,
+                objective_delta_stop_strategy(1e-16, 500), 
+                rosen, der_rosen, x,
+                lower(0),  
+                upper(0)   
+            );
+        }
+
 
         DLIB_TEST(std::abs(val - rosen(x)) < 1e-14);
         dlog << LINFO << "rosen solution:\n" << x;
