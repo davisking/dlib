@@ -1111,8 +1111,10 @@ namespace
             rs.add(test_bound_solver_brown(rnd, search_strategy));
         dlog << LINFO << "mean brown gradient: " << rs.mean();
         dlog << LINFO << "max brown gradient:  " << rs.max();
-        DLIB_TEST(rs.mean() < 1e-6);
-        DLIB_TEST(rs.max() < 1e-4);
+        dlog << LINFO << "min brown gradient:  " << rs.min();
+        DLIB_TEST(rs.mean() < 1e-5);
+        DLIB_TEST(rs.max() < 1e-2);
+        DLIB_TEST(rs.min() < 1e-10);
 
         dlog << LINFO << "test find_max_box_constrained() on neg_rosen";
         rs.clear();
