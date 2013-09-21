@@ -80,7 +80,12 @@ namespace dlib
             - The basic segmentation is performed kvals.size() times, each time with the k
               parameter (see segment_image() and the Felzenszwalb paper for details on k)
               set to a different value from kvals.   
-            - All the rectangles output by this function will have an area >= min_size.
+            - When doing the basic segmentations prior to any box merging, we discard all
+              rectangles that have an area < min_size.  Therefore, all outputs and
+              subsequent merged rectangles are built out of rectangles that contain at
+              least min_size pixels.  Note that setting min_size to a smaller value than
+              you might otherwise be interested in using can be useful since it allows a
+              larger number of possible merged boxes to be created.
             - There are max_merging_iterations rounds of neighboring blob merging.
               Therefore, this parameter has some effect on the number of output rectangles
               you get, with larger values of the parameter giving more output rectangles.
