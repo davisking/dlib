@@ -1016,11 +1016,27 @@ namespace
         matrix<double,2,1> starting_point, lower, upper, x;
 
 
-        // pick random bounds
-        lower = rnd.get_random_gaussian()+1, rnd.get_random_gaussian()+1;
-        upper = rnd.get_random_gaussian()+1, rnd.get_random_gaussian()+1;
-        while (upper(0) < lower(0)) upper(0) = rnd.get_random_gaussian()+1;
-        while (upper(1) < lower(1)) upper(1) = rnd.get_random_gaussian()+1;
+        // pick random bounds and sometimes put the upper bound at zero so we can have
+        // a test where the optimal value has a bound active at 0 so make sure this case
+        // works properly.
+        if (rnd.get_random_double() > 0.2)
+        {
+            lower = rnd.get_random_gaussian()+1, rnd.get_random_gaussian()+1;
+            upper = rnd.get_random_gaussian()+1, rnd.get_random_gaussian()+1;
+            while (upper(0) < lower(0)) upper(0) = rnd.get_random_gaussian()+1;
+            while (upper(1) < lower(1)) upper(1) = rnd.get_random_gaussian()+1;
+        }
+        else
+        {
+            upper = 0,0;
+            if (rnd.get_random_double() > 0.5)
+                upper(0) = -rnd.get_random_double();
+            if (rnd.get_random_double() > 0.5)
+                upper(1) = -rnd.get_random_double();
+
+            lower = rnd.get_random_double()+1, rnd.get_random_double()+1;
+            lower = upper - lower;
+        }
 
         starting_point = rnd.get_random_double()*(upper(0)-lower(0))+lower(0), 
                        rnd.get_random_double()*(upper(1)-lower(1))+lower(1);
@@ -1098,7 +1114,7 @@ namespace
         running_stats<double> rs;
 
         dlog << LINFO << "test find_min_box_constrained() on rosen";
-        for (int i = 0; i < 1000; ++i)
+        for (int i = 0; i < 10000; ++i)
             rs.add(test_bound_solver_rosen(rnd, search_strategy));
         dlog << LINFO << "mean rosen gradient: " << rs.mean();
         dlog << LINFO << "max rosen gradient:  " << rs.max();
