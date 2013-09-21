@@ -2,7 +2,9 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 
+#include "optimization_test_functions.h"
 #include <dlib/optimization.h>
+#include <dlib/statistics.h>
 #include <sstream>
 #include <string>
 #include <cstdlib>
@@ -916,6 +918,135 @@ namespace
 
     }
 
+    template <typename der_funct, typename T>
+    double unconstrained_gradient_magnitude (
+        const der_funct& grad,
+        const T& x,
+        const T& lower,
+        const T& upper
+    )
+    {
+        T g = grad(x);
+
+        double unorm = 0;
+
+        for (long i = 0; i < g.size(); ++i)
+        {
+            if (lower(i) < x(i) && x(i) < upper(i))
+                unorm += g(i)*g(i);
+            else if (x(i) == lower(i) && g(i) < 0)
+                unorm += g(i)*g(i);
+            else if (x(i) == upper(i) && g(i) > 0)
+                unorm += g(i)*g(i);
+        }
+
+        return unorm;
+    }
+
+    template <typename search_strategy_type>
+    double test_bound_solver_rosen (dlib::rand& rnd, search_strategy_type search_strategy)
+    {
+        using namespace dlib::test_functions;
+        print_spinner();
+        matrix<double,2,1> starting_point, lower, upper, x;
+
+
+        // pick random bounds
+        lower = rnd.get_random_gaussian()+1, rnd.get_random_gaussian()+1;
+        upper = rnd.get_random_gaussian()+1, rnd.get_random_gaussian()+1;
+        while (upper(0) < lower(0)) upper(0) = rnd.get_random_gaussian()+1;
+        while (upper(1) < lower(1)) upper(1) = rnd.get_random_gaussian()+1;
+
+        starting_point = rnd.get_random_double()*(upper(0)-lower(0))+lower(0), 
+                       rnd.get_random_double()*(upper(1)-lower(1))+lower(1);
+
+        dlog << LINFO << "lower: "<< trans(lower);
+        dlog << LINFO << "upper: "<< trans(upper);
+        dlog << LINFO << "starting: "<< trans(starting_point);
+
+        x = starting_point;
+        find_min_box_constrained( 
+            search_strategy,
+            objective_delta_stop_strategy(1e-16, 500), 
+            rosen, der_rosen, x,
+            lower,  
+            upper   
+        );
+
+        dlog << LINFO << "rosen solution:\n" << x;
+
+        dlog << LINFO << "rosen gradient: "<< trans(der_rosen(x));
+        const double gradient_residual = unconstrained_gradient_magnitude(der_rosen, x, lower, upper);
+        dlog << LINFO << "gradient_residual: "<< gradient_residual;
+
+        return gradient_residual;
+    }
+
+    template <typename search_strategy_type>
+    double test_bound_solver_brown (dlib::rand& rnd, search_strategy_type search_strategy)
+    {
+        using namespace dlib::test_functions;
+        print_spinner();
+        matrix<double,4,1> starting_point(4), lower(4), upper(4), x;
+
+        const matrix<double,0,1> solution = brown_solution();
+
+        // pick random bounds
+        lower = rnd.get_random_gaussian(), rnd.get_random_gaussian(), rnd.get_random_gaussian(), rnd.get_random_gaussian();
+        lower = lower*10 + solution;
+        upper = rnd.get_random_gaussian(), rnd.get_random_gaussian(), rnd.get_random_gaussian(), rnd.get_random_gaussian();
+        upper = upper*10 + solution;
+        for (int i = 0; i < lower.size(); ++i)
+        {
+            if (upper(i) < lower(i)) 
+                swap(upper(i),lower(i));
+        }
+
+        starting_point = rnd.get_random_double()*(upper(0)-lower(0))+lower(0), 
+                       rnd.get_random_double()*(upper(1)-lower(1))+lower(1),
+                       rnd.get_random_double()*(upper(2)-lower(2))+lower(2),
+                       rnd.get_random_double()*(upper(3)-lower(3))+lower(3);
+
+        dlog << LINFO << "lower: "<< trans(lower);
+        dlog << LINFO << "upper: "<< trans(upper);
+        dlog << LINFO << "starting: "<< trans(starting_point);
+
+        x = starting_point;
+        find_min_box_constrained( 
+            search_strategy,
+            objective_delta_stop_strategy(1e-16, 500), 
+            brown, brown_derivative, x,
+            lower,  
+            upper   
+        );
+
+        dlog << LINFO << "brown solution:\n" << x;
+        return unconstrained_gradient_magnitude(brown_derivative, x, lower, upper);
+    }
+
+    template <typename search_strategy_type>
+    void test_box_constrained_optimizers(search_strategy_type search_strategy)
+    {
+        dlog << LINFO << "test find_min_box_constrained() on rosen";
+        dlib::rand rnd;
+        running_stats<double> rs;
+
+        for (int i = 0; i < 1000; ++i)
+            rs.add(test_bound_solver_rosen(rnd, search_strategy));
+        dlog << LINFO << "mean rosen gradient: " << rs.mean();
+        dlog << LINFO << "max rosen gradient:  " << rs.max();
+        DLIB_TEST(rs.mean() < 1e-12);
+        DLIB_TEST(rs.max() < 1e-9);
+
+        dlog << LINFO << "test find_min_box_constrained() on brown";
+        rs.clear();
+        for (int i = 0; i < 1000; ++i)
+            rs.add(test_bound_solver_brown(rnd, search_strategy));
+        dlog << LINFO << "mean brown gradient: " << rs.mean();
+        dlog << LINFO << "max brown gradient:  " << rs.max();
+        DLIB_TEST(rs.mean() < 1e-6);
+        DLIB_TEST(rs.max() < 1e-4);
+    }
 
     void test_poly_min_extract_2nd()
     {
@@ -945,6 +1076,10 @@ namespace
         void perform_test (
         )
         {
+            dlog << LINFO << "test_box_constrained_optimizers(bfgs_search_strategy())";
+            test_box_constrained_optimizers(bfgs_search_strategy());
+            dlog << LINFO << "test_box_constrained_optimizers(lbfgs_search_strategy(5))";
+            test_box_constrained_optimizers(lbfgs_search_strategy(5));
             test_poly_min_extract_2nd();
             optimization_test();
         }
