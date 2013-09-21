@@ -322,7 +322,7 @@ namespace dlib
               specified by x_lower and x_upper.  That is, we ensure that #x satisfies: 
                 - min(#x - x_lower) >= 0 && min(x_upper - #x) >= 0
             - This function uses a backtracking line search along with a gradient projection
-              to handle the box constraints.
+              step to handle the box constraints.
             - The function is optimized until stop_strategy decides that an acceptable
               point has been found. 
             - #x == the value of x that was found to minimize f() within the given box
@@ -374,7 +374,7 @@ namespace dlib
               specified by x_lower and x_upper.  That is, we ensure that #x satisfies: 
                 - min(#x - x_lower) >= 0 && min(x_upper - #x) >= 0
             - This function uses a backtracking line search along with a gradient projection
-              to handle the box constraints.
+              step to handle the box constraints.
             - The function is optimized until stop_strategy decides that an acceptable
               point has been found. 
             - #x == the value of x that was found to maximize f() within the given box
