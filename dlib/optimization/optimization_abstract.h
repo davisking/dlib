@@ -73,15 +73,6 @@ namespace dlib
     template <
         typename funct
         >
-    class negate_function_object;
-    /*!
-        This is a function object that represents the negative of some other
-        function.   
-    !*/
-
-    template <
-        typename funct
-        >
     const negate_function_object<funct> negate_function(
         const funct& f
     );
@@ -91,6 +82,32 @@ namespace dlib
         ensures
             - returns a function that represents the negation of f.  That is,
               the returned function object represents g(x) == -f(x)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct, 
+        typename EXP1, 
+        typename EXP2
+        >
+    clamped_function_object<funct,EXP1,EXP2> clamp_function (
+        const funct& f,
+        const matrix_exp<EXP1>& x_lower,
+        const matrix_exp<EXP2>& x_upper 
+    );
+    /*!
+        requires
+            - f == a function that takes a matrix and returns a scalar value.  Moreover, f
+              must be capable of taking in matrices with the same dimensions as x_lower and
+              x_upper.  So f(x_lower) must be a valid expression that evaluates to a scalar
+              value.
+            - x_lower.nr() == x_upper.nr() && x_lower.nc() == x_upper.nc()
+              (i.e. x_lower and x_upper must have the same dimensions)
+            - x_lower and x_upper must contain the same type of elements.
+        ensures
+            - returns a function object that represents the function g(x) where
+              g(x) == f(clamp(x,x_lower,x_upper))
     !*/
 
 // ----------------------------------------------------------------------------------------

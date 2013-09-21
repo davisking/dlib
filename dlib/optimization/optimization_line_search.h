@@ -463,6 +463,56 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename funct
+        >
+    double backtracking_line_search (
+        const funct& f, 
+        double f0,
+        double d0,
+        double alpha,
+        double rho, 
+        unsigned long max_iter 
+    )
+    {
+        DLIB_ASSERT (
+            0 < rho && rho < 1 && max_iter > 0,
+            "\tdouble backtracking_line_search()"
+            << "\n\tYou have given invalid arguments to this function"
+            << "\n\t rho:      " << rho 
+            << "\n\t max_iter: " << max_iter 
+        );
+
+        // If the gradient is telling us we need to search backwards then that is what we
+        // will do.
+        if (d0 > 0 && alpha > 0)
+            alpha *= -1;
+
+        for (unsigned long iter = 0; iter < max_iter; ++iter)
+        {
+            const double val = f(alpha);
+            if (val <= f0 + alpha*rho*d0)
+            {
+                return alpha;
+            }
+            else
+            {
+                // Interpolate a new alpha.  We also make sure the step by which we
+                // reduce alpha is not super small.
+                double step;
+                if (d0 < 0)
+                    step = put_in_range(0.1,0.9, poly_min_extrap(f0, d0, val));
+                else
+                    step = put_in_range(0.1,0.9, poly_min_extrap(f0, -d0, val));
+
+                alpha *= step;
+            }
+        }
+        return alpha;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class optimize_single_variable_failure : public error {
     public: optimize_single_variable_failure(const std::string& s):error(s){}
     };

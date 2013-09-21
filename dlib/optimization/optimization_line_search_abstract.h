@@ -193,6 +193,38 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename funct
+        >
+    double backtracking_line_search (
+        const funct& f, 
+        double f0,
+        double d0,
+        double alpha,
+        double rho, 
+        unsigned long max_iter 
+    );
+    /*!
+        requires
+            - 0 < rho < 1
+            - f is a scalar function of scalars 
+              (e.g. a line_search_funct object)
+            - f0 == f(0)
+            - d0 == the derivative of f() at f(0). 
+            - max_iter > 0
+        ensures
+            - Performs a backtracking line search and uses the Armijo sufficient decrease
+              rule to decide when the search can stop.
+                - rho == the parameter of the sufficient decrease condition. 
+                - max_iter == the maximum number of iterations allowable.  After this many
+                  evaluations of f() line_search() is guaranteed to terminate.
+            - The line search starts with the input alpha value and then backtracks until
+              it finds a good enough alpha value.  Once found, it returns the alpha value
+              such that f(alpha) is significantly closer to the minimum of f than f(0).
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     class optimize_single_variable_failure : public error;
     /*!
         This is the exception class used by the functions defined below.

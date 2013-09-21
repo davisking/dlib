@@ -145,6 +145,41 @@ namespace dlib
     const negate_function_object<funct> negate_function(const funct& f) { return negate_function_object<funct>(f); }
 
 // ----------------------------------------------------------------------------------------
+
+    template <typename funct, typename EXP1, typename EXP2>
+    struct clamped_function_object
+    {
+        clamped_function_object(
+            const funct& f_,
+            const matrix_exp<EXP1>& x_lower_,
+            const matrix_exp<EXP2>& x_upper_ 
+        ) : f(f_), x_lower(x_lower_), x_upper(x_upper_)
+        {
+        }
+
+        template <typename T>
+        double operator() (
+            const T& x
+        ) const
+        {
+            return f(clamp(x,x_lower,x_upper));
+        }
+        
+        const funct& f;
+        const matrix_exp<EXP1>& x_lower;
+        const matrix_exp<EXP2>& x_upper; 
+    };
+
+    template <typename funct, typename EXP1, typename EXP2>
+    clamped_function_object<funct,EXP1,EXP2> clamp_function(
+        const funct& f,
+        const matrix_exp<EXP1>& x_lower,
+        const matrix_exp<EXP2>& x_upper 
+    ) { return clamped_function_object<funct,EXP1,EXP2>(f,x_lower,x_upper); }
+
+// ----------------------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 //                    Functions that perform unconstrained optimization 
 // ----------------------------------------------------------------------------------------
