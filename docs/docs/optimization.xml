@@ -370,6 +370,8 @@
          <description>
              Performs a box constrained minimization of a nonlinear function using 
              some search strategy (e.g. <a href="#bfgs_search_strategy">bfgs_search_strategy</a>).
+             This function uses a backtracking line search along with a gradient projection
+             step to handle the box constraints.
          </description>
       </component>
 
@@ -918,6 +920,8 @@ However, for graphs with cycles, the solution may be approximate.
          <description>
              Performs a box constrained maximization of a nonlinear function using 
              some search strategy (e.g. <a href="#bfgs_search_strategy">bfgs_search_strategy</a>).
+             This function uses a backtracking line search along with a gradient projection
+             step to handle the box constraints.
          </description>
                                  
       </component>
