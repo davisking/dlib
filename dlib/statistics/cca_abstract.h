@@ -29,10 +29,13 @@ namespace dlib
               row vectors.  In particular, we return a vector COR such that:
                 - COR.size() == L.nc()
                 - for all valid i:
-                    - COR(i) == the correlation coefficient between the following 
-                      sequence of paired numbers: (L(k,i), R(k,i)) for k: 0 <= k < L.nr().
+                    - COR(i) == the correlation coefficient between the following sequence
+                      of paired numbers: (L(k,i), R(k,i)) for k: 0 <= k < L.nr().
                       Therefore, COR(i) is a value between -1 and 1 inclusive where 1
-                      indicates perfect correlation and -1 perfect anti-correlation.
+                      indicates perfect correlation and -1 perfect anti-correlation.  Note
+                      that this function assumes the input data vectors have been centered
+                      (i.e. made to have zero mean).  If this is not the case then it will
+                      report inaccurate results.
     !*/
 
 // ----------------------------------------------------------------------------------------
