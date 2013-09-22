@@ -328,6 +328,7 @@ namespace dlib
             - #x == the value of x that was found to minimize f() within the given box
               constraints.
             - returns f(#x). 
+            - The last call to f() will be made with f(#x).  
             - When calling f() and der(), the input passed to them will always be inside
               the box constraints defined by x_lower and x_upper.
             - When calling der(x), it will always be the case that the last call to f() was
@@ -421,6 +422,7 @@ namespace dlib
             - #x == the value of x that was found to maximize f() within the given box
               constraints.
             - returns f(#x). 
+            - The last call to f() will be made with f(#x).  
             - When calling f() and der(), the input passed to them will always be inside
               the box constraints defined by x_lower and x_upper.
             - When calling der(x), it will always be the case that the last call to f() was
