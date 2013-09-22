@@ -37,7 +37,7 @@ namespace
 
         void funct(int) {}
 
-        float funct_f(int) {}
+        float funct_f(int) { return 0;}
     };
 
     void test_metaprog()
