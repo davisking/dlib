@@ -330,6 +330,10 @@ namespace dlib
             - returns f(#x). 
             - When calling f() and der(), the input passed to them will always be inside
               the box constraints defined by x_lower and x_upper.
+            - When calling der(x), it will always be the case that the last call to f() was
+              made with the same x value.  This means that you can reuse any intermediate
+              results from the previous call to f(x) inside der(x) rather than recomputing
+              them inside der(x).
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -419,6 +423,10 @@ namespace dlib
             - returns f(#x). 
             - When calling f() and der(), the input passed to them will always be inside
               the box constraints defined by x_lower and x_upper.
+            - When calling der(x), it will always be the case that the last call to f() was
+              made with the same x value.  This means that you can reuse any intermediate
+              results from the previous call to f(x) inside der(x) rather than recomputing
+              them inside der(x).
             - Note that this function solves the maximization problem by converting it 
               into a minimization problem.  Therefore, the values of f and its derivative
               reported to the stopping strategy will be negated.  That is, stop_strategy

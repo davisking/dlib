@@ -452,10 +452,12 @@ namespace dlib
         if (d0 > 0 && alpha > 0)
             alpha *= -1;
 
-        for (unsigned long iter = 0; iter < max_iter; ++iter)
+        unsigned long iter = 0;
+        while (true)
         {
+            ++max_iter;
             const double val = f(alpha);
-            if (val <= f0 + alpha*rho*d0)
+            if (val <= f0 + alpha*rho*d0 || iter >= max_iter)
             {
                 return alpha;
             }
@@ -472,7 +474,6 @@ namespace dlib
                 alpha *= step;
             }
         }
-        return alpha;
     }
 
 // ----------------------------------------------------------------------------------------

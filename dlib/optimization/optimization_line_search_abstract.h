@@ -217,10 +217,14 @@ namespace dlib
               rule to decide when the search can stop.
                 - rho == the parameter of the sufficient decrease condition. 
                 - max_iter == the maximum number of iterations allowable.  After this many
-                  evaluations of f() line_search() is guaranteed to terminate.
+                  evaluations of f() backtracking_line_search() is guaranteed to terminate.
             - The line search starts with the input alpha value and then backtracks until
               it finds a good enough alpha value.  Once found, it returns the alpha value
               such that f(alpha) is significantly closer to the minimum of f than f(0).
+            - The returned value of alpha will always be the last value of alpha which was
+              passed to f().  That is, it will always be the case that the last call to f()
+              made by backtracking_line_search() was f(alpha) where alpha is the return
+              value from this function.
     !*/
 
 // ----------------------------------------------------------------------------------------
