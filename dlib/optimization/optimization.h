@@ -456,6 +456,11 @@ namespace dlib
         const matrix_exp<EXP2>& x_upper
     )
     {
+        /*
+            The implementation of this function is more or less based on the discussion in
+            the paper Projected Newton-type Methods in Machine Learning by Mark Schmidt, et al.
+        */
+
         // make sure the requires clause is not violated
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
         DLIB_ASSERT (
