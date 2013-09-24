@@ -162,7 +162,7 @@
          <spec_file link="true">dlib/optimization/optimization_line_search_abstract.h</spec_file>
          <description>
             This function finds the 2nd or 3rd degree polynomial that interpolates a 
-            pair of points and returns you the minimum of that polynomial.
+            set of points and returns the minimum of that polynomial.
          </description>
                                  
       </component>
@@ -175,7 +175,7 @@
          <spec_file link="true">dlib/optimization/optimization_line_search_abstract.h</spec_file>
          <description>
             This function finds the second order polynomial that interpolates a 
-            set of points and returns you the minimum of that polynomial.
+            set of points and returns the minimum of that polynomial.
          </description>
                                  
       </component>
