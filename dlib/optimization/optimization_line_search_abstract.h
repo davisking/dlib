@@ -121,6 +121,28 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline double poly_min_extrap (
+        double f0,
+        double d0,
+        double x1,
+        double f_x1,
+        double x2,
+        double f_x2
+    )
+    /*!
+        requires
+            - 0 < x1 < x2
+        ensures
+            - let f(x) be a 3rd degree polynomial such that:
+                - f(0) == f0
+                - derivative of f(x) at x==0 is d0
+                - f(x1) == f_x1
+                - f(x2) == f_x2
+            - returns the point in the range [0,x2] that minimizes the polynomial f(x) 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     inline double lagrange_poly_min_extrap (
         double p1, 
         double p2,

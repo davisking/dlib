@@ -185,6 +185,57 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline double poly_min_extrap (
+        double f0,
+        double d0,
+        double x1,
+        double f_x1,
+        double x2,
+        double f_x2
+    )
+    {
+        DLIB_ASSERT(0 < x1 && x1 < x2,"Invalid inputs were given to this function");
+        // The contents of this function follow the equations described on page 58 of the
+        // book Numerical Optimization by Nocedal and Wright, second edition.
+        matrix<double,2,2> m;
+        matrix<double,2,1> v;
+
+        const double aa2 = x2*x2;
+        const double aa1 = x1*x1;
+        m =  aa2,       -aa1,
+            -aa2*x2, aa1*x1;   
+        v = f_x1 - f0 - d0*x1,
+            f_x2 - f0 - d0*x2;
+
+
+        double temp = aa2*aa1*(x1-x2);
+
+        // just take a guess if this happens
+        if (temp == 0)
+        {
+            return x1/2.0;
+        }
+
+        matrix<double,2,1> temp2;
+        temp2 = m*v/temp;
+        const double a = temp2(0);
+        const double b = temp2(1);
+
+        temp = b*b - 3*a*d0;
+        if (temp < 0 || a == 0)
+        {
+            // This is probably a line so just pick the lowest point
+            if (f0 < f_x2)
+                return 0;
+            else
+                return x2;
+        }
+        temp = (-b + std::sqrt(temp))/(3*a);
+        return put_in_range(0, x2, temp);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     inline double lagrange_poly_min_extrap (
         double p1, 
         double p2,
@@ -447,11 +498,17 @@ namespace dlib
             << "\n\t max_iter: " << max_iter 
         );
 
-        // If the gradient is telling us we need to search backwards then that is what we
-        // will do.
-        if (d0 > 0 && alpha > 0)
+        // make sure alpha is going in the right direction.  That is, it should be opposite
+        // the direction of the gradient.
+        if ((d0 > 0 && alpha > 0) ||
+            (d0 < 0 && alpha < 0))
+        {
             alpha *= -1;
+        }
 
+        bool have_prev_alpha = false;
+        double prev_alpha = 0;
+        double prev_val = 0;
         unsigned long iter = 0;
         while (true)
         {
@@ -466,12 +523,26 @@ namespace dlib
                 // Interpolate a new alpha.  We also make sure the step by which we
                 // reduce alpha is not super small.
                 double step;
-                if (d0 < 0)
-                    step = put_in_range(0.1,0.9, poly_min_extrap(f0, d0, val));
+                if (!have_prev_alpha)
+                {
+                    if (d0 < 0)
+                        step = alpha*put_in_range(0.1,0.9, poly_min_extrap(f0, d0, val));
+                    else
+                        step = alpha*put_in_range(0.1,0.9, poly_min_extrap(f0, -d0, val));
+                    have_prev_alpha = true;
+                }
                 else
-                    step = put_in_range(0.1,0.9, poly_min_extrap(f0, -d0, val));
+                {
+                    if (d0 < 0)
+                        step = put_in_range(0.1*alpha,0.9*alpha, poly_min_extrap(f0, d0, alpha, val, prev_alpha, prev_val));
+                    else
+                        step = put_in_range(0.1*alpha,0.9*alpha, -poly_min_extrap(f0, -d0, -alpha, val, -prev_alpha, prev_val));
+                }
 
-                alpha *= step;
+                prev_alpha = alpha;
+                prev_val = val;
+
+                alpha = step;
             }
         }
     }
