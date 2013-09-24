@@ -495,6 +495,7 @@ namespace dlib
         // active constraint.
         const double gap_eps = 1e-8;
 
+        double last_alpha = 1;
         while(stop_strategy.should_continue_search(x, f_value, g))
         {
             s = search_strategy.get_next_direction(x, f_value, zero_bounded_variables(gap_eps, g, x, g, x_lower, x_upper));
@@ -504,9 +505,18 @@ namespace dlib
                         make_line_search_function(clamp_function(f,x_lower,x_upper), x, s, f_value),
                         f_value,
                         dot(g,s), // compute gradient for the line search
-                        1, 
+                        last_alpha, 
                         search_strategy.get_wolfe_rho(), 
                         search_strategy.get_max_line_search_iterations());
+
+            // Do a trust region style thing for alpha.  The idea is that if we take a
+            // small step then we are likely to take another small step.  So we reuse the
+            // alpha from the last iteration unless the line search didn't shrink alpha at
+            // all, in that case, we start with a bigger alpha next time.
+            if (alpha == last_alpha)
+                last_alpha = std::min(last_alpha*10,1.0);
+            else
+                last_alpha = alpha;
 
             // Take the search step indicated by the above line search
             x = clamp(x + alpha*s, x_lower, x_upper);
@@ -606,6 +616,7 @@ namespace dlib
         // active constraint.
         const double gap_eps = 1e-8;
 
+        double last_alpha = 1;
         while(stop_strategy.should_continue_search(x, f_value, g))
         {
             s = search_strategy.get_next_direction(x, f_value, zero_bounded_variables(gap_eps, g, x, g, x_lower, x_upper));
@@ -615,9 +626,18 @@ namespace dlib
                         negate_function(make_line_search_function(clamp_function(f,x_lower,x_upper), x, s, f_value)),
                         f_value,
                         dot(g,s), // compute gradient for the line search
-                        1, 
+                        last_alpha, 
                         search_strategy.get_wolfe_rho(), 
                         search_strategy.get_max_line_search_iterations());
+
+            // Do a trust region style thing for alpha.  The idea is that if we take a
+            // small step then we are likely to take another small step.  So we reuse the
+            // alpha from the last iteration unless the line search didn't shrink alpha at
+            // all, in that case, we start with a bigger alpha next time.
+            if (alpha == last_alpha)
+                last_alpha = std::min(last_alpha*10,1.0);
+            else
+                last_alpha = alpha;
 
             // Take the search step indicated by the above line search
             x = clamp(x + alpha*s, x_lower, x_upper);
