@@ -148,6 +148,7 @@
                   <li>A large-scale <a href="ml.html#svm_rank_trainer">SVM-Rank</a> implementation</li>
                   <li>An online <a href="ml.html#krls">kernel RLS regression</a> algorithm</li>
                   <li>An online <a href="ml.html#svm_pegasos">SVM classification</a> algorithm</li>
+                  <li><a href="ml.html#vector_normalizer_frobmetric">Semidefinite Metric Learning</a></li>
                   <li>An online kernelized <a href="ml.html#kcentroid">centroid estimator</a>/novelty detector and
                      offline support vector <a href="ml.html#svm_one_class_trainer">one-class classification</a></li>
                   <li>Clustering algorithms: <a href="ml.html#find_clusters_using_kmeans">linear</a> 
