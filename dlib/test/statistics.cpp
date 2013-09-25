@@ -573,9 +573,133 @@ namespace
             DLIB_TEST(std::abs(average_precision(items,1) - (2.0 + 4.0/5.0 + 4.0/5.0)/5.0) < 1e-14);
         }
 
+
+        template <typename sample_type>
+        void check_distance_metrics (
+            const std::vector<frobmetric_training_sample<sample_type> >& samples
+        )
+        {
+            running_stats<double> rs;
+            for (unsigned long i = 0; i < samples.size(); ++i)
+            {
+                for (unsigned long j = 0; j < samples[i].near.size(); ++j)
+                {
+                    const double d1 = length_squared(samples[i].anchor - samples[i].near[j]);
+                    for (unsigned long k = 0; k < samples[i].far.size(); ++k)
+                    {
+                        const double d2 = length_squared(samples[i].anchor - samples[i].far[k]);
+                        rs.add(d2-d1);
+                    }
+                }
+            }
+
+            dlog << LINFO << "dist gap max:    "<< rs.max();
+            dlog << LINFO << "dist gap min:    "<< rs.min();
+            dlog << LINFO << "dist gap mean:   "<< rs.mean();
+            dlog << LINFO << "dist gap stddev: "<< rs.stddev();
+            DLIB_TEST(rs.min() >= 0.99);
+            DLIB_TEST(rs.mean() >= 0.9999);
+        }
+
+        void test_vector_normalizer_frobmetric(dlib::rand& rnd)
+        { 
+            print_spinner();
+            typedef matrix<double,0,1> sample_type;
+            vector_normalizer_frobmetric<sample_type> normalizer;
+
+            std::vector<frobmetric_training_sample<sample_type> > samples;
+            frobmetric_training_sample<sample_type> samp;
+
+            const long key = 1;
+            const long dims = 5;
+            // Lets make some two class training data.  Each sample will have dims dimensions but
+            // only the one with index equal to key will be meaningful.  In particular, if the key
+            // dimension is > 0 then the sample is class +1 and -1 otherwise.  
+
+            long k = 0;
+            for (int i = 0; i < 50; ++i)
+            {
+                samp.clear();
+                samp.anchor = gaussian_randm(dims,1,k++);
+                if (samp.anchor(key) > 0)
+                    samp.anchor(key) = rnd.get_random_double() + 5;
+                else
+                    samp.anchor(key) = -(rnd.get_random_double() + 5);
+
+                matrix<double,0,1> temp;
+
+                for (int j = 0; j < 5; ++j)
+                {
+                    // Don't always put an equal number of near and far vectors into the
+                    // training samples.
+                    const int numa = rnd.get_random_32bit_number()%2 + 1;
+                    const int numb = rnd.get_random_32bit_number()%2 + 1;
+
+                    for (int num = 0; num < numa; ++num)
+                    {
+                        temp = gaussian_randm(dims,1,k++); temp(key) = 0.1;
+                        //temp = gaussian_randm(dims,1,k++); temp(key) = std::abs(temp(key));
+                        if (samp.anchor(key) > 0) samp.near.push_back(temp);
+                        else                    samp.far.push_back(temp);
+                    }
+
+                    for (int num = 0; num < numb; ++num)
+                    {
+                        temp = gaussian_randm(dims,1,k++); temp(key) = -0.1;
+                        //temp = gaussian_randm(dims,1,k++); temp(key) = -std::abs(temp(key));
+                        if (samp.anchor(key) < 0) samp.near.push_back(temp);
+                        else                    samp.far.push_back(temp);
+                    }
+                }
+                samples.push_back(samp);
+            }
+
+            normalizer.set_epsilon(0.0001);
+            normalizer.set_c(100);
+            normalizer.set_max_iterations(6000);
+            normalizer.train(samples);
+
+            dlog << LINFO << "learned transform: \n" << normalizer.transform();
+
+            matrix<double,0,1> total;
+
+            for (unsigned long i = 0; i < samples.size(); ++i)
+            {
+                samples[i].anchor = normalizer(samples[i].anchor);
+                total += samples[i].anchor;
+                for (unsigned long j = 0; j < samples[i].near.size(); ++j)
+                    samples[i].near[j] = normalizer(samples[i].near[j]);
+                for (unsigned long j = 0; j < samples[i].far.size(); ++j)
+                    samples[i].far[j] = normalizer(samples[i].far[j]);
+            }
+            total /= samples.size();
+            dlog << LINFO << "sample transformed means: "<< trans(total);
+            DLIB_TEST(length(total) < 1e-9);
+            check_distance_metrics(samples);
+
+            // make sure serialization works
+            stringstream os;
+            serialize(normalizer, os);
+            vector_normalizer_frobmetric<sample_type> normalizer2;
+            deserialize(normalizer2, os);
+            DLIB_TEST(equal(normalizer.transform(), normalizer2.transform()));
+            DLIB_TEST(equal(normalizer.transformed_means(), normalizer2.transformed_means()));
+            DLIB_TEST(normalizer.in_vector_size() == normalizer2.in_vector_size());
+            DLIB_TEST(normalizer.out_vector_size() == normalizer2.out_vector_size());
+            DLIB_TEST(normalizer.get_max_iterations() == normalizer2.get_max_iterations());
+            DLIB_TEST(std::abs(normalizer.get_c() - normalizer2.get_c()) < 1e-14);
+            DLIB_TEST(std::abs(normalizer.get_epsilon() - normalizer2.get_epsilon()) < 1e-14);
+
+        }
+
+
         void perform_test (
         )
         {
+            dlib::rand rnd;
+            for (int i = 0; i < 5; ++i)
+                test_vector_normalizer_frobmetric(rnd);
+
             test_random_subset_selector();
             test_random_subset_selector2();
             test_running_covariance();
