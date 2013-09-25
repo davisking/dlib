@@ -61,7 +61,6 @@ namespace dlib
             INITIAL VALUE
                 - in_vector_size() == 0
                 - out_vector_size() == 0
-                - means().size() == 0
                 - get_epsilon() == 0.1
                 - get_c() == 1
                 - get_max_iterations() == 5000
