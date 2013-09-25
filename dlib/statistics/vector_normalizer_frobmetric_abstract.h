@@ -3,9 +3,7 @@
 #undef DLIB_VECTOR_NORMALIZER_FRoBMETRIC_ABSTRACT_H__
 #ifdef DLIB_VECTOR_NORMALIZER_FRoBMETRIC_ABSTRACT_H__
 
-#include "vector_normalizer_frobmetric_abstract.h"
 #include "../matrix.h"
-#include "../optimization.h"
 
 namespace dlib
 {
