@@ -382,6 +382,8 @@
          <term file="ml.html" name="sort_basis_vectors"                             include="dlib/svm.h"/>
          <term file="ml.html" name="rank_unlabeled_training_samples"                include="dlib/svm.h"/>
          <term file="ml.html" name="vector_normalizer"                              include="dlib/statistics.h"/>
+         <term file="ml.html" name="vector_normalizer_frobmetric"                   include="dlib/statistics.h"/>
+         <term file="ml.html" name="frobmetric_training_sample"                     include="dlib/statistics.h"/>
          <term file="ml.html" name="vector_normalizer_pca"                          include="dlib/statistics.h"/>
          <term file="ml.html" name="discriminant_pca"                               include="dlib/statistics.h"/>
          <term file="ml.html" name="sammon_projection"                              include="dlib/statistics.h"/>

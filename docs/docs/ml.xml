@@ -125,9 +125,10 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>cca</item> 
       </section>
       <section>
-         <name>Semi-Supervised</name>
+         <name>Semi-Supervised/Metric Learning</name>
          <item>linear_manifold_regularizer</item>
          <item>discriminant_pca</item> 
+         <item>vector_normalizer_frobmetric</item> 
       </section>
       <section>
          <name>Feature Selection</name>
@@ -576,6 +577,30 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
       
    <!-- ************************************************************************* -->
 
+      <component>
+         <name>vector_normalizer_frobmetric</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/vector_normalizer_frobmetric_abstract.h</spec_file>
+         <description>
+                This object is a tool for performing the FrobMetric distance metric
+                learning algorithm described in the following paper:
+                <blockquote>
+                    A Scalable Dual Approach to Semidefinite Metric Learning
+                    By Chunhua Shen, Junae Kim, Lei Wang, in CVPR 2011
+                </blockquote>
+                Therefore, this object is a tool that takes as input training triplets
+                (anchor, near, far) of vectors and attempts to learn a linear
+                transformation T such that:
+                <blockquote> <tt>length(T*anchor-T*near) + 1 &lt; length(T*anchor - T*far)</tt> </blockquote>
+                That is, you give a bunch of anchor vectors and for each anchor vector you
+                specify some vectors which should be near to it and some that should be far
+                form it.  This object then tries to find a transformation matrix that makes
+                the "near" vectors close to their anchors while the "far" vectors are
+                farther away.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
       
       <component>
          <name>discriminant_pca</name>
