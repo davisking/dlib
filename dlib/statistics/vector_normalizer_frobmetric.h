@@ -153,14 +153,15 @@ namespace dlib
             custom_stop_strategy(
                 double C_,
                 double eps_,
-                bool be_verbose_
+                bool be_verbose_,
+                unsigned long max_iter_
             ) 
             {
                 _C = C_;
 
                 _cur_iter = 0;
                 _gradient_thresh = eps_;
-                _max_iter = 1000;
+                _max_iter = max_iter_;
                 _verbose = be_verbose_;
             }
 
@@ -217,6 +218,7 @@ namespace dlib
             verbose = false;
             eps = 0.1;
             C = 1;
+            max_iter = 5000;
         }
 
         void be_verbose(
@@ -257,6 +259,19 @@ namespace dlib
                 );
 
             C = C_;
+        }
+
+        void set_max_iterations (
+            unsigned long max_iterations
+        )
+        {
+            max_iter = max_iterations;
+        }
+
+        unsigned long get_max_iterations (
+        ) const
+        {
+            return max_iter;
         }
 
         double get_c (
@@ -388,7 +403,7 @@ namespace dlib
             // Now run the main part of the algorithm
             matrix<double,0,0,mem_manager_type> Aminus;
             find_max_box_constrained(lbfgs_search_strategy(10),
-                                     custom_stop_strategy(C, eps, verbose),
+                                     custom_stop_strategy(C, eps, verbose, max_iter),
                                      objective(data, Aminus),
                                      derivative(num_triples, data, Aminus),
                                      u, 0, C/num_triples);
@@ -476,6 +491,7 @@ namespace dlib
         bool verbose;
         double eps;
         double C;
+        unsigned long max_iter;
 
         // This is just a temporary variable that doesn't contribute to the
         // state of this object.
@@ -500,6 +516,7 @@ namespace dlib
         serialize(item.verbose, out);
         serialize(item.eps, out);
         serialize(item.C, out);
+        serialize(item.max_iter, out);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -522,6 +539,7 @@ namespace dlib
         deserialize(item.verbose, in);
         deserialize(item.eps, in);
         deserialize(item.C, in);
+        deserialize(item.max_iter, in);
     }
 
 // ----------------------------------------------------------------------------------------

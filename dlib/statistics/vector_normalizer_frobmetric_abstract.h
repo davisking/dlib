@@ -66,6 +66,7 @@ namespace dlib
                 - means().size() == 0
                 - get_epsilon() == 0.1
                 - get_c() == 1
+                - get_max_iterations() == 5000
                 - This object is not verbose
 
             WHAT THIS OBJECT REPRESENTS
@@ -159,6 +160,25 @@ namespace dlib
                   smaller values of C may encourage better generalization. 
         !*/
        
+        void set_max_iterations (
+            unsigned long max_iterations
+        );
+        /*!
+            ensures
+                - #get_max_iterations() == max_iterations
+        !*/
+
+        unsigned long get_max_iterations (
+        ) const;
+        /*!
+            ensures
+                - The train() routine uses an iterative numerical solver to find the best
+                  distance metric.  This function returns the maximum allowable number of
+                  iterations it will use before terminating.  Note that typically the
+                  solver terminates prior to the max iteration count limit due to the error
+                  dropping below get_epsilon().
+        !*/
+
         void train (
             const std::vector<frobmetric_training_sample<matrix_type> >& samples
         );
