@@ -23,7 +23,6 @@ namespace dlib
                 - nc_ == 0 
                 - nr_ == 0 
                 - data == 0 
-                - rows == 0
                 - at_start_ == true
                 - cur == 0
                 - last == 0
@@ -34,15 +33,10 @@ namespace dlib
                 - if (data != 0) then
                     - last == a pointer to the last element in the data array
                     - data == pointer to an array of nc_*nr_ T objects 
-                    - rows == pointer to an array of nr_ row objects
-                    - for all x < nr_:
-                        - rows[x].data == data + x*nc_
-                        - rows[x].nc_ == nc_
                 - else
                     - nc_ == 0
                     - nr_ == 0
                     - data == 0
-                    - rows == 0
                     - last == 0
 
 
@@ -119,13 +113,14 @@ namespace dlib
 
         private:
 
-            long nc_;
+            row(T* data_, long nc__) : data(data_), nc_(nc__) {}
+
             T* data; 
+            long nc_;
 
 
             // restricted functions
             row(){}
-            row(row&);
             row& operator=(row&);
         };
 
@@ -133,10 +128,9 @@ namespace dlib
 
         array2d (
         ) : 
+            data(0),
             nc_(0),
             nr_(0),
-            rows(0),
-            data(0),
             cur(0),
             last(0),
             at_start_(true)
@@ -147,10 +141,9 @@ namespace dlib
             long nr__,
             long nc__
         ) : 
+            data(0),
             nc_(0),
             nr_(0),
-            rows(0),
-            data(0),
             cur(0),
             last(0),
             at_start_(true)
@@ -177,36 +170,36 @@ namespace dlib
         long nr (
         ) const { return nr_; }
 
-        row& operator[] (
-            long row
+        row operator[] (
+            long row_
         ) 
         { 
             // make sure requires clause is not broken
-            DLIB_ASSERT(row < nr() && row >= 0,
-                "\trow& array2d::operator[](long row)"
+            DLIB_ASSERT(row_ < nr() && row_ >= 0,
+                "\trow array2d::operator[](long row_)"
                 << "\n\tThe row index given must be less than the number of rows."
                 << "\n\tthis:     " << this
-                << "\n\trow:      " << row 
+                << "\n\trow_:      " << row_ 
                 << "\n\tnr(): " << nr()
                 );
 
-            return rows[row]; 
+            return row(data+row_*nc_, nc_);
         }
 
-        const row& operator[] (
-            long row
+        const row operator[] (
+            long row_
         ) const 
         { 
             // make sure requires clause is not broken
-            DLIB_ASSERT(row < nr() && row >= 0,
-                "\tconst row& array2d::operator[](long row) const"
+            DLIB_ASSERT(row_ < nr() && row_ >= 0,
+                "\tconst row array2d::operator[](long row_) const"
                 << "\n\tThe row index given must be less than the number of rows."
                 << "\n\tthis:     " << this
-                << "\n\trow:      " << row 
+                << "\n\trow_:      " << row_ 
                 << "\n\tnr(): " << nr()
             );
 
-            return rows[row]; 
+            return row(data+row_*nc_, nc_);
         }
 
         void swap (
@@ -214,14 +207,12 @@ namespace dlib
         )
         {
             exchange(data,item.data);
-            exchange(rows,item.rows);
             exchange(nr_,item.nr_);
             exchange(nc_,item.nc_);
             exchange(at_start_,item.at_start_);
             exchange(cur,item.cur);
             exchange(last,item.last);
             pool.swap(item.pool);
-            rpool.swap(item.rpool);
         }
 
         void clear (
@@ -229,11 +220,9 @@ namespace dlib
         {
             if (data != 0)
             {
-                rpool.deallocate_array(reinterpret_cast<row_helper*>(rows));
                 pool.deallocate_array(data);
                 nc_ = 0;
                 nr_ = 0;
-                rows = 0;
                 data = 0;
                 at_start_ = true;
                 cur = 0;
@@ -317,20 +306,12 @@ namespace dlib
 
     private:
 
-        // this object exists just so we can have a row type object that
-        // has a public default constructor so the memory_manager can construct it.
-        // I would have made rpool a friend of row but some compilers can't handle 
-        // that without crapping out.
-        class row_helper : public row {};
 
-        typename mem_manager::template rebind<T>::other pool;
-        typename mem_manager::template rebind<row_helper>::other rpool;
-
+        T* data;
         long nc_;
         long nr_;
-        row* rows;
-        T* data;
 
+        typename mem_manager::template rebind<T>::other pool;
         mutable T* cur;
         T* last;
         mutable bool at_start_;
@@ -464,9 +445,7 @@ namespace dlib
         if (data != 0)
         {
             pool.deallocate_array(data);
-            rpool.deallocate_array(reinterpret_cast<row_helper*>(rows));
             data = 0;
-            rows = 0;
         }
 
         // now setup this object to have the new size
@@ -474,31 +453,20 @@ namespace dlib
         {
             if (nr_ > 0)
             {
-                rows = rpool.allocate_array(nr_);
                 data = pool.allocate_array(nr_*nc_);
                 last = data + nr_*nc_ - 1;
             }
         }
         catch (...)
         {
-            if (rows)
-                rpool.deallocate_array(reinterpret_cast<row_helper*>(rows));
             if (data)
                 pool.deallocate_array(data);
 
-            rows = 0;
             data = 0;
             nc_ = 0;
             nr_ = 0;
             last = 0;
             throw;
-        }
-
-        // now set up all the rows
-        for (long i = 0; i < nr_; ++i)
-        {
-            rows[i].nc_ = nc_;
-            rows[i].data = data + i*nc_;
         }
     }
 
