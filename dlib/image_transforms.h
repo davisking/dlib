@@ -16,6 +16,7 @@
 #include "image_transforms/colormaps.h"
 #include "image_transforms/segment_image.h"
 #include "image_transforms/interpolation.h"
+#include "image_transforms/fhog.h"
 
 #endif // DLIB_IMAGE_TRANSFORMs_
 
