@@ -1245,6 +1245,10 @@
          <term file="imaging.html" name="compute_dominant_angle"  include="dlib/image_keypoint.h"/>
          <term file="imaging.html" name="draw_surf_points"        include="dlib/image_keypoint/draw_surf_points.h"/>
          <term file="imaging.html" name="compute_surf_descriptor" include="dlib/image_keypoint.h"/>
+         <term file="imaging.html" name="extract_fhog_features"   include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="draw_fhog"               include="dlib/image_transforms.h"/>
+         <term file="dlib/image_transforms/fhog_abstract.h.html"  name="fhog_to_image" include="dlib/image_transforms.h"/>
+         <term file="dlib/image_transforms/fhog_abstract.h.html"  name="image_to_fhog" include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="hog_image"               include="dlib/image_keypoint.h"/>
          <term file="imaging.html" name="fine_hog_image"          include="dlib/image_keypoint.h"/>
          <term file="imaging.html" name="poly_image"              include="dlib/image_keypoint.h"/>

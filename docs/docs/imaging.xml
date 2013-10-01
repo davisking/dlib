@@ -125,6 +125,7 @@
          </item>
 
          <item>hog_image</item>
+         <item>extract_fhog_features</item>
          <item>fine_hog_image</item>
          <item>poly_image</item>
          <item>hashed_feature_image</item>
@@ -205,6 +206,7 @@
          <item>toMat</item>
 
          <item>draw_line</item> 
+         <item>draw_fhog</item> 
          <item>fill_rect</item> 
          <item>assign_image</item> 
          <item>assign_image_scaled</item> 
@@ -376,6 +378,26 @@
             <example>object_detector_ex.cpp.html</example>
             <example>train_object_detector.cpp.html</example>
          </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>extract_fhog_features</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/fhog_abstract.h</spec_file>
+         <description>
+              This function implements the HOG feature extraction method described in 
+              the paper:
+                <blockquote>
+                  Object Detection with Discriminatively Trained Part Based Models by
+                  P. Felzenszwalb, R. Girshick, D. McAllester, D. Ramanan
+                  in IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 32, No. 9, Sep. 2010
+                </blockquote>
+              This means that it takes an input image and outputs Felzenszwalb's
+              31 dimensional version of HOG features.
+         </description>
                                  
       </component>
 
@@ -975,6 +997,23 @@
          <spec_file link="true">dlib/image_transforms/draw_abstract.h</spec_file>
          <description>        
             This global function draws a line on an image.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>draw_fhog</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/fhog_abstract.h</spec_file>
+         <description>        
+            This function takes a FHOG feature map which was created by 
+            <a href="#extract_fhog_features">extract_fhog_features</a> and
+              converts it into an image suitable for display on the screen.  In
+              particular, we draw all the hog cells into a grayscale image in a
+              way that shows the magnitude and orientation of the gradient
+              energy in each cell.  
          </description>
                                  
       </component>
