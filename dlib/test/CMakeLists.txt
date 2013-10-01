@@ -45,6 +45,7 @@ set (tests
    entropy_encoder_model.cpp
    example_args.cpp
    fft.cpp
+   fhog.cpp
    filtering.cpp
    find_max_factor_graph_nmplp.cpp
    find_max_factor_graph_viterbi.cpp
