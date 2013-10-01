@@ -36,7 +36,7 @@ namespace dlib
                 P. Felzenszwalb, R. Girshick, D. McAllester, D. Ramanan
                 IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 32, No. 9, Sep. 2010
               This means that it takes an input image img and outputs Felzenszwalb's
-              version of the HOG features, which are stored into #hog.
+              31 dimensional version of HOG features, which are stored into #hog.
             - The input image is broken into cells that are cell_size by cell_size pixels
               and within each cell we compute a 31 dimensional FHOG vector.  This vector
               describes the gradient structure within the cell.  
