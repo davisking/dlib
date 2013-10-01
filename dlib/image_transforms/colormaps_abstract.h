@@ -21,7 +21,8 @@ namespace dlib
     );
     /*!
         requires
-            - image_type is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type is an implementation of array2d/array2d_kernel_abstract.h, a
+              dlib::matrix, or something convertible to a matrix via mat().
             - pixel_traits<image_type::type> must be defined
         ensures
             - randomly generates a mapping from gray level pixel values
@@ -45,7 +46,8 @@ namespace dlib
     );
     /*!
         requires
-            - image_type is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type is an implementation of array2d/array2d_kernel_abstract.h, a
+              dlib::matrix, or something convertible to a matrix via mat().
             - pixel_traits<image_type::type> must be defined
         ensures
             - Interprets img as a grayscale image and returns a new matrix
@@ -66,7 +68,8 @@ namespace dlib
     );
     /*!
         requires
-            - image_type is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type is an implementation of array2d/array2d_kernel_abstract.h, a
+              dlib::matrix, or something convertible to a matrix via mat().
             - pixel_traits<image_type::type> must be defined
         ensures
             - returns heatmap(img, max(mat(img)), min(mat(img)))
@@ -85,7 +88,8 @@ namespace dlib
     );
     /*!
         requires
-            - image_type is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type is an implementation of array2d/array2d_kernel_abstract.h, a 
+              dlib::matrix, or something convertible to a matrix via mat().
             - pixel_traits<image_type::type> must be defined
         ensures
             - Interprets img as a grayscale image and returns a new matrix which represents
@@ -106,7 +110,8 @@ namespace dlib
     );
     /*!
         requires
-            - image_type is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type is an implementation of array2d/array2d_kernel_abstract.h, a
+              dlib::matrix, or something convertible to a matrix via mat().
             - pixel_traits<image_type::type> must be defined
         ensures
             - returns jet(img, max(mat(img)), min(mat(img)))

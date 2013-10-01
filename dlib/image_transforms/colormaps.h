@@ -30,7 +30,7 @@ namespace dlib
 
         const_ret_type apply (long r, long c ) const 
         { 
-            const unsigned long gray = get_pixel_intensity(img[r][c]);
+            const unsigned long gray = get_pixel_intensity(mat(img)(r,c));
             if (gray != 0)
             {
                 const uint32 h = murmur_hash3_2(gray,0);
@@ -90,7 +90,7 @@ namespace dlib
         const_ret_type apply (long r, long c ) const 
         { 
             // scale the gray value into the range [0, 1]
-            const double gray = put_in_range(0, 1, (get_pixel_intensity(img[r][c]) - min_val)/(max_val-min_val));
+            const double gray = put_in_range(0, 1, (get_pixel_intensity(mat(img)(r,c)) - min_val)/(max_val-min_val));
             rgb_pixel pix(0,0,0);
 
             pix.red = static_cast<unsigned char>(std::min(gray/0.4,1.0)*255 + 0.5);
@@ -164,7 +164,7 @@ namespace dlib
         const_ret_type apply (long r, long c ) const 
         { 
             // scale the gray value into the range [0, 8]
-            const double gray = 8*put_in_range(0, 1, (get_pixel_intensity(img[r][c]) - min_val)/(max_val-min_val));
+            const double gray = 8*put_in_range(0, 1, (get_pixel_intensity(mat(img)(r,c)) - min_val)/(max_val-min_val));
             rgb_pixel pix;
             // s is the slope of color change
             const double s = 1.0/2.0;
