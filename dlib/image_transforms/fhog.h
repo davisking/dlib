@@ -135,7 +135,7 @@ namespace dlib
         void impl_extract_fhog_features(
             const image_type& img, 
             out_type& hog, 
-            int bin_size
+            int cell_size
         ) 
         {
             /*
@@ -190,8 +190,8 @@ namespace dlib
 
 
             // First we allocate memory for caching orientation histograms & their norms.
-            const int cells_nr = (int)((double)img.nr()/(double)bin_size + 0.5);
-            const int cells_nc = (int)((double)img.nc()/(double)bin_size + 0.5);
+            const int cells_nr = (int)((double)img.nr()/(double)cell_size + 0.5);
+            const int cells_nc = (int)((double)img.nc()/(double)cell_size + 0.5);
 
             array2d<matrix<float,18,1> > hist(cells_nr, cells_nc);
             for (long r = 0; r < hist.nr(); ++r)
@@ -210,8 +210,8 @@ namespace dlib
             const int hog_nc = std::max(cells_nc-2, 0);
             init_hog(hog, hog_nr, hog_nc);
 
-            const int visible_nr = cells_nr*bin_size;
-            const int visible_nc = cells_nc*bin_size;
+            const int visible_nr = cells_nr*cell_size;
+            const int visible_nc = cells_nc*cell_size;
 
             // First populate the gradient histograms
             for (int y = 1; y < visible_nr-1; y++) 
@@ -245,8 +245,8 @@ namespace dlib
                     }
 
                     // add to 4 histograms around pixel using bilinear interpolation
-                    double xp = ((double)x+0.5)/(double)bin_size - 0.5;
-                    double yp = ((double)y+0.5)/(double)bin_size - 0.5;
+                    double xp = ((double)x+0.5)/(double)cell_size - 0.5;
+                    double yp = ((double)y+0.5)/(double)cell_size - 0.5;
                     int ixp = (int)std::floor(xp);
                     int iyp = (int)std::floor(yp);
                     double vx0 = xp-ixp;
@@ -370,10 +370,10 @@ namespace dlib
     void extract_fhog_features(
         const image_type& img, 
         dlib::array<array2d<T,mm1>,mm2>& hog, 
-        int bin_size = 8
+        int cell_size = 8
     ) 
     {
-        return impl_fhog::impl_extract_fhog_features(img, hog, bin_size);
+        return impl_fhog::impl_extract_fhog_features(img, hog, cell_size);
     }
 
     template <
@@ -384,10 +384,10 @@ namespace dlib
     void extract_fhog_features(
         const image_type& img, 
         array2d<matrix<T,31,1>,mm>& hog, 
-        int bin_size = 8
+        int cell_size = 8
     ) 
     {
-        return impl_fhog::impl_extract_fhog_features(img, hog, bin_size);
+        return impl_fhog::impl_extract_fhog_features(img, hog, cell_size);
     }
 
 // ----------------------------------------------------------------------------------------
