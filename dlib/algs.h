@@ -39,6 +39,10 @@
 #pragma warning(disable : 4244)
 #pragma warning(disable : 4305)
 
+// Disable "warning C4180: qualifier applied to function type has no meaning; ignored".
+// This warning happens often in generic code that works with functions and isn't useful.
+#pragma warning(disable : 4180)
+
 #endif
 
 #ifdef __BORLANDC__
