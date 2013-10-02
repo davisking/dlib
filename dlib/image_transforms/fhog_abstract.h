@@ -83,7 +83,7 @@ namespace dlib
 
     inline point image_to_fhog (
         point p,
-        int cell_size 
+        int cell_size = 8
     );
     /*!
         requires
@@ -104,7 +104,7 @@ namespace dlib
 
     inline point fhog_to_image (
         point p,
-        int cell_size 
+        int cell_size = 8
     );
     /*!
         requires

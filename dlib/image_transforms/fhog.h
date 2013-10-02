@@ -395,24 +395,24 @@ namespace dlib
 
     inline point image_to_fhog (
         point p,
-        int sbin
+        int cell_size = 8
     )
     {
         // There is a one pixel border around the imag.
         p -= point(1,1);
         // There is also a 1 "cell" border around the HOG image formation.
-        return p/sbin - point(1,1);
+        return p/cell_size - point(1,1);
     }
 
 // ----------------------------------------------------------------------------------------
 
     inline point fhog_to_image (
         point p,
-        int sbin
+        int cell_size = 8
     )
     {
         // Convert to image space and then set to the center of the cell.
-        return (p+point(1,1))*sbin + point(1,1) + point(sbin/2,sbin/2);
+        return (p+point(1,1))*cell_size + point(1,1) + point(cell_size/2,cell_size/2);
     }
 
 // ----------------------------------------------------------------------------------------
