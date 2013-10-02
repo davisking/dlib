@@ -19,20 +19,20 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object represents a training data sample for the
                 vector_normalizer_frobmetric object.  It defines a set of training triplets
-                relative to a single anchor vector.  That is, it specifies that the learned
-                distance metric should satisfy num_triples() constraints which are, for all
-                valid i and j:
-                    length(T*anchor-T*near[i]) + 1 < length(T*anchor - T*far[j])
+                relative to a single anchor_vect vector.  That is, it specifies that the
+                learned distance metric should satisfy num_triples() constraints which are,
+                for all valid i and j:
+                    length(T*anchor_vect-T*near_vects[i]) + 1 < length(T*anchor_vect - T*far_vects[j])
                 for some appropriate linear transformation T which will be learned by
                 vector_normalizer_frobmetric.
         !*/
 
-        matrix_type anchor;
-        std::vector<matrix_type> near;
-        std::vector<matrix_type> far;
+        matrix_type anchor_vect;
+        std::vector<matrix_type> near_vects;
+        std::vector<matrix_type> far_vects;
 
         unsigned long num_triples (
-        ) const { return near.size() * far.size(); }
+        ) const { return near_vects.size() * far_vects.size(); }
         /*!
             ensures
                 - returns the number of training triplets defined by this object.
@@ -41,8 +41,8 @@ namespace dlib
         void clear()
         /*!
             ensures
-                - #near.size() == 0
-                - #far.size() == 0
+                - #near_vects.size() == 0
+                - #far_vects.size() == 0
         !*/
     };
 
@@ -73,13 +73,13 @@ namespace dlib
                     By Chunhua Shen, Junae Kim, Lei Wang, in CVPR 2011
 
                 Therefore, this object is a tool that takes as input training triplets
-                (anchor, near, far) of vectors and attempts to learn a linear
+                (anchor_vect, near, far) of vectors and attempts to learn a linear
                 transformation T such that:
-                    length(T*anchor-T*near) + 1 < length(T*anchor - T*far)
-                That is, you give a bunch of anchor vectors and for each anchor vector you
-                specify some vectors which should be near to it and some that should be far
-                form it.  This object then tries to find a transformation matrix that makes
-                the "near" vectors close to their anchors while the "far" vectors are
+                    length(T*anchor_vect-T*near) + 1 < length(T*anchor_vect - T*far)
+                That is, you give a bunch of anchor_vect vectors and for each anchor_vect
+                you specify some vectors which should be near to it and some that should be
+                far form it.  This object then tries to find a transformation matrix that
+                makes the "near" vectors close to their anchors while the "far" vectors are
                 farther away.
 
             THREAD SAFETY
@@ -182,7 +182,7 @@ namespace dlib
         /*!
             requires
                 - samples.size() != 0
-                - All matrices inside samples (i.e. anchors and elements of near and far)
+                - All matrices inside samples (i.e. anchors and elements of near_vects and far_vects)
                   are column vectors with the same non-zero dimension.
                 - All the vectors in samples contain finite values.
                 - All elements of samples contain data, specifically, for all valid i:
@@ -193,13 +193,13 @@ namespace dlib
                   according to the learned distance metric.  In particular, we will have:
                     - #transform() == The linear transformation learned by the FrobMetric
                       learning procedure.
-                    - #in_vector_size() == samples[0].anchor.size()
+                    - #in_vector_size() == samples[0].anchor_vect.size()
                     - You can call (*this)(x) to transform a vector according to the learned 
                       distance metric.  That is, it should generally be the case that:
-                        - length((*this)(anchor) - (*this)(near)) + 1 < length((*this)(anchor) - (*this)(far))
-                      for the anchor, near, and far vectors in the training data.
-                    - #transformed_means() == the mean of the input anchor vectors after being
-                      transformed by #transform()
+                        - length((*this)(anchor_vect) - (*this)(near)) + 1 < length((*this)(anchor_vect) - (*this)(far))
+                      for the anchor_vect, near, and far vectors in the training data.
+                    - #transformed_means() == the mean of the input anchor_vect vectors
+                      after being transformed by #transform()
         !*/
 
         long in_vector_size (
@@ -230,8 +230,8 @@ namespace dlib
                     - V.size() == in_vector_size()
                     - V is a vector such that subtracting it from transformed vectors
                       results in them having an expected value of 0.  Therefore, it is
-                      equal to transform() times the mean of the input anchor vectors given
-                      to train().
+                      equal to transform() times the mean of the input anchor_vect vectors
+                      given to train().
         !*/
 
         const matrix<scalar_type,0,0,mem_manager_type>& transform (

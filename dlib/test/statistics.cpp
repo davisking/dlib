@@ -378,7 +378,7 @@ namespace
             }   
 
             // check the unbiased skewness and excess kurtosis of one million Gaussian
-            // draws are both near zero.
+            // draws are both near_vects zero.
             DLIB_TEST(abs(rs1.skewness()) < 0.1);
             DLIB_TEST(abs(rs1.ex_kurtosis()) < 0.1);
         }
@@ -582,12 +582,12 @@ namespace
             running_stats<double> rs;
             for (unsigned long i = 0; i < samples.size(); ++i)
             {
-                for (unsigned long j = 0; j < samples[i].near.size(); ++j)
+                for (unsigned long j = 0; j < samples[i].near_vects.size(); ++j)
                 {
-                    const double d1 = length_squared(samples[i].anchor - samples[i].near[j]);
-                    for (unsigned long k = 0; k < samples[i].far.size(); ++k)
+                    const double d1 = length_squared(samples[i].anchor_vect - samples[i].near_vects[j]);
+                    for (unsigned long k = 0; k < samples[i].far_vects.size(); ++k)
                     {
-                        const double d2 = length_squared(samples[i].anchor - samples[i].far[k]);
+                        const double d2 = length_squared(samples[i].anchor_vect - samples[i].far_vects[k]);
                         rs.add(d2-d1);
                     }
                 }
@@ -620,17 +620,17 @@ namespace
             for (int i = 0; i < 50; ++i)
             {
                 samp.clear();
-                samp.anchor = gaussian_randm(dims,1,k++);
-                if (samp.anchor(key) > 0)
-                    samp.anchor(key) = rnd.get_random_double() + 5;
+                samp.anchor_vect = gaussian_randm(dims,1,k++);
+                if (samp.anchor_vect(key) > 0)
+                    samp.anchor_vect(key) = rnd.get_random_double() + 5;
                 else
-                    samp.anchor(key) = -(rnd.get_random_double() + 5);
+                    samp.anchor_vect(key) = -(rnd.get_random_double() + 5);
 
                 matrix<double,0,1> temp;
 
                 for (int j = 0; j < 5; ++j)
                 {
-                    // Don't always put an equal number of near and far vectors into the
+                    // Don't always put an equal number of near_vects and far_vects vectors into the
                     // training samples.
                     const int numa = rnd.get_random_32bit_number()%2 + 1;
                     const int numb = rnd.get_random_32bit_number()%2 + 1;
@@ -639,16 +639,16 @@ namespace
                     {
                         temp = gaussian_randm(dims,1,k++); temp(key) = 0.1;
                         //temp = gaussian_randm(dims,1,k++); temp(key) = std::abs(temp(key));
-                        if (samp.anchor(key) > 0) samp.near.push_back(temp);
-                        else                    samp.far.push_back(temp);
+                        if (samp.anchor_vect(key) > 0) samp.near_vects.push_back(temp);
+                        else                    samp.far_vects.push_back(temp);
                     }
 
                     for (int num = 0; num < numb; ++num)
                     {
                         temp = gaussian_randm(dims,1,k++); temp(key) = -0.1;
                         //temp = gaussian_randm(dims,1,k++); temp(key) = -std::abs(temp(key));
-                        if (samp.anchor(key) < 0) samp.near.push_back(temp);
-                        else                    samp.far.push_back(temp);
+                        if (samp.anchor_vect(key) < 0) samp.near_vects.push_back(temp);
+                        else                    samp.far_vects.push_back(temp);
                     }
                 }
                 samples.push_back(samp);
@@ -665,12 +665,12 @@ namespace
 
             for (unsigned long i = 0; i < samples.size(); ++i)
             {
-                samples[i].anchor = normalizer(samples[i].anchor);
-                total += samples[i].anchor;
-                for (unsigned long j = 0; j < samples[i].near.size(); ++j)
-                    samples[i].near[j] = normalizer(samples[i].near[j]);
-                for (unsigned long j = 0; j < samples[i].far.size(); ++j)
-                    samples[i].far[j] = normalizer(samples[i].far[j]);
+                samples[i].anchor_vect = normalizer(samples[i].anchor_vect);
+                total += samples[i].anchor_vect;
+                for (unsigned long j = 0; j < samples[i].near_vects.size(); ++j)
+                    samples[i].near_vects[j] = normalizer(samples[i].near_vects[j]);
+                for (unsigned long j = 0; j < samples[i].far_vects.size(); ++j)
+                    samples[i].far_vects[j] = normalizer(samples[i].far_vects[j]);
             }
             total /= samples.size();
             dlog << LINFO << "sample transformed means: "<< trans(total);
