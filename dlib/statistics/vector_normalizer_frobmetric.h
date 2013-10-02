@@ -17,17 +17,17 @@ namespace dlib
         >
     struct frobmetric_training_sample 
     {
-        matrix_type anchor;
-        std::vector<matrix_type> near;
-        std::vector<matrix_type> far;
+        matrix_type anchor_vect;
+        std::vector<matrix_type> near_vects;
+        std::vector<matrix_type> far_vects;
 
         unsigned long num_triples (
-        ) const { return near.size() * far.size(); }
+        ) const { return near_vects.size() * far_vects.size(); }
 
         void clear()
         {
-            near.clear();
-            far.clear();
+            near_vects.clear();
+            far_vects.clear();
         }
     };
 
@@ -47,8 +47,8 @@ namespace dlib
     private:
         struct compact_frobmetric_training_sample 
         {
-            std::vector<matrix_type> near;
-            std::vector<matrix_type> far;
+            std::vector<matrix_type> near_vects;
+            std::vector<matrix_type> far_vects;
         };
 
         struct objective
@@ -61,7 +61,7 @@ namespace dlib
             double operator()(const matrix<double,0,1,mem_manager_type>& u) const
             {
                 long idx = 0;
-                const long dims = samples[0].far[0].size();
+                const long dims = samples[0].far_vects[0].size();
                 // Here we compute \hat A from the paper, which we refer to as just A in
                 // the code.  
                 matrix<double,0,0,mem_manager_type> A(dims,dims);
@@ -69,8 +69,8 @@ namespace dlib
                 std::vector<double> ufar, unear;
                 for (unsigned long i = 0; i < samples.size(); ++i)
                 {
-                    ufar.assign(samples[i].far.size(),0);
-                    unear.assign(samples[i].near.size(),0);
+                    ufar.assign(samples[i].far_vects.size(),0);
+                    unear.assign(samples[i].near_vects.size(),0);
                     for (unsigned long j = 0; j < unear.size(); ++j)
                     {
                         for (unsigned long k = 0; k < ufar.size(); ++k)
@@ -81,9 +81,9 @@ namespace dlib
                         }
                     }
                     for (unsigned long j = 0; j < unear.size(); ++j)
-                        A += unear[j]*samples[i].near[j]*trans(samples[i].near[j]);
+                        A += unear[j]*samples[i].near_vects[j]*trans(samples[i].near_vects[j]);
                     for (unsigned long j = 0; j < ufar.size(); ++j)
-                        A += ufar[j]*samples[i].far[j]*trans(samples[i].far[j]);
+                        A += ufar[j]*samples[i].far_vects[j]*trans(samples[i].far_vects[j]);
                 }
 
                 eigenvalue_decomposition<matrix<double,0,0,mem_manager_type> > ed(make_symmetric(A));
@@ -120,17 +120,17 @@ namespace dlib
                 std::vector<double> ufar, unear;
                 for (unsigned long i = 0; i < samples.size(); ++i)
                 {
-                    ufar.resize(samples[i].far.size());
-                    unear.resize(samples[i].near.size());
+                    ufar.resize(samples[i].far_vects.size());
+                    unear.resize(samples[i].near_vects.size());
 
                     for (unsigned long j = 0; j < unear.size(); ++j)
-                        unear[j] = sum(pointwise_multiply(Aminus, samples[i].near[j]*trans(samples[i].near[j])));
+                        unear[j] = sum(pointwise_multiply(Aminus, samples[i].near_vects[j]*trans(samples[i].near_vects[j])));
                     for (unsigned long j = 0; j < ufar.size(); ++j)
-                        ufar[j] = sum(pointwise_multiply(Aminus, samples[i].far[j]*trans(samples[i].far[j])));
+                        ufar[j] = sum(pointwise_multiply(Aminus, samples[i].far_vects[j]*trans(samples[i].far_vects[j])));
 
-                    for (unsigned long j = 0; j < samples[i].near.size(); ++j)
+                    for (unsigned long j = 0; j < samples[i].near_vects.size(); ++j)
                     {
-                        for (unsigned long k = 0; k < samples[i].far.size(); ++k)
+                        for (unsigned long k = 0; k < samples[i].far_vects.size(); ++k)
                         {
                             grad(idx++) = 1 + ufar[k]-unear[j];
                         }
@@ -289,15 +289,6 @@ namespace dlib
         void train (
             const std::vector<frobmetric_training_sample<matrix_type> >& samples
         )
-        /*!
-            requires
-                - samples.size() != 0
-                - All matrices inside samples (i.e. anchors and elements of near and far)
-                  are column vectors with the same non-zero dimension.
-                - All the vectors in samples contain finite values.
-                - All elements of samples contain data, specifically, for all valid i:
-                    - samples[i].num_triples() != 0
-        !*/
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(samples.size() > 0,
@@ -306,24 +297,24 @@ namespace dlib
                 );
 #ifdef ENABLE_ASSERTS
             {
-                const long dims = samples[0].anchor.size();
+                const long dims = samples[0].anchor_vect.size();
                 DLIB_ASSERT(dims != 0,
                     "\tvoid vector_normalizer_frobmetric::train()"
                     << "\n\t The dimension of the input vectors can't be zero."
                     );
                 for (unsigned long i = 0; i < samples.size(); ++i)
                 {
-                    DLIB_ASSERT(is_col_vector(samples[i].anchor), 
+                    DLIB_ASSERT(is_col_vector(samples[i].anchor_vect), 
                         "\tvoid vector_normalizer_frobmetric::train()"
                         << "\n\t Invalid inputs were given to this function."
                         << "\n\t i: " << i
                         );
-                    DLIB_ASSERT(samples[i].anchor.size() == dims, 
+                    DLIB_ASSERT(samples[i].anchor_vect.size() == dims, 
                         "\tvoid vector_normalizer_frobmetric::train()"
                         << "\n\t Invalid inputs were given to this function."
                         << "\n\t i:    " << i
                         << "\n\t dims: " << dims
-                        << "\n\t samples[i].anchor.size(): " << samples[i].anchor.size()
+                        << "\n\t samples[i].anchor_vect.size(): " << samples[i].anchor_vect.size()
                         );
 
                     DLIB_ASSERT(samples[i].num_triples() != 0,
@@ -331,38 +322,38 @@ namespace dlib
                         << "\n\t It is illegal for a training sample to have no data in it"
                         << "\n\t i:    " << i
                     );
-                    for (unsigned long j = 0; j < samples[i].near.size(); ++j)
+                    for (unsigned long j = 0; j < samples[i].near_vects.size(); ++j)
                     {
-                        DLIB_ASSERT(is_col_vector(samples[i].near[j]), 
+                        DLIB_ASSERT(is_col_vector(samples[i].near_vects[j]), 
                             "\tvoid vector_normalizer_frobmetric::train()"
                             << "\n\t Invalid inputs were given to this function."
                             << "\n\t i: " << i
                             << "\n\t j: " << j
                             );
-                        DLIB_ASSERT(samples[i].near[j].size() == dims, 
+                        DLIB_ASSERT(samples[i].near_vects[j].size() == dims, 
                             "\tvoid vector_normalizer_frobmetric::train()"
                             << "\n\t Invalid inputs were given to this function."
                             << "\n\t i:    " << i
                             << "\n\t j:    " << j
                             << "\n\t dims: " << dims
-                            << "\n\t samples[i].near[j].size(): " << samples[i].near[j].size()
+                            << "\n\t samples[i].near_vects[j].size(): " << samples[i].near_vects[j].size()
                             );
                     }
-                    for (unsigned long j = 0; j < samples[i].far.size(); ++j)
+                    for (unsigned long j = 0; j < samples[i].far_vects.size(); ++j)
                     {
-                        DLIB_ASSERT(is_col_vector(samples[i].far[j]), 
+                        DLIB_ASSERT(is_col_vector(samples[i].far_vects[j]), 
                             "\tvoid vector_normalizer_frobmetric::train()"
                             << "\n\t Invalid inputs were given to this function."
                             << "\n\t i: " << i
                             << "\n\t j: " << j
                             );
-                        DLIB_ASSERT(samples[i].far[j].size() == dims, 
+                        DLIB_ASSERT(samples[i].far_vects[j].size() == dims, 
                             "\tvoid vector_normalizer_frobmetric::train()"
                             << "\n\t Invalid inputs were given to this function."
                             << "\n\t i:    " << i
                             << "\n\t j:    " << j
                             << "\n\t dims: " << dims
-                            << "\n\t samples[i].far[j].size(): " << samples[i].far[j].size()
+                            << "\n\t samples[i].far_vects[j].size(): " << samples[i].far_vects[j].size()
                             );
                     }
                 }
@@ -373,7 +364,7 @@ namespace dlib
             // compute the mean sample
             m = 0;
             for (unsigned long i = 0; i < samples.size(); ++i)
-                m += samples[i].anchor;
+                m += samples[i].anchor_vect;
             m /= samples.size();
 
             DLIB_ASSERT(is_finite(m), "Some of the input vectors to vector_normalizer_frobmetric::train() have infinite or NaN values");
@@ -382,22 +373,22 @@ namespace dlib
             // over the next few lines of code.
             unsigned long num_triples = 0;
             for (unsigned long i = 0; i < samples.size(); ++i)
-                num_triples += samples[i].near.size()*samples[i].far.size();
+                num_triples += samples[i].near_vects.size()*samples[i].far_vects.size();
 
             matrix<double,0,1,mem_manager_type> u(num_triples);
             u = 0;
 
 
-            // precompute all the anchor to far/near pairs
+            // precompute all the anchor_vect to far_vects/near_vects pairs
             std::vector<compact_frobmetric_training_sample> data(samples.size());
             for (unsigned long i = 0; i < data.size(); ++i)
             {
-                data[i].far.reserve(samples[i].far.size());
-                data[i].near.reserve(samples[i].near.size());
-                for (unsigned long j = 0; j < samples[i].far.size(); ++j)
-                    data[i].far.push_back(samples[i].anchor - samples[i].far[j]);
-                for (unsigned long j = 0; j < samples[i].near.size(); ++j)
-                    data[i].near.push_back(samples[i].anchor - samples[i].near[j]);
+                data[i].far_vects.reserve(samples[i].far_vects.size());
+                data[i].near_vects.reserve(samples[i].near_vects.size());
+                for (unsigned long j = 0; j < samples[i].far_vects.size(); ++j)
+                    data[i].far_vects.push_back(samples[i].anchor_vect - samples[i].far_vects[j]);
+                for (unsigned long j = 0; j < samples[i].near_vects.size(); ++j)
+                    data[i].near_vects.push_back(samples[i].anchor_vect - samples[i].near_vects[j]);
             }
 
             // Now run the main part of the algorithm
