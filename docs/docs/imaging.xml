@@ -398,6 +398,9 @@
               This means that it takes an input image and outputs Felzenszwalb's
               31 dimensional version of HOG features.
          </description>
+         <examples>
+            <example>fhog_ex.cpp.html</example>
+         </examples>
                                  
       </component>
 
@@ -1015,6 +1018,9 @@
               way that shows the magnitude and orientation of the gradient
               energy in each cell.  
          </description>
+         <examples>
+            <example>fhog_ex.cpp.html</example>
+         </examples>
                                  
       </component>
             
