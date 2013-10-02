@@ -11,7 +11,7 @@
         P. Felzenszwalb, R. Girshick, D. McAllester, D. Ramanan
         IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 32, No. 9, Sep. 2010
     This means that it takes an input image and outputs Felzenszwalb's
-    31 dimensional version of HOG features.  We show it's use below.
+    31 dimensional version of HOG features.  We show its use below.
 */
 
 
@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 
         cout << "hog image has " << hog.nr() << " rows and " << hog.nc() << " columns." << endl;
 
-        // Lets see what the image and also the FHOG features look like.
+        // Lets see what the image and FHOG features look like.
         image_window win(img);
         image_window winhog(draw_fhog(hog));
 
@@ -71,12 +71,12 @@ int main(int argc, char** argv)
             cout << "FHOG features at this point: " << trans(hog[hp.y()][hp.x()]) << endl;
         }
 
-        // Finally, sometimes you want to get a "planar" representation of the HOG features
+        // Finally, sometimes you want to get a planar representation of the HOG features
         // rather than the explicit vector (i.e. interlaced) representation used above.  
         dlib::array<array2d<float> > planar_hog;
         extract_fhog_features(img, planar_hog);
-        // Now we have an array of 31 float valued images, each representing one of the
-        // dimensions of the HOG feature vector.  
+        // Now we have an array of 31 float valued image planes, each representing one of
+        // the dimensions of the HOG feature vector.  
     }
     catch (exception& e)
     {
