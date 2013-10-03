@@ -1462,7 +1462,7 @@ namespace dlib
                 for (c = 0; c < full_nc; c+=size_out)
                 {
                     ptype block[size_in][size_in];
-                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate block 
                     assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
@@ -1491,7 +1491,7 @@ namespace dlib
                 if (part_nc - full_nc == 3)
                 {
                     ptype block[size_in][4];
-                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
@@ -1513,7 +1513,7 @@ namespace dlib
                 else if (part_nc - full_nc == 2)
                 {
                     ptype block[size_in][3];
-                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
@@ -1531,7 +1531,7 @@ namespace dlib
                 else if (part_nc - full_nc == 1)
                 {
                     ptype block[size_in][2];
-                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
@@ -1552,7 +1552,7 @@ namespace dlib
                 for (c = 0; c < full_nc; c+=size_out)
                 {
                     ptype block[4][size_in];
-                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
@@ -1576,7 +1576,7 @@ namespace dlib
                 if (part_nc - full_nc == 3)
                 {
                     ptype block[4][4];
-                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
@@ -1595,7 +1595,7 @@ namespace dlib
                 else if (part_nc - full_nc == 2)
                 {
                     ptype block[4][3];
-                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
@@ -1611,7 +1611,7 @@ namespace dlib
                 else if (part_nc - full_nc == 1)
                 {
                     ptype block[4][2];
-                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
@@ -1628,7 +1628,7 @@ namespace dlib
                 for (c = 0; c < full_nc; c+=size_out)
                 {
                     ptype block[3][size_in];
-                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
@@ -1647,7 +1647,7 @@ namespace dlib
                 if (part_nc - full_nc == 3)
                 {
                     ptype block[3][4];
-                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
@@ -1662,7 +1662,7 @@ namespace dlib
                 else if (part_nc - full_nc == 2)
                 {
                     ptype block[3][3];
-                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
@@ -1674,7 +1674,7 @@ namespace dlib
                 else if (part_nc - full_nc == 1)
                 {
                     ptype block[3][2];
-                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
@@ -1689,7 +1689,7 @@ namespace dlib
                 for (c = 0; c < full_nc; c+=size_out)
                 {
                     ptype block[2][size_in];
-                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
@@ -1703,7 +1703,7 @@ namespace dlib
                 if (part_nc - full_nc == 3)
                 {
                     ptype block[2][4];
-                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
@@ -1713,7 +1713,7 @@ namespace dlib
                 else if (part_nc - full_nc == 2)
                 {
                     ptype block[2][3];
-                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
@@ -1722,7 +1722,7 @@ namespace dlib
                 else if (part_nc - full_nc == 1)
                 {
                     ptype block[2][2];
-                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
@@ -1787,7 +1787,7 @@ namespace dlib
                 for (c = 0; c < full_nc; c+=size_out)
                 {
                     rgbptype block[size_in][size_in];
-                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate block 
                     down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
@@ -1861,7 +1861,7 @@ namespace dlib
                 if (part_nc - full_nc == 3)
                 {
                     rgbptype block[size_in][4];
-                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
@@ -1916,7 +1916,7 @@ namespace dlib
                 else if (part_nc - full_nc == 2)
                 {
                     rgbptype block[size_in][3];
-                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
@@ -1955,7 +1955,7 @@ namespace dlib
                 else if (part_nc - full_nc == 1)
                 {
                     rgbptype block[size_in][2];
-                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
@@ -1985,7 +1985,7 @@ namespace dlib
                 for (c = 0; c < full_nc; c+=size_out)
                 {
                     rgbptype block[4][size_in];
-                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
@@ -2042,7 +2042,7 @@ namespace dlib
                 if (part_nc - full_nc == 3)
                 {
                     rgbptype block[4][4];
-                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
@@ -2085,7 +2085,7 @@ namespace dlib
                 else if (part_nc - full_nc == 2)
                 {
                     rgbptype block[4][3];
-                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
@@ -2116,7 +2116,7 @@ namespace dlib
                 else if (part_nc - full_nc == 1)
                 {
                     rgbptype block[4][2];
-                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
@@ -2140,7 +2140,7 @@ namespace dlib
                 for (c = 0; c < full_nc; c+=size_out)
                 {
                     rgbptype block[3][size_in];
-                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
@@ -2181,7 +2181,7 @@ namespace dlib
                 if (part_nc - full_nc == 3)
                 {
                     rgbptype block[3][4];
-                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
@@ -2212,7 +2212,7 @@ namespace dlib
                 else if (part_nc - full_nc == 2)
                 {
                     rgbptype block[3][3];
-                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
@@ -2235,7 +2235,7 @@ namespace dlib
                 else if (part_nc - full_nc == 1)
                 {
                     rgbptype block[3][2];
-                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
@@ -2255,7 +2255,7 @@ namespace dlib
                 for (c = 0; c < full_nc; c+=size_out)
                 {
                     rgbptype block[2][size_in];
-                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
@@ -2280,7 +2280,7 @@ namespace dlib
                 if (part_nc - full_nc == 3)
                 {
                     rgbptype block[2][4];
-                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
@@ -2299,7 +2299,7 @@ namespace dlib
                 else if (part_nc - full_nc == 2)
                 {
                     rgbptype block[2][3];
-                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
@@ -2314,7 +2314,7 @@ namespace dlib
                 else if (part_nc - full_nc == 1)
                 {
                     rgbptype block[2][2];
-                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
 
                     // bi-linearly interpolate partial block 
                     down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
