@@ -529,6 +529,13 @@ namespace dlib
         interpolate_bilinear
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
+            "\t void resize_image()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
+            );
+
         typedef typename image_type1::type T;
         const double x_scale = (img.nc()-1)/(double)std::max<long>((out.nc()-1),1);
         const double y_scale = (img.nr()-1)/(double)std::max<long>((out.nr()-1),1);
