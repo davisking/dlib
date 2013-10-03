@@ -393,8 +393,7 @@ namespace dlib
             - The size of out_img is not modified.  I.e. 
                 - #out_img.nr() == out_img.nr()
                 - #out_img.nc() == out_img.nc()
-            - uses the interpolate_quadratic object to perform the necessary pixel 
-              interpolation.
+            - Uses the bilinear interpolation to perform the necessary pixel interpolation.
     !*/
 
 // ----------------------------------------------------------------------------------------

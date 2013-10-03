@@ -517,6 +517,75 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    // This is an optimized version of resize_image for the case where bilinear
+    // interpolation is used.
+    template <
+        typename image_type1,
+        typename image_type2
+        >
+    void resize_image (
+        const image_type1& img,
+        image_type2& out,
+        interpolate_bilinear
+    )
+    {
+        typedef typename image_type1::type T;
+        const double x_scale = (img.nc()-1)/(double)std::max<long>((out.nc()-1),1);
+        const double y_scale = (img.nr()-1)/(double)std::max<long>((out.nr()-1),1);
+        double y = -y_scale;
+        for (long r = 0; r < out.nr(); ++r)
+        {
+            y += y_scale;
+            const long top    = static_cast<long>(std::floor(y));
+            const long bottom = std::min(top+1, img.nr()-1);
+            const double tb_frac = y - top;
+            double x = -x_scale;
+            if (!pixel_traits<T>::rgb)
+            {
+                for (long c = 0; c < out.nc(); ++c)
+                {
+                    x += x_scale;
+                    const long left   = static_cast<long>(std::floor(x));
+                    const long right  = std::min(left+1, img.nc()-1);
+                    const double lr_frac = x - left;
+
+                    double tl = 0, tr = 0, bl = 0, br = 0;
+
+                    assign_pixel(tl, img[top][left]);
+                    assign_pixel(tr, img[top][right]);
+                    assign_pixel(bl, img[bottom][left]);
+                    assign_pixel(br, img[bottom][right]);
+
+                    double temp = (1-tb_frac)*((1-lr_frac)*tl + lr_frac*tr) + 
+                        tb_frac*((1-lr_frac)*bl + lr_frac*br);
+
+                    assign_pixel(out[r][c], temp);
+                }
+            }
+            else
+            {
+                for (long c = 0; c < out.nc(); ++c)
+                {
+                    x += x_scale;
+                    const long left   = static_cast<long>(std::floor(x));
+                    const long right  = std::min(left+1, img.nc()-1);
+                    const double lr_frac = x - left;
+
+                    const T tl = img[top][left];
+                    const T tr = img[top][right];
+                    const T bl = img[bottom][left];
+                    const T br = img[bottom][right];
+
+                    vector_to_pixel(out[r][c], 
+                        (1-tb_frac)*((1-lr_frac)*pixel_to_vector<double>(tl) + lr_frac*pixel_to_vector<double>(tr)) + 
+                            tb_frac*((1-lr_frac)*pixel_to_vector<double>(bl) + lr_frac*pixel_to_vector<double>(br)));
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename image_type1,
         typename image_type2
@@ -533,7 +602,7 @@ namespace dlib
             << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
             );
 
-        resize_image(in_img, out_img, interpolate_quadratic());
+        resize_image(in_img, out_img, interpolate_bilinear());
     }
 
 // ----------------------------------------------------------------------------------------
