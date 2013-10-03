@@ -96,18 +96,18 @@ namespace dlib
         {
             COMPILE_TIME_ASSERT(pixel_traits<typename image_type::type>::has_alpha == false);
 
-            const long top    = static_cast<long>(std::floor(p.y()));
-            const long bottom = static_cast<long>(std::ceil (p.y()));
             const long left   = static_cast<long>(std::floor(p.x()));
-            const long right  = static_cast<long>(std::ceil (p.x()));
+            const long top    = static_cast<long>(std::floor(p.y()));
+            const long right  = left+1;
+            const long bottom = top+1;
 
 
             // if the interpolation goes outside img 
             if (!get_rect(img).contains(rectangle(left,top,right,bottom))) 
                 return false;
 
-            const double lr_frac = p.x() - std::floor(p.x());
-            const double tb_frac = p.y() - std::floor(p.y());
+            const double lr_frac = p.x() - left;
+            const double tb_frac = p.y() - top;
 
             double tl, tr, bl, br;
 
