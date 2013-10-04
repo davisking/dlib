@@ -76,9 +76,38 @@ namespace
             }
         }
 
+        void test_on_small()
+        {
+            print_spinner();
+            array2d<unsigned char> img;
+            dlib::array<array2d<float> > hog;
+
+            // do this just to make sure it doesn't crash on small images
+            for (int i = 0; i < 10; ++i)
+            {
+                img.set_size(i,i);
+                assign_all_pixels(img, i);
+                extract_fhog_features(img, hog);
+            }
+            for (int i = 1; i < 10; ++i)
+            {
+                img.set_size(i,i+1);
+                assign_all_pixels(img, i);
+                extract_fhog_features(img, hog);
+            }
+            for (int i = 1; i < 10; ++i)
+            {
+                img.set_size(i+1,i);
+                assign_all_pixels(img, i);
+                extract_fhog_features(img, hog);
+            }
+        }
+
         void perform_test (
         )
         {
+            test_on_small();
+
             print_spinner();
             // load the testing data
             array2d<rgb_pixel> img;

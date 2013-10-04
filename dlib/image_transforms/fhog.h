@@ -193,6 +193,12 @@ namespace dlib
             const int cells_nr = (int)((double)img.nr()/(double)cell_size + 0.5);
             const int cells_nc = (int)((double)img.nc()/(double)cell_size + 0.5);
 
+            if (cells_nr == 0 || cells_nc == 0)
+            {
+                hog.clear();
+                return;
+            }
+
             array2d<matrix<float,18,1> > hist(cells_nr, cells_nc);
             for (long r = 0; r < hist.nr(); ++r)
             {
@@ -208,6 +214,11 @@ namespace dlib
             // memory for HOG features
             const int hog_nr = std::max(cells_nr-2, 0);
             const int hog_nc = std::max(cells_nc-2, 0);
+            if (hog_nr == 0 || hog_nc == 0)
+            {
+                hog.clear();
+                return;
+            }
             init_hog(hog, hog_nr, hog_nc);
 
             const int visible_nr = cells_nr*cell_size;
