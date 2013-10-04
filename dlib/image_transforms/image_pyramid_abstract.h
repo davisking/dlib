@@ -190,6 +190,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        unsigned int N
+        >
+    class pyramid_down_generic : noncopyable
+    {
+        /*!
+            REQUIREMENTS ON N
+                N > 1
+
+            WHAT THIS OBJECT REPRESENTS
+                This is a function object with an interface identical to pyramid_down
+                (defined at the top of this file) except that it downsamples images at a
+                ratio of N to N-1 instead of 2 to 1.
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
     class pyramid_disable : noncopyable
     {
         /*!

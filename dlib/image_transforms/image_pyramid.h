@@ -2336,6 +2336,126 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    template <
+        unsigned int N
+        >
+    class pyramid_down_generic : noncopyable
+    {
+    public:
+
+        COMPILE_TIME_ASSERT(N > 1);
+
+        template <typename T>
+        vector<double,2> point_down (
+            const vector<T,2>& p
+        ) const
+        {
+            const double ratio = (N-1.0)/N;
+            return p*ratio;
+        }
+
+        template <typename T>
+        vector<double,2> point_up (
+            const vector<T,2>& p
+        ) const
+        {
+            const double ratio = N/(N-1.0);
+            return p*ratio;
+        }
+
+    // -----------------------------
+
+        template <typename T>
+        vector<double,2> point_down (
+            const vector<T,2>& p,
+            unsigned int levels
+        ) const
+        {
+            vector<double,2> temp = p;
+            for (unsigned int i = 0; i < levels; ++i)
+                temp = point_down(temp);
+            return temp;
+        }
+
+        template <typename T>
+        vector<double,2> point_up (
+            const vector<T,2>& p,
+            unsigned int levels
+        ) const
+        {
+            vector<double,2> temp = p;
+            for (unsigned int i = 0; i < levels; ++i)
+                temp = point_up(temp);
+            return temp;
+        }
+
+    // -----------------------------
+
+        rectangle rect_up (
+            const rectangle& rect
+        ) const
+        {
+            return rectangle(point_up(rect.tl_corner()), point_up(rect.br_corner()));
+        }
+
+        rectangle rect_up (
+            const rectangle& rect,
+            unsigned int levels
+        ) const
+        {
+            return rectangle(point_up(rect.tl_corner(),levels), point_up(rect.br_corner(),levels));
+        }
+
+    // -----------------------------
+
+        rectangle rect_down (
+            const rectangle& rect
+        ) const
+        {
+            return rectangle(point_down(rect.tl_corner()), point_down(rect.br_corner()));
+        }
+
+        rectangle rect_down (
+            const rectangle& rect,
+            unsigned int levels
+        ) const
+        {
+            return rectangle(point_down(rect.tl_corner(),levels), point_down(rect.br_corner(),levels));
+        }
+
+        template <
+            typename in_image_type,
+            typename out_image_type
+            >
+        void operator() (
+            const in_image_type& original,
+            out_image_type& down
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_same_object(original, down) == false, 
+                        "\t void pyramid_down_generic::operator()"
+                        << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
+                        << "\n\t this:                           " << this
+                        );
+
+            COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
+            COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+
+
+            down.set_size(((N-1)*original.nr())/N,
+                          ((N-1)*original.nc())/N);
+            resize_image(original, down);
+        }
+    };
+
+    template <>
+    class pyramid_down_generic<2> : public pyramid_down {};
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_IMAGE_PYRaMID_H__
