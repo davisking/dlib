@@ -176,6 +176,7 @@
          <name>Scaling and Rotating</name>
          <item>pyramid_up</item> 
          <item>pyramid_down</item> 
+         <item>pyramid_down_generic</item> 
          <item>pyramid_down_3_2</item> 
          <item>pyramid_down_4_3</item> 
          <item>pyramid_down_5_4</item> 
@@ -1314,6 +1315,20 @@
          <description>        
                This is a simple function object to help create image pyramids.  It 
                downsamples an image by half.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>pyramid_down_generic</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/image_pyramid_abstract.h</spec_file>
+         <description>        
+               This is a simple function object to help create image pyramids.  It 
+               downsamples an image by a ratio of N to N-1 where N is supplied by the
+               user.
          </description>
                                  
       </component>
