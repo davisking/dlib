@@ -537,6 +537,7 @@ namespace dlib
             );
 
         typedef typename image_type1::type T;
+        typedef typename image_type2::type U;
         const double x_scale = (in_img.nc()-1)/(double)std::max<long>((out_img.nc()-1),1);
         const double y_scale = (in_img.nr()-1)/(double)std::max<long>((out_img.nr()-1),1);
         double y = -y_scale;
@@ -547,7 +548,7 @@ namespace dlib
             const long bottom = std::min(top+1, in_img.nr()-1);
             const double tb_frac = y - top;
             double x = -x_scale;
-            if (!pixel_traits<T>::rgb)
+            if (!pixel_traits<U>::rgb)
             {
                 for (long c = 0; c < out_img.nc(); ++c)
                 {
