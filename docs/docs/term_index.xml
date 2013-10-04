@@ -1216,11 +1216,7 @@
          <term file="imaging.html" name="separable_3x3_filter_block_grayscale"   include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="separable_3x3_filter_block_rgb"         include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="pyramid_down"               include="dlib/image_transforms.h"/>
-         <term file="imaging.html" name="pyramid_down_generic"       include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="pyramid_disable"            include="dlib/image_transforms.h"/>
-         <term file="imaging.html" name="pyramid_down_3_2"           include="dlib/image_transforms.h"/>
-         <term file="imaging.html" name="pyramid_down_4_3"           include="dlib/image_transforms.h"/>
-         <term file="imaging.html" name="pyramid_down_5_4"           include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="threshold_image"            include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="auto_threshold_image"       include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="png_loader"                 include="dlib/image_io.h"/>

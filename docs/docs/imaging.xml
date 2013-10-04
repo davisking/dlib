@@ -176,10 +176,6 @@
          <name>Scaling and Rotating</name>
          <item>pyramid_up</item> 
          <item>pyramid_down</item> 
-         <item>pyramid_down_generic</item> 
-         <item>pyramid_down_3_2</item> 
-         <item>pyramid_down_4_3</item> 
-         <item>pyramid_down_5_4</item> 
          <item>pyramid_disable</item> 
 
          <item>interpolate_nearest_neighbor</item> 
@@ -1314,34 +1310,8 @@
          <spec_file link="true">dlib/image_transforms/image_pyramid_abstract.h</spec_file>
          <description>        
                This is a simple function object to help create image pyramids.  It 
-               downsamples an image by half.
-         </description>
-                                 
-      </component>
-            
-   <!-- ************************************************************************* -->
-      
-      <component>
-         <name>pyramid_down_generic</name>
-         <file>dlib/image_transforms.h</file>
-         <spec_file link="true">dlib/image_transforms/image_pyramid_abstract.h</spec_file>
-         <description>        
-               This is a simple function object to help create image pyramids.  It 
                downsamples an image by a ratio of N to N-1 where N is supplied by the
-               user.
-         </description>
-                                 
-      </component>
-            
-   <!-- ************************************************************************* -->
-      
-      <component>
-         <name>pyramid_down_3_2</name>
-         <file>dlib/image_transforms.h</file>
-         <spec_file link="true">dlib/image_transforms/image_pyramid_abstract.h</spec_file>
-         <description>        
-               This is a simple function object to help create image pyramids.  It 
-               downsamples an image by a ratio of 3 to 2.
+               user as a template argument.
          </description>
                                  
       </component>
@@ -1363,32 +1333,6 @@
                                  
       </component>
             
-   <!-- ************************************************************************* -->
-      
-      <component>
-         <name>pyramid_down_4_3</name>
-         <file>dlib/image_transforms.h</file>
-         <spec_file link="true">dlib/image_transforms/image_pyramid_abstract.h</spec_file>
-         <description>        
-               This is a simple function object to help create image pyramids.  It 
-               downsamples an image by a ratio of 4 to 3.
-         </description>
-                                 
-      </component>
-            
-   <!-- ************************************************************************* -->
-      
-      <component>
-         <name>pyramid_down_5_4</name>
-         <file>dlib/image_transforms.h</file>
-         <spec_file link="true">dlib/image_transforms/image_pyramid_abstract.h</spec_file>
-         <description>        
-               This is a simple function object to help create image pyramids.  It 
-               downsamples an image by a ratio of 5 to 4.
-         </description>
-                                 
-      </component>
-
    <!-- ************************************************************************* -->
       
       <component>
@@ -1458,10 +1402,10 @@
          <file>dlib/image_transforms.h</file>
          <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
          <description>        
-            This routine upsamples an image.  In particular, it takes one of the
-            <a href="#pyramid_down">pyramid_down</a> objects as an argument and
-            performs an upsampling which is the inverse of the supplied pyramid_down
-            object.
+            This routine upsamples an image.  In particular, it takes a  
+            <a href="#pyramid_down">pyramid_down</a> object (or an object with a
+            compatible interface) as an argument and performs an upsampling
+            which is the inverse of the supplied pyramid_down object.
          </description>
       </component>
 
