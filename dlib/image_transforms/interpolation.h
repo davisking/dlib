@@ -524,8 +524,8 @@ namespace dlib
         typename image_type2
         >
     void resize_image (
-        const image_type1& img,
-        image_type2& out,
+        const image_type1& in_img,
+        image_type2& out_img,
         interpolate_bilinear
     )
     {
@@ -537,55 +537,58 @@ namespace dlib
             );
 
         typedef typename image_type1::type T;
-        const double x_scale = (img.nc()-1)/(double)std::max<long>((out.nc()-1),1);
-        const double y_scale = (img.nr()-1)/(double)std::max<long>((out.nr()-1),1);
+        const double x_scale = (in_img.nc()-1)/(double)std::max<long>((out_img.nc()-1),1);
+        const double y_scale = (in_img.nr()-1)/(double)std::max<long>((out_img.nr()-1),1);
         double y = -y_scale;
-        for (long r = 0; r < out.nr(); ++r)
+        for (long r = 0; r < out_img.nr(); ++r)
         {
             y += y_scale;
             const long top    = static_cast<long>(std::floor(y));
-            const long bottom = std::min(top+1, img.nr()-1);
+            const long bottom = std::min(top+1, in_img.nr()-1);
             const double tb_frac = y - top;
             double x = -x_scale;
             if (!pixel_traits<T>::rgb)
             {
-                for (long c = 0; c < out.nc(); ++c)
+                for (long c = 0; c < out_img.nc(); ++c)
                 {
                     x += x_scale;
                     const long left   = static_cast<long>(std::floor(x));
-                    const long right  = std::min(left+1, img.nc()-1);
+                    const long right  = std::min(left+1, in_img.nc()-1);
                     const double lr_frac = x - left;
 
                     double tl = 0, tr = 0, bl = 0, br = 0;
 
-                    assign_pixel(tl, img[top][left]);
-                    assign_pixel(tr, img[top][right]);
-                    assign_pixel(bl, img[bottom][left]);
-                    assign_pixel(br, img[bottom][right]);
+                    assign_pixel(tl, in_img[top][left]);
+                    assign_pixel(tr, in_img[top][right]);
+                    assign_pixel(bl, in_img[bottom][left]);
+                    assign_pixel(br, in_img[bottom][right]);
 
                     double temp = (1-tb_frac)*((1-lr_frac)*tl + lr_frac*tr) + 
                         tb_frac*((1-lr_frac)*bl + lr_frac*br);
 
-                    assign_pixel(out[r][c], temp);
+                    assign_pixel(out_img[r][c], temp);
                 }
             }
             else
             {
-                for (long c = 0; c < out.nc(); ++c)
+                for (long c = 0; c < out_img.nc(); ++c)
                 {
                     x += x_scale;
                     const long left   = static_cast<long>(std::floor(x));
-                    const long right  = std::min(left+1, img.nc()-1);
+                    const long right  = std::min(left+1, in_img.nc()-1);
                     const double lr_frac = x - left;
 
-                    const T tl = img[top][left];
-                    const T tr = img[top][right];
-                    const T bl = img[bottom][left];
-                    const T br = img[bottom][right];
+                    const T tl = in_img[top][left];
+                    const T tr = in_img[top][right];
+                    const T bl = in_img[bottom][left];
+                    const T br = in_img[bottom][right];
 
-                    vector_to_pixel(out[r][c], 
+                    T temp;
+                    assign_pixel(temp, 0);
+                    vector_to_pixel(temp, 
                         (1-tb_frac)*((1-lr_frac)*pixel_to_vector<double>(tl) + lr_frac*pixel_to_vector<double>(tr)) + 
                             tb_frac*((1-lr_frac)*pixel_to_vector<double>(bl) + lr_frac*pixel_to_vector<double>(br)));
+                    assign_pixel(out_img[r][c], temp);
                 }
             }
         }
