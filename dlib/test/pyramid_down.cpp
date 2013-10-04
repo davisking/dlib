@@ -23,7 +23,7 @@ namespace
 void test_pyramid_down_grayscale()
 {
     array2d<unsigned char> img, down;
-    pyramid_down pyr;
+    pyramid_down<2> pyr;
 
     img.set_size(300,264);
 
@@ -52,7 +52,7 @@ void test_pyramid_down_rgb()
 {
     array2d<rgb_pixel> img;
     array2d<bgr_pixel> down;
-    pyramid_down pyr;
+    pyramid_down<2> pyr;
 
     img.set_size(231, 351);
 
@@ -325,59 +325,59 @@ void test_pyramid_down_small_sizes()
             test_pyramid_down_rgb();
 
             print_spinner();
-            dlog << LINFO << "call test_pyramid_down_small_sizes<pyramid_down>();";
-            test_pyramid_down_small_sizes<pyramid_down>();
-            dlog << LINFO << "call test_pyramid_down_small_sizes<pyramid_down_3_2>();";
-            test_pyramid_down_small_sizes<pyramid_down_3_2>();
-            dlog << LINFO << "call test_pyramid_down_small_sizes<pyramid_down_4_3>();";
-            test_pyramid_down_small_sizes<pyramid_down_4_3>();
-            dlog << LINFO << "call test_pyramid_down_small_sizes<pyramid_down_5_4>();";
-            test_pyramid_down_small_sizes<pyramid_down_5_4>();
+            dlog << LINFO << "call test_pyramid_down_small_sizes<pyramid_down<2> >();";
+            test_pyramid_down_small_sizes<pyramid_down<2> >();
+            dlog << LINFO << "call test_pyramid_down_small_sizes<pyramid_down<3> >();";
+            test_pyramid_down_small_sizes<pyramid_down<3> >();
+            dlog << LINFO << "call test_pyramid_down_small_sizes<pyramid_down<4> >();";
+            test_pyramid_down_small_sizes<pyramid_down<4> >();
+            dlog << LINFO << "call test_pyramid_down_small_sizes<pyramid_down<5> >();";
+            test_pyramid_down_small_sizes<pyramid_down<5> >();
             dlog << LINFO << "call test_pyramid_down_small_sizes<pyramid_disable>();";
             test_pyramid_down_small_sizes<pyramid_disable>();
-            dlog << LINFO << "call test_pyramid_down_small_sizes<pyramid_down_generic<3> >();";
-            test_pyramid_down_small_sizes<pyramid_down_generic<3> >();
+            dlog << LINFO << "call test_pyramid_down_small_sizes<pyramid_down<9> >();";
+            test_pyramid_down_small_sizes<pyramid_down<9> >();
 
             print_spinner();
-            dlog << LINFO << "call test_pyramid_down_rgb2<pyramid_down>();";
-            test_pyramid_down_rgb2<pyramid_down>();
+            dlog << LINFO << "call test_pyramid_down_rgb2<pyramid_down<2> >();";
+            test_pyramid_down_rgb2<pyramid_down<2> >();
 
             print_spinner();
-            dlog << LINFO << "call test_pyramid_down_rgb2<pyramid_down_3_2>();";
-            test_pyramid_down_rgb2<pyramid_down_3_2>();
+            dlog << LINFO << "call test_pyramid_down_rgb2<pyramid_down<3> >();";
+            test_pyramid_down_rgb2<pyramid_down<3> >();
 
             print_spinner();
-            dlog << LINFO << "call test_pyramid_down_rgb2<pyramid_down_4_3>();";
-            test_pyramid_down_rgb2<pyramid_down_4_3>();
+            dlog << LINFO << "call test_pyramid_down_rgb2<pyramid_down<4> >();";
+            test_pyramid_down_rgb2<pyramid_down<4> >();
 
             print_spinner();
-            dlog << LINFO << "call test_pyramid_down_rgb2<pyramid_down_5_4>();";
-            test_pyramid_down_rgb2<pyramid_down_5_4>();
+            dlog << LINFO << "call test_pyramid_down_rgb2<pyramid_down<5> >();";
+            test_pyramid_down_rgb2<pyramid_down<5> >();
 
             print_spinner();
-            dlog << LINFO << "call test_pyramid_down_rgb2<pyramid_down_generic<5> >();";
-            test_pyramid_down_rgb2<pyramid_down_generic<5> >();
+            dlog << LINFO << "call test_pyramid_down_rgb2<pyramid_down<8> >();";
+            test_pyramid_down_rgb2<pyramid_down<8> >();
 
 
             print_spinner();
-            dlog << LINFO << "call test_pyramid_down_grayscale2<pyramid_down>();";
-            test_pyramid_down_grayscale2<pyramid_down>();
+            dlog << LINFO << "call test_pyramid_down_grayscale2<pyramid_down<2> >();";
+            test_pyramid_down_grayscale2<pyramid_down<2> >();
 
             print_spinner();
-            dlog << LINFO << "call test_pyramid_down_grayscale2<pyramid_down_3_2>();";
-            test_pyramid_down_grayscale2<pyramid_down_3_2>();
+            dlog << LINFO << "call test_pyramid_down_grayscale2<pyramid_down<3> >();";
+            test_pyramid_down_grayscale2<pyramid_down<3> >();
 
             print_spinner();
-            dlog << LINFO << "call test_pyramid_down_grayscale2<pyramid_down_4_3>();";
-            test_pyramid_down_grayscale2<pyramid_down_4_3>();
+            dlog << LINFO << "call test_pyramid_down_grayscale2<pyramid_down<4> >();";
+            test_pyramid_down_grayscale2<pyramid_down<4> >();
 
             print_spinner();
-            dlog << LINFO << "call test_pyramid_down_grayscale2<pyramid_down_5_4>();";
-            test_pyramid_down_grayscale2<pyramid_down_5_4>();
+            dlog << LINFO << "call test_pyramid_down_grayscale2<pyramid_down<5> >();";
+            test_pyramid_down_grayscale2<pyramid_down<5> >();
 
             print_spinner();
-            dlog << LINFO << "call test_pyramid_down_grayscale2<pyramid_down_generic<6> >();";
-            test_pyramid_down_grayscale2<pyramid_down_generic<6> >();
+            dlog << LINFO << "call test_pyramid_down_grayscale2<pyramid_down<6> >();";
+            test_pyramid_down_grayscale2<pyramid_down<6> >();
         }
     } a;
 

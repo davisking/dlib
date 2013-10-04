@@ -196,7 +196,7 @@ int main()
         make_simple_test_data(images, object_locations);
 
 
-        typedef scan_image_pyramid<pyramid_down_5_4, very_simple_feature_extractor> image_scanner_type;
+        typedef scan_image_pyramid<pyramid_down<5>, very_simple_feature_extractor> image_scanner_type;
         image_scanner_type scanner;
         // Instead of using setup_grid_detection_templates() like in object_detector_ex.cpp, lets manually
         // setup the sliding window box.  We use a window with the same shape as the white boxes we

@@ -10,11 +10,18 @@
 namespace dlib
 {
 
+    template <
+        unsigned int N
+        >
     class pyramid_down : noncopyable
     {
         /*!
+            REQUIREMENTS ON N
+                N > 1
+
             WHAT THIS OBJECT REPRESENTS
-                This is a simple functor to help create image pyramids.
+                This is a simple functor to help create image pyramids.  In particular, it
+                downsamples images at a ratio of N to N-1.
 
 
                 WARNING, when mapping rectangles from one layer of a pyramid
@@ -43,18 +50,14 @@ namespace dlib
                 - pixel_traits<typename in_image_type::type>::has_alpha == false
                 - pixel_traits<typename out_image_type::type>::has_alpha == false
             ensures
-                - #down will contain an image that is roughly half the size of the original
-                  image.  To be specific, this function performs the following steps:
-                    - 1. Applies a 5x5 Gaussian filter to the original image to smooth it a little.
-                    - 2. Every other row and column is discarded to create an image half the size
-                         of the original.  This smaller image is stored in #down.
-                - if both input and output images contain RGB pixels then the downsampled image will
+                - #down will contain an image that is roughly (N-1)/N times the size of the
+                  original image.  
+                - If both input and output images contain RGB pixels then the downsampled image will
                   be in color.  Otherwise, the downsampling will be performed in a grayscale mode.
                 - The location of a point P in original image will show up at point point_down(P)
                   in the #down image.  
-                - Note that some points on the border of the original image will correspond to 
-                  points outside the #down image.  This is because the 5x5 filter is not applied 
-                  at the borders.
+                - Note that some points on the border of the original image might correspond to 
+                  points outside the #down image.  
         !*/
 
     // -------------------------------
@@ -149,61 +152,6 @@ namespace dlib
                   (i.e. Basically applies rect_up() to rect levels times and returns the result.)
         !*/
 
-    };
-
-// ----------------------------------------------------------------------------------------
-
-    class pyramid_down_3_2 : noncopyable
-    {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This is a function object with an interface identical to pyramid_down (defined
-                at the top of this file) except that it downsamples images at a ratio of 3 to 2
-                instead of 2 to 1.
-        !*/
-    };
-
-
-// ----------------------------------------------------------------------------------------
-
-    class pyramid_down_4_3 : noncopyable
-    {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This is a function object with an interface identical to pyramid_down (defined
-                at the top of this file) except that it downsamples images at a ratio of 4 to 3
-                instead of 2 to 1.
-        !*/
-    };
-
-// ----------------------------------------------------------------------------------------
-
-    class pyramid_down_5_4 : noncopyable
-    {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This is a function object with an interface identical to pyramid_down (defined
-                at the top of this file) except that it downsamples images at a ratio of 5 to 4
-                instead of 2 to 1.
-        !*/
-    };
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        unsigned int N
-        >
-    class pyramid_down_generic : noncopyable
-    {
-        /*!
-            REQUIREMENTS ON N
-                N > 1
-
-            WHAT THIS OBJECT REPRESENTS
-                This is a function object with an interface identical to pyramid_down
-                (defined at the top of this file) except that it downsamples images at a
-                ratio of N to N-1 instead of 2 to 1.
-        !*/
     };
 
 // ----------------------------------------------------------------------------------------

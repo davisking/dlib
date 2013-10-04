@@ -145,11 +145,12 @@ int main()
                       parameters yourself.  They are automatically populated by the 
                       structural_object_detection_trainer.
 
-                The sliding window classifiers described above are applied to every level of an image
-                pyramid.   So you need to tell scan_image_pyramid what kind of pyramid you want to
-                use.  In this case we are using pyramid_down which downsamples each pyramid layer by
-                half (dlib also contains other version of pyramid_down which result in finer grained
-                pyramids).
+                The sliding window classifiers described above are applied to every level of an
+                image pyramid.  So you need to tell scan_image_pyramid what kind of pyramid you want
+                to use.  In this case we are using pyramid_down<2> which downsamples each pyramid
+                layer by half (if you want to use a finer image pyramid then just change the
+                template argument to a larger value.  For example, using pyramid_down<5> would
+                downsample each layer by a ratio of 5 to 4).
 
                 Finally, some of the feature extraction zones are allowed to move freely within the
                 object box.  This means that when we are sliding the classifier over an image, some
@@ -168,7 +169,7 @@ int main()
                 feature extraction regions.
         */
         typedef hashed_feature_image<hog_image<3,3,1,4,hog_signed_gradient,hog_full_interpolation> > feature_extractor_type;
-        typedef scan_image_pyramid<pyramid_down, feature_extractor_type> image_scanner_type;
+        typedef scan_image_pyramid<pyramid_down<2>, feature_extractor_type> image_scanner_type;
         image_scanner_type scanner;
 
         // The hashed_feature_image in the scanner needs to be supplied with a hash function capable 

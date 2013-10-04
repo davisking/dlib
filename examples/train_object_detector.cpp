@@ -133,7 +133,7 @@ int main(int argc, char** argv)
 
 
         typedef hashed_feature_image<hog_image<4,4,1,9,hog_signed_gradient,hog_full_interpolation> > feature_extractor_type;
-        typedef scan_image_pyramid<pyramid_down_3_2, feature_extractor_type> image_scanner_type;
+        typedef scan_image_pyramid<pyramid_down<3>, feature_extractor_type> image_scanner_type;
 
         if (parser.option("t") || parser.option("cross-validate"))
         {
