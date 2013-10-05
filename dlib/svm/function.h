@@ -782,6 +782,17 @@ namespace dlib
             const sample_type& x
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(weights.size() > 0 && 
+                        weights.nr() == (long)number_of_classes() &&
+                        weights.nr() == b.size(),
+                "\t pair<result_type,scalar_type> multiclass_linear_decision_function::predict(x)"
+                << "\n\t This object must be properly initialized before you can use it."
+                << "\n\t weights.size():      " << weights.size()
+                << "\n\t weights.nr():        " << weights.nr()
+                << "\n\t number_of_classes(): " << number_of_classes()
+                );
+
             // Rather than doing something like, best_idx = index_of_max(weights*x-b)
             // we do the following somewhat more complex thing because this supports
             // both sparse and dense samples.
@@ -805,6 +816,17 @@ namespace dlib
             const sample_type& x
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(weights.size() > 0 && 
+                        weights.nr() == (long)number_of_classes() &&
+                        weights.nr() == b.size(),
+                "\t result_type multiclass_linear_decision_function::operator()(x)"
+                << "\n\t This object must be properly initialized before you can use it."
+                << "\n\t weights.size():      " << weights.size()
+                << "\n\t weights.nr():        " << weights.nr()
+                << "\n\t number_of_classes(): " << number_of_classes()
+                );
+
             return predict(x).first;
         }
     };
