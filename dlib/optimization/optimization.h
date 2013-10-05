@@ -181,6 +181,9 @@ namespace dlib
     )
     {
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
+        // The starting point (i.e. x) must be a column vector.  
+        COMPILE_TIME_ASSERT(T::NC <= 1);
+
         DLIB_ASSERT (
             is_col_vector(x),
             "\tdouble find_min()"
@@ -238,6 +241,9 @@ namespace dlib
     )
     {
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
+        // The starting point (i.e. x) must be a column vector.  
+        COMPILE_TIME_ASSERT(T::NC <= 1);
+
         DLIB_ASSERT (
             is_col_vector(x),
             "\tdouble find_max()"
@@ -302,6 +308,9 @@ namespace dlib
     )
     {
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
+        // The starting point (i.e. x) must be a column vector.  
+        COMPILE_TIME_ASSERT(T::NC <= 1);
+
         DLIB_ASSERT (
             is_col_vector(x) && derivative_eps > 0,
             "\tdouble find_min_using_approximate_derivatives()"
@@ -362,6 +371,9 @@ namespace dlib
     )
     {
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
+        // The starting point (i.e. x) must be a column vector.  
+        COMPILE_TIME_ASSERT(T::NC <= 1);
+
         DLIB_ASSERT (
             is_col_vector(x) && derivative_eps > 0,
             "\tdouble find_max_using_approximate_derivatives()"
@@ -463,6 +475,9 @@ namespace dlib
 
         // make sure the requires clause is not violated
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
+        // The starting point (i.e. x) must be a column vector.  
+        COMPILE_TIME_ASSERT(T::NC <= 1);
+
         DLIB_ASSERT (
             is_col_vector(x) && is_col_vector(x_lower) && is_col_vector(x_upper) &&
             x.size() == x_lower.size() && x.size() == x_upper.size(),
@@ -548,6 +563,9 @@ namespace dlib
         double x_upper
     )
     {
+        // The starting point (i.e. x) must be a column vector.  
+        COMPILE_TIME_ASSERT(T::NC <= 1);
+
         typedef typename T::type scalar_type;
         return find_min_box_constrained(search_strategy,
                                         stop_strategy,
@@ -581,6 +599,9 @@ namespace dlib
     {
         // make sure the requires clause is not violated
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
+        // The starting point (i.e. x) must be a column vector.  
+        COMPILE_TIME_ASSERT(T::NC <= 1);
+
         DLIB_ASSERT (
             is_col_vector(x) && is_col_vector(x_lower) && is_col_vector(x_upper) &&
             x.size() == x_lower.size() && x.size() == x_upper.size(),
@@ -673,6 +694,9 @@ namespace dlib
         double x_upper
     )
     {
+        // The starting point (i.e. x) must be a column vector.  
+        COMPILE_TIME_ASSERT(T::NC <= 1);
+
         typedef typename T::type scalar_type;
         return find_max_box_constrained(search_strategy,
                                         stop_strategy,

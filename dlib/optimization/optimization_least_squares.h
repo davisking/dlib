@@ -190,6 +190,9 @@ namespace dlib
         double radius = 1
     )
     {
+        // The starting point (i.e. x) must be a column vector.  
+        COMPILE_TIME_ASSERT(T::NC <= 1);
+
         // make sure requires clause is not broken
         DLIB_ASSERT(is_vector(mat(list)) && list.size() > 0 && 
                     is_col_vector(x) && radius > 0,
@@ -313,6 +316,9 @@ namespace dlib
         double radius = 1
     )
     {
+        // The starting point (i.e. x) must be a column vector.  
+        COMPILE_TIME_ASSERT(T::NC <= 1);
+
         // make sure requires clause is not broken
         DLIB_ASSERT(is_vector(mat(list)) && list.size() > 0 && 
                     is_col_vector(x) && radius > 0,

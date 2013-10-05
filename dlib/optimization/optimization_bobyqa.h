@@ -3353,6 +3353,9 @@ L210:
         const long max_f_evals
     ) 
     {
+        // The starting point (i.e. x) must be a column vector.  
+        COMPILE_TIME_ASSERT(T::NC <= 1);
+
         // check the requirements.  Also split the assert up so that the error message isn't huge.
         DLIB_CASSERT(is_col_vector(x) && is_col_vector(x_lower) && is_col_vector(x_upper) &&
                     x.size() == x_lower.size() && x_lower.size() == x_upper.size() &&
@@ -3405,6 +3408,9 @@ L210:
         const long max_f_evals
     ) 
     {
+        // The starting point (i.e. x) must be a column vector.  
+        COMPILE_TIME_ASSERT(T::NC <= 1);
+
         return -find_min_bobyqa(negate_function(f), x, npt, x_lower, x_upper, rho_begin, rho_end, max_f_evals);
     }
 
