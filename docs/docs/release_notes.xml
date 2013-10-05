@@ -12,12 +12,42 @@
 
 <current>
 New Features:
+   - Added scan_image_custom
+   - Added split_array()
+   - Added add_image_left_right_flips()
+   - Updated the interface to allow the user to set different loss values for
+     false alarming vs getting a correct detection.  This is for the
+     structural_sequence_segmentation_trainer
+   - Added an overload of clamp() that lets you use matrix valued lower/upper bounds.
+   - Added a backtracking_line_search(), find_min_box_constrained() and find_max_box_constrained()
+   - Added vector_normalizer_frobmetric
+   - Added a function for computing Felzenszwalb's 31 channel HOG image
+     representation.  This is extract_fhog_features().
 
 Non-Backwards Compatible Changes:
+   - Refactored the image pyramid code. Now there is just one templated object,
+     pyramid_down and you give it the downsampling amount as a template
+     argument.  So you will have to update your code slightly.  Use the
+     following substitutions:
+      change pyramid_down to pyramid_down&lt;2&gt;
+      change pyramid_down_3_2 to pyramid_down&lt;3&gt;
+      change pyramid_down_4_3 to pyramid_down&lt;4&gt;
+      change pyramid_down_5_4 to pyramid_down&lt;5&gt;
 
 Bug fixes:
 
 Other:
+   - Moved python C++ utility headers into dlib/python and updated #include
+     statements to reflect this move.
+   - Made the structural SVM solver's cache slightly more efficient
+   - Made the PNG loader able to load in grayscale images with an alpha channel.
+   - Removed a bunch of checks that prevented users from using references to
+     functions with the optimization code and forced the use of function
+     pointers. This was to avoid triggering a bug in gcc 4.0. Since that
+     compiler is no longer officially supported by dlib I've removed these
+     checks to increase usability.
+   - Made resize_image() use bilinear interpolation by default and also added a
+     special version of it that is optimized for this case.
 
 </current>
 
