@@ -17,12 +17,14 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON N
-                N > 1
+                N > 0
 
             WHAT THIS OBJECT REPRESENTS
                 This is a simple functor to help create image pyramids.  In particular, it
                 downsamples images at a ratio of N to N-1.
 
+                Note that setting N to 1 means that this object functions like
+                pyramid_disable (defined at the bottom of this file).  
 
                 WARNING, when mapping rectangles from one layer of a pyramid
                 to another you might end up with rectangles which extend slightly 

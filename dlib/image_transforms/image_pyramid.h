@@ -782,7 +782,7 @@ namespace dlib
     {
     public:
 
-        COMPILE_TIME_ASSERT(N > 1);
+        COMPILE_TIME_ASSERT(N > 0);
 
         template <typename T>
         vector<double,2> point_down (
@@ -887,6 +887,9 @@ namespace dlib
             resize_image(original, down);
         }
     };
+
+    template <>
+    class pyramid_down<1> : public pyramid_disable {};
 
     template <>
     class pyramid_down<2> : public dlib::impl::pyramid_down_2_1 {};
