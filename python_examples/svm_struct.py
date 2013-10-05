@@ -8,6 +8,10 @@
 # classifier.  We first discuss the multi-class classifier model and then walk through
 # using the structural SVM tools to find the parameters of this classification model.   
 #
+# As an aside, dlib's C++ interface to the structural SVM solver is threaded.  So on a
+# multi-core computer it is significantly faster than using the python interface.  So
+# consider using the C++ interface instead if you find that running it in python is slow.
+#
 # COMPILING THE DLIB PYTHON INTERFACE
 #   Dlib comes with a compiled python interface for python 2.7 on MS Windows.  If
 #   you are using another python version or operating system then you need to
