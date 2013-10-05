@@ -778,7 +778,7 @@ namespace dlib
         unsigned long number_of_classes (
         ) const { return labels.size(); }
 
-        result_type operator() (
+        std::pair<result_type, scalar_type> predict (
             const sample_type& x
         ) const
         {
@@ -798,7 +798,14 @@ namespace dlib
                 }
             }
 
-            return labels[best_idx];
+            return std::make_pair(labels[best_idx], best_val);
+        }
+
+        result_type operator() (
+            const sample_type& x
+        ) const
+        {
+            return predict(x).first;
         }
     };
 

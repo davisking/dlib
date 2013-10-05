@@ -927,6 +927,23 @@ namespace dlib
                   this object)
         !*/
 
+        std::pair<result_type, scalar_type> predict (
+            const sample_type& x
+        ) const;
+        /*!
+            requires
+                - weights.size() > 0
+                - weights.nr() == number_of_classes() == b.size()
+                - if (x is a dense vector, i.e. a dlib::matrix) then
+                    - is_vector(x) == true
+                    - x.size() == weights.nc()
+                      (i.e. it must be legal to multiply weights with x)
+            ensures
+                - Returns the predicted label for the x sample and also it's score.  
+                  In particular, it returns the following:
+                    std::make_pair(labels[index_of_max(weights*x-b)],  max(weights*x-b))
+        !*/
+
         result_type operator() (
             const sample_type& x
         ) const;
@@ -942,6 +959,7 @@ namespace dlib
                 - Returns the predicted label for the x sample.  In particular, it returns
                   the following:
                     labels[index_of_max(weights*x-b)]
+                  Or in other words, this function returns predict(x).first
         !*/
     };
 
