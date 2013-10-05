@@ -134,6 +134,20 @@ namespace dlib
                   this object)
         !*/
 
+        std::pair<result_type, scalar_type> predict (
+            const sample_type& sample 
+        ) const;
+        /*!
+            requires
+                - number_of_classes() != 0
+            ensures
+                - Evaluates all the decision functions in get_binary_decision_functions()
+                  and returns the predicted label and score for the input sample.  That is,
+                  returns std::make_pair(label,score)
+                - The label is determined by whichever classifier outputs the largest
+                  score.  
+        !*/
+
         result_type operator() (
             const sample_type& sample
         ) const
@@ -141,8 +155,8 @@ namespace dlib
             requires
                 - number_of_classes() != 0
             ensures
-                - evaluates all the decision functions in get_binary_decision_functions()
-                  and returns the predicted label.
+                - Evaluates all the decision functions in get_binary_decision_functions()
+                  and returns the predicted label.  That is, returns predict(sample).first.
         !*/
     };
 

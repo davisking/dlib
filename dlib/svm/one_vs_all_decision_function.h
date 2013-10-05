@@ -79,12 +79,12 @@ namespace dlib
             return num_classes;
         }
 
-        result_type operator() (
+        std::pair<result_type, scalar_type> predict (
             const sample_type& sample
         ) const
         {
             DLIB_ASSERT(number_of_classes() != 0, 
-                "\t void one_vs_all_decision_function::operator()"
+                "\t pair<result_type,scalar_type> one_vs_all_decision_function::predict()"
                 << "\n\t You can't make predictions with an empty decision function."
                 << "\n\t this: " << this
                 );
@@ -104,7 +104,20 @@ namespace dlib
                 }
             }
 
-            return best_label;
+            return std::make_pair(best_label, best_score);
+        }
+
+        result_type operator() (
+            const sample_type& sample
+        ) const
+        {
+            DLIB_ASSERT(number_of_classes() != 0, 
+                "\t result_type one_vs_all_decision_function::operator()"
+                << "\n\t You can't make predictions with an empty decision function."
+                << "\n\t this: " << this
+                );
+
+            return predict(sample).first;
         }
 
 
