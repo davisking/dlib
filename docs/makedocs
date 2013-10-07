@@ -166,7 +166,7 @@ makedocs ()
     else
         if [ "$1" != "fast" ]
         then
-            build_python_interface
+            build_python_interface no-test-python
         fi;
         sphinx-build -b html docs/python sphinx.$$
     fi;
