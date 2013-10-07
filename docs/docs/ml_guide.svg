@@ -8,12 +8,12 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="1827.1782"
-   height="887.87561"
-   viewBox="-331 -284 1031.3405 492.80382"
+   width="1826.2773"
+   height="887.87567"
+   viewBox="-331 -284 1030.832 492.80385"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="0.48.3.1 r9886"
    sodipodi:docname="ml_guide.svg">
   <metadata
      id="metadata1192">
@@ -79,24 +79,6 @@
          operator="in"
          in="result12" />
     </filter>
-    <filter
-       inkscape:collect="always"
-       id="filter4656"
-       color-interpolation-filters="sRGB">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="2.0881325"
-         id="feGaussianBlur4658" />
-    </filter>
-    <filter
-       inkscape:collect="always"
-       id="filter4656-5"
-       color-interpolation-filters="sRGB">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="2.0881325"
-         id="feGaussianBlur4658-8" />
-    </filter>
     <linearGradient
        id="linearGradient4255-5">
       <stop
@@ -147,24 +129,38 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1855"
-     inkscape:window-height="1056"
+     inkscape:window-width="1535"
+     inkscape:window-height="876"
      id="namedview1188"
      showgrid="false"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:zoom="0.70710678"
-     inkscape:cx="876.86491"
-     inkscape:cy="546.81265"
+     inkscape:zoom="0.5"
+     inkscape:cx="496.99623"
+     inkscape:cy="315.58474"
      inkscape:window-x="65"
      inkscape:window-y="24"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg2" />
   <g
+     transform="matrix(0.57695863,0,0,0.57695863,-190.33208,-96.898833)"
+     id="g4252">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#dbebea"
+       d="m 1513.95,474.536 c 44.08,-55.164 20.74,-230.632 15.98,-300.199 -4.76,-69.566 0.44,-206.0882 -63.27,-245.9956 -63.71,-39.9074 -144.02,-30.4984 -321.02,-31.4984 -176.998,-1 -248.756,24.7046 -281.698,47.9308 C 831,-32 763.184,6.58152 768.184,145.581 c 5,138.997 37.762,229.961 130.234,320.547 49,47.998 144.632,70.634 259.832,68.112 115.21,-2.524 311.62,-4.538 355.7,-59.704 z"
+       id="path4254" />
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#5aa5a2;stroke-width:5"
+       d="m 1513.95,474.536 c 44.08,-55.164 20.74,-230.632 15.98,-300.199 -4.76,-69.566 0.44,-206.0882 -63.27,-245.9956 -63.71,-39.9074 -144.02,-30.4984 -321.02,-31.4984 -176.998,-1 -248.756,24.7046 -281.698,47.9308 C 831,-32 763.184,6.58152 768.184,145.581 c 5,138.997 37.762,229.961 130.234,320.547 49,47.998 144.632,70.634 259.832,68.112 115.21,-2.524 311.62,-4.538 355.7,-59.704"
+       id="path4256" />
+  </g>
+  <g
      id="g40342"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40344"
        d="m 325.556,-296.732 c 32,-36 394.686,-51.344 446.998,19 63.938,85.98 32.859,253.2787 -3.141,298.2784 -36,44.9997 -137.257,34.6994 -171.955,15.422 -34.7,-19.2775 -29.301,-25.4462 -77.881,-64.0011 -48.579,-38.5549 -144.367,-0.3276 -198.415,-38.409 -20.12,-14.1764 -24.606,-32.2914 -23.606,-96.2903 1,-64 -4,-98 28,-134 z"
@@ -178,39 +174,39 @@
   </g>
   <text
      id="text582"
-     y="-79.914719"
+     y="-79.359634"
      x="199.17044"
      style="font-size:7.14567232px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan584"
-       y="-79.914719"
+       y="-79.359634"
        x="199.17044" />
   </text>
   <text
      font-size="12.8"
      style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:sans-serif"
      x="543.29382"
-     y="276.75272"
+     y="277.3078"
      id="text14">
     <tspan
        x="543.29382"
-       y="276.75272"
+       y="277.3078"
        id="tspan16" />
   </text>
   <text
      font-size="12.8"
      style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:sans-serif"
      x="-83.899239"
-     y="24.441938"
+     y="24.997019"
      id="text232">
     <tspan
        x="-83.899239"
-       y="24.441938"
+       y="24.997019"
        id="tspan234" />
   </text>
   <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)"
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
      id="g39608">
     <ellipse
        sodipodi:ry="41.979599"
@@ -253,7 +249,7 @@
     </text>
   </g>
   <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)"
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
      id="g39620">
     <ellipse
        sodipodi:ry="46.270802"
@@ -296,7 +292,7 @@
     </text>
   </g>
   <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)"
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
      id="g39632">
     <ellipse
        sodipodi:ry="43.628201"
@@ -339,7 +335,7 @@
     </text>
   </g>
   <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)"
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
      id="g39644">
     <ellipse
        sodipodi:ry="35.506901"
@@ -382,7 +378,7 @@
     </text>
   </g>
   <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)"
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
      id="g39656">
     <ellipse
        sodipodi:ry="45.4314"
@@ -429,7 +425,7 @@
     </text>
   </g>
   <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)"
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
      id="g39670">
     <ellipse
        sodipodi:ry="45.8988"
@@ -479,26 +475,26 @@
      font-size="12.8"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      x="189.6427"
-     y="-51.915993"
+     y="-51.360909"
      id="text39684">
     <tspan
        x="189.6427"
-       y="-51.915993"
+       y="-51.360909"
        id="tspan39686">YES</tspan>
   </text>
   <text
      font-size="12.8"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      x="221.85201"
-     y="-44.87886"
+     y="-44.323776"
      id="text39688">
     <tspan
        x="221.85201"
-       y="-44.87886"
+       y="-44.323776"
        id="tspan39690">NO</tspan>
   </text>
   <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)"
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
      id="g39692">
     <path
        inkscape:connector-curvature="0"
@@ -507,15 +503,15 @@
        id="path39694" />
     <polygon
        style="fill:#008000"
-       points="610.598,228.501 609.037,223.133 617.976,229.849 607.24,232.971 "
+       points="609.037,223.133 617.976,229.849 607.24,232.971 610.598,228.501 "
        id="polygon39696" />
     <polygon
        style="fill:none;stroke:#008000;stroke-width:4"
-       points="610.598,228.501 609.037,223.133 617.976,229.849 607.24,232.971 "
+       points="609.037,223.133 617.976,229.849 607.24,232.971 610.598,228.501 "
        id="polygon39698" />
   </g>
   <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)"
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
      id="g39700">
     <path
        inkscape:connector-curvature="0"
@@ -524,15 +520,15 @@
        id="path39702" />
     <polygon
        style="fill:#008000"
-       points="171.059,237.545 173.394,242.624 163.563,237.299 173.721,232.63 "
+       points="173.394,242.624 163.563,237.299 173.721,232.63 171.059,237.545 "
        id="polygon39704" />
     <polygon
        style="fill:none;stroke:#008000;stroke-width:4"
-       points="171.059,237.545 173.394,242.624 163.563,237.299 173.721,232.63 "
+       points="173.394,242.624 163.563,237.299 173.721,232.63 171.059,237.545 "
        id="polygon39706" />
   </g>
   <g
-     transform="matrix(0.65939608,0,0,0.64580433,-228.12625,-108.54392)"
+     transform="matrix(0.65939608,0,0,0.64580433,-228.12625,-107.98884)"
      id="g39708">
     <path
        inkscape:connector-curvature="0"
@@ -541,15 +537,15 @@
        id="path39710" />
     <polygon
        style="fill:#808000"
-       points="482.027,140.541 470.856,140.085 477.923,131.422 477.695,137.007 "
+       points="470.856,140.085 477.923,131.422 477.695,137.007 482.027,140.541 "
        id="polygon39712" />
     <polygon
        style="fill:none;stroke:#808000;stroke-width:6"
-       points="482.027,140.541 470.856,140.085 477.923,131.422 477.695,137.007 "
+       points="470.856,140.085 477.923,131.422 477.695,137.007 482.027,140.541 "
        id="polygon39714" />
   </g>
   <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)"
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
      id="g39716">
     <path
        inkscape:connector-curvature="0"
@@ -558,15 +554,15 @@
        id="path39718" />
     <polygon
        style="fill:#800000"
-       points="308.398,191.725 313.36,194.3 302.331,196.134 307.481,186.21 "
+       points="313.36,194.3 302.331,196.134 307.481,186.21 308.398,191.725 "
        id="polygon39720" />
     <polygon
        style="fill:none;stroke:#800000;stroke-width:4"
-       points="308.398,191.725 313.36,194.3 302.331,196.134 307.481,186.21 "
+       points="313.36,194.3 302.331,196.134 307.481,186.21 308.398,191.725 "
        id="polygon39722" />
   </g>
   <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)"
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
      id="g39724">
     <path
        inkscape:connector-curvature="0"
@@ -575,15 +571,15 @@
        id="path39726" />
     <polygon
        style="fill:#800000"
-       points="409.965,252.174 407.398,247.208 417.465,252.072 407.533,257.207 "
+       points="407.398,247.208 417.465,252.072 407.533,257.207 409.965,252.174 "
        id="polygon39728" />
     <polygon
        style="fill:none;stroke:#800000;stroke-width:4"
-       points="409.965,252.174 407.398,247.208 417.465,252.072 407.533,257.207 "
+       points="407.398,247.208 417.465,252.072 407.533,257.207 409.965,252.174 "
        id="polygon39730" />
   </g>
   <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)"
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
      id="g39732">
     <path
        inkscape:connector-curvature="0"
@@ -592,16 +588,16 @@
        id="path39734" />
     <polygon
        style="fill:#800000"
-       points="621.516,163.44 617.369,159.691 628.503,160.712 621.006,169.006 "
+       points="617.369,159.691 628.503,160.712 621.006,169.006 621.516,163.44 "
        id="polygon39736" />
     <polygon
        style="fill:none;stroke:#800000;stroke-width:4"
-       points="621.516,163.44 617.369,159.691 628.503,160.712 621.006,169.006 "
+       points="617.369,159.691 628.503,160.712 621.006,169.006 621.516,163.44 "
        id="polygon39738" />
   </g>
   <g
      id="g39774"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path39776"
        d="m -222.239,303.824 c 21.592,-43.182 279.0802,-40.572 334.539,5.214 55.458,45.786 20.459,97.785 -13.5411,154.785 -33.9997,56.999 -85.9994,72.999 -169.9988,72.999 -83.9991,0 -156.7471,3.207 -165.9991,-49.999 -9.254,-53.206 -6.59,-139.817 15,-182.999 z"
@@ -615,7 +611,7 @@
   </g>
   <g
      id="g39780"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <ellipse
        id="ellipse39782"
        ry="47.970299"
@@ -658,57 +654,57 @@
   </g>
   <text
      id="text39816"
-     y="129.58191"
+     y="130.13699"
      x="-265.93613"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#808000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan39818"
-       y="129.58191"
+       y="130.13699"
        x="-276.64673"
        style="text-align:center;text-anchor:middle">TOO</tspan>
     <tspan
        id="tspan39820"
-       y="138.80928"
+       y="139.36436"
        x="-276.64673"
        style="text-align:center;text-anchor:middle">SLOW</tspan>
   </text>
   <text
      id="text39822"
-     y="165.54091"
+     y="166.09599"
      x="-178.49316"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan39824"
-       y="165.54091"
+       y="166.09599"
        x="-178.49316">YES</tspan>
   </text>
   <text
      id="text39826"
-     y="92.601967"
+     y="93.157051"
      x="-203.82185"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan39828"
-       y="92.601967"
+       y="93.157051"
        x="-203.82185">NO</tspan>
   </text>
   <text
      id="text39830"
-     y="200.76408"
+     y="201.31917"
      x="-266.13144"
      style="font-size:13.02086735px;font-style:normal;font-weight:700;text-anchor:start;fill:#000000;font-family:sans-serif"
      font-size="22.5778">
     <tspan
        id="tspan39832"
-       y="200.76408"
+       y="201.31917"
        x="-266.13144">Clustering</tspan>
   </text>
   <g
      id="g39834"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path39836"
        d="M -7.15504,459.873 A 115.524,115.524 0 0 0 38.9173,416.696"
@@ -716,16 +712,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon39838"
-       points="-13.856,463.155 -6.36487,454.856 -6.87145,460.423 -2.72166,464.168 "
+       points="-6.36487,454.856 -6.87145,460.423 -2.72166,464.168 -13.856,463.155 "
        style="fill:#008000" />
     <polygon
        id="polygon39840"
-       points="-13.856,463.155 -6.36487,454.856 -6.87145,460.423 -2.72166,464.168 "
+       points="-6.36487,454.856 -6.87145,460.423 -2.72166,464.168 -13.856,463.155 "
        style="fill:none;stroke:#008000;stroke-width:4" />
   </g>
   <g
      id="g39842"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path39844"
        d="M -5.74405,345.146 A 347.239,347.239 0 0 0 -38.1294,337.429"
@@ -733,16 +729,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon39846"
-       points="-45.5053,336.094 -34.8652,332.66 -38.0912,337.226 -36.3746,342.546 "
+       points="-34.8652,332.66 -38.0912,337.226 -36.3746,342.546 -45.5053,336.094 "
        style="fill:#800000" />
     <polygon
        id="polygon39848"
-       points="-45.5053,336.094 -34.8652,332.66 -38.0912,337.226 -36.3746,342.546 "
+       points="-34.8652,332.66 -38.0912,337.226 -36.3746,342.546 -45.5053,336.094 "
        style="fill:none;stroke:#800000;stroke-width:4" />
   </g>
   <g
      id="g39850"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path39852"
        d="m -126.051,374.113 a 710.741,710.741 0 0 0 1.909,51.097"
@@ -750,15 +746,15 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon39854"
-       points="-126.035,366.614 -121.191,376.69 -126.151,374.113 -131.189,376.536 "
+       points="-121.191,376.69 -126.151,374.113 -131.189,376.536 -126.035,366.614 "
        style="fill:#808000" />
     <polygon
        id="polygon39856"
-       points="-126.035,366.614 -121.191,376.69 -126.151,374.113 -131.189,376.536 "
+       points="-121.191,376.69 -126.151,374.113 -131.189,376.536 -126.035,366.614 "
        style="fill:none;stroke:#808000;stroke-width:4" />
   </g>
   <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)"
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
      id="g39858">
     <path
        inkscape:connector-curvature="0"
@@ -767,30 +763,16 @@
        id="path39860" />
     <polygon
        style="fill:#800000"
-       points="40.7362,309.067 45.6616,306.423 40.9539,316.564 35.6658,306.714 "
+       points="45.6616,306.423 40.9539,316.564 35.6658,306.714 40.7362,309.067 "
        id="polygon39862" />
     <polygon
        style="fill:none;stroke:#800000;stroke-width:4"
-       points="40.7362,309.067 45.6616,306.423 40.9539,316.564 35.6658,306.714 "
+       points="45.6616,306.423 40.9539,316.564 35.6658,306.714 40.7362,309.067 "
        id="polygon39864" />
   </g>
   <g
-     id="g40014"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
-    <path
-       id="path40016"
-       d="m 1513.95,474.536 c 44.08,-55.164 20.74,-230.632 15.98,-300.199 -4.76,-69.566 0.44,-206.0882 -63.27,-245.9956 -63.71,-39.9074 -144.02,-30.4984 -321.02,-31.4984 -176.997,-1 -224.698,-5.069 -281.698,47.9309 -57,52.99941 -100.758,61.80761 -95.758,200.8071 5,138.998 37.762,229.96 130.234,320.546 49,47.998 144.632,70.635 259.832,68.112 115.21,-2.522 311.62,-4.537 355.7,-59.703 z"
-       style="fill:#dbebea"
-       inkscape:connector-curvature="0" />
-    <path
-       id="path40018"
-       d="m 1513.95,474.536 c 44.08,-55.164 20.74,-230.632 15.98,-300.199 -4.76,-69.566 0.44,-206.0882 -63.27,-245.9956 -63.71,-39.9074 -144.02,-30.4984 -321.02,-31.4984 -176.997,-1 -224.698,-5.069 -281.698,47.9309 -57,52.99941 -100.758,61.80761 -95.758,200.8071 5,138.998 37.762,229.96 130.234,320.546 49,47.998 144.632,70.635 259.832,68.112 115.21,-2.522 311.62,-4.537 355.7,-59.703"
-       style="fill:none;stroke:#5aa5a2;stroke-width:5"
-       inkscape:connector-curvature="0" />
-  </g>
-  <g
      id="g40020"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40022"
        d="m 852.184,309.579 c 37,-40 157.996,-82.998 300.996,-82.998 143,0 339.75,-9.358 354.89,53.709 15.13,63.067 30.01,181.954 -55.5,209.382 -44.57,14.295 -339.46,51.893 -458.29,6.727 C 875.448,451.233 815.184,349.579 852.184,309.579 z"
@@ -804,7 +786,7 @@
   </g>
   <g
      id="g40036"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <ellipse
        id="ellipse40038"
        ry="48.248299"
@@ -847,7 +829,7 @@
   </g>
   <g
      id="g40058"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <ellipse
        id="ellipse40060"
        ry="34.054901"
@@ -890,7 +872,7 @@
   </g>
   <g
      id="g40070"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <ellipse
        id="ellipse40072"
        ry="47.365101"
@@ -933,7 +915,7 @@
   </g>
   <g
      id="g40082"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <ellipse
        id="ellipse40084"
        ry="38.759998"
@@ -976,7 +958,7 @@
   </g>
   <g
      id="g40094"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <ellipse
        id="ellipse40096"
        ry="39.1562"
@@ -1019,7 +1001,7 @@
   </g>
   <g
      id="g40106"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40108"
        d="M 1083.18,119.397 A 1243.57,1243.57 0 0 0 983.122,63.3948"
@@ -1027,16 +1009,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40110"
-       points="1089.54,123.37 1078.42,122.228 1083.21,119.348 1083.78,113.787 "
+       points="1078.42,122.228 1083.21,119.348 1083.78,113.787 1089.54,123.37 "
        style="fill:#800000" />
     <polygon
        id="polygon40112"
-       points="1089.54,123.37 1078.42,122.228 1083.21,119.348 1083.78,113.787 "
+       points="1078.42,122.228 1083.21,119.348 1083.78,113.787 1089.54,123.37 "
        style="fill:none;stroke:#800000;stroke-width:4" />
   </g>
   <g
      id="g40144"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <ellipse
        id="ellipse40146"
        ry="36.265999"
@@ -1079,139 +1061,139 @@
   </g>
   <text
      id="text40180"
-     y="124.33201"
+     y="124.88709"
      x="469.96988"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40182"
-       y="124.33201"
+       y="124.88709"
        x="469.96988">YES</tspan>
   </text>
   <text
      id="text40184"
-     y="151.60757"
+     y="152.16266"
      x="492.04642"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40186"
-       y="151.60757"
+       y="152.16266"
        x="492.04642">NO</tspan>
   </text>
   <text
      id="text40188"
-     y="41.849083"
+     y="42.404167"
      x="487.27115"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40190"
-       y="41.849083"
+       y="42.404167"
        x="487.27115">NO</tspan>
   </text>
   <text
      id="text40192"
-     y="57.030418"
+     y="57.585503"
      x="518.01562"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40194"
-       y="57.030418"
+       y="57.585503"
        x="518.01562">YES</tspan>
   </text>
   <text
      id="text40196"
-     y="-82.410583"
+     y="-81.855499"
      x="533.13135"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40198"
-       y="-82.410583"
+       y="-81.855499"
        x="533.13135">NO</tspan>
   </text>
   <text
      id="text40200"
-     y="-34.336758"
+     y="-33.781673"
      x="472.21906"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40202"
-       y="-34.336758"
+       y="-33.781673"
        x="472.21906">NO</tspan>
   </text>
   <text
      id="text40204"
-     y="20.539026"
+     y="21.094107"
      x="436.72824"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40206"
-       y="20.539026"
+       y="21.094107"
        x="436.72824">YES</tspan>
   </text>
   <text
      id="text40208"
-     y="68.01561"
+     y="68.570694"
      x="401.00095"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40210"
-       y="68.01561"
+       y="68.570694"
        x="401.00095">NO</tspan>
   </text>
   <text
      id="text40212"
-     y="129.19829"
+     y="129.75337"
      x="366.72705"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40214"
-       y="129.19829"
+       y="129.75337"
        x="366.72705">YES</tspan>
   </text>
   <text
      id="text40216"
-     y="-109.79467"
+     y="-109.23959"
      x="487.55954"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40218"
-       y="-109.79467"
+       y="-109.23959"
        x="487.55954">YES</tspan>
   </text>
   <text
      id="text40220"
-     y="-42.981365"
+     y="-42.426281"
      x="314.43146"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40222"
-       y="-42.981365"
+       y="-42.426281"
        x="314.43146">YES</tspan>
   </text>
   <text
      id="text40224"
-     y="-63.184937"
+     y="-62.629852"
      x="390.52213"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40226"
-       y="-63.184937"
+       y="-62.629852"
        x="390.52213">NO</tspan>
   </text>
   <g
      id="g40228"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40230"
        d="m 1215.65,-22.7081 a 155.111,155.111 0 0 0 -31.92,21.34378"
@@ -1219,16 +1201,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40232"
-       points="1222.38,-25.9604 1215.02,-17.546 1215.44,-23.1204 1211.23,-26.8014 "
+       points="1215.02,-17.546 1215.44,-23.1204 1211.23,-26.8014 1222.38,-25.9604 "
        style="fill:#008000" />
     <polygon
        id="polygon40234"
-       points="1222.38,-25.9604 1215.02,-17.546 1215.44,-23.1204 1211.23,-26.8014 "
+       points="1215.02,-17.546 1215.44,-23.1204 1211.23,-26.8014 1222.38,-25.9604 "
        style="fill:none;stroke:#008000;stroke-width:4" />
   </g>
   <g
      id="g40236"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40238"
        d="m 1187.31,387.941 a 426.072,426.072 0 0 0 -42.53,11.773"
@@ -1236,16 +1218,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40240"
-       points="1194.64,386.359 1185.76,393.159 1187.27,387.777 1183.87,383.34 "
+       points="1185.76,393.159 1187.27,387.777 1183.87,383.34 1194.64,386.359 "
        style="fill:#008000" />
     <polygon
        id="polygon40242"
-       points="1194.64,386.359 1185.76,393.159 1187.27,387.777 1183.87,383.34 "
+       points="1185.76,393.159 1187.27,387.777 1183.87,383.34 1194.64,386.359 "
        style="fill:none;stroke:#008000;stroke-width:4" />
   </g>
   <g
      id="g40244"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40246"
        d="m 1167.34,440.624 a 946.03,946.03 0 0 0 36.52,2.794"
@@ -1253,16 +1235,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40248"
-       points="1211.34,443.826 1201.13,448.377 1203.85,443.493 1201.58,438.387 "
+       points="1201.13,448.377 1203.85,443.493 1201.58,438.387 1211.34,443.826 "
        style="fill:#800000" />
     <polygon
        id="polygon40250"
-       points="1211.34,443.826 1201.13,448.377 1203.85,443.493 1201.58,438.387 "
+       points="1201.13,448.377 1203.85,443.493 1201.58,438.387 1211.34,443.826 "
        style="fill:none;stroke:#800000;stroke-width:4" />
   </g>
   <g
      id="g40252"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40254"
        d="m 989.226,374.39 a 139.53,139.53 0 0 0 15.594,17.328"
@@ -1270,16 +1252,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40256"
-       points="1010.36,396.742 999.412,394.465 1004.47,392.092 1005.61,386.619 "
+       points="999.412,394.465 1004.47,392.092 1005.61,386.619 1010.36,396.742 "
        style="fill:#008000" />
     <polygon
        id="polygon40258"
-       points="1010.36,396.742 999.412,394.465 1004.47,392.092 1005.61,386.619 "
+       points="999.412,394.465 1004.47,392.092 1005.61,386.619 1010.36,396.742 "
        style="fill:none;stroke:#008000;stroke-width:4" />
   </g>
   <g
      id="g40260"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40262"
        d="m 1071.48,291.885 a 186.305,186.305 0 0 0 -46.59,10.732"
@@ -1287,38 +1269,38 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40264"
-       points="1078.94,291.251 1069.11,296.583 1071.44,291.502 1068.78,286.589 "
+       points="1069.11,296.583 1071.44,291.502 1068.78,286.589 1078.94,291.251 "
        style="fill:#800000" />
     <polygon
        id="polygon40266"
-       points="1078.94,291.251 1069.11,296.583 1071.44,291.502 1068.78,286.589 "
+       points="1069.11,296.583 1071.44,291.502 1068.78,286.589 1078.94,291.251 "
        style="fill:none;stroke:#800000;stroke-width:4" />
   </g>
   <text
      id="text40268"
-     y="-135.85071"
+     y="-135.29562"
      x="388.20953"
      style="font-size:13.02086735px;font-style:normal;font-weight:700;text-anchor:start;fill:#000000;font-family:sans-serif"
      font-size="22.5778">
     <tspan
        id="tspan40270"
-       y="-135.85071"
+       y="-135.29562"
        x="388.20953">Structured Prediction</tspan>
   </text>
   <text
      id="text40272"
-     y="185.95129"
+     y="186.50638"
      x="411.37601"
      style="font-size:13.02086735px;font-style:normal;font-weight:700;text-anchor:start;fill:#000000;font-family:sans-serif"
      font-size="22.5778">
     <tspan
        id="tspan40274"
-       y="185.95129"
+       y="186.50638"
        x="411.37601">Markov Random Fields</tspan>
   </text>
   <g
      id="g40276"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40278"
        d="m 905.224,81.3648 a 233.885,233.885 0 0 0 -1.755,35.3962"
@@ -1326,16 +1308,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40280"
-       points="903.743,124.247 897.984,114.664 903.162,116.77 907.954,113.89 "
+       points="897.984,114.664 903.162,116.77 907.954,113.89 903.743,124.247 "
        style="fill:#008000" />
     <polygon
        id="polygon40282"
-       points="903.743,124.247 897.984,114.664 903.162,116.77 907.954,113.89 "
+       points="897.984,114.664 903.162,116.77 907.954,113.89 903.743,124.247 "
        style="fill:none;stroke:#008000;stroke-width:4" />
   </g>
   <g
      id="g40284"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40286"
        d="M 1093.41,185.751 A 436.428,436.428 0 0 0 997.315,287.03"
@@ -1343,16 +1325,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40288"
-       points="993.126,293.247 994.324,282.132 997.18,286.937 1002.74,287.537 "
+       points="994.324,282.132 997.18,286.937 1002.74,287.537 993.126,293.247 "
        style="fill:#008000" />
     <polygon
        id="polygon40290"
-       points="993.126,293.247 994.324,282.132 997.18,286.937 1002.74,287.537 "
+       points="994.324,282.132 997.18,286.937 1002.74,287.537 993.126,293.247 "
        style="fill:none;stroke:#008000;stroke-width:4" />
   </g>
   <g
      id="g40292"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40294"
        d="m 1221.36,302.852 a 10652,10652 0 0 0 23.47,0.318"
@@ -1360,16 +1342,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40296"
-       points="1252.33,303.261 1242.27,308.148 1244.83,303.177 1242.39,298.149 "
+       points="1242.27,308.148 1244.83,303.177 1242.39,298.149 1252.33,303.261 "
        style="fill:#008000" />
     <polygon
        id="polygon40298"
-       points="1252.33,303.261 1242.27,308.148 1244.83,303.177 1242.39,298.149 "
+       points="1242.27,308.148 1244.83,303.177 1242.39,298.149 1252.33,303.261 "
        style="fill:none;stroke:#008000;stroke-width:4" />
   </g>
   <g
      id="g40300"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40302"
        d="m 1241.78,206.916 a 300.724,300.724 0 0 0 -58.65,51.54"
@@ -1377,16 +1359,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40304"
-       points="1248.04,202.792 1242.14,212.287 1241.65,206.718 1236.9,203.767 "
+       points="1242.14,212.287 1241.65,206.718 1236.9,203.767 1248.04,202.792 "
        style="fill:#800000" />
     <polygon
        id="polygon40306"
-       points="1248.04,202.792 1242.14,212.287 1241.65,206.718 1236.9,203.767 "
+       points="1242.14,212.287 1241.65,206.718 1236.9,203.767 1248.04,202.792 "
        style="fill:none;stroke:#800000;stroke-width:4" />
   </g>
   <g
      id="g40308"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40310"
        d="m 1141.3,82.3812 a 295.846,295.846 0 0 0 -3.85,38.3218"
@@ -1394,16 +1376,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40312"
-       points="1142.59,74.9995 1145.44,85.8099 1141.06,82.3414 1135.65,83.7676 "
+       points="1145.44,85.8099 1141.06,82.3414 1135.65,83.7676 1142.59,74.9995 "
        style="fill:#800000" />
     <polygon
        id="polygon40314"
-       points="1142.59,74.9995 1145.44,85.8099 1141.06,82.3414 1135.65,83.7676 "
+       points="1145.44,85.8099 1141.06,82.3414 1135.65,83.7676 1142.59,74.9995 "
        style="fill:none;stroke:#800000;stroke-width:4" />
   </g>
   <g
      id="g40316"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40318"
        d="M 1332.97,113.509 A 151.561,151.561 0 0 0 1244.09,35.2431"
@@ -1411,15 +1393,15 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40320"
-       points="1336.1,120.301 1327.83,112.774 1333.4,113.305 1337.16,109.171 "
+       points="1327.83,112.774 1333.4,113.305 1337.16,109.171 1336.1,120.301 "
        style="fill:#800000" />
     <polygon
        id="polygon40322"
-       points="1336.1,120.301 1327.83,112.774 1333.4,113.305 1337.16,109.171 "
+       points="1327.83,112.774 1333.4,113.305 1337.16,109.171 1336.1,120.301 "
        style="fill:none;stroke:#800000;stroke-width:4" />
   </g>
   <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)"
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
      id="g40324">
     <path
        inkscape:connector-curvature="0"
@@ -1428,15 +1410,15 @@
        id="path40326" />
     <polygon
        style="fill:#008000"
-       points="789.544,225.947 786.604,221.192 797.014,225.271 787.505,231.152 "
+       points="786.604,221.192 797.014,225.271 787.505,231.152 789.544,225.947 "
        id="polygon40328" />
     <polygon
        style="fill:none;stroke:#008000;stroke-width:4"
-       points="789.544,225.947 786.604,221.192 797.014,225.271 787.505,231.152 "
+       points="786.604,221.192 797.014,225.271 787.505,231.152 789.544,225.947 "
        id="polygon40330" />
   </g>
   <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)"
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
      id="g40332">
     <path
        inkscape:connector-curvature="0"
@@ -1445,16 +1427,16 @@
        id="path40334" />
     <polygon
        style="fill:#800000"
-       points="823.456,49.6756 819.604,45.625 830.629,47.4827 822.527,55.188 "
+       points="819.604,45.625 830.629,47.4827 822.527,55.188 823.456,49.6756 "
        id="polygon40336" />
     <polygon
        style="fill:none;stroke:#800000;stroke-width:4"
-       points="823.456,49.6756 819.604,45.625 830.629,47.4827 822.527,55.188 "
+       points="819.604,45.625 830.629,47.4827 822.527,55.188 823.456,49.6756 "
        id="polygon40338" />
   </g>
   <g
      id="g40348"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <ellipse
        id="ellipse40350"
        ry="30.107"
@@ -1497,7 +1479,7 @@
   </g>
   <g
      id="g40394"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40396"
        d="m 539.226,-150.668 a 234.783,234.783 0 0 0 -44.156,-9.456"
@@ -1505,16 +1487,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40398"
-       points="487.62,-160.904 497.918,-165.257 495.105,-160.427 497.282,-155.278 "
+       points="497.918,-165.257 495.105,-160.427 497.282,-155.278 487.62,-160.904 "
        style="fill:#800000" />
     <polygon
        id="polygon40400"
-       points="487.62,-160.904 497.918,-165.257 495.105,-160.427 497.282,-155.278 "
+       points="497.918,-165.257 495.105,-160.427 497.282,-155.278 487.62,-160.904 "
        style="fill:none;stroke:#800000;stroke-width:4" />
   </g>
   <g
      id="g40402"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40404"
        d="m 491.306,-105.322 a 333.999,333.999 0 0 0 48.041,-12.972"
@@ -1522,16 +1504,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40406"
-       points="483.934,-103.965 493.053,-110.434 491.346,-105.111 494.581,-100.552 "
+       points="493.053,-110.434 491.346,-105.111 494.581,-100.552 483.934,-103.965 "
        style="fill:#008000" />
     <polygon
        id="polygon40408"
-       points="483.934,-103.965 493.053,-110.434 491.346,-105.111 494.581,-100.552 "
+       points="493.053,-110.434 491.346,-105.111 494.581,-100.552 483.934,-103.965 "
        style="fill:none;stroke:#008000;stroke-width:4" />
   </g>
   <g
      id="g40428"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40430"
        d="M 646.463,-36.9024 A 119.845,119.845 0 0 0 611.982,-54.0107"
@@ -1539,104 +1521,104 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40432"
-       points="604.807,-56.0686 615.6,-58.9853 612.158,-54.5807 613.616,-49.1841 "
+       points="615.6,-58.9853 612.158,-54.5807 613.616,-49.1841 604.807,-56.0686 "
        style="fill:#008000" />
     <polygon
        id="polygon40434"
-       points="604.807,-56.0686 615.6,-58.9853 612.158,-54.5807 613.616,-49.1841 "
+       points="615.6,-58.9853 612.158,-54.5807 613.616,-49.1841 604.807,-56.0686 "
        style="fill:none;stroke:#008000;stroke-width:4" />
   </g>
   <text
      id="text40436"
-     y="-250.72105"
+     y="-250.16597"
      x="155.97491"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40438"
-       y="-250.72105"
+       y="-250.16597"
        x="155.97491">YES</tspan>
   </text>
   <text
      id="text40448"
-     y="-164.50841"
+     y="-163.95332"
      x="207.23254"
      style="font-size:7.13555813px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40450"
-       y="-164.50841"
+       y="-163.95332"
        x="207.23254" />
   </text>
   <text
      id="text40452"
-     y="-164.50841"
+     y="-163.95332"
      x="207.23254"
      style="font-size:7.13555813px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40454"
-       y="-164.50841"
+       y="-163.95332"
        x="207.23254" />
   </text>
   <text
      id="text40456"
-     y="-164.50841"
+     y="-163.95332"
      x="207.23254"
      style="font-size:7.13555813px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40458"
-       y="-164.50841"
+       y="-163.95332"
        x="207.23254" />
   </text>
   <text
      id="text40460"
-     y="-164.50841"
+     y="-163.95332"
      x="207.23254"
      style="font-size:7.13555813px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40462"
-       y="-164.50841"
+       y="-163.95332"
        x="207.23254" />
   </text>
   <text
      id="text40464"
-     y="-164.50841"
+     y="-163.95332"
      x="207.23254"
      style="font-size:7.13555813px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40466"
-       y="-164.50841"
+       y="-163.95332"
        x="207.23254" />
   </text>
   <text
      id="text40468"
-     y="-164.50841"
+     y="-163.95332"
      x="207.23254"
      style="font-size:7.13555813px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40470"
-       y="-164.50841"
+       y="-163.95332"
        x="207.23254" />
   </text>
   <text
      id="text40472"
-     y="-225.93863"
+     y="-225.38354"
      x="149.64148"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40474"
-       y="-225.93863"
+       y="-225.38354"
        x="149.64148">NO</tspan>
   </text>
   <g
      id="g40496"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <ellipse
        id="ellipse40498"
        ry="47.136902"
@@ -1683,18 +1665,18 @@
   </g>
   <text
      id="text40510"
-     y="-230.65727"
+     y="-230.10219"
      x="192.80646"
      style="font-size:7.13555813px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40512"
-       y="-230.65727"
+       y="-230.10219"
        x="192.80646" />
   </text>
   <g
      id="g40522"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40524"
        d="m 553.379,-208.999 a 1542.89,1542.89 0 0 0 57.939,-5.188"
@@ -1702,16 +1684,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40526"
-       points="545.897,-208.483 555.564,-214.099 553.382,-208.953 556.19,-204.119 "
+       points="555.564,-214.099 553.382,-208.953 556.19,-204.119 545.897,-208.483 "
        style="fill:#800000" />
     <polygon
        id="polygon40528"
-       points="545.897,-208.483 555.564,-214.099 553.382,-208.953 556.19,-204.119 "
+       points="555.564,-214.099 553.382,-208.953 556.19,-204.119 545.897,-208.483 "
        style="fill:none;stroke:#800000;stroke-width:4" />
   </g>
   <g
      id="g40530"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40532"
        d="m 624.32,-252.957 a 369.129,369.129 0 0 0 -69.043,-12.422"
@@ -1719,92 +1701,92 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40534"
-       points="547.803,-265.951 558.042,-270.44 555.294,-265.573 557.538,-260.453 "
+       points="558.042,-270.44 555.294,-265.573 557.538,-260.453 547.803,-265.951 "
        style="fill:#008000" />
     <polygon
        id="polygon40536"
-       points="547.803,-265.951 558.042,-270.44 555.294,-265.573 557.538,-260.453 "
+       points="558.042,-270.44 555.294,-265.573 557.538,-260.453 547.803,-265.951 "
        style="fill:none;stroke:#008000;stroke-width:4" />
   </g>
   <text
      id="text40538"
-     y="-129.96779"
+     y="-129.4127"
      x="171.8362"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40540"
-       y="-129.96779"
+       y="-129.4127"
        x="171.8362">YES</tspan>
   </text>
   <text
      id="text40542"
-     y="-126.41006"
+     y="-125.85497"
      x="209.48737"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40544"
-       y="-126.41006"
+       y="-125.85497"
        x="209.48737">NO</tspan>
   </text>
   <text
      id="text40546"
-     y="-187.19287"
+     y="-186.63779"
      x="219.06247"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40548"
-       y="-187.19287"
+       y="-186.63779"
        x="219.06247">YES</tspan>
   </text>
   <text
      id="text40550"
-     y="-178.80289"
+     y="-178.2478"
      x="186.89644"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40552"
-       y="-178.80289"
+       y="-178.2478"
        x="186.89644">NO</tspan>
   </text>
   <text
      id="text40554"
-     y="-154.67346"
+     y="-154.11838"
      x="112.01455"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40556"
-       y="-154.67346"
+       y="-154.11838"
        x="112.01455">YES</tspan>
   </text>
   <text
      id="text40558"
-     y="-191.09433"
+     y="-190.53925"
      x="116.18299"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40560"
-       y="-191.09433"
+       y="-190.53925"
        x="116.18299">NO</tspan>
   </text>
   <text
      id="text40562"
-     y="-265.88336"
+     y="-265.32828"
      x="46.646641"
      style="font-size:13.02086735px;font-style:normal;font-weight:700;text-anchor:start;fill:#000000;font-family:sans-serif"
      font-size="22.5778">
     <tspan
        id="tspan40564"
-       y="-265.88336"
+       y="-265.32828"
        x="46.646641">Data Transformations</tspan>
   </text>
   <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)"
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
      id="g40566">
     <path
        inkscape:connector-curvature="0"
@@ -1813,16 +1795,16 @@
        id="path40568" />
     <polygon
        style="fill:#008000"
-       points="654.032,41.4831 648.493,42.2342 656.455,34.3851 657.957,45.464 "
+       points="648.493,42.2342 656.455,34.3851 657.957,45.464 654.032,41.4831 "
        id="polygon40570" />
     <polygon
        style="fill:none;stroke:#008000;stroke-width:4"
-       points="654.032,41.4831 648.493,42.2342 656.455,34.3851 657.957,45.464 "
+       points="648.493,42.2342 656.455,34.3851 657.957,45.464 654.032,41.4831 "
        id="polygon40572" />
   </g>
   <g
      id="g40576"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40578"
        d="m -233.95,-270.543 c 15.023,-64.189 463.682,-70.498 480.187,21.201 16.506,91.7 0.917,108.205 27.51,151.3041 26.593,43.0987 51.496,46.9911 73.36,59.6046 21.863,12.6134 82.529,21.0908 71.525,83.4463 -11.004,62.356 -77.027,67.857 -122.838,86.957 -45.811,19.099 -88.676,43.952 -215.1364,47.808 -126.4599,3.855 -296.8196,22.687 -311.5236,-11.567 -13.726,-31.97 -10.024,-117.2067 -11.561,-199.0835 -1.537,-81.8765 -0.005,-203.4295 8.477,-239.6705 z"
@@ -1836,7 +1818,7 @@
   </g>
   <g
      id="g40594"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <ellipse
        id="ellipse40596"
        ry="43.724201"
@@ -1883,29 +1865,29 @@
   </g>
   <text
      id="text40608"
-     y="-111.07813"
-     x="-4.7936721"
+     y="-110.52305"
+     x="-4.7936749"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40610"
-       y="-111.07813"
-       x="-4.7936721">NO</tspan>
+       y="-110.52305"
+       x="-4.7936749">NO</tspan>
   </text>
   <text
      id="text40612"
-     y="-47.268234"
-     x="-12.304185"
+     y="-46.71315"
+     x="-12.304188"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40614"
-       y="-47.268234"
-       x="-12.304185">YES</tspan>
+       y="-46.71315"
+       x="-12.304188">YES</tspan>
   </text>
   <g
      id="g40630"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <ellipse
        id="ellipse40632"
        ry="33.556599"
@@ -1948,68 +1930,68 @@
   </g>
   <text
      id="text40642"
-     y="-113.29001"
+     y="-112.73492"
      x="-116.2119"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#808000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40644"
-       y="-113.29001"
+       y="-112.73492"
        x="-134.03767"
        style="text-align:center;text-anchor:middle">NOT</tspan>
     <tspan
        id="tspan40646"
-       y="-104.06262"
+       y="-103.50754"
        x="-134.03767"
        style="text-align:center;text-anchor:middle">WORKING</tspan>
   </text>
   <text
      id="text40648"
-     y="-123.47316"
+     y="-122.91808"
      x="-180.65865"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40650"
-       y="-123.47316"
+       y="-122.91808"
        x="-180.65865">YES</tspan>
   </text>
   <text
      id="text40662"
-     y="-57.997482"
+     y="-57.442398"
      x="-106.05607"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40664"
-       y="-57.997482"
+       y="-57.442398"
        x="-106.05607">NO</tspan>
   </text>
   <text
      id="text40666"
-     y="-102.29508"
+     y="-101.74"
      x="-212.59938"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40668"
-       y="-102.29508"
+       y="-101.74"
        x="-212.59938">NO</tspan>
   </text>
   <text
      id="text40670"
-     y="-105.18784"
+     y="-104.63276"
      x="-182.14595"
      style="font-size:7.13555813px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40672"
-       y="-105.18784"
+       y="-104.63276"
        x="-182.14595" />
   </text>
   <g
      id="g40674"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <ellipse
        id="ellipse40676"
        ry="43.008801"
@@ -2052,7 +2034,7 @@
   </g>
   <g
      id="g40686"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <ellipse
        id="ellipse40688"
        ry="50.1301"
@@ -2103,7 +2085,7 @@
   </g>
   <g
      id="g40714"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <ellipse
        id="ellipse40716"
        ry="33.426998"
@@ -2146,18 +2128,18 @@
   </g>
   <text
      id="text40726"
-     y="-197.60307"
+     y="-197.04799"
      x="-118.14854"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40728"
-       y="-197.60307"
+       y="-197.04799"
        x="-118.14854">YES</tspan>
   </text>
   <g
      id="g40730"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <ellipse
        id="ellipse40732"
        ry="34.2831"
@@ -2200,40 +2182,40 @@
   </g>
   <text
      id="text40742"
-     y="-194.41733"
+     y="-193.86224"
      x="-80.957031"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40744"
-       y="-194.41733"
+       y="-193.86224"
        x="-80.957031">NO</tspan>
   </text>
   <text
      id="text40746"
-     y="-239.57381"
+     y="-239.01872"
      x="-195.65677"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40748"
-       y="-239.57381"
+       y="-239.01872"
        x="-195.65677">YES</tspan>
   </text>
   <text
      id="text40764"
-     y="-195.32103"
+     y="-194.76595"
      x="-158.55869"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40766"
-       y="-195.32103"
+       y="-194.76595"
        x="-158.55869">NO</tspan>
   </text>
   <g
      id="g40778"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <ellipse
        id="ellipse40780"
        ry="42.668499"
@@ -2280,29 +2262,29 @@
   </g>
   <text
      id="text40806"
-     y="-12.239492"
+     y="-11.68441"
      x="-181.19244"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40808"
-       y="-12.239492"
+       y="-11.68441"
        x="-181.19244">NO</tspan>
   </text>
   <text
      id="text40810"
-     y="-41.939541"
+     y="-41.384457"
      x="-187.60071"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40812"
-       y="-41.939541"
+       y="-41.384457"
        x="-187.60071">YES</tspan>
   </text>
   <g
      id="g40814"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40816"
        d="M 15.4817,-34.5846 A 88.5543,88.5543 0 0 0 4.3608,-54.7601"
@@ -2310,16 +2292,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40818"
-       points="-0.203689,-60.6292 10.342,-56.9159 5.00976,-55.2375 3.15314,-49.9647 "
+       points="10.342,-56.9159 5.00976,-55.2375 3.15314,-49.9647 -0.203689,-60.6292 "
        style="fill:#008000" />
     <polygon
        id="polygon40820"
-       points="-0.203689,-60.6292 10.342,-56.9159 5.00976,-55.2375 3.15314,-49.9647 "
+       points="10.342,-56.9159 5.00976,-55.2375 3.15314,-49.9647 -0.203689,-60.6292 "
        style="fill:none;stroke:#008000;stroke-width:4" />
   </g>
   <g
      id="g40822"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40824"
        d="M 37.6877,88.8209 A 291.658,291.658 0 0 0 -47.4035,62.0991"
@@ -2327,16 +2309,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40826"
-       points="-54.8215,61.0347 -44.334,57.1602 -47.3666,61.8563 -45.4294,67.1 "
+       points="-44.334,57.1602 -47.3666,61.8563 -45.4294,67.1 -54.8215,61.0347 "
        style="fill:#008000" />
     <polygon
        id="polygon40828"
-       points="-54.8215,61.0347 -44.334,57.1602 -47.3666,61.8563 -45.4294,67.1 "
+       points="-44.334,57.1602 -47.3666,61.8563 -45.4294,67.1 -54.8215,61.0347 "
        style="fill:none;stroke:#008000;stroke-width:4" />
   </g>
   <g
      id="g40830"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40832"
        d="M 4.29936,134.693 A 373.615,373.615 0 0 0 30.5238,129.756"
@@ -2344,16 +2326,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40834"
-       points="-3.11945,135.768 6.22026,129.623 4.32809,134.883 7.40095,139.553 "
+       points="6.22026,129.623 4.32809,134.883 7.40095,139.553 -3.11945,135.768 "
        style="fill:#800000" />
     <polygon
        id="polygon40836"
-       points="-3.11945,135.768 6.22026,129.623 4.32809,134.883 7.40095,139.553 "
+       points="6.22026,129.623 4.32809,134.883 7.40095,139.553 -3.11945,135.768 "
        style="fill:none;stroke:#800000;stroke-width:4" />
   </g>
   <g
      id="g40838"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40840"
        d="M 75.3235,1.6094 A 1598.85,1598.85 0 0 0 131.581,1.76512"
@@ -2361,16 +2343,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40842"
-       points="67.8255,1.44536 77.9609,-3.27424 75.3226,1.65421 77.6824,6.72189 "
+       points="77.9609,-3.27424 75.3226,1.65421 77.6824,6.72189 67.8255,1.44536 "
        style="fill:#808000" />
     <polygon
        id="polygon40844"
-       points="67.8255,1.44536 77.9609,-3.27424 75.3226,1.65421 77.6824,6.72189 "
+       points="77.9609,-3.27424 75.3226,1.65421 77.6824,6.72189 67.8255,1.44536 "
        style="fill:none;stroke:#808000;stroke-width:4" />
   </g>
   <g
      id="g40846"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40848"
        d="m 195.197,40.7523 a 116.277,116.277 0 0 0 0.087,17.5929"
@@ -2378,16 +2360,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40850"
-       points="195.878,33.3213 199.078,44.034 194.584,40.7088 189.228,42.3086 "
+       points="199.078,44.034 194.584,40.7088 189.228,42.3086 195.878,33.3213 "
        style="fill:#008000" />
     <polygon
        id="polygon40852"
-       points="195.878,33.3213 199.078,44.034 194.584,40.7088 189.228,42.3086 "
+       points="199.078,44.034 194.584,40.7088 189.228,42.3086 195.878,33.3213 "
        style="fill:none;stroke:#008000;stroke-width:4" />
   </g>
   <g
      id="g40854"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40856"
        d="M 270.517,91.1026 A 170.517,170.517 0 0 0 317.083,64.8329"
@@ -2395,16 +2377,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40858"
-       points="263.468,93.6127 271.65,85.9937 270.663,91.496 274.472,95.5872 "
+       points="271.65,85.9937 270.663,91.496 274.472,95.5872 263.468,93.6127 "
        style="fill:#008000" />
     <polygon
        id="polygon40860"
-       points="263.468,93.6127 271.65,85.9937 270.663,91.496 274.472,95.5872 "
+       points="271.65,85.9937 270.663,91.496 274.472,95.5872 263.468,93.6127 "
        style="fill:none;stroke:#008000;stroke-width:4" />
   </g>
   <g
      id="g40862"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40864"
        d="m -51.9933,2.6041 a 503.024,503.024 0 0 0 31.8616,0.02767"
@@ -2412,16 +2394,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40866"
-       points="-59.486,2.32415 -49.2203,-2.10482 -51.9979,2.74647 -49.7834,7.87932 "
+       points="-49.2203,-2.10482 -51.9979,2.74647 -49.7834,7.87932 -59.486,2.32415 "
        style="fill:#800000" />
     <polygon
        id="polygon40868"
-       points="-59.486,2.32415 -49.2203,-2.10482 -51.9979,2.74647 -49.7834,7.87932 "
+       points="-49.2203,-2.10482 -51.9979,2.74647 -49.7834,7.87932 -59.486,2.32415 "
        style="fill:none;stroke:#800000;stroke-width:4" />
   </g>
   <g
      id="g40870"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40872"
        d="M 322.165,-8.37154 A 325.627,325.627 0 0 0 224.261,-85.2944"
@@ -2429,16 +2411,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40874"
-       points="217.565,-88.6633 228.742,-88.9629 224.361,-85.4902 224.511,-79.902 "
+       points="228.742,-88.9629 224.361,-85.4902 224.511,-79.902 217.565,-88.6633 "
        style="fill:#800000" />
     <polygon
        id="polygon40876"
-       points="217.565,-88.6633 228.742,-88.9629 224.361,-85.4902 224.511,-79.902 "
+       points="228.742,-88.9629 224.361,-85.4902 224.511,-79.902 217.565,-88.6633 "
        style="fill:none;stroke:#800000;stroke-width:4" />
   </g>
   <g
      id="g40878"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40880"
        d="m 177.426,-159.971 a 142.158,142.158 0 0 0 9.199,-31.544"
@@ -2446,16 +2428,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40882"
-       points="187.75,-198.905 191.894,-188.521 187.122,-191.431 181.93,-189.359 "
+       points="191.894,-188.521 187.122,-191.431 181.93,-189.359 187.75,-198.905 "
        style="fill:#800000" />
     <polygon
        id="polygon40884"
-       points="187.75,-198.905 191.894,-188.521 187.122,-191.431 181.93,-189.359 "
+       points="191.894,-188.521 187.122,-191.431 181.93,-189.359 187.75,-198.905 "
        style="fill:none;stroke:#800000;stroke-width:4" />
   </g>
   <g
      id="g40886"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40888"
        d="m 62.1711,29.8336 a 591.42,591.42 0 0 0 97.7109,53.71"
@@ -2463,38 +2445,38 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40890"
-       points="55.9869,25.5928 67.0356,27.3034 62.103,29.9338 61.2477,35.4581 "
+       points="67.0356,27.3034 62.103,29.9338 61.2477,35.4581 55.9869,25.5928 "
        style="fill:#800000" />
     <polygon
        id="polygon40892"
-       points="55.9869,25.5928 67.0356,27.3034 62.103,29.9338 61.2477,35.4581 "
+       points="67.0356,27.3034 62.103,29.9338 61.2477,35.4581 55.9869,25.5928 "
        style="fill:none;stroke:#800000;stroke-width:4" />
   </g>
   <text
      id="text40894"
-     y="-69.932114"
+     y="-69.377029"
      x="-71.392265"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40896"
-       y="-69.932114"
+       y="-69.377029"
        x="-71.392265">YES</tspan>
   </text>
   <text
      id="text40898"
-     y="-264.15668"
+     y="-263.60159"
      x="-228.87804"
      style="font-size:13.02086735px;font-style:normal;font-weight:700;text-anchor:start;fill:#000000;font-family:sans-serif"
      font-size="22.5778">
     <tspan
        id="tspan40900"
-       y="-264.15668"
+       y="-263.60159"
        x="-228.87804">Classification</tspan>
   </text>
   <g
      id="g40902"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40904"
        d="M 122.3,-162.086 A 366.244,366.244 0 0 0 96.8913,-200.354"
@@ -2502,16 +2484,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40906"
-       points="92.3222,-206.297 102.505,-201.681 97.0472,-200.473 94.7392,-195.381 "
+       points="102.505,-201.681 97.0472,-200.473 94.7392,-195.381 92.3222,-206.297 "
        style="fill:#008000" />
     <polygon
        id="polygon40908"
-       points="92.3222,-206.297 102.505,-201.681 97.0472,-200.473 94.7392,-195.381 "
+       points="102.505,-201.681 97.0472,-200.473 94.7392,-195.381 92.3222,-206.297 "
        style="fill:none;stroke:#008000;stroke-width:4" />
   </g>
   <g
      id="g40910"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40912"
        d="m 25.1131,-165.496 a 107.611,107.611 0 0 0 30.0863,-38.415"
@@ -2519,16 +2501,16 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40914"
-       points="19.2025,-160.951 24.9532,-170.539 25.5293,-164.979 30.3233,-162.103 "
+       points="24.9532,-170.539 25.5293,-164.979 30.3233,-162.103 19.2025,-160.951 "
        style="fill:#800000" />
     <polygon
        id="polygon40916"
-       points="19.2025,-160.951 24.9532,-170.539 25.5293,-164.979 30.3233,-162.103 "
+       points="24.9532,-170.539 25.5293,-164.979 30.3233,-162.103 19.2025,-160.951 "
        style="fill:none;stroke:#800000;stroke-width:4" />
   </g>
   <g
      id="g40918"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <path
        id="path40920"
        d="m -31.4533,-236.213 a 5892.89,5892.89 0 0 0 54.0786,-0.513"
@@ -2536,15 +2518,15 @@
        inkscape:connector-curvature="0" />
     <polygon
        id="polygon40922"
-       points="-38.9532,-236.179 -28.9676,-241.208 -31.4532,-236.201 -28.9388,-231.208 "
+       points="-28.9676,-241.208 -31.4532,-236.201 -28.9388,-231.208 -38.9532,-236.179 "
        style="fill:#008000" />
     <polygon
        id="polygon40924"
-       points="-38.9532,-236.179 -28.9676,-241.208 -31.4532,-236.201 -28.9388,-231.208 "
+       points="-28.9676,-241.208 -31.4532,-236.201 -28.9388,-231.208 -38.9532,-236.179 "
        style="fill:none;stroke:#008000;stroke-width:4" />
   </g>
   <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)"
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
      id="g40926">
     <path
        inkscape:connector-curvature="0"
@@ -2553,15 +2535,15 @@
        id="path40928" />
     <polygon
        style="fill:#008000"
-       points="46.2262,161.885 40.6805,162.589 48.7086,154.808 50.1169,165.899 "
+       points="40.6805,162.589 48.7086,154.808 50.1169,165.899 46.2262,161.885 "
        id="polygon40930" />
     <polygon
        style="fill:none;stroke:#008000;stroke-width:4"
-       points="46.2262,161.885 40.6805,162.589 48.7086,154.808 50.1169,165.899 "
+       points="40.6805,162.589 48.7086,154.808 50.1169,165.899 46.2262,161.885 "
        id="polygon40932" />
   </g>
   <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)"
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
      id="g40934">
     <path
        inkscape:connector-curvature="0"
@@ -2570,16 +2552,16 @@
        id="path40936" />
     <polygon
        style="fill:#008000"
-       points="344.43,85.2111 339.556,87.9473 344.072,77.7197 349.544,87.4692 "
+       points="339.556,87.9473 344.072,77.7197 349.544,87.4692 344.43,85.2111 "
        id="polygon40938" />
     <polygon
        style="fill:none;stroke:#008000;stroke-width:4"
-       points="344.43,85.2111 339.556,87.9473 344.072,77.7197 349.544,87.4692 "
+       points="339.556,87.9473 344.072,77.7197 349.544,87.4692 344.43,85.2111 "
        id="polygon40940" />
   </g>
   <g
      id="g40944"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-197.34379,-98.071115)">
     <path
        id="path40946"
        d="m 190.915,337.515 c 29.444,-62.158 265.335,-38.547 332.599,-33.805 67.266,4.744 166.844,10.905 224.64,30.533 57.796,19.629 81.787,41.439 74.153,102.506 -7.633,61.067 -150.487,88.329 -205.011,90.51 -54.525,2.181 -408.933,17.448 -431.833,-3.271 -22.9,-20.719 -23.991,-124.315 5.452,-186.473 z"
@@ -2593,24 +2575,24 @@
   </g>
   <text
      id="text40962"
-     y="121.15796"
-     x="60.786018"
+     y="121.71304"
+     x="52.883808"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-align:start;text-anchor:start;fill:#808000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40964"
-       y="121.15796"
-       x="60.786018"
+       y="121.71304"
+       x="52.883808"
        style="text-align:start;text-anchor:start">NOT</tspan>
     <tspan
        id="tspan40966"
-       y="130.38535"
-       x="60.786018"
+       y="130.94043"
+       x="52.883808"
        style="text-align:start;text-anchor:start">WORKING</tspan>
   </text>
   <g
      id="g40968"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-197.34379,-98.071115)">
     <ellipse
        id="ellipse40970"
        ry="36.242298"
@@ -2653,29 +2635,29 @@
   </g>
   <text
      id="text40994"
-     y="137.91357"
-     x="27.592104"
+     y="138.46866"
+     x="19.689875"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan40996"
-       y="137.91357"
-       x="27.592104">YES</tspan>
+       y="138.46866"
+       x="19.689875">YES</tspan>
   </text>
   <text
      id="text41008"
-     y="151.40341"
-     x="172.65051"
+     y="157.17961"
+     x="167.00606"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan41010"
-       y="151.40341"
-       x="172.65051">NO</tspan>
+       y="157.17961"
+       x="167.00606">NO</tspan>
   </text>
   <g
      id="g41012"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-197.34379,-98.071115)">
     <ellipse
        id="ellipse41014"
        ry="52.748001"
@@ -2722,18 +2704,18 @@
   </g>
   <text
      id="text41026"
-     y="103.41184"
-     x="-10.741302"
+     y="103.96693"
+     x="-18.64353"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan41028"
-       y="103.41184"
-       x="-10.741302">NO</tspan>
+       y="103.96693"
+       x="-18.64353">NO</tspan>
   </text>
   <g
      id="g41040"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-197.34379,-98.071115)">
     <path
        id="path41042"
        d="m 652.123,388.838 a 599.374,599.374 0 0 0 -40.487,-5.422"
@@ -2750,7 +2732,7 @@
   </g>
   <g
      id="g41048"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-197.34379,-98.071115)">
     <path
        id="path41050"
        d="m 619.937,458.655 a 217.037,217.037 0 0 0 49.968,-14.592"
@@ -2767,7 +2749,7 @@
   </g>
   <g
      id="g41056"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-197.34379,-98.071115)">
     <path
        id="path41058"
        d="m 413.686,383.131 a 367.292,367.292 0 0 0 57.107,42.348"
@@ -2784,7 +2766,7 @@
   </g>
   <g
      id="g41064"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-197.34379,-98.071115)">
     <path
        id="path41066"
        d="m 343.369,331.921 a 72.3233,72.3233 0 0 0 -61.351,20.735"
@@ -2801,7 +2783,7 @@
   </g>
   <g
      id="g41072"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-197.34379,-98.071115)">
     <path
        id="path41074"
        d="M 353.614,423.554 A 147.263,147.263 0 0 0 372.81,384.628"
@@ -2818,28 +2800,28 @@
   </g>
   <text
      id="text41080"
-     y="117.19234"
-     x="172.98903"
+     y="117.74742"
+     x="165.08679"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      font-size="12.8">
     <tspan
        id="tspan41082"
-       y="117.19234"
-       x="172.98903">YES</tspan>
+       y="117.74742"
+       x="165.08679">YES</tspan>
   </text>
   <text
      id="text41084"
-     y="198.37416"
-     x="58.823895"
+     y="198.92924"
+     x="50.921684"
      style="font-size:13.02086735px;font-style:normal;font-weight:700;text-anchor:start;fill:#000000;font-family:sans-serif"
      font-size="22.5778">
     <tspan
        id="tspan41086"
-       y="198.37416"
-       x="58.823895">Regression</tspan>
+       y="198.92924"
+       x="50.921684">Regression</tspan>
   </text>
   <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)"
+     transform="matrix(0.5738609,0.0572652,-0.0572652,0.5738609,-171.31153,-138.14896)"
      id="g41088">
     <path
        inkscape:connector-curvature="0"
@@ -2848,126 +2830,126 @@
        id="path41090" />
     <polygon
        style="fill:#800000"
-       points="735.52,341.493 740.371,338.714 735.945,348.981 730.387,339.28 "
+       points="740.371,338.714 735.945,348.981 730.387,339.28 735.52,341.493 "
        id="polygon41092" />
     <polygon
        style="fill:none;stroke:#800000;stroke-width:4"
-       points="735.52,341.493 740.371,338.714 735.945,348.981 730.387,339.28 "
+       points="740.371,338.714 735.945,348.981 730.387,339.28 735.52,341.493 "
        id="polygon41094" />
   </g>
   <text
      font-size="12.8"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      x="-176.64941"
-     y="58.488358"
+     y="59.043442"
      id="text41096">
     <tspan
        x="-176.64941"
-       y="58.488358"
+       y="59.043442"
        id="tspan41098">NO</tspan>
   </text>
   <text
      font-size="12.8"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      x="-179.53648"
-     y="16.594324"
+     y="17.149405"
      id="text41100">
     <tspan
        x="-179.53648"
-       y="16.594324"
+       y="17.149405"
        id="tspan41102">YES</tspan>
   </text>
   <text
      font-size="12.8"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      x="-93.865562"
-     y="30.873114"
+     y="31.428194"
      id="text41104">
     <tspan
        x="-93.865562"
-       y="30.873114"
+       y="31.428194"
        id="tspan41106">YES</tspan>
   </text>
   <text
      font-size="12.8"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
-     x="2.8615785"
-     y="39.496666"
+     x="2.8615749"
+     y="40.05175"
      id="text41108">
     <tspan
-       x="2.8615785"
-       y="39.496666"
+       x="2.8615749"
+       y="40.05175"
        id="tspan41110">NO</tspan>
   </text>
   <text
      font-size="12.8"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
-     x="-14.06084"
-     y="4.5935459"
+     x="-14.060843"
+     y="5.1486268"
      id="text41112">
     <tspan
-       x="-14.06084"
-       y="4.5935459"
+       x="-14.060843"
+       y="5.1486268"
        id="tspan41114">NO</tspan>
   </text>
   <text
      font-size="12.8"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
-     x="19.834177"
-     y="-28.35627"
+     x="19.834171"
+     y="-27.801189"
      id="text41116">
     <tspan
-       x="19.834177"
-       y="-28.35627"
+       x="19.834171"
+       y="-27.801189"
        id="tspan41118">YES</tspan>
   </text>
   <text
      font-size="12.8"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
      x="120.26321"
-     y="13.583891"
+     y="14.138973"
      id="text41120">
     <tspan
        x="120.26321"
-       y="13.583891"
+       y="14.138973"
        id="tspan41122">NO</tspan>
   </text>
   <text
      font-size="12.8"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      x="141.46599"
-     y="27.171202"
+     y="27.726282"
      id="text41124">
     <tspan
        x="141.46599"
-       y="27.171202"
+       y="27.726282"
        id="tspan41126">YES</tspan>
   </text>
   <text
      font-size="12.8"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
      x="236.12737"
-     y="29.286581"
+     y="29.841661"
      id="text41128">
     <tspan
        x="236.12737"
-       y="29.286581"
+       y="29.841661"
        id="tspan41130">YES</tspan>
   </text>
   <text
      font-size="12.8"
      style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
-     x="231.31819"
-     y="73.870934"
+     x="229.12302"
+     y="74.62558"
      id="text41132">
     <tspan
-       x="231.31819"
-       y="73.870934"
+       x="229.12302"
+       y="74.62558"
        id="tspan41134">NO</tspan>
   </text>
   <g
      id="g47702"
-     transform="matrix(1.0218295,0,0,1.0218295,-6.2614212,3.6131526)">
+     transform="matrix(1.0218295,0,0,1.0218295,-6.2614245,4.1682336)">
     <path
        style="font-size:300px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:-29.45005226px;word-spacing:0px;fill:#6c6c6c;fill-opacity:1;stroke:none;font-family:Andale Mono;-inkscape-font-specification:Andale Mono"
        d="m 426.04965,-261.67503 c -5.14827,-0.0231 -10.26699,3.08331 -12.20528,7.92542 -2.76719,5.98758 -2.66457,12.91435 -1.47568,19.289 1.05335,4.73781 4.03885,9.43078 8.83161,11.01067 5.49384,1.97944 11.98404,0.92564 16.59442,-2.58084 0.51367,-0.97222 -0.55086,-1.80882 -0.68408,-2.74859 -0.41887,-1.05081 -0.84308,-2.09954 -1.25485,-3.15314 -3.50032,2.36812 -8.10359,4.13172 -12.27628,2.49666 -3.25685,-1.51557 -4.39342,-5.36946 -4.69066,-8.67995 -0.44133,-4.9068 -0.55773,-10.23416 2.03457,-14.58177 1.74388,-2.36194 4.88943,-3.05838 7.67072,-2.58699 2.38118,0.25335 4.63124,1.15783 6.60295,2.51264 0.8151,-1.88513 1.60107,-3.78266 2.39048,-5.67864 -3.24755,-2.52106 -7.49719,-3.31903 -11.53792,-3.22447 z m -67.86222,0.0317 c -3.16538,-0.0996 -5.13344,4.24072 -3.01733,6.587 1.70525,2.35597 5.96221,1.74113 6.83672,-1.06241 0.99853,-2.48346 -1.0568,-5.72213 -3.81939,-5.52459 z m 191.26789,0 c -3.17342,-0.0919 -5.12311,4.28915 -2.98539,6.60294 1.69858,2.35888 6.00367,1.7082 6.8314,-1.1421 0.99917,-2.49184 -1.1229,-5.63854 -3.84601,-5.46084 z m -224.10205,0.96681 c 0,1.91411 0,3.82823 0,5.74237 2.25757,10e-6 4.51525,0 6.77292,0 0,10.59058 0,21.18116 0,31.77173 4.4427,0 8.88538,0 13.32808,0 0,-2.02568 0,-4.05133 0,-6.07704 -2.24171,0 -4.48342,0 -6.72511,0 0,-10.59235 0,-21.18471 0,-31.77703 -4.45867,0 -8.91734,0 -13.37589,0 l 0,0.16997 z m 41.21129,0 c 0,12.50469 0,25.00941 0,37.5141 2.1585,0 4.31698,0 6.47549,0 0.11254,-0.49726 0.16683,-1.00371 0.14344,-1.51395 3.92514,3.11418 10.37431,2.97739 13.6628,-1.00928 4.02068,-4.51721 4.64336,-11.10011 3.62812,-16.85532 -0.77325,-4.02896 -3.22074,-8.18733 -7.336,-9.42901 -3.31678,-1.05983 -7.14201,-0.34451 -9.97089,1.6627 0,-3.56976 0,-7.13949 0,-10.70921 -2.20098,0 -4.40197,0 -6.60296,0 l 0,0.16997 z m 147.4695,0 c 0,12.50469 0,25.00941 0,37.5141 7.28118,0 14.56237,0 21.84344,0 0,-2.09297 0,-4.18594 0,-6.2789 -5.01285,0 -10.0257,0 -15.03855,0 0,-10.52507 0,-21.05013 0,-31.57517 -2.26834,0 -4.53655,0 -6.80489,0 l 0,0.16997 z m 46.02422,0 c 0,12.50469 0,25.00941 0,37.5141 2.17614,0 4.35238,0 6.52852,0 0.0814,-0.49914 0.10619,-1.00686 0.0909,-1.51395 3.92953,3.12296 10.43759,2.97342 13.70529,-1.05179 4.01347,-4.5687 4.61851,-11.1673 3.56119,-16.94197 -0.78774,-3.90895 -3.1256,-7.90625 -7.08312,-9.2308 -3.3978,-1.15286 -7.30593,-0.45985 -10.1939,1.59365 0,-3.56976 0,-7.13949 0,-10.70921 -2.20277,0 -4.40553,0 -6.60829,0 l 0,0.16997 z m -110.97006,5.30679 c 0,3.28996 0,6.57993 0,9.86989 -3.40322,2e-5 -6.80655,0 -10.20987,0 0,1.99384 0,3.98764 0,5.98145 3.40332,-1e-5 6.80665,0 10.20987,0 0,3.39442 0,6.78886 0,10.18328 1.99386,0 3.98769,0 5.98143,0 0,-3.39442 0,-6.78886 0,-10.18328 3.36084,0 6.72167,-1e-5 10.0824,0 0,-1.99381 0,-3.98761 0,-5.98145 -3.36073,2e-5 -6.72156,0 -10.0824,0 0,-3.40329 0,-6.8066 0,-10.20987 -1.99374,0 -3.98757,0 -5.98143,0 l 0,0.16999 z m 28.2924,0 c 0,3.28996 0,6.57993 0,9.86989 -3.40332,2e-5 -6.80666,0 -10.20998,0 0,1.99384 0,3.98764 0,5.98145 3.40332,-1e-5 6.80666,0 10.20998,0 0,3.39442 0,6.78886 0,10.18328 1.99374,0 3.98748,0 5.98132,0 0,-3.39442 0,-6.78886 0,-10.18328 3.36261,-1e-5 6.72522,0 10.08773,0 0,-1.99381 0,-3.98761 0,-5.98145 -3.36251,0 -6.72512,2e-5 -10.08773,0 0,-3.40329 0,-6.8066 0,-10.20987 -1.99384,0 -3.98758,0 -5.98132,0 l 0,0.16999 z m 124.62743,2.92695 c -2.42776,0.0254 -4.71342,1.25847 -6.37985,2.97479 0.0469,-0.763 0.33316,-2.09424 -0.65869,-2.35857 -1.96723,0 -3.93455,0 -5.90177,0 0,9.55471 0,19.10946 0,28.66414 2.19388,0 4.38788,0 6.58176,0 0.0292,-5.9672 -0.0574,-11.93506 0.047,-17.90178 1.5,-2.44248 3.98465,-5.09524 7.12885,-4.67999 1.53434,0.20776 2.95553,0.88461 4.38255,1.4927 0.8745,-2.05286 1.7275,-4.11484 2.60285,-6.16736 -2.36595,-1.30773 -5.06809,-2.12322 -7.80342,-2.02393 z m 22.31086,0 c -3.95407,0.0872 -7.75017,1.54259 -11.16071,3.41569 0.64816,1.77888 1.30279,3.55543 1.93893,5.33868 3.28451,-1.65317 7.01776,-3.39008 10.75175,-2.31075 1.92243,0.75243 2.59156,3.06591 2.48069,4.9084 -4.04366,0.37479 -8.40543,0.45456 -11.98938,2.61883 -2.75371,1.48095 -4.36167,4.60902 -4.12519,7.71304 0.1044,3.43134 2.37826,6.72097 5.69754,7.73989 3.68952,1.30302 7.97507,0.17381 10.84729,-2.33732 0.13551,0.74569 0.33493,1.47464 0.5737,2.1939 2.20632,0 4.41263,0 6.61894,0 -2.1395,-7.18981 -0.19953,-14.81137 -1.38652,-22.12494 -0.64533,-3.2128 -3.08081,-6.05253 -6.34256,-6.74104 -1.27052,-0.33943 -2.58791,-0.4501 -3.90448,-0.41438 z m 29.15824,0 c -2.43257,0.0278 -4.71739,1.26004 -6.39061,2.97479 0.0564,-0.76151 0.33765,-2.09464 -0.65327,-2.35857 -1.96732,0 -3.93454,0 -5.90176,0 0,9.55471 0,19.10946 0,28.66414 2.19389,0 4.38777,0 6.58166,0 0.0292,-5.96368 -0.0574,-11.92797 0.047,-17.89117 1.51012,-2.4212 3.8816,-5.04816 7.028,-4.69592 1.57809,0.16947 3.03278,0.89195 4.48872,1.49802 0.86667,-2.0547 1.72489,-4.11296 2.5923,-6.16736 -2.36961,-1.31327 -5.06412,-2.12073 -7.79277,-2.02393 z m -306.22742,0.95621 c 0,1.91411 0,3.82824 0,5.74238 2.54805,0 5.09607,0 7.6442,0 0,7.52727 0,15.0545 0,22.58177 2.20088,0 4.40188,0 6.60296,0 0,-9.55468 0,-19.10943 0,-28.66414 -4.74912,0 -9.49814,0 -14.24716,0 l 0,0.16998 z m 191.27855,0 c 0,1.91411 0,3.82824 0,5.74238 2.54802,0 5.09606,0 7.6442,0 0,7.52727 0,15.0545 0,22.58177 2.20098,0 4.40186,0 6.60284,0 0,-9.55468 0,-19.10943 0,-28.66414 -4.74901,0 -9.49803,0 -14.24704,0 l 0,0.16998 z m 122.72566,0.11676 c 3.34684,8.93198 6.69734,17.86143 10.05587,26.78895 -0.88504,2.03459 -1.61703,4.77175 -3.99457,5.49273 -1.7395,0.32874 -3.43391,-0.45279 -5.0944,-0.8712 -0.41835,1.89254 -0.80131,3.79266 -1.20057,5.68929 3.28787,1.38482 7.49105,2.22139 10.59243,-0.0104 4.2343,-3.30317 5.50106,-8.8207 7.47089,-13.57077 3.03069,-7.99172 6.0614,-15.9835 9.09221,-23.97522 -2.38861,0 -4.77732,0 -7.16602,0 -2.1229,6.00702 -4.25414,12.01109 -6.3905,18.01335 -2.13625,-6.00226 -4.26749,-12.00633 -6.39038,-18.01335 -2.38171,0 -4.76322,0 -7.14483,0 0.0564,0.15221 0.11339,0.30456 0.16998,0.45684 z m -282.41832,4.97742 c 2.72249,-0.026 4.55138,2.721 4.90302,5.18994 0.83598,3.91193 0.49332,8.53866 -2.41168,11.54322 -1.67414,1.46733 -4.28086,1.14864 -5.84862,-0.31343 -1.21017,-1.0459 -2.5971,-2.44327 -2.30017,-4.18064 0.0532,-2.95606 -0.17676,-5.97536 0.12748,-8.89245 1.23565,-1.81822 3.20474,-3.3774 5.52987,-3.34664 z m 193.49362,0 c 2.80946,-0.0194 4.61465,2.8372 4.93392,5.35073 0.80967,3.89363 0.41522,8.44816 -2.46367,11.41961 -1.73825,1.46914 -4.46837,1.06497 -6.0188,-0.51529 -1.25841,-1.05746 -2.42233,-2.53723 -2.10358,-4.31874 0.0522,-2.85888 -0.18,-5.77775 0.1329,-8.60031 1.23576,-1.80994 3.20549,-3.37009 5.51933,-3.336 z m 56.01087,10.91107 c 0.24462,0.23056 -0.16841,0.85668 -0.0219,1.22711 0.12946,0.92556 0.0375,2.00563 -0.78618,2.5498 -1.82377,1.98597 -4.81761,3.52587 -7.45293,2.31078 -1.58572,-1.01002 -1.34851,-3.75504 0.43025,-4.45154 2.37399,-1.37408 5.22887,-1.10797 7.83005,-1.63615 z"
@@ -3071,7 +3053,7 @@
     </g>
   </g>
   <g
-     transform="matrix(1.0345233,0,0,1.0345233,-1007.1164,587.54135)"
+     transform="matrix(1.0345233,0,0,1.0345233,-1007.1164,588.09643)"
      id="g39490">
     <g
        style="opacity:0.60905349;fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1;filter:url(#filter4656-5-8)"
@@ -3175,7 +3157,7 @@
   <a
      xlink:href="ml.html#svm_c_trainer"
      id="a3653"
-     transform="matrix(1.0345233,0,0,1.0345233,11.692975,-4.5643037)">
+     transform="matrix(1.0345233,0,0,1.0345233,11.692972,-4.0092227)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g116">
@@ -3217,7 +3199,7 @@
   <a
      xlink:href="ml.html#svm_c_linear_trainer"
      id="a3662"
-     transform="matrix(1.0345233,0,0,1.0345233,11.571272,-12.969056)">
+     transform="matrix(1.0345233,0,0,1.0345233,11.571269,-12.413974)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g152">
@@ -3251,7 +3233,7 @@
   <a
      xlink:href="ml.html#svm_one_class_trainer"
      id="a3636"
-     transform="matrix(1.0345233,0,0,1.0345233,7.4344169,4.9496223)">
+     transform="matrix(1.0345233,0,0,1.0345233,7.4344136,5.5047033)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g346">
@@ -3289,7 +3271,7 @@
   <a
      xlink:href="ml.html#svm_c_linear_dcd_trainer"
      id="a3644"
-     transform="matrix(1.0345233,0,0,1.0345233,11.899441,3.1183973)">
+     transform="matrix(1.0345233,0,0,1.0345233,11.899438,3.6734783)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g418">
@@ -3331,7 +3313,7 @@
   <a
      xlink:href="ml.html#svm_multiclass_linear_trainer"
      id="a3678"
-     transform="matrix(1.0345233,0,0,1.0345233,8.7733209,-27.992385)">
+     transform="matrix(1.0345233,0,0,1.0345233,8.7733176,-27.437303)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g444">
@@ -3365,7 +3347,7 @@
   <a
      xlink:href="ml.html#one_vs_one_trainer"
      id="a3669"
-     transform="matrix(1.0345233,0,0,1.0345233,9.5637219,-20.50147)">
+     transform="matrix(1.0345233,0,0,1.0345233,9.5637186,-19.946388)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g472">
@@ -3406,7 +3388,7 @@
   </a>
   <a
      xlink:href="ml.html#krr_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,-7.5701161,1.1254933)"
+     transform="matrix(1.0345233,0,0,1.0345233,-7.5701194,1.6805743)"
      id="a3628">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
@@ -3444,7 +3426,7 @@
   </a>
   <a
      xlink:href="ml.html#newman_cluster"
-     transform="matrix(1.0345233,0,0,1.0345233,1296.7302,-569.79503)"
+     transform="matrix(1.0345233,0,0,1.0345233,1296.7302,-569.23995)"
      id="a3685">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-1369.5729,428.8738)"
@@ -3482,7 +3464,7 @@
   </a>
   <a
      xlink:href="ml.html#kkmeans"
-     transform="matrix(1.0345233,0,0,1.0345233,7.1212879,-25.443075)"
+     transform="matrix(1.0345233,0,0,1.0345233,7.1212846,-24.887993)"
      id="a3693">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
@@ -3520,7 +3502,7 @@
   </a>
   <a
      xlink:href="ml.html#vector_normalizer_frobmetric"
-     transform="matrix(1.0345233,0,0,1.0345233,-44.86377,8.7002013)"
+     transform="matrix(1.0345233,0,0,1.0345233,-44.863773,9.2552823)"
      id="a38121">
     <g
        transform="matrix(0.55795892,0,0,0.55795892,-138.86453,-79.441536)"
@@ -3554,7 +3536,7 @@
   </a>
   <a
      xlink:href="ml.html#linear_manifold_regularizer"
-     transform="matrix(1.0345233,0,0,1.0345233,-44.728161,7.5323383)"
+     transform="matrix(1.0345233,0,0,1.0345233,-44.728164,8.0874193)"
      id="a38128">
     <g
        transform="matrix(0.55795892,0,0,0.55795892,-138.86453,-79.441536)"
@@ -3588,7 +3570,7 @@
   </a>
   <a
      xlink:href="ml.html#krr_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,117.15557,29.833291)"
+     transform="matrix(1.0345233,0,0,1.0345233,109.25334,30.388373)"
      id="a3708">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
@@ -3626,7 +3608,7 @@
   </a>
   <a
      xlink:href="ml.html#svm_rank_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,-42.021777,-21.804024)"
+     transform="matrix(1.0345233,0,0,1.0345233,-42.02178,-21.248942)"
      id="a3746">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
@@ -3660,7 +3642,7 @@
   </a>
   <a
      xlink:href="ml.html#svr_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,-138.08271,-42.638902)"
+     transform="matrix(1.0345233,0,0,1.0345233,-145.98494,-42.08382)"
      id="a3723">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
@@ -3702,7 +3684,7 @@
   </a>
   <a
      xlink:href="ml.html#svr_linear_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,-174.26139,-49.003459)"
+     transform="matrix(1.0345233,0,0,1.0345233,-182.16362,-48.448377)"
      id="a3716">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
@@ -3736,7 +3718,7 @@
   </a>
   <a
      xlink:href="ml.html#sammon_projection"
-     transform="matrix(1.0345233,0,0,1.0345233,-65.805211,94.656204)"
+     transform="matrix(1.0345233,0,0,1.0345233,-65.805214,95.211286)"
      id="a3621">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
@@ -3770,7 +3752,7 @@
   </a>
   <a
      xlink:href="ml.html#discriminant_pca"
-     transform="matrix(1.0345233,0,0,1.0345233,-182.5205,61.649434)"
+     transform="matrix(1.0345233,0,0,1.0345233,-182.5205,62.204516)"
      id="a3614">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
@@ -3804,7 +3786,7 @@
   </a>
   <a
      xlink:href="ml.html#krls"
-     transform="matrix(1.0345233,0,0,1.0345233,118.83856,23.76966)"
+     transform="matrix(1.0345233,0,0,1.0345233,110.93633,24.324742)"
      id="a3701">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
@@ -3838,7 +3820,7 @@
   </a>
   <a
      xlink:href="ml.html#structural_object_detection_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,-39.102203,-22.971893)"
+     transform="matrix(1.0345233,0,0,1.0345233,-39.102206,-22.416811)"
      id="a3739">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
@@ -3872,7 +3854,7 @@
   </a>
   <a
      xlink:href="ml.html#structural_sequence_segmentation_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,-55.355383,-37.713436)"
+     transform="matrix(1.0345233,0,0,1.0345233,-55.355386,-37.158354)"
      id="a3769">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
@@ -3906,7 +3888,7 @@
   </a>
   <a
      xlink:href="ml.html#structural_sequence_labeling_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,-65.599255,-47.333618)"
+     transform="matrix(1.0345233,0,0,1.0345233,-65.599258,-46.778536)"
      id="a3776">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
@@ -3940,7 +3922,7 @@
   </a>
   <a
      xlink:href="ml.html#structural_graph_labeling_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,-57.545123,-33.555072)"
+     transform="matrix(1.0345233,0,0,1.0345233,-57.545126,-32.99999)"
      id="a3762">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
@@ -3974,7 +3956,7 @@
   </a>
   <a
      xlink:href="ml.html#structural_assignment_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,8.9653849,13.026568)"
+     transform="matrix(1.0345233,0,0,1.0345233,8.9653816,13.58165)"
      id="a3732">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
@@ -4008,7 +3990,7 @@
   </a>
   <a
      xlink:href="ml.html#structural_svm_problem"
-     transform="matrix(1.0345233,0,0,1.0345233,-81.226757,-29.70371)"
+     transform="matrix(1.0345233,0,0,1.0345233,-81.22676,-29.148628)"
      id="a3753">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
@@ -4050,7 +4032,7 @@
   </a>
   <a
      xlink:href="ml.html#cca"
-     transform="matrix(1.0345233,0,0,1.0345233,-150.53989,74.312724)"
+     transform="matrix(1.0345233,0,0,1.0345233,-150.53989,74.867806)"
      id="a13216">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
@@ -4084,7 +4066,7 @@
   </a>
   <g
      id="g47633"
-     transform="matrix(0.57462316,0,0,0.57462316,76.94779,125.71763)">
+     transform="matrix(0.57462316,0,0,0.57462316,76.947787,126.27271)">
     <g
        id="g45724"
        transform="matrix(1.0061486,0,0,1.0061486,-466.39656,-390.38341)">
@@ -4095,11 +4077,11 @@
          inkscape:connector-curvature="0" />
       <polygon
          id="polygon45728"
-         points="718.448,-50.3021 724.261,-59.8526 728.414,-49.472 723.639,-52.3785 "
+         points="724.261,-59.8526 728.414,-49.472 723.639,-52.3785 718.448,-50.3021 "
          style="fill:#800000" />
       <polygon
          id="polygon45730"
-         points="718.448,-50.3021 724.261,-59.8526 728.414,-49.472 723.639,-52.3785 "
+         points="724.261,-59.8526 728.414,-49.472 723.639,-52.3785 718.448,-50.3021 "
          style="fill:none;stroke:#800000;stroke-width:4" />
     </g>
     <g
@@ -4112,11 +4094,11 @@
          inkscape:connector-curvature="0" />
       <polygon
          id="polygon45758"
-         points="636.704,-128.139 627.257,-134.119 637.709,-138.088 634.719,-133.365 "
+         points="627.257,-134.119 637.709,-138.088 634.719,-133.365 636.704,-128.139 "
          style="fill:#800000" />
       <polygon
          id="polygon45760"
-         points="636.704,-128.139 627.257,-134.119 637.709,-138.088 634.719,-133.365 "
+         points="627.257,-134.119 637.709,-138.088 634.719,-133.365 636.704,-128.139 "
          style="fill:none;stroke:#800000;stroke-width:4" />
     </g>
     <g
@@ -4129,11 +4111,11 @@
          inkscape:connector-curvature="0" />
       <polygon
          id="polygon45832"
-         points="691.284,-162.374 695.1,-172.884 701.218,-163.526 695.963,-165.433 "
+         points="695.1,-172.884 701.218,-163.526 695.963,-165.433 691.284,-162.374 "
          style="fill:#008000" />
       <polygon
          id="polygon45834"
-         points="691.284,-162.374 695.1,-172.884 701.218,-163.526 695.963,-165.433 "
+         points="695.1,-172.884 701.218,-163.526 695.963,-165.433 691.284,-162.374 "
          style="fill:none;stroke:#008000;stroke-width:4" />
     </g>
     <g
@@ -4182,7 +4164,7 @@
   </g>
   <g
      id="g40380"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.626197)">
+     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
     <ellipse
        id="ellipse40382"
        ry="34.489201"
