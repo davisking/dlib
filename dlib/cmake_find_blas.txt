@@ -171,6 +171,42 @@ if (UNIX)
       message(" *****************************************************************************")
    endif()
 
+elseif(WIN32)
+    message(STATUS "Searching for BLAS and LAPACK")
+
+    include(CheckTypeSize)
+    check_type_size( "void*" SIZE_OF_VOID_PTR)
+    if (SIZE_OF_VOID_PTR EQUAL 8)
+        set( mkl_search_path
+            "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/intel64"
+            "C:/Program Files (x86)/Intel/Composer XE/compiler/lib/intel64"
+            )
+        find_library(mkl_intel  mkl_intel_ilp64 ${mkl_search_path})
+    else()
+        set( mkl_search_path
+            "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/ia32"
+            "C:/Program Files (x86)/Intel/Composer XE/compiler/lib/ia32"
+            )
+        find_library(mkl_intel  mkl_intel_c ${mkl_search_path})
+    endif()
+
+
+    # Search for the needed libraries from the MKL.  
+    find_library(mkl_core mkl_core ${mkl_search_path})
+    find_library(mkl_thread mkl_intel_thread ${mkl_search_path})
+    find_library(mkl_iomp libiomp5md ${mkl_search_path})
+
+    mark_as_advanced( mkl_intel mkl_core mkl_thread  mkl_iomp)
+    # If we found the MKL 
+    if (mkl_intel AND mkl_core AND mkl_thread AND mkl_iomp )
+        set(blas_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp}  )
+        set(lapack_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} )
+        set(blas_found 1)
+        set(lapack_found 1)
+        message(STATUS "Found Intel MKL BLAS/LAPACK library")
+    endif()
+
+
 endif()
 
 
