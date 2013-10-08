@@ -181,7 +181,7 @@ elseif(WIN32)
             "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/intel64"
             "C:/Program Files (x86)/Intel/Composer XE/compiler/lib/intel64"
             )
-        find_library(mkl_intel  mkl_intel_ilp64 ${mkl_search_path})
+        find_library(mkl_intel  mkl_intel_lp64 ${mkl_search_path})
     else()
         set( mkl_search_path
             "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/ia32"
@@ -204,6 +204,16 @@ elseif(WIN32)
         set(blas_found 1)
         set(lapack_found 1)
         message(STATUS "Found Intel MKL BLAS/LAPACK library")
+
+        if (MSVC)
+            # need to set /bigobj when statically linking with the MKL on
+            # visual studio or it doesn't work right.
+            if (NOT CMAKE_CXX_FLAGS MATCHES "/bigobj")
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj" 
+                    CACHE STRING "Flags used by the compiler during all C++ builds." 
+                    FORCE)
+            endif ()
+        endif()
     endif()
 
 
