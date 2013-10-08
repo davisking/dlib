@@ -46,9 +46,6 @@ namespace dlib
 #if defined(__alpha__) || defined(__sparc64__) || defined(__x86_64__) || defined(__ia64__)
             typedef int integer;
             typedef unsigned int uinteger;
-#elif defined(_M_X64) // If we are building on windows in Win64 mode 
-            typedef long long int integer;
-            typedef unsigned long long int uinteger;
 #else
             typedef long int integer;
             typedef unsigned long int uinteger;
