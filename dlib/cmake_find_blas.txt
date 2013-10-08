@@ -180,12 +180,16 @@ elseif(WIN32)
         set( mkl_search_path
             "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/intel64"
             "C:/Program Files (x86)/Intel/Composer XE/compiler/lib/intel64"
+            "C:/Program Files/Intel/Composer XE/mkl/lib/intel64"
+            "C:/Program Files/Intel/Composer XE/compiler/lib/intel64"
             )
         find_library(mkl_intel  mkl_intel_lp64 ${mkl_search_path})
     else()
         set( mkl_search_path
             "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/ia32"
             "C:/Program Files (x86)/Intel/Composer XE/compiler/lib/ia32"
+            "C:/Program Files/Intel/Composer XE/mkl/lib/ia32"
+            "C:/Program Files/Intel/Composer XE/compiler/lib/ia32"
             )
         find_library(mkl_intel  mkl_intel_c ${mkl_search_path})
     endif()
