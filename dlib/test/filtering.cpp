@@ -136,7 +136,7 @@ namespace
         DLIB_TEST(rls.get_forget_factor() == 0.99);
         DLIB_TEST(rls.get_c() == 0.1);
 
-        double rls_error = test_filter(rls, 300);
+        double rls_error = test_filter(rls, 1000);
 
         dlog << LINFO << "rls error: "<< rls_error;
         DLIB_TEST_MSG(rls_error < 0.75, rls_error);
