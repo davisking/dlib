@@ -82,7 +82,7 @@ namespace dlib
             // detections we will consider.  We do this purely for computational reasons
             // since otherwise we can end up wasting large amounts of time on certain
             // pathological cases during optimization which ultimately do not influence the
-            // result.  Therefore, we for the separation oracle to only consider the
+            // result.  Therefore, we force the separation oracle to only consider the
             // max_num_dets strongest detections.
             max_num_dets = 0;
             for (unsigned long i = 0; i < truth_object_detections.size(); ++i)
