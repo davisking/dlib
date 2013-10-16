@@ -16,7 +16,7 @@ New Features:
      See the new find_min_box_constrained() and find_max_box_constrained() routines.
    - Added vector_normalizer_frobmetric.  This is a tool for learning a
      Mahalanobis distance metric.
-   - The user can now set different loss values for false alarming vs getting a
+   - The user can now set different loss values for false alarming vs. getting a
      correct detection when using the structural_sequence_segmentation_trainer.
    - Added an overload of clamp() that lets you use matrix valued lower/upper bounds.
    - New image processing tools:
