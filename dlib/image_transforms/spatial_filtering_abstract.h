@@ -46,8 +46,7 @@ namespace dlib
               add_to is true then the filtered output value will be added to out_img rather than 
               overwriting the original value.
             - if (pixel_traits<typename in_image_type::type>::grayscale == false) then
-                - the pixel values are converted to the HSI color space and the filtering
-                  is done on the intensity channel only.
+                - The filter is applied to each color channel independently.
             - if (use_abs == true) then
                 - pixel values after filtering that are < 0 are converted to their absolute values.
             - Pixels close enough to the edge of in_img to not have the filter still fit 
@@ -102,8 +101,7 @@ namespace dlib
               add_to is true then the filtered output value will be added to out_img rather than 
               overwriting the original value.
             - if (pixel_traits<typename in_image_type::type>::grayscale == false) then
-                - the pixel values are converted to the HSI color space and the filtering
-                  is done on the intensity channel only.
+                - The filter is applied to each color channel independently.
             - if (use_abs == true) then
                 - pixel values after filtering that are < 0 are converted to their absolute values
             - Pixels close enough to the edge of in_img to not have the filter still fit 
@@ -139,6 +137,7 @@ namespace dlib
             - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
             - pixel_traits<typename in_image_type::type>::has_alpha == false
             - pixel_traits<typename out_image_type::type>::has_alpha == false 
+            - pixel_traits<typename out_image_type::type>::grayscale == true 
             - is_same_object(in_img, out_img) == false 
             - T must be some scalar type
             - scale != 0
@@ -304,8 +303,7 @@ namespace dlib
             - Pixel values are stored into out_img using the assign_pixel() function and therefore
               any applicable color space conversion or value saturation is performed.
             - if (pixel_traits<typename in_image_type::type>::grayscale == false) then
-                - the pixel values are converted to the HSI color space and the filtering
-                  is done on the intensity channel only.
+                - The filter is applied to each color channel independently.
             - Pixels close enough to the edge of in_img to not have the filter still fit 
               inside the image are set to zero.
             - #out_img.nc() == in_img.nc()

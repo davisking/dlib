@@ -23,7 +23,8 @@ namespace dlib
         typename EXP,
         typename T
         >
-    rectangle spatially_filter_image (
+    typename enable_if_c<pixel_traits<typename out_image_type::type>::grayscale,rectangle>::type 
+    spatially_filter_image (
         const in_image_type& in_img,
         out_image_type& out_img,
         const matrix_exp<EXP>& filter,
@@ -98,13 +99,98 @@ namespace dlib
                 // save this pixel to the output image
                 if (add_to == false)
                 {
-                    assign_pixel(out_img[r][c], in_img[r][c]);
-                    assign_pixel_intensity(out_img[r][c], temp);
+                    assign_pixel(out_img[r][c], temp);
                 }
                 else
                 {
-                    assign_pixel(out_img[r][c], temp + get_pixel_intensity(out_img[r][c]));
+                    assign_pixel(out_img[r][c], temp + out_img[r][c]);
                 }
+            }
+        }
+
+        return non_border;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        typename out_image_type,
+        typename EXP,
+        typename T
+        >
+    typename disable_if_c<pixel_traits<typename out_image_type::type>::grayscale,rectangle>::type 
+    spatially_filter_image (
+        const in_image_type& in_img,
+        out_image_type& out_img,
+        const matrix_exp<EXP>& filter,
+        T scale,
+        bool use_abs = false,
+        bool add_to = false
+    )
+    {
+        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+
+        DLIB_ASSERT(scale != 0 &&
+                    filter.nr()%2 == 1 &&
+                    filter.nc()%2 == 1,
+            "\tvoid spatially_filter_image()"
+            << "\n\t You can't give a scale of zero or a filter with even dimensions"
+            << "\n\t scale: "<< scale
+            << "\n\t filter.nr(): "<< filter.nr()
+            << "\n\t filter.nc(): "<< filter.nc()
+            );
+        DLIB_ASSERT(is_same_object(in_img, out_img) == false,
+            "\tvoid spatially_filter_image()"
+            << "\n\tYou must give two different image objects"
+            );
+
+
+
+        // if there isn't any input image then don't do anything
+        if (in_img.size() == 0)
+        {
+            out_img.clear();
+            return rectangle();
+        }
+
+        out_img.set_size(in_img.nr(),in_img.nc());
+
+        zero_border_pixels(out_img, filter.nc()/2, filter.nr()/2); 
+
+        // figure out the range that we should apply the filter to
+        const long first_row = filter.nr()/2;
+        const long first_col = filter.nc()/2;
+        const long last_row = in_img.nr() - filter.nr()/2;
+        const long last_col = in_img.nc() - filter.nc()/2;
+
+        const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
+
+        // apply the filter to the image
+        for (long r = first_row; r < last_row; ++r)
+        {
+            for (long c = first_col; c < last_col; ++c)
+            {
+                typedef matrix<typename EXP::type,pixel_traits<typename in_image_type::type>::num,1> ptype;
+                ptype p;
+                ptype temp;
+                temp = 0;
+                for (long m = 0; m < filter.nr(); ++m)
+                {
+                    for (long n = 0; n < filter.nc(); ++n)
+                    {
+                        // pull out the current pixel and put it into p
+                        p = pixel_to_vector<typename EXP::type>(in_img[r-filter.nr()/2+m][c-filter.nc()/2+n]);
+                        temp += p*filter(m,n);
+                    }
+                }
+
+                temp /= scale;
+
+                typename in_image_type::type pp;
+                vector_to_pixel(pp, temp);
+                assign_pixel(out_img[r][c], pp);
             }
         }
 
@@ -134,7 +220,8 @@ namespace dlib
         typename EXP2,
         typename T
         >
-    rectangle spatially_filter_image_separable (
+    typename enable_if_c<pixel_traits<typename out_image_type::type>::grayscale,rectangle>::type 
+    spatially_filter_image_separable (
         const in_image_type& in_img,
         out_image_type& out_img,
         const matrix_exp<EXP1>& row_filter,
@@ -230,13 +317,120 @@ namespace dlib
                 // save this pixel to the output image
                 if (add_to == false)
                 {
-                    assign_pixel(out_img[r][c], in_img[r][c]);
-                    assign_pixel_intensity(out_img[r][c], temp);
+                    assign_pixel(out_img[r][c], temp);
                 }
                 else
                 {
-                    assign_pixel(out_img[r][c], temp + get_pixel_intensity(out_img[r][c]));
+                    assign_pixel(out_img[r][c], temp + out_img[r][c]);
                 }
+            }
+        }
+        return non_border;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        typename out_image_type,
+        typename EXP1,
+        typename EXP2,
+        typename T
+        >
+    typename disable_if_c<pixel_traits<typename out_image_type::type>::grayscale,rectangle>::type 
+    spatially_filter_image_separable (
+        const in_image_type& in_img,
+        out_image_type& out_img,
+        const matrix_exp<EXP1>& row_filter,
+        const matrix_exp<EXP2>& col_filter,
+        T scale
+    )
+    {
+        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+
+        DLIB_ASSERT(scale != 0 &&
+                    row_filter.size()%2 == 1 &&
+                    col_filter.size()%2 == 1 &&
+                    is_vector(row_filter) &&
+                    is_vector(col_filter),
+            "\tvoid spatially_filter_image_separable()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t scale: "<< scale
+            << "\n\t row_filter.size(): "<< row_filter.size()
+            << "\n\t col_filter.size(): "<< col_filter.size()
+            << "\n\t is_vector(row_filter): "<< is_vector(row_filter)
+            << "\n\t is_vector(col_filter): "<< is_vector(col_filter)
+            );
+        DLIB_ASSERT(is_same_object(in_img, out_img) == false,
+            "\tvoid spatially_filter_image_separable()"
+            << "\n\tYou must give two different image objects"
+            );
+
+
+
+        // if there isn't any input image then don't do anything
+        if (in_img.size() == 0)
+        {
+            out_img.clear();
+            return rectangle();
+        }
+
+        out_img.set_size(in_img.nr(),in_img.nc());
+
+        zero_border_pixels(out_img, row_filter.size()/2, col_filter.size()/2); 
+
+        // figure out the range that we should apply the filter to
+        const long first_row = col_filter.size()/2;
+        const long first_col = row_filter.size()/2;
+        const long last_row = in_img.nr() - col_filter.size()/2;
+        const long last_col = in_img.nc() - row_filter.size()/2;
+
+        const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
+
+        typedef typename out_image_type::mem_manager_type mem_manager_type;
+        typedef matrix<typename EXP1::type,pixel_traits<typename in_image_type::type>::num,1> ptype;
+
+        array2d<ptype,mem_manager_type> temp_img;
+        temp_img.set_size(in_img.nr(), in_img.nc());
+
+        // apply the row filter
+        for (long r = 0; r < in_img.nr(); ++r)
+        {
+            for (long c = first_col; c < last_col; ++c)
+            {
+                ptype p;
+                ptype temp;
+                temp = 0;
+                for (long n = 0; n < row_filter.size(); ++n)
+                {
+                    // pull out the current pixel and put it into p
+                    p = pixel_to_vector<typename EXP1::type>(in_img[r][c-row_filter.size()/2+n]);
+                    temp += p*row_filter(n);
+                }
+                temp_img[r][c] = temp;
+            }
+        }
+
+        // apply the column filter 
+        for (long r = first_row; r < last_row; ++r)
+        {
+            for (long c = first_col; c < last_col; ++c)
+            {
+                ptype temp;
+                temp = 0;
+                for (long m = 0; m < col_filter.size(); ++m)
+                {
+                    temp += temp_img[r-col_filter.size()/2+m][c]*col_filter(m);
+                }
+
+                temp /= scale;
+
+
+                // save this pixel to the output image
+                typename in_image_type::type p;
+                vector_to_pixel(p, temp);
+                assign_pixel(out_img[r][c], p);
             }
         }
         return non_border;
@@ -280,6 +474,7 @@ namespace dlib
     {
         COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
         COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::grayscale == true );
 
         DLIB_ASSERT(downsample > 0 &&
                     scale != 0 &&
@@ -374,12 +569,11 @@ namespace dlib
                 // save this pixel to the output image
                 if (add_to == false)
                 {
-                    assign_pixel(out_img[r][c], in_img[r*downsample][c*downsample]);
-                    assign_pixel_intensity(out_img[r][c], temp);
+                    assign_pixel(out_img[r][c], temp);
                 }
                 else
                 {
-                    assign_pixel(out_img[r][c], temp + get_pixel_intensity(out_img[r][c]));
+                    assign_pixel(out_img[r][c], temp + out_img[r][c]);
                 }
             }
         }
