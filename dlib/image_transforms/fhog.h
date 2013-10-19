@@ -417,6 +417,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline rectangle image_to_fhog (
+        const rectangle& rect,
+        int cell_size = 8
+    ) 
+    {
+        return rectangle(image_to_fhog(rect.tl_corner(),cell_size),
+                         image_to_fhog(rect.br_corner(),cell_size));
+    }
+
+// ----------------------------------------------------------------------------------------
+
     inline point fhog_to_image (
         point p,
         int cell_size = 8
@@ -424,6 +435,17 @@ namespace dlib
     {
         // Convert to image space and then set to the center of the cell.
         return (p+point(1,1))*cell_size + point(1,1) + point(cell_size/2,cell_size/2);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline rectangle fhog_to_image (
+        const rectangle& rect,
+        int cell_size = 8
+    ) 
+    {
+        return rectangle(fhog_to_image(rect.tl_corner(),cell_size),
+                         fhog_to_image(rect.br_corner(),cell_size));
     }
 
 // ----------------------------------------------------------------------------------------

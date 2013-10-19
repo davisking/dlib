@@ -102,6 +102,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline rectangle image_to_fhog (
+        const rectangle& rect,
+        int cell_size = 8
+    );
+    /*!
+        requires
+            - cell_size > 0
+        ensures
+            - maps a rectangle from image space to fhog space.  In particular this function returns:
+              rectangle(image_to_fhog(rect.tl_corner(),cell_size), image_to_fhog(rect.br_corner(),cell_size))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     inline point fhog_to_image (
         point p,
         int cell_size = 8
@@ -116,6 +130,20 @@ namespace dlib
               invertible.  Therefore, the returned location will be the center of the cell
               in the original image that contained the FHOG vector at position p.  Moreover,
               cell_size should be set to the value used by the call to extract_fhog_features().
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    inline rectangle fhog_to_image (
+        const rectangle& rect,
+        int cell_size = 8
+    );
+    /*!
+        requires
+            - cell_size > 0
+        ensures
+            - maps a rectangle from fhog space to image space.  In particular this function returns:
+              rectangle(fhog_to_image(rect.tl_corner(),cell_size), fhog_to_image(rect.br_corner(),cell_size))
     !*/
 
 // ----------------------------------------------------------------------------------------
