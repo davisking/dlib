@@ -411,12 +411,12 @@ namespace dlib
 
 #ifdef ENABLE_ASSERTS
             const double psi_score = dot(psi, current_solution);
-            DLIB_ASSERT(std::abs(psi_score-total_score)*std::max(psi_score,total_score) < 1e-5,
+            DLIB_ASSERT(std::abs(psi_score-total_score) <= 1e-5 * std::max(std::abs(psi_score),std::abs(total_score)),
                         "\t The get_feature_vector() and detect() methods of image_scanner_type are not in sync." 
                         << "\n\t The relative error is too large to be attributed to rounding error."
-                        << "\n\t relative error: " << std::abs(psi_score-total_score)*std::max(psi_score,total_score)
-                        << "\n\t psi_score:      " << psi_score
-                        << "\n\t total_score:    " << total_score
+                        << "\n\t error:       " << std::abs(psi_score-total_score)
+                        << "\n\t psi_score:   " << psi_score
+                        << "\n\t total_score: " << total_score
             );
 #endif
 
