@@ -434,7 +434,13 @@ namespace dlib
     )
     {
         // Convert to image space and then set to the center of the cell.
-        return (p+point(1,1))*cell_size + point(1,1) + point(cell_size/2,cell_size/2);
+        point offset;
+        
+        if (p.x() >= 0 && p.y() >= 0) offset = point(cell_size/2,cell_size/2);
+        if (p.x() <  0 && p.y() >= 0) offset = point(-cell_size/2,cell_size/2);
+        if (p.x() >= 0 && p.y() <  0) offset = point(cell_size/2,-cell_size/2);
+        if (p.x() <  0 && p.y() <  0) offset = point(-cell_size/2,-cell_size/2);
+        return (p+point(1,1))*cell_size + point(1,1) + offset;
     }
 
 // ----------------------------------------------------------------------------------------

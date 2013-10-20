@@ -103,9 +103,33 @@ namespace
             }
         }
 
+        void test_point_transforms()
+        {
+            for (int cell_size = 1; cell_size < 10; ++cell_size)
+            {
+                print_spinner();
+                for (long i = -10; i <= 10; ++i)
+                {
+                    for (long j = -10; j <= 10; ++j)
+                    {
+                        for (long k = -10; k <= 10; ++k)
+                        {
+                            for (long l = -10; l <= 10; ++l)
+                            {
+                                rectangle rect(point(i,j), point(k,l));
+                                DLIB_TEST(rect == image_to_fhog(fhog_to_image(rect,cell_size),cell_size));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
         void perform_test (
         )
         {
+            test_point_transforms();
             test_on_small();
 
             print_spinner();

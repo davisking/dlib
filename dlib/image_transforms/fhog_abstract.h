@@ -130,6 +130,8 @@ namespace dlib
               invertible.  Therefore, the returned location will be the center of the cell
               in the original image that contained the FHOG vector at position p.  Moreover,
               cell_size should be set to the value used by the call to extract_fhog_features().
+            - Mapping from fhog space to image space is an invertible transformation.  That
+              is, for any point P we have P == image_to_fhog(fhog_to_image(P,cell_size),cell_size).
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -144,6 +146,8 @@ namespace dlib
         ensures
             - maps a rectangle from fhog space to image space.  In particular this function returns:
               rectangle(fhog_to_image(rect.tl_corner(),cell_size), fhog_to_image(rect.br_corner(),cell_size))
+            - Mapping from fhog space to image space is an invertible transformation.  That
+              is, for any rectangle R we have R == image_to_fhog(fhog_to_image(R,cell_size),cell_size).
     !*/
 
 // ----------------------------------------------------------------------------------------
