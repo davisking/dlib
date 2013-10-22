@@ -12,6 +12,18 @@
 
 <current>
 New Features:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="18.5" date="Oct 22, 2013">
+New Features:
    - Added routines for performing BFGS and L-BFGS optimization with box constraints.  
      See the new find_min_box_constrained() and find_max_box_constrained() routines.
    - Added vector_normalizer_frobmetric.  This is a tool for learning a
@@ -47,7 +59,7 @@ Other:
      version of it that is optimized for this case.
    - Dlib's cmake files will now automatically link to the Intel MKL on MS Windows
      platforms if the MKL is installed.
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
