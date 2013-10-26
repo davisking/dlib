@@ -259,7 +259,7 @@ namespace dlib
             }
             else
             {
-                if (tree[i].c.begin < words.size())
+                if ((tree[i].c.begin) < words.size())
                 {
                     out << words[tree[i].c.begin] << " ";
                 }
