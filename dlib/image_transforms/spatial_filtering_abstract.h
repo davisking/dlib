@@ -36,6 +36,9 @@ namespace dlib
             - scale != 0
             - filter.nr() % 2 == 1  (i.e. must be odd)
             - filter.nc() % 2 == 1  (i.e. must be odd)
+            - if (pixel_traits<typename in_image_type::type>::grayscale == false) then
+                - use_abs == false && add_to == false
+                  (i.e. You can only use the use_abs and add_to options with grayscale images)
         ensures
             - Applies the given spatial filter to in_img and stores the result in out_img (i.e.
               cross-correlates in_img with filter).  Also divides each resulting pixel by scale.  
@@ -88,6 +91,9 @@ namespace dlib
             - is_vector(col_filter) == true
             - row_filter.size() % 2 == 1  (i.e. must be odd)
             - col_filter.size() % 2 == 1  (i.e. must be odd)
+            - if (pixel_traits<typename in_image_type::type>::grayscale == false) then
+                - use_abs == false && add_to == false
+                  (i.e. You can only use the use_abs and add_to options with grayscale images)
         ensures
             - Applies the given separable spatial filter to in_img and stores the result in out_img.  
               Also divides each resulting pixel by scale.  Calling this function has the same

@@ -260,7 +260,7 @@ namespace
             for (int i = 0; i < 100; ++i)
             {
                 int a = 9;
-                go.remove_any(a);
+                a1.remove_any(a);
                 DLIB_TEST(a == 3);
             }
             DLIB_TEST(go.size() == 0);

@@ -124,9 +124,7 @@ namespace dlib
         const in_image_type& in_img,
         out_image_type& out_img,
         const matrix_exp<EXP>& filter,
-        T scale,
-        bool use_abs = false,
-        bool add_to = false
+        T scale
     )
     {
         COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );

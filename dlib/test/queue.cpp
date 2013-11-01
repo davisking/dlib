@@ -354,7 +354,7 @@ namespace
             for (int i = 0; i < 100; ++i)
             {
                 int a = 9;
-                go.remove_any(a);
+                q.remove_any(a);
                 DLIB_TEST(a == 3);
             }
             DLIB_TEST(go.size() == 0);
