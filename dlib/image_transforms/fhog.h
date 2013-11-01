@@ -30,18 +30,18 @@ namespace dlib
         {
             matrix<double,2,1> grad2, grad3;
             // get the red gradient
-            grad = (int)img[r][c+1].red-(int)img[r][c-1].red, 
-                 (int)img[r+1][c].red-(int)img[r-1][c].red;
+            grad(0) = (int)img[r][c+1].red-(int)img[r][c-1].red; 
+            grad(1) = (int)img[r+1][c].red-(int)img[r-1][c].red;
             len = length_squared(grad);
 
             // get the green gradient
-            grad2 = (int)img[r][c+1].green-(int)img[r][c-1].green, 
-                  (int)img[r+1][c].green-(int)img[r-1][c].green;
+            grad2(0) = (int)img[r][c+1].green-(int)img[r][c-1].green; 
+            grad2(1) = (int)img[r+1][c].green-(int)img[r-1][c].green;
             double v2 = length_squared(grad2);
 
             // get the blue gradient
-            grad3 = (int)img[r][c+1].blue-(int)img[r][c-1].blue, 
-                  (int)img[r+1][c].blue-(int)img[r-1][c].blue;
+            grad3(0) = (int)img[r][c+1].blue-(int)img[r][c-1].blue; 
+            grad3(1) = (int)img[r+1][c].blue-(int)img[r-1][c].blue;
             double v3 = length_squared(grad3);
 
             // pick color with strongest gradient
@@ -68,8 +68,8 @@ namespace dlib
             double& len
         )
         {
-            grad = (int)get_pixel_intensity(img[r][c+1])-(int)get_pixel_intensity(img[r][c-1]), 
-            (int)get_pixel_intensity(img[r+1][c])-(int)get_pixel_intensity(img[r-1][c]);
+            grad(0) = (int)get_pixel_intensity(img[r][c+1])-(int)get_pixel_intensity(img[r][c-1]); 
+            grad(1) = (int)get_pixel_intensity(img[r+1][c])-(int)get_pixel_intensity(img[r-1][c]);
             len = length_squared(grad);
         }
 
@@ -227,9 +227,9 @@ namespace dlib
             // First populate the gradient histograms
             for (int y = 1; y < visible_nr-1; y++) 
             {
+                const int r = std::min<int>(y, img.nr()-2);
                 for (int x = 1; x < visible_nc-1; x++) 
                 {
-                    const int r = std::min<int>(y, img.nr()-2);
                     const int c = std::min<int>(x, img.nc()-2);
 
                     matrix<double,2,1> grad;
@@ -299,10 +299,10 @@ namespace dlib
                 {
                     double n1, n2, n3, n4;
 
-                    n1 = 1.0 / std::sqrt(norm[y+1][x+1] + norm[y+1][x+2] + norm[y+2][x+1] + norm[y+2][x+2] + eps);
-                    n2 = 1.0 / std::sqrt(norm[y][x+1]   + norm[y][x+2]   + norm[y+1][x+1] + norm[y+1][x+2] + eps);
-                    n3 = 1.0 / std::sqrt(norm[y+1][x]   + norm[y+1][x+1] + norm[y+2][x]   + norm[y+2][x+1] + eps);
-                    n4 = 1.0 / std::sqrt(norm[y][x]     + norm[y][x+1]   + norm[y+1][x]   + norm[y+1][x+1] + eps);
+                    n1 = 0.5 / std::sqrt(norm[y+1][x+1] + norm[y+1][x+2] + norm[y+2][x+1] + norm[y+2][x+2] + eps);
+                    n2 = 0.5 / std::sqrt(norm[y][x+1]   + norm[y][x+2]   + norm[y+1][x+1] + norm[y+1][x+2] + eps);
+                    n3 = 0.5 / std::sqrt(norm[y+1][x]   + norm[y+1][x+1] + norm[y+2][x]   + norm[y+2][x+1] + eps);
+                    n4 = 0.5 / std::sqrt(norm[y][x]     + norm[y][x+1]   + norm[y+1][x]   + norm[y+1][x+1] + eps);
 
                     double t1 = 0;
                     double t2 = 0;
@@ -312,11 +312,11 @@ namespace dlib
                     // contrast-sensitive features
                     for (int o = 0; o < 18; o++) 
                     {
-                        double h1 = std::min(hist[y+1][x+1](o) * n1, 0.2);
-                        double h2 = std::min(hist[y+1][x+1](o) * n2, 0.2);
-                        double h3 = std::min(hist[y+1][x+1](o) * n3, 0.2);
-                        double h4 = std::min(hist[y+1][x+1](o) * n4, 0.2);
-                        set_hog(hog,o,x,y,0.5 * (h1 + h2 + h3 + h4));
+                        double h1 = std::min(hist[y+1][x+1](o) * n1, 0.1);
+                        double h2 = std::min(hist[y+1][x+1](o) * n2, 0.1);
+                        double h3 = std::min(hist[y+1][x+1](o) * n3, 0.1);
+                        double h4 = std::min(hist[y+1][x+1](o) * n4, 0.1);
+                        set_hog(hog,o,x,y, (h1 + h2 + h3 + h4));
                         t1 += h1;
                         t2 += h2;
                         t3 += h3;
@@ -327,18 +327,18 @@ namespace dlib
                     for (int o = 0; o < 9; o++) 
                     {
                         double sum = hist[y+1][x+1](o) + hist[y+1][x+1](o+9);
-                        double h1 = std::min(sum * n1, 0.2);
-                        double h2 = std::min(sum * n2, 0.2);
-                        double h3 = std::min(sum * n3, 0.2);
-                        double h4 = std::min(sum * n4, 0.2);
-                        set_hog(hog,o+18,x,y, 0.5 * (h1 + h2 + h3 + h4));
+                        double h1 = std::min(sum * n1, 0.1);
+                        double h2 = std::min(sum * n2, 0.1);
+                        double h3 = std::min(sum * n3, 0.1);
+                        double h4 = std::min(sum * n4, 0.1);
+                        set_hog(hog,o+18,x,y, (h1 + h2 + h3 + h4));
                     }
 
                     // texture features
-                    set_hog(hog,27,x,y, 0.2357 * t1);
-                    set_hog(hog,28,x,y, 0.2357 * t2);
-                    set_hog(hog,29,x,y, 0.2357 * t3);
-                    set_hog(hog,30,x,y, 0.2357 * t4);
+                    set_hog(hog,27,x,y, 2*0.2357 * t1);
+                    set_hog(hog,28,x,y, 2*0.2357 * t2);
+                    set_hog(hog,29,x,y, 2*0.2357 * t3);
+                    set_hog(hog,30,x,y, 2*0.2357 * t4);
                 }
             }
         }
