@@ -497,6 +497,33 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename T
+        >
+    matrix<unsigned char> draw_fhog (
+        const std::vector<matrix<T> >& hog,
+        const long w = 15
+    )
+    {
+        // Just convert the input into the right object and then call the above draw_fhog()
+        // function on it.
+        dlib::array<array2d<T> > temp(hog.size());
+        for (unsigned long i = 0; i < temp.size(); ++i)
+        {
+            temp[i].set_size(hog[i].nr(), hog[i].nc());
+            for (long r = 0; r < hog[i].nr(); ++r)
+            {
+                for (long c = 0; c < hog[i].nc(); ++c)
+                {
+                    temp[i][r][c] = hog[i](r,c);
+                }
+            }
+        }
+        return draw_fhog(temp,w);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename T, 
         typename mm
         >

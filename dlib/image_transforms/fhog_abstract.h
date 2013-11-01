@@ -178,6 +178,23 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename T
+        >
+    matrix<unsigned char> draw_fhog (
+        const std::vector<matrix<T> >& hog,
+        const long cell_draw_size = 15
+    );
+    /*!
+        requires
+            - cell_draw_size > 0
+        ensures
+            - This function just converts the given hog object into an array<array2d<T>>
+              and passes it to the above draw_fhog() routine and returns the results.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename T, 
         typename mm
         >
