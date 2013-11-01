@@ -25,7 +25,6 @@ namespace dlib
         const std::vector<label_type>& y_test
     )
     {
-        typedef typename reg_funct_type::mem_manager_type mem_manager_type;
 
         // make sure requires clause is not broken
         DLIB_ASSERT( is_learning_problem(x_test,y_test) == true,
@@ -67,7 +66,6 @@ namespace dlib
         const long folds
     )
     {
-        typedef typename trainer_type::mem_manager_type mem_manager_type;
 
         // make sure requires clause is not broken
         DLIB_ASSERT(is_learning_problem(x,y) == true &&

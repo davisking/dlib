@@ -456,8 +456,6 @@ namespace
         typename image_type1::type thresh
         )
     {
-        typedef typename image_type1::type pixel_type;
-
         const rectangle area = get_rect(img);
         for (long r = 0; r < img.nr(); ++r)
         {

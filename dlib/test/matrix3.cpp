@@ -634,7 +634,6 @@ namespace
             - runs tests on the matrix stuff compliance with the specs
     !*/
     {        
-        typedef memory_manager_stateless<char>::kernel_2_2a MM;
         print_spinner();
 
 

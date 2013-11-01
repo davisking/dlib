@@ -255,8 +255,6 @@ namespace dlib
 
         typedef typename funct_model::column_vector T;
         typedef typename T::type type;
-        typedef typename T::mem_manager_type mem_manager_type;
-        typedef typename T::layout_type layout_type;
 
         typename funct_model::general_matrix h;
         typename funct_model::column_vector g, p, d;

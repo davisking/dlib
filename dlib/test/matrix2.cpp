@@ -667,7 +667,6 @@ namespace
             const long M = 3;
             const long N = 3;
 
-            typedef matrix<double,0,0> mat;
 
             matrix<double,0,0,default_memory_manager, column_major_layout> a(M,N);  
             for (long r = 0; r < a.nr(); ++r)

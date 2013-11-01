@@ -33,7 +33,6 @@ namespace dlib
 
         */
         typedef typename kernel_type::scalar_type scalar_type;
-        typedef typename kernel_type::sample_type sample_type;
         typedef typename kernel_type::mem_manager_type mm;
 
 
@@ -172,7 +171,6 @@ namespace dlib
 
         */
         typedef typename kernel_type::scalar_type scalar_type;
-        typedef typename kernel_type::sample_type sample_type;
         typedef typename kernel_type::mem_manager_type mm;
 
         // make sure requires clause is not broken
@@ -374,7 +372,6 @@ namespace dlib
             bool verbose
         )
         {
-            typedef typename sample_matrix_type::type sample_type;
             using namespace std;
 
             if (verbose)

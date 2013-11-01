@@ -25,7 +25,6 @@ namespace dlib
         const std::vector<label_type>& y_test
     )
     {
-        typedef typename dec_funct_type::mem_manager_type mem_manager_type;
 
         // make sure requires clause is not broken
         DLIB_ASSERT( is_learning_problem(x_test,y_test) == true,

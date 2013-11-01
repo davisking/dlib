@@ -90,10 +90,7 @@ namespace dlib
     {
         using namespace dlib::cvtti_helpers;
         typedef typename trainer_type::scalar_type scalar_type;
-        typedef typename trainer_type::sample_type sample_type;
         typedef typename trainer_type::mem_manager_type mem_manager_type;
-        typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
-        typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
 
         // make sure requires clause is not broken
         DLIB_ASSERT(is_binary_classification_problem(x,y) == true &&

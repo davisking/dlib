@@ -1090,7 +1090,6 @@ convergence:
         )
         {
             using namespace nric;
-            typedef typename EXP::mem_manager_type MM;
             // you can't invert a non-square matrix
             COMPILE_TIME_ASSERT(matrix_exp<EXP>::NR == matrix_exp<EXP>::NC || 
                                 matrix_exp<EXP>::NR == 0 ||
@@ -1306,7 +1305,6 @@ convergence:
             );
 
         typedef typename matrix_exp<EXP>::matrix_type matrix_type;
-        typedef typename matrix_type::type type;
 
         matrix_type m(A);
 
@@ -1351,7 +1349,6 @@ convergence:
             );
 
         typedef typename matrix_exp<EXP>::matrix_type matrix_type;
-        typedef typename matrix_type::type type;
 
         matrix_type m(A);
 
@@ -1646,8 +1643,6 @@ convergence:
                 << "\n\tm.nr(): " << m.nr()
                 << "\n\tm.nc(): " << m.nc() 
                 );
-            typedef typename matrix_exp<EXP>::type type;
-            typedef typename matrix_exp<EXP>::mem_manager_type MM;
 
             return lu_decomposition<EXP>(m).det();
         }
@@ -1663,7 +1658,6 @@ convergence:
         )
         {
             COMPILE_TIME_ASSERT(matrix_exp<EXP>::NR == matrix_exp<EXP>::NC);
-            typedef typename matrix_exp<EXP>::type type;
 
             return m(0);
         }
@@ -1679,7 +1673,6 @@ convergence:
         )
         {
             COMPILE_TIME_ASSERT(matrix_exp<EXP>::NR == matrix_exp<EXP>::NC);
-            typedef typename matrix_exp<EXP>::type type;
 
             return m(0,0)*m(1,1) - m(0,1)*m(1,0);
         }

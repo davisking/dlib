@@ -280,7 +280,6 @@ namespace dlib
             }
 
             typedef matrix<scalar_type,0,1,mem_manager_type> column_matrix_type;
-            typedef matrix<scalar_type,0,0,mem_manager_type> general_matrix_type;
 
             running_stats<scalar_type> rs;
 

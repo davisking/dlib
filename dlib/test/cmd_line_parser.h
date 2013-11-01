@@ -32,7 +32,6 @@ namespace
     !*/
     {        
         typedef typename clp::char_type ct;
-        typedef typename clp::string_type string_type;
 
 
 

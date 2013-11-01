@@ -345,11 +345,6 @@ namespace dlib
             }
         };
 
-#ifdef __GNUC__
-#define DLIB_SHUT_UP_GCC_ABOUT_THIS_UNUSED_VARIABLE __attribute__ ((unused))
-#else
-#define DLIB_SHUT_UP_GCC_ABOUT_THIS_UNUSED_VARIABLE 
-#endif
         // This is a macro to help us add overloads for the matrix_assign_blas_helper template.  
         // Using this macro it is easy to add overloads for arbitrary matrix expressions.
 #define DLIB_ADD_BLAS_BINDING(src_expression)                                               \
@@ -364,9 +359,9 @@ namespace dlib
             const src_exp& src,                                                             \
             typename src_exp::type alpha,                                                   \
             bool add_to,                                                                    \
-            bool DLIB_SHUT_UP_GCC_ABOUT_THIS_UNUSED_VARIABLE transpose                      \
+            bool DLIB_NO_WARN_UNUSED transpose                      \
         ) {                                                                                 \
-            typedef typename dest_exp::type T;                                             
+            DLIB_NO_WARN_UNUSED typedef typename dest_exp::type T;                                             
 
 #define DLIB_END_BLAS_BINDING }};
 

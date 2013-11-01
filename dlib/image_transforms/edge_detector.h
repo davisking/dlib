@@ -176,7 +176,6 @@ namespace dlib
         template <typename T>
         typename promote<T>::type square (const T& a)
         { 
-            typedef typename promote<T>::type type;
             return static_cast<T>(a)*static_cast<T>(a); 
         }
     }

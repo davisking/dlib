@@ -65,7 +65,7 @@ namespace
                 int last = -1;
                 for (unsigned long i = 0; i < proc1_count; ++i)
                 {
-                    int cur;
+                    int cur=0;
                     DLIB_TEST(p.dequeue(cur) == true);
                     DLIB_TEST(last + 1 == cur);
                     last = cur;

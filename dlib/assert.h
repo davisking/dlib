@@ -38,14 +38,24 @@ namespace dlib
     template <typename T, typename U> struct assert_are_not_same_type {enum{value=1}; };
     template <typename T> struct assert_are_not_same_type<T,T> {};
 }
+
+
+// gcc 4.8 will warn about unused typedefs.  But we use typedefs in some of the compile
+// time assert macros so we need to make it not complain about them "not being used".
+#ifdef __GNUC__
+#define DLIB_NO_WARN_UNUSED __attribute__ ((unused))
+#else
+#define DLIB_NO_WARN_UNUSED 
+#endif
+
 #define COMPILE_TIME_ASSERT(expression) \
-        typedef char BOOST_JOIN(DLIB_CTA, __LINE__)[::dlib::compile_time_assert<(bool)(expression)>::value] 
+        DLIB_NO_WARN_UNUSED typedef char BOOST_JOIN(DLIB_CTA, __LINE__)[::dlib::compile_time_assert<(bool)(expression)>::value] 
 
 #define ASSERT_ARE_SAME_TYPE(type1, type2) \
-        typedef char BOOST_JOIN(DLIB_AAST, __LINE__)[::dlib::assert_are_same_type<type1,type2>::value] 
+        DLIB_NO_WARN_UNUSED typedef char BOOST_JOIN(DLIB_AAST, __LINE__)[::dlib::assert_are_same_type<type1,type2>::value] 
 
 #define ASSERT_ARE_NOT_SAME_TYPE(type1, type2) \
-        typedef char BOOST_JOIN(DLIB_AANST, __LINE__)[::dlib::assert_are_not_same_type<type1,type2>::value] 
+        DLIB_NO_WARN_UNUSED typedef char BOOST_JOIN(DLIB_AANST, __LINE__)[::dlib::assert_are_not_same_type<type1,type2>::value] 
 
 // -----------------------------
 
@@ -117,7 +127,7 @@ namespace dlib
     // Use the fact that in C++03 you can't put non-PODs into a union.
 #define DLIB_ASSERT_HAS_STANDARD_LAYOUT(type)   \
     union  BOOST_JOIN(DAHSL_,__LINE__) { type TYPE_NOT_STANDARD_LAYOUT; };  \
-    typedef char BOOST_JOIN(DAHSL2_,__LINE__)[sizeof(BOOST_JOIN(DAHSL_,__LINE__))]; 
+    DLIB_NO_WARN_UNUSED typedef char BOOST_JOIN(DAHSL2_,__LINE__)[sizeof(BOOST_JOIN(DAHSL_,__LINE__))]; 
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_SVm_HEADER
-#define DLIB_SVM_HEADER
+#define DLIB_SVm_HEADER
 
 #include "svm/svm_rank_trainer.h"
 #include "svm/svm.h"

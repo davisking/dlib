@@ -448,7 +448,6 @@ namespace dlib
         )
         {
             using namespace dlib::impl;
-            typedef typename in_image_type::type ptype;
 
             std::vector<dlib::impl::segment_image_edge_data_T<diff_type> > rejected_edges;
             rejected_edges.reserve(sorted_edges.size());

@@ -387,7 +387,6 @@ namespace
             print_spinner();
 
             ++thetime;
-            typedef matrix<double,0,1> sample_type;
             //dlog << LINFO << "time seed: " << thetime;
             //rnd.set_seed(cast_to_string(thetime));
 
