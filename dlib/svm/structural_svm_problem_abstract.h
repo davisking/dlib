@@ -44,8 +44,13 @@ namespace dlib
                 data sample x matches a label y.  When used for prediction, the best label
                 for a new x is given by the y which maximizes F(x,y).   
 
-                To use this object you inherit from it, provide implementations of its four 
+                To use this object you inherit from it, provide implementations of its four
                 pure virtual functions, and then pass your object to the oca optimizer.
+                Also, you should only pass an instance of this object to the oca optimizer
+                once.  That is, the act of using a structural_svm_problem instance with the
+                oca solver "uses" the structural_svm_problem instance.  If you want to
+                solve the same problem multiple times then you must use a fresh instance of
+                your structural_svm_problem.
 
 
                 To define the optimization problem precisely, we first introduce some notation:
