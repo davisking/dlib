@@ -297,12 +297,14 @@ namespace dlib
             {
                 for (int x = 0; x < hog_nc; x++) 
                 {
-                    double n1, n2, n3, n4;
-
-                    n1 = 0.5 / std::sqrt(norm[y+1][x+1] + norm[y+1][x+2] + norm[y+2][x+1] + norm[y+2][x+2] + eps);
-                    n2 = 0.5 / std::sqrt(norm[y][x+1]   + norm[y][x+2]   + norm[y+1][x+1] + norm[y+1][x+2] + eps);
-                    n3 = 0.5 / std::sqrt(norm[y+1][x]   + norm[y+1][x+1] + norm[y+2][x]   + norm[y+2][x+1] + eps);
-                    n4 = 0.5 / std::sqrt(norm[y][x]     + norm[y][x+1]   + norm[y+1][x]   + norm[y+1][x+1] + eps);
+                    const double nn1 = 0.2*std::sqrt(norm[y+1][x+1] + norm[y+1][x+2] + norm[y+2][x+1] + norm[y+2][x+2] + eps);
+                    const double nn2 = 0.2*std::sqrt(norm[y][x+1]   + norm[y][x+2]   + norm[y+1][x+1] + norm[y+1][x+2] + eps);
+                    const double nn3 = 0.2*std::sqrt(norm[y+1][x]   + norm[y+1][x+1] + norm[y+2][x]   + norm[y+2][x+1] + eps);
+                    const double nn4 = 0.2*std::sqrt(norm[y][x]     + norm[y][x+1]   + norm[y+1][x]   + norm[y+1][x+1] + eps);
+                    const double n1 = 0.1 / nn1;
+                    const double n2 = 0.1 / nn2;
+                    const double n3 = 0.1 / nn3;
+                    const double n4 = 0.1 / nn4;
 
                     double t1 = 0;
                     double t2 = 0;
@@ -312,10 +314,10 @@ namespace dlib
                     // contrast-sensitive features
                     for (int o = 0; o < 18; o++) 
                     {
-                        double h1 = std::min(hist[y+1][x+1](o) * n1, 0.1);
-                        double h2 = std::min(hist[y+1][x+1](o) * n2, 0.1);
-                        double h3 = std::min(hist[y+1][x+1](o) * n3, 0.1);
-                        double h4 = std::min(hist[y+1][x+1](o) * n4, 0.1);
+                        double h1 = std::min<double>(hist[y+1][x+1](o) , nn1)*n1;
+                        double h2 = std::min<double>(hist[y+1][x+1](o) , nn2)*n2;
+                        double h3 = std::min<double>(hist[y+1][x+1](o) , nn3)*n3;
+                        double h4 = std::min<double>(hist[y+1][x+1](o) , nn4)*n4;
                         set_hog(hog,o,x,y, (h1 + h2 + h3 + h4));
                         t1 += h1;
                         t2 += h2;
@@ -327,10 +329,10 @@ namespace dlib
                     for (int o = 0; o < 9; o++) 
                     {
                         double sum = hist[y+1][x+1](o) + hist[y+1][x+1](o+9);
-                        double h1 = std::min(sum * n1, 0.1);
-                        double h2 = std::min(sum * n2, 0.1);
-                        double h3 = std::min(sum * n3, 0.1);
-                        double h4 = std::min(sum * n4, 0.1);
+                        double h1 = std::min(sum , nn1)*n1;
+                        double h2 = std::min(sum , nn2)*n2;
+                        double h3 = std::min(sum , nn3)*n3;
+                        double h4 = std::min(sum , nn4)*n4;
                         set_hog(hog,o+18,x,y, (h1 + h2 + h3 + h4));
                     }
 
