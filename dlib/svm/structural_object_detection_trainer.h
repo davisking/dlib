@@ -18,6 +18,21 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename image_scanner_type,
+        typename svm_struct_prob_type
+        >
+    void configure_nuclear_norm_regularizer (
+        const image_scanner_type&,
+        svm_struct_prob_type& 
+    )
+    { 
+        // does nothing by default.  Specific scanner types overload this function to do
+        // whatever is appropriate.
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename image_scanner_type
         >
     class structural_object_detection_trainer : noncopyable
@@ -287,6 +302,7 @@ namespace dlib
             svm_prob.set_match_eps(match_eps);
             svm_prob.set_loss_per_missed_target(loss_per_missed_target);
             svm_prob.set_loss_per_false_alarm(loss_per_false_alarm);
+            configure_nuclear_norm_regularizer(scanner, svm_prob);
             matrix<double,0,1> w;
 
             // Run the optimizer to find the optimal w.
