@@ -9,7 +9,7 @@
 #include "../algs.h"
 #include "../array2d.h"
 #include "../pixel.h"
-#include "../image_transforms.h"
+#include "../image_transforms/assign_image.h"
 #include "../geometry.h"
 #include <cmath>
 

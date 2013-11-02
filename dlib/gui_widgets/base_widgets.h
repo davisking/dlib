@@ -14,7 +14,7 @@
 #include "../set.h"
 #include "../array2d.h"
 #include "../pixel.h"
-#include "../image_transforms.h"
+#include "../image_transforms/assign_image.h"
 #include "../array.h" 
 #include "style.h"
 #include "../smart_pointers.h"
