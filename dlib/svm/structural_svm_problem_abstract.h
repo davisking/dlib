@@ -31,6 +31,9 @@ namespace dlib
                 - get_epsilon() == 0.001
                 - get_max_cache_size() == 5
                 - get_c() == 1
+                - get_cache_based_epsilon() == std::numeric_limits<scalar_type>::infinity()
+                  (I.e. the cache based epsilon feature is disabled)
+                - num_nuclear_norm_regularizers() == 0
                 - This object will not be verbose
 
             WHAT THIS OBJECT REPRESENTS
@@ -123,6 +126,41 @@ namespace dlib
                   optimal value".
         !*/
 
+        scalar_type get_cache_based_epsilon (
+        ) const;
+        /*!
+            ensures
+                - if (get_max_cache_size() != 0) then
+                    - The solver will not stop when the average sample risk is within
+                      get_epsilon() of its optimal value.  Instead, it will keep running
+                      but will run the optimizer completely on the cache until the average
+                      sample risk is within #get_cache_based_epsilon() of its optimal
+                      value.  This means that it will perform this additional refinement in
+                      the solution accuracy without making any additional calls to the
+                      separation_oracle().  This is useful when using a nuclear norm
+                      regularization term because it allows you to quickly solve the
+                      optimization problem to a high precision, which in the case of a
+                      nuclear norm regularized problem means that many of the learned
+                      matrices will be low rank or very close to low rank due to the
+                      nuclear norm regularizer.  This may not happen without solving the
+                      problem to a high accuracy or their ranks may be difficult to
+                      determine, so the extra accuracy given by the cache based refinement
+                      is very useful.  Finally, note that we include the nuclear norm term
+                      as part of the "risk" for the purposes of determining when to stop.  
+                - else
+                    - The value of #get_cache_based_epsilon() has no effect.
+        !*/
+
+        void set_cache_based_epsilon (
+            scalar_type eps
+        );
+        /*!
+            requires
+                - eps > 0
+            ensures
+                - #get_cache_based_epsilon() == eps
+        !*/
+
         void set_max_cache_size (
             unsigned long max_size
         );
@@ -140,6 +178,52 @@ namespace dlib
                   calls to the user supplied separation_oracle() function.  Note that a 
                   value of 0 means that caching is not used at all.  This is appropriate 
                   if the separation oracle is cheap to evaluate. 
+        !*/
+
+        void add_nuclear_norm_regularizer (
+            long first_dimension,
+            long rows,
+            long cols,
+            double regularization_strength
+        );
+        /*!
+            requires
+                - 0 <= first_dimension < get_num_dimensions()
+                - 0 <= rows
+                - 0 <= cols
+                - first_dimension+rows*cols <= get_num_dimensions()
+                - 0 < regularization_strength
+            ensures
+                - Adds a nuclear norm regularization term to the optimization problem
+                  solved by this object.  That is, instead of solving:
+                    Minimize: h(w) == 0.5*dot(w,w) + C*R(w)
+                  this object will solve:
+                    Minimize: h(w) == 0.5*dot(w,w) + C*R(w) + regularization_strength*nuclear_norm_of(part of w)
+                  where "part of w" is the part of w indicated by the arguments to this
+                  function. In particular, the part of w included in the nuclear norm is
+                  exactly the matrix reshape(rowm(w, range(first_dimension, first_dimension+rows*cols-1)), rows, cols).
+                  Therefore, if you think of the w vector as being the concatenation of a
+                  bunch of matrices then you can use multiple calls to add_nuclear_norm_regularizer() 
+                  to add nuclear norm regularization terms to any of the matrices packed into w.
+                - #num_nuclear_norm_regularizers() == num_nuclear_norm_regularizers() + 1
+        !*/
+
+        unsigned long num_nuclear_norm_regularizers (
+        ) const; 
+        /*!
+            ensures
+                - returns the number of nuclear norm regularizers that are currently a part
+                  of this optimization problem.  That is, returns the number of times
+                  add_nuclear_norm_regularizer() has been called since the last call to
+                  clear_nuclear_norm_regularizers() or object construction, whichever is
+                  most recent.
+        !*/
+
+        void clear_nuclear_norm_regularizers (
+        );
+        /*!
+            ensures
+                - #num_nuclear_norm_regularizers() == 0
         !*/
 
         void be_verbose (

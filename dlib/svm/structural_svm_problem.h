@@ -238,8 +238,32 @@ namespace dlib
             skip_cache(true),
             count_below_eps(0),
             max_cache_size(5),
+            converged(false),
+            nuclear_norm_part(0),
+            cache_based_eps(std::numeric_limits<scalar_type>::infinity()),
             C(1)
         {}
+
+        scalar_type get_cache_based_epsilon (
+        ) const
+        {
+            return cache_based_eps;
+        }
+
+        void set_cache_based_epsilon (
+            scalar_type eps_
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(eps_ > 0,
+                "\t void structural_svm_problem::set_cache_based_epsilon()"
+                << "\n\t eps_ must be greater than 0"
+                << "\n\t eps_: " << eps_ 
+                << "\n\t this: " << this
+                );
+
+            cache_based_eps = eps_;
+        }
 
         void set_epsilon (
             scalar_type eps_
@@ -299,6 +323,41 @@ namespace dlib
             C = C_; 
         }
 
+        void add_nuclear_norm_regularizer (
+            long first_dimension,
+            long rows,
+            long cols,
+            double regularization_strength
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(0 <= first_dimension && first_dimension < get_num_dimensions() &&
+                0 <= rows && 0 <= cols && rows*cols+first_dimension <= get_num_dimensions() &&
+                0 < regularization_strength,
+                "\t void structural_svm_problem::add_nuclear_norm_regularizer()"
+                << "\n\t Invalid arguments were given to this function."
+                << "\n\t first_dimension:         " << first_dimension 
+                << "\n\t rows:                    " << rows 
+                << "\n\t cols:                    " << cols 
+                << "\n\t get_num_dimensions():    " << get_num_dimensions() 
+                << "\n\t regularization_strength: " << regularization_strength 
+                << "\n\t this: " << this
+                );
+
+            nuclear_norm_regularizer temp;
+            temp.first_dimension = first_dimension;
+            temp.nr = rows;
+            temp.nc = cols;
+            temp.regularization_strength = regularization_strength;
+            nuclear_norm_regularizers.push_back(temp);
+        }
+
+        unsigned long num_nuclear_norm_regularizers (
+        ) const { return nuclear_norm_regularizers.size(); }
+
+        void clear_nuclear_norm_regularizers (
+        ) { nuclear_norm_regularizers.clear(); }
+
         virtual long get_num_dimensions (
         ) const = 0;
 
@@ -339,23 +398,48 @@ namespace dlib
             if (verbose)
             {
                 using namespace std;
-                cout << "objective:     " << current_objective_value << endl;
-                cout << "objective gap: " << current_error_gap << endl;
-                cout << "risk:          " << current_risk_value << endl;
-                cout << "risk gap:      " << current_risk_gap << endl;
-                cout << "num planes:    " << num_cutting_planes << endl;
-                cout << "iter:          " << num_iterations << endl;
+                if (nuclear_norm_regularizers.size() != 0)
+                {
+                    cout << "objective:             " << current_objective_value << endl;
+                    cout << "objective gap:         " << current_error_gap << endl;
+                    cout << "risk:                  " << current_risk_value-nuclear_norm_part << endl;
+                    cout << "risk+nuclear norm:     " << current_risk_value << endl;
+                    cout << "risk+nuclear norm gap: " << current_risk_gap << endl;
+                    cout << "num planes:            " << num_cutting_planes << endl;
+                    cout << "iter:                  " << num_iterations << endl;
+                }
+                else
+                {
+                    cout << "objective:     " << current_objective_value << endl;
+                    cout << "objective gap: " << current_error_gap << endl;
+                    cout << "risk:          " << current_risk_value << endl;
+                    cout << "risk gap:      " << current_risk_gap << endl;
+                    cout << "num planes:    " << num_cutting_planes << endl;
+                    cout << "iter:          " << num_iterations << endl;
+                }
                 cout << endl;
             }
 
             saved_current_risk_gap = current_risk_gap;
 
+            if (converged)
+            {
+                return current_risk_gap < std::max(cache_based_eps,cache_based_eps*current_risk_value);
+            }
+
             if (current_risk_gap < eps)
             {
                 // Only stop when we see that the risk gap is small enough on a non-cached
-                // iteration.
+                // iteration.  But even then, if we are supposed to do the cache based
+                // refinement then we just mark that we have "converged" to avoid further
+                // calls to the separation oracle and run all subsequent iterations off the
+                // cache.
                 if (skip_cache || max_cache_size == 0)
-                    return true;
+                {
+                    converged = true;
+                    skip_cache = false;
+                    return current_risk_gap < std::max(cache_based_eps,cache_based_eps*current_risk_value);
+                }
 
                 ++count_below_eps;
 
@@ -377,6 +461,45 @@ namespace dlib
             }
 
             return false;
+        }
+
+        void compute_nuclear_norm_parts(
+            const matrix_type& m,
+            matrix_type& grad,
+            scalar_type& obj
+        ) const
+        {
+            obj = 0;
+            grad.set_size(m.size());
+            grad = 0;
+
+            matrix<double> u,v,w,f;
+            nuclear_norm_part = 0;
+            for (unsigned long i = 0; i < nuclear_norm_regularizers.size(); ++i)
+            {
+                const long nr = nuclear_norm_regularizers[i].nr;
+                const long nc = nuclear_norm_regularizers[i].nc;
+                const long size = nr*nc;
+                const long idx = nuclear_norm_regularizers[i].first_dimension;
+                const double strength = nuclear_norm_regularizers[i].regularization_strength;
+
+                f = matrix_cast<double>(reshape(rowm(m, range(idx, idx+size-1)), nr, nc));
+                svd3(f, u,w,v);
+
+                w = round_zeros(w, std::max(1e-9,max(w)*1e-7)); 
+
+                const double norm = sum(w);
+                obj += strength*norm;
+                nuclear_norm_part += strength*norm/C;
+
+                w = w>0;
+                f = u*diagm(w)*trans(v);
+
+                set_rowm(grad, range(idx, idx+size-1)) = matrix_cast<double>(strength*reshape_to_column_vector(f));
+            }
+
+            obj /= C;
+            grad /= C;
         }
 
         virtual void get_risk (
@@ -413,6 +536,15 @@ namespace dlib
             subgradient /= num;
             total_loss /= num;
             risk = total_loss + dot(subgradient,w);
+
+            if (nuclear_norm_regularizers.size() != 0)
+            {
+                matrix_type grad; 
+                scalar_type obj;
+                compute_nuclear_norm_parts(w, grad, obj);
+                risk += obj;
+                subgradient += grad;
+            }
         }
 
         virtual void call_separation_oracle_on_all_samples (
@@ -448,6 +580,14 @@ namespace dlib
         }
     private:
 
+        struct nuclear_norm_regularizer
+        {
+            long first_dimension;
+            long nr;
+            long nc;
+            double regularization_strength;
+        };
+        std::vector<nuclear_norm_regularizer> nuclear_norm_regularizers;
 
         mutable scalar_type saved_current_risk_gap;
         mutable matrix_type psi_true;
@@ -459,6 +599,9 @@ namespace dlib
         mutable bool skip_cache;
         mutable int count_below_eps;
         unsigned long max_cache_size;
+        mutable bool converged;
+        mutable double nuclear_norm_part;
+        scalar_type cache_based_eps;
 
         scalar_type C;
     };
