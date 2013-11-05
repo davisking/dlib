@@ -167,6 +167,28 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_type
+        >
+    void zero_border_pixels (
+        image_type& img,
+        rectangle inside
+    );
+    /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type::type> is defined  
+        ensures
+            - #img.nc() == img.nc()
+            - #img.nr() == img.nr()
+              (i.e. the size of img isn't changed by this function)
+            - All the pixels in img that are not contained inside the inside rectangle
+              given to this function are set to 0.  That is, anything not "inside" is on
+              the border and set to 0.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_ASSIGN_IMAGe_ABSTRACT

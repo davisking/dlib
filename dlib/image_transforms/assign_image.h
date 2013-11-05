@@ -276,6 +276,39 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_type
+        >
+    void zero_border_pixels (
+        image_type& img,
+        rectangle inside
+    )
+    {
+        inside = inside.intersect(get_rect(img));
+        if (inside.is_empty())
+            return;
+
+        for (long r = 0; r < inside.top(); ++r)
+        {
+            for (long c = 0; c < img.nc(); ++c)
+                assign_pixel(img[r][c], 0);
+        }
+        for (long r = inside.top(); r <= inside.bottom(); ++r)
+        {
+            for (long c = 0; c < inside.left(); ++c)
+                assign_pixel(img[r][c], 0);
+            for (long c = inside.right()+1; c < img.nc(); ++c)
+                assign_pixel(img[r][c], 0);
+        }
+        for (long r = inside.bottom()+1; r < img.nr(); ++r)
+        {
+            for (long c = 0; c < img.nc(); ++c)
+                assign_pixel(img[r][c], 0);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_ASSIGN_IMAGe_
