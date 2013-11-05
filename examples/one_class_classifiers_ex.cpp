@@ -19,6 +19,7 @@
 #include <dlib/svm.h>
 #include <dlib/gui_widgets.h>
 #include <dlib/array2d.h>
+#include <dlib/image_transforms.h>
 
 using namespace std;
 using namespace dlib;
