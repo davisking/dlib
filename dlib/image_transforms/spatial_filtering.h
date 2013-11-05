@@ -36,11 +36,9 @@ namespace dlib
         COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
         COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
 
-        DLIB_ASSERT(scale != 0 &&
-                    filter.nr()%2 == 1 &&
-                    filter.nc()%2 == 1,
+        DLIB_ASSERT(scale != 0 && filter.size() != 0,
             "\tvoid spatially_filter_image()"
-            << "\n\t You can't give a scale of zero or a filter with even dimensions"
+            << "\n\t You can't give a scale of zero or an empty filter."
             << "\n\t scale: "<< scale
             << "\n\t filter.nr(): "<< filter.nr()
             << "\n\t filter.nc(): "<< filter.nc()
@@ -61,15 +59,16 @@ namespace dlib
 
         out_img.set_size(in_img.nr(),in_img.nc());
 
-        zero_border_pixels(out_img, filter.nc()/2, filter.nr()/2); 
 
         // figure out the range that we should apply the filter to
-        const long first_row = filter.nr()/2;
-        const long first_col = filter.nc()/2;
-        const long last_row = in_img.nr() - filter.nr()/2;
-        const long last_col = in_img.nc() - filter.nc()/2;
+        const long first_row = (filter.nr()-1)/2;
+        const long first_col = (filter.nc()-1)/2;
+        const long last_row = in_img.nr() - (filter.nr()-first_row);
+        const long last_col = in_img.nc() - (filter.nc()-first_col);
 
         const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
+        if (!add_to)
+            zero_border_pixels(out_img, non_border); 
 
         // apply the filter to the image
         for (long r = first_row; r < last_row; ++r)
@@ -84,7 +83,7 @@ namespace dlib
                     for (long n = 0; n < filter.nc(); ++n)
                     {
                         // pull out the current pixel and put it into p
-                        p = get_pixel_intensity(in_img[r-filter.nr()/2+m][c-filter.nc()/2+n]);
+                        p = get_pixel_intensity(in_img[r-first_row+m][c-first_col+n]);
                         temp += p*filter(m,n);
                     }
                 }
@@ -130,11 +129,9 @@ namespace dlib
         COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
         COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
 
-        DLIB_ASSERT(scale != 0 &&
-                    filter.nr()%2 == 1 &&
-                    filter.nc()%2 == 1,
+        DLIB_ASSERT(scale != 0 && filter.size() != 0,
             "\tvoid spatially_filter_image()"
-            << "\n\t You can't give a scale of zero or a filter with even dimensions"
+            << "\n\t You can't give a scale of zero or an empty filter."
             << "\n\t scale: "<< scale
             << "\n\t filter.nr(): "<< filter.nr()
             << "\n\t filter.nc(): "<< filter.nc()
@@ -155,15 +152,15 @@ namespace dlib
 
         out_img.set_size(in_img.nr(),in_img.nc());
 
-        zero_border_pixels(out_img, filter.nc()/2, filter.nr()/2); 
 
         // figure out the range that we should apply the filter to
-        const long first_row = filter.nr()/2;
-        const long first_col = filter.nc()/2;
-        const long last_row = in_img.nr() - filter.nr()/2;
-        const long last_col = in_img.nc() - filter.nc()/2;
+        const long first_row = (filter.nr()-1)/2;
+        const long first_col = (filter.nc()-1)/2;
+        const long last_row = in_img.nr() - (filter.nr()-first_row);
+        const long last_col = in_img.nc() - (filter.nc()-first_col);
 
         const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
+        zero_border_pixels(out_img, non_border); 
 
         // apply the filter to the image
         for (long r = first_row; r < last_row; ++r)
@@ -179,7 +176,7 @@ namespace dlib
                     for (long n = 0; n < filter.nc(); ++n)
                     {
                         // pull out the current pixel and put it into p
-                        p = pixel_to_vector<typename EXP::type>(in_img[r-filter.nr()/2+m][c-filter.nc()/2+n]);
+                        p = pixel_to_vector<typename EXP::type>(in_img[r-first_row+m][c-first_col+n]);
                         temp += p*filter(m,n);
                     }
                 }
@@ -232,9 +229,7 @@ namespace dlib
         COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
         COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
 
-        DLIB_ASSERT(scale != 0 &&
-                    row_filter.size()%2 == 1 &&
-                    col_filter.size()%2 == 1 &&
+        DLIB_ASSERT(scale != 0 && row_filter.size() != 0 && col_filter.size() != 0 &&
                     is_vector(row_filter) &&
                     is_vector(col_filter),
             "\tvoid spatially_filter_image_separable()"
@@ -261,15 +256,16 @@ namespace dlib
 
         out_img.set_size(in_img.nr(),in_img.nc());
 
-        zero_border_pixels(out_img, row_filter.size()/2, col_filter.size()/2); 
 
         // figure out the range that we should apply the filter to
-        const long first_row = col_filter.size()/2;
-        const long first_col = row_filter.size()/2;
-        const long last_row = in_img.nr() - col_filter.size()/2;
-        const long last_col = in_img.nc() - row_filter.size()/2;
+        const long first_row = (col_filter.size()-1)/2;
+        const long first_col = (row_filter.size()-1)/2;
+        const long last_row = in_img.nr() - (col_filter.size()-first_row);
+        const long last_col = in_img.nc() - (row_filter.size()-first_col);
 
         const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
+        if (!add_to)
+            zero_border_pixels(out_img, non_border); 
 
         typedef typename out_image_type::mem_manager_type mem_manager_type;
         typedef typename EXP1::type ptype;
@@ -287,7 +283,7 @@ namespace dlib
                 for (long n = 0; n < row_filter.size(); ++n)
                 {
                     // pull out the current pixel and put it into p
-                    p = get_pixel_intensity(in_img[r][c-row_filter.size()/2+n]);
+                    p = get_pixel_intensity(in_img[r][c-first_col+n]);
                     temp += p*row_filter(n);
                 }
                 temp_img[r][c] = temp;
@@ -302,7 +298,7 @@ namespace dlib
                 ptype temp = 0;
                 for (long m = 0; m < col_filter.size(); ++m)
                 {
-                    temp += temp_img[r-col_filter.size()/2+m][c]*col_filter(m);
+                    temp += temp_img[r-first_row+m][c]*col_filter(m);
                 }
 
                 temp /= scale;
@@ -347,9 +343,7 @@ namespace dlib
         COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
         COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
 
-        DLIB_ASSERT(scale != 0 &&
-                    row_filter.size()%2 == 1 &&
-                    col_filter.size()%2 == 1 &&
+        DLIB_ASSERT(scale != 0 && row_filter.size() != 0 && col_filter.size() != 0 &&
                     is_vector(row_filter) &&
                     is_vector(col_filter),
             "\tvoid spatially_filter_image_separable()"
@@ -376,15 +370,15 @@ namespace dlib
 
         out_img.set_size(in_img.nr(),in_img.nc());
 
-        zero_border_pixels(out_img, row_filter.size()/2, col_filter.size()/2); 
 
         // figure out the range that we should apply the filter to
-        const long first_row = col_filter.size()/2;
-        const long first_col = row_filter.size()/2;
-        const long last_row = in_img.nr() - col_filter.size()/2;
-        const long last_col = in_img.nc() - row_filter.size()/2;
+        const long first_row = (col_filter.size()-1)/2;
+        const long first_col = (row_filter.size()-1)/2;
+        const long last_row = in_img.nr() - (col_filter.size()-first_row);
+        const long last_col = in_img.nc() - (row_filter.size()-first_col);
 
         const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
+        zero_border_pixels(out_img, non_border); 
 
         typedef typename out_image_type::mem_manager_type mem_manager_type;
         typedef matrix<typename EXP1::type,pixel_traits<typename in_image_type::type>::num,1> ptype;
@@ -403,7 +397,7 @@ namespace dlib
                 for (long n = 0; n < row_filter.size(); ++n)
                 {
                     // pull out the current pixel and put it into p
-                    p = pixel_to_vector<typename EXP1::type>(in_img[r][c-row_filter.size()/2+n]);
+                    p = pixel_to_vector<typename EXP1::type>(in_img[r][c-first_col+n]);
                     temp += p*row_filter(n);
                 }
                 temp_img[r][c] = temp;
@@ -419,7 +413,7 @@ namespace dlib
                 temp = 0;
                 for (long m = 0; m < col_filter.size(); ++m)
                 {
-                    temp += temp_img[r-col_filter.size()/2+m][c]*col_filter(m);
+                    temp += temp_img[r-first_row+m][c]*col_filter(m);
                 }
 
                 temp /= scale;
@@ -517,11 +511,7 @@ namespace dlib
 
         // zero border pixels
         const rectangle non_border = rectangle(first_col, first_row, last_col, last_row);
-        border_enumerator be(get_rect(out_img), non_border );
-        while (be.move_next())
-        {
-            out_img[be.element().y()][be.element().x()] = 0;
-        }
+        zero_border_pixels(out_img,non_border);
 
         typedef typename EXP1::type ptype;
 
