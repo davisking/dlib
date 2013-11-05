@@ -63,8 +63,8 @@ namespace dlib
         // figure out the range that we should apply the filter to
         const long first_row = (filter.nr()-1)/2;
         const long first_col = (filter.nc()-1)/2;
-        const long last_row = in_img.nr() - (filter.nr()-first_row);
-        const long last_col = in_img.nc() - (filter.nc()-first_col);
+        const long last_row = in_img.nr() - (filter.nr()/2);
+        const long last_col = in_img.nc() - (filter.nc()/2);
 
         const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
         if (!add_to)
@@ -156,8 +156,8 @@ namespace dlib
         // figure out the range that we should apply the filter to
         const long first_row = (filter.nr()-1)/2;
         const long first_col = (filter.nc()-1)/2;
-        const long last_row = in_img.nr() - (filter.nr()-first_row);
-        const long last_col = in_img.nc() - (filter.nc()-first_col);
+        const long last_row = in_img.nr() - (filter.nr()/2);
+        const long last_col = in_img.nc() - (filter.nc()/2);
 
         const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
         zero_border_pixels(out_img, non_border); 
@@ -260,8 +260,8 @@ namespace dlib
         // figure out the range that we should apply the filter to
         const long first_row = (col_filter.size()-1)/2;
         const long first_col = (row_filter.size()-1)/2;
-        const long last_row = in_img.nr() - (col_filter.size()-first_row);
-        const long last_col = in_img.nc() - (row_filter.size()-first_col);
+        const long last_row = in_img.nr() - (col_filter.size()/2);
+        const long last_col = in_img.nc() - (row_filter.size()/2);
 
         const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
         if (!add_to)
@@ -374,8 +374,8 @@ namespace dlib
         // figure out the range that we should apply the filter to
         const long first_row = (col_filter.size()-1)/2;
         const long first_col = (row_filter.size()-1)/2;
-        const long last_row = in_img.nr() - (col_filter.size()-first_row);
-        const long last_col = in_img.nc() - (row_filter.size()-first_col);
+        const long last_row = in_img.nr() - (col_filter.size()/2);
+        const long last_col = in_img.nc() - (row_filter.size()/2);
 
         const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
         zero_border_pixels(out_img, non_border); 

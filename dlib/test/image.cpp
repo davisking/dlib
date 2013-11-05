@@ -762,6 +762,93 @@ namespace
 
     }
 
+    void test_filtering2(int nr, int nc, dlib::rand& rnd)
+    {
+        print_spinner();
+        dlog << LINFO << "test_filtering2(): " << nr << "  " << nc;
+        array2d<float> img(302,301);
+        for (long r = 0; r < img.nr(); ++r)
+        {
+            for (long c = 0; c < img.nc(); ++c)
+            {
+                img[r][c] = rnd.get_random_gaussian();
+            }
+        }
+        matrix<float> filt = matrix_cast<float>(randm(nr,nc,rnd));
+
+        matrix<float> out = xcorr_same(mat(img),filt);
+        matrix<float> out2 = subm(conv(mat(img),flip(filt)), filt.nr()/2, filt.nc()/2, img.nr(), img.nc());
+        // make sure xcorr_same does exactly what the docs say it should.
+        DLIB_TEST(max(abs(out-out2)) < 1e-7);
+
+        // Now compare the filtering functions to xcorr_same to make sure everything does
+        // filtering in the same way.
+        array2d<float> imout(img.nr(), img.nc());
+        assign_all_pixels(imout, 10);
+        rectangle rect = spatially_filter_image(img, imout, filt);
+        border_enumerator be(get_rect(imout),rect);
+        while (be.move_next())
+        {
+            DLIB_TEST(imout[be.element().y()][be.element().x()] == 0)
+        }
+        DLIB_TEST(max(abs(subm(mat(imout),rect) - subm(out,rect))) < 1e-7);
+
+
+        assign_all_pixels(imout, 10);
+        out = 10;
+        rect = spatially_filter_image(img, imout, filt,2,true,true);
+        be = border_enumerator(get_rect(imout),rect);
+        while (be.move_next())
+        {
+            DLIB_TEST(imout[be.element().y()][be.element().x()] == 10)
+        }
+        out += abs(xcorr_same(mat(img),filt)/2);
+        DLIB_TEST(max(abs(subm(mat(imout),rect) - subm(out,rect))) < 1e-7);
+
+
+        assign_all_pixels(imout, -10);
+        out = -10;
+        rect = spatially_filter_image(img, imout, filt,2,false,true);
+        be = border_enumerator(get_rect(imout),rect);
+        while (be.move_next())
+        {
+            DLIB_TEST(imout[be.element().y()][be.element().x()] == -10)
+        }
+        out += xcorr_same(mat(img),filt)/2;
+        DLIB_TEST(max(abs(subm(mat(imout),rect) - subm(out,rect))) < 1e-7);
+
+
+
+
+        matrix<float> row_filt = matrix_cast<float>(randm(nc,1,rnd));
+        matrix<float> col_filt = matrix_cast<float>(randm(nr,1,rnd));
+        assign_all_pixels(imout, 10);
+        rect = spatially_filter_image_separable(img, imout, row_filt, col_filt);
+        out = xcorr_same(tmp(xcorr_same(mat(img),trans(row_filt))), col_filt);
+        DLIB_TEST(max(abs(subm(mat(imout),rect) - subm(out,rect))) < 1e-7);
+
+        be = border_enumerator(get_rect(imout),rect);
+        while (be.move_next())
+        {
+            DLIB_TEST(imout[be.element().y()][be.element().x()] == 0);
+        }
+
+
+        assign_all_pixels(imout, 10);
+        out = 10;
+        rect = spatially_filter_image_separable(img, imout, row_filt, col_filt,2,true,true);
+        out += abs(xcorr_same(tmp(xcorr_same(mat(img),trans(row_filt))), col_filt)/2);
+        DLIB_TEST_MSG(max(abs(subm(mat(imout),rect) - subm(out,rect))) < 1e-7, 
+            max(abs(subm(mat(imout),rect) - subm(out,rect))));
+
+        be = border_enumerator(get_rect(imout),rect);
+        while (be.move_next())
+        {
+            DLIB_TEST(imout[be.element().y()][be.element().x()] == 10);
+        }
+
+    }
+
     template <typename T>
     void test_filtering(bool use_abs, unsigned long scale )
     {
@@ -933,20 +1020,20 @@ namespace
 
             assign_all_pixels(img2, 3);
             spatially_filter_image_separable(img,img2,rowf,colf,1,true, true);
-            DLIB_TEST(img2[0][0] == 0);
-            DLIB_TEST(img2[0][1] == 0);
-            DLIB_TEST(img2[0][2] == 0);
-            DLIB_TEST(img2[0][3] == 0);
+            DLIB_TEST(img2[0][0] == 3);
+            DLIB_TEST(img2[0][1] == 3);
+            DLIB_TEST(img2[0][2] == 3);
+            DLIB_TEST(img2[0][3] == 3);
 
-            DLIB_TEST(img2[1][0] == 0);
+            DLIB_TEST(img2[1][0] == 3);
             DLIB_TEST_MSG(img2[1][1] == 9+3, img2[1][1] );
             DLIB_TEST(img2[1][2] == 9+3);
-            DLIB_TEST(img2[1][3] == 0);
+            DLIB_TEST(img2[1][3] == 3);
 
-            DLIB_TEST(img2[2][0] == 0);
-            DLIB_TEST(img2[2][1] == 0);
-            DLIB_TEST(img2[2][2] == 0);
-            DLIB_TEST(img2[2][3] == 0);
+            DLIB_TEST(img2[2][0] == 3);
+            DLIB_TEST(img2[2][1] == 3);
+            DLIB_TEST(img2[2][2] == 3);
+            DLIB_TEST(img2[2][3] == 3);
         }
         {
             array2d<double> img, img2;
@@ -986,20 +1073,20 @@ namespace
 
             spatially_filter_image(img,img2,filter,2, false, true);
 
-            DLIB_TEST(img2[0][0] == 0);
-            DLIB_TEST(img2[0][1] == 0);
-            DLIB_TEST(img2[0][2] == 0);
-            DLIB_TEST(img2[0][3] == 0);
+            DLIB_TEST(img2[0][0] == 8);
+            DLIB_TEST(img2[0][1] == 8);
+            DLIB_TEST(img2[0][2] == 8);
+            DLIB_TEST(img2[0][3] == 8);
 
-            DLIB_TEST(img2[1][0] == 0);
+            DLIB_TEST(img2[1][0] == 8);
             DLIB_TEST(std::abs(img2[1][1] -  -4.5 - 8) < 1e-14);
             DLIB_TEST(std::abs(img2[1][2] -  -4.5 - 8) < 1e-14);
-            DLIB_TEST(img2[1][3] == 0);
+            DLIB_TEST(img2[1][3] == 8);
 
-            DLIB_TEST(img2[2][0] == 0);
-            DLIB_TEST(img2[2][1] == 0);
-            DLIB_TEST(img2[2][2] == 0);
-            DLIB_TEST(img2[2][3] == 0);
+            DLIB_TEST(img2[2][0] == 8);
+            DLIB_TEST(img2[2][1] == 8);
+            DLIB_TEST(img2[2][2] == 8);
+            DLIB_TEST(img2[2][3] == 8);
 
         }
     }
@@ -1535,6 +1622,18 @@ namespace
             test_dng_floats<long double>(1e30);
 
             test_dng_float_int();
+
+            dlib::rand rnd;
+            for (int i = 0; i < 10; ++i)
+            {
+                test_filtering2(3,3,rnd);
+                test_filtering2(3,4,rnd);
+                test_filtering2(4,3,rnd);
+                test_filtering2(4,4,rnd);
+                test_filtering2(4,7,rnd);
+                test_filtering2(7,7,rnd);
+                test_filtering2(7,5,rnd);
+            }
         }
     } a;
 
