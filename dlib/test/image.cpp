@@ -1036,6 +1036,65 @@ namespace
 
         DLIB_TEST(img[1][2] == 1);
         DLIB_TEST(img[2][2] == 1);
+
+        rectangle rect = get_rect(img);
+        rect.left()+=2;
+        rect.top()+=1;
+        rect.right()-=2;
+        rect.bottom()-=1;
+        assign_all_pixels(img, 1);
+        zero_border_pixels(img, rect);
+
+        DLIB_TEST(img[0][0] == 0);
+        DLIB_TEST(img[1][0] == 0);
+        DLIB_TEST(img[2][0] == 0);
+        DLIB_TEST(img[3][0] == 0);
+        DLIB_TEST(img[0][1] == 0);
+        DLIB_TEST(img[1][1] == 0);
+        DLIB_TEST(img[2][1] == 0);
+        DLIB_TEST(img[3][1] == 0);
+
+        DLIB_TEST(img[0][3] == 0);
+        DLIB_TEST(img[1][3] == 0);
+        DLIB_TEST(img[2][3] == 0);
+        DLIB_TEST(img[3][3] == 0);
+        DLIB_TEST(img[0][4] == 0);
+        DLIB_TEST(img[1][4] == 0);
+        DLIB_TEST(img[2][4] == 0);
+        DLIB_TEST(img[3][4] == 0);
+
+        DLIB_TEST(img[0][2] == 0);
+        DLIB_TEST(img[3][2] == 0);
+
+        DLIB_TEST(img[1][2] == 1);
+        DLIB_TEST(img[2][2] == 1);
+
+        rect.right()+=1;
+        assign_all_pixels(img, 1);
+        zero_border_pixels(img, rect);
+        DLIB_TEST(img[0][0] == 0);
+        DLIB_TEST(img[1][0] == 0);
+        DLIB_TEST(img[2][0] == 0);
+        DLIB_TEST(img[3][0] == 0);
+        DLIB_TEST(img[0][1] == 0);
+        DLIB_TEST(img[1][1] == 0);
+        DLIB_TEST(img[2][1] == 0);
+        DLIB_TEST(img[3][1] == 0);
+
+        DLIB_TEST(img[0][3] == 0);
+        DLIB_TEST(img[1][3] == 1);
+        DLIB_TEST(img[2][3] == 1);
+        DLIB_TEST(img[3][3] == 0);
+        DLIB_TEST(img[0][4] == 0);
+        DLIB_TEST(img[1][4] == 0);
+        DLIB_TEST(img[2][4] == 0);
+        DLIB_TEST(img[3][4] == 0);
+
+        DLIB_TEST(img[0][2] == 0);
+        DLIB_TEST(img[3][2] == 0);
+
+        DLIB_TEST(img[1][2] == 1);
+        DLIB_TEST(img[2][2] == 1);
     }
 
 
