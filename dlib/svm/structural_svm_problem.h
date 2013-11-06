@@ -65,6 +65,7 @@ namespace dlib
         }
 
         void separation_oracle_cached (
+            const bool use_only_cache,
             const bool skip_cache,
             const scalar_type& saved_current_risk_gap,
             const matrix_type& current_solution,
@@ -102,8 +103,8 @@ namespace dlib
                     // a proxy for the true separation oracle.  If the risk value has dropped
                     // by enough to get into the stopping condition then the best psi isn't
                     // good enough. 
-                    if (best_risk + saved_current_risk_gap > last_true_risk_computed &&
-                        best_risk >= 0)
+                    if ((best_risk + saved_current_risk_gap > last_true_risk_computed &&
+                        best_risk >= 0) || use_only_cache)
                     {
                         out_psi = psi[best_idx];
                         lru_count[best_idx] = max_lru_count + 1;
@@ -572,7 +573,8 @@ namespace dlib
             feature_vector_type& psi
         ) const 
         {
-            cache[idx].separation_oracle_cached(skip_cache, 
+            cache[idx].separation_oracle_cached(converged,
+                                                skip_cache, 
                                                 saved_current_risk_gap,
                                                 current_solution,
                                                 loss,
