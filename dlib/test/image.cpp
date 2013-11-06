@@ -1091,6 +1091,48 @@ namespace
         }
     }
 
+    void test_small_filter()
+    {
+        array2d<int> img(3,3), out;
+        assign_all_pixels(img, 1);
+        matrix<int> filt(2,2);
+        filt = 1;
+
+        spatially_filter_image(img, out, filt);
+
+        DLIB_TEST(out[0][0] == 4);
+        DLIB_TEST(out[0][1] == 4);
+        DLIB_TEST(out[0][2] == 0);
+
+        DLIB_TEST(out[1][0] == 4);
+        DLIB_TEST(out[1][1] == 4);
+        DLIB_TEST(out[1][2] == 0);
+
+        DLIB_TEST(out[2][0] == 0);
+        DLIB_TEST(out[2][1] == 0);
+        DLIB_TEST(out[2][2] == 0);
+
+        matrix<int> rfilt(2,1), cfilt(2,1);
+        rfilt = 1;
+        cfilt = 1;
+
+        assign_all_pixels(out, 9);
+        spatially_filter_image_separable(img, out, rfilt, cfilt);
+
+        DLIB_TEST(out[0][0] == 4);
+        DLIB_TEST(out[0][1] == 4);
+        DLIB_TEST(out[0][2] == 0);
+
+        DLIB_TEST(out[1][0] == 4);
+        DLIB_TEST(out[1][1] == 4);
+        DLIB_TEST(out[1][2] == 0);
+
+        DLIB_TEST(out[2][0] == 0);
+        DLIB_TEST(out[2][1] == 0);
+        DLIB_TEST(out[2][2] == 0);
+
+    }
+
     void test_zero_border_pixels(
     )
     {
@@ -1586,6 +1628,7 @@ namespace
         void perform_test (
         )
         {
+            test_small_filter();
             image_test();
             test_integral_image<long, unsigned char>();
             test_integral_image<double, int>();
@@ -1634,6 +1677,7 @@ namespace
                 test_filtering2(7,7,rnd);
                 test_filtering2(7,5,rnd);
             }
+
         }
     } a;
 
