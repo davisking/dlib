@@ -65,32 +65,32 @@ namespace dlib
             typedef typename matrix_type::type scalar_type;
 
             matrix_type current_solution;
-            scalar_type cur_risk_lower_bound;
-            double eps;
+            scalar_type saved_current_risk_gap;
             bool skip_cache;
+            bool converged;
 
             friend void swap (oracle_request& a, oracle_request& b)
             {
                 a.current_solution.swap(b.current_solution);
-                std::swap(a.cur_risk_lower_bound, b.cur_risk_lower_bound);
-                std::swap(a.eps, b.eps);
+                std::swap(a.saved_current_risk_gap, b.saved_current_risk_gap);
                 std::swap(a.skip_cache, b.skip_cache);
+                std::swap(a.converged, b.converged);
             }
 
             friend void serialize (const oracle_request& item, std::ostream& out)
             {
                 serialize(item.current_solution, out);
-                dlib::serialize(item.cur_risk_lower_bound, out);
-                dlib::serialize(item.eps, out);
+                dlib::serialize(item.saved_current_risk_gap, out);
                 dlib::serialize(item.skip_cache, out);
+                dlib::serialize(item.converged, out);
             }
 
             friend void deserialize (oracle_request& item, std::istream& in)
             {
                 deserialize(item.current_solution, in);
-                dlib::deserialize(item.cur_risk_lower_bound, in);
-                dlib::deserialize(item.eps, in);
+                dlib::deserialize(item.saved_current_risk_gap, in);
                 dlib::deserialize(item.skip_cache, in);
+                dlib::deserialize(item.converged, in);
             }
         };
 
@@ -270,8 +270,9 @@ namespace dlib
                         feature_vector_type ftemp;
                         for (long i = begin; i < end; ++i)
                         {
-                            self.cache[i].separation_oracle_cached(req.skip_cache, 
-                                                                   req.cur_risk_lower_bound,
+                            self.cache[i].separation_oracle_cached(req.converged, 
+                                                                   req.skip_cache, 
+                                                                   req.saved_current_risk_gap,
                                                                    req.current_solution,
                                                                    loss,
                                                                    ftemp);
@@ -292,8 +293,9 @@ namespace dlib
                         for (long i = begin; i < end; ++i)
                         {
                             scalar_type loss_temp;
-                            self.cache[i].separation_oracle_cached(req.skip_cache, 
-                                                                   req.cur_risk_lower_bound,
+                            self.cache[i].separation_oracle_cached(req.converged,
+                                                                   req.skip_cache, 
+                                                                   req.saved_current_risk_gap,
                                                                    req.current_solution,
                                                                    loss_temp,
                                                                    ftemp);
@@ -343,9 +345,31 @@ namespace dlib
         svm_struct_controller_node (
         ) :
             eps(0.001),
+            cache_based_eps(std::numeric_limits<double>::infinity()),
             verbose(false),
             C(1)
         {}
+
+        double get_cache_based_epsilon (
+        ) const
+        {
+            return cache_based_eps;
+        }
+
+        void set_cache_based_epsilon (
+            double eps_
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(eps_ > 0,
+                "\t void svm_struct_controller_node::set_cache_based_epsilon()"
+                << "\n\t eps_ must be greater than 0"
+                << "\n\t eps_: " << eps_ 
+                << "\n\t this: " << this
+                );
+
+            cache_based_eps = eps_;
+        }
 
         void set_epsilon (
             double eps_
@@ -353,7 +377,7 @@ namespace dlib
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(eps_ > 0,
-                "\t void structural_svm_problem::set_epsilon()"
+                "\t void svm_struct_controller_node::set_epsilon()"
                 << "\n\t eps_ must be greater than 0"
                 << "\n\t eps_: " << eps_ 
                 << "\n\t this: " << this
@@ -377,6 +401,41 @@ namespace dlib
             verbose = false;
         }
 
+        void add_nuclear_norm_regularizer (
+            long first_dimension,
+            long rows,
+            long cols,
+            double regularization_strength
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(0 <= first_dimension  &&
+                0 <= rows && 0 <= cols && 
+                0 < regularization_strength,
+                "\t void svm_struct_controller_node::add_nuclear_norm_regularizer()"
+                << "\n\t Invalid arguments were given to this function."
+                << "\n\t first_dimension:         " << first_dimension 
+                << "\n\t rows:                    " << rows 
+                << "\n\t cols:                    " << cols 
+                << "\n\t regularization_strength: " << regularization_strength 
+                << "\n\t this: " << this
+                );
+
+            impl::nuclear_norm_regularizer temp;
+            temp.first_dimension = first_dimension;
+            temp.nr = rows;
+            temp.nc = cols;
+            temp.regularization_strength = regularization_strength;
+            nuclear_norm_regularizers.push_back(temp);
+        }
+
+        unsigned long num_nuclear_norm_regularizers (
+        ) const { return nuclear_norm_regularizers.size(); }
+
+        void clear_nuclear_norm_regularizers (
+        ) { nuclear_norm_regularizers.clear(); }
+
+
         double get_c (
         ) const { return C; }
 
@@ -386,7 +445,7 @@ namespace dlib
         { 
             // make sure requires clause is not broken
             DLIB_ASSERT(C_ > 0,
-                "\t void structural_svm_problem::set_c()"
+                "\t void svm_struct_controller_node::set_c()"
                 << "\n\t C_ must be greater than 0"
                 << "\n\t C_:    " << C_ 
                 << "\n\t this: " << this
@@ -401,7 +460,7 @@ namespace dlib
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(addr.port != 0,
-                "\t void structural_svm_problem::add_processing_node()"
+                "\t void svm_struct_controller_node::add_processing_node()"
                 << "\n\t Invalid inputs were given to this function"
                 << "\n\t addr.host_address:   " << addr.host_address 
                 << "\n\t addr.port: " << addr.port
@@ -453,7 +512,20 @@ namespace dlib
                         << "\n\t this: " << this
             );
 
-            problem_type<matrix_type> problem(nodes,eps,verbose,C);
+            problem_type<matrix_type> problem(nodes);
+            problem.set_cache_based_epsilon(cache_based_eps);
+            problem.set_epsilon(eps);
+            if (verbose)
+                problem.be_verbose();
+            problem.set_c(C);
+            for (unsigned long i = 0; i < nuclear_norm_regularizers.size(); ++i)
+            {
+                problem.add_nuclear_norm_regularizer(
+                    nuclear_norm_regularizers[i].first_dimension,
+                    nuclear_norm_regularizers[i].nr,
+                    nuclear_norm_regularizers[i].nc,
+                    nuclear_norm_regularizers[i].regularization_strength);
+            }
 
             return solver(problem, w);
         }
@@ -470,25 +542,17 @@ namespace dlib
     private:
 
         template <typename matrix_type_>
-        class problem_type : public oca_problem<matrix_type_>
+        class problem_type : public structural_svm_problem<matrix_type_>
         {
         public:
             typedef typename matrix_type_::type scalar_type;
             typedef matrix_type_ matrix_type;
 
             problem_type (
-                const std::vector<network_address>& nodes_,
-                double eps_,
-                bool verbose_,
-                double C_
+                const std::vector<network_address>& nodes_
             ) :
                 nodes(nodes_),
-                eps(eps_),
-                verbose(verbose_),
-                C(C_),
                 in(3),
-                cur_risk_lower_bound(0),
-                skip_cache(true),
                 num_dims(0)
             {
 
@@ -529,69 +593,14 @@ namespace dlib
                         num_dims = temp.template get<long>();
                     }
                 }
-
             }
 
-
-
-            virtual bool risk_has_lower_bound (
-                scalar_type& lower_bound
-            ) const 
-            { 
-                lower_bound = 0;
-                return true; 
-            }
-
-            virtual bool optimization_status (
-                scalar_type current_objective_value,
-                scalar_type current_error_gap,
-                scalar_type current_risk_value,
-                scalar_type current_risk_gap,
-                unsigned long num_cutting_planes,
-                unsigned long num_iterations
-            ) const 
-            {
-                if (verbose)
-                {
-                    using namespace std;
-                    cout << "objective:     " << current_objective_value << endl;
-                    cout << "objective gap: " << current_error_gap << endl;
-                    cout << "risk:          " << current_risk_value << endl;
-                    cout << "risk gap:      " << current_risk_gap << endl;
-                    cout << "num planes:    " << num_cutting_planes << endl;
-                    cout << "iter:          " << num_iterations << endl;
-                    cout << endl;
-                }
-
-                cur_risk_lower_bound = std::max<scalar_type>(current_risk_value - current_risk_gap, 0);
-
-                bool should_stop = false;
-
-                if (current_risk_gap < eps)
-                    should_stop = true;
-
-                if (should_stop && !skip_cache)
-                {
-                    // Instead of stopping we shouldn't use the cache on the next iteration.  This way
-                    // we can be sure to have the best solution rather than assuming the cache is up-to-date
-                    // enough.
-                    should_stop = false;
-                    skip_cache = true;
-                }
-                else
-                {
-                    skip_cache = false;
-                }
-
-
-                return should_stop;
-            }
-
-            virtual scalar_type get_c (
-            ) const 
-            {
-                return C;
-            }
+            // These functions are just here because the structural_svm_problem requires
+            // them, but since we are overloading get_risk() they are never called so they
+            // don't matter.
+            virtual long get_num_samples () const {return 0;}
+            virtual void get_truth_joint_feature_vector ( long , matrix_type&  ) const {}
+            virtual void separation_oracle ( const long , const matrix_type& , scalar_type& , matrix_type& ) const {}
 
             virtual long get_num_dimensions (
             ) const
@@ -614,9 +623,9 @@ namespace dlib
                 for (unsigned long i = 0; i < out_pipes.size(); ++i)
                 {
                     temp_out.template get<oracle_request<matrix_type> >().current_solution = w;
-                    temp_out.template get<oracle_request<matrix_type> >().eps = eps;
-                    temp_out.template get<oracle_request<matrix_type> >().cur_risk_lower_bound = cur_risk_lower_bound;
-                    temp_out.template get<oracle_request<matrix_type> >().skip_cache = skip_cache;
+                    temp_out.template get<oracle_request<matrix_type> >().saved_current_risk_gap = this->saved_current_risk_gap;
+                    temp_out.template get<oracle_request<matrix_type> >().skip_cache = this->skip_cache;
+                    temp_out.template get<oracle_request<matrix_type> >().converged = this->converged;
                     out_pipes[i]->enqueue(temp_out);
                 }
 
@@ -641,12 +650,18 @@ namespace dlib
                 subgradient /= num;
                 total_loss /= num;
                 risk = total_loss + dot(subgradient,w);
+
+                if (this->nuclear_norm_regularizers.size() != 0)
+                {
+                    matrix_type grad; 
+                    double obj;
+                    this->compute_nuclear_norm_parts(w, grad, obj);
+                    risk += obj;
+                    subgradient += grad;
+                }
             }
 
             std::vector<network_address> nodes;
-            double eps;
-            mutable bool verbose;
-            double C;
 
             typedef type_safe_union<impl::oracle_request<matrix_type> > tsu_out;
             typedef type_safe_union<impl::oracle_response<matrix_type>, long> tsu_in;
@@ -654,16 +669,15 @@ namespace dlib
             std::vector<shared_ptr<pipe<tsu_out> > > out_pipes;
             mutable pipe<tsu_in> in;
             std::vector<shared_ptr<bridge> > bridges;
-
-            mutable scalar_type cur_risk_lower_bound;
-            mutable bool skip_cache;
             long num_dims;
         };
 
         std::vector<network_address> nodes;
         double eps;
-        mutable bool verbose;
+        double cache_based_eps;
+        bool verbose;
         double C;
+        std::vector<impl::nuclear_norm_regularizer> nuclear_norm_regularizers;
     };
 
 // ----------------------------------------------------------------------------------------

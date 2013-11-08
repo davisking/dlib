@@ -16,6 +16,19 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        struct nuclear_norm_regularizer
+        {
+            long first_dimension;
+            long nr;
+            long nc;
+            double regularization_strength;
+        };
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename structural_svm_problem
         >
@@ -345,7 +358,7 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            nuclear_norm_regularizer temp;
+            impl::nuclear_norm_regularizer temp;
             temp.first_dimension = first_dimension;
             temp.nr = rows;
             temp.nc = cols;
@@ -464,45 +477,6 @@ namespace dlib
             return false;
         }
 
-        void compute_nuclear_norm_parts(
-            const matrix_type& m,
-            matrix_type& grad,
-            scalar_type& obj
-        ) const
-        {
-            obj = 0;
-            grad.set_size(m.size());
-            grad = 0;
-
-            matrix<double> u,v,w,f;
-            nuclear_norm_part = 0;
-            for (unsigned long i = 0; i < nuclear_norm_regularizers.size(); ++i)
-            {
-                const long nr = nuclear_norm_regularizers[i].nr;
-                const long nc = nuclear_norm_regularizers[i].nc;
-                const long size = nr*nc;
-                const long idx = nuclear_norm_regularizers[i].first_dimension;
-                const double strength = nuclear_norm_regularizers[i].regularization_strength;
-
-                f = matrix_cast<double>(reshape(rowm(m, range(idx, idx+size-1)), nr, nc));
-                svd3(f, u,w,v);
-
-                w = round_zeros(w, std::max(1e-9,max(w)*1e-7)); 
-
-                const double norm = sum(w);
-                obj += strength*norm;
-                nuclear_norm_part += strength*norm/C;
-
-                w = w>0;
-                f = u*diagm(w)*trans(v);
-
-                set_rowm(grad, range(idx, idx+size-1)) = matrix_cast<double>(strength*reshape_to_column_vector(f));
-            }
-
-            obj /= C;
-            grad /= C;
-        }
-
         virtual void get_risk (
             matrix_type& w,
             scalar_type& risk,
@@ -566,6 +540,46 @@ namespace dlib
         }
 
     protected:
+
+        void compute_nuclear_norm_parts(
+            const matrix_type& m,
+            matrix_type& grad,
+            scalar_type& obj
+        ) const
+        {
+            obj = 0;
+            grad.set_size(m.size());
+            grad = 0;
+
+            matrix<double> u,v,w,f;
+            nuclear_norm_part = 0;
+            for (unsigned long i = 0; i < nuclear_norm_regularizers.size(); ++i)
+            {
+                const long nr = nuclear_norm_regularizers[i].nr;
+                const long nc = nuclear_norm_regularizers[i].nc;
+                const long size = nr*nc;
+                const long idx = nuclear_norm_regularizers[i].first_dimension;
+                const double strength = nuclear_norm_regularizers[i].regularization_strength;
+
+                f = matrix_cast<double>(reshape(rowm(m, range(idx, idx+size-1)), nr, nc));
+                svd3(f, u,w,v);
+
+                w = round_zeros(w, std::max(1e-9,max(w)*1e-7)); 
+
+                const double norm = sum(w);
+                obj += strength*norm;
+                nuclear_norm_part += strength*norm/C;
+
+                w = w>0;
+                f = u*diagm(w)*trans(v);
+
+                set_rowm(grad, range(idx, idx+size-1)) = matrix_cast<double>(strength*reshape_to_column_vector(f));
+            }
+
+            obj /= C;
+            grad /= C;
+        }
+
         void separation_oracle_cached (
             const long idx,
             const matrix_type& current_solution,
@@ -580,16 +594,8 @@ namespace dlib
                                                 loss,
                                                 psi);
         }
-    private:
 
-        struct nuclear_norm_regularizer
-        {
-            long first_dimension;
-            long nr;
-            long nc;
-            double regularization_strength;
-        };
-        std::vector<nuclear_norm_regularizer> nuclear_norm_regularizers;
+        std::vector<impl::nuclear_norm_regularizer> nuclear_norm_regularizers;
 
         mutable scalar_type saved_current_risk_gap;
         mutable matrix_type psi_true;
