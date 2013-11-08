@@ -4,7 +4,7 @@
 #define DLIB_sIMD4I_H__
 
 #include "simd_check.h"
-#include "dlib/uintn.h"
+#include "../uintn.h"
 
 namespace dlib
 {
