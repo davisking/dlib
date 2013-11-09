@@ -480,7 +480,6 @@ namespace dlib
         const image_type1& in_img,
         image_type2& out_img,
         const pyramid_type& pyr,
-        unsigned int levels,
         const interpolation_type& interp
     );
     /*!
@@ -497,9 +496,9 @@ namespace dlib
               In particular, it attempts to make an image, out_img, which would result
               in in_img when downsampled with pyr().  
             - #out_img == An upsampled copy of in_img.  In particular, downsampling
-              #out_img levels times with pyr() should result in a final image which
-              looks like in_img.
-            - uses the supplied interpolation routine interp to perform the necessary
+              #out_img 1 time with pyr() should result in a final image which looks like
+              in_img.
+            - Uses the supplied interpolation routine interp to perform the necessary
               pixel interpolation.
             - Note that downsampling an image with pyr() and then upsampling it with 
               pyramid_up() will not necessarily result in a final image which is
@@ -517,8 +516,7 @@ namespace dlib
     void pyramid_up (
         const image_type1& in_img,
         image_type2& out_img,
-        const pyramid_type& pyr,
-        unsigned int levels = 1
+        const pyramid_type& pyr
     );
     /*!
         requires
@@ -528,7 +526,7 @@ namespace dlib
               in dlib/image_transforms/image_pyramid_abstract.h
             - is_same_object(in_img, out_img) == false
         ensures
-            - performs: pyramid_up(in_img, out_img, pyr, levels, interpolate_quadratic());
+            - performs: pyramid_up(in_img, out_img, pyr, interpolate_bilinear());
     !*/
 
 // ----------------------------------------------------------------------------------------

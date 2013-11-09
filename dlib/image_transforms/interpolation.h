@@ -7,6 +7,7 @@
 #include "../pixel.h"
 #include "../matrix.h"
 #include "assign_image.h"
+#include "../simd.h"
 
 namespace dlib
 {
@@ -517,13 +518,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename image_type>
+    struct is_rgb_image { const static bool value = pixel_traits<typename image_type::type>::rgb; };
+    template <typename image_type>
+    struct is_grayscale_image { const static bool value = pixel_traits<typename image_type::type>::grayscale; };
+
     // This is an optimized version of resize_image for the case where bilinear
     // interpolation is used.
     template <
         typename image_type1,
         typename image_type2
         >
-    void resize_image (
+    typename disable_if_c<(is_rgb_image<image_type1>::value&&is_rgb_image<image_type2>::value) || 
+                          (is_grayscale_image<image_type1>::value&&is_grayscale_image<image_type2>::value)>::type 
+    resize_image (
         const image_type1& in_img,
         image_type2& out_img,
         interpolate_bilinear
@@ -535,6 +543,12 @@ namespace dlib
             << "\n\t Invalid inputs were given to this function."
             << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
             );
+        if (out_img.nr() <= 1 || out_img.nc() <= 1)
+        {
+            assign_all_pixels(out_img, 0);
+            return;
+        }
+
 
         typedef typename image_type1::type T;
         typedef typename image_type2::type U;
@@ -591,6 +605,226 @@ namespace dlib
                             tb_frac*((1-lr_frac)*pixel_to_vector<double>(bl) + lr_frac*pixel_to_vector<double>(br)));
                     assign_pixel(out_img[r][c], temp);
                 }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    typename enable_if<is_grayscale_image<image_type> >::type resize_image (
+        const image_type& in_img,
+        image_type& out_img,
+        interpolate_bilinear
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
+            "\t void resize_image()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
+            );
+        if (out_img.nr() <= 1 || out_img.nc() <= 1)
+        {
+            assign_all_pixels(out_img, 0);
+            return;
+        }
+
+        typedef typename image_type::type T;
+        const double x_scale = (in_img.nc()-1)/(double)std::max<long>((out_img.nc()-1),1);
+        const double y_scale = (in_img.nr()-1)/(double)std::max<long>((out_img.nr()-1),1);
+        double y = -y_scale;
+        for (long r = 0; r < out_img.nr(); ++r)
+        {
+            y += y_scale;
+            const long top    = static_cast<long>(std::floor(y));
+            const long bottom = std::min(top+1, in_img.nr()-1);
+            const double tb_frac = y - top;
+            double x = -4*x_scale;
+
+            const simd4f _tb_frac = tb_frac;
+            const simd4f _inv_tb_frac = 1-tb_frac;
+            const simd4f _x_scale = 4*x_scale;
+            simd4f _x(x, x+x_scale, x+2*x_scale, x+3*x_scale);
+            long c = 0;
+            const long num_simd_blocks = static_cast<long>(out_img.nc()-3*x_scale)-1;
+            for (; c < num_simd_blocks; c+=4)
+            {
+                _x += _x_scale;
+                simd4f _left = floor(_x);
+                simd4i left = simd4i(_left);
+
+                simd4f _lr_frac = _x-_left;
+                simd4f _inv_lr_frac = 1-_lr_frac; 
+                simd4i right = left+1;
+
+                simd4f tlf = _inv_tb_frac*_inv_lr_frac;
+                simd4f trf = _inv_tb_frac*_lr_frac;
+                simd4f blf = _tb_frac*_inv_lr_frac;
+                simd4f brf = _tb_frac*_lr_frac;
+
+                int32 fleft[4];
+                int32 fright[4];
+                left.store(fleft);
+                right.store(fright);
+
+                simd4f tl(in_img[top][fleft[0]],     in_img[top][fleft[1]],     in_img[top][fleft[2]],     in_img[top][fleft[3]]);
+                simd4f tr(in_img[top][fright[0]],    in_img[top][fright[1]],    in_img[top][fright[2]],    in_img[top][fright[3]]);
+                simd4f bl(in_img[bottom][fleft[0]],  in_img[bottom][fleft[1]],  in_img[bottom][fleft[2]],  in_img[bottom][fleft[3]]);
+                simd4f br(in_img[bottom][fright[0]], in_img[bottom][fright[1]], in_img[bottom][fright[2]], in_img[bottom][fright[3]]);
+
+                simd4i out = simd4i(tlf*tl + trf*tr + blf*bl + brf*br);
+                int32 fout[4];
+                out.store(fout);
+
+                out_img[r][c]   = static_cast<T>(fout[0]);
+                out_img[r][c+1] = static_cast<T>(fout[1]);
+                out_img[r][c+2] = static_cast<T>(fout[2]);
+                out_img[r][c+3] = static_cast<T>(fout[3]);
+            }
+            x = -x_scale + c*x_scale;
+            for (; c < out_img.nc(); ++c)
+            {
+                x += x_scale;
+                const long left   = static_cast<long>(std::floor(x));
+                const long right  = std::min(left+1, in_img.nc()-1);
+                const float lr_frac = x - left;
+
+                float tl = 0, tr = 0, bl = 0, br = 0;
+
+                assign_pixel(tl, in_img[top][left]);
+                assign_pixel(tr, in_img[top][right]);
+                assign_pixel(bl, in_img[bottom][left]);
+                assign_pixel(br, in_img[bottom][right]);
+
+                float temp = (1-tb_frac)*((1-lr_frac)*tl + lr_frac*tr) + 
+                    tb_frac*((1-lr_frac)*bl + lr_frac*br);
+
+                assign_pixel(out_img[r][c], temp);
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    typename enable_if<is_rgb_image<image_type> >::type resize_image (
+        const image_type& in_img,
+        image_type& out_img,
+        interpolate_bilinear
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
+            "\t void resize_image()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
+            );
+        if (out_img.nr() <= 1 || out_img.nc() <= 1)
+        {
+            assign_all_pixels(out_img, 0);
+            return;
+        }
+
+
+        typedef typename image_type::type T;
+        const double x_scale = (in_img.nc()-1)/(double)std::max<long>((out_img.nc()-1),1);
+        const double y_scale = (in_img.nr()-1)/(double)std::max<long>((out_img.nr()-1),1);
+        double y = -y_scale;
+        for (long r = 0; r < out_img.nr(); ++r)
+        {
+            y += y_scale;
+            const long top    = static_cast<long>(std::floor(y));
+            const long bottom = std::min(top+1, in_img.nr()-1);
+            const double tb_frac = y - top;
+            double x = -4*x_scale;
+
+            const simd4f _tb_frac = tb_frac;
+            const simd4f _inv_tb_frac = 1-tb_frac;
+            const simd4f _x_scale = 4*x_scale;
+            simd4f _x(x, x+x_scale, x+2*x_scale, x+3*x_scale);
+            long c = 0;
+            const long num_simd_blocks = static_cast<long>(out_img.nc()-3*x_scale)-1;
+            for (; c < num_simd_blocks; c+=4)
+            {
+                _x += _x_scale;
+                simd4f _left = floor(_x);
+                simd4i left = simd4i(_left);
+                simd4f lr_frac = _x-_left;
+                simd4f _inv_lr_frac = 1-lr_frac; 
+                simd4i right = left+1;
+
+                simd4f tlf = _inv_tb_frac*_inv_lr_frac;
+                simd4f trf = _inv_tb_frac*lr_frac;
+                simd4f blf = _tb_frac*_inv_lr_frac;
+                simd4f brf = _tb_frac*lr_frac;
+
+                int32 fleft[4];
+                int32 fright[4];
+                left.store(fleft);
+                right.store(fright);
+
+                simd4f tl(in_img[top][fleft[0]].red,     in_img[top][fleft[1]].red,     in_img[top][fleft[2]].red,     in_img[top][fleft[3]].red);
+                simd4f tr(in_img[top][fright[0]].red,    in_img[top][fright[1]].red,    in_img[top][fright[2]].red,    in_img[top][fright[3]].red);
+                simd4f bl(in_img[bottom][fleft[0]].red,  in_img[bottom][fleft[1]].red,  in_img[bottom][fleft[2]].red,  in_img[bottom][fleft[3]].red);
+                simd4f br(in_img[bottom][fright[0]].red, in_img[bottom][fright[1]].red, in_img[bottom][fright[2]].red, in_img[bottom][fright[3]].red);
+
+                simd4i out = simd4i(tlf*tl + trf*tr + blf*bl + brf*br);
+                int32 fout[4];
+                out.store(fout);
+
+                out_img[r][c].red   = static_cast<unsigned char>(fout[0]);
+                out_img[r][c+1].red = static_cast<unsigned char>(fout[1]);
+                out_img[r][c+2].red = static_cast<unsigned char>(fout[2]);
+                out_img[r][c+3].red = static_cast<unsigned char>(fout[3]);
+
+
+                tl = simd4f(in_img[top][fleft[0]].green,    in_img[top][fleft[1]].green,    in_img[top][fleft[2]].green,    in_img[top][fleft[3]].green);
+                tr = simd4f(in_img[top][fright[0]].green,   in_img[top][fright[1]].green,   in_img[top][fright[2]].green,   in_img[top][fright[3]].green);
+                bl = simd4f(in_img[bottom][fleft[0]].green, in_img[bottom][fleft[1]].green, in_img[bottom][fleft[2]].green, in_img[bottom][fleft[3]].green);
+                br = simd4f(in_img[bottom][fright[0]].green, in_img[bottom][fright[1]].green, in_img[bottom][fright[2]].green, in_img[bottom][fright[3]].green);
+                out = simd4i(tlf*tl + trf*tr + blf*bl + brf*br);
+                out.store(fout);
+                out_img[r][c].green   = static_cast<unsigned char>(fout[0]);
+                out_img[r][c+1].green = static_cast<unsigned char>(fout[1]);
+                out_img[r][c+2].green = static_cast<unsigned char>(fout[2]);
+                out_img[r][c+3].green = static_cast<unsigned char>(fout[3]);
+
+
+                tl = simd4f(in_img[top][fleft[0]].blue,     in_img[top][fleft[1]].blue,     in_img[top][fleft[2]].blue,     in_img[top][fleft[3]].blue);
+                tr = simd4f(in_img[top][fright[0]].blue,    in_img[top][fright[1]].blue,    in_img[top][fright[2]].blue,    in_img[top][fright[3]].blue);
+                bl = simd4f(in_img[bottom][fleft[0]].blue,  in_img[bottom][fleft[1]].blue,  in_img[bottom][fleft[2]].blue,  in_img[bottom][fleft[3]].blue);
+                br = simd4f(in_img[bottom][fright[0]].blue, in_img[bottom][fright[1]].blue, in_img[bottom][fright[2]].blue, in_img[bottom][fright[3]].blue);
+                out = simd4i(tlf*tl + trf*tr + blf*bl + brf*br);
+                out.store(fout);
+                out_img[r][c].blue   = static_cast<unsigned char>(fout[0]);
+                out_img[r][c+1].blue = static_cast<unsigned char>(fout[1]);
+                out_img[r][c+2].blue = static_cast<unsigned char>(fout[2]);
+                out_img[r][c+3].blue = static_cast<unsigned char>(fout[3]);
+            }
+            x = -x_scale + c*x_scale;
+            for (; c < out_img.nc(); ++c)
+            {
+                x += x_scale;
+                const long left   = static_cast<long>(std::floor(x));
+                const long right  = std::min(left+1, in_img.nc()-1);
+                const double lr_frac = x - left;
+
+                const T tl = in_img[top][left];
+                const T tr = in_img[top][right];
+                const T bl = in_img[bottom][left];
+                const T br = in_img[bottom][right];
+
+                T temp;
+                assign_pixel(temp, 0);
+                vector_to_pixel(temp, 
+                    (1-tb_frac)*((1-lr_frac)*pixel_to_vector<double>(tl) + lr_frac*pixel_to_vector<double>(tr)) + 
+                    tb_frac*((1-lr_frac)*pixel_to_vector<double>(bl) + lr_frac*pixel_to_vector<double>(br)));
+                assign_pixel(out_img[r][c], temp);
             }
         }
     }
@@ -714,36 +948,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    namespace impl
-    {
-        class helper_pyramid_up 
-        {
-        public:
-            helper_pyramid_up(
-                double x_scale_,
-                double y_scale_,
-                const dlib::vector<double,2> offset_
-            ):
-                x_scale(x_scale_),
-                y_scale(y_scale_),
-                offset(offset_)
-            {}
-
-            dlib::vector<double,2> operator() (
-                const dlib::vector<double,2>& p
-            ) const
-            {
-                return dlib::vector<double,2>((p.x()-offset.x())*x_scale, 
-                                              (p.y()-offset.y())*y_scale);
-            }
-
-        private:
-            const double x_scale;
-            const double y_scale;
-            const dlib::vector<double,2> offset;
-        };
-    }
-
     template <
         typename image_type1,
         typename image_type2,
@@ -754,7 +958,6 @@ namespace dlib
         const image_type1& in_img,
         image_type2& out_img,
         const pyramid_type& pyr,
-        unsigned int levels,
         const interpolation_type& interp
     )
     {
@@ -771,14 +974,8 @@ namespace dlib
             return;
         }
 
-        if (levels == 0)
-        {
-            assign_image(out_img, in_img);
-            return;
-        }
-
         rectangle rect = get_rect(in_img);
-        rectangle uprect = pyr.rect_up(rect,levels);
+        rectangle uprect = pyr.rect_up(rect);
         if (uprect.is_empty())
         {
             out_img.clear();
@@ -786,11 +983,7 @@ namespace dlib
         }
         out_img.set_size(uprect.bottom()+1, uprect.right()+1);
 
-        const double x_scale = (rect.width() -1)/(double)std::max<long>(1,(uprect.width() -1));
-        const double y_scale = (rect.height()-1)/(double)std::max<long>(1,(uprect.height()-1));
-        transform_image(in_img, out_img, interp, 
-                        dlib::impl::helper_pyramid_up(x_scale,y_scale,  uprect.tl_corner()));
-
+        resize_image(in_img, out_img, interp);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -803,8 +996,7 @@ namespace dlib
     void pyramid_up (
         const image_type1& in_img,
         image_type2& out_img,
-        const pyramid_type& pyr,
-        unsigned int levels = 1
+        const pyramid_type& pyr
     )
     {
         // make sure requires clause is not broken
@@ -814,7 +1006,7 @@ namespace dlib
             << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
             );
 
-        pyramid_up(in_img, out_img, pyr, levels, interpolate_quadratic());
+        pyramid_up(in_img, out_img, pyr, interpolate_bilinear());
     }
 
 // ----------------------------------------------------------------------------------------
