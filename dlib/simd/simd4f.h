@@ -31,6 +31,9 @@ namespace dlib
 
         operator __m128() const { return x; }
 
+        // truncate to 32bit integers
+        operator __m128i() const { return _mm_cvttps_epi32(x); }
+
         void load_aligned(const type* ptr)  { x = _mm_load_ps(ptr); }
         void store_aligned(type* ptr) const { _mm_store_ps(ptr, x); }
         void load(const type* ptr)          { x = _mm_loadu_ps(ptr); }
@@ -78,6 +81,12 @@ namespace dlib
         simd4f(float f) { x[0]=f; x[1]=f; x[2]=f; x[3]=f; }
         simd4f(float r0, float r1, float r2, float r3) { x[0]=r0; x[1]=r1; x[2]=r2; x[3]=r3;}
         simd4f(const simd4i& val) { x[0]=val[0]; x[1]=val[1]; x[2]=val[2]; x[3]=val[3];}
+
+        // truncate to 32bit integers
+        operator simd4i() const { return simd4i((int32)x[0], 
+                                                (int32)x[1],
+                                                (int32)x[2],
+                                                (int32)x[3]); }
 
         void load_aligned(const type* ptr)
         {
