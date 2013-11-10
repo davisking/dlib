@@ -589,13 +589,25 @@ namespace dlib
                 long c = first_col;
                 for (; c < last_col-3; c+=4)
                 {
-                    simd4f p, temp = 0;
-                    for (long n = 0; n < row_filter.size(); ++n)
+                    simd4f p,p2,p3, temp = 0, temp2=0, temp3=0;
+                    long n = 0;
+                    for (; n < row_filter.size()-2; n+=3)
+                    {
+                        // pull out the current pixel and put it into p
+                        p.load(&in_img[r][c-first_col+n]);
+                        p2.load(&in_img[r][c-first_col+n+1]);
+                        p3.load(&in_img[r][c-first_col+n+2]);
+                        temp += p*row_filter(n);
+                        temp2 += p2*row_filter(n+1);
+                        temp3 += p3*row_filter(n+2);
+                    }
+                    for (; n < row_filter.size(); ++n)
                     {
                         // pull out the current pixel and put it into p
                         p.load(&in_img[r][c-first_col+n]);
                         temp += p*row_filter(n);
                     }
+                    temp += temp2 + temp3;
                     temp.store(&temp_img[r][c]);
                 }
                 for (; c < last_col; ++c)
@@ -618,12 +630,23 @@ namespace dlib
                 long c = first_col;
                 for (; c < last_col-3; c+=4)
                 {
-                    simd4f p, temp = 0;
-                    for (long m = 0; m < col_filter.size(); ++m)
+                    simd4f p, p2, p3, temp = 0, temp2 = 0, temp3 = 0;
+                    long m = 0;
+                    for (; m < col_filter.size()-2; m+=3)
+                    {
+                        p.load(&temp_img[r-first_row+m][c]);
+                        p2.load(&temp_img[r-first_row+m+1][c]);
+                        p3.load(&temp_img[r-first_row+m+2][c]);
+                        temp += p*col_filter(m);
+                        temp2 += p2*col_filter(m+1);
+                        temp3 += p3*col_filter(m+2);
+                    }
+                    for (; m < col_filter.size(); ++m)
                     {
                         p.load(&temp_img[r-first_row+m][c]);
                         temp += p*col_filter(m);
                     }
+                    temp += temp2+temp3;
 
                     // save this pixel to the output image
                     if (add_to == false)

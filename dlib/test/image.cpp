@@ -791,7 +791,7 @@ namespace
         {
             DLIB_TEST(imout[be.element().y()][be.element().x()] == 0)
         }
-        DLIB_TEST(max(abs(subm(mat(imout),rect) - subm(out,rect))) < 1e-7);
+        DLIB_TEST_MSG(max(abs(subm(mat(imout),rect) - subm(out,rect))) < 1e-5, max(abs(subm(mat(imout),rect) - subm(out,rect))));
 
 
         assign_all_pixels(imout, 10);
@@ -815,7 +815,7 @@ namespace
             DLIB_TEST(imout[be.element().y()][be.element().x()] == -10)
         }
         out += xcorr_same(mat(img),filt)/2;
-        DLIB_TEST(max(abs(subm(mat(imout),rect) - subm(out,rect))) < 1e-7);
+        DLIB_TEST_MSG(max(abs(subm(mat(imout),rect) - subm(out,rect))) < 1e-5, max(abs(subm(mat(imout),rect) - subm(out,rect))));
 
 
 
@@ -825,7 +825,7 @@ namespace
         assign_all_pixels(imout, 10);
         rect = spatially_filter_image_separable(img, imout, row_filt, col_filt);
         out = xcorr_same(tmp(xcorr_same(mat(img),trans(row_filt))), col_filt);
-        DLIB_TEST(max(abs(subm(mat(imout),rect) - subm(out,rect))) < 1e-7);
+        DLIB_TEST_MSG(max(abs(subm(mat(imout),rect) - subm(out,rect))) < 1e-5, max(abs(subm(mat(imout),rect) - subm(out,rect))));
 
         be = border_enumerator(get_rect(imout),rect);
         while (be.move_next())
