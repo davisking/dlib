@@ -522,52 +522,73 @@ namespace dlib
                 const int yy = y+padding_rows_offset; 
                 for (int x = 0; x < hog_nc; x++) 
                 {
-                    const double nn1 = 0.2*std::sqrt(norm[y+1][x+1] + norm[y+1][x+2] + norm[y+2][x+1] + norm[y+2][x+2] + eps);
-                    const double nn2 = 0.2*std::sqrt(norm[y][x+1]   + norm[y][x+2]   + norm[y+1][x+1] + norm[y+1][x+2] + eps);
-                    const double nn3 = 0.2*std::sqrt(norm[y+1][x]   + norm[y+1][x+1] + norm[y+2][x]   + norm[y+2][x+1] + eps);
-                    const double nn4 = 0.2*std::sqrt(norm[y][x]     + norm[y][x+1]   + norm[y+1][x]   + norm[y+1][x+1] + eps);
-                    const double n1 = 0.1 / nn1;
-                    const double n2 = 0.1 / nn2;
-                    const double n3 = 0.1 / nn3;
-                    const double n4 = 0.1 / nn4;
+                    const simd4f z1(norm[y+1][x+1],
+                                    norm[y][x+1], 
+                                    norm[y+1][x],  
+                                    norm[y][x]);
 
-                    double t1 = 0;
-                    double t2 = 0;
-                    double t3 = 0;
-                    double t4 = 0;
+                    const simd4f z2(norm[y+1][x+2],
+                                    norm[y][x+2],
+                                    norm[y+1][x+1],
+                                    norm[y][x+1]);
+
+                    const simd4f z3(norm[y+2][x+1],
+                                    norm[y+1][x+1],
+                                    norm[y+2][x],
+                                    norm[y+1][x]);
+
+                    const simd4f z4(norm[y+2][x+2],
+                                    norm[y+1][x+2],
+                                    norm[y+2][x+1],
+                                    norm[y+1][x+1]);
+
+                    const simd4f nn = 0.2*sqrt(z1+z2+z3+z4+eps);
+                    const simd4f n = 0.1/nn;
+
+                    simd4f t = 0;
 
                     const int xx = x+padding_cols_offset; 
 
                     // contrast-sensitive features
-                    for (int o = 0; o < 18; o++) 
+                    for (int o = 0; o < 18; o+=3) 
                     {
-                        double h1 = std::min<double>(hist[y+1+1][x+1+1](o) , nn1)*n1;
-                        double h2 = std::min<double>(hist[y+1+1][x+1+1](o) , nn2)*n2;
-                        double h3 = std::min<double>(hist[y+1+1][x+1+1](o) , nn3)*n3;
-                        double h4 = std::min<double>(hist[y+1+1][x+1+1](o) , nn4)*n4;
-                        set_hog(hog,o,xx,yy, (h1 + h2 + h3 + h4));
-                        t1 += h1;
-                        t2 += h2;
-                        t3 += h3;
-                        t4 += h4;
+                        simd4f temp0(hist[y+1+1][x+1+1](o));
+                        simd4f temp1(hist[y+1+1][x+1+1](o+1));
+                        simd4f temp2(hist[y+1+1][x+1+1](o+2));
+                        simd4f h0 = min(temp0,nn)*n;
+                        simd4f h1 = min(temp1,nn)*n;
+                        simd4f h2 = min(temp2,nn)*n;
+                        set_hog(hog,o,xx,yy,   sum(h0));
+                        set_hog(hog,o+1,xx,yy, sum(h1));
+                        set_hog(hog,o+2,xx,yy, sum(h2));
+                        t += h0+h1+h2;
                     }
+
+                    t *= 2*0.2357;
 
                     // contrast-insensitive features
-                    for (int o = 0; o < 9; o++) 
+                    for (int o = 0; o < 9; o+=3) 
                     {
-                        double sum = hist[y+1+1][x+1+1](o) + hist[y+1+1][x+1+1](o+9);
-                        double h1 = std::min(sum , nn1)*n1;
-                        double h2 = std::min(sum , nn2)*n2;
-                        double h3 = std::min(sum , nn3)*n3;
-                        double h4 = std::min(sum , nn4)*n4;
-                        set_hog(hog,o+18,xx,yy, (h1 + h2 + h3 + h4));
+                        simd4f temp0 = hist[y+1+1][x+1+1](o)   + hist[y+1+1][x+1+1](o+9);
+                        simd4f temp1 = hist[y+1+1][x+1+1](o+1) + hist[y+1+1][x+1+1](o+9+1);
+                        simd4f temp2 = hist[y+1+1][x+1+1](o+2) + hist[y+1+1][x+1+1](o+9+2);
+                        simd4f h0 = min(temp0,nn)*n;
+                        simd4f h1 = min(temp1,nn)*n;
+                        simd4f h2 = min(temp2,nn)*n;
+                        set_hog(hog,o+18,xx,yy, sum(h0));
+                        set_hog(hog,o+18+1,xx,yy, sum(h1));
+                        set_hog(hog,o+18+2,xx,yy, sum(h2));
                     }
 
+
+                    float temp[4];
+                    t.store(temp);
+
                     // texture features
-                    set_hog(hog,27,xx,yy, 2*0.2357 * t1);
-                    set_hog(hog,28,xx,yy, 2*0.2357 * t2);
-                    set_hog(hog,29,xx,yy, 2*0.2357 * t3);
-                    set_hog(hog,30,xx,yy, 2*0.2357 * t4);
+                    set_hog(hog,27,xx,yy, temp[0]);
+                    set_hog(hog,28,xx,yy, temp[1]);
+                    set_hog(hog,29,xx,yy, temp[2]);
+                    set_hog(hog,30,xx,yy, temp[3]);
                 }
             }
         }
