@@ -18,13 +18,246 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        template <
+            typename in_image_type,
+            typename out_image_type,
+            typename EXP,
+            typename T
+            >
+        rectangle grayscale_spatially_filter_image (
+            const in_image_type& in_img,
+            out_image_type& out_img,
+            const matrix_exp<EXP>& _filter,
+            T scale,
+            bool use_abs,
+            bool add_to
+        )
+        {
+            const_temp_matrix<EXP> filter(_filter);
+            COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
+            COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+
+            DLIB_ASSERT(scale != 0 && filter.size() != 0,
+                "\trectangle spatially_filter_image()"
+                << "\n\t You can't give a scale of zero or an empty filter."
+                << "\n\t scale: "<< scale
+                << "\n\t filter.nr(): "<< filter.nr()
+                << "\n\t filter.nc(): "<< filter.nc()
+            );
+            DLIB_ASSERT(is_same_object(in_img, out_img) == false,
+                "\trectangle spatially_filter_image()"
+                << "\n\tYou must give two different image objects"
+            );
+
+
+
+            // if there isn't any input image then don't do anything
+            if (in_img.size() == 0)
+            {
+                out_img.clear();
+                return rectangle();
+            }
+
+            out_img.set_size(in_img.nr(),in_img.nc());
+
+
+            // figure out the range that we should apply the filter to
+            const long first_row = (filter.nr()-1)/2;
+            const long first_col = (filter.nc()-1)/2;
+            const long last_row = in_img.nr() - (filter.nr()/2);
+            const long last_col = in_img.nc() - (filter.nc()/2);
+
+            const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
+            if (!add_to)
+                zero_border_pixels(out_img, non_border); 
+
+            // apply the filter to the image
+            for (long r = first_row; r < last_row; ++r)
+            {
+                for (long c = first_col; c < last_col; ++c)
+                {
+                    typedef typename EXP::type ptype;
+                    ptype p;
+                    ptype temp = 0;
+                    for (long m = 0; m < filter.nr(); ++m)
+                    {
+                        for (long n = 0; n < filter.nc(); ++n)
+                        {
+                            // pull out the current pixel and put it into p
+                            p = get_pixel_intensity(in_img[r-first_row+m][c-first_col+n]);
+                            temp += p*filter(m,n);
+                        }
+                    }
+
+                    temp /= scale;
+
+                    if (use_abs && temp < 0)
+                    {
+                        temp = -temp;
+                    }
+
+                    // save this pixel to the output image
+                    if (add_to == false)
+                    {
+                        assign_pixel(out_img[r][c], temp);
+                    }
+                    else
+                    {
+                        assign_pixel(out_img[r][c], temp + out_img[r][c]);
+                    }
+                }
+            }
+
+            return non_border;
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename in_image_type,
+            typename out_image_type,
+            typename EXP
+            >
+        rectangle float_spatially_filter_image (
+            const in_image_type& in_img,
+            out_image_type& out_img,
+            const matrix_exp<EXP>& _filter,
+            bool add_to
+        )
+        {
+
+            const_temp_matrix<EXP> filter(_filter);
+            DLIB_ASSERT(filter.size() != 0,
+                "\trectangle spatially_filter_image()"
+                << "\n\t You can't give an empty filter."
+                << "\n\t filter.nr(): "<< filter.nr()
+                << "\n\t filter.nc(): "<< filter.nc()
+            );
+            DLIB_ASSERT(is_same_object(in_img, out_img) == false,
+                "\trectangle spatially_filter_image()"
+                << "\n\tYou must give two different image objects"
+            );
+
+
+
+            // if there isn't any input image then don't do anything
+            if (in_img.size() == 0)
+            {
+                out_img.clear();
+                return rectangle();
+            }
+
+            out_img.set_size(in_img.nr(),in_img.nc());
+
+
+            // figure out the range that we should apply the filter to
+            const long first_row = (filter.nr()-1)/2;
+            const long first_col = (filter.nc()-1)/2;
+            const long last_row = in_img.nr() - (filter.nr()/2);
+            const long last_col = in_img.nc() - (filter.nc()/2);
+
+            const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
+            if (!add_to)
+                zero_border_pixels(out_img, non_border); 
+
+            // apply the filter to the image
+            for (long r = first_row; r < last_row; ++r)
+            {
+                long c = first_col;
+                for (; c < last_col-3; c+=4)
+                {
+                    simd4f p,p2,p3;
+                    simd4f temp = 0, temp2=0, temp3=0;
+                    for (long m = 0; m < filter.nr(); ++m)
+                    {
+                        long n = 0;
+                        for (; n < filter.nc()-2; n+=3)
+                        {
+                            // pull out the current pixel and put it into p
+                            p.load(&in_img[r-first_row+m][c-first_col+n]);
+                            p2.load(&in_img[r-first_row+m][c-first_col+n+1]);
+                            p3.load(&in_img[r-first_row+m][c-first_col+n+2]);
+                            temp += p*filter(m,n);
+                            temp2 += p2*filter(m,n+1);
+                            temp3 += p3*filter(m,n+2);
+                        }
+                        for (; n < filter.nc(); ++n)
+                        {
+                            // pull out the current pixel and put it into p
+                            p.load(&in_img[r-first_row+m][c-first_col+n]);
+                            temp += p*filter(m,n);
+                        }
+                    }
+                    temp += temp2+temp3;
+
+                    // save this pixel to the output image
+                    if (add_to == false)
+                    {
+                        temp.store(&out_img[r][c]);
+                    }
+                    else
+                    {
+                        p.load(&out_img[r][c]);
+                        temp += p;
+                        temp.store(&out_img[r][c]);
+                    }
+                }
+                for (; c < last_col; ++c)
+                {
+                    float p;
+                    float temp = 0;
+                    for (long m = 0; m < filter.nr(); ++m)
+                    {
+                        for (long n = 0; n < filter.nc(); ++n)
+                        {
+                            // pull out the current pixel and put it into p
+                            p = in_img[r-first_row+m][c-first_col+n];
+                            temp += p*filter(m,n);
+                        }
+                    }
+
+                    // save this pixel to the output image
+                    if (add_to == false)
+                    {
+                        out_img[r][c] = temp;
+                    }
+                    else
+                    {
+                        out_img[r][c] += temp;
+                    }
+                }
+            }
+
+            return non_border;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        typename out_image_type,
+        typename EXP
+        >
+    struct is_float_filtering2
+    {
+        const static bool value = is_same_type<typename in_image_type::type,float>::value &&
+                                  is_same_type<typename out_image_type::type,float>::value &&
+                                  is_same_type<typename EXP::type,float>::value;
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename in_image_type,
         typename out_image_type,
         typename EXP,
         typename T
         >
-    typename enable_if_c<pixel_traits<typename out_image_type::type>::grayscale,rectangle>::type 
+    typename enable_if_c<pixel_traits<typename out_image_type::type>::grayscale && 
+                         is_float_filtering2<in_image_type,out_image_type,EXP>::value,rectangle>::type 
     spatially_filter_image (
         const in_image_type& in_img,
         out_image_type& out_img,
@@ -34,81 +267,39 @@ namespace dlib
         bool add_to = false
     )
     {
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
-
-        DLIB_ASSERT(scale != 0 && filter.size() != 0,
-            "\tvoid spatially_filter_image()"
-            << "\n\t You can't give a scale of zero or an empty filter."
-            << "\n\t scale: "<< scale
-            << "\n\t filter.nr(): "<< filter.nr()
-            << "\n\t filter.nc(): "<< filter.nc()
-            );
-        DLIB_ASSERT(is_same_object(in_img, out_img) == false,
-            "\tvoid spatially_filter_image()"
-            << "\n\tYou must give two different image objects"
-            );
-
-
-
-        // if there isn't any input image then don't do anything
-        if (in_img.size() == 0)
+        if (use_abs == false)
         {
-            out_img.clear();
-            return rectangle();
+            if (scale == 1)
+                return impl::float_spatially_filter_image(in_img, out_img, filter, add_to);
+            else
+                return impl::float_spatially_filter_image(in_img, out_img, filter/scale, add_to);
         }
-
-        out_img.set_size(in_img.nr(),in_img.nc());
-
-
-        // figure out the range that we should apply the filter to
-        const long first_row = (filter.nr()-1)/2;
-        const long first_col = (filter.nc()-1)/2;
-        const long last_row = in_img.nr() - (filter.nr()/2);
-        const long last_col = in_img.nc() - (filter.nc()/2);
-
-        const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
-        if (!add_to)
-            zero_border_pixels(out_img, non_border); 
-
-        // apply the filter to the image
-        for (long r = first_row; r < last_row; ++r)
+        else
         {
-            for (long c = first_col; c < last_col; ++c)
-            {
-                typedef typename EXP::type ptype;
-                ptype p;
-                ptype temp = 0;
-                for (long m = 0; m < filter.nr(); ++m)
-                {
-                    for (long n = 0; n < filter.nc(); ++n)
-                    {
-                        // pull out the current pixel and put it into p
-                        p = get_pixel_intensity(in_img[r-first_row+m][c-first_col+n]);
-                        temp += p*filter(m,n);
-                    }
-                }
-
-                temp /= scale;
-
-                if (use_abs && temp < 0)
-                {
-                    temp = -temp;
-                }
-
-                // save this pixel to the output image
-                if (add_to == false)
-                {
-                    assign_pixel(out_img[r][c], temp);
-                }
-                else
-                {
-                    assign_pixel(out_img[r][c], temp + out_img[r][c]);
-                }
-            }
+            return impl::grayscale_spatially_filter_image(in_img, out_img, filter, scale, true, add_to);
         }
+    }
 
-        return non_border;
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        typename out_image_type,
+        typename EXP,
+        typename T
+        >
+    typename enable_if_c<pixel_traits<typename out_image_type::type>::grayscale && 
+                         !is_float_filtering2<in_image_type,out_image_type,EXP>::value,rectangle>::type 
+    spatially_filter_image (
+        const in_image_type& in_img,
+        out_image_type& out_img,
+        const matrix_exp<EXP>& filter,
+        T scale,
+        bool use_abs = false,
+        bool add_to = false
+    )
+    {
+        return impl::grayscale_spatially_filter_image(in_img,out_img,filter,scale,use_abs,add_to);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -123,22 +314,23 @@ namespace dlib
     spatially_filter_image (
         const in_image_type& in_img,
         out_image_type& out_img,
-        const matrix_exp<EXP>& filter,
+        const matrix_exp<EXP>& _filter,
         T scale
     )
     {
+        const_temp_matrix<EXP> filter(_filter);
         COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
         COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
 
         DLIB_ASSERT(scale != 0 && filter.size() != 0,
-            "\tvoid spatially_filter_image()"
+            "\trectangle spatially_filter_image()"
             << "\n\t You can't give a scale of zero or an empty filter."
             << "\n\t scale: "<< scale
             << "\n\t filter.nr(): "<< filter.nr()
             << "\n\t filter.nc(): "<< filter.nc()
             );
         DLIB_ASSERT(is_same_object(in_img, out_img) == false,
-            "\tvoid spatially_filter_image()"
+            "\trectangle spatially_filter_image()"
             << "\n\tYou must give two different image objects"
             );
 
@@ -193,6 +385,8 @@ namespace dlib
         return non_border;
     }
 
+// ----------------------------------------------------------------------------------------
+
     template <
         typename in_image_type,
         typename out_image_type,
@@ -207,6 +401,8 @@ namespace dlib
         return spatially_filter_image(in_img,out_img,filter,1);
     }
 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     namespace impl
@@ -236,7 +432,7 @@ namespace dlib
             DLIB_ASSERT(scale != 0 && row_filter.size() != 0 && col_filter.size() != 0 &&
                 is_vector(row_filter) &&
                 is_vector(col_filter),
-                "\tvoid spatially_filter_image_separable()"
+                "\trectangle spatially_filter_image_separable()"
                 << "\n\t Invalid inputs were given to this function."
                 << "\n\t scale: "<< scale
                 << "\n\t row_filter.size(): "<< row_filter.size()
@@ -245,7 +441,7 @@ namespace dlib
                 << "\n\t is_vector(col_filter): "<< is_vector(col_filter)
             );
             DLIB_ASSERT(is_same_object(in_img, out_img) == false,
-                "\tvoid spatially_filter_image_separable()"
+                "\trectangle spatially_filter_image_separable()"
                 << "\n\tYou must give two different image objects"
             );
 
@@ -349,7 +545,7 @@ namespace dlib
             DLIB_ASSERT(row_filter.size() != 0 && col_filter.size() != 0 &&
                 is_vector(row_filter) &&
                 is_vector(col_filter),
-                "\tvoid spatially_filter_image_separable()"
+                "\trectangle spatially_filter_image_separable()"
                 << "\n\t Invalid inputs were given to this function."
                 << "\n\t row_filter.size(): "<< row_filter.size()
                 << "\n\t col_filter.size(): "<< col_filter.size()
@@ -357,7 +553,7 @@ namespace dlib
                 << "\n\t is_vector(col_filter): "<< is_vector(col_filter)
             );
             DLIB_ASSERT(is_same_object(in_img, out_img) == false,
-                "\tvoid spatially_filter_image_separable()"
+                "\trectangle spatially_filter_image_separable()"
                 << "\n\tYou must give two different image objects"
             );
 
@@ -529,15 +725,13 @@ namespace dlib
     spatially_filter_image_separable (
         const in_image_type& in_img,
         out_image_type& out_img,
-        const matrix_exp<EXP1>& _row_filter,
-        const matrix_exp<EXP2>& _col_filter,
+        const matrix_exp<EXP1>& row_filter,
+        const matrix_exp<EXP2>& col_filter,
         T scale,
         bool use_abs = false,
         bool add_to = false
     )
     {
-        const_temp_matrix<EXP1> row_filter(_row_filter);
-        const_temp_matrix<EXP2> col_filter(_col_filter);
         return impl::grayscale_spatially_filter_image_separable(in_img,out_img, row_filter, col_filter, scale, use_abs, add_to);
     }
 
@@ -567,7 +761,7 @@ namespace dlib
         DLIB_ASSERT(scale != 0 && row_filter.size() != 0 && col_filter.size() != 0 &&
                     is_vector(row_filter) &&
                     is_vector(col_filter),
-            "\tvoid spatially_filter_image_separable()"
+            "\trectangle spatially_filter_image_separable()"
             << "\n\t Invalid inputs were given to this function."
             << "\n\t scale: "<< scale
             << "\n\t row_filter.size(): "<< row_filter.size()
@@ -576,7 +770,7 @@ namespace dlib
             << "\n\t is_vector(col_filter): "<< is_vector(col_filter)
             );
         DLIB_ASSERT(is_same_object(in_img, out_img) == false,
-            "\tvoid spatially_filter_image_separable()"
+            "\trectangle spatially_filter_image_separable()"
             << "\n\tYou must give two different image objects"
             );
 
@@ -699,7 +893,7 @@ namespace dlib
                     col_filter.size()%2 == 1 &&
                     is_vector(row_filter) &&
                     is_vector(col_filter),
-            "\tvoid spatially_filter_image_separable_down()"
+            "\trectangle spatially_filter_image_separable_down()"
             << "\n\t Invalid inputs were given to this function."
             << "\n\t downsample: "<< downsample
             << "\n\t scale: "<< scale
@@ -709,7 +903,7 @@ namespace dlib
             << "\n\t is_vector(col_filter): "<< is_vector(col_filter)
             );
         DLIB_ASSERT(is_same_object(in_img, out_img) == false,
-            "\tvoid spatially_filter_image_separable_down()"
+            "\trectangle spatially_filter_image_separable_down()"
             << "\n\tYou must give two different image objects"
             );
 

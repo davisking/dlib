@@ -60,6 +60,9 @@ namespace dlib
             - #out_img.nr() == in_img.nr()
             - returns a rectangle which indicates what pixels in #out_img are considered 
               non-border pixels and therefore contain output from the filter.
+            - if (use_abs == false && all images and filers contain float types) then
+                - This function will use SIMD instructions and is particularly fast.  So if
+                  you can use this form of the function it can give a decent speed boost.
     !*/
 
 // ----------------------------------------------------------------------------------------
