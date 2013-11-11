@@ -23,6 +23,12 @@ namespace dlib
         simd4f(const __m128& val):x(val) {}
         simd4f(const simd4i& val):x(_mm_cvtepi32_ps(val)) {}
 
+        inline simd4f& operator=(const simd4i& val)
+        {
+            x = simd4f(val);
+            return *this;
+        }
+
         simd4f& operator=(const __m128& val)
         {
             x = val;
