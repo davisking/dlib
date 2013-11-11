@@ -100,8 +100,8 @@ namespace dlib
         operator simd8i::rawarray() const 
         { 
             simd8i::rawarray temp;
-            temp.low = _low;
-            temp.high = _high;
+            temp.low = simd4i(_low);
+            temp.high = simd4i(_high);
             return temp;
         }
 

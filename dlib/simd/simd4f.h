@@ -99,6 +99,16 @@ namespace dlib
             return temp;
         }
 
+        inline simd4f& operator=(const simd4i& val)
+        {
+            x[0] = val[0];
+            x[1] = val[1];
+            x[2] = val[2];
+            x[3] = val[3];
+            return *this;
+        }
+
+
         void load_aligned(const type* ptr)
         {
             x[0] = ptr[0];
