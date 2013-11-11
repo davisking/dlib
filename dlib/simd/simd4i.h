@@ -251,10 +251,10 @@ namespace dlib
 #ifdef DLIB_HAVE_SSE2
         return _mm_sra_epi32(lhs,_mm_cvtsi32_si128(rhs));
 #else
-        return simd4i(lhs[0]<<rhs,
-                      lhs[1]<<rhs,
-                      lhs[2]<<rhs,
-                      lhs[3]<<rhs);
+        return simd4i(lhs[0]>>rhs,
+                      lhs[1]>>rhs,
+                      lhs[2]>>rhs,
+                      lhs[3]>>rhs);
 #endif
     }
     inline simd4i& operator>>= (simd4i& lhs, const int& rhs) 
