@@ -653,10 +653,9 @@ namespace dlib
             for (; c < num_simd_blocks; c+=4)
             {
                 _x += _x_scale;
-                simd4f _left = floor(_x);
-                simd4i left = simd4i(_left);
+                simd4i left = simd4i(_x);
 
-                simd4f _lr_frac = _x-_left;
+                simd4f _lr_frac = _x-left;
                 simd4f _inv_lr_frac = 1-_lr_frac; 
                 simd4i right = left+1;
 
@@ -752,9 +751,8 @@ namespace dlib
             for (; c < num_simd_blocks; c+=4)
             {
                 _x += _x_scale;
-                simd4f _left = floor(_x);
-                simd4i left = simd4i(_left);
-                simd4f lr_frac = _x-_left;
+                simd4i left = simd4i(_x);
+                simd4f lr_frac = _x-left;
                 simd4f _inv_lr_frac = 1-lr_frac; 
                 simd4i right = left+1;
 

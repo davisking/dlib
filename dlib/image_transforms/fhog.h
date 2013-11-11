@@ -403,8 +403,8 @@ namespace dlib
                     // We will use bilinear interpolation to add into the histogram bins.
                     // So first we precompute the values needed to determine how much each
                     // pixel votes into each bin.
-                    simd4f xp = (xx+0.5)/(float)cell_size - 0.5;
-                    simd4f ixp = floor(xp);
+                    simd4f xp = (xx+0.5)/(float)cell_size + 0.5;
+                    simd4i ixp = simd4i(xp);
                     simd4f vx0 = xp-ixp;
                     simd4f vx1 = 1.0f-vx0;
 
@@ -438,31 +438,31 @@ namespace dlib
                     simd4f v00 = vy0*vx0;
 
                     float _best_o[4]; best_o.store(_best_o);
-                    float _ixp[4];    ixp.store(_ixp);
+                    int32 _ixp[4];    ixp.store(_ixp);
                     float _v11[4];    v11.store(_v11);
                     float _v01[4];    v01.store(_v01);
                     float _v10[4];    v10.store(_v10);
                     float _v00[4];    v00.store(_v00);
 
-                    hist[iyp+1]  [_ixp[0]+1](_best_o[0]) += _v11[0];
-                    hist[iyp+1+1][_ixp[0]+1](_best_o[0]) += _v01[0];
-                    hist[iyp+1]  [_ixp[0]+2](_best_o[0]) += _v10[0];
-                    hist[iyp+1+1][_ixp[0]+2](_best_o[0]) += _v00[0];
+                    hist[iyp+1]  [_ixp[0]  ](_best_o[0]) += _v11[0];
+                    hist[iyp+1+1][_ixp[0]  ](_best_o[0]) += _v01[0];
+                    hist[iyp+1]  [_ixp[0]+1](_best_o[0]) += _v10[0];
+                    hist[iyp+1+1][_ixp[0]+1](_best_o[0]) += _v00[0];
 
-                    hist[iyp+1]  [_ixp[1]+1](_best_o[1]) += _v11[1];
-                    hist[iyp+1+1][_ixp[1]+1](_best_o[1]) += _v01[1];
-                    hist[iyp+1]  [_ixp[1]+2](_best_o[1]) += _v10[1];
-                    hist[iyp+1+1][_ixp[1]+2](_best_o[1]) += _v00[1];
+                    hist[iyp+1]  [_ixp[1]  ](_best_o[1]) += _v11[1];
+                    hist[iyp+1+1][_ixp[1]  ](_best_o[1]) += _v01[1];
+                    hist[iyp+1]  [_ixp[1]+1](_best_o[1]) += _v10[1];
+                    hist[iyp+1+1][_ixp[1]+1](_best_o[1]) += _v00[1];
 
-                    hist[iyp+1]  [_ixp[2]+1](_best_o[2]) += _v11[2];
-                    hist[iyp+1+1][_ixp[2]+1](_best_o[2]) += _v01[2];
-                    hist[iyp+1]  [_ixp[2]+2](_best_o[2]) += _v10[2];
-                    hist[iyp+1+1][_ixp[2]+2](_best_o[2]) += _v00[2];
+                    hist[iyp+1]  [_ixp[2]  ](_best_o[2]) += _v11[2];
+                    hist[iyp+1+1][_ixp[2]  ](_best_o[2]) += _v01[2];
+                    hist[iyp+1]  [_ixp[2]+1](_best_o[2]) += _v10[2];
+                    hist[iyp+1+1][_ixp[2]+1](_best_o[2]) += _v00[2];
 
-                    hist[iyp+1]  [_ixp[3]+1](_best_o[3]) += _v11[3];
-                    hist[iyp+1+1][_ixp[3]+1](_best_o[3]) += _v01[3];
-                    hist[iyp+1]  [_ixp[3]+2](_best_o[3]) += _v10[3];
-                    hist[iyp+1+1][_ixp[3]+2](_best_o[3]) += _v00[3];
+                    hist[iyp+1]  [_ixp[3]  ](_best_o[3]) += _v11[3];
+                    hist[iyp+1+1][_ixp[3]  ](_best_o[3]) += _v01[3];
+                    hist[iyp+1]  [_ixp[3]+1](_best_o[3]) += _v10[3];
+                    hist[iyp+1+1][_ixp[3]+1](_best_o[3]) += _v00[3];
                 }
                 // Now process the right columns that don't fit into simd registers.
                 for (; x < visible_nc; x++) 
