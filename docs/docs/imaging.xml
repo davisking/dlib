@@ -86,6 +86,7 @@
          <item>find_points_above_thresh</item>
          <item>scan_image_pyramid</item>
          <item>scan_image_boxes</item>
+         <item>scan_fhog_pyramid</item>
          <item>scan_image_custom</item>
          <item>find_candidate_object_locations</item>
          <item>test_box_overlap</item>
@@ -1713,6 +1714,33 @@
    <!-- ************************************************************************* -->
 
       <component>
+         <name>scan_fhog_pyramid</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/scan_fhog_pyramid_abstract.h</spec_file>
+         <description>        
+
+                This object is a tool for running a fixed sized sliding window classifier
+                over an image pyramid.  In particular,  it slides a linear classifier over
+                a HOG pyramid as discussed in the paper:  
+                <blockquote>
+                    Histograms of Oriented Gradients for Human Detection by Navneet Dalal
+                    and Bill Triggs, CVPR 2005
+                </blockquote>
+                However, we augment the method slightly to use the version of HOG features 
+                from: 
+                <blockquote>
+                    Object Detection with Discriminatively Trained Part Based Models by
+                    P. Felzenszwalb, R. Girshick, D. McAllester, D. Ramanan
+                    IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 32, No. 9, Sep. 2010
+                </blockquote>
+                Since these HOG features have been shown to give superior performance. 
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
          <name>scan_image_boxes</name>
          <file>dlib/image_processing.h</file>
          <spec_file link="true">dlib/image_processing/scan_image_boxes_abstract.h</spec_file>
@@ -1800,8 +1828,8 @@
          <description>        
                 This object is a tool for detecting the positions of objects in an image.  In
                 particular, it is a simple container to aggregate an instance of an image
-                scanner object (either <a
-                href="#scan_image_pyramid">scan_image_pyramid</a>, <a
+                scanner object (either <a href="#scan_fhog_pyramid">scan_fhog_pyramid</a>,
+                <a href="#scan_image_pyramid">scan_image_pyramid</a>, <a
                 href="#scan_image_boxes">scan_image_boxes</a>, or 
                 <a href="#scan_image_custom">scan_image_custom</a>), the weight vector
                 needed by one of these image scanners, and finally an instance of
