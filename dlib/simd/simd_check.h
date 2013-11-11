@@ -18,7 +18,7 @@
         #ifdef __SSE2__
             #define DLIB_HAVE_SSE2
         #endif
-        #ifdef __SSE3__
+        #ifdef __SSSE3__
             #define DLIB_HAVE_SSE3
         #endif
         #ifdef __SSE4_1__
@@ -40,6 +40,7 @@
 #endif
 #ifdef DLIB_HAVE_SSE3
     #include <pmmintrin.h> // SSE3
+    #include <tmmintrin.h>
 #endif
 #ifdef DLIB_HAVE_SSE41
     #include <smmintrin.h> // SSE4
