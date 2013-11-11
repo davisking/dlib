@@ -166,10 +166,10 @@ namespace dlib
             for (long r = first_row; r < last_row; ++r)
             {
                 long c = first_col;
-                for (; c < last_col-3; c+=4)
+                for (; c < last_col-7; c+=8)
                 {
-                    simd4f p,p2,p3;
-                    simd4f temp = 0, temp2=0, temp3=0;
+                    simd8f p,p2,p3;
+                    simd8f temp = 0, temp2=0, temp3=0;
                     for (long m = 0; m < filter.nr(); ++m)
                     {
                         long n = 0;
@@ -587,9 +587,9 @@ namespace dlib
             for (long r = 0; r < in_img.nr(); ++r)
             {
                 long c = first_col;
-                for (; c < last_col-3; c+=4)
+                for (; c < last_col-7; c+=8)
                 {
-                    simd4f p,p2,p3, temp = 0, temp2=0, temp3=0;
+                    simd8f p,p2,p3, temp = 0, temp2=0, temp3=0;
                     long n = 0;
                     for (; n < row_filter.size()-2; n+=3)
                     {
@@ -628,9 +628,9 @@ namespace dlib
             for (long r = first_row; r < last_row; ++r)
             {
                 long c = first_col;
-                for (; c < last_col-3; c+=4)
+                for (; c < last_col-7; c+=8)
                 {
-                    simd4f p, p2, p3, temp = 0, temp2 = 0, temp3 = 0;
+                    simd8f p, p2, p3, temp = 0, temp2 = 0, temp3 = 0;
                     long m = 0;
                     for (; m < col_filter.size()-2; m+=3)
                     {
