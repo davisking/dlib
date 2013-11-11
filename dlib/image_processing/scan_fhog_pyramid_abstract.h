@@ -21,6 +21,7 @@ namespace dlib
     );
     /*!
         requires
+            - cell_draw_size > 0
             - detector.get_w().size() >= detector.get_scanner().get_num_dimensions()
               (i.e. the detector must have been populated with a HOG filter)
         ensures
