@@ -45,6 +45,7 @@ namespace dlib
         __m128i x;
     };
 #else
+
     class simd4i
     {
     public:
@@ -53,6 +54,12 @@ namespace dlib
         simd4i() {}
         simd4i(int32 f) { x[0]=f; x[1]=f; x[2]=f; x[3]=f; }
         simd4i(int32 r0, int32 r1, int32 r2, int32 r3) { x[0]=r0; x[1]=r1; x[2]=r2; x[3]=r3;}
+
+        struct rawarray
+        {
+            int32 a[4];
+        };
+        simd4i(const rawarray& a) { x[0]=a.a[0]; x[1]=a.a[1]; x[2]=a.a[2]; x[3]=a.a[3]; }
 
         void load_aligned(const type* ptr)
         {

@@ -83,10 +83,15 @@ namespace dlib
         simd4f(const simd4i& val) { x[0]=val[0]; x[1]=val[1]; x[2]=val[2]; x[3]=val[3];}
 
         // truncate to 32bit integers
-        operator simd4i() const { return simd4i((int32)x[0], 
-                                                (int32)x[1],
-                                                (int32)x[2],
-                                                (int32)x[3]); }
+        operator simd4i::rawarray() const 
+        { 
+            simd4i::rawarray temp;
+            temp.a[0] = (int32)x[0];
+            temp.a[1] = (int32)x[1];
+            temp.a[2] = (int32)x[2];
+            temp.a[3] = (int32)x[3];
+            return temp;
+        }
 
         void load_aligned(const type* ptr)
         {
