@@ -15,6 +15,43 @@ namespace dlib
     template <
         typename Pyramid_type
         >
+    matrix<unsigned char> draw_fhog (
+        const object_detector<scan_fhog_pyramid<Pyramid_type> >& detector,
+        const long cell_draw_size = 15
+    );
+    /*!
+        requires
+            - detector.get_w().size() >= detector.get_scanner().get_num_dimensions()
+              (i.e. the detector must have been populated with a HOG filter)
+        ensures
+            - Converts the HOG filters in the given detector into an image suitable for
+              display on the screen.  In particular, we draw all the HOG cells into a
+              grayscale image in a way that shows the magnitude and orientation of the
+              gradient energy in each cell.  The resulting image is then returned.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename Pyramid_type
+        >
+    unsigned long num_separable_filters (
+        const object_detector<scan_fhog_pyramid<Pyramid_type> >& detector
+    );
+    /*!
+        requires
+            - detector.get_w().size() >= detector.get_scanner().get_num_dimensions()
+              (i.e. the detector must have been populated with a HOG filter)
+        ensures
+            - Returns the number of separable filters necessary to represent the HOG
+              filters in the given detector.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename Pyramid_type
+        >
     class scan_fhog_pyramid : noncopyable
     {
         /*!
@@ -24,6 +61,14 @@ namespace dlib
                   compatible interface
 
             INITIAL VALUE
+                - get_padding()   == 1
+                - get_cell_size() == 8
+                - get_detection_window_width()   == 64
+                - get_detection_window_height()  == 64
+                - get_max_pyramid_levels()       == 1000
+                - get_min_pyramid_layer_width()  == 64
+                - get_min_pyramid_layer_height() == 64
+                - get_nuclear_norm_regularization_strength() == 0
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for running a fixed sized sliding window classifier
@@ -37,7 +82,6 @@ namespace dlib
                     P. Felzenszwalb, R. Girshick, D. McAllester, D. Ramanan
                     IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 32, No. 9, Sep. 2010
                 Since these HOG features have been shown to give superior performance. 
-
 
             THREAD SAFETY
                 Concurrent access to an instance of this object is not safe and should be
@@ -480,43 +524,6 @@ namespace dlib
     );
     /*!
         provides deserialization support 
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename Pyramid_type
-        >
-    matrix<unsigned char> draw_fhog (
-        const object_detector<scan_fhog_pyramid<Pyramid_type> >& detector,
-        const long cell_draw_size = 15
-    );
-    /*!
-        requires
-            - detector.get_w().size() >= detector.get_scanner().get_num_dimensions()
-              (i.e. the detector must have been populated with a HOG filter)
-        ensures
-            - Converts the HOG filters in the given detector into an image suitable for
-              display on the screen.  In particular, we draw all the HOG cells into a
-              grayscale image in a way that shows the magnitude and orientation of the
-              gradient energy in each cell.  The resulting image is then returned.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename Pyramid_type
-        >
-    unsigned long num_separable_filters (
-        const object_detector<scan_fhog_pyramid<Pyramid_type> >& detector
-    );
-    /*!
-        requires
-            - detector.get_w().size() >= detector.get_scanner().get_num_dimensions()
-              (i.e. the detector must have been populated with a HOG filter)
-        ensures
-            - Returns the number of separable filters necessary to represent the HOG
-              filters in the given detector.
     !*/
 
 // ----------------------------------------------------------------------------------------
