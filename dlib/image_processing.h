@@ -13,6 +13,7 @@
 #include "image_processing/scan_image_boxes.h"
 #include "image_processing/scan_image_custom.h"
 #include "image_processing/remove_unobtainable_rectangles.h"
+#include "image_processing/scan_fhog_pyramid.h"
 
 #endif // DLIB_IMAGE_PROCESSInG_H___
 
