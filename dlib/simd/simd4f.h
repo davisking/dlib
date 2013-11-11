@@ -356,7 +356,7 @@ namespace dlib
 #elif defined(DLIB_HAVE_SSE3)
         simd4f temp = _mm_hadd_ps(item,item);
         return _mm_cvtss_f32(_mm_hadd_ps(temp,temp));
-#elif defined(DLIB_HAVE_SSE2)
+#elif defined(DLIB_HAVE_SSE2) && (!defined(_MSC_VER) || _MSC_VER!=1400)
         simd4f temp = _mm_add_ps(item,_mm_movehl_ps(item,item));
         simd4f temp2 = _mm_shuffle_ps(temp,temp,1);
         return _mm_cvtss_f32(_mm_add_ss(temp,temp2));
