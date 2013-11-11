@@ -6,6 +6,7 @@
 #include "simd/simd4f.h"
 #include "simd/simd4i.h"
 #include "simd/simd8f.h"
+#include "simd/simd8i.h"
 
 #endif // DLIB_SIMd_H__
 
