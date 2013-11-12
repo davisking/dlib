@@ -581,7 +581,7 @@ namespace dlib
         for (unsigned long l = 0; l < feats.size(); ++l)
         {
             rectangle area;
-            if (num_separable_filters > 62)
+            if (num_separable_filters > 31*3)
             {
                 area = spatially_filter_image(feats[l][0], saliency_image, w.filters[0]);
                 for (unsigned long i = 1; i < w.filters.size(); ++i)
