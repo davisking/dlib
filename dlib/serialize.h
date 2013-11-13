@@ -652,6 +652,26 @@ namespace dlib
         std::istream& in
     );
 
+    inline void serialize (
+        const std::wstring& item,
+        std::ostream& out
+    );
+
+    inline void deserialize (
+        std::wstring& item,
+        std::istream& in
+    );
+
+    inline void serialize (
+        const ustring& item,
+        std::ostream& out
+    );
+
+    inline void deserialize (
+        ustring& item,
+        std::istream& in
+    );
+
     template <
         typename T
         >
