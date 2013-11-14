@@ -411,7 +411,7 @@ namespace dlib
         typename image_type2,
         typename interpolation_type
         >
-    void rotate_image (
+    point_transform_affine rotate_image (
         const image_type1& in_img,
         image_type2& out_img,
         double angle,
@@ -420,7 +420,7 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
-            "\t void rotate_image()"
+            "\t point_transform_affine rotate_image()"
             << "\n\t Invalid inputs were given to this function."
             << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
             );
@@ -438,8 +438,9 @@ namespace dlib
 
         const matrix<double,2,2> R = rotation_matrix(angle);
 
-        transform_image(in_img, out_img, interp, 
-                        point_transform_affine(R, -R*dcenter(get_rect(out_img)) + dcenter(rimg)));
+        point_transform_affine trans = point_transform_affine(R, -R*dcenter(get_rect(out_img)) + dcenter(rimg));
+        transform_image(in_img, out_img, interp, trans);
+        return trans;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -448,7 +449,7 @@ namespace dlib
         typename image_type1,
         typename image_type2
         >
-    void rotate_image (
+    point_transform_affine rotate_image (
         const image_type1& in_img,
         image_type2& out_img,
         double angle
@@ -456,12 +457,12 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
-            "\t void rotate_image()"
+            "\t point_transform_affine rotate_image()"
             << "\n\t Invalid inputs were given to this function."
             << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
             );
 
-        rotate_image(in_img, out_img, angle, interpolate_quadratic());
+        return rotate_image(in_img, out_img, angle, interpolate_quadratic());
     }
 
 // ----------------------------------------------------------------------------------------
@@ -861,7 +862,7 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
-            "\t void rotate_image()"
+            "\t void flip_image_left_right()"
             << "\n\t Invalid inputs were given to this function."
             << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
             );
@@ -882,7 +883,7 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
-            "\t void rotate_image()"
+            "\t void flip_image_up_down()"
             << "\n\t Invalid inputs were given to this function."
             << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
             );

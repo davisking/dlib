@@ -293,7 +293,7 @@ namespace dlib
         typename image_type2,
         typename interpolation_type
         >
-    void rotate_image (
+    point_transform_affine rotate_image (
         const image_type1& in_img,
         image_type2& out_img,
         double angle,
@@ -312,6 +312,8 @@ namespace dlib
             - Parts of #out_img which have no corresponding locations in in_img are set to black.
             - uses the supplied interpolation routine interp to perform the necessary
               pixel interpolation.
+            - returns a transformation object that maps points in in_img into their corresponding 
+              location in #out_img.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -321,7 +323,7 @@ namespace dlib
         typename image_type1,
         typename image_type2
         >
-    void rotate_image (
+    point_transform_affine rotate_image (
         const image_type1& in_img,
         image_type2& out_img,
         double angle
@@ -338,6 +340,8 @@ namespace dlib
               The rotation is performed with respect to the center of the image.  
             - Parts of #out_img which have no corresponding locations in in_img are set to black.
             - uses the interpolate_quadratic object to perform the necessary pixel interpolation.
+            - returns a transformation object that maps points in in_img into their corresponding 
+              location in #out_img.
     !*/
 
 // ----------------------------------------------------------------------------------------
