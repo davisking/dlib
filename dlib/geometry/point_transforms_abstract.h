@@ -59,6 +59,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    point_transform_affine inv (
+        const point_transform_affine& trans
+    );
+    /*!
+        ensures
+            - If trans is an invertible transformation then this function returns a new
+              transformation that is the inverse of trans. 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <typename T>
     point_transform_affine find_affine_transform (
         const std::vector<dlib::vector<T,2> >& from_points,
@@ -133,6 +144,17 @@ namespace dlib
         !*/
 
     };
+
+// ----------------------------------------------------------------------------------------
+
+    point_transform_projective inv (
+        const point_transform_projective& trans
+    );
+    /*!
+        ensures
+            - If trans is an invertible transformation then this function returns a new
+              transformation that is the inverse of trans. 
+    !*/
 
 // ----------------------------------------------------------------------------------------
 

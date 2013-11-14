@@ -128,6 +128,16 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline point_transform_affine inv (
+        const point_transform_affine& trans
+    )
+    {
+        matrix<double,2,2> im = inv(trans.get_m());
+        return point_transform_affine(im, -im*trans.get_b());
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <typename T>
     point_transform_affine find_affine_transform (
         const std::vector<dlib::vector<T,2> >& from_points,
@@ -202,6 +212,15 @@ namespace dlib
     private:
         matrix<double,3,3> m;
     };
+
+// ----------------------------------------------------------------------------------------
+
+    inline point_transform_projective inv (
+        const point_transform_projective& trans
+    )
+    {
+        return point_transform_projective(inv(trans.get_m()));
+    }
 
 // ----------------------------------------------------------------------------------------
 
