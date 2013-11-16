@@ -299,6 +299,12 @@ namespace dlib
 
         typedef array<array2d<float> > fhog_image;
 
+        static rectangle apply_filters_to_fhog (
+            const fhog_filterbank& w,
+            const fhog_image& feats,
+            array2d<float>& saliency_image
+        );
+
         array<fhog_image> feats;
         int cell_size;
         unsigned long padding; 
@@ -310,6 +316,56 @@ namespace dlib
         double nuclear_norm_regularization_strength;
 
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    rectangle scan_fhog_pyramid<T>::
+    apply_filters_to_fhog (
+        const fhog_filterbank& w,
+        const fhog_image& feats,
+        array2d<float>& saliency_image
+    )
+    {
+        const unsigned long num_separable_filters = w.num_separable_filters();
+        rectangle area;
+        if (num_separable_filters > 31*3)
+        {
+            area = spatially_filter_image(feats[0], saliency_image, w.filters[0]);
+            for (unsigned long i = 1; i < w.filters.size(); ++i)
+            {
+                // now we filter but the output adds to saliency_image rather than
+                // overwriting it.
+                spatially_filter_image(feats[i], saliency_image, w.filters[i], 1, false, true);
+            }
+        }
+        else
+        {
+            saliency_image.clear();
+
+            // find the first filter to apply
+            unsigned long i = 0;
+            while (i < w.row_filters.size() && w.row_filters[i].size() == 0) 
+                ++i;
+
+            for (; i < w.row_filters.size(); ++i)
+            {
+                for (unsigned long j = 0; j < w.row_filters[i].size(); ++j)
+                {
+                    if (saliency_image.size() == 0)
+                        area = spatially_filter_image_separable(feats[i], saliency_image, w.row_filters[i][j], w.col_filters[i][j],1,false,false);
+                    else
+                        area = spatially_filter_image_separable(feats[i], saliency_image, w.row_filters[i][j], w.col_filters[i][j],1,false,true);
+                }
+            }
+            if (saliency_image.size() == 0)
+            {
+                saliency_image.set_size(feats[0].nr(), feats[0].nc());
+                assign_all_pixels(saliency_image, 0);
+            }
+        }
+        return area;
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -573,49 +629,12 @@ namespace dlib
                            (height+1)%2);
 
         array2d<float> saliency_image;
-        array2d<float> temp;
         pyramid_type pyr;
 
-        const unsigned long num_separable_filters = w.num_separable_filters();
         // for all pyramid levels
         for (unsigned long l = 0; l < feats.size(); ++l)
         {
-            rectangle area;
-            if (num_separable_filters > 31*3)
-            {
-                area = spatially_filter_image(feats[l][0], saliency_image, w.filters[0]);
-                for (unsigned long i = 1; i < w.filters.size(); ++i)
-                {
-                    // now we filter but the output adds to saliency_image rather than
-                    // overwriting it.
-                    spatially_filter_image(feats[l][i], saliency_image, w.filters[i], 1, false, true);
-                }
-            }
-            else
-            {
-                saliency_image.clear();
-
-                // find the first filter to apply
-                unsigned long i = 0;
-                while (i < w.row_filters.size() && w.row_filters[i].size() == 0) 
-                    ++i;
-
-                for (; i < w.row_filters.size(); ++i)
-                {
-                    for (unsigned long j = 0; j < w.row_filters[i].size(); ++j)
-                    {
-                        if (saliency_image.size() == 0)
-                            area = spatially_filter_image_separable(feats[l][i], saliency_image, w.row_filters[i][j], w.col_filters[i][j],1,false,false);
-                        else
-                            area = spatially_filter_image_separable(feats[l][i], saliency_image, w.row_filters[i][j], w.col_filters[i][j],1,false,true);
-                    }
-                }
-                if (saliency_image.size() == 0)
-                {
-                    saliency_image.set_size(feats[l][0].nr(), feats[l][0].nc());
-                    assign_all_pixels(saliency_image, 0);
-                }
-            }
+            const rectangle area = apply_filters_to_fhog(w, feats[l], saliency_image);
 
             // now search the saliency image for any detections
             for (long r = area.top(); r <= area.bottom(); ++r)
