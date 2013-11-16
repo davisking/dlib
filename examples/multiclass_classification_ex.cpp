@@ -178,7 +178,7 @@ void generate_data (
         m(0) = 2*radius*rnd.get_random_double()-radius;
         m(1) = sign*sqrt(radius*radius - m(0)*m(0));
 
-        // add this sample to our set of samples we will run k-means 
+        // add this sample to our set of training samples 
         samples.push_back(m);
         labels.push_back(1);
     }
@@ -193,7 +193,7 @@ void generate_data (
         m(0) = 2*radius*rnd.get_random_double()-radius;
         m(1) = sign*sqrt(radius*radius - m(0)*m(0));
 
-        // add this sample to our set of samples we will run k-means 
+        // add this sample to our set of training samples 
         samples.push_back(m);
         labels.push_back(2);
     }
@@ -212,7 +212,7 @@ void generate_data (
         m(0) += 25;
         m(1) += 25;
 
-        // add this sample to our set of samples we will run k-means 
+        // add this sample to our set of training samples 
         samples.push_back(m);
         labels.push_back(3);
     }
