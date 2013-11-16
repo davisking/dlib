@@ -16,7 +16,7 @@
 #include <dlib/dir_nav.h>
 
 
-const char* VERSION = "0.6";
+const char* VERSION = "0.7";
 
 
 
@@ -228,6 +228,34 @@ void rename_labels (
 
 // ----------------------------------------------------------------------------------------
 
+void merge_metadata_files (
+    const command_line_parser& parser
+)
+{
+    image_dataset_metadata::dataset src, dest;
+    load_image_dataset_metadata(src, parser.option("add").argument(0));
+    load_image_dataset_metadata(dest, parser.option("add").argument(1));
+
+    std::map<string,image_dataset_metadata::image> merged_data;
+    for (unsigned long i = 0; i < dest.images.size(); ++i)
+        merged_data[dest.images[i].filename] = dest.images[i];
+    // now add in the src data and overwrite anything if there are duplicate entries.
+    for (unsigned long i = 0; i < src.images.size(); ++i)
+        merged_data[src.images[i].filename] = src.images[i];
+
+    // copy merged data into dest
+    dest.images.clear();
+    for (std::map<string,image_dataset_metadata::image>::const_iterator i = merged_data.begin(); 
+        i != merged_data.end(); ++i)
+    {
+        dest.images.push_back(i->second);
+    }
+
+    save_image_dataset_metadata(dest, "merged.xml");
+}
+
+// ----------------------------------------------------------------------------------------
+
 int main(int argc, char** argv)
 {
     try
@@ -257,19 +285,25 @@ int main(int argc, char** argv)
             "images with objects labeled <arg> and another file with all the other images.  Additionally, the file "
             "containing the <arg> labeled objects will not contain any other labels other than <arg>. "
             "That is, the images in the first file are stripped of all labels other than the <arg> labels.",1);
+        parser.add_option("add", "Add the image metadata from <arg1> into <arg2>.  If any of the image "
+                                 "tags are in both files then the ones in <arg2> are deleted and replaced with the "
+                                 "image tags from <arg1>.  The results are saved into merged.xml and neither <arg1> or "
+                                 "<arg2> files are modified.",2);
 
         parser.parse(argc, argv);
 
-        const char* singles[] = {"h","c","r","l","convert","parts","rmdiff","seed", "shuffle", "split"};
+        const char* singles[] = {"h","c","r","l","convert","parts","rmdiff","seed", "shuffle", "split", "add"};
         parser.check_one_time_options(singles);
         const char* c_sub_ops[] = {"r", "convert"};
         parser.check_sub_options("c", c_sub_ops);
         parser.check_sub_option("shuffle", "seed");
         parser.check_incompatible_options("c", "l");
         parser.check_incompatible_options("c", "rmdiff");
+        parser.check_incompatible_options("c", "add");
         parser.check_incompatible_options("c", "rename");
         parser.check_incompatible_options("c", "parts");
         parser.check_incompatible_options("l", "rename");
+        parser.check_incompatible_options("l", "add");
         parser.check_incompatible_options("l", "parts");
         parser.check_incompatible_options("convert", "l");
         parser.check_incompatible_options("convert", "rename");
@@ -283,6 +317,12 @@ int main(int argc, char** argv)
             cout << "Usage: imglab [options] <image files/directories or XML file>\n";
             parser.print_options(cout);
             cout << endl << endl;
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("add"))
+        {
+            merge_metadata_files(parser);
             return EXIT_SUCCESS;
         }
 
