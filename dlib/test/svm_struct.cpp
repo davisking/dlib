@@ -446,7 +446,7 @@ namespace
 
             typedef matrix<scalar_type,0,1> w_type;
             w_type weights;
-            multiclass_svm_problem<w_type, sample_type, label_type> problem(all_samples, all_labels);
+            multiclass_svm_problem<w_type, sample_type, label_type> problem(all_samples, all_labels,4);
             problem.set_max_cache_size(3);
 
             problem.set_c(C);

@@ -45,7 +45,6 @@
 #include "svm/one_vs_all_trainer.h"
 
 #include "svm/structural_svm_problem.h"
-#include "svm/svm_multiclass_linear_trainer.h"
 #include "svm/sequence_labeler.h"
 #include "svm/assignment_function.h"
 #include "svm/active_learning.h"

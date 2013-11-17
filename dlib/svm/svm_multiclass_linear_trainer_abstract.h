@@ -31,6 +31,7 @@ namespace dlib
                 using operator<<.
 
             INITIAL VALUE
+                - get_num_threads() == 4 
                 - get_epsilon() == 0.001
                 - get_c() == 1
                 - this object will not be verbose unless be_verbose() is called
@@ -104,6 +105,23 @@ namespace dlib
         /*!
             ensures
                 - returns a copy of the optimizer used to solve the SVM problem.  
+        !*/
+
+        void set_num_threads (
+            unsigned long num
+        );
+        /*!
+            ensures
+                - #get_num_threads() == num
+        !*/
+
+        unsigned long get_num_threads (
+        ) const;
+        /*!
+            ensures
+                - returns the number of threads used during training.  You should 
+                  usually set this equal to the number of processing cores on your
+                  machine.
         !*/
 
         const kernel_type get_kernel (

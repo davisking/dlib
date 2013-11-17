@@ -4,7 +4,7 @@
 #define DLIB_SVm_MULTICLASS_LINEAR_TRAINER_H__
 
 #include "svm_multiclass_linear_trainer_abstract.h"
-#include "structural_svm_problem.h"
+#include "structural_svm_problem_threaded.h"
 #include <vector>
 #include "../optimization/optimization_oca.h"
 #include "../matrix.h"
@@ -21,7 +21,7 @@ namespace dlib
         typename sample_type,
         typename label_type
         >
-    class multiclass_svm_problem : public structural_svm_problem<matrix_type,
+    class multiclass_svm_problem : public structural_svm_problem_threaded<matrix_type,
                                                                  std::vector<std::pair<unsigned long,typename matrix_type::type> > > 
     {
         /*!
@@ -45,8 +45,10 @@ namespace dlib
 
         multiclass_svm_problem (
             const std::vector<sample_type>& samples_,
-            const std::vector<label_type>& labels_
+            const std::vector<label_type>& labels_,
+            const unsigned long num_threads
         ) :
+            structural_svm_problem_threaded<matrix_type, std::vector<std::pair<unsigned long,typename matrix_type::type> > >(num_threads),
             samples(samples_),
             labels(labels_),
             distinct_labels(select_all_distinct_labels(labels_)),
@@ -172,10 +174,24 @@ namespace dlib
 
         svm_multiclass_linear_trainer (
         ) :
+            num_threads(4),
             C(1),
             eps(0.001),
             verbose(false)
         {
+        }
+
+        void set_num_threads (
+            unsigned long num
+        )
+        {
+            num_threads = num;
+        }
+
+        unsigned long get_num_threads (
+        ) const
+        {
+            return num_threads;
         }
 
         void set_epsilon (
@@ -273,7 +289,7 @@ namespace dlib
 
             typedef matrix<scalar_type,0,1> w_type;
             w_type weights;
-            multiclass_svm_problem<w_type, sample_type, label_type> problem(all_samples, all_labels);
+            multiclass_svm_problem<w_type, sample_type, label_type> problem(all_samples, all_labels, num_threads);
             if (verbose)
                 problem.be_verbose();
 
@@ -293,6 +309,8 @@ namespace dlib
         }
 
     private:
+
+        unsigned long num_threads;
         scalar_type C;
         scalar_type eps;
         bool verbose;
