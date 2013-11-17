@@ -138,6 +138,24 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp sign (
+        const matrix_exp& m
+    );
+    /*!
+        ensures
+            - returns a matrix that tells the sign of each element in m. In particular:
+              returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                    - if (m(r,c) >= 0) then
+                        - R(r,c) == +1
+                    - else
+                        - R(r,c) == -1
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp sigmoid (
         const matrix_exp& m
     );

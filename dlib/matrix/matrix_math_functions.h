@@ -80,6 +80,15 @@ namespace dlib
         }
 
         template <typename type>
+        inline type sign (const type& val)
+        {
+            if (val >= 0)
+                return +1;
+            else
+                return -1;
+        }
+
+        template <typename type>
         type cubed (const type& val)
         {
             return val*val*val;
@@ -153,6 +162,7 @@ namespace dlib
     DLIB_DEFINE_FUNCTION_M(op_round_zeros2, round_zeros, impl::round_zeros, 7);
     DLIB_DEFINE_FUNCTION_M(op_cubed, cubed, impl::cubed, 7);
     DLIB_DEFINE_FUNCTION_M(op_squared, squared, impl::squared, 6);
+    DLIB_DEFINE_FUNCTION_M(op_sign, sign, impl::sign, 6);
     DLIB_DEFINE_FUNCTION_MS(op_pow1, pow, impl::pow1, 7);
     DLIB_DEFINE_FUNCTION_SM(op_pow2, pow, impl::pow2, 7);
     DLIB_DEFINE_FUNCTION_M(op_reciprocal, reciprocal, impl::reciprocal, 6);
