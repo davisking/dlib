@@ -177,7 +177,8 @@ namespace dlib
             num_threads(4),
             C(1),
             eps(0.001),
-            verbose(false)
+            verbose(false),
+            learn_nonnegative_weights(false)
         {
         }
 
@@ -243,6 +244,16 @@ namespace dlib
             return kernel_type();
         }
 
+        bool learns_nonnegative_weights (
+        ) const { return learn_nonnegative_weights; }
+       
+        void set_learns_nonnegative_weights (
+            bool value
+        )
+        {
+            learn_nonnegative_weights = value;
+        }
+
         void set_c (
             scalar_type C_
         )
@@ -297,7 +308,13 @@ namespace dlib
             problem.set_c(C);
             problem.set_epsilon(eps);
 
-            svm_objective = solver(problem, weights);
+            unsigned long num_nonnegative = 0;
+            if (learn_nonnegative_weights)
+            {
+                num_nonnegative = problem.get_num_dimensions();
+            }
+
+            svm_objective = solver(problem, weights, num_nonnegative);
 
             trained_function_type df;
 
@@ -315,6 +332,7 @@ namespace dlib
         scalar_type eps;
         bool verbose;
         oca solver;
+        bool learn_nonnegative_weights;
     };
 
 // ----------------------------------------------------------------------------------------
