@@ -238,7 +238,7 @@
          <spec_file link="true">dlib/graph_utils/edge_list_graphs_abstract.h</spec_file>
          <description>
             This is a function which finds all the k nearest neighbors of a set of points and outputs
-            the result as a vector of <a href="#sample_pair">sample_pair</a> objects.  It takes O(n^2) where
+            the result as a vector of <a href="#sample_pair">sample_pair</a> objects.  It takes O(n^2) time where
             n is the number of data samples.  A faster approximate version is provided by 
             <a href="#find_approximate_k_nearest_neighbors">find_approximate_k_nearest_neighbors</a> 
             and <a href="#find_k_nearest_neighbors_lsh">find_k_nearest_neighbors_lsh</a>.
