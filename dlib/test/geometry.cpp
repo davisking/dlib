@@ -638,11 +638,14 @@ namespace
         to.push_back(vect(0,0));
 
         point_transform_affine t = find_affine_transform(from,to);
+        point_transform_affine tinv = inv(t);
 
         for (unsigned long i = 0; i < from.size(); ++i)
         {
             dlog << LINFO << "affine transformation error: "<< length(t(from[i])-to[i]);
             DLIB_TEST(length(t(from[i])-to[i]) < 1e-14);
+            DLIB_TEST(length(tinv(t(from[i]))-from[i]) < 1e-14);
+            DLIB_TEST(length(t(tinv(from[i]))-from[i]) < 1e-14);
         }
 
     }
@@ -669,6 +672,7 @@ namespace
             H(2,2) = 1 + rnd.get_random_gaussian()*3.1; 
 
             point_transform_projective tran(H);
+            point_transform_projective traninv = inv(tran);
 
             const int num = rnd.get_random_32bit_number()%8 + 4;
 
@@ -678,6 +682,8 @@ namespace
                 dlib::vector<double,2> p = randm(2,1,rnd)*1000;
                 from_points.push_back(p);
                 to_points.push_back(tran(p) + (randm(2,1,rnd)-0.5)*error_rate);
+                DLIB_TEST(length(traninv(tran(p))-p) <= 1e-6);
+                DLIB_TEST(length(tran(traninv(p))-p) <= 1e-6);
             }
 
 
