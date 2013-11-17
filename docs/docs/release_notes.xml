@@ -14,6 +14,8 @@
 New Features:
 
 Non-Backwards Compatible Changes:
+   - The spatial filtering functions no longer zero the borders if you set the add_to 
+     parameter to true.  
 
 Bug fixes:
 
