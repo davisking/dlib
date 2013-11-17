@@ -248,8 +248,8 @@
          <term file="ml.html" name="select_all_distinct_labels"            include="dlib/svm.h"/>
          <term file="dlib/svm/multiclass_tools_abstract.h.html" name="find_missing_pairs" include="dlib/svm.h"/>
 
-         <term file="ml.html" name="svm_multiclass_linear_trainer"         include="dlib/svm.h"/>
-         <term link="ml.html#svm_multiclass_linear_trainer" name="Multiclass SVM" include="dlib/svm.h"/>
+         <term file="ml.html" name="svm_multiclass_linear_trainer"         include="dlib/svm_threaded.h"/>
+         <term link="ml.html#svm_multiclass_linear_trainer" name="Multiclass SVM" include="dlib/svm_threaded.h"/>
          <term file="ml.html" name="one_vs_one_trainer"                    include="dlib/svm.h"/>
          <term file="ml.html" name="one_vs_one_decision_function"          include="dlib/svm.h"/>
          <term file="ml.html" name="multiclass_linear_decision_function"   include="dlib/svm.h"/>
