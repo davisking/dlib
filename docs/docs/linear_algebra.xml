@@ -749,10 +749,9 @@
            various operations while still allowing the user to use a simple MATLAB like syntax.  
            </p>
            <p>
-           Note that the cmake files that come with dlib know how to link a project with ATLAS or
-           the Intel MKL if you are building on a linux system.  The cmake files may also 
-           work in a few other cases as well but I haven't tested any others.   But in any
-           case, by no means are you required to use the dlib cmake files. 
+           Note that the cmake files that come with dlib will automatically link with ATLAS or the Intel
+           MKL if they are installed.  So using cmake makes this easy, but by no means are you required 
+           to use cmake or the dlib cmake files. 
            </p>
            <p>
               It is also worth noting that all the preconditions of every function 
