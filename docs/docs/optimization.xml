@@ -373,6 +373,9 @@
              This function uses a backtracking line search along with a gradient projection
              step to handle the box constraints.
          </description>
+         <examples>
+            <example>optimization_ex.cpp.html</example>
+         </examples>
       </component>
 
    <!-- ************************************************************************* -->
