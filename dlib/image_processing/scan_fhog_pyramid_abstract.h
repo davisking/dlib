@@ -416,7 +416,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - w.get_num_dimensions() >= get_num_dimensions()
+                - w.size() >= get_num_dimensions()
                 - is_loaded_with_image() == true
             ensures
                 - performs: detect(build_fhog_filterbank(w), dets, thresh)

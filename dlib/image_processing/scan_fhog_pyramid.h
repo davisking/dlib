@@ -49,6 +49,15 @@ namespace dlib
             unsigned long height
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(width > 0 && height > 0,
+                "\t void scan_fhog_pyramid::set_detection_window_size()"
+                << "\n\t Invalid inputs were given to this function "
+                << "\n\t width:  " << width
+                << "\n\t height: " << height
+                << "\n\t this:   " << this
+                );
+
             window_width = width;
             window_height = height;
         }
@@ -118,6 +127,17 @@ namespace dlib
             const double thresh
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_loaded_with_image() &&
+                        w.size() >= get_num_dimensions(), 
+                "\t void scan_fhog_pyramid::detect()"
+                << "\n\t Invalid inputs were given to this function "
+                << "\n\t is_loaded_with_image(): " << is_loaded_with_image()
+                << "\n\t w.size():               " << w.size()
+                << "\n\t get_num_dimensions():   " << get_num_dimensions()
+                << "\n\t this: " << this
+                );
+
             fhog_filterbank temp = build_fhog_filterbank(w);
             detect(temp, dets, thresh);
         }
@@ -157,6 +177,15 @@ namespace dlib
             const feature_vector_type& weights 
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(weights.size() >= get_num_dimensions(),
+                "\t fhog_filterbank scan_fhog_pyramid::build_fhog_filterbank()"
+                << "\n\t The number of weights isn't enough to fill out the filterbank. "
+                << "\n\t weights.size():       " << weights.size() 
+                << "\n\t get_num_dimensions(): " << get_num_dimensions() 
+                << "\n\t this: " << this
+                );
+
             fhog_filterbank temp;
             temp.filters.resize(31);
             temp.row_filters.resize(31);
@@ -222,13 +251,15 @@ namespace dlib
         void set_nuclear_norm_regularization_strength (
             double strength
         ) 
-        /*!
-            requires
-                - strength >= 0
-            ensures
-                - #get_nuclear_norm_regularization_strength() == strength
-        !*/
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(strength >= 0 ,
+                "\t void scan_fhog_pyramid::set_nuclear_norm_regularization_strength()"
+                << "\n\t You can't have a negative regularization strength."
+                << "\n\t strength: " << strength 
+                << "\n\t this: " << this
+            );
+
             nuclear_norm_regularization_strength = strength;
         }
 
@@ -836,6 +867,15 @@ namespace dlib
         const long cell_draw_size = 15
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(cell_draw_size > 0 && detector.get_w().size() >= detector.get_scanner().get_num_dimensions() ,
+            "\t matrix draw_fhog()"
+            << "\n\t Invalid arguments were given to this function. "
+            << "\n\t cell_draw_size:                              " << cell_draw_size
+            << "\n\t detector.get_w().size():                     " << detector.get_w().size()
+            << "\n\t detector.get_scanner().get_num_dimensions(): " << detector.get_scanner().get_num_dimensions()
+            );
+
         typename scan_fhog_pyramid<Pyramid_type>::fhog_filterbank fb = detector.get_scanner().build_fhog_filterbank(detector.get_w());
         return draw_fhog(fb.get_filters(),cell_draw_size);
     }
@@ -849,6 +889,14 @@ namespace dlib
         const object_detector<scan_fhog_pyramid<Pyramid_type> >& detector
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(detector.get_w().size() >= detector.get_scanner().get_num_dimensions() ,
+            "\t unsigned long num_separable_filters()"
+            << "\n\t Invalid arguments were given to this function. "
+            << "\n\t detector.get_w().size():                     " << detector.get_w().size()
+            << "\n\t detector.get_scanner().get_num_dimensions(): " << detector.get_scanner().get_num_dimensions()
+            );
+
         typename scan_fhog_pyramid<Pyramid_type>::fhog_filterbank fb = detector.get_scanner().build_fhog_filterbank(detector.get_w());
         return fb.num_separable_filters();
     }
