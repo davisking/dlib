@@ -65,7 +65,7 @@ namespace dlib
     );
     /*!
         requires
-            - rows and cols contain elements of type long
+            - rows and cols contain integral elements (e.g. int, long)
             - 0 <= min(rows) && max(rows) < m.nr() 
             - 0 <= min(cols) && max(cols) < m.nc()
             - rows.nr() == 1 || rows.nc() == 1
@@ -197,7 +197,7 @@ namespace dlib
     );
     /*!
         requires
-            - rows contains elements of type long
+            - rows contains integral elements (e.g. int, long)
             - 0 <= min(rows) && max(rows) < m.nr() 
             - rows.nr() == 1 || rows.nc() == 1
               (i.e. rows must be a vector)
@@ -284,7 +284,7 @@ namespace dlib
     );
     /*!
         requires
-            - cols contains elements of type long
+            - cols contains integral elements (e.g. int, long)
             - 0 <= min(cols) && max(cols) < m.nc() 
             - cols.nr() == 1 || cols.nc() == 1
               (i.e. cols must be a vector)
@@ -365,7 +365,7 @@ namespace dlib
     );
     /*!
         requires
-            - rows and cols contain elements of type long
+            - rows and cols contain integral elements (e.g. int, long)
             - 0 <= min(rows) && max(rows) < m.nr() 
             - 0 <= min(cols) && max(cols) < m.nc()
             - rows.nr() == 1 || rows.nc() == 1
@@ -420,7 +420,7 @@ namespace dlib
     );
     /*!
         requires
-            - rows contains elements of type long
+            - rows contains integral elements (e.g. int, long)
             - 0 <= min(rows) && max(rows) < m.nr() 
             - rows.nr() == 1 || rows.nc() == 1
               (i.e. rows must be a vector)
@@ -473,7 +473,7 @@ namespace dlib
     );
     /*!
         requires
-            - cols contains elements of type long
+            - cols contains integral elements (e.g. int, long)
             - 0 <= min(cols) && max(cols) < m.nc() 
             - cols.nr() == 1 || cols.nc() == 1
               (i.e. cols must be a vector)

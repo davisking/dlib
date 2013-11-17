@@ -186,9 +186,9 @@ namespace dlib
         const matrix_exp<EXPc>& cols
     )
     {
-        // the rows and cols matrices must contain elements of type long
-        COMPILE_TIME_ASSERT((is_same_type<typename EXPr::type,long>::value == true));
-        COMPILE_TIME_ASSERT((is_same_type<typename EXPc::type,long>::value == true));
+        // the rows and cols matrices must contain integer elements 
+        COMPILE_TIME_ASSERT(std::numeric_limits<typename EXPr::type>::is_integer);
+        COMPILE_TIME_ASSERT(std::numeric_limits<typename EXPc::type>::is_integer);
 
         DLIB_ASSERT(0 <= min(rows) && max(rows) < m.nr() && 0 <= min(cols) && max(cols) < m.nc() &&
                     (rows.nr() == 1 || rows.nc() == 1) && (cols.nr() == 1 || cols.nc() == 1), 
@@ -347,8 +347,8 @@ namespace dlib
         const matrix_exp<EXP2>& rows
     )
     {
-        // the rows matrix must contain elements of type long
-        COMPILE_TIME_ASSERT((is_same_type<typename EXP2::type,long>::value == true));
+        // the rows matrix must contain integer elements 
+        COMPILE_TIME_ASSERT(std::numeric_limits<typename EXP2::type>::is_integer);
 
         DLIB_ASSERT(0 <= min(rows) && max(rows) < m.nr() && (rows.nr() == 1 || rows.nc() == 1), 
             "\tconst matrix_exp rowm(const matrix_exp& m, const matrix_exp& rows)"
@@ -502,8 +502,8 @@ namespace dlib
         const matrix_exp<EXP2>& cols
     )
     {
-        // the cols matrix must contain elements of type long
-        COMPILE_TIME_ASSERT((is_same_type<typename EXP2::type,long>::value == true));
+        // the rows matrix must contain integer elements 
+        COMPILE_TIME_ASSERT(std::numeric_limits<typename EXP2::type>::is_integer);
 
         DLIB_ASSERT(0 <= min(cols) && max(cols) < m.nc() && (cols.nr() == 1 || cols.nc() == 1), 
             "\tconst matrix_exp colm(const matrix_exp& m, const matrix_exp& cols)"
