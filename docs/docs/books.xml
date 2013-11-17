@@ -37,8 +37,11 @@
             <li> <i>Programming: Principles and Practice Using C++</i> by Bjarne Stroustrup 
                <ul>  This is the sort of book you would use in a freshman introduction-to-programming class.  
                   So if you are just beginning to study programming and are interested in C++ then I think
-               it is probably safe to say this is one of the best books you could read.   It is both
-               recent (2009) and written by the creator of C++. </ul> <br/>
+               it is probably safe to say this is one of the best books you could read.   </ul> <br/>
+            </li>
+            <li> <i>Accelerated C++: Practical Programming by Example</i> by Andrew Koenig and Barbara E. Moo 
+               <ul> If you are new to C++ but already know how to program then this is a great book.  It's also 
+                  about one fourth the size of the Stroustrup book.  </ul> <br/>
             </li>
             <li> <i>Effective C++: 55 Specific Ways to Improve Your Programs and Designs</i> (3rd Edition) by Scott Meyers  
                <ul>  This is a great intermediate level C++ book.  Most people have heard the jokes about 
@@ -63,7 +66,7 @@
                   yourself frustrated with the online resources, then this is the book for you.
                </ul><br/>
             </li>
-            <li> <a href="http://stdcxx.apache.org/doc/stdlibref/index.html">Apache C++ Standard Library Reference</a>
+            <li> <a href="http://www.cplusplus.com/reference/">Online C++ Standard Library Reference</a>
                <ul> What I said aside, this is a good online reference.   I often find myself referring to it
                   when I do not have the Josuttis book on hand.
                </ul><br/>
