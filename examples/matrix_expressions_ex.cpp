@@ -81,18 +81,26 @@ int main()
                     x(r,c) = y(r,c) + y(r,c);  
                 
        
-        This technique works for expressions of arbitrary complexity.  So if you 
-        typed x = round(y + y + y + M*y) it would involve no temporary matrices being 
-        created at all.  Each operator takes and returns only matrix_exp objects.
-        Thus, no computations are performed until the assignment operator requests
-        the values from the matrix_exp it receives as input. 
-            
+        This technique works for expressions of arbitrary complexity.  So if you typed
+        x = round(y + y + y + M*y) it would involve no temporary matrices being created
+        at all.  Each operator takes and returns only matrix_exp objects.  Thus, no
+        computations are performed until the assignment operator requests the values
+        from the matrix_exp it receives as input.  This also means that statements such as:
+            auto x = round(y + y + y + M*y)
+        will not work properly because x would be a matrix expression that references
+        parts of the expression round(y + y + y + M*y) but those expression parts will
+        immediately go out of scope so x will contain references to non-existing sub
+        matrix expressions.  This is very bad, so you should never use auto to store
+        the result of a matrix expression.  Always store the output in a matrix object
+        like so:
+            matrix<double> x = round(y + y + y + M*y)
 
 
 
 
-        There is, however, a slight complication in all of this.  It is for statements 
-        that involve the multiplication of a complex matrix_exp such as the following:
+        In terms of implementation, there is a slight complication in all of this.  It
+        is for statements that involve the multiplication of a complex matrix_exp such
+        as the following:
     */
         x = M*(M+M+M+M+M+M+M);
     /*

@@ -34,25 +34,23 @@ int main()
 
     // First lets declare these 3 matrices.
     // This declares a matrix that contains doubles and has 3 rows and 1 column.
+    // Moreover, it's size is a compile time constant since we put it inside the <>.
     matrix<double,3,1> y;
-    // Make a 3 by 3 matrix of doubles for the M matrix.
-    matrix<double,3,3> M;
-    // Make a matrix of doubles that has unknown dimensions (the dimensions are
-    // decided at runtime unlike the above two matrices which are bound at compile
-    // time).  We could declare x the same way as y but I'm doing it differently
-    // for the purposes of illustration.
-    matrix<double> x;
+    // Make a 3 by 3 matrix of doubles for the M matrix.  In this case, M is
+    // sized at runtime and can therefore be resized later by calling M.set_size(). 
+    matrix<double> M(3,3);
     
-    // You may be wondering why someone would want to specify the size of a matrix
-    // at compile time when you don't have to.  The reason is two fold.  First,
-    // there is often a substantial performance improvement, especially for small
-    // matrices, because the compiler is able to perform loop unrolling if it knows
-    // the sizes of matrices.  Second, the dlib::matrix object checks these compile
-    // time sizes to ensure that the matrices are being used correctly.  For example,
-    // if you attempt to compile the expression y = M; or x = y*y; you will get
-    // a compiler error on those lines since those are not legal matrix operations.
-    // So if you know the size of a matrix at compile time then it is always a good
-    // idea to let the compiler know about it.
+    // You may be wondering why someone would want to specify the size of a
+    // matrix at compile time when you don't have to.  The reason is two fold.
+    // First, there is often a substantial performance improvement, especially
+    // for small matrices, because the compiler is able to perform loop
+    // unrolling if it knows the sizes of matrices.  Second, the dlib::matrix
+    // object checks these compile time sizes to ensure that the matrices are
+    // being used correctly.  For example, if you attempt to compile the
+    // expression y*y you will get a compiler error since that is not a legal
+    // matrix operation (the matrix dimensions don't make sense as a matrix
+    // multiplication).  So if you know the size of a matrix at compile time
+    // then it is always a good idea to let the compiler know about it.
 
 
 
@@ -67,8 +65,11 @@ int main()
         7.8;
 
 
-    // the solution can be obtained now by multiplying the inverse of M with y
-    x = inv(M)*y;
+    // The solution to y = M*x can be obtained by multiplying the inverse of M
+    // with y.  As an aside, you should *NEVER* use the auto keyword to capture
+    // the output from a matrix expression.  So don't do this: auto x = inv(M)*y; 
+    // To understand why, read the matrix_expressions_ex.cpp example program.
+    matrix<double> x = inv(M)*y;
 
     cout << "x: \n" << x << endl;
 
@@ -90,10 +91,16 @@ int main()
 
 
 
-    // The elements of a matrix are accessed using the () operator like so
+    // The elements of a matrix are accessed using the () operator like so:
     cout << M(0,1) << endl;
     // The above expression prints out the value 7.4.  That is, the value of
     // the element at row 0 and column 1.
+
+    // If we have a matrix that is a row or column vector.  That is, it contains either 
+    // a single row or a single column then we know that any access is always either 
+    // to row 0 or column 0 so we can omit that 0 and use the following syntax.
+    cout << y(1) << endl;
+    // The above expression prints out the value 1.2
 
 
     // Let's compute the sum of elements in the M matrix.
@@ -114,11 +121,6 @@ int main()
     cout << "sum of all elements in M is " << sum(M) << endl;
 
 
-    // If we have a matrix that is a row or column vector.  That is, it contains either 
-    // a single row or a single column then we know that any access is always either 
-    // to row 0 or column 0 so we can omit that 0 and use the following syntax.
-    cout << y(1) << endl;
-    // The above expression prints out the value 1.2
 
 
     // Note that you can always print a matrix to an output stream by saying:
