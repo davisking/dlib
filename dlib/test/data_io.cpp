@@ -2,7 +2,7 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #include "tester.h"
-#include <dlib/svm.h>
+#include <dlib/svm_threaded.h>
 #include <dlib/data_io.h>
 #include <dlib/sparse_vector.h>
 #include "create_iris_datafile.h"
