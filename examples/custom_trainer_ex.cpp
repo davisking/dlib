@@ -19,7 +19,7 @@
         "lower_right"
 */
 
-#include <dlib/svm.h>
+#include <dlib/svm_threaded.h>
 
 #include <iostream>
 #include <vector>
