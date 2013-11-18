@@ -2,7 +2,7 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #include "tester.h"
-#include <dlib/svm.h>
+#include <dlib/svm_threaded.h>
 #include <vector>
 #include <sstream>
 

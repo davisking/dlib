@@ -32,7 +32,6 @@
 #include "svm/svr_trainer.h"
 
 #include "svm/one_vs_one_decision_function.h"
-#include "svm/one_vs_one_trainer.h"
 #include "svm/multiclass_tools.h"
 #include "svm/cross_validate_multiclass_trainer.h"
 #include "svm/cross_validate_regression_trainer.h"
@@ -42,7 +41,6 @@
 #include "svm/cross_validate_assignment_trainer.h"
 
 #include "svm/one_vs_all_decision_function.h"
-#include "svm/one_vs_all_trainer.h"
 
 #include "svm/structural_svm_problem.h"
 #include "svm/sequence_labeler.h"

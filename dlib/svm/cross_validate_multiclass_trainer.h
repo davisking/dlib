@@ -5,7 +5,6 @@
 
 #include <vector>
 #include "../matrix.h"
-#include "one_vs_one_trainer.h"
 #include "cross_validate_multiclass_trainer_abstract.h"
 #include <sstream>
 
