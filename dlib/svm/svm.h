@@ -818,7 +818,7 @@ namespace dlib
     {
         typedef probabilistic_function<typename trainer_type::trained_function_type> trained_function_type;
 
-        const trainer_type& trainer;
+        const trainer_type trainer;
         const long folds;
 
         trainer_adapter_probabilistic (
