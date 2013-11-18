@@ -360,7 +360,8 @@ namespace dlib
     {
         const unsigned long num_separable_filters = w.num_separable_filters();
         rectangle area;
-        if (num_separable_filters > 31*3)
+        // use the separable filters if they would be faster than running the regular filters.
+        if (num_separable_filters > 31*std::min(w.filters[0].nr(),w.filters[0].nc())/3.0)
         {
             area = spatially_filter_image(feats[0], saliency_image, w.filters[0]);
             for (unsigned long i = 1; i < w.filters.size(); ++i)
