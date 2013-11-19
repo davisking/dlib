@@ -928,6 +928,32 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename Pyramid_type
+        >
+    struct processed_weight_vector<scan_fhog_pyramid<Pyramid_type> >
+    {
+        processed_weight_vector(){}
+
+        typedef matrix<double,0,1> feature_vector_type;
+        typedef typename scan_fhog_pyramid<Pyramid_type>::fhog_filterbank fhog_filterbank;
+
+        void init (
+            const scan_fhog_pyramid<Pyramid_type>& scanner
+        ) 
+        {
+            fb = scanner.build_fhog_filterbank(w);
+        }
+
+        const fhog_filterbank& get_detect_argument() const { return fb; }
+
+        feature_vector_type w;
+        fhog_filterbank fb;
+
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SCAN_fHOG_PYRAMID_H__
