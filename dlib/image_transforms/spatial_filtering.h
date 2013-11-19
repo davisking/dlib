@@ -1139,13 +1139,6 @@ namespace dlib
         double x, 
         double sigma
     )
-    /*!
-        requires
-            - sigma > 0
-        ensures
-            - computes and returns the value of a 1D Gaussian function with mean 0 
-              and standard deviation sigma at the given x value.
-    !*/
     {
         DLIB_ASSERT(sigma > 0,
             "\tdouble gaussian(x)"
@@ -1165,19 +1158,6 @@ namespace dlib
         double sigma,
         int max_size 
     )
-    /*!
-        requires
-            - sigma > 0
-            - max_size > 0 
-            - max_size is an odd number
-        ensures
-            - returns a separable Gaussian filter F such that:
-                - is_vector(F) == true 
-                - F.size() <= max_size 
-                - F is suitable for use with the spatially_filter_image_separable() routine
-                  and its use with this function corresponds to running a Gaussian filter 
-                  of sigma width over an image.
-    !*/
     {
         DLIB_ASSERT(sigma > 0 && max_size > 0 && (max_size%2)==1,
             "\t matrix<T,0,1> create_gaussian_filter()"
