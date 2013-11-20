@@ -650,8 +650,7 @@ namespace dlib
             const simd4f _x_scale = 4*x_scale;
             simd4f _x(x, x+x_scale, x+2*x_scale, x+3*x_scale);
             long c = 0;
-            const long num_simd_blocks = static_cast<long>(out_img.nc()-3*x_scale)-1;
-            for (; c < num_simd_blocks; c+=4)
+            for (;; c+=4)
             {
                 _x += _x_scale;
                 simd4i left = simd4i(_x);
@@ -670,6 +669,8 @@ namespace dlib
                 left.store(fleft);
                 right.store(fright);
 
+                if (fright[3] >= in_img.nc())
+                    break;
                 simd4f tl(in_img[top][fleft[0]],     in_img[top][fleft[1]],     in_img[top][fleft[2]],     in_img[top][fleft[3]]);
                 simd4f tr(in_img[top][fright[0]],    in_img[top][fright[1]],    in_img[top][fright[2]],    in_img[top][fright[3]]);
                 simd4f bl(in_img[bottom][fleft[0]],  in_img[bottom][fleft[1]],  in_img[bottom][fleft[2]],  in_img[bottom][fleft[3]]);
@@ -748,8 +749,7 @@ namespace dlib
             const simd4f _x_scale = 4*x_scale;
             simd4f _x(x, x+x_scale, x+2*x_scale, x+3*x_scale);
             long c = 0;
-            const long num_simd_blocks = static_cast<long>(out_img.nc()-3*x_scale)-1;
-            for (; c < num_simd_blocks; c+=4)
+            for (;; c+=4)
             {
                 _x += _x_scale;
                 simd4i left = simd4i(_x);
@@ -767,6 +767,8 @@ namespace dlib
                 left.store(fleft);
                 right.store(fright);
 
+                if (fright[3] >= in_img.nc())
+                    break;
                 simd4f tl(in_img[top][fleft[0]].red,     in_img[top][fleft[1]].red,     in_img[top][fleft[2]].red,     in_img[top][fleft[3]].red);
                 simd4f tr(in_img[top][fright[0]].red,    in_img[top][fright[1]].red,    in_img[top][fright[2]].red,    in_img[top][fright[3]].red);
                 simd4f bl(in_img[bottom][fleft[0]].red,  in_img[bottom][fleft[1]].red,  in_img[bottom][fleft[2]].red,  in_img[bottom][fleft[3]].red);
