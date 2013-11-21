@@ -67,8 +67,18 @@ namespace dlib
             const feature_vector_type& w_ 
         );
 
+        object_detector (
+            const image_scanner_type& scanner_, 
+            const test_box_overlap& overlap_tester_,
+            const std::vector<feature_vector_type>& w_ 
+        );
+
+        unsigned long num_detectors (
+        ) const { return w.size(); }
+
         const feature_vector_type& get_w (
-        ) const { return w.w; }
+            unsigned long idx = 0
+        ) const { return w[idx].w; }
 
         const test_box_overlap& get_overlap_tester (
         ) const;
@@ -115,6 +125,42 @@ namespace dlib
             double adjust_threshold = 0
         );
 
+        struct rect_detection
+        {
+            double detection_confidence;
+            unsigned long weight_index;
+            rectangle rect;
+
+            bool operator<(const rect_detection& item) const { return detection_confidence < item.detection_confidence; }
+        };
+
+        struct full_detection
+        {
+            double detection_confidence;
+            unsigned long weight_index;
+            full_object_detection rect;
+
+            bool operator<(const full_detection& item) const { return detection_confidence < item.detection_confidence; }
+        };
+
+        template <
+            typename image_type
+            >
+        void operator() (
+            const image_type& img,
+            std::vector<rect_detection>& final_dets,
+            double adjust_threshold = 0
+        );
+
+        template <
+            typename image_type
+            >
+        void operator() (
+            const image_type& img,
+            std::vector<full_detection>& final_dets,
+            double adjust_threshold = 0
+        );
+
         template <typename T>
         friend void serialize (
             const object_detector<T>& item,
@@ -130,33 +176,20 @@ namespace dlib
     private:
 
         bool overlaps_any_box (
-            const std::vector<rectangle>& rects,
+            const std::vector<rect_detection>& rects,
             const dlib::rectangle& rect
         ) const
         {
             for (unsigned long i = 0; i < rects.size(); ++i)
             {
-                if (boxes_overlap(rects[i], rect))
-                    return true;
-            }
-            return false;
-        }
-
-        bool overlaps_any_box (
-            const std::vector<std::pair<double,rectangle> >& rects,
-            const dlib::rectangle& rect
-        ) const
-        {
-            for (unsigned long i = 0; i < rects.size(); ++i)
-            {
-                if (boxes_overlap(rects[i].second, rect))
+                if (boxes_overlap(rects[i].rect, rect))
                     return true;
             }
             return false;
         }
 
         test_box_overlap boxes_overlap;
-        processed_weight_vector<image_scanner_type> w;
+        std::vector<processed_weight_vector<image_scanner_type> > w;
         image_scanner_type scanner;
     };
 
@@ -168,14 +201,17 @@ namespace dlib
         std::ostream& out
     )
     {
-        int version = 1;
+        int version = 2;
         serialize(version, out);
 
         T scanner;
         scanner.copy_configuration(item.scanner);
         serialize(scanner, out);
-        serialize(item.w.w, out);
         serialize(item.boxes_overlap, out);
+        // serialize all the weight vectors
+        serialize(item.w.size(), out);
+        for (unsigned long i = 0; i < item.w.size(); ++i)
+            serialize(item.w[i].w, out);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -188,13 +224,31 @@ namespace dlib
     {
         int version = 0;
         deserialize(version, in);
-        if (version != 1)
+        if (version == 1)
+        {
+            deserialize(item.scanner, in);
+            item.w.resize(1);
+            deserialize(item.w[0].w, in);
+            item.w[0].init(item.scanner);
+            deserialize(item.boxes_overlap, in);
+        }
+        else if (version == 2)
+        {
+            deserialize(item.scanner, in);
+            deserialize(item.boxes_overlap, in);
+            unsigned long num_detectors = 0;
+            deserialize(num_detectors, in);
+            item.w.resize(num_detectors);
+            for (unsigned long i = 0; i < item.w.size(); ++i)
+            {
+                deserialize(item.w[i].w, in);
+                item.w[i].init(item.scanner);
+            }
+        }
+        else 
+        {
             throw serialization_error("Unexpected version encountered while deserializing a dlib::object_detector object.");
-
-        deserialize(item.scanner, in);
-        deserialize(item.w.w, in);
-        item.w.init(item.scanner);
-        deserialize(item.boxes_overlap, in);
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -252,8 +306,54 @@ namespace dlib
             );
 
         scanner.copy_configuration(scanner_);
-        w.w = w_;
-        w.init(scanner);
+        w.resize(1);
+        w[0].w = w_;
+        w[0].init(scanner);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_scanner_type
+        >
+    object_detector<image_scanner_type>::
+    object_detector (
+        const image_scanner_type& scanner_, 
+        const test_box_overlap& overlap_tester,
+        const std::vector<feature_vector_type>& w_ 
+    ) :
+        boxes_overlap(overlap_tester)
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(scanner_.get_num_detection_templates() > 0 && w_.size() > 0,
+            "\t object_detector::object_detector(scanner_,overlap_tester,w_)"
+            << "\n\t Invalid inputs were given to this function "
+            << "\n\t scanner_.get_num_detection_templates(): " << scanner_.get_num_detection_templates()
+            << "\n\t w_.size():                     " << w_.size()
+            << "\n\t this: " << this
+            );
+
+#ifdef ENABLE_ASSERTS
+        for (unsigned long i = 0; i < w_.size(); ++i)
+        {
+            DLIB_ASSERT(w_[i].size() == scanner_.get_num_dimensions() + 1, 
+                "\t object_detector::object_detector(scanner_,overlap_tester,w_)"
+                << "\n\t Invalid inputs were given to this function "
+                << "\n\t scanner_.get_num_detection_templates(): " << scanner_.get_num_detection_templates()
+                << "\n\t w_["<<i<<"].size():                     " << w_[i].size()
+                << "\n\t scanner_.get_num_dimensions(): " << scanner_.get_num_dimensions()
+                << "\n\t this: " << this
+                );
+        }
+#endif
+
+        scanner.copy_configuration(scanner_);
+        w.resize(w_.size());
+        for (unsigned long i = 0; i < w.size(); ++i)
+        {
+            w[i].w = w_[i];
+            w[i].init(scanner);
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -272,8 +372,80 @@ namespace dlib
         boxes_overlap = item.boxes_overlap;
         w = item.w;
         scanner.copy_configuration(item.scanner);
-        w.init(scanner);
         return *this;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_scanner_type
+        >
+    template <
+        typename image_type
+        >
+    void object_detector<image_scanner_type>::
+    operator() (
+        const image_type& img,
+        std::vector<rect_detection>& final_dets,
+        double adjust_threshold
+    ) 
+    {
+        scanner.load(img);
+        std::vector<std::pair<double, rectangle> > dets;
+        std::vector<rect_detection> dets_accum;
+        for (unsigned long i = 0; i < w.size(); ++i)
+        {
+            const double thresh = w[i].w(scanner.get_num_dimensions());
+            scanner.detect(w[i].get_detect_argument(), dets, thresh + adjust_threshold);
+            for (unsigned long j = 0; j < dets.size(); ++j)
+            {
+                rect_detection temp;
+                temp.detection_confidence = dets[j].first-thresh;
+                temp.weight_index = i;
+                temp.rect = dets[j].second;
+                dets_accum.push_back(temp);
+            }
+        }
+
+        // Do non-max suppression
+        final_dets.clear();
+        for (unsigned long i = 0; i < dets_accum.size(); ++i)
+        {
+            if (overlaps_any_box(final_dets, dets_accum[i].rect))
+                continue;
+
+            final_dets.push_back(dets_accum[i]);
+        }
+        std::sort(final_dets.rbegin(), final_dets.rend());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_scanner_type
+        >
+    template <
+        typename image_type
+        >
+    void object_detector<image_scanner_type>::
+    operator() (
+        const image_type& img,
+        std::vector<full_detection>& final_dets,
+        double adjust_threshold 
+    )
+    {
+        std::vector<rect_detection> dets;
+        (*this)(img,dets,adjust_threshold);
+
+        final_dets.resize(dets.size());
+
+        // convert all the rectangle detections into full_object_detections.
+        for (unsigned long i = 0; i < dets.size(); ++i)
+        {
+            final_dets[i].detection_confidence = dets[i].detection_confidence;
+            final_dets[i].weight_index = dets[i].weight_index;
+            final_dets[i].rect = scanner.get_full_object_detection(dets[i].rect, w[dets[i].weight_index].w);
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -290,23 +462,12 @@ namespace dlib
         double adjust_threshold
     ) 
     {
-        std::vector<rectangle> final_dets;
-        if (w.w.size() != 0)
-        {
-            std::vector<std::pair<double, rectangle> > dets;
-            const double thresh = w.w(scanner.get_num_dimensions());
+        std::vector<rect_detection> dets;
+        (*this)(img,dets,adjust_threshold);
 
-            scanner.load(img);
-            scanner.detect(w.get_detect_argument(), dets, thresh + adjust_threshold);
-
-            for (unsigned long i = 0; i < dets.size(); ++i)
-            {
-                if (overlaps_any_box(final_dets, dets[i].second))
-                    continue;
-
-                final_dets.push_back(dets[i].second);
-            }
-        }
+        std::vector<rectangle> final_dets(dets.size());
+        for (unsigned long i = 0; i < dets.size(); ++i)
+            final_dets[i] = dets[i].rect;
 
         return final_dets;
     }
@@ -326,24 +487,12 @@ namespace dlib
         double adjust_threshold
     ) 
     {
-        final_dets.clear();
-        if (w.w.size() != 0)
-        {
-            std::vector<std::pair<double, rectangle> > dets;
-            const double thresh = w.w(scanner.get_num_dimensions());
+        std::vector<rect_detection> dets;
+        (*this)(img,dets,adjust_threshold);
 
-            scanner.load(img);
-            scanner.detect(w.get_detect_argument(), dets, thresh + adjust_threshold);
-
-            for (unsigned long i = 0; i < dets.size(); ++i)
-            {
-                if (overlaps_any_box(final_dets, dets[i].second))
-                    continue;
-
-                dets[i].first -= thresh;
-                final_dets.push_back(dets[i]);
-            }
-        }
+        final_dets.resize(dets.size());
+        for (unsigned long i = 0; i < dets.size(); ++i)
+            final_dets[i] = std::make_pair(dets[i].detection_confidence,dets[i].rect);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -361,17 +510,17 @@ namespace dlib
         double adjust_threshold
     ) 
     {
-        std::vector<std::pair<double, rectangle> > temp_dets;
-        (*this)(img,temp_dets,adjust_threshold);
+        std::vector<rect_detection> dets;
+        (*this)(img,dets,adjust_threshold);
 
         final_dets.clear();
-        final_dets.reserve(temp_dets.size());
+        final_dets.reserve(dets.size());
 
         // convert all the rectangle detections into full_object_detections.
-        for (unsigned long i = 0; i < temp_dets.size(); ++i)
+        for (unsigned long i = 0; i < dets.size(); ++i)
         {
-            final_dets.push_back(std::make_pair(temp_dets[i].first, 
-                                                scanner.get_full_object_detection(temp_dets[i].second, w.w)));
+            final_dets.push_back(std::make_pair(dets[i].detection_confidence, 
+                                                scanner.get_full_object_detection(dets[i].rect, w[dets[i].weight_index].w)));
         }
     }
 
@@ -390,16 +539,16 @@ namespace dlib
         double adjust_threshold
     ) 
     {
-        std::vector<std::pair<double, rectangle> > temp_dets;
-        (*this)(img,temp_dets,adjust_threshold);
+        std::vector<rect_detection> dets;
+        (*this)(img,dets,adjust_threshold);
 
         final_dets.clear();
-        final_dets.reserve(temp_dets.size());
+        final_dets.reserve(dets.size());
 
         // convert all the rectangle detections into full_object_detections.
-        for (unsigned long i = 0; i < temp_dets.size(); ++i)
+        for (unsigned long i = 0; i < dets.size(); ++i)
         {
-            final_dets.push_back(scanner.get_full_object_detection(temp_dets[i].second, w.w));
+            final_dets.push_back(scanner.get_full_object_detection(dets[i].rect, w[dets[i].weight_index].w));
         }
     }
 

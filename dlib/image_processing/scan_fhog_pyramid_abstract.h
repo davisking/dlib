@@ -17,18 +17,21 @@ namespace dlib
         >
     matrix<unsigned char> draw_fhog (
         const object_detector<scan_fhog_pyramid<Pyramid_type> >& detector,
+        const unsigned long weight_index = 0,
         const long cell_draw_size = 15
     );
     /*!
         requires
             - cell_draw_size > 0
+            - weight_index < detector.num_detectors()
             - detector.get_w().size() >= detector.get_scanner().get_num_dimensions()
               (i.e. the detector must have been populated with a HOG filter)
         ensures
-            - Converts the HOG filters in the given detector into an image suitable for
-              display on the screen.  In particular, we draw all the HOG cells into a
-              grayscale image in a way that shows the magnitude and orientation of the
-              gradient energy in each cell.  The resulting image is then returned.
+            - Converts the HOG filters in the given detector (specifically, the filters in
+              detector.get_w(weight_index)) into an image suitable for display on the
+              screen.  In particular, we draw all the HOG cells into a grayscale image in a
+              way that shows the magnitude and orientation of the gradient energy in each
+              cell.  The resulting image is then returned.
     !*/
 
 // ----------------------------------------------------------------------------------------
