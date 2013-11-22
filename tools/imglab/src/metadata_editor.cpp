@@ -425,10 +425,13 @@ display_about(
     sout << wrap_string("Image Labeler v" + string(VERSION) + "." ,0,0) << endl << endl;
     sout << wrap_string("This program is a tool for labeling images with rectangles. " ,0,0) << endl << endl;
 
-    sout << wrap_string("You can add new rectangles by holding the shift key, left clicking "
-                        "the mouse, and dragging it.  Hit tab to give input focus to the next "
-                        "label text field and supply a label for a rectangle.  Double clicking "
-                        "a rectangle selects it and the delete key removes it."
+    sout << wrap_string("You can add a new rectangle by holding the shift key, left clicking "
+                        "the mouse, and dragging it.  New rectangles are given the label from the \"Next Label\" "
+                        "field at the top of the application.  You can quickly edit the contents of the Next Label field "
+                        "by hitting the tab key. Double clicking "
+                        "a rectangle selects it and the delete key removes it.  You can also mark "
+                        "a rectangle as ignored by hitting the i key when it is selected.  Ignored "
+                        "rectangles are visually displayed with an X through them."
                         ,0,0) << endl << endl;
 
     sout << wrap_string("It is also possible to label object parts by selecting a rectangle and "
