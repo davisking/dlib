@@ -31,7 +31,8 @@ namespace dlib
             ) : 
                 difficult(false),
                 truncated(false),
-                occluded(false)
+                occluded(false),
+                ignore(false)
             {}
 
             rectangle rect;
@@ -43,6 +44,7 @@ namespace dlib
             bool difficult;
             bool truncated;
             bool occluded;
+            bool ignore;
 
             bool has_label() const { return label.size() != 0; }
             /*!
