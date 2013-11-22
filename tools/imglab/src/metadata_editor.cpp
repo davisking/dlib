@@ -290,6 +290,7 @@ std::vector<dlib::image_display::overlay_rect> get_overlays (
         temp[i].rect = data.boxes[i].rect;
         temp[i].label = data.boxes[i].label;
         temp[i].parts = data.boxes[i].parts;
+        temp[i].crossed_out = data.boxes[i].ignore;
         assign_pixel(temp[i].color, rgb_pixel(255,0,0));
     }
     return temp;
@@ -388,6 +389,7 @@ on_overlay_rects_changed(
             temp.label = rects[i].label;
             temp.rect = rects[i].rect;
             temp.parts = rects[i].parts;
+            temp.ignore = rects[i].crossed_out;
             boxes.push_back(temp);
         }
     }
