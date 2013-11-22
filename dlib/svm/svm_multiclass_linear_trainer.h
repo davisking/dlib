@@ -77,7 +77,15 @@ namespace dlib
             psi.push_back(std::make_pair(dims-1,static_cast<scalar_type>(-1)));
 
             // Find which distinct label goes with this psi.
-            const long label_idx = index_of_max(mat(distinct_labels) == labels[idx]);
+            long label_idx = 0;
+            for (unsigned long i = 0; i < distinct_labels.size(); ++i)
+            {
+                if (distinct_labels[i] == labels[idx])
+                {
+                    label_idx = i;
+                    break;
+                }
+            }
 
             offset_feature_vector(psi, dims*label_idx);
         }
