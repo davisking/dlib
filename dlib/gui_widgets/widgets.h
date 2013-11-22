@@ -3292,24 +3292,25 @@ namespace dlib
 
         struct overlay_rect
         {
-            overlay_rect() { assign_pixel(color, 0);}
+            overlay_rect() :crossed_out(false) { assign_pixel(color, 0);}
 
             template <typename pixel_type>
             overlay_rect(const rectangle& r, pixel_type p) 
-                : rect(r) { assign_pixel(color, p); }
+                : rect(r),crossed_out(false) { assign_pixel(color, p); }
 
             template <typename pixel_type>
             overlay_rect(const rectangle& r, pixel_type p, const std::string& l) 
-                : rect(r),label(l) { assign_pixel(color, p); }
+                : rect(r),label(l),crossed_out(false) { assign_pixel(color, p); }
 
             template <typename pixel_type>
             overlay_rect(const rectangle& r, pixel_type p, const std::string& l, const std::map<std::string,point>& parts_) 
-                : rect(r),label(l),parts(parts_) { assign_pixel(color, p); }
+                : rect(r),label(l),parts(parts_),crossed_out(false) { assign_pixel(color, p); }
 
             rectangle rect;
             rgb_alpha_pixel color;
             std::string label;
             std::map<std::string,point> parts;
+            bool crossed_out;
         };
 
         struct overlay_line

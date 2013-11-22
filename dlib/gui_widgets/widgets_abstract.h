@@ -2394,12 +2394,16 @@ namespace dlib
                     Moreover, the rectangle can have sub-parts. Each part is listed
                     in the parts member variable.  This variable maps the name of the
                     part to its position.
+
+                    Rectangles with crossed_out == true will be drawn with an X through
+                    them.
             !*/
 
             rectangle rect;
             rgb_alpha_pixel color;
             std::string label;
             std::map<std::string,point> parts;
+            bool crossed_out;
 
             overlay_rect(
             ); 
@@ -2408,6 +2412,7 @@ namespace dlib
                     - #color == rgb_alpha_pixel(0,0,0,0) 
                     - #rect == rectangle()
                     - #label.size() == 0
+                    - #crossed_out == false
             !*/
 
             template <typename pixel_type>
@@ -2420,6 +2425,7 @@ namespace dlib
                     - #rect == r
                     - performs assign_pixel(color, p) 
                     - #label.size() == 0
+                    - #crossed_out == false
             !*/
 
             template <typename pixel_type>
@@ -2433,6 +2439,7 @@ namespace dlib
                     - #rect == r
                     - performs assign_pixel(color, p)
                     - #label == l
+                    - #crossed_out == false
             !*/
 
             template <typename pixel_type>
@@ -2448,6 +2455,7 @@ namespace dlib
                     - performs assign_pixel(color, p)
                     - #label == l
                     - #parts == parts_
+                    - #crossed_out == false
             !*/
 
         };

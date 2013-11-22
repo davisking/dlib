@@ -5978,6 +5978,20 @@ namespace dlib
                 mfont->draw_string(c, r, itr->first, overlay_rects[i].color, 0, 
                                    std::string::npos, area);
             }
+
+            if (overlay_rects[i].crossed_out)
+            {
+                if (rect_is_selected && selected_rect == i)
+                {
+                    draw_line(c, orect.tl_corner(), orect.br_corner(),invert_pixel(overlay_rects[i].color), area);
+                    draw_line(c, orect.bl_corner(), orect.tr_corner(),invert_pixel(overlay_rects[i].color), area);
+                }
+                else
+                {
+                    draw_line(c, orect.tl_corner(), orect.br_corner(),overlay_rects[i].color, area);
+                    draw_line(c, orect.bl_corner(), orect.tr_corner(),overlay_rects[i].color, area);
+                }
+            }
         }
 
         // now draw all the overlay lines 
@@ -6034,6 +6048,15 @@ namespace dlib
                 overlay_rects.erase(overlay_rects.begin() + selected_rect);
             else
                 overlay_rects[selected_rect].parts.erase(selected_part_name);
+            parent.invalidate_rectangle(rect);
+
+            if (event_handler.is_set())
+                event_handler();
+        }
+
+        if (is_printable && !hidden && enabled && rect_is_selected && (key == 'i'))
+        {
+            overlay_rects[selected_rect].crossed_out = !overlay_rects[selected_rect].crossed_out;
             parent.invalidate_rectangle(rect);
 
             if (event_handler.is_set())
