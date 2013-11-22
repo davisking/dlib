@@ -81,11 +81,14 @@ namespace dlib
             const bool auto_overlap_tester,
             const image_array_type& images,
             const std::vector<std::vector<full_object_detection> >& truth_object_detections,
+            const std::vector<std::vector<rectangle> >& ignore,
+            const test_box_overlap& ignore_overlap_tester,
             unsigned long num_threads = 2
         );
         /*!
             requires
                 - is_learning_problem(images, truth_object_detections)
+                - ignore.size() == images.size()
                 - scanner.get_num_detection_templates() > 0
                 - scanner.load(images[0]) must be a valid expression.
                 - for all valid i, j:
@@ -115,6 +118,15 @@ namespace dlib
                   available processing cores on your machine.
                 - #get_loss_per_missed_target() == 1
                 - #get_loss_per_false_alarm() == 1
+                - for all valid i:
+                    - Within images[i] any detections that match against a rectangle in
+                      ignore[i], according to ignore_overlap_tester, are ignored.  That is,
+                      the optimizer doesn't care if the detector outputs a detection that
+                      matches any of the ignore rectangles or if it fails to output a
+                      detection for an ignore rectangle.  Therefore, if there are objects
+                      in your dataset that you are unsure you want to detect or otherwise
+                      don't care if the detector gets or doesn't then you can mark them
+                      with ignore rectangles and the optimizer will simply ignore them. 
         !*/
 
         test_box_overlap get_overlap_tester (

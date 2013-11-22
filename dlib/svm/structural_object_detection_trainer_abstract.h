@@ -318,6 +318,65 @@ namespace dlib
                   Therefore, this version of train() is a convenience function for for the 
                   case where you don't have any movable components of the detection templates.
         !*/
+
+        template <
+            typename image_array_type
+            >
+        const trained_function_type train (
+            const image_array_type& images,
+            const std::vector<std::vector<full_object_detection> >& truth_object_detections,
+            const std::vector<std::vector<rectangle> >& ignore,
+            const test_box_overlap& ignore_overlap_tester = test_box_overlap()
+        ) const;
+        /*!
+            requires
+                - is_learning_problem(images, truth_object_detections) == true
+                - it must be valid to pass images[0] into the image_scanner_type::load() method.
+                  (also, image_array_type must be an implementation of dlib/array/array_kernel_abstract.h)
+                - ignore.size() == images.size()
+                - for all valid i, j:
+                    - truth_object_detections[i][j].num_parts() == get_scanner().get_num_movable_components_per_detection_template() 
+                    - all_parts_in_rect(truth_object_detections[i][j]) == true
+            ensures
+                - Uses the structural_svm_object_detection_problem to train an object_detector 
+                  on the given images and truth_object_detections.  
+                - for all valid i:
+                    - Within images[i] any detections that match against a rectangle in
+                      ignore[i], according to ignore_overlap_tester, are ignored.  That is,
+                      the optimizer doesn't care if the detector outputs a detection that
+                      matches any of the ignore rectangles or if it fails to output a
+                      detection for an ignore rectangle.  Therefore, if there are objects
+                      in your dataset that you are unsure you want to detect or otherwise
+                      don't care if the detector gets or doesn't then you can mark them
+                      with ignore rectangles and the optimizer will simply ignore them. 
+                - returns a function F with the following properties:
+                    - F(new_image) == A prediction of what objects are present in new_image.  This
+                      is a set of rectangles indicating their positions.
+        !*/
+
+        template <
+            typename image_array_type
+            >
+        const trained_function_type train (
+            const image_array_type& images,
+            const std::vector<std::vector<rectangle> >& truth_object_detections,
+            const std::vector<std::vector<rectangle> >& ignore,
+            const test_box_overlap& ignore_overlap_tester = test_box_overlap()
+        ) const;
+        /*!
+            requires
+                - is_learning_problem(images, truth_object_detections) == true
+                - ignore.size() == images.size()
+                - it must be valid to pass images[0] into the image_scanner_type::load() method.
+                  (also, image_array_type must be an implementation of dlib/array/array_kernel_abstract.h)
+                - get_scanner().get_num_movable_components_per_detection_template() == 0
+            ensures
+                - This function is identical to the above train(), except that it converts 
+                  each element of truth_object_detections into a full_object_detection by 
+                  passing it to full_object_detection's constructor taking only a rectangle.
+                  Therefore, this version of train() is a convenience function for for the 
+                  case where you don't have any movable components of the detection templates.
+        !*/
     }; 
 
 // ----------------------------------------------------------------------------------------
