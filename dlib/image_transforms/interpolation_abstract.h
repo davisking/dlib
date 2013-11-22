@@ -447,6 +447,39 @@ namespace dlib
               objects in the new flipped images.
             - #images.size() == images.size()*2
             - #objects.size() == objects.size()*2
+            - All the original elements of images and objects are left unmodified.  That
+              is, this function only appends new elements to each of these containers.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    void add_image_left_right_flips (
+        dlib::array<image_type>& images,
+        std::vector<std::vector<rectangle> >& objects,
+        std::vector<std::vector<rectangle> >& objects2
+    );
+    /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type::type> is defined
+            - images.size() == objects.size()
+            - images.size() == objects2.size()
+        ensures
+            - This function computes all the left/right flips of the contents of images and
+              then appends them onto the end of the images array.  It also finds the
+              left/right flips of the rectangles in objects and objects2 and similarly
+              appends them into objects and objects2 respectively.  That is, we assume
+              objects[i] is the set of bounding boxes in images[i] and we flip the bounding
+              boxes so that they still bound the same objects in the new flipped images.
+              We similarly flip the boxes in objects2.
+            - #images.size()   == images.size()*2
+            - #objects.size()  == objects.size()*2
+            - #objects2.size() == objects2.size()*2
+            - All the original elements of images, objects, and objects2 are left unmodified.
+              That is, this function only appends new elements to each of these containers.
     !*/
 
 // ----------------------------------------------------------------------------------------
