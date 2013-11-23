@@ -146,7 +146,7 @@ namespace dlib
         {
             friend class scan_fhog_pyramid;
         public:
-            inline unsigned long get_num_dimensions() const
+            inline long get_num_dimensions() const
             {
                 unsigned long dims = 0;
                 for (unsigned long i = 0; i < filters.size(); ++i)

@@ -360,7 +360,7 @@ namespace dlib
             !*/
 
         public:
-            unsigned long get_num_dimensions(
+            long get_num_dimensions(
             ) const;
             /*!
                 ensures
