@@ -16,7 +16,7 @@ namespace dlib
     {
     public:
         test_box_overlap (
-        ) : match_thresh(0.5), overlap_thresh(0.5)
+        ) : match_thresh(0.5), overlap_thresh(1.0)
         {}
 
         test_box_overlap (

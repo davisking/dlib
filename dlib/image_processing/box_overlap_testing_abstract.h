@@ -29,7 +29,7 @@ namespace dlib
         /*!
             ensures
                 - #get_match_thresh()   == 0.5
-                - #get_overlap_thresh() == 0.5
+                - #get_overlap_thresh() == 1.0
         !*/
 
         test_box_overlap (
