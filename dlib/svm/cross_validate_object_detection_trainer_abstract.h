@@ -21,13 +21,14 @@ namespace dlib
         object_detector_type& detector,
         const image_array_type& images,
         const std::vector<std::vector<full_object_detection> >& truth_dets,
-        const double overlap_eps = 0.5,
+        const std::vector<std::vector<rectangle> >& ignore,
+        const test_box_overlap& overlap_tester = test_box_overlap(),
         const double adjust_threshold = 0
     );
     /*!
         requires
             - is_learning_problem(images,truth_dets)
-            - 0 < overlap_eps <= 1
+            - images.size() == ignore.size()
             - object_detector_type == some kind of object detector function object
               (e.g. object_detector)
             - image_array_type must be an implementation of dlib/array/array_kernel_abstract.h 
@@ -35,7 +36,12 @@ namespace dlib
         ensures
             - Tests the given detector against the supplied object detection problem and
               returns the precision, recall, and average precision.  Note that the task is
-              to predict, for each images[i], the set of object locations given by truth_dets[i].
+              to predict, for each images[i], the set of object locations given by
+              truth_dets[i].  Additionally, any detections on image[i] that match a box in
+              ignore[i] are ignored.  That is, detections matching a box in ignore[i] do
+              not count as a false alarm and similarly if any element of ignore[i] goes
+              undetected it does not count as a missed detection.  So we say that ignore[i]
+              contains a set of boxes that we "don't care" if they are detected or not.
             - In particular, returns a matrix M such that:  
                 - M(0) == the precision of the detector object.  This is a number
                   in the range [0,1] which measures the fraction of detector outputs
@@ -53,9 +59,8 @@ namespace dlib
                   ordering them in descending order of their detection scores.  Then we use
                   the average_precision() routine to score the ranked listing and store the
                   output into M(2).
-                - The rule for deciding if a detector output, D, matches a truth rectangle,
-                  T, is the following:
-                    T and R match if and only if: T.intersect(R).area()/(T+R).area() > overlap_eps
+                - This function considers a detector output D to match a rectangle T if and
+                  only if overlap_tester(T,D) returns true. 
                 - Note that you can use the adjust_threshold argument to raise or lower the
                   detection threshold.  This value is passed into the identically named
                   argument to the detector object and therefore influences the number of
@@ -73,12 +78,13 @@ namespace dlib
         object_detector_type& detector,
         const image_array_type& images,
         const std::vector<std::vector<rectangle> >& truth_dets,
-        const double overlap_eps = 0.5,
+        const std::vector<std::vector<rectangle> >& ignore,
+        const test_box_overlap& overlap_tester = test_box_overlap(),
         const double adjust_threshold = 0
     );
     /*!
         requires
-            - all the requirements of the above test_object_detection_function() routine.
+            - All the requirements of the above test_object_detection_function() routine.
         ensures
             - converts all the rectangles in truth_dets into full_object_detection objects
               via full_object_detection's rectangle constructor.  Then invokes
@@ -86,6 +92,46 @@ namespace dlib
               the results.  
     !*/
 
+    template <
+        typename object_detector_type,
+        typename image_array_type
+        >
+    const matrix<double,1,3> test_object_detection_function (
+        object_detector_type& detector,
+        const image_array_type& images,
+        const std::vector<std::vector<rectangle> >& truth_dets,
+        const test_box_overlap& overlap_tester = test_box_overlap(),
+        const double adjust_threshold = 0
+    );
+    /*!
+        requires
+            - All the requirements of the above test_object_detection_function() routine.
+        ensures
+            - This function simply invokes test_object_detection_function() with all the
+              given arguments and an empty set of ignore rectangles and returns the results.
+    !*/
+
+    template <
+        typename object_detector_type,
+        typename image_array_type
+        >
+    const matrix<double,1,3> test_object_detection_function (
+        object_detector_type& detector,
+        const image_array_type& images,
+        const std::vector<std::vector<full_object_detection> >& truth_dets,
+        const test_box_overlap& overlap_tester = test_box_overlap(),
+        const double adjust_threshold = 0
+    );
+    /*!
+        requires
+            - All the requirements of the above test_object_detection_function() routine.
+        ensures
+            - This function simply invokes test_object_detection_function() with all the
+              given arguments and an empty set of ignore rectangles and returns the results.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -96,14 +142,15 @@ namespace dlib
         const trainer_type& trainer,
         const image_array_type& images,
         const std::vector<std::vector<full_object_detection> >& truth_dets,
+        const std::vector<std::vector<rectangle> >& ignore,
         const long folds,
-        const double overlap_eps = 0.5,
+        const test_box_overlap& overlap_tester = test_box_overlap(),
         const double adjust_threshold = 0
     );
     /*!
         requires
             - is_learning_problem(images,truth_dets)
-            - 0 < overlap_eps <= 1
+            - images.size() == ignore.size()
             - 1 < folds <= images.size()
             - trainer_type == some kind of object detection trainer (e.g structural_object_detection_trainer)
             - image_array_type must be an implementation of dlib/array/array_kernel_abstract.h 
@@ -126,8 +173,9 @@ namespace dlib
         const trainer_type& trainer,
         const image_array_type& images,
         const std::vector<std::vector<rectangle> >& truth_dets,
+        const std::vector<std::vector<rectangle> >& ignore,
         const long folds,
-        const double overlap_eps = 0.5,
+        const test_box_overlap& overlap_tester = test_box_overlap(),
         const double adjust_threshold = 0
     );
     /*!
@@ -139,6 +187,47 @@ namespace dlib
               cross_validate_object_detection_trainer() on the full_object_detections and
               returns the results.  
     !*/
+
+    template <
+        typename trainer_type,
+        typename image_array_type
+        >
+    const matrix<double,1,3> cross_validate_object_detection_trainer (
+        const trainer_type& trainer,
+        const image_array_type& images,
+        const std::vector<std::vector<rectangle> >& truth_dets,
+        const long folds,
+        const test_box_overlap& overlap_tester = test_box_overlap(),
+        const double adjust_threshold = 0
+    );
+    /*!
+        requires
+            - All the requirements of the above cross_validate_object_detection_trainer() routine.
+        ensures
+            - This function simply invokes cross_validate_object_detection_trainer() with all
+              the given arguments and an empty set of ignore rectangles and returns the results.
+    !*/
+
+    template <
+        typename trainer_type,
+        typename image_array_type
+        >
+    const matrix<double,1,3> cross_validate_object_detection_trainer (
+        const trainer_type& trainer,
+        const image_array_type& images,
+        const std::vector<std::vector<full_object_detection> >& truth_dets,
+        const long folds,
+        const test_box_overlap& overlap_tester = test_box_overlap(),
+        const double adjust_threshold = 0
+    );
+    /*!
+        requires
+            - All the requirements of the above cross_validate_object_detection_trainer() routine.
+        ensures
+            - This function simply invokes cross_validate_object_detection_trainer() with all
+              the given arguments and an empty set of ignore rectangles and returns the results.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
 }
