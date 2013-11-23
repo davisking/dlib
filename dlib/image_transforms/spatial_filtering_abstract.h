@@ -135,6 +135,46 @@ namespace dlib
         typename in_image_type,
         typename out_image_type,
         typename EXP1,
+        typename EXP2
+        >
+    rectangle float_spatially_filter_image_separable (
+        const in_image_type& in_img,
+        out_image_type& out_img,
+        const matrix_exp<EXP1>& row_filter,
+        const matrix_exp<EXP2>& col_filter,
+        out_image_type& scratch,
+        bool add_to = false
+    );
+    /*!
+        requires
+            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - in_img, out_img, row_filter, and col_filter must all contain float type elements.
+            - is_same_object(in_img, out_img) == false 
+            - row_filter.size() != 0
+            - col_filter.size() != 0
+            - is_vector(row_filter) == true
+            - is_vector(col_filter) == true
+        ensures
+            - This function is identical to the above spatially_filter_image_separable()
+              function except that it can only be invoked on float images with float
+              filters.  In fact, spatially_filter_image_separable() invokes
+              float_spatially_filter_image_separable() in those cases.  So why is
+              float_spatially_filter_image_separable() in the public API?  The reason is
+              because the separable filtering routines internally allocate an image each
+              time they are called.  If you want to avoid this memory allocation then you
+              can call float_spatially_filter_image_separable() and provide the scratch
+              image as input.  This allows you to reuse the same scratch image for many
+              calls to float_spatially_filter_image_separable() and thereby avoid having it
+              allocated and freed for each call.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        typename out_image_type,
+        typename EXP1,
         typename EXP2,
         typename T
         >

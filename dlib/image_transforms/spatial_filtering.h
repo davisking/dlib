@@ -522,166 +522,6 @@ namespace dlib
             return non_border;
         }
 
-    // ------------------------------------------------------------------------------------
-
-        // This overload is optimized to use SIMD instructions when filtering float images with
-        // float filters.
-        template <
-            typename in_image_type,
-            typename out_image_type,
-            typename EXP1,
-            typename EXP2
-            >
-        rectangle float_spatially_filter_image_separable (
-            const in_image_type& in_img,
-            out_image_type& out_img,
-            const matrix_exp<EXP1>& _row_filter,
-            const matrix_exp<EXP2>& _col_filter,
-            bool add_to 
-        )
-        {
-            const_temp_matrix<EXP1> row_filter(_row_filter);
-            const_temp_matrix<EXP2> col_filter(_col_filter);
-            DLIB_ASSERT(row_filter.size() != 0 && col_filter.size() != 0 &&
-                is_vector(row_filter) &&
-                is_vector(col_filter),
-                "\trectangle spatially_filter_image_separable()"
-                << "\n\t Invalid inputs were given to this function."
-                << "\n\t row_filter.size(): "<< row_filter.size()
-                << "\n\t col_filter.size(): "<< col_filter.size()
-                << "\n\t is_vector(row_filter): "<< is_vector(row_filter)
-                << "\n\t is_vector(col_filter): "<< is_vector(col_filter)
-            );
-            DLIB_ASSERT(is_same_object(in_img, out_img) == false,
-                "\trectangle spatially_filter_image_separable()"
-                << "\n\tYou must give two different image objects"
-            );
-
-
-
-            // if there isn't any input image then don't do anything
-            if (in_img.size() == 0)
-            {
-                out_img.clear();
-                return rectangle();
-            }
-
-            out_img.set_size(in_img.nr(),in_img.nc());
-
-            // figure out the range that we should apply the filter to
-            const long first_row = (col_filter.size()-1)/2;
-            const long first_col = (row_filter.size()-1)/2;
-            const long last_row = in_img.nr() - (col_filter.size()/2);
-            const long last_col = in_img.nc() - (row_filter.size()/2);
-
-            const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
-            if (!add_to)
-                zero_border_pixels(out_img, non_border); 
-
-            typedef typename in_image_type::mem_manager_type mem_manager_type;
-
-            array2d<float,mem_manager_type> temp_img;
-            temp_img.set_size(in_img.nr(), in_img.nc());
-
-            // apply the row filter
-            for (long r = 0; r < in_img.nr(); ++r)
-            {
-                long c = first_col;
-                for (; c < last_col-7; c+=8)
-                {
-                    simd8f p,p2,p3, temp = 0, temp2=0, temp3=0;
-                    long n = 0;
-                    for (; n < row_filter.size()-2; n+=3)
-                    {
-                        // pull out the current pixel and put it into p
-                        p.load(&in_img[r][c-first_col+n]);
-                        p2.load(&in_img[r][c-first_col+n+1]);
-                        p3.load(&in_img[r][c-first_col+n+2]);
-                        temp += p*row_filter(n);
-                        temp2 += p2*row_filter(n+1);
-                        temp3 += p3*row_filter(n+2);
-                    }
-                    for (; n < row_filter.size(); ++n)
-                    {
-                        // pull out the current pixel and put it into p
-                        p.load(&in_img[r][c-first_col+n]);
-                        temp += p*row_filter(n);
-                    }
-                    temp += temp2 + temp3;
-                    temp.store(&temp_img[r][c]);
-                }
-                for (; c < last_col; ++c)
-                {
-                    float p;
-                    float temp = 0;
-                    for (long n = 0; n < row_filter.size(); ++n)
-                    {
-                        // pull out the current pixel and put it into p
-                        p = in_img[r][c-first_col+n];
-                        temp += p*row_filter(n);
-                    }
-                    temp_img[r][c] = temp;
-                }
-            }
-
-            // apply the column filter 
-            for (long r = first_row; r < last_row; ++r)
-            {
-                long c = first_col;
-                for (; c < last_col-7; c+=8)
-                {
-                    simd8f p, p2, p3, temp = 0, temp2 = 0, temp3 = 0;
-                    long m = 0;
-                    for (; m < col_filter.size()-2; m+=3)
-                    {
-                        p.load(&temp_img[r-first_row+m][c]);
-                        p2.load(&temp_img[r-first_row+m+1][c]);
-                        p3.load(&temp_img[r-first_row+m+2][c]);
-                        temp += p*col_filter(m);
-                        temp2 += p2*col_filter(m+1);
-                        temp3 += p3*col_filter(m+2);
-                    }
-                    for (; m < col_filter.size(); ++m)
-                    {
-                        p.load(&temp_img[r-first_row+m][c]);
-                        temp += p*col_filter(m);
-                    }
-                    temp += temp2+temp3;
-
-                    // save this pixel to the output image
-                    if (add_to == false)
-                    {
-                        temp.store(&out_img[r][c]);
-                    }
-                    else
-                    {
-                        p.load(&out_img[r][c]);
-                        temp += p;
-                        temp.store(&out_img[r][c]);
-                    }
-                }
-                for (; c < last_col; ++c)
-                {
-                    float temp = 0;
-                    for (long m = 0; m < col_filter.size(); ++m)
-                    {
-                        temp += temp_img[r-first_row+m][c]*col_filter(m);
-                    }
-
-                    // save this pixel to the output image
-                    if (add_to == false)
-                    {
-                        out_img[r][c] = temp;
-                    }
-                    else
-                    {
-                        out_img[r][c] += temp;
-                    }
-                }
-            }
-            return non_border;
-        }
-
     } // namespace impl
 
 // ----------------------------------------------------------------------------------------
@@ -699,6 +539,169 @@ namespace dlib
                                   is_same_type<typename EXP1::type,float>::value &&
                                   is_same_type<typename EXP2::type,float>::value;
     };
+
+// ----------------------------------------------------------------------------------------
+
+    // This overload is optimized to use SIMD instructions when filtering float images with
+    // float filters.
+    template <
+        typename in_image_type,
+        typename out_image_type,
+        typename EXP1,
+        typename EXP2
+        >
+    rectangle float_spatially_filter_image_separable (
+        const in_image_type& in_img,
+        out_image_type& out_img,
+        const matrix_exp<EXP1>& _row_filter,
+        const matrix_exp<EXP2>& _col_filter,
+        out_image_type& scratch,
+        bool add_to = false
+    )
+    {
+        // You can only use this function with images and filters containing float
+        // variables.
+        COMPILE_TIME_ASSERT((is_float_filtering<in_image_type,out_image_type,EXP1,EXP2>::value == true));
+
+
+        const_temp_matrix<EXP1> row_filter(_row_filter);
+        const_temp_matrix<EXP2> col_filter(_col_filter);
+        DLIB_ASSERT(row_filter.size() != 0 && col_filter.size() != 0 &&
+            is_vector(row_filter) &&
+            is_vector(col_filter),
+            "\trectangle float_spatially_filter_image_separable()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t row_filter.size(): "<< row_filter.size()
+            << "\n\t col_filter.size(): "<< col_filter.size()
+            << "\n\t is_vector(row_filter): "<< is_vector(row_filter)
+            << "\n\t is_vector(col_filter): "<< is_vector(col_filter)
+        );
+        DLIB_ASSERT(is_same_object(in_img, out_img) == false,
+            "\trectangle float_spatially_filter_image_separable()"
+            << "\n\tYou must give two different image objects"
+        );
+
+
+
+        // if there isn't any input image then don't do anything
+        if (in_img.size() == 0)
+        {
+            out_img.clear();
+            return rectangle();
+        }
+
+        out_img.set_size(in_img.nr(),in_img.nc());
+
+        // figure out the range that we should apply the filter to
+        const long first_row = (col_filter.size()-1)/2;
+        const long first_col = (row_filter.size()-1)/2;
+        const long last_row = in_img.nr() - (col_filter.size()/2);
+        const long last_col = in_img.nc() - (row_filter.size()/2);
+
+        const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
+        if (!add_to)
+            zero_border_pixels(out_img, non_border); 
+
+        scratch.set_size(in_img.nr(), in_img.nc());
+
+        // apply the row filter
+        for (long r = 0; r < in_img.nr(); ++r)
+        {
+            long c = first_col;
+            for (; c < last_col-7; c+=8)
+            {
+                simd8f p,p2,p3, temp = 0, temp2=0, temp3=0;
+                long n = 0;
+                for (; n < row_filter.size()-2; n+=3)
+                {
+                    // pull out the current pixel and put it into p
+                    p.load(&in_img[r][c-first_col+n]);
+                    p2.load(&in_img[r][c-first_col+n+1]);
+                    p3.load(&in_img[r][c-first_col+n+2]);
+                    temp += p*row_filter(n);
+                    temp2 += p2*row_filter(n+1);
+                    temp3 += p3*row_filter(n+2);
+                }
+                for (; n < row_filter.size(); ++n)
+                {
+                    // pull out the current pixel and put it into p
+                    p.load(&in_img[r][c-first_col+n]);
+                    temp += p*row_filter(n);
+                }
+                temp += temp2 + temp3;
+                temp.store(&scratch[r][c]);
+            }
+            for (; c < last_col; ++c)
+            {
+                float p;
+                float temp = 0;
+                for (long n = 0; n < row_filter.size(); ++n)
+                {
+                    // pull out the current pixel and put it into p
+                    p = in_img[r][c-first_col+n];
+                    temp += p*row_filter(n);
+                }
+                scratch[r][c] = temp;
+            }
+        }
+
+        // apply the column filter 
+        for (long r = first_row; r < last_row; ++r)
+        {
+            long c = first_col;
+            for (; c < last_col-7; c+=8)
+            {
+                simd8f p, p2, p3, temp = 0, temp2 = 0, temp3 = 0;
+                long m = 0;
+                for (; m < col_filter.size()-2; m+=3)
+                {
+                    p.load(&scratch[r-first_row+m][c]);
+                    p2.load(&scratch[r-first_row+m+1][c]);
+                    p3.load(&scratch[r-first_row+m+2][c]);
+                    temp += p*col_filter(m);
+                    temp2 += p2*col_filter(m+1);
+                    temp3 += p3*col_filter(m+2);
+                }
+                for (; m < col_filter.size(); ++m)
+                {
+                    p.load(&scratch[r-first_row+m][c]);
+                    temp += p*col_filter(m);
+                }
+                temp += temp2+temp3;
+
+                // save this pixel to the output image
+                if (add_to == false)
+                {
+                    temp.store(&out_img[r][c]);
+                }
+                else
+                {
+                    p.load(&out_img[r][c]);
+                    temp += p;
+                    temp.store(&out_img[r][c]);
+                }
+            }
+            for (; c < last_col; ++c)
+            {
+                float temp = 0;
+                for (long m = 0; m < col_filter.size(); ++m)
+                {
+                    temp += scratch[r-first_row+m][c]*col_filter(m);
+                }
+
+                // save this pixel to the output image
+                if (add_to == false)
+                {
+                    out_img[r][c] = temp;
+                }
+                else
+                {
+                    out_img[r][c] += temp;
+                }
+            }
+        }
+        return non_border;
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -723,10 +726,11 @@ namespace dlib
     {
         if (use_abs == false)
         {
+            out_image_type scratch;
             if (scale == 1)
-                return impl::float_spatially_filter_image_separable(in_img, out_img, row_filter, col_filter, add_to);
+                return float_spatially_filter_image_separable(in_img, out_img, row_filter, col_filter, scratch, add_to);
             else
-                return impl::float_spatially_filter_image_separable(in_img, out_img, row_filter/scale, col_filter, add_to);
+                return float_spatially_filter_image_separable(in_img, out_img, row_filter/scale, col_filter, scratch,  add_to);
         }
         else
         {
