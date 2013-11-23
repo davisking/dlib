@@ -374,6 +374,7 @@ namespace dlib
         else
         {
             saliency_image.clear();
+            array2d<float> scratch;
 
             // find the first filter to apply
             unsigned long i = 0;
@@ -385,9 +386,9 @@ namespace dlib
                 for (unsigned long j = 0; j < w.row_filters[i].size(); ++j)
                 {
                     if (saliency_image.size() == 0)
-                        area = spatially_filter_image_separable(feats[i], saliency_image, w.row_filters[i][j], w.col_filters[i][j],1,false,false);
+                        area = float_spatially_filter_image_separable(feats[i], saliency_image, w.row_filters[i][j], w.col_filters[i][j],scratch,false);
                     else
-                        area = spatially_filter_image_separable(feats[i], saliency_image, w.row_filters[i][j], w.col_filters[i][j],1,false,true);
+                        area = float_spatially_filter_image_separable(feats[i], saliency_image, w.row_filters[i][j], w.col_filters[i][j],scratch,true);
                 }
             }
             if (saliency_image.size() == 0)
