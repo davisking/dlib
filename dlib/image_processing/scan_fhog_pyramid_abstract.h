@@ -24,7 +24,7 @@ namespace dlib
         requires
             - cell_draw_size > 0
             - weight_index < detector.num_detectors()
-            - detector.get_w().size() >= detector.get_scanner().get_num_dimensions()
+            - detector.get_w(weight_index).size() >= detector.get_scanner().get_num_dimensions()
               (i.e. the detector must have been populated with a HOG filter)
         ensures
             - Converts the HOG filters in the given detector (specifically, the filters in
@@ -40,15 +40,18 @@ namespace dlib
         typename Pyramid_type
         >
     unsigned long num_separable_filters (
-        const object_detector<scan_fhog_pyramid<Pyramid_type> >& detector
+        const object_detector<scan_fhog_pyramid<Pyramid_type> >& detector,
+        const unsigned long weight_index = 0
     );
     /*!
         requires
-            - detector.get_w().size() >= detector.get_scanner().get_num_dimensions()
+            - weight_index < detector.num_detectors()
+            - detector.get_w(weight_index).size() >= detector.get_scanner().get_num_dimensions()
               (i.e. the detector must have been populated with a HOG filter)
         ensures
             - Returns the number of separable filters necessary to represent the HOG
-              filters in the given detector.
+              filters in the given detector's weight_index'th filter.  This is the filter
+              defined by detector.get_w(weight_index).
     !*/
 
 // ----------------------------------------------------------------------------------------

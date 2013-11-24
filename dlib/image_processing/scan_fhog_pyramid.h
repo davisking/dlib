@@ -874,8 +874,8 @@ namespace dlib
         DLIB_ASSERT(weight_index < detector.num_detectors(),
             "\t matrix draw_fhog()"
             << "\n\t Invalid arguments were given to this function. "
-            << "\n\t cell_draw_size:                              " << cell_draw_size
-            << "\n\t detector.num_detectors():                    " << detector.num_detectors()
+            << "\n\t weight_index:             " << weight_index
+            << "\n\t detector.num_detectors(): " << detector.num_detectors()
             );
         DLIB_ASSERT(cell_draw_size > 0 && detector.get_w(weight_index).size() >= detector.get_scanner().get_num_dimensions(),
             "\t matrix draw_fhog()"
@@ -896,18 +896,25 @@ namespace dlib
         typename Pyramid_type
         >
     unsigned long num_separable_filters (
-        const object_detector<scan_fhog_pyramid<Pyramid_type> >& detector
+        const object_detector<scan_fhog_pyramid<Pyramid_type> >& detector,
+        const unsigned long weight_index = 0
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(detector.get_w().size() >= detector.get_scanner().get_num_dimensions() ,
+        DLIB_ASSERT(weight_index < detector.num_detectors(),
             "\t unsigned long num_separable_filters()"
             << "\n\t Invalid arguments were given to this function. "
-            << "\n\t detector.get_w().size():                     " << detector.get_w().size()
+            << "\n\t weight_index:             " << weight_index
+            << "\n\t detector.num_detectors(): " << detector.num_detectors()
+            );
+        DLIB_ASSERT(detector.get_w(weight_index).size() >= detector.get_scanner().get_num_dimensions() ,
+            "\t unsigned long num_separable_filters()"
+            << "\n\t Invalid arguments were given to this function. "
+            << "\n\t detector.get_w(weight_index).size():         " << detector.get_w(weight_index).size()
             << "\n\t detector.get_scanner().get_num_dimensions(): " << detector.get_scanner().get_num_dimensions()
             );
 
-        typename scan_fhog_pyramid<Pyramid_type>::fhog_filterbank fb = detector.get_scanner().build_fhog_filterbank(detector.get_w());
+        typename scan_fhog_pyramid<Pyramid_type>::fhog_filterbank fb = detector.get_scanner().build_fhog_filterbank(detector.get_w(weight_index));
         return fb.num_separable_filters();
     }
 
