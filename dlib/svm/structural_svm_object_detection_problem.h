@@ -334,7 +334,7 @@ namespace dlib
             // The point of this loop is to fill out the truth_score_hits array. 
             for (unsigned long i = 0; i < dets.size() && final_dets.size() < max_num_dets; ++i)
             {
-                if (overlaps_any_box(final_dets, dets[i].second))
+                if (overlaps_any_box(boxes_overlap, final_dets, dets[i].second))
                     continue;
 
                 const std::pair<double,unsigned int> truth = find_best_match(truth_object_detections[idx], dets[i].second);
@@ -371,7 +371,7 @@ namespace dlib
             // detections.
             for (unsigned long i = 0; i < dets.size() && final_dets.size() < max_num_dets; ++i)
             {
-                if (overlaps_any_box(final_dets, dets[i].second))
+                if (overlaps_any_box(boxes_overlap, final_dets, dets[i].second))
                     continue;
 
                 const std::pair<double,unsigned int> truth = find_best_match(truth_object_detections[idx], dets[i].second);
@@ -430,19 +430,6 @@ namespace dlib
             psi(scanner.get_num_dimensions()) = -1.0*final_dets.size();
         }
 
-
-        bool overlaps_any_box (
-            const std::vector<rectangle>& truth_object_detections,
-            const dlib::rectangle& rect
-        ) const
-        {
-            for (unsigned long i = 0; i < truth_object_detections.size(); ++i)
-            {
-                if (boxes_overlap(truth_object_detections[i], rect))
-                    return true;
-            }
-            return false;
-        }
 
         bool overlaps_ignore_box (
             const long idx,
