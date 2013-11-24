@@ -21,6 +21,7 @@ namespace dlib
     {
         inline unsigned long number_of_truth_hits (
             const std::vector<full_object_detection>& truth_boxes,
+            const std::vector<rectangle>& ignore,
             const std::vector<std::pair<double,rectangle> >& boxes,
             const test_box_overlap& overlap_tester,
             std::vector<std::pair<double,bool> >& all_dets,
@@ -34,8 +35,10 @@ namespace dlib
                 - No element of boxes is allowed to account for more than one element of truth_boxes.  
                 - The returned number is in the range [0,truth_boxes.size()]
                 - Adds the score for each box from boxes into all_dets and labels each with
-                  a bool indicating if it hit a truth box.  Also adds the number of truth
-                  boxes which didn't have any hits into missing_detections.
+                  a bool indicating if it hit a truth box.  Note that we skip boxes that
+                  don't hit any truth boxes and match an ignore box.
+                - Adds the number of truth boxes which didn't have any hits into
+                  missing_detections.
         !*/
         {
             if (boxes.size() == 0)
@@ -70,7 +73,11 @@ namespace dlib
 
             for (unsigned long i = 0; i < boxes.size(); ++i)
             {
-                all_dets.push_back(std::make_pair(boxes[i].first, used[i]));
+                // only out put boxes if they match a truth box or are not ignored.
+                if (used[i] || !overlaps_any_box(overlap_tester, ignore, boxes[i].second))
+                {
+                    all_dets.push_back(std::make_pair(boxes[i].first, used[i]));
+                }
             }
 
             return count;
@@ -78,23 +85,6 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        inline unsigned long count_dets_not_hitting_ignore_boxes (
-            const test_box_overlap& overlap_tester,
-            const std::vector<rectangle>& ignore,
-            const std::vector<std::pair<double,rectangle> >& dets
-        )
-        {
-            unsigned long count = 0;
-
-            for (unsigned long i = 0; i < dets.size(); ++i)
-            {
-                if (!overlaps_any_box(overlap_tester, ignore, dets[i].second))
-                {
-                    ++count;
-                }
-            }
-            return count;
-        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -125,7 +115,6 @@ namespace dlib
 
 
         double correct_hits = 0;
-        double total_hits = 0;
         double total_true_targets = 0;
 
         std::vector<std::pair<double,bool> > all_dets;
@@ -137,8 +126,7 @@ namespace dlib
             std::vector<std::pair<double,rectangle> > hits; 
             detector(images[i], hits, adjust_threshold);
 
-            total_hits += impl::count_dets_not_hitting_ignore_boxes(overlap_tester, ignore[i], hits);
-            correct_hits += impl::number_of_truth_hits(truth_dets[i], hits, overlap_tester, all_dets, missing_detections);
+            correct_hits += impl::number_of_truth_hits(truth_dets[i], ignore[i], hits, overlap_tester, all_dets, missing_detections);
             total_true_targets += truth_dets[i].size();
         }
 
@@ -146,10 +134,7 @@ namespace dlib
 
         double precision, recall;
 
-        // If the user put an ignore box on the same spot as a truth box then we could end
-        // up with a total_hits value less than correct_hits.  So we do this to make sure
-        // the precision value never goes above 1.
-        total_hits = std::max(total_hits,correct_hits);
+        double total_hits = all_dets.size();
 
         if (total_hits == 0)
             precision = 1;
@@ -301,7 +286,6 @@ namespace dlib
                     );
 
         double correct_hits = 0;
-        double total_hits = 0;
         double total_true_targets = 0;
 
         const long test_size = images.size()/folds;
@@ -336,8 +320,7 @@ namespace dlib
                 std::vector<std::pair<double,rectangle> > hits; 
                 detector(images[test_idx_set[i]], hits, adjust_threshold);
 
-                total_hits += impl::count_dets_not_hitting_ignore_boxes(overlap_tester, ignore[i], hits);
-                correct_hits += impl::number_of_truth_hits(truth_dets[test_idx_set[i]], hits, overlap_tester, all_dets, missing_detections);
+                correct_hits += impl::number_of_truth_hits(truth_dets[test_idx_set[i]], ignore[i], hits, overlap_tester, all_dets, missing_detections);
                 total_true_targets += truth_dets[test_idx_set[i]].size();
             }
 
@@ -348,10 +331,7 @@ namespace dlib
 
         double precision, recall;
 
-        // If the user put an ignore box on the same spot as a truth box then we could end
-        // up with a total_hits value less than correct_hits.  So we do this to make sure
-        // the precision value never goes above 1.
-        total_hits = std::max(total_hits,correct_hits);
+        double total_hits = all_dets.size();
 
         if (total_hits == 0)
             precision = 1;
