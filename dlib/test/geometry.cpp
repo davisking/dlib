@@ -107,7 +107,7 @@ namespace
         DLIB_TEST(rect2 == rect1);
         DLIB_TEST(p2 == p1);
         DLIB_TEST(v2 == v1);
-        DLIB_TEST(sin);
+        DLIB_TEST(sin.good());
         DLIB_TEST(sin.get() == EOF);
 
 

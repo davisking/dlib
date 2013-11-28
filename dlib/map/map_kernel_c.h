@@ -50,10 +50,32 @@ namespace dlib
             ) const;
 
             const map_pair<domain,range>& element (
-            ) const;
+            ) const
+            {
+                // make sure requires clause is not broken
+                DLIB_CASSERT(this->current_element_valid() == true,
+                    "\tconst map_pair<domain,range>& map::element"
+                    << "\n\tyou can't access the current element if it doesn't exist"
+                    << "\n\tthis: " << this
+                    );
+
+                // call the real function
+                return map_base::element();
+            }
 
             map_pair<domain,range>& element (
-            );
+            )
+            {
+                // make sure requires clause is not broken
+                DLIB_CASSERT(this->current_element_valid() == true,
+                    "\tmap_pair<domain,range>& map::element"
+                    << "\n\tyou can't access the current element if it doesn't exist"
+                    << "\n\tthis: " << this
+                    );
+
+                // call the real function
+                return map_base::element();
+            }
 
     };
 
@@ -217,47 +239,7 @@ namespace dlib
         // call the real function
         return map_base::operator[](d);
     }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename map_base
-        >
-    const map_pair<typename map_base::domain_type,typename map_base::range_type>& map_kernel_c<map_base>::
-    element (
-    ) const
-    {
-        // make sure requires clause is not broken
-        DLIB_CASSERT(this->current_element_valid() == true,
-            "\tconst map_pair<domain,range>& map::element"
-            << "\n\tyou can't access the current element if it doesn't exist"
-            << "\n\tthis: " << this
-            );
-
-        // call the real function
-        return map_base::element();
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename map_base
-        >
-    map_pair<typename map_base::domain_type,typename map_base::range_type>& map_kernel_c<map_base>::
-    element (
-    ) 
-    {
-        // make sure requires clause is not broken
-        DLIB_CASSERT(this->current_element_valid() == true,
-            "\tmap_pair<domain,range>& map::element"
-            << "\n\tyou can't access the current element if it doesn't exist"
-            << "\n\tthis: " << this
-            );
-
-        // call the real function
-        return map_base::element();
-    }
-
+    
 // ----------------------------------------------------------------------------------------
 
 }

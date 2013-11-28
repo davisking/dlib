@@ -1058,16 +1058,16 @@ namespace
         {
             istringstream sin(" 1 2\n3");
             matrix<double> m;
-            DLIB_TEST(sin);
+            DLIB_TEST(sin.good());
             sin >> m;
-            DLIB_TEST(!sin);
+            DLIB_TEST(!sin.good());
         }
         {
             istringstream sin("");
             matrix<double> m;
-            DLIB_TEST(sin);
+            DLIB_TEST(sin.good());
             sin >> m;
-            DLIB_TEST(!sin);
+            DLIB_TEST(!sin.good());
         }
     }
 

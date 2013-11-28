@@ -54,10 +54,28 @@ namespace dlib
             );
 
             const map_pair<domain,range>& element (
-            ) const;
+            ) const
+            {
+                DLIB_CASSERT(this->current_element_valid() == true,
+                    "\tconst map_pair<domain,range>& hash_table::element() const"
+                    << "\n\tyou can't access the current element if it doesn't exist"
+                    << "\n\tthis: " << this
+                    );
+
+                return ht_base::element();
+            }
 
             map_pair<domain,range>& element (
-            );
+            )
+            {
+                DLIB_CASSERT(this->current_element_valid() == true,
+                    "\tmap_pair<domain,range>& hash_table::element()"
+                    << "\n\tyou can't access the current element if it doesn't exist"
+                    << "\n\tthis: " << this
+                    );
+
+                return ht_base::element();
+            }
 
 
     };
@@ -166,42 +184,6 @@ namespace dlib
             );
 
         ht_base::remove_any(d,r);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename ht_base        
-        >
-    const map_pair<typename ht_base::domain_type,typename ht_base::range_type>& hash_table_kernel_c<ht_base>::
-    element (
-    ) const
-    {
-        DLIB_CASSERT(this->current_element_valid() == true,
-            "\tconst map_pair<domain,range>& hash_table::element() const"
-            << "\n\tyou can't access the current element if it doesn't exist"
-            << "\n\tthis: " << this
-            );
-
-        return ht_base::element();
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename ht_base        
-        >
-    map_pair<typename ht_base::domain_type,typename ht_base::range_type>& hash_table_kernel_c<ht_base>::
-    element (
-    ) 
-    {
-        DLIB_CASSERT(this->current_element_valid() == true,
-            "\tmap_pair<domain,range>& hash_table::element()"
-            << "\n\tyou can't access the current element if it doesn't exist"
-            << "\n\tthis: " << this
-            );
-
-        return ht_base::element();
     }
 
 // ----------------------------------------------------------------------------------------
