@@ -1212,6 +1212,7 @@
          <term file="imaging.html" name="sum_filter_assign"          include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="max_filter"                 include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="spatially_filter_image_separable"       include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="float_spatially_filter_image_separable"       include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="spatially_filter_image_separable_down"  include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="separable_3x3_filter_block_grayscale"   include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="separable_3x3_filter_block_rgb"         include="dlib/image_transforms.h"/>
