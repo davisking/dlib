@@ -575,10 +575,14 @@ However, for graphs with cycles, the solution may be approximate.
 <br/>
 <br/>
             This function is an implementation of the NMPLP algorithm introduced in the 
-            following paper:
+            following papers:
                 <blockquote>
-                Fixing Max-Product: Convergent Message Passing Algorithms for MAP LP-Relaxations 
+                Fixing Max-Product: Convergent Message Passing Algorithms for MAP LP-Relaxations (2008)
                 by Amir Globerson and Tommi Jaakkola
+                </blockquote>
+                <blockquote>
+                Introduction to dual decomposition for inference (2011)
+                by David Sontag, Amir Globerson, and Tommi Jaakkola 
                 </blockquote>
 
          </description>
