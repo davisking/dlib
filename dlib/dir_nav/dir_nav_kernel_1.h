@@ -101,6 +101,9 @@ namespace dlib
         inline  const std::string& full_name (
         ) const { return state.full_name; }
 
+        operator std::string (
+        ) const { return full_name(); }
+
         inline uint64 size (
         ) const { return state.file_size; }
 

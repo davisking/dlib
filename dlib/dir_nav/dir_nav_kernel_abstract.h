@@ -139,6 +139,14 @@ namespace dlib
                 - returns the size of this file in bytes.
         !*/
 
+        operator std::string (
+        ) const; 
+        /*!
+            ensures
+                - returns full_name()
+                  (i.e. provides an implicit conversion to string from dlib::file)
+        !*/
+
         file& operator= (
             const file& rhs
         );
