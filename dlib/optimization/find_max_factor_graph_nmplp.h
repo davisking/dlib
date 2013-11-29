@@ -143,12 +143,19 @@ namespace dlib
 
         /*
             This function is an implementation of the NMPLP algorithm introduced in the 
-            following paper:
-                Fixing Max-Product: Convergent Message Passing Algorithms for MAP LP-Relaxations 
+            following papers:
+                Fixing Max-Product: Convergent Message Passing Algorithms for MAP LP-Relaxations (2008)
                 by Amir Globerson and Tommi Jaakkola
 
-                In particular, see the pseudocode in Figure 1.  The code in this function
-                follows what is described there.
+                Introduction to dual decomposition for inference (2011)
+                by David Sontag, Amir Globerson, and Tommi Jaakkola 
+
+            In particular, this function implements the star MPLP update equations shown as
+            equation 1.20 from the paper Introduction to dual decomposition for inference
+            (the method was called NMPLP in the first paper).  It should also be noted that
+            the original description of the NMPLP in the first paper had an error in the
+            equations and the second paper contains corrected equations, which is what this 
+            function uses.
         */
 
         typedef typename map_problem::node_iterator node_iterator;
@@ -161,14 +168,15 @@ namespace dlib
             return;
 
 
-        std::vector<double> gamma_elements;
-        gamma_elements.reserve(prob.number_of_nodes()*prob.num_states(prob.begin())*3);
+        std::vector<double> delta_elements;
+        delta_elements.reserve(prob.number_of_nodes()*prob.num_states(prob.begin())*3);
 
-        impl::simple_hash_map gamma_idx;
+        impl::simple_hash_map delta_idx;
 
 
 
-        // initialize gamma according to the initialization instructions at top of Figure 1
+        // Initialize delta to zero and fill up the hash table with the appropriate values
+        // so we can index into delta later on.
         for (node_iterator i = prob.begin(); i != prob.end(); ++i)
         {
             const unsigned long id_i = prob.node_id(i);
@@ -176,106 +184,124 @@ namespace dlib
             for (neighbor_iterator j = prob.begin(i); j != prob.end(i); ++j)
             {
                 const unsigned long id_j = prob.node_id(j);
-
-                gamma_idx.insert(id_i, id_j, gamma_elements.size());
+                delta_idx.insert(id_i, id_j, delta_elements.size());
 
                 const unsigned long num_states_xj = prob.num_states(j);
-
                 for (unsigned long xj = 0; xj < num_states_xj; ++xj)
-                {
-                    const unsigned long num_states_xi = prob.num_states(i);
-
-                    double best_val = -std::numeric_limits<double>::infinity();
-                    for (unsigned long xi = 0; xi < num_states_xi; ++xi)
-                    {
-                        double val = prob.factor_value(i,j,xi,xj); 
-
-                        double sum_temp = 0;
-
-                        for (neighbor_iterator k = prob.begin(i); k != prob.end(i); ++k)
-                        {
-                            if (j == k)
-                                continue;
-
-                            double max_val = -std::numeric_limits<double>::infinity();
-                            for (unsigned long xk = 0; xk < prob.num_states(k); ++xk)
-                            {
-                                double temp = prob.factor_value(k,i,xk,xi);
-                                if (temp > max_val)
-                                    max_val = temp;
-                            }
-
-                            sum_temp += max_val;
-                        }
-
-
-                        val += 0.5*sum_temp;
-
-                        if (val > best_val)
-                            best_val = val;
-                    }
-
-
-                    gamma_elements.push_back(best_val);
-                }
+                    delta_elements.push_back(0);
             }
         }
 
 
+        std::vector<double> gamma_i;
+        std::vector<std::vector<double> > gamma_ji;
+        std::vector<std::vector<double> > delta_to_j_no_i;
+        // These arrays will end up with a length equal to the maximum number of neighbors
+        // of any node in the graph.  So reserve a bigish number of slots so that we are
+        // very unlikely to need to preform an expensive reallocation during the
+        // optimization.
+        gamma_ji.reserve(10000);
+        delta_to_j_no_i.reserve(10000);
 
 
         double max_change = eps + 1; 
         // Now do the main body of the optimization. 
-        for (unsigned long iter = 0; iter < max_iter && max_change > eps; ++iter)
+        unsigned long iter;
+        for (iter = 0; iter < max_iter && max_change > eps; ++iter)
         {
             max_change = -std::numeric_limits<double>::infinity();
 
             for (node_iterator i = prob.begin(); i != prob.end(); ++i)
             {
                 const unsigned long id_i = prob.node_id(i);
+                const unsigned long num_states_xi = prob.num_states(i);
+                gamma_i.assign(num_states_xi, 0);
 
+                double num_neighbors = 0;
+
+                unsigned int jcnt = 0;
+                // first we fill in the gamma vectors
+                for (neighbor_iterator j = prob.begin(i); j != prob.end(i); ++j)
+                {
+                    // Make sure these arrays are big enough to hold all the neighbor
+                    // information.
+                    if (jcnt >= gamma_ji.size())
+                    {
+                        gamma_ji.resize(gamma_ji.size()+1);
+                        delta_to_j_no_i.resize(delta_to_j_no_i.size()+1);
+                    }
+
+                    ++num_neighbors;
+                    const unsigned long id_j = prob.node_id(j);
+                    const unsigned long num_states_xj = prob.num_states(j);
+
+                    gamma_ji[jcnt].assign(num_states_xi, -std::numeric_limits<double>::infinity());
+                    delta_to_j_no_i[jcnt].assign(num_states_xj, 0);
+
+                    // compute delta_j^{-i} and store it in delta_to_j_no_i[jcnt]  
+                    for (neighbor_iterator k = prob.begin(j); k != prob.end(j); ++k)
+                    {
+                        const unsigned long id_k = prob.node_id(k);
+                        if (id_k==id_i)
+                            continue;
+                        const double* const delta_kj = &delta_elements[delta_idx(id_k,id_j)];
+                        for (unsigned long xj = 0; xj < num_states_xj; ++xj)
+                        {
+                            delta_to_j_no_i[jcnt][xj] += delta_kj[xj];
+                        }
+                    }
+
+                    // now compute gamma values
+                    for (unsigned long xi = 0; xi < num_states_xi; ++xi)
+                    {
+                        for (unsigned long xj = 0; xj < num_states_xj; ++xj)
+                        {
+                            gamma_ji[jcnt][xi] = std::max(gamma_ji[jcnt][xi], prob.factor_value(i,j,xi,xj) + delta_to_j_no_i[jcnt][xj]);
+                        }
+                        gamma_i[xi] += gamma_ji[jcnt][xi];
+                    }
+                    ++jcnt;
+                }
+
+                // now update the delta values
+                jcnt = 0;
                 for (neighbor_iterator j = prob.begin(i); j != prob.end(i); ++j)
                 {
                     const unsigned long id_j = prob.node_id(j);
-                    double* const gamma_ji = &gamma_elements[gamma_idx(id_j,id_i)];
-                    double* const gamma_ij = &gamma_elements[gamma_idx(id_i,id_j)];
-
                     const unsigned long num_states_xj = prob.num_states(j);
+
+                    // messages from j to i
+                    double* const delta_ji = &delta_elements[delta_idx(id_j,id_i)];
+
+                    // messages from i to j
+                    double* const delta_ij = &delta_elements[delta_idx(id_i,id_j)];
 
                     for (unsigned long xj = 0; xj < num_states_xj; ++xj)
                     {
-                        const unsigned long num_states_xi = prob.num_states(i);
-
                         double best_val = -std::numeric_limits<double>::infinity();
+
                         for (unsigned long xi = 0; xi < num_states_xi; ++xi)
                         {
-                            double val = prob.factor_value(i,j,xi,xj) - gamma_ji[xi];  
-
-                            double sum_temp = 0;
-
-                            int num_neighbors = 0;
-                            for (neighbor_iterator k = prob.begin(i); k != prob.end(i); ++k)
-                            {
-                                const unsigned long id_k = prob.node_id(k);
-                                ++num_neighbors;
-
-                                const double* const gamma_ki = &gamma_elements[gamma_idx(id_k,id_i)];
-                                sum_temp += gamma_ki[xi];
-                            }
-
-
-                            val += 2.0/(num_neighbors + 1.0)*sum_temp;
-
+                            double val = prob.factor_value(i,j,xi,xj) + 2/(num_neighbors+1)*gamma_i[xi] -gamma_ji[jcnt][xi];
                             if (val > best_val)
                                 best_val = val;
                         }
+                        best_val = -0.5*delta_to_j_no_i[jcnt][xj] + 0.5*best_val;
 
+                        if (std::abs(delta_ij[xj] - best_val) > max_change)
+                            max_change = std::abs(delta_ij[xj] - best_val);
 
-                        if (std::abs(gamma_ij[xj] - best_val) > max_change)
-                            max_change = std::abs(gamma_ij[xj] - best_val);
-
-                        gamma_ij[xj] = best_val;
+                        delta_ij[xj] = best_val;
                     }
+
+                    for (unsigned long xi = 0; xi < num_states_xi; ++xi)
+                    {
+                        double new_val = -1/(num_neighbors+1)*gamma_i[xi] + gamma_ji[jcnt][xi];
+                        if (std::abs(delta_ji[xi] - new_val) > max_change)
+                            max_change = std::abs(delta_ji[xi] - new_val);
+                        delta_ji[xi] = new_val;
+                    }
+                    ++jcnt;
                 }
             }
         }
@@ -294,8 +320,8 @@ namespace dlib
 
                 for (unsigned long xi = 0; xi < b.size(); ++xi)
                 {
-                    const double* const gamma_ki = &gamma_elements[gamma_idx(id_k,id_i)];
-                    b[xi] += gamma_ki[xi];
+                    const double* const delta_ki = &delta_elements[delta_idx(id_k,id_i)];
+                    b[xi] += delta_ki[xi];
                 }
             }
 

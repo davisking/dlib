@@ -347,10 +347,13 @@ namespace dlib
               to the MAP problem.  However, for graphs with cycles, the solution may be approximate.
               
 
-            - This function is an implementation of the NMPLP algorithm introduced in the 
-              following paper:
-                Fixing Max-Product: Convergent Message Passing Algorithms for MAP LP-Relaxations 
+            - This function is an implementation of the NMPLP algorithm introduced in the
+              following papers:
+                Fixing Max-Product: Convergent Message Passing Algorithms for MAP LP-Relaxations (2008)
                 by Amir Globerson and Tommi Jaakkola
+
+                Introduction to dual decomposition for inference (2011)
+                by David Sontag, Amir Globerson, and Tommi Jaakkola 
     !*/
 
 // ----------------------------------------------------------------------------------------
