@@ -398,6 +398,14 @@ namespace dlib
                     - the last character of #full_name() is NOT get_separator()
         !*/
 
+        operator std::string (
+        ) const; 
+        /*!
+            ensures
+                - returns full_name()
+                  (i.e. provides an implicit conversion to string from dlib::directory)
+        !*/
+
         directory& operator= (
             const directory& rhs
         );
