@@ -6,6 +6,7 @@
 #include "convert_pascal_v1.h"
 #include "convert_idl.h"
 #include <dlib/cmd_line_parser.h>
+#include <dlib/image_transforms.h>
 #include <dlib/svm.h>
 
 #include <iostream>
@@ -35,7 +36,7 @@ void create_new_dataset (
     // make sure the file exists so we can use the get_parent_directory() command to
     // figure out it's parent directory.
     make_empty_file(filename);
-    const std::string parent_dir = get_parent_directory(file(filename)).full_name();
+    const std::string parent_dir = get_parent_directory(file(filename));
 
     unsigned long depth = 0;
     if (parser.option("r"))
@@ -48,7 +49,7 @@ void create_new_dataset (
     {
         try
         {
-            const string temp = strip_path(file(parser[i]).full_name(), parent_dir);
+            const string temp = strip_path(file(parser[i]), parent_dir);
             meta.images.push_back(image(temp));
         }
         catch (dlib::file::file_not_found&)
@@ -62,7 +63,7 @@ void create_new_dataset (
 
             for (unsigned long j = 0; j < files.size(); ++j)
             {
-                meta.images.push_back(image(strip_path(files[j].full_name(), parent_dir)));
+                meta.images.push_back(image(strip_path(files[j], parent_dir)));
             }
         }
     }
@@ -256,6 +257,65 @@ void merge_metadata_files (
 
 // ----------------------------------------------------------------------------------------
 
+string to_png_name (const string& filename)
+{
+    string::size_type pos = filename.find_last_of(".");
+    if (pos == string::npos)
+        throw dlib::error("invalid filename: " + filename);
+    return filename.substr(0,pos) + ".png";
+}
+
+// ----------------------------------------------------------------------------------------
+
+void flip_dataset(const command_line_parser& parser)
+{
+#ifdef DLIB_PNG_SUPPORT
+    image_dataset_metadata::dataset metadata;
+    const string datasource = parser.option("flip").argument();
+    load_image_dataset_metadata(metadata,datasource);
+
+    // Set the current directory to be the one that contains the
+    // metadata file. We do this because the file might contain
+    // file paths which are relative to this folder.
+    set_current_dir(get_parent_directory(file(datasource)));
+
+    const string metadata_filename = get_parent_directory(file(datasource)).full_name() +
+        directory::get_separator() + "flipped_" + file(datasource).name();
+
+
+    array2d<rgb_pixel> img, temp;
+    for (unsigned long i = 0; i < metadata.images.size(); ++i)
+    {
+        file f(metadata.images[i].filename);
+        const string filename = get_parent_directory(f).full_name() + directory::get_separator() + "flipped_" + to_png_name(f.name());
+
+        load_image(img, metadata.images[i].filename);
+        flip_image_left_right(img, temp);
+        save_png(temp, filename);
+
+        for (unsigned long j = 0; j < metadata.images[i].boxes.size(); ++j)
+        {
+            metadata.images[i].boxes[j].rect = impl::flip_rect_left_right(metadata.images[i].boxes[j].rect, get_rect(img));
+
+            // flip all the object parts
+            std::map<std::string,point>::iterator k;
+            for (k = metadata.images[i].boxes[j].parts.begin(); k != metadata.images[i].boxes[j].parts.end(); ++k)
+            {
+                k->second = impl::flip_rect_left_right(rectangle(k->second,k->second), get_rect(img)).tl_corner();
+            }
+        }
+
+        metadata.images[i].filename = filename;
+    }
+
+    save_image_dataset_metadata(metadata, metadata_filename);
+#else
+    throw dlib::error("imglab must be compiled with libpng if you want to use the --flip option.");
+#endif
+}
+
+// ----------------------------------------------------------------------------------------
+
 int main(int argc, char** argv)
 {
     try
@@ -289,10 +349,12 @@ int main(int argc, char** argv)
                                  "tags are in both files then the ones in <arg2> are deleted and replaced with the "
                                  "image tags from <arg1>.  The results are saved into merged.xml and neither <arg1> or "
                                  "<arg2> files are modified.",2);
+        parser.add_option("flip", "Read an XML image dataset from the <arg> XML file and output a left-right flipped "
+                                  "version of the dataset and an accompanying flipped XML file named flipped_<arg>.",1);
 
         parser.parse(argc, argv);
 
-        const char* singles[] = {"h","c","r","l","convert","parts","rmdiff","seed", "shuffle", "split", "add"};
+        const char* singles[] = {"h","c","r","l","convert","parts","rmdiff","seed", "shuffle", "split", "add", "flip"};
         parser.check_one_time_options(singles);
         const char* c_sub_ops[] = {"r", "convert"};
         parser.check_sub_options("c", c_sub_ops);
@@ -300,11 +362,14 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("c", "l");
         parser.check_incompatible_options("c", "rmdiff");
         parser.check_incompatible_options("c", "add");
+        parser.check_incompatible_options("c", "flip");
         parser.check_incompatible_options("c", "rename");
         parser.check_incompatible_options("c", "parts");
         parser.check_incompatible_options("l", "rename");
         parser.check_incompatible_options("l", "add");
         parser.check_incompatible_options("l", "parts");
+        parser.check_incompatible_options("l", "flip");
+        parser.check_incompatible_options("add", "flip");
         parser.check_incompatible_options("convert", "l");
         parser.check_incompatible_options("convert", "rename");
         parser.check_incompatible_options("convert", "parts");
@@ -323,6 +388,12 @@ int main(int argc, char** argv)
         if (parser.option("add"))
         {
             merge_metadata_files(parser);
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("flip"))
+        {
+            flip_dataset(parser);
             return EXIT_SUCCESS;
         }
 
