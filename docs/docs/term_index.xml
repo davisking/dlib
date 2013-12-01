@@ -1231,6 +1231,10 @@
          <term file="imaging.html" name="resize_image"            include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="pyramid_up"              include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="add_image_left_right_flips" include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="flip_image_dataset_left_right" include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="upsample_image_dataset" include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="rotate_image_dataset" include="dlib/image_transforms.h"/>
+
          <term file="imaging.html" name="flip_image_left_right"   include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="flip_image_up_down"      include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/interpolation_abstract.h.html" name="black_background" include="dlib/image_transforms.h"/>
