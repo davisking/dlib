@@ -15,26 +15,26 @@ namespace dlib
     public:
         typedef int32 type;
 
-        simd4i() {}
-        simd4i(int32 f) { x = _mm_set1_epi32(f); }
-        simd4i(int32 r0, int32 r1, int32 r2, int32 r3) { x = _mm_setr_epi32(r0,r1,r2,r3); }
-        simd4i(const __m128i& val):x(val) {}
+        inline simd4i() {}
+        inline simd4i(int32 f) { x = _mm_set1_epi32(f); }
+        inline simd4i(int32 r0, int32 r1, int32 r2, int32 r3) { x = _mm_setr_epi32(r0,r1,r2,r3); }
+        inline simd4i(const __m128i& val):x(val) {}
 
-        simd4i& operator=(const __m128i& val)
+        inline simd4i& operator=(const __m128i& val)
         {
             x = val;
             return *this;
         }
 
-        operator __m128i() const { return x; }
+        inline operator __m128i() const { return x; }
 
-        void load_aligned(const type* ptr)  { x = _mm_load_si128((const __m128i*)ptr); }
-        void store_aligned(type* ptr) const { _mm_store_si128((__m128i*)ptr, x); }
-        void load(const type* ptr)          { x = _mm_loadu_si128((const __m128i*)ptr); }
-        void store(type* ptr)         const { _mm_storeu_si128((__m128i*)ptr, x); }
+        inline void load_aligned(const type* ptr)  { x = _mm_load_si128((const __m128i*)ptr); }
+        inline void store_aligned(type* ptr) const { _mm_store_si128((__m128i*)ptr, x); }
+        inline void load(const type* ptr)          { x = _mm_loadu_si128((const __m128i*)ptr); }
+        inline void store(type* ptr)         const { _mm_storeu_si128((__m128i*)ptr, x); }
 
-        unsigned int size() const { return 4; }
-        int32 operator[](unsigned int idx) const 
+        inline unsigned int size() const { return 4; }
+        inline int32 operator[](unsigned int idx) const 
         {
             int32 temp[4];
             store(temp);
@@ -51,17 +51,17 @@ namespace dlib
     public:
         typedef int32 type;
 
-        simd4i() {}
-        simd4i(int32 f) { x[0]=f; x[1]=f; x[2]=f; x[3]=f; }
-        simd4i(int32 r0, int32 r1, int32 r2, int32 r3) { x[0]=r0; x[1]=r1; x[2]=r2; x[3]=r3;}
+        inline simd4i() {}
+        inline simd4i(int32 f) { x[0]=f; x[1]=f; x[2]=f; x[3]=f; }
+        inline simd4i(int32 r0, int32 r1, int32 r2, int32 r3) { x[0]=r0; x[1]=r1; x[2]=r2; x[3]=r3;}
 
         struct rawarray
         {
             int32 a[4];
         };
-        simd4i(const rawarray& a) { x[0]=a.a[0]; x[1]=a.a[1]; x[2]=a.a[2]; x[3]=a.a[3]; }
+        inline simd4i(const rawarray& a) { x[0]=a.a[0]; x[1]=a.a[1]; x[2]=a.a[2]; x[3]=a.a[3]; }
 
-        void load_aligned(const type* ptr)
+        inline void load_aligned(const type* ptr)
         {
             x[0] = ptr[0];
             x[1] = ptr[1];
@@ -69,7 +69,7 @@ namespace dlib
             x[3] = ptr[3];
         }
 
-        void store_aligned(type* ptr) const
+        inline void store_aligned(type* ptr) const
         {
             ptr[0] = x[0];
             ptr[1] = x[1];
@@ -77,7 +77,7 @@ namespace dlib
             ptr[3] = x[3];
         }
 
-        void load(const type* ptr)
+        inline void load(const type* ptr)
         {
             x[0] = ptr[0];
             x[1] = ptr[1];
@@ -85,7 +85,7 @@ namespace dlib
             x[3] = ptr[3];
         }
 
-        void store(type* ptr) const
+        inline void store(type* ptr) const
         {
             ptr[0] = x[0];
             ptr[1] = x[1];
@@ -93,8 +93,8 @@ namespace dlib
             ptr[3] = x[3];
         }
 
-        unsigned int size() const { return 4; }
-        int32 operator[](unsigned int idx) const { return x[idx]; }
+        inline unsigned int size() const { return 4; }
+        inline int32 operator[](unsigned int idx) const { return x[idx]; }
 
     private:
         int32 x[4];

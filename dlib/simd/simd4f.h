@@ -17,11 +17,11 @@ namespace dlib
     public:
         typedef float type;
 
-        simd4f() {}
-        simd4f(float f) { x = _mm_set1_ps(f); }
-        simd4f(float r0, float r1, float r2, float r3) { x = _mm_setr_ps(r0,r1,r2,r3); }
-        simd4f(const __m128& val):x(val) {}
-        simd4f(const simd4i& val):x(_mm_cvtepi32_ps(val)) {}
+        inline simd4f() {}
+        inline simd4f(float f) { x = _mm_set1_ps(f); }
+        inline simd4f(float r0, float r1, float r2, float r3) { x = _mm_setr_ps(r0,r1,r2,r3); }
+        inline simd4f(const __m128& val):x(val) {}
+        inline simd4f(const simd4i& val):x(_mm_cvtepi32_ps(val)) {}
 
         inline simd4f& operator=(const simd4i& val)
         {
@@ -29,24 +29,24 @@ namespace dlib
             return *this;
         }
 
-        simd4f& operator=(const __m128& val)
+        inline simd4f& operator=(const __m128& val)
         {
             x = val;
             return *this;
         }
 
-        operator __m128() const { return x; }
+        inline operator __m128() const { return x; }
 
         // truncate to 32bit integers
-        operator __m128i() const { return _mm_cvttps_epi32(x); }
+        inline operator __m128i() const { return _mm_cvttps_epi32(x); }
 
-        void load_aligned(const type* ptr)  { x = _mm_load_ps(ptr); }
-        void store_aligned(type* ptr) const { _mm_store_ps(ptr, x); }
-        void load(const type* ptr)          { x = _mm_loadu_ps(ptr); }
-        void store(type* ptr)         const { _mm_storeu_ps(ptr, x); }
+        inline void load_aligned(const type* ptr)  { x = _mm_load_ps(ptr); }
+        inline void store_aligned(type* ptr) const { _mm_store_ps(ptr, x); }
+        inline void load(const type* ptr)          { x = _mm_loadu_ps(ptr); }
+        inline void store(type* ptr)         const { _mm_storeu_ps(ptr, x); }
 
-        unsigned int size() const { return 4; }
-        float operator[](unsigned int idx) const 
+        inline unsigned int size() const { return 4; }
+        inline float operator[](unsigned int idx) const 
         {
             float temp[4];
             store(temp);
@@ -62,16 +62,16 @@ namespace dlib
     public:
         typedef float type;
 
-        simd4f_bool() {}
-        simd4f_bool(const __m128& val):x(val) {}
+        inline simd4f_bool() {}
+        inline simd4f_bool(const __m128& val):x(val) {}
 
-        simd4f_bool& operator=(const __m128& val)
+        inline simd4f_bool& operator=(const __m128& val)
         {
             x = val;
             return *this;
         }
 
-        operator __m128() const { return x; }
+        inline operator __m128() const { return x; }
 
 
     private:
@@ -83,13 +83,13 @@ namespace dlib
     public:
         typedef float type;
 
-        simd4f() {}
-        simd4f(float f) { x[0]=f; x[1]=f; x[2]=f; x[3]=f; }
-        simd4f(float r0, float r1, float r2, float r3) { x[0]=r0; x[1]=r1; x[2]=r2; x[3]=r3;}
-        simd4f(const simd4i& val) { x[0]=val[0]; x[1]=val[1]; x[2]=val[2]; x[3]=val[3];}
+        inline simd4f() {}
+        inline simd4f(float f) { x[0]=f; x[1]=f; x[2]=f; x[3]=f; }
+        inline simd4f(float r0, float r1, float r2, float r3) { x[0]=r0; x[1]=r1; x[2]=r2; x[3]=r3;}
+        inline simd4f(const simd4i& val) { x[0]=val[0]; x[1]=val[1]; x[2]=val[2]; x[3]=val[3];}
 
         // truncate to 32bit integers
-        operator simd4i::rawarray() const 
+        inline operator simd4i::rawarray() const 
         { 
             simd4i::rawarray temp;
             temp.a[0] = (int32)x[0];
@@ -109,7 +109,7 @@ namespace dlib
         }
 
 
-        void load_aligned(const type* ptr)
+        inline void load_aligned(const type* ptr)
         {
             x[0] = ptr[0];
             x[1] = ptr[1];
@@ -117,7 +117,7 @@ namespace dlib
             x[3] = ptr[3];
         }
 
-        void store_aligned(type* ptr) const
+        inline void store_aligned(type* ptr) const
         {
             ptr[0] = x[0];
             ptr[1] = x[1];
@@ -125,7 +125,7 @@ namespace dlib
             ptr[3] = x[3];
         }
 
-        void load(const type* ptr)
+        inline void load(const type* ptr)
         {
             x[0] = ptr[0];
             x[1] = ptr[1];
@@ -133,7 +133,7 @@ namespace dlib
             x[3] = ptr[3];
         }
 
-        void store(type* ptr) const
+        inline void store(type* ptr) const
         {
             ptr[0] = x[0];
             ptr[1] = x[1];
@@ -141,8 +141,8 @@ namespace dlib
             ptr[3] = x[3];
         }
 
-        unsigned int size() const { return 4; }
-        float operator[](unsigned int idx) const { return x[idx]; }
+        inline unsigned int size() const { return 4; }
+        inline float operator[](unsigned int idx) const { return x[idx]; }
 
     private:
         float x[4];
@@ -153,10 +153,10 @@ namespace dlib
     public:
         typedef float type;
 
-        simd4f_bool() {}
-        simd4f_bool(bool r0, bool r1, bool r2, bool r3) { x[0]=r0; x[1]=r1; x[2]=r2; x[3]=r3;}
+        inline simd4f_bool() {}
+        inline simd4f_bool(bool r0, bool r1, bool r2, bool r3) { x[0]=r0; x[1]=r1; x[2]=r2; x[3]=r3;}
 
-        bool operator[](unsigned int idx) const { return x[idx]; }
+        inline bool operator[](unsigned int idx) const { return x[idx]; }
     private:
         bool x[4];
     };

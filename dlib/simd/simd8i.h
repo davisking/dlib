@@ -15,37 +15,37 @@ namespace dlib
     public:
         typedef int32 type;
 
-        simd8i() {}
-        simd8i(int32 f) { x = _mm256_set1_epi32(f); }
-        simd8i(int32 r0, int32 r1, int32 r2, int32 r3,
+        inline simd8i() {}
+        inline simd8i(int32 f) { x = _mm256_set1_epi32(f); }
+        inline simd8i(int32 r0, int32 r1, int32 r2, int32 r3,
                int32 r4, int32 r5, int32 r6, int32 r7 ) 
         { x = _mm256_setr_epi32(r0,r1,r2,r3,r4,r5,r6,r7); }
 
-        simd8i(const __m256i& val):x(val) {}
+        inline simd8i(const __m256i& val):x(val) {}
 
-        simd8i(const simd4i& low, const simd4i& high)
+        inline simd8i(const simd4i& low, const simd4i& high)
         {
             x = _mm256_insertf128_si256(_mm256_castsi128_si256(low),high,1);
         }
 
-        simd8i& operator=(const __m256i& val)
+        inline simd8i& operator=(const __m256i& val)
         {
             x = val;
             return *this;
         }
 
-        operator __m256i() const { return x; }
+        inline operator __m256i() const { return x; }
 
-        void load_aligned(const type* ptr)  { x = _mm256_load_si256((const __m256i*)ptr); }
-        void store_aligned(type* ptr) const { _mm256_store_si256((__m256i*)ptr, x); }
-        void load(const type* ptr)          { x = _mm256_loadu_si256((const __m256i*)ptr); }
-        void store(type* ptr)         const { _mm256_storeu_si256((__m256i*)ptr, x); }
+        inline void load_aligned(const type* ptr)  { x = _mm256_load_si256((const __m256i*)ptr); }
+        inline void store_aligned(type* ptr) const { _mm256_store_si256((__m256i*)ptr, x); }
+        inline void load(const type* ptr)          { x = _mm256_loadu_si256((const __m256i*)ptr); }
+        inline void store(type* ptr)         const { _mm256_storeu_si256((__m256i*)ptr, x); }
 
-        simd4i low() const { return _mm256_castsi256_si128(x); }
-        simd4i high() const { return _mm256_extractf128_si256(x,1); }
+        inline simd4i low() const { return _mm256_castsi256_si128(x); }
+        inline simd4i high() const { return _mm256_extractf128_si256(x,1); }
 
-        unsigned int size() const { return 4; }
-        int32 operator[](unsigned int idx) const 
+        inline unsigned int size() const { return 4; }
+        inline int32 operator[](unsigned int idx) const 
         {
             int32 temp[8];
             store(temp);
@@ -61,29 +61,29 @@ namespace dlib
     public:
         typedef int32 type;
 
-        simd8i() {}
-        simd8i(const simd4i& low_, const simd4i& high_): _low(low_),_high(high_){}
-        simd8i(int32 f) :_low(f),_high(f) {}
-        simd8i(int32 r0, int32 r1, int32 r2, int32 r3, int32 r4, int32 r5, int32 r6, int32 r7) :
+        inline simd8i() {}
+        inline simd8i(const simd4i& low_, const simd4i& high_): _low(low_),_high(high_){}
+        inline simd8i(int32 f) :_low(f),_high(f) {}
+        inline simd8i(int32 r0, int32 r1, int32 r2, int32 r3, int32 r4, int32 r5, int32 r6, int32 r7) :
             _low(r0,r1,r2,r3), _high(r4,r5,r6,r7) {}
 
         struct rawarray
         {
             simd4i low, high;
         };
-        simd8i(const rawarray& a) 
+        inline simd8i(const rawarray& a) 
         { 
             _low = a.low;
             _high = a.high;
         }
 
-        void load_aligned(const type* ptr)  { _low.load_aligned(ptr); _high.load_aligned(ptr+4); }
-        void store_aligned(type* ptr) const { _low.store_aligned(ptr); _high.store_aligned(ptr+4); }
-        void load(const type* ptr)          { _low.load(ptr); _high.load(ptr+4); }
-        void store(type* ptr)         const { _low.store(ptr); _high.store(ptr+4); }
+        inline void load_aligned(const type* ptr)  { _low.load_aligned(ptr); _high.load_aligned(ptr+4); }
+        inline void store_aligned(type* ptr) const { _low.store_aligned(ptr); _high.store_aligned(ptr+4); }
+        inline void load(const type* ptr)          { _low.load(ptr); _high.load(ptr+4); }
+        inline void store(type* ptr)         const { _low.store(ptr); _high.store(ptr+4); }
 
-        unsigned int size() const { return 8; }
-        int32 operator[](unsigned int idx) const 
+        inline unsigned int size() const { return 8; }
+        inline int32 operator[](unsigned int idx) const 
         {
             if (idx < 4)
                 return _low[idx];
@@ -91,8 +91,8 @@ namespace dlib
                 return _high[idx-4];
         }
 
-        simd4i low() const { return _low; }
-        simd4i high() const { return _high; }
+        inline simd4i low() const { return _low; }
+        inline simd4i high() const { return _high; }
 
     private:
         simd4i _low, _high;
