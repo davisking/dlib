@@ -7,13 +7,14 @@
 
 // figure out which SIMD instructions we can use.
 #ifndef DLIB_DO_NOT_USE_SIMD
-    #ifdef _MSC_VER
-        #if _MSC_VER >= 1400
+    #if defined(_MSC_VER) && defined(_M_IX86_FP)
+        #if _M_IX86_FP >= 2
             #define DLIB_HAVE_SSE2
-        #endif
-        #if _MSC_VER >= 1500
-            #define DLIB_HAVE_SSE3
-            #define DLIB_HAVE_SSE41
+            #ifdef __AVX__
+                #define DLIB_HAVE_SSE3
+                #define DLIB_HAVE_SSE41
+                #define DLIB_HAVE_AVX
+            #endif
         #endif
     #else
         #ifdef __SSE2__
