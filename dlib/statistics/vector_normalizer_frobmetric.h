@@ -157,7 +157,7 @@ namespace dlib
                 unsigned long max_iter_
             ) 
             {
-                _C = C_;
+                _c = C_;
 
                 _cur_iter = 0;
                 _gradient_thresh = eps_;
@@ -178,7 +178,7 @@ namespace dlib
                 for (long i = 0; i < grad.size(); ++i)
                 {
                     const bool at_lower_bound = (0 >= u(i) && grad(i) > 0);
-                    const bool at_upper_bound = (_C/grad.size() <= u(i) && grad(i) < 0);
+                    const bool at_upper_bound = (_c/grad.size() <= u(i) && grad(i) < 0);
                     if (!at_lower_bound && !at_upper_bound)
                         max_gradient = std::max(std::abs(grad(i)), max_gradient);
                 }
@@ -207,7 +207,7 @@ namespace dlib
 
             unsigned long _max_iter;
             unsigned long _cur_iter;
-            double _C;
+            double _c;
             double _gradient_thresh;
         };
 

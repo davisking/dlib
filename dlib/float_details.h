@@ -105,11 +105,18 @@ namespace dlib
 
         double      _frexp(double      v, int* e) const { return frexp(v,e); }
         float       _frexp(float       v, int* e) const { return frexpf(v,e); }
-        long double _frexp(long double v, int* e) const { return frexpl(v,e); }
 
         double      _ldexp(double      v, int e) const { return ldexp(v,e); }
         float       _ldexp(float       v, int e) const { return ldexpf(v,e); }
+
+#ifdef __CYGWIN__
+        // frexpl and ldexpl aren't available on cygwin so just use the double version.
+        long double _frexp(long double v, int* e) const { return _frexp((double)v,e); }
+        long double _ldexp(long double v, int e) const { return _ldexp((double)v,e); }
+#else
+        long double _frexp(long double v, int* e) const { return frexpl(v,e); }
         long double _ldexp(long double v, int e) const { return ldexpl(v,e); }
+#endif
 
         template <typename T>
         void convert_from_T (
