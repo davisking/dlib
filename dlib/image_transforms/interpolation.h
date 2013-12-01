@@ -991,6 +991,205 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename image_type>
+    void flip_image_dataset_left_right (
+        dlib::array<image_type>& images, 
+        std::vector<std::vector<rectangle> >& objects
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( images.size() == objects.size(),
+            "\t void flip_image_dataset_left_right()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t images.size():   " << images.size() 
+            << "\n\t objects.size():  " << objects.size() 
+            );
+
+        image_type temp;
+        for (unsigned long i = 0; i < images.size(); ++i)
+        {
+            flip_image_left_right(images[i], temp); 
+            temp.swap(images[i]);
+            for (unsigned long j = 0; j < objects[i].size(); ++j)
+            {
+                objects[i][j] = impl::flip_rect_left_right(objects[i][j], get_rect(images[i]));
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename image_type>
+    void flip_image_dataset_left_right (
+        dlib::array<image_type>& images, 
+        std::vector<std::vector<rectangle> >& objects,
+        std::vector<std::vector<rectangle> >& objects2
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( images.size() == objects.size() &&
+                     images.size() == objects2.size(),
+            "\t void flip_image_dataset_left_right()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t images.size():   " << images.size() 
+            << "\n\t objects.size():  " << objects.size() 
+            << "\n\t objects2.size(): " << objects2.size() 
+            );
+
+        image_type temp;
+        for (unsigned long i = 0; i < images.size(); ++i)
+        {
+            flip_image_left_right(images[i], temp); 
+            temp.swap(images[i]);
+            for (unsigned long j = 0; j < objects[i].size(); ++j)
+            {
+                objects[i][j] = impl::flip_rect_left_right(objects[i][j], get_rect(images[i]));
+            }
+            for (unsigned long j = 0; j < objects2[i].size(); ++j)
+            {
+                objects2[i][j] = impl::flip_rect_left_right(objects2[i][j], get_rect(images[i]));
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename pyramid_type,
+        typename image_type
+        >
+    void upsample_image_dataset (
+        dlib::array<image_type>& images,
+        std::vector<std::vector<rectangle> >& objects
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( images.size() == objects.size(),
+            "\t void upsample_image_dataset()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t images.size():   " << images.size() 
+            << "\n\t objects.size():  " << objects.size() 
+            );
+
+        image_type temp;
+        pyramid_type pyr;
+        for (unsigned long i = 0; i < images.size(); ++i)
+        {
+            pyramid_up(images[i], temp, pyr);
+            temp.swap(images[i]);
+            for (unsigned long j = 0; j < objects[i].size(); ++j)
+            {
+                objects[i][j] = pyr.rect_up(objects[i][j]);
+            }
+        }
+    }
+
+    template <
+        typename pyramid_type,
+        typename image_type
+        >
+    void upsample_image_dataset (
+        dlib::array<image_type>& images,
+        std::vector<std::vector<rectangle> >& objects,
+        std::vector<std::vector<rectangle> >& objects2 
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( images.size() == objects.size() &&
+                     images.size() == objects2.size(),
+            "\t void upsample_image_dataset()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t images.size():   " << images.size() 
+            << "\n\t objects.size():  " << objects.size() 
+            << "\n\t objects2.size(): " << objects2.size() 
+            );
+
+        image_type temp;
+        pyramid_type pyr;
+        for (unsigned long i = 0; i < images.size(); ++i)
+        {
+            pyramid_up(images[i], temp, pyr);
+            temp.swap(images[i]);
+            for (unsigned long j = 0; j < objects[i].size(); ++j)
+            {
+                objects[i][j] = pyr.rect_up(objects[i][j]);
+            }
+            for (unsigned long j = 0; j < objects2[i].size(); ++j)
+            {
+                objects2[i][j] = pyr.rect_up(objects2[i][j]);
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename image_type>
+    void rotate_image_dataset (
+        double angle,
+        dlib::array<image_type>& images,
+        std::vector<std::vector<rectangle> >& objects
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( images.size() == objects.size(),
+            "\t void rotate_image_dataset()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t images.size():   " << images.size() 
+            << "\n\t objects.size():  " << objects.size() 
+            );
+
+        image_type temp;
+        for (unsigned long i = 0; i < images.size(); ++i)
+        {
+            const point_transform_affine tran = inv(rotate_image(images[i], temp, angle));
+            temp.swap(images[i]);
+            for (unsigned long j = 0; j < objects[i].size(); ++j)
+            {
+                const rectangle rect = objects[i][j];
+                objects[i][j] = centered_rect(tran(center(rect)), rect.width(), rect.height());
+            }
+        }
+    }
+
+    template <typename image_type>
+    void rotate_image_dataset (
+        double angle,
+        dlib::array<image_type>& images,
+        std::vector<std::vector<rectangle> >& objects,
+        std::vector<std::vector<rectangle> >& objects2
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( images.size() == objects.size() &&
+                     images.size() == objects2.size(),
+            "\t void rotate_image_dataset()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t images.size():   " << images.size() 
+            << "\n\t objects.size():  " << objects.size() 
+            << "\n\t objects2.size(): " << objects2.size() 
+            );
+
+        image_type temp;
+        for (unsigned long i = 0; i < images.size(); ++i)
+        {
+            const point_transform_affine tran = inv(rotate_image(images[i], temp, angle));
+            temp.swap(images[i]);
+            for (unsigned long j = 0; j < objects[i].size(); ++j)
+            {
+                const rectangle rect = objects[i][j];
+                objects[i][j] = centered_rect(tran(center(rect)), rect.width(), rect.height());
+            }
+            for (unsigned long j = 0; j < objects2[i].size(); ++j)
+            {
+                const rectangle rect = objects2[i][j];
+                objects2[i][j] = centered_rect(tran(center(rect)), rect.width(), rect.height());
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
     template <
         typename image_type1,
         typename image_type2,

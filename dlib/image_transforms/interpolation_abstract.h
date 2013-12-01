@@ -485,6 +485,185 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename image_type
+        >
+    void flip_image_dataset_left_right (
+        dlib::array<image_type>& images, 
+        std::vector<std::vector<rectangle> >& objects
+    );
+    /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type::type> is defined
+            - images.size() == objects.size()
+        ensures
+            - This function replaces each image in images with the left/right flipped
+              version of the image.  Therefore, #images[i] will contain the left/right
+              flipped version of images[i].  It also flips all the rectangles in objects so
+              that they still bound the same visual objects in each image.
+            - #images.size() == image.size()
+            - #objects.size() == objects.size()
+            - for all valid i:
+                #objects[i].size() == objects[i].size()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    void flip_image_dataset_left_right (
+        dlib::array<image_type>& images, 
+        std::vector<std::vector<rectangle> >& objects,
+        std::vector<std::vector<rectangle> >& objects2
+    );
+    /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type::type> is defined
+            - images.size() == objects.size()
+            - images.size() == objects2.size()
+        ensures
+            - This function replaces each image in images with the left/right flipped
+              version of the image.  Therefore, #images[i] will contain the left/right
+              flipped version of images[i].  It also flips all the rectangles in objects
+              and objects2 so that they still bound the same visual objects in each image.
+            - #images.size() == image.size()
+            - #objects.size() == objects.size()
+            - #objects2.size() == objects2.size()
+            - for all valid i:
+                #objects[i].size() == objects[i].size()
+            - for all valid i:
+                #objects2[i].size() == objects2[i].size()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename pyramid_type,
+        typename image_type
+        >
+    void upsample_image_dataset (
+        dlib::array<image_type>& images,
+        std::vector<std::vector<rectangle> >& objects
+    );
+    /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type::type> is defined
+            - images.size() == objects.size()
+        ensures
+            - This function replaces each image in images with an upsampled version of that
+              image.  Each image is upsampled using pyramid_up() and the given
+              pyramid_type.  Therefore, #images[i] will contain the larger upsampled
+              version of images[i].  It also adjusts all the rectangles in objects so that
+              they still bound the same visual objects in each image.
+            - #images.size() == image.size()
+            - #objects.size() == objects.size()
+            - for all valid i:
+                #objects[i].size() == objects[i].size()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename pyramid_type,
+        typename image_type
+        >
+    void upsample_image_dataset (
+        dlib::array<image_type>& images,
+        std::vector<std::vector<rectangle> >& objects,
+        std::vector<std::vector<rectangle> >& objects2 
+    );
+    /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type::type> is defined
+            - images.size() == objects.size()
+            - images.size() == objects2.size()
+        ensures
+            - This function replaces each image in images with an upsampled version of that
+              image.  Each image is upsampled using pyramid_up() and the given
+              pyramid_type.  Therefore, #images[i] will contain the larger upsampled
+              version of images[i].  It also adjusts all the rectangles in objects and
+              objects2 so that they still bound the same visual objects in each image.
+            - #images.size() == image.size()
+            - #objects.size() == objects.size()
+            - #objects2.size() == objects2.size()
+            - for all valid i:
+                #objects[i].size() == objects[i].size()
+            - for all valid i:
+                #objects2[i].size() == objects2[i].size()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename image_type>
+    void rotate_image_dataset (
+        double angle,
+        dlib::array<image_type>& images,
+        std::vector<std::vector<rectangle> >& objects
+    );
+    /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type::type> is defined
+            - images.size() == objects.size()
+        ensures
+            - This function replaces each image in images with a rotated version of that
+              image.  In particular, each image is rotated using
+              rotate_image(original,rotated,angle).  Therefore, the images are rotated
+              angle radians counter clockwise around their centers. That is, #images[i]
+              will contain the rotated version of images[i].  It also adjusts all
+              the rectangles in objects so that they still bound the same visual objects in
+              each image.
+            - All the rectangles will still have the same sizes and aspect ratios after
+              rotation.  They will simply have had their positions adjusted so they still
+              fall on the same objects.
+            - #images.size() == image.size()
+            - #objects.size() == objects.size()
+            - for all valid i:
+                #objects[i].size() == objects[i].size()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename image_type>
+    void rotate_image_dataset (
+        double angle,
+        dlib::array<image_type>& images,
+        std::vector<std::vector<rectangle> >& objects,
+        std::vector<std::vector<rectangle> >& objects2
+    );
+    /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type::type> is defined
+            - images.size() == objects.size()
+            - images.size() == objects2.size()
+        ensures
+            - This function replaces each image in images with a rotated version of that
+              image.  In particular, each image is rotated using
+              rotate_image(original,rotated,angle).  Therefore, the images are rotated
+              angle radians counter clockwise around their centers. That is, #images[i]
+              will contain the rotated version of images[i].  It also adjusts all
+              the rectangles in objects and objects2 so that they still bound the same
+              visual objects in each image.
+            - All the rectangles will still have the same sizes and aspect ratios after
+              rotation.  They will simply have had their positions adjusted so they still
+              fall on the same objects.
+            - #images.size() == image.size()
+            - #objects.size() == objects.size()
+            - #objects2.size() == objects2.size()
+            - for all valid i:
+                #objects[i].size() == objects[i].size()
+            - for all valid i:
+                #objects2[i].size() == objects2[i].size()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename image_type1,
         typename image_type2
         >
