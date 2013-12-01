@@ -747,6 +747,44 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_type,
+        typename pyramid_type
+        >
+    void pyramid_up (
+        image_type& img,
+        const pyramid_type& pyr
+    );
+    /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pyramid_type == a type compatible with the image pyramid objects defined 
+              in dlib/image_transforms/image_pyramid_abstract.h
+        ensures
+            - Performs an in-place version of pyramid_up() on the given image.  In
+              particular, this function is equivalent to:
+                pyramid_up(img, temp, pyr); 
+                temp.swap(img);
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    void pyramid_up (
+        image_type& img
+    );
+    /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+        ensures
+            - performs: pyramid_up(img, pyramid_down<2>());
+              (i.e. it upsamples the given image and doubles it in size.)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_INTERPOlATION_ABSTRACT_

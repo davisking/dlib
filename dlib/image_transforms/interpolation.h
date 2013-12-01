@@ -7,6 +7,7 @@
 #include "../pixel.h"
 #include "../matrix.h"
 #include "assign_image.h"
+#include "image_pyramid.h"
 #include "../simd.h"
 
 namespace dlib
@@ -1249,6 +1250,35 @@ namespace dlib
             );
 
         pyramid_up(in_img, out_img, pyr, interpolate_bilinear());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type,
+        typename pyramid_type
+        >
+    void pyramid_up (
+        image_type& img,
+        const pyramid_type& pyr
+    )
+    {
+        image_type temp;
+        pyramid_up(img, temp, pyr);
+        temp.swap(img);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    void pyramid_up (
+        image_type& img
+    )
+    {
+        pyramid_down<2> pyr;
+        pyramid_up(img, pyr);
     }
 
 // ----------------------------------------------------------------------------------------
