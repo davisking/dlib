@@ -242,7 +242,7 @@ select_ncolors (j_decompress_ptr cinfo, int Ncolors[])
 
 
 LOCAL(int)
-output_value (j_decompress_ptr cinfo, int ci, int j, int maxj)
+output_value (j_decompress_ptr , int , int j, int maxj)
 /* Return j'th output value, where j will range from 0 to maxj */
 /* The output values must fall in 0..MAXJSAMPLE in increasing order */
 {
@@ -256,7 +256,7 @@ output_value (j_decompress_ptr cinfo, int ci, int j, int maxj)
 
 
 LOCAL(int)
-largest_input_value (j_decompress_ptr cinfo, int ci, int j, int maxj)
+largest_input_value (j_decompress_ptr , int , int j, int maxj)
 /* Return largest input value that should map to j'th output value */
 /* Must have largest(j=0) >= 0, and largest(j=maxj) >= MAXJSAMPLE */
 {
@@ -738,7 +738,7 @@ alloc_fs_workspace (j_decompress_ptr cinfo)
  */
 
 METHODDEF(void)
-start_pass_1_quant (j_decompress_ptr cinfo, boolean is_pre_scan)
+start_pass_1_quant (j_decompress_ptr cinfo, boolean )
 {
   my_cquantize_ptr cquantize = (my_cquantize_ptr) cinfo->cquantize;
   size_t arraysize;
@@ -795,7 +795,7 @@ start_pass_1_quant (j_decompress_ptr cinfo, boolean is_pre_scan)
  */
 
 METHODDEF(void)
-finish_pass_1_quant (j_decompress_ptr cinfo)
+finish_pass_1_quant (j_decompress_ptr )
 {
   /* no work in 1-pass case */
 }

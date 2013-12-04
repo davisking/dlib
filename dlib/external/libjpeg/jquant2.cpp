@@ -222,7 +222,7 @@ typedef my_cquantizer * my_cquantize_ptr;
 
 METHODDEF(void)
 prescan_quantize (j_decompress_ptr cinfo, JSAMPARRAY input_buf,
-		  JSAMPARRAY output_buf, int num_rows)
+		  JSAMPARRAY , int num_rows)
 {
   my_cquantize_ptr cquantize = (my_cquantize_ptr) cinfo->cquantize;
   register JSAMPROW ptr;
@@ -1153,7 +1153,7 @@ finish_pass1 (j_decompress_ptr cinfo)
 
 
 METHODDEF(void)
-finish_pass2 (j_decompress_ptr cinfo)
+finish_pass2 (j_decompress_ptr )
 {
   /* no work */
 }
