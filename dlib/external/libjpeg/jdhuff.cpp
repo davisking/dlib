@@ -71,8 +71,8 @@ typedef struct {
   d_derived_tbl * dc_cur_tbls[D_MAX_BLOCKS_IN_MCU];
   d_derived_tbl * ac_cur_tbls[D_MAX_BLOCKS_IN_MCU];
   /* Whether we care about the DC and AC coefficient values for each block */
-  boolean dc_needed[D_MAX_BLOCKS_IN_MCU];
-  boolean ac_needed[D_MAX_BLOCKS_IN_MCU];
+  int dc_needed[D_MAX_BLOCKS_IN_MCU];
+  int ac_needed[D_MAX_BLOCKS_IN_MCU];
 } huff_entropy_decoder;
 
 typedef huff_entropy_decoder * huff_entropy_ptr;
@@ -146,7 +146,7 @@ start_pass_huff_decoder (j_decompress_ptr cinfo)
  */
 
 GLOBAL(void)
-jpeg_make_d_derived_tbl (j_decompress_ptr cinfo, boolean isDC, int tblno,
+jpeg_make_d_derived_tbl (j_decompress_ptr cinfo, int isDC, int tblno,
 			 d_derived_tbl ** pdtbl)
 {
   JHUFF_TBL *htbl;
@@ -204,7 +204,7 @@ jpeg_make_d_derived_tbl (j_decompress_ptr cinfo, boolean isDC, int tblno,
     /* code is now 1 more than the last code used for codelength si; but
      * it must still fit in si bits, since no code is allowed to be all ones.
      */
-    if (((INT32) code) >= (((INT32) 1) << si))
+    if (((long) code) >= (((long) 1) << si))
       ERREXIT(cinfo, JERR_BAD_HUFF_TABLE);
     code <<= 1;
     si++;
@@ -218,7 +218,7 @@ jpeg_make_d_derived_tbl (j_decompress_ptr cinfo, boolean isDC, int tblno,
       /* valoffset[l] = huffval[] index of 1st symbol of code length l,
        * minus the minimum code of length l
        */
-      dtbl->valoffset[l] = (INT32) p - (INT32) huffcode[p];
+      dtbl->valoffset[l] = (long) p - (long) huffcode[p];
       p += htbl->bits[l];
       dtbl->maxcode[l] = huffcode[p-1]; /* maximum code of length l */
     } else {
@@ -288,7 +288,7 @@ jpeg_make_d_derived_tbl (j_decompress_ptr cinfo, boolean isDC, int tblno,
 #endif
 
 
-GLOBAL(boolean)
+GLOBAL(int)
 jpeg_fill_bit_buffer (bitread_working_state * state,
 		      register bit_buf_type get_buffer, register int bits_left,
 		      int nbits)
@@ -400,7 +400,7 @@ jpeg_huff_decode (bitread_working_state * state,
 		  d_derived_tbl * htbl, int min_bits)
 {
   register int l = min_bits;
-  register INT32 code;
+  register long code;
 
   /* HUFF_DECODE has determined that the code is at least min_bits */
   /* bits long, so fetch that many bits in one swoop. */
@@ -464,7 +464,7 @@ static const int extend_offset[16] = /* entry n is (-1 << n) + 1 */
  * Returns FALSE if must suspend.
  */
 
-LOCAL(boolean)
+LOCAL(int)
 process_restart (j_decompress_ptr cinfo)
 {
   huff_entropy_ptr entropy = (huff_entropy_ptr) cinfo->entropy;
@@ -513,7 +513,7 @@ process_restart (j_decompress_ptr cinfo)
  * this module, since we'll just re-assign them on the next call.)
  */
 
-METHODDEF(boolean)
+METHODDEF(int)
 decode_mcu (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 {
   huff_entropy_ptr entropy = (huff_entropy_ptr) cinfo->entropy;

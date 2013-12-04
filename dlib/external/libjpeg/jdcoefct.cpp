@@ -69,7 +69,7 @@ METHODDEF(int) decompress_data
 	JPP((j_decompress_ptr cinfo, JSAMPIMAGE output_buf));
 #endif
 #ifdef BLOCK_SMOOTHING_SUPPORTED
-LOCAL(boolean) smoothing_ok JPP((j_decompress_ptr cinfo));
+LOCAL(int) smoothing_ok JPP((j_decompress_ptr cinfo));
 METHODDEF(int) decompress_smooth_data
 	JPP((j_decompress_ptr cinfo, JSAMPIMAGE output_buf));
 #endif
@@ -401,11 +401,11 @@ decompress_data (j_decompress_ptr cinfo, JSAMPIMAGE output_buf)
  * more accurately than they really are.
  */
 
-LOCAL(boolean)
+LOCAL(int)
 smoothing_ok (j_decompress_ptr cinfo)
 {
   my_coef_ptr coef = (my_coef_ptr) cinfo->coef;
-  boolean smoothing_useful = FALSE;
+  int smoothing_useful = FALSE;
   int ci, coefi;
   jpeg_component_info *compptr;
   JQUANT_TBL * qtable;
@@ -470,11 +470,11 @@ decompress_smooth_data (j_decompress_ptr cinfo, JSAMPIMAGE output_buf)
   JDIMENSION output_col;
   jpeg_component_info *compptr;
   inverse_DCT_method_ptr inverse_DCT;
-  boolean first_row, last_row;
+  int first_row, last_row;
   JBLOCK workspace;
   int *coef_bits;
   JQUANT_TBL *quanttbl;
-  INT32 Q00,Q01,Q02,Q10,Q11,Q20, num;
+  long Q00,Q01,Q02,Q10,Q11,Q20, num;
   int DC1,DC2,DC3,DC4,DC5,DC6,DC7,DC8,DC9;
   int Al, pred;
 
@@ -673,7 +673,7 @@ decompress_smooth_data (j_decompress_ptr cinfo, JSAMPIMAGE output_buf)
  */
 
 GLOBAL(void)
-jinit_d_coef_controller (j_decompress_ptr cinfo, boolean need_full_buffer)
+jinit_d_coef_controller (j_decompress_ptr cinfo, int need_full_buffer)
 {
   my_coef_ptr coef;
 

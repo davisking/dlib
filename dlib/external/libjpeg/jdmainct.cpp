@@ -117,7 +117,7 @@ typedef struct {
   /* Pointer to allocated workspace (M or M+2 row groups). */
   JSAMPARRAY buffer[MAX_COMPONENTS];
 
-  boolean buffer_full;		/* Have we gotten an iMCU row from decoder? */
+  int buffer_full;		/* Have we gotten an iMCU row from decoder? */
   JDIMENSION rowgroup_ctr;	/* counts row groups output to postprocessor */
 
   /* Remaining fields are only used in the context case. */
@@ -473,7 +473,7 @@ process_data_crank_post (j_decompress_ptr cinfo,
  */
 
 GLOBAL(void)
-jinit_d_main_controller (j_decompress_ptr cinfo, boolean need_full_buffer)
+jinit_d_main_controller (j_decompress_ptr cinfo, int need_full_buffer)
 {
   my_main_ptr main;
   int ci, rgroup, ngroups;

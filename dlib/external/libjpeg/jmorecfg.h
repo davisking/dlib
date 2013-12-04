@@ -129,37 +129,12 @@ typedef char JOCTET;
  * typedefs live at a different point on the speed/space tradeoff curve.)
  */
 
-/* UINT8 must hold at least the values 0..255. */
+/* unsigned char must hold at least the values 0..255. */
 
-#ifdef HAVE_UNSIGNED_CHAR
-typedef unsigned char UINT8;
-#else /* not HAVE_UNSIGNED_CHAR */
-#ifdef CHAR_IS_UNSIGNED
-typedef char UINT8;
-#else /* not CHAR_IS_UNSIGNED */
-typedef short UINT8;
-#endif /* CHAR_IS_UNSIGNED */
-#endif /* HAVE_UNSIGNED_CHAR */
 
-/* UINT16 must hold at least the values 0..65535. */
+/* unsigned short must hold at least the values 0..65535. */
 
-#ifdef HAVE_UNSIGNED_SHORT
-typedef unsigned short UINT16;
-#else /* not HAVE_UNSIGNED_SHORT */
-typedef unsigned int UINT16;
-#endif /* HAVE_UNSIGNED_SHORT */
 
-/* INT16 must hold at least the values -32768..32767. */
-
-#ifndef XMD_H			/* X11/xmd.h correctly defines INT16 */
-typedef short INT16;
-#endif
-
-/* INT32 must hold at least signed 32-bit values. */
-
-#ifndef XMD_H			/* X11/xmd.h correctly defines INT32 */
-typedef long INT32;
-#endif
 
 /* Datatype used for image dimensions.  The JPEG standard only supports
  * images up to 64K*64K due to 16-bit fields in SOF markers.  Therefore
@@ -223,9 +198,6 @@ typedef unsigned int JDIMENSION;
  * Defining HAVE_BOOLEAN before including jpeglib.h should make it work.
  */
 
-#ifndef HAVE_BOOLEAN
-typedef int boolean;
-#endif
 #ifndef FALSE			/* in case these macros already exist */
 #define FALSE	0		/* values of boolean */
 #endif

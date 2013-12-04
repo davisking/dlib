@@ -144,7 +144,7 @@
 #define C2_SHIFT  (BITS_IN_JSAMPLE-HIST_C2_BITS)
 
 
-typedef UINT16 histcell;	/* histogram cell; prefer an unsigned type */
+typedef unsigned short histcell;	/* histogram cell; prefer an unsigned type */
 
 typedef histcell FAR * histptr;	/* for pointers to histogram cells */
 
@@ -178,11 +178,11 @@ typedef hist2d * hist3d;	/* type for top-level pointer */
  */
 
 #if BITS_IN_JSAMPLE == 8
-typedef INT16 FSERROR;		/* 16 bits should be enough */
+typedef short FSERROR;		/* 16 bits should be enough */
 typedef int LOCFSERROR;		/* use 'int' for calculation temps */
 #else
-typedef INT32 FSERROR;		/* may need more than 16 bits */
-typedef INT32 LOCFSERROR;	/* be sure calculation temps are big enough */
+typedef long FSERROR;		/* may need more than 16 bits */
+typedef long LOCFSERROR;	/* be sure calculation temps are big enough */
 #endif
 
 typedef FSERROR FAR *FSERRPTR;	/* pointer to error array (in FAR storage!) */
@@ -200,11 +200,11 @@ typedef struct {
   /* Variables for accumulating image statistics */
   hist3d histogram;		/* pointer to the histogram */
 
-  boolean needs_zeroed;		/* TRUE if next pass must zero histogram */
+  int needs_zeroed;		/* TRUE if next pass must zero histogram */
 
   /* Variables for Floyd-Steinberg dithering */
   FSERRPTR fserrors;		/* accumulated errors */
-  boolean on_odd_row;		/* flag to remember which row we are on */
+  int on_odd_row;		/* flag to remember which row we are on */
   int * error_limiter;		/* table for clamping the applied error */
 } my_cquantizer;
 
@@ -261,7 +261,7 @@ typedef struct {
   int c1min, c1max;
   int c2min, c2max;
   /* The volume (actually 2-norm) of the box */
-  INT32 volume;
+  long volume;
   /* The number of nonzero histogram cells within this box */
   long colorcount;
 } box;
@@ -296,7 +296,7 @@ find_biggest_volume (boxptr boxlist, int numboxes)
 {
   register boxptr boxp;
   register int i;
-  register INT32 maxv = 0;
+  register long maxv = 0;
   boxptr which = NULL;
   
   for (i = 0, boxp = boxlist; i < numboxes; i++, boxp++) {
@@ -319,7 +319,7 @@ update_box (j_decompress_ptr cinfo, boxptr boxp)
   histptr histp;
   int c0,c1,c2;
   int c0min,c0max,c1min,c1max,c2min,c2max;
-  INT32 dist0,dist1,dist2;
+  long dist0,dist1,dist2;
   long ccount;
   
   c0min = boxp->c0min;  c0max = boxp->c0max;
@@ -658,8 +658,8 @@ find_nearby_colors (j_decompress_ptr cinfo, int minc0, int minc1, int minc2,
   int maxc0, maxc1, maxc2;
   int centerc0, centerc1, centerc2;
   int i, x, ncolors;
-  INT32 minmaxdist, min_dist, max_dist, tdist;
-  INT32 mindist[MAXNUMCOLORS];	/* min distance to colormap entry i */
+  long minmaxdist, min_dist, max_dist, tdist;
+  long mindist[MAXNUMCOLORS];	/* min distance to colormap entry i */
 
   /* Compute true coordinates of update box's upper corner and center.
    * Actually we compute the coordinates of the center of the upper-corner
@@ -783,15 +783,15 @@ find_best_colors (j_decompress_ptr cinfo, int minc0, int minc1, int minc2,
 {
   int ic0, ic1, ic2;
   int i, icolor;
-  register INT32 * bptr;	/* pointer into bestdist[] array */
+  register long * bptr;	/* pointer into bestdist[] array */
   JSAMPLE * cptr;		/* pointer into bestcolor[] array */
-  INT32 dist0, dist1;		/* initial distance values */
-  register INT32 dist2;		/* current distance in inner loop */
-  INT32 xx0, xx1;		/* distance increments */
-  register INT32 xx2;
-  INT32 inc0, inc1, inc2;	/* initial values for increments */
+  long dist0, dist1;		/* initial distance values */
+  register long dist2;		/* current distance in inner loop */
+  long xx0, xx1;		/* distance increments */
+  register long xx2;
+  long inc0, inc1, inc2;	/* initial values for increments */
   /* This array holds the distance to the nearest-so-far color for each cell */
-  INT32 bestdist[BOX_C0_ELEMS * BOX_C1_ELEMS * BOX_C2_ELEMS];
+  long bestdist[BOX_C0_ELEMS * BOX_C1_ELEMS * BOX_C2_ELEMS];
 
   /* Initialize best-distance for each cell of the update box */
   bptr = bestdist;
@@ -1164,7 +1164,7 @@ finish_pass2 (j_decompress_ptr )
  */
 
 METHODDEF(void)
-start_pass_2_quant (j_decompress_ptr cinfo, boolean is_pre_scan)
+start_pass_2_quant (j_decompress_ptr cinfo, int is_pre_scan)
 {
   my_cquantize_ptr cquantize = (my_cquantize_ptr) cinfo->cquantize;
   hist3d histogram = cquantize->histogram;

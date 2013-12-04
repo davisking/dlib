@@ -89,10 +89,10 @@
  */
 
 #if CONST_BITS == 8
-#define FIX_1_082392200  ((INT32)  277)		/* FIX(1.082392200) */
-#define FIX_1_414213562  ((INT32)  362)		/* FIX(1.414213562) */
-#define FIX_1_847759065  ((INT32)  473)		/* FIX(1.847759065) */
-#define FIX_2_613125930  ((INT32)  669)		/* FIX(2.613125930) */
+#define FIX_1_082392200  ((long)  277)		/* FIX(1.082392200) */
+#define FIX_1_414213562  ((long)  362)		/* FIX(1.414213562) */
+#define FIX_1_847759065  ((long)  473)		/* FIX(1.847759065) */
+#define FIX_2_613125930  ((long)  669)		/* FIX(2.613125930) */
 #else
 #define FIX_1_082392200  FIX(1.082392200)
 #define FIX_1_414213562  FIX(1.414213562)
@@ -112,7 +112,7 @@
 #endif
 
 
-/* Multiply a DCTELEM variable by an INT32 constant, and immediately
+/* Multiply a DCTELEM variable by an long constant, and immediately
  * descale to yield a DCTELEM result.
  */
 
@@ -122,7 +122,7 @@
 /* Dequantize a coefficient by multiplying it by the multiplier-table
  * entry; produce a DCTELEM result.  For 8-bit data a 16x16->16
  * multiplication will do.  For 12-bit data, the multiplier table is
- * declared INT32, so a 32-bit multiply will be used.
+ * declared long, so a 32-bit multiply will be used.
  */
 
 #if BITS_IN_JSAMPLE == 8
@@ -134,7 +134,7 @@
 
 
 /* Like DESCALE, but applies to a DCTELEM and produces an int.
- * We assume that int right shift is unsigned if INT32 right shift is.
+ * We assume that int right shift is unsigned if long right shift is.
  */
 
 #ifdef RIGHT_SHIFT_IS_UNSIGNED

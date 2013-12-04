@@ -218,21 +218,21 @@ jpeg_idct_float (j_decompress_ptr cinfo, jpeg_component_info * compptr,
 
     /* Final output stage: scale down by a factor of 8 and range-limit */
 
-    outptr[0] = range_limit[(int) DESCALE((INT32) (tmp0 + tmp7), 3)
+    outptr[0] = range_limit[(int) DESCALE((long) (tmp0 + tmp7), 3)
 			    & RANGE_MASK];
-    outptr[7] = range_limit[(int) DESCALE((INT32) (tmp0 - tmp7), 3)
+    outptr[7] = range_limit[(int) DESCALE((long) (tmp0 - tmp7), 3)
 			    & RANGE_MASK];
-    outptr[1] = range_limit[(int) DESCALE((INT32) (tmp1 + tmp6), 3)
+    outptr[1] = range_limit[(int) DESCALE((long) (tmp1 + tmp6), 3)
 			    & RANGE_MASK];
-    outptr[6] = range_limit[(int) DESCALE((INT32) (tmp1 - tmp6), 3)
+    outptr[6] = range_limit[(int) DESCALE((long) (tmp1 - tmp6), 3)
 			    & RANGE_MASK];
-    outptr[2] = range_limit[(int) DESCALE((INT32) (tmp2 + tmp5), 3)
+    outptr[2] = range_limit[(int) DESCALE((long) (tmp2 + tmp5), 3)
 			    & RANGE_MASK];
-    outptr[5] = range_limit[(int) DESCALE((INT32) (tmp2 - tmp5), 3)
+    outptr[5] = range_limit[(int) DESCALE((long) (tmp2 - tmp5), 3)
 			    & RANGE_MASK];
-    outptr[4] = range_limit[(int) DESCALE((INT32) (tmp3 + tmp4), 3)
+    outptr[4] = range_limit[(int) DESCALE((long) (tmp3 + tmp4), 3)
 			    & RANGE_MASK];
-    outptr[3] = range_limit[(int) DESCALE((INT32) (tmp3 - tmp4), 3)
+    outptr[3] = range_limit[(int) DESCALE((long) (tmp3 - tmp4), 3)
 			    & RANGE_MASK];
     
     wsptr += DCTSIZE;		/* advance pointer to next row */

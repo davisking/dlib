@@ -161,7 +161,7 @@ format_message (j_common_ptr cinfo, char * buffer)
   const char * msgtext = NULL;
   const char * msgptr;
   char ch;
-  boolean isstring;
+  int isstring;
 
   /* Look up message string in proper table */
   if (msg_code > 0 && msg_code <= err->last_jpeg_message) {

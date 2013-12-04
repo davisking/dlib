@@ -238,7 +238,7 @@ default_decompress_parms (j_decompress_ptr cinfo)
  */
 
 GLOBAL(int)
-jpeg_read_header (j_decompress_ptr cinfo, boolean require_image)
+jpeg_read_header (j_decompress_ptr cinfo, int require_image)
 {
   int retcode;
 
@@ -330,7 +330,7 @@ jpeg_consume_input (j_decompress_ptr cinfo)
  * Have we finished reading the input file?
  */
 
-GLOBAL(boolean)
+GLOBAL(int)
 jpeg_input_complete (j_decompress_ptr cinfo)
 {
   /* Check for valid jpeg object */
@@ -345,7 +345,7 @@ jpeg_input_complete (j_decompress_ptr cinfo)
  * Is there more than one scan?
  */
 
-GLOBAL(boolean)
+GLOBAL(int)
 jpeg_has_multiple_scans (j_decompress_ptr cinfo)
 {
   /* Only valid after jpeg_read_header completes */
@@ -365,7 +365,7 @@ jpeg_has_multiple_scans (j_decompress_ptr cinfo)
  * a suspending data source is used.
  */
 
-GLOBAL(boolean)
+GLOBAL(int)
 jpeg_finish_decompress (j_decompress_ptr cinfo)
 {
   if ((cinfo->global_state == DSTATE_SCANNING ||
