@@ -19,6 +19,15 @@
  * and png_info.
  */
 
+#ifdef _MSC_VER
+// Disable the following warnings for Visual Studio
+// This is a warning you get from visual studio 2005 about things in the standard C++
+// library being "deprecated."  I checked the C++ standard and it doesn't say jack 
+// about any of them (I checked the searchable PDF).   So this warning is total Bunk.
+#pragma warning(disable : 4996)
+#endif
+
+
 #ifndef PNGCONF_H
 #define PNGCONF_H
 
