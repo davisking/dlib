@@ -83,10 +83,9 @@ if (NOT TARGET dlib)
    option(DLIB_LINK_WITH_FFTW ${DLIB_LINK_WITH_FFTW_STR} ON)
 
 
-   add_library(dlib STATIC all/source.cpp )
-
-
-   if (NOT DLIB_ISO_CPP_ONLY)
+   if (DLIB_ISO_CPP_ONLY)
+      add_library(dlib STATIC all/source.cpp )
+   else()
       # we want to link to the right stuff depending on our platform.  
       if (WIN32 AND NOT CYGWIN) ###############################################################################
          if (DLIB_NO_GUI_SUPPORT)
@@ -154,6 +153,7 @@ if (NOT TARGET dlib)
       endif () ##################################################################################
 
 
+      set(source_files all/source.cpp)
 
       if (DLIB_LINK_WITH_LIBPNG)
          # try to find libpng 
@@ -175,7 +175,35 @@ if (NOT TARGET dlib)
             include_directories(${JPEG_INCLUDE_DIR})
             set (dlib_needed_libraries ${dlib_needed_libraries} ${JPEG_LIBRARY})
          else()
-            set(DLIB_LINK_WITH_LIBJPEG OFF CACHE STRING ${DLIB_LINK_WITH_LIBJPEG_STR} FORCE )
+            # If we can't find libjpeg then statically compile it in.
+            include_directories("external/libjpeg")
+            set(source_files ${source_files}
+                  external/libjpeg/jcomapi.cpp
+                  external/libjpeg/jdapimin.cpp
+                  external/libjpeg/jdapistd.cpp
+                  external/libjpeg/jdatasrc.cpp
+                  external/libjpeg/jdcoefct.cpp
+                  external/libjpeg/jdcolor.cpp
+                  external/libjpeg/jddctmgr.cpp
+                  external/libjpeg/jdhuff.cpp
+                  external/libjpeg/jdinput.cpp
+                  external/libjpeg/jdmainct.cpp
+                  external/libjpeg/jdmarker.cpp
+                  external/libjpeg/jdmaster.cpp
+                  external/libjpeg/jdmerge.cpp
+                  external/libjpeg/jdphuff.cpp
+                  external/libjpeg/jdpostct.cpp
+                  external/libjpeg/jdsample.cpp
+                  external/libjpeg/jerror.cpp
+                  external/libjpeg/jidctflt.cpp
+                  external/libjpeg/jidctfst.cpp
+                  external/libjpeg/jidctint.cpp
+                  external/libjpeg/jidctred.cpp
+                  external/libjpeg/jmemmgr.cpp
+                  external/libjpeg/jmemnobs.cpp
+                  external/libjpeg/jquant1.cpp
+                  external/libjpeg/jquant2.cpp
+                  external/libjpeg/jutils.cpp  )
          endif()
       endif()
 
@@ -234,6 +262,7 @@ if (NOT TARGET dlib)
       endif()
 
 
+      add_library(dlib STATIC ${source_files} )
       target_link_libraries(dlib ${dlib_needed_libraries} )
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
