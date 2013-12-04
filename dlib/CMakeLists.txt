@@ -164,7 +164,40 @@ if (NOT TARGET dlib)
             include_directories(${PNG_INCLUDE_DIR})
             set (dlib_needed_libraries ${dlib_needed_libraries} ${PNG_LIBRARY})
          else()
-            set(DLIB_LINK_WITH_LIBPNG OFF CACHE STRING ${DLIB_LINK_WITH_LIBPNG_STR} FORCE )
+            # If we can't find libpng then statically compile it in.
+            include_directories(external/libpng external/zlib)
+            set(source_files ${source_files}
+               external/libpng/png.c
+               external/libpng/pngerror.c
+               external/libpng/pngget.c
+               external/libpng/pngmem.c
+               external/libpng/pngpread.c
+               external/libpng/pngread.c
+               external/libpng/pngrio.c
+               external/libpng/pngrtran.c
+               external/libpng/pngrutil.c
+               external/libpng/pngset.c
+               external/libpng/pngtrans.c
+               external/libpng/pngwio.c
+               external/libpng/pngwrite.c
+               external/libpng/pngwtran.c
+               external/libpng/pngwutil.c
+               external/zlib/adler32.c
+               external/zlib/compress.c
+               external/zlib/crc32.c
+               external/zlib/deflate.c
+               external/zlib/gzclose.c
+               external/zlib/gzlib.c
+               external/zlib/gzread.c
+               external/zlib/gzwrite.c
+               external/zlib/infback.c
+               external/zlib/inffast.c
+               external/zlib/inflate.c
+               external/zlib/inftrees.c
+               external/zlib/trees.c
+               external/zlib/uncompr.c
+               external/zlib/zutil.c
+               )
          endif()
       endif()
 
@@ -176,7 +209,7 @@ if (NOT TARGET dlib)
             set (dlib_needed_libraries ${dlib_needed_libraries} ${JPEG_LIBRARY})
          else()
             # If we can't find libjpeg then statically compile it in.
-            include_directories("external/libjpeg")
+            include_directories(external/libjpeg)
             set(source_files ${source_files}
                   external/libjpeg/jcomapi.cpp
                   external/libjpeg/jdapimin.cpp
