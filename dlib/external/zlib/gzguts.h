@@ -3,6 +3,14 @@
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
+#ifdef _MSC_VER
+// Disable the following warnings for Visual Studio
+// This is a warning you get from visual studio 2005 about things in the standard C++
+// library being "deprecated."  I checked the C++ standard and it doesn't say jack 
+// about any of them (I checked the searchable PDF).   So this warning is total Bunk.
+#pragma warning(disable : 4996)
+#endif
+
 #ifdef _LARGEFILE64_SOURCE
 #  ifndef _LARGEFILE_SOURCE
 #    define _LARGEFILE_SOURCE 1
