@@ -53,7 +53,10 @@ namespace dlib
                 - pixel values after filtering that are < 0 are converted to their absolute values.
             - The filter is applied such that it's centered over the pixel it writes its
               output into.  For centering purposes, we consider the center element of the
-              filter to be filter((filter.nr()-1)/2,(filter.nc()-1)/2).
+              filter to be filter(filter.nr()/2,filter.nc()/2).  This means that the filter
+              that writes its output to a pixel at location point(c,r) and is W by H (width
+              by height) pixels in size operates on exactly the pixels in the rectangle
+              centered_rect(point(c,r),W,H) within in_img.
             - Pixels close enough to the edge of in_img to not have the filter still fit 
               inside the image are always set to zero.
             - #out_img.nc() == in_img.nc()
@@ -117,7 +120,10 @@ namespace dlib
                 - pixel values after filtering that are < 0 are converted to their absolute values
             - The filter is applied such that it's centered over the pixel it writes its
               output into.  For centering purposes, we consider the center element of the
-              filter to be FILT((col_filter.size()-1)/2,(row_filter.size()-1)/2).
+              filter to be FILT(col_filter.size()/2,row_filter.size()/2).  This means that
+              the filter that writes its output to a pixel at location point(c,r) and is W
+              by H (width by height) pixels in size operates on exactly the pixels in the
+              rectangle centered_rect(point(c,r),W,H) within in_img.
             - Pixels close enough to the edge of in_img to not have the filter still fit 
               inside the image are always set to zero.
             - #out_img.nc() == in_img.nc()

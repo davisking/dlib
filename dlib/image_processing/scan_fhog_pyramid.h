@@ -658,8 +658,6 @@ namespace dlib
 
         unsigned long width, height;
         compute_fhog_window_size(width,height);
-        const point anchor((width+1)%2, 
-                           (height+1)%2);
 
         array2d<float> saliency_image;
         pyramid_type pyr;
@@ -677,7 +675,7 @@ namespace dlib
                     // if we found a detection
                     if (saliency_image[r][c] >= thresh)
                     {
-                        rectangle rect = fhog_to_image(centered_rect(point(c,r)+anchor,width-2*padding,height-2*padding), cell_size, height,width);
+                        rectangle rect = fhog_to_image(centered_rect(point(c,r),width-2*padding,height-2*padding), cell_size, height,width);
                         rect = pyr.rect_up(rect, l);
                         dets.push_back(std::make_pair(saliency_image[r][c], rect));
                     }

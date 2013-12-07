@@ -1091,47 +1091,6 @@ namespace
         }
     }
 
-    void test_small_filter()
-    {
-        array2d<int> img(3,3), out;
-        assign_all_pixels(img, 1);
-        matrix<int> filt(2,2);
-        filt = 1;
-
-        spatially_filter_image(img, out, filt);
-
-        DLIB_TEST(out[0][0] == 4);
-        DLIB_TEST(out[0][1] == 4);
-        DLIB_TEST(out[0][2] == 0);
-
-        DLIB_TEST(out[1][0] == 4);
-        DLIB_TEST(out[1][1] == 4);
-        DLIB_TEST(out[1][2] == 0);
-
-        DLIB_TEST(out[2][0] == 0);
-        DLIB_TEST(out[2][1] == 0);
-        DLIB_TEST(out[2][2] == 0);
-
-        matrix<int> rfilt(2,1), cfilt(2,1);
-        rfilt = 1;
-        cfilt = 1;
-
-        assign_all_pixels(out, 9);
-        spatially_filter_image_separable(img, out, rfilt, cfilt);
-
-        DLIB_TEST(out[0][0] == 4);
-        DLIB_TEST(out[0][1] == 4);
-        DLIB_TEST(out[0][2] == 0);
-
-        DLIB_TEST(out[1][0] == 4);
-        DLIB_TEST(out[1][1] == 4);
-        DLIB_TEST(out[1][2] == 0);
-
-        DLIB_TEST(out[2][0] == 0);
-        DLIB_TEST(out[2][1] == 0);
-        DLIB_TEST(out[2][2] == 0);
-
-    }
 
     void test_zero_border_pixels(
     )
@@ -1616,6 +1575,104 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
+    void test_filtering_center (
+        dlib::rand& rnd
+    )
+    {
+        array2d<T> img(rnd.get_random_32bit_number()%100+1,
+            rnd.get_random_32bit_number()%100+1);
+        matrix<T> filt(rnd.get_random_32bit_number()%10+1,
+            rnd.get_random_32bit_number()%10+1);
+
+        for (long r = 0; r < img.nr(); ++r)
+        {
+            for (long c = 0; c < img.nc(); ++c)
+            {
+                img[r][c] = rnd.get_random_32bit_number()%100;
+            }
+        }
+        for (long r = 0; r < filt.nr(); ++r)
+        {
+            for (long c = 0; c < filt.nc(); ++c)
+            {
+                filt(r,c) = rnd.get_random_32bit_number()%100;
+            }
+        }
+
+        array2d<T> out;
+        const rectangle area = spatially_filter_image(img, out, filt);
+
+        for (long r = 0; r < out.nr(); ++r)
+        {
+            for (long c = 0; c < out.nc(); ++c)
+            {
+                const rectangle rect = centered_rect(point(c,r), filt.nc(), filt.nr());
+                if (get_rect(out).contains(rect))
+                {
+                    T val = sum(pointwise_multiply(filt, subm(mat(img),rect)));
+                    DLIB_CASSERT(val == out[r][c],"err: " << val-out[r][c]);
+                    DLIB_CASSERT(area.contains(point(c,r)),"");
+                }
+                else
+                {
+                    DLIB_CASSERT(!area.contains(point(c,r)),"");
+                }
+            }
+        }
+    }
+
+    template <typename T>
+    void test_separable_filtering_center (
+        dlib::rand& rnd
+    )
+    {
+        array2d<T> img(rnd.get_random_32bit_number()%100+1,
+            rnd.get_random_32bit_number()%100+1);
+        matrix<T,1,0> row_filt(rnd.get_random_32bit_number()%10+1);
+        matrix<T,0,1> col_filt(rnd.get_random_32bit_number()%10+1);
+
+        for (long r = 0; r < img.nr(); ++r)
+        {
+            for (long c = 0; c < img.nc(); ++c)
+            {
+                img[r][c] = rnd.get_random_32bit_number()%10;
+            }
+        }
+        for (long r = 0; r < row_filt.size(); ++r)
+        {
+            row_filt(r) = rnd.get_random_32bit_number()%10;
+        }
+        for (long r = 0; r < col_filt.size(); ++r)
+        {
+            col_filt(r) = rnd.get_random_32bit_number()%10;
+        }
+
+        array2d<T> out;
+        const rectangle area = spatially_filter_image_separable(img, out, row_filt, col_filt);
+
+        for (long r = 0; r < out.nr(); ++r)
+        {
+            for (long c = 0; c < out.nc(); ++c)
+            {
+                const rectangle rect = centered_rect(point(c,r), row_filt.size(), col_filt.size());
+                if (get_rect(out).contains(rect))
+                {
+                    T val = sum(pointwise_multiply(col_filt*row_filt, subm(mat(img),rect)));
+                    DLIB_CASSERT(val == out[r][c],"err: " << val-out[r][c]);
+
+                    DLIB_CASSERT(area.contains(point(c,r)),"");
+                }
+                else
+                {
+                    DLIB_CASSERT(!area.contains(point(c,r)),"");
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class image_tester : public tester
     {
     public:
@@ -1628,7 +1685,6 @@ namespace
         void perform_test (
         )
         {
-            test_small_filter();
             image_test();
             test_integral_image<long, unsigned char>();
             test_integral_image<double, int>();
@@ -1669,14 +1725,21 @@ namespace
             dlib::rand rnd;
             for (int i = 0; i < 10; ++i)
             {
+                // the spatial filtering stuff is the same as xcorr_same when the filter
+                // sizes are odd.
                 test_filtering2(3,3,rnd);
-                test_filtering2(3,4,rnd);
-                test_filtering2(4,3,rnd);
-                test_filtering2(4,4,rnd);
-                test_filtering2(4,7,rnd);
+                test_filtering2(5,5,rnd);
                 test_filtering2(7,7,rnd);
-                test_filtering2(7,5,rnd);
             }
+
+            for (int i = 0; i < 100; ++i)
+                test_filtering_center<float>(rnd);
+            for (int i = 0; i < 100; ++i)
+                test_filtering_center<int>(rnd);
+            for (int i = 0; i < 100; ++i)
+                test_separable_filtering_center<int>(rnd);
+            for (int i = 0; i < 100; ++i)
+                test_separable_filtering_center<float>(rnd);
 
         }
     } a;
