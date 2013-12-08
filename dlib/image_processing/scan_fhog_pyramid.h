@@ -928,7 +928,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(thresh > 0 ,
+        DLIB_ASSERT(thresh >= 0 ,
             "\t object_detector threshold_filter_singular_values()"
             << "\n\t Invalid inputs were given to this function."
             << "\n\t thresh: " << thresh 

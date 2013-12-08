@@ -66,7 +66,7 @@ namespace dlib
     );
     /*!
         requires
-            - thresh > 0
+            - thresh >= 0
             - weight_index < detector.num_detectors()
             - detector.get_w(weight_index).size() >= detector.get_scanner().get_num_dimensions()
               (i.e. the detector must have been populated with a HOG filter)
