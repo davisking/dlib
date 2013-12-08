@@ -59,6 +59,33 @@ namespace dlib
     template <
         typename Pyramid_type
         >
+    object_detector<scan_fhog_pyramid<Pyramid_type> > threshold_filter_singular_values (
+        const object_detector<scan_fhog_pyramid<Pyramid_type> >& detector,
+        double thresh,
+        const unsigned long weight_index = 0
+    );
+    /*!
+        requires
+            - thresh > 0
+            - weight_index < detector.num_detectors()
+            - detector.get_w(weight_index).size() >= detector.get_scanner().get_num_dimensions()
+              (i.e. the detector must have been populated with a HOG filter)
+        ensures
+            - Removes all components of the filters in the given detector that have
+              singular values that are smaller than the given threshold.  Therefore, this
+              function allows you to control how many separable filters are in a detector.
+              In particular, as thresh gets larger the quantity
+              num_separable_filters(threshold_filter_singular_values(detector,thresh,weight_index),weight_index)
+              will generally get smaller and therefore give a faster running detector.
+              However, note that at some point a large enough thresh will drop too much
+              information from the filters and their accuracy will suffer.  
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename Pyramid_type
+        >
     class scan_fhog_pyramid : noncopyable
     {
         /*!

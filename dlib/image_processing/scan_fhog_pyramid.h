@@ -919,6 +919,70 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename Pyramid_type
+        >
+    object_detector<scan_fhog_pyramid<Pyramid_type> > threshold_filter_singular_values (
+        const object_detector<scan_fhog_pyramid<Pyramid_type> >& detector,
+        double thresh,
+        const unsigned long weight_index = 0
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(thresh > 0 ,
+            "\t object_detector threshold_filter_singular_values()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t thresh: " << thresh 
+        );
+
+        DLIB_ASSERT(weight_index < detector.num_detectors(),
+            "\t object_detector threshold_filter_singular_values()"
+            << "\n\t Invalid arguments were given to this function. "
+            << "\n\t weight_index:             " << weight_index
+            << "\n\t detector.num_detectors(): " << detector.num_detectors()
+            );
+        DLIB_ASSERT(detector.get_w(weight_index).size() >= detector.get_scanner().get_num_dimensions() ,
+            "\t object_detector threshold_filter_singular_values()"
+            << "\n\t Invalid arguments were given to this function. "
+            << "\n\t detector.get_w(weight_index).size():         " << detector.get_w(weight_index).size()
+            << "\n\t detector.get_scanner().get_num_dimensions(): " << detector.get_scanner().get_num_dimensions()
+            );
+
+
+        const unsigned long width = detector.get_scanner().get_fhog_window_width();
+        const unsigned long height = detector.get_scanner().get_fhog_window_height();
+        const long size = width*height;
+
+        std::vector<matrix<double,0,1> > detector_weights;
+        for (unsigned long j = 0; j < detector.num_detectors(); ++j)
+        {
+            matrix<double,0,1> weights = detector.get_w(j);
+
+            if (j == weight_index)
+            {
+                matrix<double> u,v,w,f;
+                for (int i = 0; i < 31; ++i)
+                {
+                    f = reshape(rowm(weights, range(i*size, (i+1)*size-1)), height, width);
+
+                    svd3(f, u,w,v);
+                    const double scaled_thresh = std::max(1e-3, max(w)*thresh);
+                    w = round_zeros(w, scaled_thresh);
+                    f = u*diagm(w)*trans(v);
+
+                    set_rowm(weights,range(i*size, (i+1)*size-1)) = reshape_to_column_vector(f);
+                }
+            }
+            detector_weights.push_back(weights);
+        }
+        
+        return object_detector<scan_fhog_pyramid<Pyramid_type> >(detector.get_scanner(), 
+                                                                 detector.get_overlap_tester(),
+                                                                 detector_weights);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename Pyramid_type,
         typename svm_struct_prob_type
         >
