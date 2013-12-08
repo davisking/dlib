@@ -79,6 +79,7 @@ namespace dlib
               will generally get smaller and therefore give a faster running detector.
               However, note that at some point a large enough thresh will drop too much
               information from the filters and their accuracy will suffer.  
+            - returns the updated detector
     !*/
 
 // ----------------------------------------------------------------------------------------
