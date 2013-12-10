@@ -79,6 +79,7 @@
 
       <section>
          <name>Object Detection</name>
+         <item>get_frontal_face_detector</item>
          <item>object_detector</item>
          <item>full_object_detection</item>
          <item>scan_image</item>
@@ -1875,6 +1876,21 @@
          <description>        
                 This object represents the location of an object in an image along with the
                 positions of each of its constituent parts.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>get_frontal_face_detector</name>
+         <file>dlib/image_processing/frontal_face_detector.h</file>
+         <spec_file link="true">dlib/image_processing/frontal_face_detector_abstract.h</spec_file>
+         <description>        
+            This function returns an <a href="#object_detector">object_detector</a> that is
+            configured to find human faces that are looking more or less towards the camera.  
+            It is created using the <a href="#scan_fhog_pyramid">scan_fhog_pyramid</a>
+            object.  
          </description>
                                  
       </component>
