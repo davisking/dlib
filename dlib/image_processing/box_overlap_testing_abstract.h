@@ -132,6 +132,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    bool overlaps_any_box (
+        const std::vector<rectangle>& rects,
+        const rectangle& rect
+    );
+    /*!
+        ensures
+            - returns overlaps_any_box(test_box_overlap(), rects, rect)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_BOX_OVERlAP_TESTING_ABSTRACT_H__
