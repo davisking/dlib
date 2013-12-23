@@ -441,7 +441,7 @@ namespace dlib
 
         point_transform_affine trans = point_transform_affine(R, -R*dcenter(get_rect(out_img)) + dcenter(rimg));
         transform_image(in_img, out_img, interp, trans);
-        return trans;
+        return inv(trans);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -858,7 +858,7 @@ namespace dlib
         typename image_type1,
         typename image_type2
         >
-    void flip_image_left_right (
+    point_transform_affine flip_image_left_right (
         const image_type1& in_img,
         image_type2& out_img
     )
@@ -871,6 +871,13 @@ namespace dlib
             );
 
         assign_image(out_img, fliplr(mat(in_img)));
+        std::vector<dlib::vector<double,2> > from, to;
+        rectangle r = get_rect(in_img);
+        from.push_back(r.tl_corner()); to.push_back(r.tr_corner());
+        from.push_back(r.bl_corner()); to.push_back(r.br_corner());
+        from.push_back(r.tr_corner()); to.push_back(r.tl_corner());
+        from.push_back(r.br_corner()); to.push_back(r.bl_corner());
+        return find_affine_transform(from,to);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1142,7 +1149,7 @@ namespace dlib
         image_type temp;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
-            const point_transform_affine tran = inv(rotate_image(images[i], temp, angle));
+            const point_transform_affine tran = rotate_image(images[i], temp, angle);
             temp.swap(images[i]);
             for (unsigned long j = 0; j < objects[i].size(); ++j)
             {
@@ -1173,7 +1180,7 @@ namespace dlib
         image_type temp;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
-            const point_transform_affine tran = inv(rotate_image(images[i], temp, angle));
+            const point_transform_affine tran = rotate_image(images[i], temp, angle);
             temp.swap(images[i]);
             for (unsigned long j = 0; j < objects[i].size(); ++j)
             {

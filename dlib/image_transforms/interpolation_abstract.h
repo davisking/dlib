@@ -406,7 +406,7 @@ namespace dlib
         typename image_type1,
         typename image_type2
         >
-    void flip_image_left_right (
+    point_transform_affine flip_image_left_right (
         const image_type1& in_img,
         image_type2& out_img
     );
@@ -422,6 +422,8 @@ namespace dlib
             - #out_img.nc() == in_img.nc()
             - #out_img == a copy of in_img which has been flipped from left to right.  
               (i.e. it is flipped as if viewed though a mirror)
+            - returns a transformation object that maps points in in_img into their
+              corresponding location in #out_img.
     !*/
 
 // ----------------------------------------------------------------------------------------
