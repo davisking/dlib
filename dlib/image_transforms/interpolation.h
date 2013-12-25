@@ -69,7 +69,7 @@ namespace dlib
 
 
             // if the interpolation goes outside img 
-            if (!get_rect(img).contains(rectangle(left,top,right,bottom))) 
+            if (!(left >= 0 && top >= 0 && right < img.nc() && bottom < img.nr()))
                 return false;
 
             const double lr_frac = p.x() - left;
@@ -105,7 +105,7 @@ namespace dlib
 
 
             // if the interpolation goes outside img 
-            if (!get_rect(img).contains(rectangle(left,top,right,bottom))) 
+            if (!(left >= 0 && top >= 0 && right < img.nc() && bottom < img.nr()))
                 return false;
 
             const double lr_frac = p.x() - left;
