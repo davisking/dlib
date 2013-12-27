@@ -1289,6 +1289,127 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    struct chip_details
+    {
+        chip_details() : size(0), angle(0) {}
+        chip_details(const rectangle& rect_, unsigned long size_) : rect(rect_),size(size_),angle(0) {}
+        chip_details(const rectangle& rect_, unsigned long size_, double angle_) : rect(rect_),size(size_),angle(angle_) {}
+
+        rectangle rect;
+        unsigned long size;
+        double angle;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type1,
+        typename image_type2
+        >
+    void extract_image_chips (
+        const image_type1& img,
+        const std::vector<chip_details>& chip_locations,
+        dlib::array<image_type2>& chips
+    )
+    {
+        // make sure requires clause is not broken
+#if ENABLE_ASSERTS
+        for (unsigned long i = 0; i < chip_locations.size(); ++i)
+        {
+            DLIB_CASSERT(chip_locations[i].size != 0 &&
+                         chip_locations[i].rect.is_empty() == false,
+            "\t void extract_image_chips()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t chip_locations["<<i<<"].size:            " << chip_locations[i].size 
+            << "\n\t chip_locations["<<i<<"].rect.is_empty(): " << chip_locations[i].rect.is_empty() 
+        }
+#endif 
+
+        pyramid_down<2> pyr;
+        long max_depth = 0;
+        // If the chip is supposed to be much smaller than the source subwindow then you
+        // can't just extract it using bilinear interpolation since at a high enough
+        // downsampling amount it would effectively turn into nearest neighbor
+        // interpolation.  So we use an image pyramid to make sure the interpolation is
+        // fast but also high quality.  The first thing we do is figure out how deep the
+        // image pyramid needs to be.
+        for (unsigned long i = 0; i < chip_locations.size(); ++i)
+        {
+            long depth = 0;
+            rectangle rect = pyr.rect_down(chip_locations[i].rect);
+            while (rect.area() > chip_locations[i].size)
+            {
+                rect = pyr.rect_down(rect);
+                ++depth;
+            }
+            max_depth = std::max(depth,max_depth);
+        }
+
+        // now make an image pyramid
+        dlib::array<image_type1> levels(max_depth);
+        if (levels.size() != 0)
+            pyr(img,levels[0]);
+        for (unsigned long i = 1; i < levels.size(); ++i)
+            pyr(levels[i-1],levels[i]);
+
+        std::vector<dlib::vector<double,2> > from, to;
+
+        // now pull out the chips
+        chips.resize(chip_locations.size());
+        for (unsigned long i = 0; i < chips.size(); ++i)
+        {
+            const double relative_size = std::sqrt(chip_locations[i].size/(double)chip_locations[i].rect.area());
+            const long chip_height = static_cast<long>(chip_locations[i].rect.height()*relative_size + 0.5);
+            const long chip_width  = static_cast<long>(chip_locations[i].size/(double)chip_height + 0.5);
+            chips[i].set_size(chip_height, chip_width);
+
+            // figure out which level in the pyramid to use to extract the chip
+            int level = -1;
+            rectangle rect = chip_locations[i].rect;
+            while (pyr.rect_down(rect).area() > chip_locations[i].size)
+            {
+                ++level;
+                rect = pyr.rect_down(rect);
+            }
+
+            // find the appropriate transformation that maps from the chip to the input
+            // image
+            from.clear();
+            to.clear();
+            from.push_back(get_rect(chips[i]).tl_corner());  to.push_back(rotate_point<double>(center(rect),rect.tl_corner(),chip_locations[i].angle));
+            from.push_back(get_rect(chips[i]).tr_corner());  to.push_back(rotate_point<double>(center(rect),rect.tr_corner(),chip_locations[i].angle));
+            from.push_back(get_rect(chips[i]).bl_corner());  to.push_back(rotate_point<double>(center(rect),rect.bl_corner(),chip_locations[i].angle));
+            point_transform_affine trns = find_affine_transform(from,to);
+
+            // now extract the actual chip
+            if (level == -1)
+                transform_image(img,chips[i],interpolate_bilinear(),trns);
+            else
+                transform_image(levels[level],chips[i],interpolate_bilinear(),trns);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type1,
+        typename image_type2
+        >
+    void extract_image_chip (
+        const image_type1& img,
+        const chip_details& location,
+        image_type2& chip
+    )
+    {
+        std::vector<chip_details> chip_locations(1,location);
+        dlib::array<image_type2> chips;
+        extract_image_chips(img, chip_locations, chips);
+        chips[0].swap(chip);
+    }
+
+// ----------------------------------------------------------------------------------------
 
 }
 

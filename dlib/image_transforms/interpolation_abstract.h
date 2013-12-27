@@ -786,6 +786,125 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    struct chip_details
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object describes where an image chip is to be extracted from within
+                another image.  In particular, it specifies that the image chip is
+                contained within the rectangle this->rect and that prior to extraction the
+                image should be rotated counter-clockwise by this->angle radians.  Finally,
+                the extracted chip should have this->size pixels in it regardless of the
+                size of this->rect.
+
+        !*/
+
+        chip_details(
+        ); 
+        /*!
+            ensures
+                - #rect.is_empty() == true
+                - #size == 0
+                - #angle == 0
+        !*/
+
+        chip_details(
+            const rectangle& rect_, 
+            unsigned long size_
+        );
+        /*!
+            ensures
+                - #rect == rect_
+                - #size == size_
+                - #angle == 0
+        !*/
+
+        chip_details(
+            const rectangle& rect_, 
+            unsigned long size_,
+            double angle_
+        );
+        /*!
+            ensures
+                - #rect == rect_
+                - #size == size_
+                - #angle == angle_
+        !*/
+
+        rectangle rect;
+        unsigned long size;
+        double angle;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type1,
+        typename image_type2
+        >
+    void extract_image_chips (
+        const image_type1& img,
+        const std::vector<chip_details>& chip_locations,
+        dlib::array<image_type2>& chips
+    );
+    /*!
+        requires
+            - image_type1 == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type2 == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type1::type>::has_alpha == false
+            - pixel_traits<typename image_type2::type> is defined
+            - for all valid i: 
+                - chip_locations[i].rect.is_empty() == false
+                - chip_locations[i].size != 0
+        ensures
+            - This function extracts "chips" from an image.  That is, it takes a list of
+              rectangular sub-windows (i.e. chips) within an image and extracts those
+              sub-windows, storing each into its own image.  It also scales and rotates the
+              image chips according to the instructions inside each chip_details object.
+            - #chips == the extracted image chips
+            - #chips.size() == chip_locations.size()
+            - for all valid i:
+                - #chips[i] == The image chip extracted from the position
+                  chip_locations[i].rect in img.
+                - #chips[i].nr()/#chips[i].nc() is approximately equal to
+                  chip_locations[i].rect.height()/chip_locations[i].rect.width() (i.e. the
+                  aspect ratio of the chip is as similar as possible to the aspect ratio of
+                  the rectangle that defines the chip's location in the original image)
+                - #chips[i].size() is as close to chip_locations[i].size as possible given that 
+                  we attempt to keep the chip's aspect ratio similar to chip_locations[i].rect. 
+                - The image will have been rotated counter-clockwise by
+                  chip_locations[i].angle radians, around the center of
+                  chip_locations[i].rect, before the chip was extracted. 
+                - As long as chip_locations[i].size and the aspect ratio of of
+                  chip_locations[i].rect and stays constant then the dimensions of
+                  #chips[i] is always the same.  This means that, for example, if you want
+                  all your chips to have the same dimensions then ensure that
+                  chip_location[i].size is always the same and also that
+                  chip_location[i].rect always has the same aspect ratio.
+            - Any pixels in an image chip that go outside img are set to 0 (i.e. black).
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type1,
+        typename image_type2
+        >
+    void extract_image_chip (
+        const image_type1& img,
+        const chip_details& chip_location,
+        image_type2& chip
+    );
+    /*!
+        ensures
+            - This function simply calls extract_image_chips() with a single chip location
+              and stores the single output chip into #chip.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
 }
 
