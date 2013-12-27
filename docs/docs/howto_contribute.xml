@@ -286,7 +286,7 @@ double compute_sum_of_array_elements(const std::vector&lt;double&gt;&amp; array)
                   If you absolutely need pointer semantics then you can usually use a smart pointer like
                   <a href="containers.html#scoped_ptr">scoped_ptr</a> or <a href="containers.html#shared_ptr">shared_ptr</a>.
                   If that still isn't good enough for you and you <i>really</i> need to use a normal C style pointer
-                  then isolate your pointers inside a class so that they are contained in a small area of the code.  
+                  then isolate your pointers inside a class or function so that they are contained in a small area of the code.  
                   However, in practice the container classes in dlib and the STL are more than sufficient in nearly 
                   every case where pointers would otherwise be used.
                </p>
