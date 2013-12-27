@@ -32,7 +32,8 @@ namespace dlib
                 difficult(false),
                 truncated(false),
                 occluded(false),
-                ignore(false)
+                ignore(false),
+                angle(0)
             {}
 
             rectangle rect;
@@ -45,6 +46,13 @@ namespace dlib
             bool truncated;
             bool occluded;
             bool ignore;
+
+            // The angle of the object in radians.  Positive values indicate that the
+            // object at the center of the box is rotated clockwise by angle radians.  A
+            // value of 0 would indicate that the object is in its "standard" upright pose.
+            // Therefore, to make the object appear upright we would have to rotate the
+            // image counter-clockwise by angle radians.
+            double angle; 
 
             bool has_label() const { return label.size() != 0; }
             /*!

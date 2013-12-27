@@ -78,6 +78,8 @@ namespace dlib
                         fout << " occluded='" << b.occluded << "'";
                     if (b.ignore)
                         fout << " ignore='" << b.ignore << "'";
+                    if (b.angle != 0)
+                        fout << " angle='" << b.angle << "'";
 
                     if (b.has_label() || b.parts.size() != 0)
                     {
@@ -189,6 +191,7 @@ namespace dlib
                         if (atts.is_in_list("truncated")) temp_box.truncated = sa = atts["truncated"];
                         if (atts.is_in_list("occluded"))  temp_box.occluded  = sa = atts["occluded"];
                         if (atts.is_in_list("ignore"))  temp_box.ignore  = sa = atts["ignore"];
+                        if (atts.is_in_list("angle"))  temp_box.angle  = sa = atts["angle"];
 
                         temp_box.rect.bottom() += temp_box.rect.top()-1;
                         temp_box.rect.right() += temp_box.rect.left()-1;
