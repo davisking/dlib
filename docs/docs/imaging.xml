@@ -193,6 +193,7 @@
          <item>upsample_image_dataset</item> 
          <item>flip_image_dataset_left_right</item> 
          <item>rotate_image_dataset</item> 
+         <item>extract_image_chips</item> 
       </section>
 
       <section>
@@ -1437,6 +1438,20 @@
          <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
          <description>        
             This is a routine capable of resizing or stretching an image.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>extract_image_chips</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
+         <description>        
+              This function extracts "chips" from an image.  That is, it takes a list of
+              rectangular sub-windows (i.e. chips) within an image and extracts those
+              sub-windows, storing each into its own image.  It also allows the user to
+              specify the scale and rotation or the chip.
          </description>
       </component>
 
