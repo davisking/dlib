@@ -292,6 +292,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline std::ostream& operator<< (
+        std::ostream& out,
+        const directory& item
+    ) { out << (std::string)item; return out; }
+
+    inline std::ostream& operator<< (
+        std::ostream& out,
+        const file& item
+    ) { out << (std::string)item; return out; }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename queue_of_dir
         >

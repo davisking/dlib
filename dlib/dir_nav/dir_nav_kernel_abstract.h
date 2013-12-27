@@ -459,6 +459,28 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline std::ostream& operator<< (
+        std::ostream& out,
+        const directory& item
+    );
+    /*!
+        ensures
+            - performs: out << item.full_name()
+            - returns out
+    !*/
+
+    inline std::ostream& operator<< (
+        std::ostream& out,
+        const file& item
+    );
+    /*!
+        ensures
+            - performs: out << item.full_name()
+            - returns out
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     inline void swap (
         file& a, 
         file& b 
