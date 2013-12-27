@@ -25,10 +25,10 @@ namespace dlib
 #ifdef __GNUC__
     typedef unsigned long long uint64;
     typedef long long int64;
-#elif __BORLANDC__
+#elif defined(__BORLANDC__)
     typedef unsigned __int64 uint64;
     typedef __int64 int64;
-#elif _MSC_VER
+#elif defined(_MSC_VER)
     typedef unsigned __int64 uint64;
     typedef __int64 int64;
 #else

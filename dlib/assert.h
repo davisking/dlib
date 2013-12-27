@@ -82,7 +82,7 @@ namespace dlib
 #  else
 #    define DLIB_FUNCTION_NAME "unknown function" 
 #  endif
-#elif _MSC_VER
+#elif defined(_MSC_VER)
 #define DLIB_FUNCTION_NAME __FUNCSIG__
 #else
 #define DLIB_FUNCTION_NAME "unknown function" 
