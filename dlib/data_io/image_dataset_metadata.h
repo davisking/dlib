@@ -27,8 +27,20 @@ namespace dlib
                     The main variable of interest is rect.  It gives the location of 
                     the box.  All the other variables are optional.
             !*/
+
             box(
             ) : 
+                difficult(false),
+                truncated(false),
+                occluded(false),
+                ignore(false),
+                angle(0)
+            {}
+
+            box (
+                const rectangle& rect_
+            ) : 
+                rect(rect_), 
                 difficult(false),
                 truncated(false),
                 occluded(false),
