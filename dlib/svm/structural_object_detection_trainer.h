@@ -57,7 +57,7 @@ namespace dlib
 
             C = 1;
             verbose = false;
-            eps = 0.3;
+            eps = 0.1;
             num_threads = 2;
             max_cache_size = 5;
             match_eps = 0.5;
