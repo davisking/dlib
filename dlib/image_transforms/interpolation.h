@@ -1323,7 +1323,8 @@ namespace dlib
             "\t void extract_image_chips()"
             << "\n\t Invalid inputs were given to this function."
             << "\n\t chip_locations["<<i<<"].size:            " << chip_locations[i].size 
-            << "\n\t chip_locations["<<i<<"].rect.is_empty(): " << chip_locations[i].rect.is_empty() 
+            << "\n\t chip_locations["<<i<<"].rect.is_empty(): " << chip_locations[i].rect.is_empty()
+            );
         }
 #endif 
 
