@@ -287,62 +287,12 @@ namespace dlib
         friend void serialize (
             const mlp_kernel_1& item, 
             std::ostream& out
-        )   
-        {
-            try
-            {
-                serialize(item.input_nodes, out);
-                serialize(item.first_hidden_nodes, out);
-                serialize(item.second_hidden_nodes, out);
-                serialize(item.output_nodes, out);
-                serialize(item.alpha, out);
-                serialize(item.momentum, out);
-
-                serialize(item.w1, out);
-                serialize(item.w2, out);
-                serialize(item.w3, out);
-
-                serialize(item.w1m, out);
-                serialize(item.w2m, out);
-                serialize(item.w3m, out);
-            }
-            catch (serialization_error& e)
-            { 
-                throw serialization_error(e.info + "\n   while serializing object of type mlp_kernel_1"); 
-            }
-        }
+        );
 
         friend void deserialize (
             mlp_kernel_1& item, 
             std::istream& in
-        )   
-        {
-            try
-            {
-                deserialize(item.input_nodes, in);
-                deserialize(item.first_hidden_nodes, in);
-                deserialize(item.second_hidden_nodes, in);
-                deserialize(item.output_nodes, in);
-                deserialize(item.alpha, in);
-                deserialize(item.momentum, in);
-
-                deserialize(item.w1, in);
-                deserialize(item.w2, in);
-                deserialize(item.w3, in);
-
-                deserialize(item.w1m, in);
-                deserialize(item.w2m, in);
-                deserialize(item.w3m, in);
-
-                item.z.set_size(item.input_nodes+1,1);
-            }
-            catch (serialization_error& e)
-            { 
-                // give item a reasonable value since the deserialization failed
-                mlp_kernel_1(1,1).swap(item);
-                throw serialization_error(e.info + "\n   while deserializing object of type mlp_kernel_1"); 
-            }
-        }
+        );
 
     private:
 
@@ -373,6 +323,70 @@ namespace dlib
         mlp_kernel_1& a, 
         mlp_kernel_1& b 
     ) { a.swap(b); }   
+
+// ----------------------------------------------------------------------------------------
+
+    inline void serialize (
+        const mlp_kernel_1& item, 
+        std::ostream& out
+    )   
+    {
+        try
+        {
+            serialize(item.input_nodes, out);
+            serialize(item.first_hidden_nodes, out);
+            serialize(item.second_hidden_nodes, out);
+            serialize(item.output_nodes, out);
+            serialize(item.alpha, out);
+            serialize(item.momentum, out);
+
+            serialize(item.w1, out);
+            serialize(item.w2, out);
+            serialize(item.w3, out);
+
+            serialize(item.w1m, out);
+            serialize(item.w2m, out);
+            serialize(item.w3m, out);
+        }
+        catch (serialization_error& e)
+        { 
+            throw serialization_error(e.info + "\n   while serializing object of type mlp_kernel_1"); 
+        }
+    }
+
+    inline void deserialize (
+        mlp_kernel_1& item, 
+        std::istream& in
+    )   
+    {
+        try
+        {
+            deserialize(item.input_nodes, in);
+            deserialize(item.first_hidden_nodes, in);
+            deserialize(item.second_hidden_nodes, in);
+            deserialize(item.output_nodes, in);
+            deserialize(item.alpha, in);
+            deserialize(item.momentum, in);
+
+            deserialize(item.w1, in);
+            deserialize(item.w2, in);
+            deserialize(item.w3, in);
+
+            deserialize(item.w1m, in);
+            deserialize(item.w2m, in);
+            deserialize(item.w3m, in);
+
+            item.z.set_size(item.input_nodes+1,1);
+        }
+        catch (serialization_error& e)
+        { 
+            // give item a reasonable value since the deserialization failed
+            mlp_kernel_1(1,1).swap(item);
+            throw serialization_error(e.info + "\n   while deserializing object of type mlp_kernel_1"); 
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
 
 }
 
