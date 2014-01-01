@@ -42,6 +42,61 @@ namespace
             )
         {}
 
+        void test_mat_bindings()
+        {
+            using namespace dlib;
+            using namespace dlib::blas_bindings;
+            matrix<double,1,0> rv(10);
+            matrix<double,0,1> cv(10);
+            double val;
+
+            rv = 1; cv = 1;
+            counter_dot() = 0;
+            val = rv*cv;
+            DLIB_TEST(val == 10);
+            DLIB_TEST(counter_dot() == 1);
+
+            rv = 1; cv = 1;
+            counter_dot() = 0;
+            val = rv*mat(&cv(0),cv.size());
+            DLIB_TEST(val == 10);
+            DLIB_TEST(counter_dot() == 1);
+
+            rv = 1; cv = 1;
+            counter_dot() = 0;
+            val = trans(mat(&rv(0),rv.size()))*mat(&cv(0),cv.size());
+            DLIB_TEST(val == 10);
+            DLIB_TEST(counter_dot() == 1);
+
+            std::vector<double> sv(10,1);
+            rv = 1; 
+            counter_dot() = 0;
+            val = trans(mat(&rv(0),rv.size()))*mat(sv);
+            DLIB_TEST(val == 10);
+            DLIB_TEST(counter_dot() == 1);
+
+
+            counter_dot() = 0;
+            val = trans(mat(sv))*mat(sv);
+            DLIB_TEST(val == 10);
+            DLIB_TEST(counter_dot() == 1);
+
+            std_vector_c<double> svc(10,1);
+            counter_dot() = 0;
+            val = trans(mat(svc))*mat(svc);
+            DLIB_TEST(val == 10);
+            DLIB_TEST(counter_dot() == 1);
+
+
+            dlib::array<double> arr(10);
+            for (unsigned int i = 0; i < arr.size(); ++i)
+                arr[i] = 1;
+            counter_dot() = 0;
+            val = trans(mat(arr))*mat(arr);
+            DLIB_TEST(val == 10);
+            DLIB_TEST(counter_dot() == 1);
+        }
+
         template <typename matrix_type, typename cv_type, typename rv_type>
         void test_dot_stuff(
             matrix_type& m,
@@ -237,6 +292,8 @@ namespace
                 test_dot_stuff_conj(m,rv,cv);
             }
 
+
+            test_mat_bindings();
 
             print_spinner();
         }

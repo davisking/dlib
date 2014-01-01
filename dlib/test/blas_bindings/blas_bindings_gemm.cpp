@@ -258,6 +258,21 @@ namespace
                 test_gemm_stuff_conj(c);
             }
 
+            {
+                using namespace dlib;
+                using namespace dlib::blas_bindings;
+                array2d<double> a(100,100);
+                array2d<double> b(100,100);
+                matrix<double> c;
+                
+                counter_gemm() = 0;
+                c = mat(a)*mat(b);
+                DLIB_TEST(counter_gemm() == 1);
+
+                counter_gemm() = 0;
+                c = trans(2*mat(a)*mat(b));
+                DLIB_TEST(counter_gemm() == 1);
+            }
 
             print_spinner();
         }

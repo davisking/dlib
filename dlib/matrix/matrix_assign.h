@@ -10,6 +10,7 @@
 #include "matrix_assign_fwd.h"
 #include "matrix_default_mul.h"
 #include "matrix_conj_trans.h"
+#include "matrix_mat.h"
 
 namespace dlib
 {
@@ -158,6 +159,29 @@ namespace dlib
         {
             const static int value = general_matrix;
         };
+
+        template < typename T, typename MM >
+        struct matrix_type_id<matrix_op<op_array2d_to_mat<array2d<T,MM> > > >
+        { const static int value = general_matrix; };
+
+        template < typename T, typename MM >
+        struct matrix_type_id<matrix_op<op_array_to_mat<array<T,MM> > > >
+        { const static int value = column_matrix; };
+
+        template < typename value_type, typename alloc >
+        struct matrix_type_id<matrix_op<op_std_vect_to_mat<std::vector<value_type,alloc> > > >
+        { const static int value = column_matrix; };
+
+        template < typename value_type, typename alloc >
+        struct matrix_type_id<matrix_op<op_std_vect_to_mat<std_vector_c<value_type,alloc> > > >
+        { const static int value = column_matrix; };
+
+        template < typename T >
+        struct matrix_type_id<matrix_op<op_pointer_to_col_vect<T> > >
+        { const static int value = column_matrix; };
+        template < typename T >
+        struct matrix_type_id<matrix_op<op_pointer_to_mat<T> > >
+        { const static int value = general_matrix; };
 
     // ------------------------------------------------------------------------------------
 

@@ -408,7 +408,33 @@ namespace dlib
         template <typename T, long NR, long NC, typename MM>
         int get_ld (const assignable_sub_matrix<T,NR,NC,MM,column_major_layout>& m) { return m.m.nr(); }
 
+        template <typename T, typename MM>
+        int get_ld (const matrix_op<op_array2d_to_mat<array2d<T,MM> > >& m) { return m.nc(); }
+        template <typename T, typename MM>
+        int get_ld (const matrix_op<op_array_to_mat<array<T,MM> > >& m) { return m.nc(); }
+        template < typename value_type, typename alloc >
+        int get_ld (const matrix_op<op_std_vect_to_mat<std::vector<value_type,alloc> > >& m) { return m.nc(); }
+        template < typename value_type, typename alloc >
+        int get_ld (const matrix_op<op_std_vect_to_mat<std_vector_c<value_type,alloc> > >& m) { return m.nc(); }
+        template <typename T>
+        int get_ld (const matrix_op<op_pointer_to_col_vect<T> >& m) { return m.nc(); }
+        template <typename T>
+        int get_ld (const matrix_op<op_pointer_to_mat<T> >& m) { return m.nc(); }
+
         // --------
+
+        template <typename T, typename MM>
+        int get_inc (const matrix_op<op_array2d_to_mat<array2d<T,MM> > >& ) { return 1; }
+        template <typename T, typename MM>
+        int get_inc (const matrix_op<op_array_to_mat<array<T,MM> > >& ) { return 1; }
+        template < typename value_type, typename alloc >
+        int get_inc (const matrix_op<op_std_vect_to_mat<std::vector<value_type,alloc> > >& ) { return 1; }
+        template < typename value_type, typename alloc >
+        int get_inc (const matrix_op<op_std_vect_to_mat<std_vector_c<value_type,alloc> > >& ) { return 1; }
+        template <typename T>
+        int get_inc (const matrix_op<op_pointer_to_col_vect<T> >& ) { return 1; }
+        template <typename T>
+        int get_inc (const matrix_op<op_pointer_to_mat<T> >& ) { return 1; }
 
         template <typename T, long NR, long NC, typename MM, typename L>
         int get_inc (const matrix<T,NR,NC,MM,L>& ) { return 1; }
@@ -521,6 +547,19 @@ namespace dlib
 
         template <typename T, long NR, long NC, typename MM, typename L>
         T* get_ptr (assignable_sub_matrix<T,NR,NC,MM,L>& m) { return &m(0,0); }
+
+        template <typename T, typename MM>
+        const T* get_ptr (const matrix_op<op_array2d_to_mat<array2d<T,MM> > >& m) { return &m.op.array[0][0]; }
+        template <typename T, typename MM>
+        const T* get_ptr (const matrix_op<op_array_to_mat<array<T,MM> > >& m) { return &m.op.vect[0]; }
+        template < typename T, typename alloc >
+        const T* get_ptr (const matrix_op<op_std_vect_to_mat<std::vector<T,alloc> > >& m) { return &m.op.vect[0]; }
+        template < typename T, typename alloc >
+        const T* get_ptr (const matrix_op<op_std_vect_to_mat<std_vector_c<T,alloc> > >& m) { return &m.op.vect[0]; }
+        template <typename T>
+        const T* get_ptr (const matrix_op<op_pointer_to_col_vect<T> >& m) { return m.op.ptr; }
+        template <typename T>
+        const T* get_ptr (const matrix_op<op_pointer_to_mat<T> >& m) { return m.op.ptr; }
 
     // ----------------------------------------------------------------------------------------
     // ----------------------------------------------------------------------------------------
