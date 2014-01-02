@@ -437,7 +437,7 @@ namespace dlib
                     simd4f v10 = vy1*vx0;
                     simd4f v00 = vy0*vx0;
 
-                    float _best_o[4]; best_o.store(_best_o);
+                    int32 _best_o[4]; simd4i(best_o).store(_best_o);
                     int32 _ixp[4];    ixp.store(_ixp);
                     float _v11[4];    v11.store(_v11);
                     float _v01[4];    v01.store(_v01);
