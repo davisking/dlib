@@ -263,6 +263,10 @@
                   <link>fhog_ex.cpp.html</link>
                </item>
                <item>
+                  <name>FHOG_Object_Detection</name>
+                  <link>fhog_object_detector_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>SURF</name>
                   <link>surf_ex.cpp.html</link>
                </item>
