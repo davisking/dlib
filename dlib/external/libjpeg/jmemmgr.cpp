@@ -303,7 +303,7 @@ alloc_small (j_common_ptr cinfo, int pool_id, size_t sizeofobject)
       if (slop < MIN_SLOP)	/* give up when it gets real small */
 	out_of_memory(cinfo, 2); /* jpeg_get_small failed */
     }
-    mem->total_space_allocated += min_request + slop;
+    mem->total_space_allocated += (long)(min_request + slop);
     /* Success, initialize the new pool header and add to end of list */
     hdr_ptr->hdr.next = NULL;
     hdr_ptr->hdr.bytes_used = 0;
@@ -363,7 +363,7 @@ alloc_large (j_common_ptr cinfo, int pool_id, size_t sizeofobject)
 					    SIZEOF(large_pool_hdr));
   if (hdr_ptr == NULL)
     out_of_memory(cinfo, 4);	/* jpeg_get_large failed */
-  mem->total_space_allocated += sizeofobject + SIZEOF(large_pool_hdr);
+  mem->total_space_allocated += (long)(sizeofobject + SIZEOF(large_pool_hdr));
 
   /* Success, initialize the new pool header and add to list */
   hdr_ptr->hdr.next = mem->large_list[pool_id];
@@ -973,7 +973,7 @@ free_pool (j_common_ptr cinfo, int pool_id)
 		  lhdr_ptr->hdr.bytes_left +
 		  SIZEOF(large_pool_hdr);
     jpeg_free_large(cinfo, (void FAR *) lhdr_ptr, space_freed);
-    mem->total_space_allocated -= space_freed;
+    mem->total_space_allocated -= (long)space_freed;
     lhdr_ptr = next_lhdr_ptr;
   }
 
@@ -987,7 +987,7 @@ free_pool (j_common_ptr cinfo, int pool_id)
 		  shdr_ptr->hdr.bytes_left +
 		  SIZEOF(small_pool_hdr);
     jpeg_free_small(cinfo, (void *) shdr_ptr, space_freed);
-    mem->total_space_allocated -= space_freed;
+    mem->total_space_allocated -= (long)space_freed;
     shdr_ptr = next_shdr_ptr;
   }
 }
