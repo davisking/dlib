@@ -22,6 +22,8 @@ namespace dlib
         /*!
             REQUIREMENTS ON image_scanner_type
                 image_scanner_type must be an implementation of 
+                dlib/image_processing/scan_fhog_pyramid_abstract.h or
+                dlib/image_processing/scan_image_custom_abstract.h or
                 dlib/image_processing/scan_image_pyramid_abstract.h or
                 dlib/image_processing/scan_image_boxes_abstract.h
 
