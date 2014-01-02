@@ -12,6 +12,29 @@ if (NOT TARGET dlib)
         add_definitions("-Wreturn-type")
     endif()
 
+    option(USE_SSE2_INSTRUCTIONS "Compile your program with SSE2 instructions" OFF)
+    option(USE_SSE4_INSTRUCTIONS "Compile your program with SSE4 instructions" OFF)
+    option(USE_AVX_INSTRUCTIONS "Compile your program with AVX instructions" OFF)
+
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        if(USE_AVX_INSTRUCTIONS)
+            add_definitions(-mavx)
+        elseif (USE_SSE4_INSTRUCTIONS)
+            add_definitions(-msse4)
+        elseif(USE_SSE2_INSTRUCTIONS)
+            add_definitions(-msse2)
+        endif()
+    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") # Visual Studio
+        if(USE_AVX_INSTRUCTIONS)
+            add_definitions(/arch:AVX)
+        elseif (USE_SSE4_INSTRUCTIONS)
+            add_definitions(/arch:SSE2)  # There isn't an /arch:SSE4 flag in visual studio.
+        elseif(USE_SSE2_INSTRUCTIONS)
+            add_definitions(/arch:SSE2)
+        endif()
+    endif()
+
+
     # Add folder containing dlib to the include search path.
     INCLUDE_DIRECTORIES(${dlib_path}/..)
 
