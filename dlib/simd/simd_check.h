@@ -38,27 +38,23 @@
  
 // ----------------------------------------------------------------------------------------
 
-#ifdef __GNUC__
-    #include <x86intrin.h>
-#else
-    #ifdef DLIB_HAVE_SSE2
-        #include <xmmintrin.h>
-        #include <emmintrin.h>
-        #include <mmintrin.h>
-    #endif
-    #ifdef DLIB_HAVE_SSE3
-        #include <pmmintrin.h> // SSE3
-        #include <tmmintrin.h>
-    #endif
-    #ifdef DLIB_HAVE_SSE41
-        #include <smmintrin.h> // SSE4
-    #endif
-    #ifdef DLIB_HAVE_AVX
-        #include <immintrin.h> // AVX
-    #endif
-    #ifdef DLIB_HAVE_AVX2
-        #include <avx2intrin.h>
-    #endif
+#ifdef DLIB_HAVE_SSE2
+    #include <xmmintrin.h>
+    #include <emmintrin.h>
+    #include <mmintrin.h>
+#endif
+#ifdef DLIB_HAVE_SSE3
+    #include <pmmintrin.h> // SSE3
+    #include <tmmintrin.h>
+#endif
+#ifdef DLIB_HAVE_SSE41
+    #include <smmintrin.h> // SSE4
+#endif
+#ifdef DLIB_HAVE_AVX
+    #include <immintrin.h> // AVX
+#endif
+#ifdef DLIB_HAVE_AVX2
+    #include <avx2intrin.h>
 #endif
 
 #endif // DLIB_SIMd_CHECK_H__
