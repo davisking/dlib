@@ -12,11 +12,11 @@ if (NOT TARGET dlib)
         add_definitions("-Wreturn-type")
     endif()
 
-    option(USE_SSE2_INSTRUCTIONS "Compile your program with SSE2 instructions" OFF)
     option(USE_SSE4_INSTRUCTIONS "Compile your program with SSE4 instructions" OFF)
     option(USE_AVX_INSTRUCTIONS "Compile your program with AVX instructions" OFF)
 
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        option(USE_SSE2_INSTRUCTIONS "Compile your program with SSE2 instructions" OFF)
         if(USE_AVX_INSTRUCTIONS)
             add_definitions(-mavx)
         elseif (USE_SSE4_INSTRUCTIONS)
@@ -25,6 +25,8 @@ if (NOT TARGET dlib)
             add_definitions(-msse2)
         endif()
     elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") # Visual Studio
+        # Use SSE2 by default when using Visual Studio
+        option(USE_SSE2_INSTRUCTIONS "Compile your program with SSE2 instructions" ON)
         if(USE_AVX_INSTRUCTIONS)
             add_definitions(/arch:AVX)
         elseif (USE_SSE4_INSTRUCTIONS)
