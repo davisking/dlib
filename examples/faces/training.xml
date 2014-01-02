@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='ISO-8859-1'?>
 <?xml-stylesheet type='text/xsl' href='image_metadata_stylesheet.xsl'?>
 <dataset>
-<name>imglab dataset</name>
-<comment>Created by imglab tool.</comment>
+<name>Training faces</name>
+<comment>These are images from the PASCAL VOC 2011 dataset.</comment>
 <images>
   <image file='2007_007763.jpg'>
     <box top='90' left='194' width='37' height='37'/>
