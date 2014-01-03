@@ -13,10 +13,10 @@ if (NOT TARGET dlib)
     endif()
 
     # Setup some options to allow a user to enable SSE and AVX instruction use.  
-    option(USE_SSE4_INSTRUCTIONS "Compile your program with SSE4 instructions" OFF)
-    option(USE_AVX_INSTRUCTIONS "Compile your program with AVX instructions" OFF)
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         option(USE_SSE2_INSTRUCTIONS "Compile your program with SSE2 instructions" OFF)
+        option(USE_SSE4_INSTRUCTIONS "Compile your program with SSE4 instructions" OFF)
+        option(USE_AVX_INSTRUCTIONS  "Compile your program with AVX instructions"  OFF)
         if(USE_AVX_INSTRUCTIONS)
             add_definitions(-mavx)
         elseif (USE_SSE4_INSTRUCTIONS)
@@ -24,20 +24,31 @@ if (NOT TARGET dlib)
         elseif(USE_SSE2_INSTRUCTIONS)
             add_definitions(-msse2)
         endif()
-    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") # Visual Studio
-        # Use SSE2 by default when using Visual Studio
+    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") # else if using Visual Studio 
+        # Use SSE2 by default when using Visual Studio.
         option(USE_SSE2_INSTRUCTIONS "Compile your program with SSE2 instructions" ON)
+        option(USE_SSE4_INSTRUCTIONS "Compile your program with SSE4 instructions" OFF)
+        option(USE_AVX_INSTRUCTIONS  "Compile your program with AVX instructions"  OFF)
+        include(CheckTypeSize)
+        check_type_size( "void*" SIZE_OF_VOID_PTR)
         if(USE_AVX_INSTRUCTIONS)
             add_definitions(/arch:AVX)
         elseif (USE_SSE4_INSTRUCTIONS)
-            # There isn't an /arch:SSE4 flag in visual studio.  But we can tell
-            # dlib to use those instructions anyway with the DLIB_HAVE_SSE3 and
-            # DLIB_HAVE_SSE41 #defines.
-            add_definitions(/arch:SSE2)  
+            # Visual studio doesn't have an /arch:SSE2 flag when building in 64 bit modes.
+            # So only give it when we are doing a 32 bit build.
+            if (SIZE_OF_VOID_PTR EQUAL 4)
+                add_definitions(/arch:SSE2)  
+            endif()
+            add_definitions(-DDLIB_HAVE_SSE2)
             add_definitions(-DDLIB_HAVE_SSE3)
             add_definitions(-DDLIB_HAVE_SSE41)
         elseif(USE_SSE2_INSTRUCTIONS)
-            add_definitions(/arch:SSE2)
+            # Visual studio doesn't have an /arch:SSE2 flag when building in 64 bit modes.
+            # So only give it when we are doing a 32 bit build.
+            if (SIZE_OF_VOID_PTR EQUAL 4)
+                add_definitions(/arch:SSE2)
+            endif()
+            add_definitions(-DDLIB_HAVE_SSE2)
         endif()
     endif()
 
