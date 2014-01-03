@@ -1914,6 +1914,9 @@
             It is created using the <a href="#scan_fhog_pyramid">scan_fhog_pyramid</a>
             object.  
          </description>
+         <examples>
+            <example>face_detection_ex.cpp.html</example>
+         </examples>
                                  
       </component>
             
