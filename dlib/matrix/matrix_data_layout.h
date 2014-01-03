@@ -7,6 +7,12 @@
 #include "matrix_fwd.h"
 #include "matrix_data_layout_abstract.h"
 
+// GCC 4.8 gives false alarms about some matrix operations going out of bounds.  Disable
+// these false warnings.
+#if ( defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ == 8)
+    #pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
+
 namespace dlib
 {
 
