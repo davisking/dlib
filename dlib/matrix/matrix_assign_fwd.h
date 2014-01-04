@@ -3,6 +3,12 @@
 #ifndef DLIB_MATRIx_ASSIGn_FWD_
 #define DLIB_MATRIx_ASSIGn_FWD_
 
+// GCC 4.8 gives false alarms about some variables being uninitialized.  Disable these
+// false warnings.
+#if ( defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ == 8)
+    #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
+
 #include "../enable_if.h"
 #include "matrix_data_layout.h"
 #include "../algs.h"
