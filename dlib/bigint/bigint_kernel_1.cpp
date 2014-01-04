@@ -1284,17 +1284,13 @@ namespace dlib
             ++r;
         }
 
-        // if we are using one less digit
-        if (*(r-1) == 0)
+        result->digits_used = lhs->digits_used;
+        // adjust the number of digits used appropriately 
+        --r;
+        while (*r == 0 && result->digits_used > 1)
         {
-            if (lhs->digits_used != 1)
-                result->digits_used = lhs->digits_used - 1;
-            else
-                result->digits_used = 1;
-        }
-        else
-        {
-            result->digits_used = lhs->digits_used;
+            --r;
+            --result->digits_used;
         }
     }
 
@@ -1344,7 +1340,7 @@ namespace dlib
         // shift rhs left until it is one shift away from being larger than lhs and
         // put the number of left shifts necessary into shifts
         uint32 shifts; 
-        shifts = (lhs->digits_used - rhs->digits_used) * 8;
+        shifts = (lhs->digits_used - rhs->digits_used) * 16;
 
         shift_left(rhs,&temp,shifts);
 

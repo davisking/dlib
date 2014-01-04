@@ -473,6 +473,15 @@ namespace
 
 
 
+        a = 10000;
+        a = a*a*a*a; a = a*a; a = a*a;
+        b = 2;
+        DLIB_TEST((a/b)*b == a);
+
+        a = 10000*5;
+        a = a*a*a*a; a = a*a; a = a*a;
+        b = 5;
+        DLIB_TEST((a/b)*b == a);
     }
 
 
