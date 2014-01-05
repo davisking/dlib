@@ -5,6 +5,7 @@
 #include "tokenizer_kernel_1.h"
 
 #include <iostream>
+#include <cstdio>
 
 namespace dlib
 {

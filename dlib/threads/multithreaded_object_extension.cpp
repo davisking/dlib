@@ -4,6 +4,7 @@
 #define DLIB_MULTITHREADED_OBJECT_EXTENSIOn_CPP
 
 #include "multithreaded_object_extension.h"
+#include "create_new_thread_extension.h"
 
 
 namespace dlib

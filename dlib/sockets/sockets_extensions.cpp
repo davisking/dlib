@@ -13,6 +13,7 @@
 #include "../timeout.h"
 #include "../misc_api.h"
 #include "../serialize.h"
+#include "../string.h"
 
 namespace dlib
 {

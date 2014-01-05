@@ -4,7 +4,6 @@
 #define DLIB_RSIGNALER_EXTENSIOn_ 
 
 #include "rsignaler_extension_abstract.h"
-#include "../threads.h"
 #include "rmutex_extension.h"
 
 namespace dlib
