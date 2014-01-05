@@ -998,7 +998,7 @@ namespace
             upper   
         );
 
-        DLIB_TEST(std::abs(val - neg_rosen(x)) < 1e-14);
+        DLIB_TEST_MSG(std::abs(val - neg_rosen(x)) < 1e-11, std::abs(val - neg_rosen(x)));
         dlog << LINFO << "neg_rosen solution:\n" << x;
 
         dlog << LINFO << "neg_rosen gradient: "<< trans(der_neg_rosen(x));
@@ -1077,7 +1077,7 @@ namespace
         }
 
 
-        DLIB_TEST(std::abs(val - rosen(x)) < 1e-14);
+        DLIB_TEST_MSG(std::abs(val - rosen(x)) < 1e-11, std::abs(val - rosen(x)));
         dlog << LINFO << "rosen solution:\n" << x;
 
         dlog << LINFO << "rosen gradient: "<< trans(der_rosen(x));
