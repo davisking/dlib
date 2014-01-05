@@ -82,10 +82,53 @@ if (NOT TARGET dlib)
    option(DLIB_LINK_WITH_SQLITE3 ${DLIB_LINK_WITH_SQLITE3_STR} ON)
    option(DLIB_LINK_WITH_FFTW ${DLIB_LINK_WITH_FFTW_STR} ON)
 
+   set(source_files 
+         base64/base64_kernel_1.cpp
+         bigint/bigint_kernel_1.cpp
+         bigint/bigint_kernel_2.cpp
+         bit_stream/bit_stream_kernel_1.cpp
+         entropy_decoder/entropy_decoder_kernel_1.cpp
+         entropy_decoder/entropy_decoder_kernel_2.cpp
+         entropy_encoder/entropy_encoder_kernel_1.cpp
+         entropy_encoder/entropy_encoder_kernel_2.cpp
+         md5/md5_kernel_1.cpp
+         tokenizer/tokenizer_kernel_1.cpp
+         unicode/unicode.cpp
+         data_io/image_dataset_metadata.cpp)
 
    if (DLIB_ISO_CPP_ONLY)
-      add_library(dlib STATIC all/source.cpp )
+      add_library(dlib STATIC ${source_files} )
    else()
+
+      set(source_files ${source_files}
+         sockets/sockets_kernel_1.cpp
+         bsp/bsp.cpp
+         dir_nav/dir_nav_kernel_1.cpp
+         dir_nav/dir_nav_kernel_2.cpp
+         dir_nav/dir_nav_extensions.cpp
+         linker/linker_kernel_1.cpp
+         logger/extra_logger_headers.cpp
+         logger/logger_kernel_1.cpp
+         logger/logger_config_file.cpp
+         misc_api/misc_api_kernel_1.cpp
+         misc_api/misc_api_kernel_2.cpp
+         sockets/sockets_extensions.cpp
+         sockets/sockets_kernel_2.cpp
+         sockstreambuf/sockstreambuf.cpp
+         sockstreambuf/sockstreambuf_unbuffered.cpp
+         server/server_kernel.cpp
+         server/server_iostream.cpp
+         server/server_http.cpp
+         threads/multithreaded_object_extension.cpp
+         threads/threaded_object_extension.cpp
+         threads/threads_kernel_1.cpp
+         threads/threads_kernel_2.cpp
+         threads/threads_kernel_shared.cpp
+         threads/thread_pool_extension.cpp
+         timer/timer.cpp
+         stack_trace.cpp
+         )
+
       # we want to link to the right stuff depending on our platform.  
       if (WIN32 AND NOT CYGWIN) ###############################################################################
          if (DLIB_NO_GUI_SUPPORT)
@@ -152,8 +195,19 @@ if (NOT TARGET dlib)
          mark_as_advanced(nsllib pthreadlib socketlib)
       endif () ##################################################################################
 
+      if (NOT DLIB_NO_GUI_SUPPORT)
+         set(source_files ${source_files}
+            gui_widgets/fonts.cpp
+            gui_widgets/widgets.cpp
+            gui_widgets/drawable.cpp
+            gui_widgets/canvas_drawing.cpp
+            gui_widgets/style.cpp
+            gui_widgets/base_widgets.cpp
+            gui_core/gui_core_kernel_1.cpp
+            gui_core/gui_core_kernel_2.cpp
+            )
+      endif()
 
-      set(source_files all/source.cpp)
 
       if (DLIB_LINK_WITH_LIBPNG)
          # try to find libpng 
@@ -199,6 +253,10 @@ if (NOT TARGET dlib)
                external/zlib/zutil.c
                )
          endif()
+         set(source_files ${source_files}
+            image_loader/png_loader.cpp
+            image_saver/save_png.cpp
+            )
       endif()
 
       if (DLIB_LINK_WITH_LIBJPEG)
@@ -238,6 +296,9 @@ if (NOT TARGET dlib)
                   external/libjpeg/jquant2.cpp
                   external/libjpeg/jutils.cpp  )
          endif()
+         set(source_files ${source_files}
+            image_loader/jpeg_loader.cpp
+            )
       endif()
 
 
