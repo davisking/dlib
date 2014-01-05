@@ -1452,7 +1452,7 @@
               This function extracts "chips" from an image.  That is, it takes a list of
               rectangular sub-windows (i.e. chips) within an image and extracts those
               sub-windows, storing each into its own image.  It also allows the user to
-              specify the scale and rotation or the chip.
+              specify the scale and rotation for the chip.
          </description>
       </component>
 
