@@ -12,14 +12,58 @@
 
 <current>
 New Features:
+   - Added extract_image_chips()
+   - Added get_frontal_face_detector()
+   - Added scan_fhog_pyramid.
+   - Added a nuclear norm regularization option to the structural svm solver.
+   - spatial filtering routines now support even sized filters
+   - SIMD use
+      - fhog 
+      - Increased the speed of resize_image() and the image pyramid functions by
+        making them use SIMD instructions. Also changed the default interpolation
+        method for pyramid_up to bilinear interpolation and removed the levels
+        option.
+      - Made spatially_filter_image_separable() use SIMD instructions when filtering float data.
+      - Made spatially_filter_image() use SIMD instructions when filtering float data.
+   - Added inv() that invert point transformation functions.
+   - Added sign() for matrix objects.
+   - Made the svm_multiclass_linear_trainer threaded. This also means you have
+     to #include dlib/svm_threaded.h instead of dlib/svm.h to get it now
+   - Added the option to learn non-negative weights to the svm_multiclass_linear_trainer.
+   - Made the one_vs_one_trainer and one_vs_all_trainer objects multithreaded
+     so they can run each binary trainer on a different core.
+   - Added an ignore option to the image dataset metadata file format.  This includes the option
+     to tell the structural_object_detection_trainer that there are ignore/don't care objects.
+   - Added flip_image_dataset_left_right(), upsample_image_dataset(), and rotate_image_dataset().
+   - libpng and libjpeg are now included in the dlib/external folder to enable easy static linking
+     to these libraries on platforms that don't have them.
 
 Non-Backwards Compatible Changes:
-   - The spatial filtering functions no longer zero the borders if you set the add_to 
-     parameter to true.  
+   - The spatial image filtering functions have the following changes:
+      - They no longer zero the image borders if you set the add_to parameter
+        to true.  
+      - The spatially_filter_image_separable_down() routine now only allows
+        grayscale output images
+      - Changed the default parameters of the test_box_overlap object. Now it
+        defaults to using exactly the PASCAL VOC match criterion.
 
 Bug fixes:
+   - Fixed a compile time bug that could occur when wide character strings were serialized.
+   - Added more () to avoid a compiler error in gcc 4.7.1 on SUSE Linux. Thanks
+     to Volker Härtel for finding this
+   - Some minor changes to avoid compiler errors in cygwin.
+   - A minor change to avoid compiler errors when serializing mlp objects.
+   - Fixed a bug in the bigint object that caused division to sometimes produce incorrect results.
 
 Other:
+   - Fixed many compiler warnings in gcc 4.8
+   - Updated find_max_factor_graph_nmplp() to use the version of the algorithm
+     from the 2011 paper Introduction to dual decomposition for inference by
+     David Sontag, Amir Globerson, and Tommi Jaakkola since the original 2008
+     paper had an error in the algorithm that negatively effected its
+     convergence. Thanks to James Gunning for pointing this out.
+   - Made many of the mat() converters bind the resulting matrix expressions into the BLAS bindings.
+
 </current>
 
 <!-- **************************************************************************************  -->
