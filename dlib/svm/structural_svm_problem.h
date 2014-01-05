@@ -438,7 +438,8 @@ namespace dlib
 
             if (converged)
             {
-                return current_risk_gap < std::max(cache_based_eps,cache_based_eps*current_risk_value);
+                return (current_risk_gap < std::max(cache_based_eps,cache_based_eps*current_risk_value)) || 
+                       (current_risk_gap == 0);
             }
 
             if (current_risk_gap < eps)
@@ -452,7 +453,8 @@ namespace dlib
                 {
                     converged = true;
                     skip_cache = false;
-                    return current_risk_gap < std::max(cache_based_eps,cache_based_eps*current_risk_value);
+                    return (current_risk_gap < std::max(cache_based_eps,cache_based_eps*current_risk_value));
+                           (current_risk_gap == 0);
                 }
 
                 ++count_below_eps;
