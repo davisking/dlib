@@ -59,6 +59,29 @@ namespace dlib
         typename image_type,
         typename pixel_type
         >
+    void draw_rectangle (
+        image_type& img,
+        const rectangle& rect,
+        const pixel_type& val,
+        unsigned int thickness = 1
+    );
+    /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<pixel_type> is defined
+        ensures
+            - Draws the given rectangle onto the image img.  It does this by calling
+              draw_line() four times to draw the four sides of the rectangle.  
+            - The rectancle is drawn with the color given by val.
+            - The drawn rectangle will have edges that are thickness pixels wide.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+    
+    template <
+        typename image_type,
+        typename pixel_type
+        >
     void fill_rect (
         image_type& img,
         const rectangle& rect,

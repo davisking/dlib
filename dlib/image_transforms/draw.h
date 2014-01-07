@@ -172,6 +172,46 @@ namespace dlib
         typename image_type,
         typename pixel_type
         >
+    void draw_rectangle (
+        image_type& c,
+        const rectangle& rect,
+        const pixel_type& val
+    ) 
+    {
+        draw_line(c, rect.tl_corner(), rect.tr_corner(), val);
+        draw_line(c, rect.bl_corner(), rect.br_corner(), val);
+        draw_line(c, rect.tl_corner(), rect.bl_corner(), val);
+        draw_line(c, rect.tr_corner(), rect.br_corner(), val);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type,
+        typename pixel_type
+        >
+    void draw_rectangle (
+        image_type& c,
+        const rectangle& rect,
+        const pixel_type& val,
+        unsigned int thickness
+    ) 
+    {
+        for (int i = 0; i < thickness; ++i)
+        {
+            if ((i%2)==0)
+                draw_rectangle(c,shrink_rect(rect,(i+1)/2),val);
+            else
+                draw_rectangle(c,grow_rect(rect,(i+1)/2),val);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type,
+        typename pixel_type
+        >
     void fill_rect (
         image_type& img,
         const rectangle& rect,
