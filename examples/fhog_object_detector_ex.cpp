@@ -147,8 +147,7 @@ int main(int argc, char** argv)
         // Now that we have a face detector we can test it.  The first statement tests it
         // on the training data.  It will print the precision, recall, and then average precision.
         cout << "training results: " << test_object_detection_function(detector, images_train, face_boxes_train) << endl;
-        // Happily, we see that the object detector works perfectly, even on the testing
-        // images.
+        // Happily, we see that the object detector works perfectly on the testing images.
         cout << "testing results:  " << test_object_detection_function(detector, images_test, face_boxes_test) << endl;
 
 
