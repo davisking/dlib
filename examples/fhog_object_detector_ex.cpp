@@ -1,30 +1,16 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
 
-    This example program shows how to find frontal human faces in an image.  In
-    particular, this program shows how you can take a list of images from the
-    command line and display each on the screen with red boxes overlaid on each
-    human face.
+    This example program shows how you can use dlib to make an object detector
+    for things like faces, pedestrians, and any semi-rigid object.  In
+    particular, we go though the steps to train the kind of sliding window
+    object detector first published by Dalal and Triggs in 2005 in the paper
+    Histograms of Oriented Gradients for Human Detection.  
 
-    The examples/faces folder contains some jpg images of people.  You can run
-    this program on them and see the detections by executing the following:
-        ./face_detection_ex faces/*.jpg
-
-    
-    This face detector is made using the now classic Histogram of Oriented
-    Gradients (HOG) feature combined with a linear classifier, an image pyramid,
-    and sliding window detection scheme.  This type of object detector is fairly
-    general and capable of detecting many types of semi-rigid objects in
-    addition to human faces.  Therefore, if you are interested in making your
-    own object detectors then read the fhog_object_detector_ex.cpp example
-    program.  It shows how to use the machine learning tools used to create this
-    face detector. 
-
-
-    Finally, note that the face detector is fastest when compiled with at least
-    SSE2 instructions enabled.  So if you are using a PC with an Intel or AMD
-    chip then you should enable at least SSE2.  If you are using cmake to
-    compile this program you can enable them by using one of the following
+    Note that this program executes fastest when compiled with at least SSE2
+    instructions enabled.  So if you are using a PC with an Intel or AMD chip
+    then you should enable at least SSE2 instructions.  If you are using cmake
+    to compile this program you can enable them by using one of the following
     commands when you create the build project:
         cmake path_to_dclib/examples -DUSE_SSE2_INSTRUCTIONS=ON
         cmake path_to_dclib/examples -DUSE_SSE4_INSTRUCTIONS=ON
@@ -57,6 +43,11 @@ int main(int argc, char** argv)
 
     try
     {
+        // In this example we are going to train a face detector based on the
+        // small faces dataset in the dclib/examples/faces directory.  So the
+        // first thing we do is load that dataset.  This means you need to
+        // supply the path to this faces folder as a command line argument so we
+        // will know where it is.
         if (argc != 2)
         {
             cout << "Give the path to the dclib/examples/faces directory as the argument to this" << endl;
@@ -67,107 +58,203 @@ int main(int argc, char** argv)
             return 0;
         }
         const std::string faces_directory = argv[1];
+        // Inside the faces directory is a training dataset and a separate
+        // testing dataset.  The training data consists of 4 images, each
+        // annotated with rectangles that bound each human face.  The idea is 
+        // to use this training data to learn to identify human faces in new
+        // images.  
+        // 
+        // Once you have trained an object detector it is always important to
+        // test it on data it wasn't trained on.  Therefore, we will also load
+        // a separate testing set of 5 images.  Once we have a face detector
+        // created from the training data we will see how well it works by
+        // running it on the testing images. 
+        // 
+        // So here we create the variables that will hold our dataset.
+        // images_train will hold the 4 training images and face_boxes_train
+        // holds the locations of the faces in the training images.  So for
+        // example, the image images_train[0] has the faces given by the
+        // rectangles in face_boxes_train[0].
+        dlib::array<array2d<unsigned char> > images_train, images_test;
+        std::vector<std::vector<rectangle> > face_boxes_train, face_boxes_test;
 
-        dlib::array<array2d<unsigned char> > images, images_test;
-        std::vector<std::vector<rectangle> > object_locations, object_locations_test;
+        // Now we load the data.  These XML files list the images in each
+        // dataset and also contain the positions of the face boxes.  Obviously
+        // you can use any kind of input format you like so long as you store
+        // the data into images_train and face_boxes_train.  But for convenience
+        // dlib comes with tools for creating and loading XML image dataset
+        // files.  Here you see how to load the data.  To create the XML files
+        // you can use the imglab tool which can be found in the
+        // dclib/tools/imglab folder.  It is a simple graphical tool for
+        // labeling objects in images with boxes.  To see how to use it you can
+        // read the dclib/tools/imglab/README.txt file.
+        load_image_dataset(images_train, face_boxes_train, faces_directory+"/training.xml");
+        load_image_dataset(images_test, face_boxes_test, faces_directory+"/testing.xml");
 
-        /*
-            These xml files are created by the imglab tool.
-            To create this annotated data you will need to use the imglab tool 
-            included with dlib.  It is located in the tools/imglab folder and can be compiled
-            using the following commands.  
-                cd tools/imglab
-                mkdir build
-                cd build
-                cmake ..
-                cmake --build . --config Release
-            Note that you may need to install CMake (www.cmake.org) for this to work.  
-
-            Next, lets assume you have a folder of images called /tmp/images.  These images 
-            should contain examples of the objects you want to learn to detect.  You will 
-            use the imglab tool to label these objects.  Do this by typing the following
-                ./imglab -c mydataset.xml /tmp/images
-            This will create a file called mydataset.xml which simply lists the images in 
-            /tmp/images.  To annotate them run
-                ./imglab mydataset.xml
-            A window will appear showing all the images.  You can use the up and down arrow 
-            keys to cycle though the images and the mouse to label objects.  In particular, 
-            holding the shift key, left clicking, and dragging the mouse will allow you to 
-            draw boxes around the objects you wish to detect.  So next, label all the objects 
-            with boxes.  Note that it is important to label all the objects since any object 
-            not labeled is implicitly assumed to be not an object we should detect.
-
-            Once you finish labeling objects go to the file menu, click save, and then close 
-            the program. This will save the object boxes back to mydataset.xml.  You can verify 
-            this by opening the tool again with
-                ./imglab mydataset.xml
-            and observing that the boxes are present.
-        */
-        load_image_dataset(images, object_locations, faces_directory+"/training.xml");
-        load_image_dataset(images_test, object_locations_test, faces_directory+"/testing.xml");
-        upsample_image_dataset<pyramid_down<2> >(images,      object_locations);
-        upsample_image_dataset<pyramid_down<2> >(images_test, object_locations_test);
-        add_image_left_right_flips(images, object_locations);
-        cout << "num training images: " << images.size() << endl;
+        // Now we do a little bit of pre-processing.  This is optional but for
+        // this training data it improves the results.  The first thing we do is
+        // increase the size of the images by a factor of two.  We do this
+        // because it will allow us to detect smaller faces than otherwise would
+        // be practical (since the faces are all now twice as big).  Note that,
+        // in addition to resizing the images, these functions also make the
+        // appropriate adjustments to the face boxes so that they still fall on
+        // top of the faces after the images are resized.
+        upsample_image_dataset<pyramid_down<2> >(images_train, face_boxes_train);
+        upsample_image_dataset<pyramid_down<2> >(images_test,  face_boxes_test);
+        // Since human faces are generally left-right symmetric we can increase
+        // our training dataset by adding mirrored versions of each image back
+        // into images_train.  So this next step doubles the size of our
+        // training dataset.  Again, this is obviously optional but is useful in
+        // many object detection tasks.
+        add_image_left_right_flips(images_train, face_boxes_train);
+        cout << "num training images: " << images_train.size() << endl;
         cout << "num testing images:  " << images_test.size() << endl;
 
+
+        // Finally we get to the training code.  dlib contains a number of
+        // object detectors.  This typedef tells it that you want to use the one
+        // based on Felzenszwalb's version of the Histogram of Oriented
+        // Gradients (commonly called HOG) detector.  The 6 means that you want
+        // it to use an image pyramid that downsamples the image at a ratio of
+        // 5/6.  Recall that HOG detectors work by creating an image pyramid and
+        // then running the detector over each pyramid level in a sliding window
+        // fashion.   
         typedef scan_fhog_pyramid<pyramid_down<6> > image_scanner_type; 
         image_scanner_type scanner;
+        // The sliding window detector will be 80 pixels wide and 80 pixels tall.
         scanner.set_detection_window_size(80, 80); 
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
-        trainer.set_num_threads(4); // Set this to the number of processing cores on your machine. 
+        // Set this to the number of processing cores on your machine.
+        trainer.set_num_threads(4);  
+        // The trainer is a kind of support vector machine and therefore has the usual SVM
+        // C parameter.  In generally, a bigger C encourages it to fit the training data
+        // better but might lead to overfitting.  
         trainer.set_c(1);
+        // We can tell the trainer to print it's progress to the console if we want.  
         trainer.be_verbose();
-        // stop when the risk gap is less than 0.01
+        // The trainer will run until the "risk gap" is less than 0.01.  Smaller values
+        // make the trainer solve the SVM optimization problem more accurately but will
+        // take longer to train.  For most problems a value in the range of 0.1 to 0.01 is
+        // plenty accurate.  Also, when in verbose mode the risk gap is printed each
+        // iteration so you can see how close it is to finishing the training.  
         trainer.set_epsilon(0.01);
 
-        // TODO, talk about this option. 
-        //remove_unobtainable_rectangles(trainer, images, object_locations);
 
-        object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
+        // Now we run the trainer.  For this example, it should take on the order of 10
+        // seconds to train.
+        object_detector<image_scanner_type> detector = trainer.train(images_train, face_boxes_train);
 
-        // prints the precision, recall, and average precision 
-        cout << "training results: " << test_object_detection_function(detector, images, object_locations) << endl;
-        cout << "testing results:  " << test_object_detection_function(detector, images_test, object_locations_test) << endl;
+        // Now that we have a face detector we can test it.  The first statement tests it
+        // on the training data.  It will print the precision, recall, and then average precision.
+        cout << "training results: " << test_object_detection_function(detector, images_train, face_boxes_train) << endl;
+        // Happily, we see that the object detector works perfectly, even on the testing
+        // images.
+        cout << "testing results:  " << test_object_detection_function(detector, images_test, face_boxes_test) << endl;
 
 
-        image_window hogwin(draw_fhog(detector), "Learned fHOG filter");
+        // If you have read any papers that use HOG you have probably seen the nice looking
+        // "sticks" visualization of a learned HOG detector.  This next line creates a
+        // window that visualizes the HOG filter we just learned.  It should look somewhat
+        // like a face.
+        image_window hogwin(draw_fhog(detector), "Learned fHOG detector");
 
+        // Now for the really fun part.  Lets display the testing images on the screen and
+        // show the output of the face detector overlaid on each image.
         image_window win; 
         for (unsigned long i = 0; i < images_test.size(); ++i)
         {
+            // Run the detector and get the detections.
             std::vector<rectangle> dets = detector(images_test[i]);
-            // Now we show the image on the screen and the face detections as
-            // red overlay boxes.
             win.clear_overlay();
             win.set_image(images_test[i]);
             win.add_overlay(dets, rgb_pixel(255,0,0));
-
             cout << "Hit enter to process the next image..." << endl;
             cin.get();
         }
 
 
+        // Like everything in dlib, you can save your detector to disk using the
+        // serialize() function.
         ofstream fout("face_detector.svm", ios::binary);
         serialize(detector, fout);
         fout.close();
 
+        // Then you can recall it using the deserialize() function.
         ifstream fin("face_detector.svm", ios::binary);
         object_detector<image_scanner_type> detector2;
         deserialize(detector2, fin);
 
 
 
-        /*
-            Advanced features...
-            - explain the concepts of ignore boxes
-            - talk about putting multiple detectors inside a single object_detector object.  
-        */
 
-        // talk about low nuclear norm stuff
-        //scanner.set_nuclear_norm_regularization_strength(1.0);
+        // Now lets talk about some optional features of this training tool as well as some
+        // important points you should understand.
+        //
+        // The first thing that should be pointed out is that, since this is a sliding
+        // window classifier, it can't output any arbitrary rectangle as a detection.  In
+        // this example our sliding window is 80 by 80 pixels and is run over an image
+        // pyramid.  This means that it detector can only output detections that are at
+        // least 80 by 80 pixels in size.  It also means that the aspect ratio of the
+        // outputs is also 1.  So if, for example, you had a box in your training data that
+        // was 200 pixels by 10 pixels then it would simply be impossible for the detector
+        // to learn to detect it.  Similarly, if you had a really small box it would be
+        // unable to learn to detect it.  
+        //
+        // So the training code performs a check on the training data and will throw an
+        // exception if it detects any boxes that are impossible to detect given your
+        // setting of scanning window size and image pyramid resolution.  You can use 
+        // a statement like:
+        //   remove_unobtainable_rectangles(trainer, images_train, face_boxes_train)
+        // to automatically discard these impossible boxes from your training dataset.
+        // This will avoid getting the "impossible box" exception.  However, I would
+        // recommend that you be careful that you are not throwing away truth boxes you
+        // really care about.  The remove_unobtainable_rectangles() will return the set of
+        // removed rectangles so you can visually inspect them and make sure you are OK
+        // that they are being removed. 
+        // 
+        // Next, note that any location in the images not marked with a truth box is
+        // implicitly treated as a negative example.  This means that when creating
+        // training data it is critical that you label all the objects you want to detect.
+        // So for example, if you are making a face detector then you must mark all the
+        // faces in each image.  Sometimes there are objects in images you are unsure about
+        // or simply don't care if the detector identifies or not.  For these objects you
+        // can pass in a set of "ignore boxes" as a third argument to the trainer.train()
+        // function.  The trainer will simply disregard any detections that happen to hit
+        // these boxes.   
+        //
+        // Another useful thing you can do is pack multiple HOG detectors into one
+        // object_detector.  The main benefit of this is increased speed since it avoids
+        // recomputing the HOG features for each run of the detector.  This is how the face
+        // detector that comes with dlib works (see get_frontal_face_detector()).  It
+        // contains 5 different detectors.  One for front looking faces with no rotation,
+        // another for faces rotated to the left about 30 degrees, one for a right rotation
+        // of 30 degrees.  Then two more detectors, one for faces looking to the left and
+        // another to the right.  However, note that to use this all the detectors must
+        // have been trained with the same settings for the sliding window size and also
+        // the scanner padding option (see the scan_fhog_pyramid documentation).  
+        //
+        // Finally, you can add a nuclear norm regularizer to the SVM trainer.  Doing has
+        // two benefits.  It can cause the learned HOG detector to be composed of separable
+        // filters and therefore makes it faster when detecting objects.  It can also help
+        // with generalization since it tends to make the learned HOG filters smoother.  To
+        // enable this option you call the following function before you create the trainer
+        // object:
+        //    scanner.set_nuclear_norm_regularization_strength(1.0);
+        // The argument determines how important it is to have a small nuclear norm.  A
+        // bigger regularization strength means it is more important.  The smaller the
+        // nuclear norm the smoother and faster the learned HOG filters will be, but if the
+        // regularization strength value is too large then the SVM will not fit the data
+        // well.  This is analogous to giving a C value that is too small.
+        //
+        // You can see how many separable filters are inside your detector like so:
+        cout << "num filters: "<< num_separable_filters(detector) << endl;
+        // You can also control how many filters there are by explicitly thresholding the
+        // singular values of the filters like this:
         detector = threshold_filter_singular_values(detector,0.1);
-        cout << "num filters 0.0:  "<< num_separable_filters(detector) << endl;
+        // That removes filter components with singular values less than 0.1.  The bigger
+        // this number the fewer separable filters you will have and the faster the
+        // detector will run.  However, a large enough threshold will hurt detection
+        // accuracy.  
 
     }
     catch (exception& e)

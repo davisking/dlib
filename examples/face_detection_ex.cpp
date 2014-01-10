@@ -23,9 +23,9 @@
 
     Finally, note that the face detector is fastest when compiled with at least
     SSE2 instructions enabled.  So if you are using a PC with an Intel or AMD
-    chip then you should enable at least SSE2.  If you are using cmake to
-    compile this program you can enable them by using one of the following
-    commands when you create the build project:
+    chip then you should enable at least SSE2 instructions.  If you are using
+    cmake to compile this program you can enable them by using one of the
+    following commands when you create the build project:
         cmake path_to_dclib/examples -DUSE_SSE2_INSTRUCTIONS=ON
         cmake path_to_dclib/examples -DUSE_SSE4_INSTRUCTIONS=ON
         cmake path_to_dclib/examples -DUSE_AVX_INSTRUCTIONS=ON
