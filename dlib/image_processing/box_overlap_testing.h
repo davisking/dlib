@@ -124,6 +124,13 @@ namespace dlib
             }
         }
 
+        // Relax these thresholds very slightly.  We do this because on some systems the
+        // boxes that generated the max values erroneously trigger a box overlap match
+        // even though their overlap and match values are *equal* to the thresholds but not
+        // greater.  That is, sometimes when double values get moved around they change
+        // their values slightly, so this avoids the problems that can create.
+        max_match_score = std::min(1.0000001*max_match_score, 1.0);
+        max_overlap     = std::min(1.0000001*max_overlap,     1.0);
         return test_box_overlap(max_match_score, max_overlap);
     }
 
