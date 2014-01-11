@@ -1121,15 +1121,15 @@ namespace
         DLIB_TEST(sum(matrix_cast<int>(mat(labels)!=0)) == 9);
         DLIB_TEST(sum(matrix_cast<int>(mat(labels)==0)) == (int)img1.size()-9);
 
-        DLIB_TEST(labels[4][3]);
-        DLIB_TEST(labels[4][4]);
-        DLIB_TEST(labels[4][5]);
-        DLIB_TEST(labels[3][3]);
-        DLIB_TEST(labels[3][4]);
-        DLIB_TEST(labels[3][5]);
-        DLIB_TEST(labels[5][3]);
-        DLIB_TEST(labels[5][4]);
-        DLIB_TEST(labels[5][5]);
+        DLIB_TEST(labels[4][3] != 0);
+        DLIB_TEST(labels[4][4] != 0);
+        DLIB_TEST(labels[4][5] != 0);
+        DLIB_TEST(labels[3][3] != 0);
+        DLIB_TEST(labels[3][4] != 0);
+        DLIB_TEST(labels[3][5] != 0);
+        DLIB_TEST(labels[5][3] != 0);
+        DLIB_TEST(labels[5][4] != 0);
+        DLIB_TEST(labels[5][5] != 0);
     }
 
 // ----------------------------------------------------------------------------------------
