@@ -21,3 +21,5 @@ python_examples/.*.dll$
 python_examples/.*.lib$
 docs/docs/python/classes.txt
 docs/docs/python/functions.txt
+syntax: glob
+dlib/test/build64/*
