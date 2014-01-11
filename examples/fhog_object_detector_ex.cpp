@@ -2,7 +2,7 @@
 /*
 
     This example program shows how you can use dlib to make an object detector
-    for things like faces, pedestrians, and any semi-rigid object.  In
+    for things like faces, pedestrians, and any other semi-rigid object.  In
     particular, we go though the steps to train the kind of sliding window
     object detector first published by Dalal and Triggs in 2005 in the paper
     Histograms of Oriented Gradients for Human Detection.  
@@ -58,7 +58,7 @@ int main(int argc, char** argv)
             return 0;
         }
         const std::string faces_directory = argv[1];
-        // Inside the faces directory is a training dataset and a separate
+        // The faces directory contains a training dataset and a separate
         // testing dataset.  The training data consists of 4 images, each
         // annotated with rectangles that bound each human face.  The idea is 
         // to use this training data to learn to identify human faces in new
@@ -86,8 +86,8 @@ int main(int argc, char** argv)
         // files.  Here you see how to load the data.  To create the XML files
         // you can use the imglab tool which can be found in the
         // dclib/tools/imglab folder.  It is a simple graphical tool for
-        // labeling objects in images with boxes.  To see how to use it you can
-        // read the dclib/tools/imglab/README.txt file.
+        // labeling objects in images with boxes.  To see how to use it read the
+        // dclib/tools/imglab/README.txt file.
         load_image_dataset(images_train, face_boxes_train, faces_directory+"/training.xml");
         load_image_dataset(images_test, face_boxes_test, faces_directory+"/testing.xml");
 
@@ -127,15 +127,17 @@ int main(int argc, char** argv)
         // Set this to the number of processing cores on your machine.
         trainer.set_num_threads(4);  
         // The trainer is a kind of support vector machine and therefore has the usual SVM
-        // C parameter.  In generally, a bigger C encourages it to fit the training data
-        // better but might lead to overfitting.  
+        // C parameter.  In general, a bigger C encourages it to fit the training data
+        // better but might lead to overfitting.  You find the best C value empirically by
+        // checking how well the trained detector works on a test set of images you haven't
+        // trained on.
         trainer.set_c(1);
         // We can tell the trainer to print it's progress to the console if we want.  
         trainer.be_verbose();
         // The trainer will run until the "risk gap" is less than 0.01.  Smaller values
         // make the trainer solve the SVM optimization problem more accurately but will
         // take longer to train.  For most problems a value in the range of 0.1 to 0.01 is
-        // plenty accurate.  Also, when in verbose mode the risk gap is printed each
+        // plenty accurate.  Also, when in verbose mode the risk gap is printed on each
         // iteration so you can see how close it is to finishing the training.  
         trainer.set_epsilon(0.01);
 
@@ -147,22 +149,25 @@ int main(int argc, char** argv)
         // Now that we have a face detector we can test it.  The first statement tests it
         // on the training data.  It will print the precision, recall, and then average precision.
         cout << "training results: " << test_object_detection_function(detector, images_train, face_boxes_train) << endl;
-        // Happily, we see that the object detector works perfectly on the testing images.
+        // However, to get an idea if it really worked without overfitting we need to run
+        // it on images it wasn't trained on.  The next line does this.  Happily, we see
+        // that the object detector works perfectly on the testing images.
         cout << "testing results:  " << test_object_detection_function(detector, images_test, face_boxes_test) << endl;
 
 
         // If you have read any papers that use HOG you have probably seen the nice looking
         // "sticks" visualization of a learned HOG detector.  This next line creates a
-        // window that visualizes the HOG filter we just learned.  It should look somewhat
-        // like a face.
+        // window with such a visualization of our detector.  It should look somewhat like
+        // a face.
         image_window hogwin(draw_fhog(detector), "Learned fHOG detector");
 
         // Now for the really fun part.  Lets display the testing images on the screen and
-        // show the output of the face detector overlaid on each image.
+        // show the output of the face detector overlaid on each image.  You will see that
+        // it finds all the faces without false alarming on any non-faces.
         image_window win; 
         for (unsigned long i = 0; i < images_test.size(); ++i)
         {
-            // Run the detector and get the detections.
+            // Run the detector and get the face detections.
             std::vector<rectangle> dets = detector(images_test[i]);
             win.clear_overlay();
             win.set_image(images_test[i]);
@@ -190,54 +195,57 @@ int main(int argc, char** argv)
         // important points you should understand.
         //
         // The first thing that should be pointed out is that, since this is a sliding
-        // window classifier, it can't output any arbitrary rectangle as a detection.  In
+        // window classifier, it can't output an arbitrary rectangle as a detection.  In
         // this example our sliding window is 80 by 80 pixels and is run over an image
-        // pyramid.  This means that it detector can only output detections that are at
-        // least 80 by 80 pixels in size.  It also means that the aspect ratio of the
-        // outputs is also 1.  So if, for example, you had a box in your training data that
-        // was 200 pixels by 10 pixels then it would simply be impossible for the detector
-        // to learn to detect it.  Similarly, if you had a really small box it would be
-        // unable to learn to detect it.  
+        // pyramid.  This means that it can only output detections that are at least 80 by
+        // 80 pixels in size (recall that this is why we upsampled the images after loading
+        // them).  It also means that the aspect ratio of the outputs is also 1.  So if,
+        // for example, you had a box in your training data that was 200 pixels by 10
+        // pixels then it would simply be impossible for the detector to learn to detect
+        // it.  Similarly, if you had a really small box it would be unable to learn to
+        // detect it.  
         //
-        // So the training code performs a check on the training data and will throw an
-        // exception if it detects any boxes that are impossible to detect given your
-        // setting of scanning window size and image pyramid resolution.  You can use 
-        // a statement like:
+        // So the training code performs an input validation check on the training data and
+        // will throw an exception if it detects any boxes that are impossible to detect
+        // given your setting of scanning window size and image pyramid resolution.  You
+        // can use a statement like:
         //   remove_unobtainable_rectangles(trainer, images_train, face_boxes_train)
-        // to automatically discard these impossible boxes from your training dataset.
-        // This will avoid getting the "impossible box" exception.  However, I would
-        // recommend that you be careful that you are not throwing away truth boxes you
-        // really care about.  The remove_unobtainable_rectangles() will return the set of
-        // removed rectangles so you can visually inspect them and make sure you are OK
-        // that they are being removed. 
+        // to automatically discard these impossible boxes from your training dataset
+        // before running the trainer.  This will avoid getting the "impossible box"
+        // exception.  However, I would recommend you be careful that you are not throwing
+        // away truth boxes you really care about.  The remove_unobtainable_rectangles()
+        // will return the set of removed rectangles so you can visually inspect them and
+        // make sure you are OK that they are being removed. 
         // 
         // Next, note that any location in the images not marked with a truth box is
         // implicitly treated as a negative example.  This means that when creating
         // training data it is critical that you label all the objects you want to detect.
         // So for example, if you are making a face detector then you must mark all the
-        // faces in each image.  Sometimes there are objects in images you are unsure about
-        // or simply don't care if the detector identifies or not.  For these objects you
-        // can pass in a set of "ignore boxes" as a third argument to the trainer.train()
-        // function.  The trainer will simply disregard any detections that happen to hit
-        // these boxes.   
+        // faces in each image.  However, sometimes there are objects in images you are
+        // unsure about or simply don't care if the detector identifies or not.  For these
+        // objects you can pass in a set of "ignore boxes" as a third argument to the
+        // trainer.train() function.  The trainer will simply disregard any detections that
+        // happen to hit these boxes.  
         //
         // Another useful thing you can do is pack multiple HOG detectors into one
-        // object_detector.  The main benefit of this is increased speed since it avoids
-        // recomputing the HOG features for each run of the detector.  This is how the face
-        // detector that comes with dlib works (see get_frontal_face_detector()).  It
-        // contains 5 different detectors.  One for front looking faces with no rotation,
-        // another for faces rotated to the left about 30 degrees, one for a right rotation
-        // of 30 degrees.  Then two more detectors, one for faces looking to the left and
-        // another to the right.  However, note that to use this all the detectors must
-        // have been trained with the same settings for the sliding window size and also
-        // the scanner padding option (see the scan_fhog_pyramid documentation).  
+        // object_detector.  The main benefit of this is increased testing speed since it
+        // avoids recomputing the HOG features for each run of the detector.  This is how
+        // the face detector that comes with dlib works (see get_frontal_face_detector()).
+        // It contains 5 different detectors.  One for front looking faces with no
+        // rotation, another for faces rotated to the left about 30 degrees, one for a
+        // right rotation of 30 degrees.  Then two more detectors, one for faces looking to
+        // the left and another to the right.  However, note that all HOG detectors packed
+        // into a single object_detector must have been trained with the same settings for
+        // the sliding window size and the scanner padding option (see the scan_fhog_pyramid 
+        // documentation for a discussion of padding).  This is because they all share the
+        // same scanner object inside the object_detector.  
         //
         // Finally, you can add a nuclear norm regularizer to the SVM trainer.  Doing has
-        // two benefits.  It can cause the learned HOG detector to be composed of separable
-        // filters and therefore makes it faster when detecting objects.  It can also help
-        // with generalization since it tends to make the learned HOG filters smoother.  To
-        // enable this option you call the following function before you create the trainer
-        // object:
+        // two benefits.  First, it can cause the learned HOG detector to be composed of
+        // separable filters and therefore makes it execute faster when detecting objects.
+        // It can also help with generalization since it tends to make the learned HOG
+        // filters smoother.  To enable this option you call the following function before
+        // you create the trainer object:
         //    scanner.set_nuclear_norm_regularization_strength(1.0);
         // The argument determines how important it is to have a small nuclear norm.  A
         // bigger regularization strength means it is more important.  The smaller the
