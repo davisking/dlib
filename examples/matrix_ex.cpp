@@ -43,19 +43,19 @@ int main()
     // You may be wondering why someone would want to specify the size of a
     // matrix at compile time when you don't have to.  The reason is two fold.
     // First, there is often a substantial performance improvement, especially
-    // for small matrices, because the compiler is able to perform loop
-    // unrolling if it knows the sizes of matrices.  Second, the dlib::matrix
-    // object checks these compile time sizes to ensure that the matrices are
-    // being used correctly.  For example, if you attempt to compile the
-    // expression y*y you will get a compiler error since that is not a legal
-    // matrix operation (the matrix dimensions don't make sense as a matrix
-    // multiplication).  So if you know the size of a matrix at compile time
-    // then it is always a good idea to let the compiler know about it.
+    // for small matrices, because it enables a number of optimizations that
+    // otherwise would be impossible.  Second, the dlib::matrix object checks
+    // these compile time sizes to ensure that the matrices are being used
+    // correctly.  For example, if you attempt to compile the expression y*y you
+    // will get a compiler error since that is not a legal matrix operation (the
+    // matrix dimensions don't make sense as a matrix multiplication).  So if
+    // you know the size of a matrix at compile time then it is always a good
+    // idea to let the compiler know about it.
 
 
 
 
-    // now we need to initialize the y and M matrices and we can do so like this:
+    // Now we need to initialize the y and M matrices and we can do so like this:
     M = 54.2,  7.4,  12.1,
         1,     2,    3,
         5.9,   0.05, 1;
