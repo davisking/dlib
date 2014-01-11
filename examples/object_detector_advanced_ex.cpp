@@ -2,10 +2,15 @@
 /*
 
     This is an example illustrating the process for defining custom
-    feature extractors for use with the structural_object_detection_trainer.
+    bag-of-visual-word style feature extractors for use with the
+    structural_object_detection_trainer.
 
-    NOTICE: This example assumes you are familiar with the contents of the 
-    object_detector_ex.cpp example program.  
+    NOTICE: This example assumes you are familiar with the contents of the
+    object_detector_ex.cpp example program.  Also, if the objects you want to
+    detect are somewhat rigid in appearance (e.g.  faces, pedestrians, etc.)
+    then you should try the methods shown in the fhog_object_detector_ex.cpp
+    example program before trying to use the bag-of-visual-word tools shown in
+    this example.  
 */
 
 
