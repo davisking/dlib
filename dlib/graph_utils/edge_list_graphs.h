@@ -560,7 +560,7 @@ namespace dlib
             }
         }
         if (neighbors.size() != 0)
-            neighbors[cur_node] = std::make_pair(start_idx, edges.size());
+            neighbors[cur_node] = std::make_pair(start_idx, (unsigned long)edges.size());
     }
 
 // ----------------------------------------------------------------------------------------
