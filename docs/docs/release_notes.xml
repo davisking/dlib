@@ -12,57 +12,68 @@
 
 <current>
 New Features:
-   - Added extract_image_chips()
-   - Added get_frontal_face_detector()
-   - Added scan_fhog_pyramid.
-   - Added a nuclear norm regularization option to the structural svm solver.
-   - spatial filtering routines now support even sized filters
-   - SIMD use
-      - fhog 
-      - Increased the speed of resize_image() and the image pyramid functions by
-        making them use SIMD instructions. Also changed the default interpolation
-        method for pyramid_up to bilinear interpolation and removed the levels
-        option.
-      - Made spatially_filter_image_separable() use SIMD instructions when filtering float data.
-      - Made spatially_filter_image() use SIMD instructions when filtering float data.
-   - Added inv() that invert point transformation functions.
-   - Added sign() for matrix objects.
-   - Made the svm_multiclass_linear_trainer threaded. This also means you have
-     to #include dlib/svm_threaded.h instead of dlib/svm.h to get it now
-   - Added the option to learn non-negative weights to the svm_multiclass_linear_trainer.
-   - Made the one_vs_one_trainer and one_vs_all_trainer objects multithreaded
-     so they can run each binary trainer on a different core.
-   - Added an ignore option to the image dataset metadata file format.  This includes the option
-     to tell the structural_object_detection_trainer that there are ignore/don't care objects.
-   - Added flip_image_dataset_left_right(), upsample_image_dataset(), and rotate_image_dataset().
-   - libpng and libjpeg are now included in the dlib/external folder to enable easy static linking
-     to these libraries on platforms that don't have them.
+   - Object Detection Tools:
+      - Added scan_fhog_pyramid, a tool for creating Histogram of Oriented Gradient (HOG)
+        based object detectors. 
+      - Added get_frontal_face_detector(), a HOG based face detector.  
+      - Added an option to include "ignore/don't care" truth boxes to the
+        structural_object_detection_trainer.  This allows a user to tell the trainer that
+        they don't care if certain objects are detected or not detected.  
+   - Image Processing Tools:
+      - Added extract_image_chips()
+      - Added a version of draw_rectangle() for drawing on images.
+      - The spatial filtering routines now support even sized filters.
+      - Added flip_image_dataset_left_right(), upsample_image_dataset(), and
+        rotate_image_dataset().
+   - Machine Learning Tools:
+      - Added a nuclear norm regularization option to the structural SVM solver.
+      - Added the option to learn only non-negative weights to the
+        svm_multiclass_linear_trainer.
+   - Speed Improvements:
+      - The svm_multiclass_linear_trainer, one_vs_one_trainer, and one_vs_all_trainer
+        objects are now multithreaded.  This also means you have to #include
+        dlib/svm_threaded.h instead of dlib/svm.h to use these tools. 
+      - A number of image processing tools can now optionally use SSE and AVX instructions
+        and are therefore considerably faster.  In particular, the following tools have been
+        accelerated: extract_fhog_features, resize_image, pyramid_down, pyramid_up,
+        spatially_filter_image_separable, and spatially_filter_image.
+   - Added an inv() routine that inverts point transformation functions.
+   - Added a sign() routine for matrix objects.
 
 Non-Backwards Compatible Changes:
    - The spatial image filtering functions have the following changes:
-      - They no longer zero the image borders if you set the add_to parameter
-        to true.  
-      - The spatially_filter_image_separable_down() routine now only allows
-        grayscale output images
-      - Changed the default parameters of the test_box_overlap object. Now it
-        defaults to using exactly the PASCAL VOC match criterion.
+      - They no longer zero the image borders when you set the add_to parameter to true.  
+      - The spatially_filter_image_separable_down() routine now only allows grayscale
+        output images.
+   - Changed the default parameters of the test_box_overlap object. Now it defaults to
+     using exactly the PASCAL VOC match criterion.
+   - To use the svm_multiclass_linear_trainer, one_vs_one_trainer, or one_vs_all_trainer
+     objects you now have to #include dlib/svm_threaded.h instead of dlib/svm.h. 
+   - pyramid_up() no longer has a levels option.
 
 Bug fixes:
-   - Fixed a compile time bug that could occur when wide character strings were serialized.
-   - Added more () to avoid a compiler error in gcc 4.7.1 on SUSE Linux. Thanks
-     to Volker Härtel for finding this
-   - Some minor changes to avoid compiler errors in cygwin.
-   - A minor change to avoid compiler errors when serializing mlp objects.
-   - Fixed a bug in the bigint object that caused division to sometimes produce incorrect results.
+   - Fixed a compile time bug that could occur when wide character strings were
+     serialized.
+   - Fixed a compile time bug occurring in gcc 4.7.1 on SUSE Linux.  Thanks to Volker
+     Härtel for finding this.
+   - Fixed compile time errors that occurred when using gcc on cygwin.
+   - Fixed a compile time bug that could occur when serializing mlp objects.
+   - Fixed a bug in the bigint object that caused division to sometimes produce incorrect
+     results.
+   - Updated find_max_factor_graph_nmplp() to use the improved version of the algorithm
+     from the 2011 paper Introduction to dual decomposition for inference by David Sontag,
+     Amir Globerson, and Tommi Jaakkola.  The original algorithm presented in their 2008
+     paper had an error that negatively effected its convergence.  Thanks to James Gunning
+     for pointing this out.
 
 Other:
-   - Fixed many compiler warnings in gcc 4.8
-   - Updated find_max_factor_graph_nmplp() to use the version of the algorithm
-     from the 2011 paper Introduction to dual decomposition for inference by
-     David Sontag, Amir Globerson, and Tommi Jaakkola since the original 2008
-     paper had an error in the algorithm that negatively effected its
-     convergence. Thanks to James Gunning for pointing this out.
-   - Made many of the mat() converters bind the resulting matrix expressions into the BLAS bindings.
+   - Fixed many compiler warnings in gcc 4.8.
+   - Made many of the mat() converters bind the resulting matrix expressions into BLAS
+     functions.
+   - libpng and libjpeg are now included in the dlib/external folder to enable easy static
+     linking to these libraries on platforms that typically don't have them (e.g. Windows).
+     Moreover, dlib's cmake files will automatically perform this static linking when no
+     copy of these libraries is found on the system. 
 
 </current>
 
