@@ -171,7 +171,7 @@ if (UNIX)
       message(" *****************************************************************************")
    endif()
 
-elseif(WIN32)
+elseif(WIN32 AND NOT MINGW)
     message(STATUS "Searching for BLAS and LAPACK")
 
     include(CheckTypeSize)
