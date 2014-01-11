@@ -35,6 +35,34 @@ build_python_interface ()
     popd
 }
 
+add_links_between_example_programs()
+{
+    # Get the list of example program filenames
+    pushd $1 > /dev/null
+    FILES=`ls *.cpp`
+    popd > /dev/null
+
+    # Now run sed on all the htmlified example programs to add the links between them.
+    for f in $FILES
+    do
+        #escape the . in the filename
+        escaped_name=`echo $f | sed -e 's/\./\\\./g'`
+        pushd $1 > /dev/null
+        # get a list of all the html example files that contain the name
+        matching_html_files=`grep -e "\b$escaped_name\b" -l *.cpp | sed -e "s/\.cpp\b/.cpp.html/g"`
+        popd > /dev/null
+
+        # now actually run sed to add the links
+        pushd $2 > /dev/null
+        if [ -n "$matching_html_files" ]
+        then
+            sed -i -e "s/\b$escaped_name\b/<a href=\"$escaped_name.html\">$escaped_name<\/a>/g" $matching_html_files
+        fi
+        popd > /dev/null
+    done
+
+}
+
 htmlify_cmake ()
 {
     echo "<html><head><title>" > $1.html;
@@ -149,6 +177,7 @@ makedocs ()
 
     echo Creating HTML version of the source
     htmlify --title "dlib C++ Library - " -i docs/cache -o htmltemp.$$
+    add_links_between_example_programs docs/cache/examples htmltemp.$$/examples
 
     echo Copying files around...
     cp -r htmltemp.$$/dlib docs/web
