@@ -29,9 +29,9 @@ namespace dlib
             - cell_size > 0
             - filter_rows_padding > 0
             - filter_cols_padding > 0
-            - in_image_type  == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type  == is an implementation of array2d/array2d_kernel_abstract.h
             - img contains some kind of pixel type. 
-              (i.e. pixel_traits<typename in_image_type::type> is defined)
+              (i.e. pixel_traits<typename image_type::type> is defined)
             - T should be float or double
         ensures
             - This function implements the HOG feature extraction method described in 
@@ -89,9 +89,9 @@ namespace dlib
             - cell_size > 0
             - filter_rows_padding > 0
             - filter_cols_padding > 0
-            - in_image_type  == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type  == is an implementation of array2d/array2d_kernel_abstract.h
             - img contains some kind of pixel type. 
-              (i.e. pixel_traits<typename in_image_type::type> is defined)
+              (i.e. pixel_traits<typename image_type::type> is defined)
             - T should be float or double
         ensures
             - This function is identical to the above extract_fhog_features() routine
@@ -103,6 +103,38 @@ namespace dlib
                 - #hog[i][r][c] == vhog[r][c](i)
                   (where 0 <= i < 31)
             - #hog.size() == 31
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    matrix<double,0,1> extract_fhog_features(
+        const image_type& img, 
+        int cell_size = 8,
+        int filter_rows_padding = 1,
+        int filter_cols_padding = 1
+    );
+    /*!
+        requires
+            - cell_size > 0
+            - filter_rows_padding > 0
+            - filter_cols_padding > 0
+            - image_type  == is an implementation of array2d/array2d_kernel_abstract.h
+            - img contains some kind of pixel type. 
+              (i.e. pixel_traits<typename image_type::type> is defined)
+        ensures
+            - This function calls the above extract_fhog_features() routine and simply
+              packages the entire output into a dlib::matrix.  The matrix is constructed
+              using the planar version of extract_fhog_features() and then each output
+              plane is converted into a column vector and subsequently all 31 column
+              vectors are concatenated together and returned.
+            - Each plane is converted into a column vector using reshape_to_column_vector(), 
+              and is therefore represented in row major order inside the returned vector.  
+            - If H is the array<array2d<double>> object output by the planar
+              extract_fhog_features() then the returned vector is composed by concatenating
+              H[0], then H[1], then H[2], and so on in ascending index order.
     !*/
 
 // ----------------------------------------------------------------------------------------
