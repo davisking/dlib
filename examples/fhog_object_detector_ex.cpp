@@ -12,9 +12,9 @@
     then you should enable at least SSE2 instructions.  If you are using cmake
     to compile this program you can enable them by using one of the following
     commands when you create the build project:
-        cmake path_to_dclib/examples -DUSE_SSE2_INSTRUCTIONS=ON
-        cmake path_to_dclib/examples -DUSE_SSE4_INSTRUCTIONS=ON
-        cmake path_to_dclib/examples -DUSE_AVX_INSTRUCTIONS=ON
+        cmake path_to_dlib_root/examples -DUSE_SSE2_INSTRUCTIONS=ON
+        cmake path_to_dlib_root/examples -DUSE_SSE4_INSTRUCTIONS=ON
+        cmake path_to_dlib_root/examples -DUSE_AVX_INSTRUCTIONS=ON
     This will set the appropriate compiler options for GCC, clang, Visual
     Studio, or the Intel compiler.  If you are using another compiler then you
     need to consult your compiler's manual to determine how to enable these
@@ -44,14 +44,14 @@ int main(int argc, char** argv)
     try
     {
         // In this example we are going to train a face detector based on the
-        // small faces dataset in the dclib/examples/faces directory.  So the
-        // first thing we do is load that dataset.  This means you need to
-        // supply the path to this faces folder as a command line argument so we
-        // will know where it is.
+        // small faces dataset in the examples/faces directory.  So the first
+        // thing we do is load that dataset.  This means you need to supply the
+        // path to this faces folder as a command line argument so we will know
+        // where it is.
         if (argc != 2)
         {
-            cout << "Give the path to the dclib/examples/faces directory as the argument to this" << endl;
-            cout << "program.  For example, if you are in the dclib/examples folder then execute " << endl;
+            cout << "Give the path to the examples/faces directory as the argument to this" << endl;
+            cout << "program.  For example, if you are in the examples folder then execute " << endl;
             cout << "this program by running: " << endl;
             cout << "   ./fhog_object_detector_ex faces" << endl;
             cout << endl;
@@ -84,10 +84,10 @@ int main(int argc, char** argv)
         // the data into images_train and face_boxes_train.  But for convenience
         // dlib comes with tools for creating and loading XML image dataset
         // files.  Here you see how to load the data.  To create the XML files
-        // you can use the imglab tool which can be found in the
-        // dclib/tools/imglab folder.  It is a simple graphical tool for
-        // labeling objects in images with boxes.  To see how to use it read the
-        // dclib/tools/imglab/README.txt file.
+        // you can use the imglab tool which can be found in the tools/imglab
+        // folder.  It is a simple graphical tool for labeling objects in images
+        // with boxes.  To see how to use it read the tools/imglab/README.txt
+        // file.
         load_image_dataset(images_train, face_boxes_train, faces_directory+"/training.xml");
         load_image_dataset(images_test, face_boxes_test, faces_directory+"/testing.xml");
 

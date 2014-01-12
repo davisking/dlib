@@ -7,7 +7,7 @@
     human face.
 
     The examples/faces folder contains some jpg images of people.  You can run
-    this program on them and see the detections by executing the following:
+    this program on them and see the detections by executing the following command:
         ./face_detection_ex faces/*.jpg
 
     
@@ -17,8 +17,8 @@
     general and capable of detecting many types of semi-rigid objects in
     addition to human faces.  Therefore, if you are interested in making your
     own object detectors then read the fhog_object_detector_ex.cpp example
-    program.  It shows how to use the machine learning tools used to create this
-    face detector. 
+    program.  It shows how to use the machine learning tools which were used to
+    create dlib's face detector. 
 
 
     Finally, note that the face detector is fastest when compiled with at least
@@ -26,9 +26,9 @@
     chip then you should enable at least SSE2 instructions.  If you are using
     cmake to compile this program you can enable them by using one of the
     following commands when you create the build project:
-        cmake path_to_dclib/examples -DUSE_SSE2_INSTRUCTIONS=ON
-        cmake path_to_dclib/examples -DUSE_SSE4_INSTRUCTIONS=ON
-        cmake path_to_dclib/examples -DUSE_AVX_INSTRUCTIONS=ON
+        cmake path_to_dlib_root/examples -DUSE_SSE2_INSTRUCTIONS=ON
+        cmake path_to_dlib_root/examples -DUSE_SSE4_INSTRUCTIONS=ON
+        cmake path_to_dlib_root/examples -DUSE_AVX_INSTRUCTIONS=ON
     This will set the appropriate compiler options for GCC, clang, Visual
     Studio, or the Intel compiler.  If you are using another compiler then you
     need to consult your compiler's manual to determine how to enable these
