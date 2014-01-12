@@ -819,7 +819,7 @@
                Note that you must define DLIB_PNG_SUPPORT if you want to use this object.  You
                must also set your build environment to link to the libpng library.  However,
                if you use CMake and dlib's default CMakeLists.txt file then it will get setup
-               automatically (assuming libpng is properly installed on your system).
+               automatically.
             </p>
          </description>
                                  
@@ -838,7 +838,7 @@
                Note that you must define DLIB_JPEG_SUPPORT if you want to use this object.  You
                must also set your build environment to link to the libjpeg library.  However,
                if you use CMake and dlib's default CMakeLists.txt file then it will get setup
-               automatically (assuming libjpeg is properly installed in your system).
+               automatically.
             </p>
          </description>
                                  
@@ -857,7 +857,7 @@
                Note that you must define DLIB_JPEG_SUPPORT if you want to use this object.  You
                must also set your build environment to link to the libjpeg library.  However,
                if you use CMake and dlib's default CMakeLists.txt file then it will get setup
-               automatically (assuming libjpeg is properly installed in your system).
+               automatically.
             </p>
          </description>
                                  
@@ -909,7 +909,7 @@
                Note that you must define DLIB_PNG_SUPPORT if you want to use this function.  You
                must also set your build environment to link to the libpng library.  However,
                if you use CMake and dlib's default CMakeLists.txt file then it will get setup
-               automatically (assuming libpng is properly installed in your system).
+               automatically.
             </p>
             <p>
                This routine can save images containing any type of pixel.  However, save_png() can
@@ -972,7 +972,7 @@
                Note that you must define DLIB_PNG_SUPPORT if you want to use this object.  You
                must also set your build environment to link to the libpng library.  However,
                if you use CMake and dlib's default CMakeLists.txt file then it will get setup
-               automatically (assuming libpng is properly installed on your system).
+               automatically.
             </p>
          </description>
 
