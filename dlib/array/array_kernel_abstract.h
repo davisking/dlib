@@ -254,6 +254,40 @@ namespace dlib
                        If an exception is thrown then it has no effect on *this.
             !*/
 
+            typedef T* iterator;
+            typedef const T* const_iterator;
+
+            iterator begin(
+            );
+            /*!
+                ensures
+                    - returns an iterator that points to the first element in this array or
+                      end() if the array is empty.
+            !*/
+
+            const_iterator begin(
+            ) const;
+            /*!
+                ensures
+                    - returns a const iterator that points to the first element in this
+                      array or end() if the array is empty.
+            !*/
+
+            iterator end(
+            );
+            /*!
+                ensures
+                    - returns an iterator that points to one past the end of the array.
+            !*/
+
+            const_iterator end(
+            ) const;
+            /*!
+                ensures
+                    - returns a const iterator that points to one past the end of the
+                      array.
+            !*/
+
         private:
 
             // restricted functions

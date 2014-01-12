@@ -177,6 +177,13 @@ namespace dlib
             T& item
         );
 
+        typedef T* iterator;
+        typedef const T* const_iterator;
+        iterator                begin()                         { return array_elements; }
+        const_iterator          begin() const                   { return array_elements; }
+        iterator                end()                           { return array_elements+array_size; }
+        const_iterator          end() const                     { return array_elements+array_size; }
+
     private:
 
         typename mem_manager::template rebind<T>::other pool;
