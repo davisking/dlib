@@ -60,6 +60,10 @@ Bug fixes:
    - Fixed a compile time bug that could occur when serializing mlp objects.
    - Fixed a bug in the bigint object that caused division to sometimes produce incorrect
      results.
+   - Fixed a bug which sometimes caused load_image_dataset() to erroneously report that
+     the dataset file could not be found.
+   - Fixed a bug in the structural_object_detection_trainer that caused it to erroneously
+     throw a impossible_labeling_error exception in certain rare cases.
    - Updated find_max_factor_graph_nmplp() to use the improved version of the algorithm
      from the 2011 paper Introduction to dual decomposition for inference by David Sontag,
      Amir Globerson, and Tommi Jaakkola.  The original algorithm presented in their 2008
