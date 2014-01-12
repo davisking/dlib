@@ -238,7 +238,7 @@ void bsp_job_other_nodes (bsp_context& bsp, long grid_resolution)
     // 
     // Therefore, try_receive() serves both as a message receiving tool as well as an
     // implicit form of barrier synchronization.  In this case, we use it to know when to
-    // terminate.  That is, we know it is the time to terminate if all the messages between
+    // terminate.  That is, we know it is time to terminate if all the messages between
     // nodes have been received and all nodes are inactive due to either termination or
     // being blocked on a receive call.  This will happen once the controller node above
     // terminates since it will result in all the other nodes inevitably becoming blocked
