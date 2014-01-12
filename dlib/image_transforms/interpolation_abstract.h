@@ -878,11 +878,11 @@ namespace dlib
                   chip_locations[i].angle radians, around the center of
                   chip_locations[i].rect, before the chip was extracted. 
                 - As long as chip_locations[i].size and the aspect ratio of of
-                  chip_locations[i].rect and stays constant then the dimensions of
-                  #chips[i] is always the same.  This means that, for example, if you want
-                  all your chips to have the same dimensions then ensure that
-                  chip_location[i].size is always the same and also that
-                  chip_location[i].rect always has the same aspect ratio.
+                  chip_locations[i].rect stays constant then the dimensions of #chips[i] is
+                  always the same.  This means that, for example, if you want all your
+                  chips to have the same dimensions then ensure that chip_location[i].size
+                  is always the same and also that chip_location[i].rect always has the
+                  same aspect ratio.
             - Any pixels in an image chip that go outside img are set to 0 (i.e. black).
     !*/
 
