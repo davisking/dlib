@@ -67,7 +67,7 @@ Bug fixes:
    - Updated find_max_factor_graph_nmplp() to use the improved version of the algorithm
      from the 2011 paper Introduction to dual decomposition for inference by David Sontag,
      Amir Globerson, and Tommi Jaakkola.  The original algorithm presented in their 2008
-     paper had an error that negatively effected its convergence.  Thanks to James Gunning
+     paper had an error that negatively affected its convergence.  Thanks to James Gunning
      for pointing this out.
 
 Other:
