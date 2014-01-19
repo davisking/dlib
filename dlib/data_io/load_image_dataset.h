@@ -45,8 +45,7 @@ namespace dlib
         // Set the current directory to be the one that contains the
         // metadata file. We do this because the file might contain
         // file paths which are relative to this folder.
-        const std::string parent_dir = get_parent_directory(file(filename)).full_name();
-        set_current_dir(parent_dir);
+        set_current_dir(get_parent_directory(file(filename)));
 
 
 
@@ -121,8 +120,7 @@ namespace dlib
         // Set the current directory to be the one that contains the
         // metadata file. We do this because the file might contain
         // file paths which are relative to this folder.
-        const std::string parent_dir = get_parent_directory(file(filename)).full_name();
-        set_current_dir(parent_dir);
+        set_current_dir(get_parent_directory(file(filename)));
 
 
         std::set<std::string> all_parts;
