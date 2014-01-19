@@ -240,6 +240,32 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename vector_type1, 
+        typename vector_type2
+        >
+    void pick_initial_centers(
+        long num_centers, 
+        vector_type1& centers, 
+        const vector_type2& samples, 
+        double percentile = 0.01
+    );
+    /*!
+        requires
+            - num_centers > 1
+            - 0 <= percentile < 1
+            - samples.size() > 1
+            - vector_type1 == something with an interface compatible with std::vector
+            - vector_type2 == something with an interface compatible with std::vector
+            - Both centers and samples must be able to contain dlib::matrix based row or
+              column vectors.
+        ensures
+            - performs: pick_initial_centers(num_centers, centers, samples, linear_kernel<sample_type>(), percentile)
+              (i.e. this function is simply an overload that uses the linear kernel.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename array_type, 
         typename sample_type,
         typename alloc

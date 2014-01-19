@@ -7,7 +7,7 @@
 #include "../matrix/matrix_abstract.h"
 #include "../algs.h"
 #include "../serialize.h"
-#include "kernel_abstract.h"
+#include "kernel.h"
 #include "../array.h"
 #include "kcentroid.h"
 #include "kkmeans_abstract.h"
@@ -359,6 +359,24 @@ namespace dlib
             centers.push_back(samples[scores_sorted[best_idx].idx]);
         }
         
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename vector_type1, 
+        typename vector_type2
+        >
+    void pick_initial_centers(
+        long num_centers, 
+        vector_type1& centers, 
+        const vector_type2& samples, 
+        double percentile = 0.01
+    )
+    {
+        typedef typename vector_type1::value_type sample_type;
+        linear_kernel<sample_type> kern;
+        pick_initial_centers(num_centers, centers, samples, kern, percentile);
     }
 
 // ----------------------------------------------------------------------------------------
