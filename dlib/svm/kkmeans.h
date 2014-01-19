@@ -364,12 +364,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename vector_type, 
+        typename array_type, 
         typename sample_type,
         typename alloc
         >
     void find_clusters_using_kmeans (
-        const vector_type& samples,
+        const array_type& samples,
         std::vector<sample_type, alloc>& centers,
         unsigned long max_iter = 1000
     )
@@ -459,6 +459,40 @@ namespace dlib
             }
         }
 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename array_type, 
+        typename EXP 
+        >
+    unsigned long nearest_center (
+        const array_type& centers,
+        const matrix_exp<EXP>& sample
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(centers.size() > 0 && samples.size() > 0 && is_vector(sample),
+            "\t unsigned long nearest_center()"
+            << "\n\t You have given invalid inputs to this function."
+            << "\n\t centers.size():    " << centers.size() 
+            << "\n\t sample.size():     " << sample.size() 
+            << "\n\t is_vector(sample): " << is_vector(sample) 
+            );
+
+        double best_dist = length_squared(centers[0] - sample);
+        unsigned long best_idx = 0;
+        for (unsigned long i = 1; i < centers.size(); ++i)
+        {
+            const double dist = length_squared(centers[i] - sample);
+            if (dist < best_dist)
+            {
+                best_dist = dist;
+                best_idx = i;
+            }
+        }
+        return best_idx;
     }
 
 // ----------------------------------------------------------------------------------------

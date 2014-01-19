@@ -240,12 +240,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename vector_type, 
+        typename array_type, 
         typename sample_type,
         typename alloc
         >
     void find_clusters_using_kmeans (
-        const vector_type& samples,
+        const array_type& samples,
         std::vector<sample_type, alloc>& centers,
         unsigned long max_iter = 1000
     );
@@ -255,7 +255,7 @@ namespace dlib
             - samples == a bunch of row or column vectors and they all must be of the
               same length.
             - centers.size() > 0
-            - vector_type == something with an interface compatible with std::vector
+            - array_type == something with an interface compatible with std::vector
               and it must contain row or column vectors capable of being stored in 
               sample_type objects
             - sample_type == a dlib::matrix capable of representing vectors
@@ -265,6 +265,30 @@ namespace dlib
               When it finishes #centers will contain the resulting centers.
             - no more than max_iter iterations will be performed before this function
               terminates.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename array_type, 
+        typename EXP 
+        >
+    unsigned long nearest_center (
+        const array_type& centers,
+        const matrix_exp<EXP>& sample
+    );
+    /*!
+        requires
+            - centers.size() > 0
+            - sample.size() > 0
+            - is_vector(sample) == true
+            - centers must be an array of vectors such that the following expression is
+              valid: length_squared(sample - centers[0]).  (e.g. centers could be a
+              std::vector of matrix objects holding column vectors).
+        ensures
+            - returns the index that identifies the element of centers that is nearest to
+              sample.  That is, returns a number IDX such that centers[IDX] is the element
+              of centers that minimizes length(centers[IDX]-sample).
     !*/
 
 // ----------------------------------------------------------------------------------------
