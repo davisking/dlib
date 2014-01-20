@@ -53,6 +53,7 @@ namespace dlib
         public:
 
             typedef T type;
+            typedef T value_type;
             typedef mem_manager mem_manager_type;
 
             array (
