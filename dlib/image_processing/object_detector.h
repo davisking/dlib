@@ -73,6 +73,10 @@ namespace dlib
             const std::vector<feature_vector_type>& w_ 
         );
 
+        explicit object_detector (
+            const std::vector<object_detector>& detectors
+        );
+
         unsigned long num_detectors (
         ) const { return w.size(); }
 
@@ -354,6 +358,32 @@ namespace dlib
             w[i].w = w_[i];
             w[i].init(scanner);
         }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_scanner_type
+        >
+    object_detector<image_scanner_type>::
+    object_detector (
+        const std::vector<object_detector>& detectors
+    )
+    {
+        DLIB_ASSERT(detectors.size() != 0,
+                "\t object_detector::object_detector(detectors)"
+                << "\n\t Invalid inputs were given to this function "
+                << "\n\t this: " << this
+        );
+        std::vector<feature_vector_type> weights;
+        weights.reserve(detectors.size());
+        for (unsigned long i = 0; i < detectors.size(); ++i)
+        {
+            for (unsigned long j = 0; j < detectors[i].num_detectors(); ++j)
+                weights.push_back(detectors[i].get_w(j));
+        }
+
+        *this = object_detector(detectors[0].get_scanner(), detectors[0].get_overlap_tester(), weights);
     }
 
 // ----------------------------------------------------------------------------------------

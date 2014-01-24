@@ -110,13 +110,13 @@ namespace dlib
                 - w.size() > 0
             ensures
                 - When the operator() member function is called it will invoke
-                  scanner.detect(w[i],dets,w[i](w[i].size()-1)) for all valid i.  Then it
+                  get_scanner().detect(w[i],dets,w[i](w[i].size()-1)) for all valid i.  Then it
                   will take all the detections output by the calls to detect() and suppress
                   overlapping detections, and finally report the results.
                 - when #*this is used to detect objects, the set of output detections will
                   never contain any overlaps with respect to overlap_tester.  That is, for
                   all pairs of returned detections A and B, we will always have:
-                  overlap_tester(A,B) == false
+                    overlap_tester(A,B) == false
                 - for all valid i:
                     - #get_w(i) == w[i]
                 - #num_detectors() == w.size()
@@ -124,6 +124,34 @@ namespace dlib
                 - #get_scanner() == scanner
                   (note that only the "configuration" of scanner is copied.
                   I.e. the copy is done using copy_configuration())
+        !*/
+
+        explicit object_detector (
+            const std::vector<object_detector>& detectors
+        );
+        /*!
+            requires
+                - detectors.size() != 0
+                - All the detectors must use compatibly configured scanners.  That is, it
+                  must make sense for the weight vector from one detector to be used with
+                  the scanner from any other.
+                - for all valid i:
+                    - detectors[i].get_scanner().get_num_dimensions() == detectors[0].get_scanner().get_num_dimensions()
+                      (i.e. all the detectors use scanners that use the same kind of feature vectors.)
+            ensures
+                - Very much like the above constructor, this constructor takes all the
+                  given detectors and packs them into #*this.  That is, invoking operator()
+                  on #*this will run all the detectors, perform non-max suppression, and
+                  then report the results.
+                - When #*this is used to detect objects, the set of output detections will
+                  never contain any overlaps with respect to overlap_tester.  That is, for
+                  all pairs of returned detections A and B, we will always have:
+                    overlap_tester(A,B) == false
+                - #num_detectors() == The sum of detectors[i].num_detectors() for all valid i. 
+                - #get_overlap_tester() == detectors[0].get_overlap_tester()
+                - #get_scanner() == detectors[0].get_scanner()
+                  (note that only the "configuration" of scanner is copied.  I.e. the copy
+                  is done using copy_configuration())
         !*/
 
         unsigned long num_detectors (
