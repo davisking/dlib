@@ -4,6 +4,7 @@
 #ifdef DLIB_INTERPOlATION_ABSTRACT_ 
 
 #include "../pixel.h"
+#include "../image_processing/full_object_detection_abstract.h"
 
 namespace dlib
 {
@@ -429,16 +430,18 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type
+        typename image_type,
+        typename T
         >
     void add_image_left_right_flips (
         dlib::array<image_type>& images,
-        std::vector<std::vector<rectangle> >& objects
+        std::vector<std::vector<T> >& objects
     );
     /*!
         requires
             - image_type == is an implementation of array2d/array2d_kernel_abstract.h
             - pixel_traits<typename image_type::type> is defined
+            - T == rectangle or full_object_detection
             - images.size() == objects.size()
         ensures
             - This function computes all the left/right flips of the contents of images and
@@ -456,12 +459,14 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type
+        typename image_type,
+        typename T,
+        typename U
         >
     void add_image_left_right_flips (
         dlib::array<image_type>& images,
-        std::vector<std::vector<rectangle> >& objects,
-        std::vector<std::vector<rectangle> >& objects2
+        std::vector<std::vector<T> >& objects,
+        std::vector<std::vector<U> >& objects2
     );
     /*!
         requires
@@ -469,6 +474,8 @@ namespace dlib
             - pixel_traits<typename image_type::type> is defined
             - images.size() == objects.size()
             - images.size() == objects2.size()
+            - T == rectangle or full_object_detection
+            - U == rectangle or full_object_detection
         ensures
             - This function computes all the left/right flips of the contents of images and
               then appends them onto the end of the images array.  It also finds the
@@ -482,6 +489,71 @@ namespace dlib
             - #objects2.size() == objects2.size()*2
             - All the original elements of images, objects, and objects2 are left unmodified.
               That is, this function only appends new elements to each of these containers.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type, 
+        typename EXP, 
+        typename T, 
+        typename U
+        >
+    void add_image_rotations (
+        const matrix_exp<EXP>& angles,
+        dlib::array<image_type>& images,
+        std::vector<std::vector<T> >& objects,
+        std::vector<std::vector<U> >& objects2
+    );
+    /*!
+        requires
+            - is_vector(angles) == true
+            - angles.size() > 0
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type::type> is defined
+            - images.size() == objects.size()
+            - images.size() == objects2.size()
+            - T == rectangle or full_object_detection
+            - U == rectangle or full_object_detection
+        ensures
+            - This function computes angles.size() different rotations of all the given
+              images and then replaces the contents of images with those rotations of the
+              input dataset.  We will also adjust the rectangles inside objects and
+              objects2 so that they still bound the same objects in the new rotated images.
+              That is, we assume objects[i] and objects2[i] are bounding boxes for things
+              in images[i].  So we will adjust the positions of the boxes in objects and
+              objects2 accordingly.
+            - The elements of angles are interpreted as angles in radians and we will
+              rotate the images around their center using the values in angles.  Moreover,
+              the rotation is done counter clockwise.
+            - #images.size()   == images.size()*angles.size()
+            - #objects.size()  == objects.size()*angles.size()
+            - #objects2.size() == objects2.size()*angles.size()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type, 
+        typename EXP,
+        typename T
+        >
+    void add_image_rotations (
+        const matrix_exp<EXP>& angles,
+        dlib::array<image_type>& images,
+        std::vector<std::vector<T> >& objects
+    );
+    /*!
+        requires
+            - is_vector(angles) == true
+            - angles.size() > 0
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type::type> is defined
+            - images.size() == objects.size()
+            - T == rectangle or full_object_detection
+        ensures
+            - This function is identical to the add_image_rotations() define above except
+              that it doesn't have objects2 as an argument.  
     !*/
 
 // ----------------------------------------------------------------------------------------
