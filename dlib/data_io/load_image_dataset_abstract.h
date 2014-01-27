@@ -210,7 +210,8 @@ namespace dlib
             - This routine is capable of loading any image format which can be read
               by the load_image() routine.
             - #parts_list == a vector that contains the list of object parts found in the
-              input file and loaded into object_locations.  
+              input file and loaded into object_locations.
+            - #parts_list is in lexicographic sorted order.
             - let IGNORED_RECTS denote the vector returned from this function.
             - IGNORED_RECTS.size() == #object_locations.size()
             - IGNORED_RECTS == a list of the rectangles which have the "ignore" flag set to
