@@ -139,6 +139,34 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_type,
+        typename T
+        >
+    void extract_fhog_features(
+        const image_type& img, 
+        matrix<T,0,1>& feats,
+        int cell_size = 8,
+        int filter_rows_padding = 1,
+        int filter_cols_padding = 1
+    );
+    /*!
+        requires
+            - cell_size > 0
+            - filter_rows_padding > 0
+            - filter_cols_padding > 0
+            - image_type  == is an implementation of array2d/array2d_kernel_abstract.h
+            - img contains some kind of pixel type. 
+              (i.e. pixel_traits<typename image_type::type> is defined)
+            - T is float, double, or long double
+        ensures
+            - This function is identical to the above version of extract_fhog_features()
+              that returns a matrix<double,0,1> except that it returns the matrix here
+              through a reference argument instead of returning it by value.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     inline point image_to_fhog (
         point p,
         int cell_size = 8,

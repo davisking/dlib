@@ -658,6 +658,30 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename image_type,
+        typename T
+        >
+    void extract_fhog_features(
+        const image_type& img, 
+        matrix<T,0,1>& feats,
+        int cell_size = 8,
+        int filter_rows_padding = 1,
+        int filter_cols_padding = 1
+    )
+    {
+        dlib::array<array2d<T> > hog;
+        extract_fhog_features(img, hog, cell_size, filter_rows_padding, filter_cols_padding);
+        feats.set_size(hog.size()*hog[0].size());
+        for (unsigned long i = 0; i < hog.size(); ++i)
+        {
+            const long size = hog[i].size();
+            set_rowm(feats, range(i*size, (i+1)*size-1)) = reshape_to_column_vector(mat(hog[i]));
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename image_type
         >
     matrix<double,0,1> extract_fhog_features(
@@ -667,15 +691,9 @@ namespace dlib
         int filter_cols_padding = 1
     )
     {
-        dlib::array<array2d<double> > hog;
-        extract_fhog_features(img, hog, cell_size, filter_rows_padding, filter_cols_padding);
-        matrix<double,0,1> temp(hog.size()*hog[0].size());
-        for (unsigned long i = 0; i < hog.size(); ++i)
-        {
-            const long size = hog[i].size();
-            set_rowm(temp, range(i*size, (i+1)*size-1)) = reshape_to_column_vector(mat(hog[i]));
-        }
-        return temp;
+        matrix<double,0,1> feats;
+        extract_fhog_features(img, feats, cell_size, filter_rows_padding, filter_cols_padding);
+        return feats;
     }
 
 // ----------------------------------------------------------------------------------------
