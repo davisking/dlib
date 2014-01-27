@@ -190,6 +190,7 @@
          <item>flip_image_left_right</item> 
          <item>flip_image_up_down</item> 
          <item>add_image_left_right_flips</item> 
+         <item>add_image_rotations</item> 
          <item>upsample_image_dataset</item> 
          <item>flip_image_dataset_left_right</item> 
          <item>rotate_image_dataset</item> 
@@ -1485,6 +1486,20 @@
          <examples>
             <example>fhog_object_detector_ex.cpp.html</example>
          </examples>
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>add_image_rotations</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
+         <description>        
+            This routine takes a set of images and bounding boxes within those images and
+            grows the dataset by computing many different rotations of each image.  It will
+            also adjust the positions of the bounding boxes so that they still fall on the
+            same objects in each rotated image.
+         </description>
       </component>
 
    <!-- ************************************************************************* -->
