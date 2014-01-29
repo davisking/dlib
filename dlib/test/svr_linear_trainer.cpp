@@ -65,6 +65,7 @@ namespace
             samples[i] = ekm.project(samples[i]);
 
         svr_linear_trainer<linear_kernel<sample_type> > linear_trainer;
+        linear_trainer.set_epsilon(0.0001);
         linear_trainer.set_c(30);
         linear_trainer.set_epsilon_insensitivity(0.001);
 

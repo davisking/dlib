@@ -72,6 +72,8 @@ namespace dlib
             unsigned long num_iterations
         ) const 
         {
+            current_risk_value /= samples.size();
+            current_risk_gap /= samples.size();
             if (be_verbose)
             {
                 using namespace std;
