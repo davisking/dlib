@@ -1292,6 +1292,25 @@ convergence:
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename EXP
+        >
+    const matrix_diag_op<op_diag_inv<EXP> > pinv (
+        const matrix_diag_exp<EXP>& m,
+        double tol
+    ) 
+    { 
+        DLIB_ASSERT(tol >= 0, 
+            "\tconst matrix_exp::type pinv(const matrix_exp& m)"
+            << "\n\t tol can't be negative"
+            << "\n\t tol: "<<tol 
+            );
+        typedef op_diag_inv<EXP> op;
+        return matrix_diag_op<op>(op(reciprocal(round_zeros(diag(m),tol))));
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <typename EXP>
     const typename matrix_exp<EXP>::matrix_type  inv_lower_triangular (
         const matrix_exp<EXP>& A 
@@ -1519,7 +1538,8 @@ convergence:
         typename EXP
         >
     const matrix<typename EXP::type,EXP::NC,EXP::NR,typename EXP::mem_manager_type> pinv_helper ( 
-        const matrix_exp<EXP>& m
+        const matrix_exp<EXP>& m,
+        double tol
     )
     /*!
         ensures
@@ -1541,8 +1561,8 @@ convergence:
 
         const double machine_eps = std::numeric_limits<typename EXP::type>::epsilon();
         // compute a reasonable epsilon below which we round to zero before doing the
-        // reciprocal
-        const double eps = machine_eps*std::max(m.nr(),m.nc())*max(w);
+        // reciprocal.  Unless a non-zero tol is given then we just use tol.
+        const double eps = (tol!=0) ? tol :  machine_eps*std::max(m.nr(),m.nc())*max(w);
 
         // now compute the pseudoinverse
         return tmp(scale_columns(v,reciprocal(round_zeros(w,eps))))*trans(u);
@@ -1552,15 +1572,21 @@ convergence:
         typename EXP
         >
     const matrix<typename EXP::type,EXP::NC,EXP::NR,typename EXP::mem_manager_type> pinv ( 
-        const matrix_exp<EXP>& m
+        const matrix_exp<EXP>& m,
+        double tol = 0
     )
     { 
+        DLIB_ASSERT(tol >= 0, 
+            "\tconst matrix_exp::type pinv(const matrix_exp& m)"
+            << "\n\t tol can't be negative"
+            << "\n\t tol: "<<tol 
+            );
         // if m has more columns then rows then it is more efficient to
         // compute the pseudo-inverse of its transpose (given the way I'm doing it below).
         if (m.nc() > m.nr())
-            return trans(pinv_helper(trans(m)));
+            return trans(pinv_helper(trans(m),tol));
         else
-            return pinv_helper(m);
+            return pinv_helper(m,tol);
     }
 
 // ----------------------------------------------------------------------------------------

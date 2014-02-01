@@ -31,12 +31,20 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     const matrix pinv (
-        const matrix_exp& m
+        const matrix_exp& m,
+        double tol = 0
     );
     /*!
+        requires
+            - tol >= 0
         ensures
             - returns the Moore-Penrose pseudoinverse of m.
             - The returned matrix has m.nc() rows and m.nr() columns.
+            - if (tol == 0) then
+                - singular values less than max(m.nr(),m.nc()) times the machine epsilon 
+                  times the largest singular value are ignored.  
+            - else
+                - singular values less than tol are ignored.
     !*/
 
 // ----------------------------------------------------------------------------------------
