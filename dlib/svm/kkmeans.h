@@ -491,7 +491,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(centers.size() > 0 && samples.size() > 0 && is_vector(sample),
+        DLIB_ASSERT(centers.size() > 0 && sample.size() > 0 && is_vector(sample),
             "\t unsigned long nearest_center()"
             << "\n\t You have given invalid inputs to this function."
             << "\n\t centers.size():    " << centers.size() 
