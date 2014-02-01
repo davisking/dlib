@@ -1422,7 +1422,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-#if ENABLE_ASSERTS
+#ifdef ENABLE_ASSERTS
         for (unsigned long i = 0; i < chip_locations.size(); ++i)
         {
             DLIB_CASSERT(chip_locations[i].size != 0 &&
