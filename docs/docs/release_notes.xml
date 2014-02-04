@@ -12,6 +12,19 @@
 
 <current>
 New Features:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="18.6" date="Feb 03, 2014">
+New Features:
    - Object Detection Tools:
       - Added scan_fhog_pyramid, a tool for creating Histogram of Oriented Gradient (HOG)
         based object detectors. 
@@ -78,8 +91,7 @@ Other:
      linking to these libraries on platforms that typically don't have them (e.g. Windows).
      Moreover, dlib's cmake files will automatically perform this static linking when no
      copy of these libraries is found on the system. 
-
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
