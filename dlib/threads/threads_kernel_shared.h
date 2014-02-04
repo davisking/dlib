@@ -13,8 +13,24 @@
 #include "../queue.h"
 #include "../set.h"
 
+// The point of this block of code is to cause a link time error that will prevent a user
+// from compiling part of their application with DLIB_ASSERTs enabled and part with them
+// disabled since doing that would be a violation of C++'s one definition rule. 
+extern "C"
+{
+#ifdef ENABLE_ASSERTS
+    extern int USER_ERROR__violation_of_one_definition_rule_detected__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives;
+    inline int dlib_check_consistent_assert_usage() { USER_ERROR__violation_of_one_definition_rule_detected__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives = 0; return 0; }
+#else
+    extern int USER_ERROR__violation_of_one_definition_rule_detected__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives_;
+    inline int dlib_check_consistent_assert_usage() { USER_ERROR__violation_of_one_definition_rule_detected__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives_ = 0; return 0; }
+#endif
+    const int dlib_check_assert_helper_variable = dlib_check_consistent_assert_usage();
+}
+
 namespace dlib
 {
+
 
 // ----------------------------------------------------------------------------------------
 
