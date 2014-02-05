@@ -199,7 +199,7 @@ int main(int argc, char** argv)
         // this example our sliding window is 80 by 80 pixels and is run over an image
         // pyramid.  This means that it can only output detections that are at least 80 by
         // 80 pixels in size (recall that this is why we upsampled the images after loading
-        // them).  It also means that the aspect ratio of the outputs is also 1.  So if,
+        // them).  It also means that the aspect ratio of the outputs is 1.  So if,
         // for example, you had a box in your training data that was 200 pixels by 10
         // pixels then it would simply be impossible for the detector to learn to detect
         // it.  Similarly, if you had a really small box it would be unable to learn to
