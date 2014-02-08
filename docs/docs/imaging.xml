@@ -212,6 +212,7 @@
 
          <item>draw_line</item> 
          <item>draw_rectangle</item> 
+         <item>tile_images</item> 
          <item>draw_fhog</item> 
          <item>fill_rect</item> 
          <item>assign_image</item> 
@@ -1018,6 +1019,20 @@
          <spec_file link="true">dlib/image_transforms/draw_abstract.h</spec_file>
          <description>        
             This global function draws a rectangle on an image.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>tile_images</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/draw_abstract.h</spec_file>
+         <description>        
+              This function takes an array of images and tiles them into a single large
+              square image and returns this new big tiled image.  Therefore, it is a useful
+              method to visualize many small images at once.
          </description>
                                  
       </component>

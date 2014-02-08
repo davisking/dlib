@@ -976,6 +976,7 @@
          <term file="dlib/gui_widgets/style_abstract.h.html" name="scroll_bar_style" include="dlib/gui_widgets.h"/>
          <term file="dlib/gui_widgets/style_abstract.h.html" name="scroll_bar_style_default" include="dlib/gui_widgets.h"/>
 
+         <term file="imaging.html" name="tile_images"    include="dlib/image_transforms.h"/>
          <term name="draw_rectangle">
             <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_rectangle" name="for the GUI canvas object" include="dlib/gui_widgets.h"/>
             <term link="imaging.html#draw_rectangle" name="for image/array2d objects"    include="dlib/image_transforms.h"/>
