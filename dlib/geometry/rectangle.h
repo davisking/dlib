@@ -612,7 +612,6 @@ namespace dlib
         DLIB_ASSERT(ratio > 0,
             "\t rectangle set_aspect_ratio()"
             << "\n\t ratio: " << ratio 
-            << "\n\t this: " << this
             );
 
         // aspect ratio is w/h
