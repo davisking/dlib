@@ -599,6 +599,7 @@
          <item>rotation_matrix</item> 
          <item>get_rect</item> 
          <item>centered_rect</item> 
+         <item>set_aspect_ratio</item> 
          <item>center</item> 
          <item>dcenter</item> 
          <item>shrink_rect</item> 
@@ -953,6 +954,19 @@
             There are various overloads of this function but the basic idea is
             that it returns a <a href="#rectangle">rectangle</a> with a given 
             width and height and centered about a given point.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>set_aspect_ratio</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
+         <description>        
+            This function reshapes a <a href="#rectangle">rectangle</a> so that
+            it has a user specified aspect ratio.
          </description>
                                  
       </component>
