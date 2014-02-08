@@ -3,6 +3,7 @@
 #undef DLIB_DRAW_IMAGe_ABSTRACT
 #ifdef DLIB_DRAW_IMAGe_ABSTRACT
 
+#include "../matrix.h"
 
 namespace dlib
 {
@@ -92,6 +93,24 @@ namespace dlib
             - pixel_traits<pixel_type> is defined
         ensures
             - fills the area defined by rect in the given image with the given pixel value.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_array_type
+        >
+    matrix<typename image_array_type::value_type::type> tile_images (
+        const image_array_type& images
+    );
+    /*!
+        requires
+            - image_array_type is a dlib::array of array2d objects, each containing pixels
+              with a pixel_traits definition or any type with a compatible interface.
+        ensures
+            - This function takes the given images and tiles them into a single large
+              square image and returns this new big tiled image.  Therefore, it is a useful
+              method to visualize many small images at once.
     !*/
 
 // ----------------------------------------------------------------------------------------

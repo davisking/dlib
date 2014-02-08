@@ -6,6 +6,7 @@
 #include "draw_abstract.h"
 #include "../algs.h"
 #include "../pixel.h"
+#include "../matrix.h"
 #include <cmath>
 
 namespace dlib
@@ -227,6 +228,51 @@ namespace dlib
                 assign_pixel(img[r][c], pixel);
             }
         }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_array_type
+        >
+    matrix<typename image_array_type::value_type::type> tile_images (
+        const image_array_type& images
+    )
+    {
+        typedef typename image_array_type::value_type::type T;
+
+        if (images.size() == 0)
+            return matrix<T>();
+
+        const unsigned long size_nc = square_root(images.size());
+        const unsigned long size_nr = (size_nc*(size_nc-1)>=images.size())? size_nc-1 : size_nc;
+        // Figure out the size we have to use for each chip in the big main image.  We will
+        // use the largest dimensions seen across all the chips.
+        long nr = 0;
+        long nc = 0;
+        for (unsigned long i = 0; i < images.size(); ++i)
+        {
+            nr = std::max(images[i].nr(), nr);
+            nc = std::max(images[i].nc(), nc);
+        }
+
+        matrix<T> temp(size_nr*nr, size_nc*nc);
+        T background_color;
+        assign_pixel(background_color, 0);
+        temp = background_color;
+        unsigned long idx = 0;
+        for (long r = 0; r < size_nr; ++r)
+        {
+            for (long c = 0; c < size_nc; ++c)
+            {
+                if (idx < images.size())
+                {
+                    set_subm(temp, r*nr, c*nc, nr, nc) = mat(images[idx]);
+                }
+                ++idx;
+            }
+        }
+        return temp;
     }
 
 // ----------------------------------------------------------------------------------------
