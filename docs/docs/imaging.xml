@@ -1959,6 +1959,7 @@
          </description>
          <examples>
             <example>face_detection_ex.cpp.html</example>
+            <example>face_detector.py.html</example>
          </examples>
                                  
       </component>
@@ -1989,9 +1990,12 @@
          </description>
          <examples>
             <example>fhog_object_detector_ex.cpp.html</example>
+            <example>face_detection_ex.cpp.html</example>
             <example>object_detector_ex.cpp.html</example>
             <example>object_detector_advanced_ex.cpp.html</example>
             <example>train_object_detector.cpp.html</example>
+
+            <example>face_detector.py.html</example>
          </examples>
                                  
       </component>

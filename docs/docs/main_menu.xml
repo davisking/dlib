@@ -130,6 +130,10 @@
             <name>Examples: Python</name>
             <sub>
                <item>
+                  <name>Face_Detector</name>
+                  <link>face_detector.py.html</link>
+               </item>
+               <item>
                   <name>Sequence_Segmenter</name>
                   <link>sequence_segmenter.py.html</link>
                </item>
