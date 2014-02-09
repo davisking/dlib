@@ -16,6 +16,7 @@ add_python_module(dlib
    src/cca.cpp
    src/sequence_segmenter.cpp
    src/svm_struct.cpp
+   src/object_detection.cpp
    )
 
 # When you run "make install" we will copy the compiled dlib.so (or dlib.pyd) 

@@ -13,6 +13,7 @@ void bind_svm_rank_trainer();
 void bind_cca();
 void bind_sequence_segmenter();
 void bind_svm_struct();
+void bind_object_detection();
 
 
 BOOST_PYTHON_MODULE(dlib)
@@ -31,5 +32,6 @@ BOOST_PYTHON_MODULE(dlib)
     bind_cca();
     bind_sequence_segmenter();
     bind_svm_struct();
+    bind_object_detection();
 }
 
