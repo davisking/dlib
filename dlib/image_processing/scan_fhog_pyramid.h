@@ -510,11 +510,14 @@ namespace dlib
         unsigned long width, height;
         compute_fhog_window_size(width,height);
 
+        typedef typename image_type::type pixel_type;
+        typedef typename image_type::mem_manager_type mem_manager_type;
+
         // build our feature pyramid
         extract_fhog_features(img, feats[0], cell_size,height,width);
         if (feats.size() > 1)
         {
-            image_type temp1, temp2;
+            array2d<pixel_type,mem_manager_type> temp1, temp2;
             pyr(img, temp1);
             extract_fhog_features(temp1, feats[1], cell_size,height,width);
             swap(temp1,temp2);
