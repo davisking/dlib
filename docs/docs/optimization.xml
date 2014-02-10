@@ -730,11 +730,17 @@ However, for graphs with cycles, the solution may be approximate.
          <description>
                 This object is a tool for solving the following optimization problem:   
 <pre>
-   Minimize: f(w) == 0.5*dot(w,w) + C*R(w)
+   Minimize: f(w) == 0.5*||w||^2 + C*R(w)
 
    Where R(w) is a user-supplied convex function and C > 0.  Optionally,
    this object can also add non-negativity constraints to some or all
    of the elements of w.
+
+Or it can alternatively solve:
+   Minimize: f(w) == 0.5*||w-prior||^2 + C*R(w)
+
+   Where prior is a user supplied vector and R(w) has the same
+   interpretation as above.
 </pre>
 <br/>
 <br/>
