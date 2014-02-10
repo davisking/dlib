@@ -116,12 +116,54 @@ namespace dlib
             unsigned long force_weight_to_1 = std::numeric_limits<unsigned long>::max()
         ) const
         {
+            matrix_type empty_prior;
+            return oca_impl(problem, w, empty_prior, false, num_nonnegative, force_weight_to_1);
+        }
+
+        template <
+            typename matrix_type
+            >
+        typename matrix_type::type operator() (
+            const oca_problem<matrix_type>& problem,
+            matrix_type& w,
+            const matrix_type& prior
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_col_vector(prior) && prior.size() == problem.get_num_dimensions(),
+                "\t scalar_type oca::operator()"
+                << "\n\t The prior vector does not have the correct dimensions."
+                << "\n\t is_col_vector(prior):         " << is_col_vector(prior) 
+                << "\n\t prior.size():                 " << prior.size() 
+                << "\n\t problem.get_num_dimensions(): " << problem.get_num_dimensions() 
+                << "\n\t this:                         " << this
+                );
+            // disable the force weight to 1 option for this mode.  We also disable the
+            // non-negative constraints.
+            unsigned long force_weight_to_1 = std::numeric_limits<unsigned long>::max();
+            return oca_impl(problem, w, prior, true, 0, force_weight_to_1);
+        }
+
+    private:
+
+        template <
+            typename matrix_type
+            >
+        typename matrix_type::type oca_impl (
+            const oca_problem<matrix_type>& problem,
+            matrix_type& w,
+            const matrix_type& prior,
+            bool have_prior,
+            unsigned long num_nonnegative,
+            unsigned long force_weight_to_1
+        ) const
+        {
             const unsigned long num_dims = problem.get_num_dimensions();
 
             // make sure requires clause is not broken
             DLIB_ASSERT(problem.get_c() > 0 &&
                         problem.get_num_dimensions() > 0,
-                "\t void oca::operator()"
+                "\t scalar_type oca::operator()"
                 << "\n\t The oca_problem is invalid"
                 << "\n\t problem.get_c():              " << problem.get_c() 
                 << "\n\t problem.get_num_dimensions(): " << num_dims 
@@ -172,6 +214,7 @@ namespace dlib
                 K(0,0) = 0;
             }
 
+            const double prior_norm = have_prior ?  0.5*dot(prior,prior) : 0;
 
             unsigned long counter = 0;
             while (true)
@@ -196,7 +239,10 @@ namespace dlib
                     set_rowm(new_plane, range(force_weight_to_1, new_plane.size()-1)) = 0;
                 }
 
-                bs.push_back(cur_risk - dot(w,new_plane));
+                if (have_prior)
+                    bs.push_back(cur_risk - dot(w,new_plane) + dot(prior,new_plane));
+                else
+                    bs.push_back(cur_risk - dot(w,new_plane));
                 planes.add(planes.size(), new_plane);
                 miss_count.push_back(0);
 
@@ -208,10 +254,11 @@ namespace dlib
                     alpha = join_cols(alpha,zeros_matrix<scalar_type>(1,1));
 
                 const scalar_type wnorm = 0.5*trans(w)*w;
-                cur_obj = wnorm + C*cur_risk;
+                const double prior_part = have_prior? dot(w,prior) : 0;
+                cur_obj = wnorm + C*cur_risk + prior_norm-prior_part;
 
                 // report current status
-                const scalar_type risk_gap = cur_risk - (cp_obj-wnorm)/C;
+                const scalar_type risk_gap = cur_risk - (cp_obj-wnorm+prior_part-prior_norm)/C;
                 if (counter > 0 && problem.optimization_status(cur_obj, cur_obj - cp_obj, 
                                                                cur_risk, risk_gap, planes.size(), counter))
                 {
@@ -273,7 +320,8 @@ namespace dlib
                 // Compute the lower bound on the true objective given to us by the cutting 
                 // plane subproblem.
                 cp_obj = -0.5*trans(w)*w + trans(alpha)*mat(bs);
-
+                if (have_prior)
+                    w += prior;
 
                 // If it has been a while since a cutting plane was an active constraint then
                 // we should throw it away.
@@ -295,8 +343,6 @@ namespace dlib
 
             return cur_obj;
         }
-
-    private:
 
         double sub_eps;
 

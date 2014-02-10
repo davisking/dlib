@@ -19,12 +19,18 @@ namespace dlib
                 problems solved by the oca optimizer defined later in this file.
 
                 OCA solves optimization problems with the following form:
-                    Minimize: f(w) == 0.5*dot(w,w) + C*R(w)
+                    Minimize: f(w) == 0.5*length_squared(w) + C*R(w)
 
                     Where R(w) is a user-supplied convex function and C > 0.  Optionally,
                     there can also be non-negativity constraints on some or all of the 
                     elements of w.
 
+                Or it can alternatively solve:
+                    Minimize: f(w) == 0.5*length_squared(w-prior) + C*R(w)
+
+                    Where prior is a user supplied vector and R(w) has the same
+                    interpretation as above.
+                       
 
                 Note that the stopping condition must be provided by the user
                 in the form of the optimization_status() function.
@@ -124,12 +130,18 @@ namespace dlib
                 by the oca_problem abstract class.  
 
                 For reference, OCA solves optimization problems with the following form:
-                    Minimize: f(w) == 0.5*dot(w,w) + C*R(w)
+                    Minimize: f(w) == 0.5*length_squared(w) + C*R(w)
 
                     Where R(w) is a user-supplied convex function and C > 0.  Optionally,
                     this object can also add non-negativity constraints to some or all
                     of the elements of w.
 
+                Or it can alternatively solve:
+                    Minimize: f(w) == 0.5*length_squared(w-prior) + C*R(w)
+
+                    Where prior is a user supplied vector and R(w) has the same
+                    interpretation as above.
+                       
 
                 For a detailed discussion you should consult the following papers
                 from the Journal of Machine Learning Research:
@@ -162,7 +174,9 @@ namespace dlib
                 - problem.get_c() > 0
                 - problem.get_num_dimensions() > 0
             ensures
-                - solves the given oca problem and stores the solution in #w
+                - solves the given oca problem and stores the solution in #w.  In particular,
+                  this function solves:
+                    Minimize: f(w) == 0.5*length_squared(w) + C*R(w)
                 - The optimization algorithm runs until problem.optimization_status() 
                   indicates it is time to stop.
                 - returns the objective value at the solution #w
@@ -181,6 +195,30 @@ namespace dlib
                           by force_weight_to_1 will have a value of 1 upon completion of
                           this function, while all subsequent elements of w will have
                           values of 0.
+        !*/
+
+        template <
+            typename matrix_type
+            >
+        typename matrix_type::type operator() (
+            const oca_problem<matrix_type>& problem,
+            matrix_type& w,
+            const matrix_type& prior
+        ) const;
+        /*!
+            requires
+                - problem.get_c() > 0
+                - problem.get_num_dimensions() > 0
+                - is_col_vector(prior) == true
+                - prior.size() == problem.get_num_dimensions()
+            ensures
+                - solves the given oca problem and stores the solution in #w.
+                - In this mode, we solve a version of the problem with a different
+                  regularizer.  In particular, this function solves:
+                    Minimize: f(w) == 0.5*length_squared(w-prior) + C*R(w)
+                - The optimization algorithm runs until problem.optimization_status() 
+                  indicates it is time to stop.
+                - returns the objective value at the solution #w
         !*/
 
         void set_subproblem_epsilon (
