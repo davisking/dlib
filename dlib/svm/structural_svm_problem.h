@@ -550,7 +550,7 @@ namespace dlib
         ) const
         {
             obj = 0;
-            grad.set_size(m.size());
+            grad.set_size(m.size(), 1);
             grad = 0;
 
             matrix<double> u,v,w,f;
