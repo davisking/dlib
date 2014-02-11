@@ -53,6 +53,7 @@ namespace
             typedef sparse_linear_kernel<sample_type> kernel_type;
             svm_multiclass_linear_trainer<kernel_type> trainer;
             trainer.set_c(100);
+            trainer.set_epsilon(0.000001);
 
             randomize_samples(samples, labels);
             matrix<double> cv = cross_validate_multiclass_trainer(trainer, samples, labels, 4);
