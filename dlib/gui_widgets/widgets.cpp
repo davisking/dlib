@@ -5690,10 +5690,13 @@ namespace dlib
         default_rect_color(255,0,0,255),
         parts_menu(w),
         part_width(15), // width part circles are drawn on the screen
-        overlay_editing_enabled(true)
+        overlay_editing_enabled(true),
+        highlight_timer(*this, &image_display::timer_event_unhighlight_rect),
+        highlighted_rect(std::numeric_limits<unsigned long>::max())
     { 
         enable_mouse_drag();
 
+        highlight_timer.set_delay_time(250);
         set_horizontal_scroll_increment(1);
         set_vertical_scroll_increment(1);
         set_horizontal_mouse_wheel_scroll_increment(30);
@@ -5744,6 +5747,7 @@ namespace dlib
     ~image_display(
     )
     {
+        highlight_timer.stop_and_wait();
         disable_events();
         parent.invalidate_rectangle(rect); 
     }
@@ -5943,9 +5947,37 @@ namespace dlib
             const rectangle orect = get_rect_on_screen(i);
 
             if (rect_is_selected && selected_rect == i)
+            {
                 draw_rectangle(c, orect, invert_pixel(overlay_rects[i].color), area);
+            }
+            else if (highlighted_rect < overlay_rects.size() && highlighted_rect == i)
+            {
+                // Draw the rectangle wider and with a slightly different color that tapers
+                // out at the edges of the line.
+                hsi_pixel temp;
+                assign_pixel(temp, 0);
+                assign_pixel(temp, overlay_rects[i].color);
+                temp.s = 255;
+                temp.h = temp.h + 20;
+                if (temp.i < 245)
+                    temp.i += 10;
+                rgb_pixel p;
+                assign_pixel(p, temp);
+                rgb_alpha_pixel po, po2;
+                assign_pixel(po, p);
+                po.alpha = 160;
+                po2 = po;
+                po2.alpha = 90;
+                draw_rectangle(c, grow_rect(orect,2), po2, area);
+                draw_rectangle(c, grow_rect(orect,1), po, area);
+                draw_rectangle(c, orect, p, area);
+                draw_rectangle(c, shrink_rect(orect,1), po, area);
+                draw_rectangle(c, shrink_rect(orect,2), po2, area);
+            }
             else
+            {
                 draw_rectangle(c, orect, overlay_rects[i].color, area);
+            }
 
             if (overlay_rects[i].label.size() != 0)
             {
@@ -6131,6 +6163,36 @@ namespace dlib
             return;
         }
 
+        if (btn == base_window::LEFT && (state&base_window::CONTROL) && !drawing_rect)
+        {
+            long best_dist = std::numeric_limits<long>::max();
+            long best_idx = 0;
+            // check if this click landed on any of the overlay rectangles
+            for (unsigned long i = 0; i < overlay_rects.size(); ++i)
+            {
+                const rectangle orect = get_rect_on_screen(i);
+                const long dist = distance_to_rect_edge(orect, point(x,y));
+
+                if (dist < best_dist)
+                {
+                    best_dist = dist;
+                    best_idx = i;
+                }
+            }
+            if (best_dist < 13)
+            {
+                overlay_rects[best_idx].label = default_rect_label;
+                highlighted_rect = best_idx;
+                highlight_timer.stop();
+                highlight_timer.start();
+                if (event_handler.is_set())
+                    event_handler();
+                parent.invalidate_rectangle(rect);
+            }
+            return;
+        }
+
+
         if (!is_double_click && btn == base_window::LEFT && (state&base_window::SHIFT))
         {
             drawing_rect = true;
@@ -6156,7 +6218,6 @@ namespace dlib
         }
         else if (is_double_click)
         {
-            const point origin(total_rect().tl_corner());
             const bool rect_was_selected = rect_is_selected;
             rect_is_selected = false;
             parts_menu.disable();

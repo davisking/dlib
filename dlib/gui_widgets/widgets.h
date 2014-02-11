@@ -3530,6 +3530,28 @@ namespace dlib
         rgb_alpha_pixel invert_pixel (const rgb_alpha_pixel& p) const
         { return rgb_alpha_pixel(255-p.red, 255-p.green, 255-p.blue, p.alpha); }
 
+        virtual int next_free_user_event_number (
+        ) const { return scrollable_region::next_free_user_event_number()+1; }
+        // The reason for using user actions here rather than just having the timer just call
+        // what it needs directly is to avoid a potential deadlock during destruction of this widget.
+        void timer_event_unhighlight_rect()
+        { 
+            highlight_timer.stop(); 
+            parent.trigger_user_event(this,scrollable_region::next_free_user_event_number()); 
+        }
+        void on_user_event (int num)
+        {
+            // ignore this user event if it isn't for us
+            if (num != scrollable_region::next_free_user_event_number())
+                return;
+            if (highlighted_rect < overlay_rects.size())
+            {
+                highlighted_rect = std::numeric_limits<unsigned long>::max();
+                parent.invalidate_rectangle(rect);
+            }
+        }
+
+
         array2d<rgb_alpha_pixel> img;
 
 
@@ -3555,6 +3577,8 @@ namespace dlib
         const int part_width;
         std::set<std::string> part_names;
         bool overlay_editing_enabled;
+        timer<image_display> highlight_timer;
+        unsigned long highlighted_rect;
 
         // restricted functions
         image_display(image_display&);        // copy constructor

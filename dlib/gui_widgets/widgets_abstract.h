@@ -2340,6 +2340,8 @@ namespace dlib
                 by selecting an overlay rectangle with the mouse and then right clicking
                 on the part.
                 
+                Finally, if you hold Ctrl and left click an overlay rectangle it will 
+                change its label to get_default_overlay_rect_label().
 
                 The image is drawn such that:
                     - the pixel img[0][0] is the upper left corner of the image.
