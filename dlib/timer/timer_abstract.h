@@ -162,7 +162,7 @@ namespace dlib
         void stop (
         );
         /*!
-            enusres
+            ensures
                 - #is_running() == false
                 - does not block.
         !*/
@@ -170,7 +170,7 @@ namespace dlib
         void stop_and_wait (
         );
         /*!
-            enusres
+            ensures 
                 - #is_running() == false
                 - if (the action function is currently executing) then
                     - blocks until it finishes
