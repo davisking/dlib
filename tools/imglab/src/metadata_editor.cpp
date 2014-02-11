@@ -440,8 +440,9 @@ display_about(
                         "command line.  An example would be '--parts \"leye reye nose mouth\"'."
                         ,0,0) << endl << endl;
 
-    sout << wrap_string("Finally, hold ctrl and scroll the mouse wheel to zoom while normal left click "
-                        "and drag allows you to navigate around the image.",0,0) << endl;
+    sout << wrap_string("Additionally, you can hold ctrl and then scroll the mouse wheel to zoom.  A normal left click "
+                        "and drag allows you to navigate around the image.  Finally, holding ctrl and "
+                        "left clicking a rectangle will give it the label from the Next Label field.",0,0) << endl;
 
     message_box("About Image Labeler",sout.str());
 }
