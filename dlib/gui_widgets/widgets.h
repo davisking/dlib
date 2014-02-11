@@ -3265,6 +3265,7 @@ namespace dlib
                 parent.invalidate_rectangle(rect);
             }
 
+            highlighted_rect = std::numeric_limits<unsigned long>::max();
             rect_is_selected = false;
             parts_menu.disable();
             assign_image_scaled(img,new_img);
