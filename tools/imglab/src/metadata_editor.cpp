@@ -249,6 +249,30 @@ void propagate_labels(
 
 }
 
+// ----------------------------------------------------------------------------------------
+
+bool has_label_or_all_boxes_labeled (
+    const std::string& label,
+    const dlib::image_dataset_metadata::image& img 
+)
+{
+    if (label.size() == 0)
+        return true;
+
+    bool all_boxes_labeled = true;
+    for (unsigned long i = 0; i < img.boxes.size(); ++i)
+    {
+        if (img.boxes[i].label == label)
+            return true;
+        if (img.boxes[i].label.size() == 0)
+            all_boxes_labeled = false;
+    }
+
+    return all_boxes_labeled;
+}
+
+// ----------------------------------------------------------------------------------------
+
 void metadata_editor::
 on_keydown (
     unsigned long key,
@@ -272,13 +296,35 @@ on_keydown (
     if (key == base_window::KEY_UP)
     {
         if (state&base_window::KBD_MOD_CONTROL)
+        {
+            // If the label we are supposed to propagate doesn't exist in the current image
+            // then don't advance.
+            if (!has_label_or_all_boxes_labeled(display.get_default_overlay_rect_label(),metadata.images[image_pos]))
+                return;
+
+            // if the next image is going to be empty then fast forward to the next one
+            while (image_pos > 1 && metadata.images[image_pos-1].boxes.size() == 0)
+                --image_pos;
+
             propagate_labels(display.get_default_overlay_rect_label(), metadata, image_pos, image_pos-1);
+        }
         select_image(image_pos-1);
     }
     else if (key == base_window::KEY_DOWN)
     {
         if (state&base_window::KBD_MOD_CONTROL)
+        {
+            // If the label we are supposed to propagate doesn't exist in the current image
+            // then don't advance.
+            if (!has_label_or_all_boxes_labeled(display.get_default_overlay_rect_label(),metadata.images[image_pos]))
+                return;
+
+            // if the next image is going to be empty then fast forward to the next one
+            while (image_pos+1 < metadata.images.size() && metadata.images[image_pos+1].boxes.size() == 0)
+                ++image_pos;
+
             propagate_labels(display.get_default_overlay_rect_label(), metadata, image_pos, image_pos+1);
+        }
         select_image(image_pos+1);
     }
 }
