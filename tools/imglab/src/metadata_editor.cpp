@@ -535,7 +535,7 @@ display_about(
                         "and drag allows you to navigate around the image.  Holding ctrl and "
                         "left clicking a rectangle will give it the label from the Next Label field. "
                         "Finally, holding ctrl and pressing the up or down keyboard keys will propagate "
-                        "rectangle labels from one image to the next.",0,0) << endl;
+                        "rectangle labels from one image to the next and also skip empty images.",0,0) << endl;
 
     message_box("About Image Labeler",sout.str());
 }
