@@ -192,19 +192,19 @@ void print_all_label_stats (
 
     for (std::set<std::string>::iterator i = labels.begin(); i != labels.end(); ++i)
     {
-        if (i->size() != 0)
-        {
+        if (i->size() == 0)
+            cout << "Unlabeled Boxes:" << endl;
+        else
             cout << "Label: "<< *i << endl;
-            cout << "   number of images:      " << image_hits[*i] << endl;
-            cout << "   number of occurrences: " << area_stats[*i].current_n() << endl;
-            cout << "   min box area:    " << area_stats[*i].min() << endl;
-            cout << "   max box area:    " << area_stats[*i].max() << endl;
-            cout << "   mean box area:   " << area_stats[*i].mean() << endl;
-            cout << "   stddev box area: " << area_stats[*i].stddev() << endl;
-            cout << "   mean width/height ratio:   " << aspect_ratio[*i].mean() << endl;
-            cout << "   stddev width/height ratio: " << aspect_ratio[*i].stddev() << endl;
-            cout << endl;
-        }
+        cout << "   number of images:      " << image_hits[*i] << endl;
+        cout << "   number of occurrences: " << area_stats[*i].current_n() << endl;
+        cout << "   min box area:    " << area_stats[*i].min() << endl;
+        cout << "   max box area:    " << area_stats[*i].max() << endl;
+        cout << "   mean box area:   " << area_stats[*i].mean() << endl;
+        cout << "   stddev box area: " << area_stats[*i].stddev() << endl;
+        cout << "   mean width/height ratio:   " << aspect_ratio[*i].mean() << endl;
+        cout << "   stddev width/height ratio: " << aspect_ratio[*i].stddev() << endl;
+        cout << endl;
     }
 }
 
