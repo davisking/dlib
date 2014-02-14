@@ -225,6 +225,10 @@ namespace dlib
                     window_table.get_mutex().unlock();
 
                     xim = NULL;
+                    // I'm disabling XIM usage all together because calling XSetICValues()
+                    // in set_im_pos() randomly hangs the application (on Ubuntu 13.10 at
+                    // least).    
+                    /*
                     window_table.get_mutex().lock();
                     std::string saved_locale(setlocale (LC_CTYPE, NULL));
                     if (setlocale( LC_CTYPE, "" ) && XSupportsLocale() && XSetLocaleModifiers(""))
@@ -232,7 +236,7 @@ namespace dlib
                     else
                         setlocale( LC_CTYPE, saved_locale.c_str() );
                     window_table.get_mutex().unlock();
-
+                    */
                     if (xim)
                     {
                         const static XIMStyle preedit_styles[] =
