@@ -21,6 +21,7 @@
 #include "svm/svm_multiclass_linear_trainer.h"
 #include "svm/one_vs_one_trainer.h"
 #include "svm/one_vs_all_trainer.h"
+#include "svm/structural_sequence_segmentation_trainer.h"
 
 #endif // DLIB_SVm_THREADED_HEADER
 
