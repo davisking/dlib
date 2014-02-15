@@ -1355,6 +1355,7 @@ namespace dlib
         const rectangle& rect
     )
     {
+        out.set_size(img.nr(), img.nc());
         impl::sum_filter<false>(img,out,rect);
     }
 

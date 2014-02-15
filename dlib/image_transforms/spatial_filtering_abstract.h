@@ -413,14 +413,14 @@ namespace dlib
     );
     /*!
         requires
-            - out.nr() == img.nr() 
-            - out.nc() == img.nc()
             - image_type1 == an implementation of array2d/array2d_kernel_abstract.h
               and it must contain a scalar type
             - image_type2 == an implementation of array2d/array2d_kernel_abstract.h
               and it must contain a scalar type
             - is_same_object(img,out) == false
         ensures
+            - #out.nr() == img.nr() 
+            - #out.nc() == img.nc()
             - for all valid r and c:
                 - let SUM(r,c) == sum of pixels from img which are inside the rectangle 
                   translate_rect(rect, point(c,r)).
