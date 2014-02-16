@@ -18,6 +18,7 @@
 #include "../optimization.h"
 #include "svm_nu_trainer.h"
 #include <vector>
+#include <set>
 
 namespace dlib
 {
@@ -304,6 +305,62 @@ namespace dlib
         }
 
         return false;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename detection_type, 
+        typename detection_id_type 
+        >
+    bool is_track_association_problem (
+        const std::vector<std::vector<std::pair<detection_type,detection_id_type> > >& samples
+    )
+    {
+        if (samples.size() == 0)
+            return false;
+
+        unsigned long num_nonzero_elements = 0;
+        for (unsigned long i = 0; i < samples.size(); ++i)
+        {
+            if (samples.size() > 0)
+                ++num_nonzero_elements;
+        }
+        if (num_nonzero_elements < 2)
+            return false;
+
+        // now make sure the detection_id_type values are unique within each time step.
+        for (unsigned long i = 0; i < samples.size(); ++i)
+        {
+            std::set<detection_id_type> vals;
+            for (unsigned long j = 0; j < samples[i].size(); ++j)
+                vals.insert(samples[i][j].second);
+            if (vals.size() != samples[i].size())
+                return false;
+        }
+
+        // passed all tests so it's good
+        return true;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename detection_type, 
+        typename detection_id_type 
+        >
+    bool is_track_association_problem (
+        const std::vector<std::vector<std::vector<std::pair<detection_type,detection_id_type> > > >& samples
+    )
+    {
+        for (unsigned long i = 0; i < samples.size(); ++i)
+        {
+            if (!is_track_association_problem(samples[i]))
+                return false;
+        }
+
+        // passed all tests so it's good
+        return true;
     }
 
 // ----------------------------------------------------------------------------------------
