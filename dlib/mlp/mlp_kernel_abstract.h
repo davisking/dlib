@@ -131,6 +131,7 @@ namespace dlib
             requires
                 - in.nr() == input_layer_nodes()
                 - in.nc() == 1
+                - EXP::type == double
             ensures
                 - returns the output of the network when it is given the
                   input in.  The output's elements are always in the range
@@ -149,6 +150,8 @@ namespace dlib
                 - example_out.nr() == output_layer_nodes()
                 - example_out.nc() == 1
                 - max(example_out) <= 1.0 && min(example_out) >= 0.0
+                - EXP1::type == double
+                - EXP2::type == double
             ensures
                 - trains the network that the correct output when given example_in 
                   should be example_out.
@@ -165,6 +168,7 @@ namespace dlib
                 - example_in.nc() == 1
                 - output_layer_nodes() == 1
                 - example_out <= 1.0 && example_out >= 0.0
+                - EXP::type == double
             ensures
                 - trains the network that the correct output when given example_in 
                   should be example_out.
