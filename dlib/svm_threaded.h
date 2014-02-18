@@ -14,6 +14,8 @@
 
 #include "svm/structural_svm_assignment_problem.h"
 #include "svm/structural_assignment_trainer.h"
+#include "svm/cross_validate_track_association_trainer.h"
+#include "svm/structural_track_association_trainer.h"
 
 #include "svm/structural_svm_graph_labeling_problem.h"
 #include "svm/structural_graph_labeling_trainer.h"
