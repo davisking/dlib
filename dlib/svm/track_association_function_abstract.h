@@ -220,8 +220,8 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - This function uses get_assignment_function() to assign all the detections
-                  in dets to their appropriate track in tracks.  Then each track which
+                - This function uses get_assignment_function() to assign each detection
+                  in dets to its appropriate track in tracks.  Then each track which
                   associates to a detection is updated by calling update_track() with the
                   associated detection.  
                 - Detections that don't associate with any of the elements of tracks will
