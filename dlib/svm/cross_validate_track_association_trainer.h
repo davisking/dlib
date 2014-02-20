@@ -41,6 +41,7 @@ namespace dlib
                 const std::vector<std::pair<detection_type,detection_id_type> >& dets = samples[j];
                 for (unsigned long k = 0; k < assignments.size(); ++k)
                 {
+                    // If the detection is associated to tracks[assignments[k]]
                     if (assignments[k] != -1)
                     {
                         tracks[assignments[k]].update_track(dets[k].first);

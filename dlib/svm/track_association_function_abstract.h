@@ -15,12 +15,16 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-
+                This object defines the interface a detection must implement if it is to be
+                used with the track_association_function defined at the bottom of this
+                file.  In this case, the interface is very simple.  A detection object is
+                only required to define the track_type typedef and it must also be possible
+                to store detection objects in a std::vector.
         !*/
 
     public:
         // Each detection object should be designed to work with a specific track object.
-        // This typedef lets you determine which track type is meant for use with this
+        // This typedef lets us determine which track type is meant for use with this
         // detection object.
         typedef struct example_track track_type;
 
@@ -32,11 +36,14 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
+                This object defines the interface a track must implement if it is to be
+                used with the track_association_function defined at the bottom of this
+                file.   
         !*/
 
     public:
-        // This type should be a dlib::matrix capable of storing column vectors
-        // or an unsorted sparse vector type as defined in dlib/svm/sparse_vector_abstract.h.
+        // This type should be a dlib::matrix capable of storing column vectors or an
+        // unsorted sparse vector type as defined in dlib/svm/sparse_vector_abstract.h.
         typedef matrix_or_sparse_vector_type feature_vector_type;
 
         example_track(
@@ -76,6 +83,8 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template <
         typename detection_type
@@ -83,12 +92,18 @@ namespace dlib
     class feature_extractor_track_association
     {
         /*!
+            REQUIREMENTS ON detection_type
+                It must be an object that implements an interface compatible with the
+                example_detection discussed above.  This also means that detection_type::track_type 
+                must be an object that implements an interface compatible with example_track 
+                defined above.
+
             WHAT THIS OBJECT REPRESENTS 
                 This object is an adapter that converts from the detection/track style
                 interface defined above to the feature extraction interface required by the
                 association rule learning tools in dlib.  Specifically, it converts the
                 detection/track interface into a form usable by the assignment_function and
-                its trainer structural_assignment_trainer.
+                its trainer object structural_assignment_trainer.
         !*/
 
     public:
@@ -115,10 +130,26 @@ namespace dlib
         !*/
     };
 
-    void serialize (const feature_extractor_track_association& item, std::ostream& out);
-    void deserialize (feature_extractor_track_association& item, std::istream& in);
+    template <
+        typename detection_type
+        > 
+    void serialize (
+        const feature_extractor_track_association<detection_type>& item, 
+        std::ostream& out
+    );
     /*!
-        Provides serialization and deserialization support.
+        Provides serialization support.
+    !*/
+
+    template <
+        typename detection_type
+        > 
+    void deserialize (
+        feature_extractor_track_association<detection_type>& item,
+        std::istream& in
+    );
+    /*!
+        Provides deserialization support.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -129,7 +160,30 @@ namespace dlib
     class track_association_function
     {
         /*!
+            REQUIREMENTS ON detection_type
+                It must be an object that implements an interface compatible with the
+                example_detection discussed above.  This also means that detection_type::track_type 
+                must be an object that implements an interface compatible with example_track 
+                defined above.
+
             WHAT THIS OBJECT REPRESENTS
+                This object is a tool that helps you implement an object tracker.  So for
+                example, if you wanted to track people moving around in a video then this
+                object can help.  In particular, imagine you have a tool for detecting the
+                positions of each person in an image.  Then you can run this person
+                detector on the video and at each time step, i.e. at each frame, you get a
+                set of person detections.  However, that by itself doesn't tell you how
+                many people there are in the video and where they are moving to and from.
+                To get that information you need to figure out which detections match each
+                other from frame to frame.  This is where the track_association_function
+                comes in.  It performs the detection to track association.  It will also do
+                some of the track management tasks like creating a new track when a
+                detection doesn't match any of the existing tracks.
+
+                Internally, this object is implemented using the assignment_function object.  
+                In fact, it's really just a thin wrapper around assignment_function and
+                exists just to provide a more convenient interface to users doing detection
+                to track association.   
         !*/
     public:
 
@@ -145,7 +199,7 @@ namespace dlib
         !*/
 
         track_association_function (
-            const association_function_type& assoc_
+            const association_function_type& assoc
         ); 
         /*!
             ensures
@@ -181,10 +235,26 @@ namespace dlib
         !*/
     };
 
-    void serialize (const track_association_function& item, std::ostream& out);
-    void deserialize (track_association_function& item, std::istream& in);
+    template <
+        typename detection_type
+        > 
+    void serialize (
+        const track_association_function<detection_type>& item,
+        std::ostream& out
+    );
     /*!
-        Provides serialization and deserialization support.
+        Provides serialization support.
+    !*/
+
+    template <
+        typename detection_type
+        > 
+    void deserialize (
+        track_association_function<detection_type>& item, 
+        std::istream& in
+    );
+    /*!
+        Provides deserialization support.
     !*/
 
 // ----------------------------------------------------------------------------------------

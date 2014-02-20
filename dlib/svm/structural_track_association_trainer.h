@@ -49,8 +49,7 @@ namespace dlib
         typedef detection_id_type_ detection_id_type;
         typedef std::pair<detection_type, detection_id_type> labeled_detection;
         typedef std::vector<labeled_detection> detections_at_single_time_step;
-        // This type logically represents an entire track history
-        typedef std::vector<detections_at_single_time_step> sample_type;
+        typedef std::vector<detections_at_single_time_step> track_history;
 
         typedef track_association_function<detection_type> trained_function_type;
 
@@ -161,7 +160,7 @@ namespace dlib
         }
 
         const track_association_function<detection_type> train (  
-            const std::vector<sample_type>& samples
+            const std::vector<track_history>& samples
         ) const
         {
             // make sure requires clause is not broken
@@ -197,10 +196,10 @@ namespace dlib
         }
 
         const track_association_function<detection_type> train (  
-            const sample_type& sample
+            const track_history& sample
         ) const
         {
-            std::vector<sample_type> samples;
+            std::vector<track_history> samples;
             samples.push_back(sample);
             return train(samples);
         }
@@ -208,7 +207,7 @@ namespace dlib
     private:
 
         static unsigned long find_num_dims (
-            const std::vector<sample_type>& samples
+            const std::vector<track_history>& samples
         )
         {
             // find a detection_type object so we can call get_similarity_features() and
@@ -326,7 +325,7 @@ namespace dlib
         {
             C = 100;
             verbose = false;
-            eps = 0.1;
+            eps = 0.01;
             num_threads = 2;
             max_cache_size = 5;
             learn_nonnegative_weights = false;

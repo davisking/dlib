@@ -17,96 +17,220 @@ namespace dlib
         >
     class structural_track_association_trainer
     {
+        /*!
+            REQUIREMENTS ON detection_type_
+                It must be an object that implements an interface compatible with the
+                example_detection defined in dlib/svm/track_association_function_abstract.h.  
+
+            REQUIREMENTS ON detection_id_type_
+                This can be any type that can be used as the key in a std::map.  e.g.
+                unsigned long, std::string, etc.
+            
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for learning to solve a track association problem.  That
+                is, it takes in a set of training data and outputs a track_association_function
+                you can use to do detection to track association.  The training data takes the
+                form of a set or sets of "track histories".  Each track history is a
+                std::vector where each element contains all the detections from a single time
+                step.  Moreover, each detection is labeled with a detection_id_type_ that
+                uniquely identifies which object (e.g. person or whatever) the detection really
+                corresponds to.  That is, the detection_id_type_ values indicate the correct
+                detection to track associations.  The goal of this object is then to produce a
+                track_association_function that can perform a correct detection to track
+                association at each time step.
+
+        !*/
+
     public:
         typedef detection_type_ detection_type;
         typedef typename detection_type::track_type track_type;
         typedef detection_id_type_ detection_id_type;
         typedef std::pair<detection_type, detection_id_type> labeled_detection;
         typedef std::vector<labeled_detection> detections_at_single_time_step;
-        // This type logically represents an entire track history
-        typedef std::vector<detections_at_single_time_step> sample_type;
+        typedef std::vector<detections_at_single_time_step> track_history;
 
         typedef track_association_function<detection_type> trained_function_type;
 
         structural_track_association_trainer (
         );  
         /*!
-            C = 100;
-            verbose = false;
-            eps = 0.1;
-            num_threads = 2;
-            max_cache_size = 5;
-            learn_nonnegative_weights = false;
+            ensures
+                - #get_c() == 100
+                - this object isn't verbose
+                - #get_epsilon() == 0.01
+                - #get_num_threads() == 2
+                - #get_max_cache_size() == 5
+                - #learns_nonnegative_weights() == false
         !*/
 
         void set_num_threads (
             unsigned long num
         );
+        /*!
+            ensures
+                - #get_num_threads() == num
+        !*/
 
         unsigned long get_num_threads (
         ) const;
+        /*!
+            ensures
+                - returns the number of threads used during training.  You should 
+                  usually set this equal to the number of processing cores on your
+                  machine.
+        !*/
 
         void set_epsilon (
             double eps
         );
+        /*!
+            requires
+                - eps > 0
+            ensures
+                - #get_epsilon() == eps
+        !*/
 
         double get_epsilon (
         ) const; 
+        /*!
+            ensures
+                - returns the error epsilon that determines when training should stop.
+                  Smaller values may result in a more accurate solution but take longer to
+                  train.  You can think of this epsilon value as saying "solve the
+                  optimization problem until the average number of association mistakes per
+                  time step is within epsilon of its optimal value".
+        !*/
 
         void set_max_cache_size (
             unsigned long max_size
         );
+        /*!
+            ensures
+                - #get_max_cache_size() == max_size
+        !*/
 
         unsigned long get_max_cache_size (
         ) const;
+        /*!
+            ensures
+                - During training, this object basically runs the track_association_function on 
+                  each training sample, over and over.  To speed this up, it is possible to 
+                  cache the results of these invocations.  This function returns the number 
+                  of cache elements per training sample kept in the cache.  Note that a value 
+                  of 0 means caching is not used at all.  
+        !*/
 
         void be_verbose (
         );
+        /*!
+            ensures
+                - This object will print status messages to standard out so that a user can
+                  observe the progress of the algorithm.
+        !*/
 
         void be_quiet (
         );
+        /*!
+            ensures
+                - this object will not print anything to standard out
+        !*/
 
         void set_oca (
             const oca& item
         );
+        /*!
+            ensures
+                - #get_oca() == item 
+        !*/
 
         const oca get_oca (
         ) const;
+        /*!
+            ensures
+                - Internally this object treats track association learning as a structural
+                  SVM problem.  This routine returns a copy of the optimizer used to solve
+                  the structural SVM problem.  
+        !*/
 
         void set_c (
             double C
         );
+        /*!
+            ensures
+                - returns the SVM regularization parameter.  It is the parameter that
+                  determines the trade-off between trying to fit the training data (i.e.
+                  minimize the loss) or allowing more errors but hopefully improving the
+                  generalization of the resulting track_association_function.  Larger
+                  values encourage exact fitting while smaller values of C may encourage
+                  better generalization. 
+        !*/
 
         double get_c (
         ) const;
+        /*!
+            requires
+                - C > 0
+            ensures
+                - #get_c() = C
+        !*/
 
         bool learns_nonnegative_weights (
         ) const; 
+        /*!
+            ensures
+                - Ultimately, the output of training is a parameter vector that defines the
+                  behavior of the track_association_function.  If
+                  learns_nonnegative_weights() == true then the resulting learned parameter
+                  vector will always have non-negative entries.
+        !*/
        
         void set_learns_nonnegative_weights (
             bool value
         );
+        /*!
+            ensures
+                - #learns_nonnegative_weights() == value
+        !*/
 
         const track_association_function<detection_type> train (  
-            const std::vector<sample_type>& samples
+            const track_history& sample
         ) const;
         /*!
             requires
                 - is_track_association_problem(samples) == true
             ensures
-                - 
+                - This function attempts to learn to do track association from the given
+                  training data.
+                - returns a function F such that:
+                    - Executing F(tracks, detections) will try to correctly associate the
+                      contents of detections to the contents of tracks and perform track
+                      updating and creation.
+                    - if (learns_nonnegative_weights() == true) then
+                        - min(F.get_assignment_function().get_weights()) >= 0
         !*/
 
         const track_association_function<detection_type> train (  
-            const sample_type& sample
+            const std::vector<track_history>& samples
         ) const;
         /*!
             requires
                 - is_track_association_problem(samples) == true
             ensures
-                - 
+                - This function attempts to learn to do track association from the given
+                  training data.  In this case, we take a set of track histories as
+                  training data instead of just one track history as with the above train()
+                  method.
+                - returns a function F such that:
+                    - Executing F(tracks, detections) will try to correctly associate the
+                      contents of detections to the contents of tracks and perform track
+                      updating and creation.
+                    - if (learns_nonnegative_weights() == true) then
+                        - min(F.get_assignment_function().get_weights()) >= 0
         !*/
+
     };
+
+// ----------------------------------------------------------------------------------------
 
 }
 
