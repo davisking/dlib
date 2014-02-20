@@ -13,8 +13,8 @@
    viewBox="-331 -284 1030.832 492.80385"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.3.1 r9886"
-   sodipodi:docname="ml_guide.svg">
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="ml_guide.svg.2014_02_20_18_33_19.0.svg">
   <metadata
      id="metadata1192">
     <rdf:RDF>
@@ -129,35 +129,1111 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1535"
-     inkscape:window-height="876"
+     inkscape:window-width="1855"
+     inkscape:window-height="1056"
      id="namedview1188"
      showgrid="false"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:zoom="0.5"
-     inkscape:cx="496.99623"
-     inkscape:cy="315.58474"
+     inkscape:zoom="0.70710678"
+     inkscape:cx="977.00321"
+     inkscape:cy="341.56721"
      inkscape:window-x="65"
      inkscape:window-y="24"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg2" />
+  <text
+     font-size="12.8"
+     style="font-size:7.37738848px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
+     x="224.83031"
+     y="-43.168491"
+     id="text5552">
+    <tspan
+       x="224.83031"
+       y="-43.168491"
+       id="tspan5554">NO</tspan>
+  </text>
   <g
-     transform="matrix(0.57695863,0,0,0.57695863,-190.33208,-96.898833)"
-     id="g4252">
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g5730">
     <path
        inkscape:connector-curvature="0"
        style="fill:#dbebea"
        d="m 1513.95,474.536 c 44.08,-55.164 20.74,-230.632 15.98,-300.199 -4.76,-69.566 0.44,-206.0882 -63.27,-245.9956 -63.71,-39.9074 -144.02,-30.4984 -321.02,-31.4984 -176.998,-1 -248.756,24.7046 -281.698,47.9308 C 831,-32 763.184,6.58152 768.184,145.581 c 5,138.997 37.762,229.961 130.234,320.547 49,47.998 144.632,70.634 259.832,68.112 115.21,-2.524 311.62,-4.538 355.7,-59.704 z"
-       id="path4254" />
+       id="path5732" />
     <path
        inkscape:connector-curvature="0"
        style="fill:none;stroke:#5aa5a2;stroke-width:5"
        d="m 1513.95,474.536 c 44.08,-55.164 20.74,-230.632 15.98,-300.199 -4.76,-69.566 0.44,-206.0882 -63.27,-245.9956 -63.71,-39.9074 -144.02,-30.4984 -321.02,-31.4984 -176.998,-1 -248.756,24.7046 -281.698,47.9308 C 831,-32 763.184,6.58152 768.184,145.581 c 5,138.997 37.762,229.961 130.234,320.547 49,47.998 144.632,70.634 259.832,68.112 115.21,-2.524 311.62,-4.538 355.7,-59.704"
-       id="path4256" />
+       id="path5734" />
   </g>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g5736">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#bbdcd0"
+       d="m 852.184,309.578 c 37,-40 157.996,-82.998 300.996,-82.998 143,0 339.75,-9.358 354.89,53.71 15.13,63.066 30.01,181.954 -55.5,209.382 C 1408,503.968 1113.11,541.566 994.28,496.4 875.448,451.234 815.184,349.578 852.184,309.578 z"
+       id="path5738" />
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#569e85;stroke-width:3"
+       d="m 852.184,309.578 c 37,-40 157.996,-82.998 300.996,-82.998 143,0 339.75,-9.358 354.89,53.71 15.13,63.066 30.01,181.954 -55.5,209.382 C 1408,503.968 1113.11,541.566 994.28,496.4 875.448,451.234 815.184,349.578 852.184,309.578"
+       id="path5740" />
+  </g>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g5752">
+    <ellipse
+       sodipodi:ry="48.248299"
+       sodipodi:rx="84.218903"
+       sodipodi:cy="57.59"
+       sodipodi:cx="914.78699"
+       d="m 999.00589,57.59 c 0,26.6468 -37.70609,48.2483 -84.2189,48.2483 -46.51282,0 -84.21891,-21.6015 -84.21891,-48.2483 0,-26.646799 37.70609,-48.2482985 84.21891,-48.2482985 46.51281,0 84.2189,21.6014995 84.2189,48.2482985 z"
+       style="fill:#ffffff"
+       cx="914.78699"
+       cy="57.59"
+       rx="84.218903"
+       ry="48.248299"
+       id="ellipse5754" />
+    <ellipse
+       sodipodi:ry="48.248299"
+       sodipodi:rx="84.218903"
+       sodipodi:cy="57.59"
+       sodipodi:cx="914.78699"
+       d="m 999.00589,57.59 c 0,26.6468 -37.70609,48.2483 -84.2189,48.2483 -46.51282,0 -84.21891,-21.6015 -84.21891,-48.2483 0,-26.646799 37.70609,-48.2482985 84.21891,-48.2482985 46.51281,0 84.2189,21.6014995 84.2189,48.2482985 z"
+       style="fill:none;stroke:#000057;stroke-width:2"
+       cx="914.78699"
+       cy="57.59"
+       rx="84.218903"
+       ry="48.248299"
+       id="ellipse5756" />
+    <text
+       font-size="12.8"
+       style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
+       x="914.78699"
+       y="53.490002"
+       id="text5758">
+      <tspan
+         x="914.78699"
+         y="53.490002"
+         id="tspan5760">Do you want to detect</tspan>
+      <tspan
+         x="914.78699"
+         y="69.489998"
+         id="tspan5762">objects in images?</tspan>
+    </text>
+  </g>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g5774">
+    <ellipse
+       sodipodi:ry="34.054901"
+       sodipodi:rx="87.774399"
+       sodipodi:cy="162.746"
+       sodipodi:cx="1138.3"
+       d="m 1226.0744,162.746 c 0,18.808 -39.2979,34.0549 -87.7744,34.0549 -48.4764,0 -87.7743,-15.2469 -87.7743,-34.0549 0,-18.808 39.2979,-34.0549 87.7743,-34.0549 48.4765,0 87.7744,15.2469 87.7744,34.0549 z"
+       style="fill:#ffffff"
+       cx="1138.3"
+       cy="162.746"
+       rx="87.774399"
+       ry="34.054901"
+       id="ellipse5776" />
+    <ellipse
+       sodipodi:ry="34.054901"
+       sodipodi:rx="87.774399"
+       sodipodi:cy="162.746"
+       sodipodi:cx="1138.3"
+       d="m 1226.0744,162.746 c 0,18.808 -39.2979,34.0549 -87.7744,34.0549 -48.4764,0 -87.7743,-15.2469 -87.7743,-34.0549 0,-18.808 39.2979,-34.0549 87.7743,-34.0549 48.4765,0 87.7744,15.2469 87.7744,34.0549 z"
+       style="fill:none;stroke:#000057;stroke-width:2"
+       cx="1138.3"
+       cy="162.746"
+       rx="87.774399"
+       ry="34.054901"
+       id="ellipse5778" />
+    <text
+       font-size="12.8"
+       style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
+       x="1138.3"
+       y="158.646"
+       id="text5780">
+      <tspan
+         x="1138.3"
+         y="158.646"
+         id="tspan5782">Predicting the labels</tspan>
+      <tspan
+         x="1138.3"
+         y="174.646"
+         id="tspan5784">of nodes in a graph?</tspan>
+    </text>
+  </g>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g5786">
+    <ellipse
+       sodipodi:ry="47.365101"
+       sodipodi:rx="68.973396"
+       sodipodi:cy="301.603"
+       sodipodi:cx="1151.63"
+       d="m 1220.6034,301.603 c 0,26.15902 -30.8804,47.3651 -68.9734,47.3651 -38.093,0 -68.9734,-21.20608 -68.9734,-47.3651 0,-26.15903 30.8804,-47.3651 68.9734,-47.3651 38.093,0 68.9734,21.20607 68.9734,47.3651 z"
+       style="fill:#ffffff"
+       cx="1151.63"
+       cy="301.603"
+       rx="68.973396"
+       ry="47.365101"
+       id="ellipse5788" />
+    <ellipse
+       sodipodi:ry="47.365101"
+       sodipodi:rx="68.973396"
+       sodipodi:cy="301.603"
+       sodipodi:cx="1151.63"
+       d="m 1220.6034,301.603 c 0,26.15902 -30.8804,47.3651 -68.9734,47.3651 -38.093,0 -68.9734,-21.20608 -68.9734,-47.3651 0,-26.15903 30.8804,-47.3651 68.9734,-47.3651 38.093,0 68.9734,21.20607 68.9734,47.3651 z"
+       style="fill:none;stroke:#000057;stroke-width:2"
+       cx="1151.63"
+       cy="301.603"
+       rx="68.973396"
+       ry="47.365101"
+       id="ellipse5790" />
+    <text
+       font-size="12.8"
+       style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
+       x="1151.63"
+       y="297.50299"
+       id="text5792">
+      <tspan
+         x="1151.63"
+         y="297.50299"
+         id="tspan5794">Binary labels on</tspan>
+      <tspan
+         x="1151.63"
+         y="313.50299"
+         id="tspan5796">nodes in a graph?</tspan>
+    </text>
+  </g>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g5798">
+    <ellipse
+       sodipodi:ry="38.759998"
+       sodipodi:rx="103.487"
+       sodipodi:cy="335.742"
+       sodipodi:cx="968.53699"
+       d="m 1072.024,335.742 c 0,21.40656 -46.3327,38.76 -103.48701,38.76 -57.15429,0 -103.487,-17.35344 -103.487,-38.76 0,-21.40655 46.33271,-38.75999 103.487,-38.75999 57.15431,0 103.48701,17.35344 103.48701,38.75999 z"
+       style="fill:#ffffff"
+       cx="968.53699"
+       cy="335.742"
+       rx="103.487"
+       ry="38.759998"
+       id="ellipse5800" />
+    <ellipse
+       sodipodi:ry="38.759998"
+       sodipodi:rx="103.487"
+       sodipodi:cy="335.742"
+       sodipodi:cx="968.53699"
+       d="m 1072.024,335.742 c 0,21.40656 -46.3327,38.76 -103.48701,38.76 -57.15429,0 -103.487,-17.35344 -103.487,-38.76 0,-21.40655 46.33271,-38.75999 103.487,-38.75999 57.15431,0 103.48701,17.35344 103.48701,38.75999 z"
+       style="fill:none;stroke:#000057;stroke-width:2"
+       cx="968.53699"
+       cy="335.742"
+       rx="103.487"
+       ry="38.759998"
+       id="ellipse5802" />
+    <text
+       font-size="12.8"
+       style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
+       x="968.53699"
+       y="331.642"
+       id="text5804">
+      <tspan
+         x="968.53699"
+         y="331.642"
+         id="tspan5806">A chain structured graph?</tspan>
+      <tspan
+         x="968.53699"
+         y="347.642"
+         id="tspan5808">(e.g. words in a sentence)</tspan>
+    </text>
+  </g>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g5810">
+    <ellipse
+       sodipodi:ry="39.1562"
+       sodipodi:rx="92.1082"
+       sodipodi:cy="427.93201"
+       sodipodi:cx="1079.11"
+       d="m 1171.2182,427.93201 c 0,21.62537 -41.2383,39.1562 -92.1082,39.1562 -50.87,0 -92.10821,-17.53083 -92.10821,-39.1562 0,-21.62538 41.23821,-39.1562 92.10821,-39.1562 50.8699,0 92.1082,17.53082 92.1082,39.1562 z"
+       style="fill:#ffffff"
+       cx="1079.11"
+       cy="427.93201"
+       rx="92.1082"
+       ry="39.1562"
+       id="ellipse5812" />
+    <ellipse
+       sodipodi:ry="39.1562"
+       sodipodi:rx="92.1082"
+       sodipodi:cy="427.93201"
+       sodipodi:cx="1079.11"
+       d="m 1171.2182,427.93201 c 0,21.62537 -41.2383,39.1562 -92.1082,39.1562 -50.87,0 -92.10821,-17.53083 -92.10821,-39.1562 0,-21.62538 41.23821,-39.1562 92.10821,-39.1562 50.8699,0 92.1082,17.53082 92.1082,39.1562 z"
+       style="fill:none;stroke:#000057;stroke-width:2"
+       cx="1079.11"
+       cy="427.93201"
+       rx="92.1082"
+       ry="39.1562"
+       id="ellipse5814" />
+    <text
+       font-size="12.8"
+       style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
+       x="1079.11"
+       y="423.832"
+       id="text5816">
+      <tspan
+         x="1079.11"
+         y="423.832"
+         id="tspan5818">Are you trying to make</tspan>
+      <tspan
+         x="1079.11"
+         y="439.832"
+         id="tspan5820">a BIO or BILOU tagger?</tspan>
+    </text>
+  </g>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g5822">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#800000;stroke-width:4"
+       d="M 1077.73,128.465 A 1181.4,1181.4 0 0 0 985.629,84.8341"
+       id="path5824" />
+    <polygon
+       style="fill:#800000"
+       points="1084.36,131.978 1073.18,131.62 1077.76,128.411 1077.94,122.824 "
+       id="polygon5826" />
+    <polygon
+       style="fill:none;stroke:#800000;stroke-width:4"
+       points="1084.36,131.978 1073.18,131.62 1077.76,128.411 1077.94,122.824 "
+       id="polygon5828" />
+  </g>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g5860">
+    <ellipse
+       sodipodi:ry="36.265999"
+       sodipodi:rx="89.409203"
+       sodipodi:cy="69.619003"
+       sodipodi:cx="1344.77"
+       d="m 1434.1792,69.619003 c 0,20.029158 -40.0298,36.265997 -89.4092,36.265997 -49.3793,0 -89.4092,-16.236839 -89.4092,-36.265997 0,-20.029158 40.0299,-36.265999 89.4092,-36.265999 49.3794,0 89.4092,16.236841 89.4092,36.265999 z"
+       style="fill:#ffffff"
+       cx="1344.77"
+       cy="69.619003"
+       rx="89.409203"
+       ry="36.265999"
+       id="ellipse5862" />
+    <ellipse
+       sodipodi:ry="36.265999"
+       sodipodi:rx="89.409203"
+       sodipodi:cy="69.619003"
+       sodipodi:cx="1344.77"
+       d="m 1434.1792,69.619003 c 0,20.029158 -40.0298,36.265997 -89.4092,36.265997 -49.3793,0 -89.4092,-16.236839 -89.4092,-36.265997 0,-20.029158 40.0299,-36.265999 89.4092,-36.265999 49.3794,0 89.4092,16.236841 89.4092,36.265999 z"
+       style="fill:none;stroke:#000057;stroke-width:2"
+       cx="1344.77"
+       cy="69.619003"
+       rx="89.409203"
+       ry="36.265999"
+       id="ellipse5864" />
+    <text
+       font-size="12.8"
+       style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
+       x="1344.77"
+       y="65.518997"
+       id="text5866">
+      <tspan
+         x="1344.77"
+         y="65.518997"
+         id="tspan5868">Trying to solve an</tspan>
+      <tspan
+         x="1344.77"
+         y="81.518997"
+         id="tspan5870">assignment problem?</tspan>
+    </text>
+  </g>
+  <text
+     font-size="12.8"
+     style="font-size:7.37738848px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
+     x="469.60294"
+     y="126.33755"
+     id="text5896">
+    <tspan
+       x="469.60294"
+       y="126.33755"
+       id="tspan5898">YES</tspan>
+  </text>
+  <text
+     font-size="12.8"
+     style="font-size:7.37738848px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
+     x="491.66599"
+     y="153.59703"
+     id="text5900">
+    <tspan
+       x="491.66599"
+       y="153.59703"
+       id="tspan5902">NO</tspan>
+  </text>
+  <text
+     font-size="12.8"
+     style="font-size:7.37738848px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
+     x="486.89365"
+     y="43.905613"
+     id="text5904">
+    <tspan
+       x="486.89365"
+       y="43.905613"
+       id="tspan5906">NO</tspan>
+  </text>
+  <text
+     font-size="12.8"
+     style="font-size:7.37738848px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
+     x="517.61932"
+     y="59.077667"
+     id="text5908">
+    <tspan
+       x="517.61932"
+       y="59.077667"
+       id="tspan5910">YES</tspan>
+  </text>
+  <text
+     font-size="12.8"
+     style="font-size:7.37738848px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
+     x="575.37628"
+     y="-26.100613"
+     id="text5912">
+    <tspan
+       x="575.37628"
+       y="-26.100613"
+       id="tspan5914">NO</tspan>
+  </text>
+  <text
+     font-size="12.8"
+     style="font-size:7.37738848px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
+     x="499.51596"
+     y="-29.351845"
+     id="text5916">
+    <tspan
+       x="499.51596"
+       y="-29.351845"
+       id="tspan5918">NO</tspan>
+  </text>
+  <text
+     font-size="12.8"
+     style="font-size:7.37738848px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
+     x="438.68704"
+     y="25.489807"
+     id="text5920">
+    <tspan
+       x="438.68704"
+       y="25.489807"
+       id="tspan5922">YES</tspan>
+  </text>
+  <text
+     font-size="12.8"
+     style="font-size:7.37738848px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
+     x="400.67618"
+     y="70.056152"
+     id="text5924">
+    <tspan
+       x="400.67618"
+       y="70.056152"
+       id="tspan5926">NO</tspan>
+  </text>
+  <text
+     font-size="12.8"
+     style="font-size:7.37738848px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
+     x="366.42319"
+     y="131.20088"
+     id="text5928">
+    <tspan
+       x="366.42319"
+       y="131.20088"
+       id="tspan5930">YES</tspan>
+  </text>
+  <text
+     font-size="12.8"
+     style="font-size:7.37738848px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
+     x="517.72882"
+     y="-48.280499"
+     id="text5932">
+    <tspan
+       x="517.72882"
+       y="-48.280499"
+       id="tspan5934">YES</tspan>
+  </text>
+  <text
+     font-size="12.8"
+     style="font-size:7.37738848px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
+     x="312.43112"
+     y="-27.616421"
+     id="text5936">
+    <tspan
+       x="312.43112"
+       y="-27.616421"
+       id="tspan5938">YES</tspan>
+  </text>
+  <text
+     font-size="12.8"
+     style="font-size:7.37738848px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
+     x="389.62741"
+     y="-52.418751"
+     id="text5940">
+    <tspan
+       x="389.62741"
+       y="-52.418751"
+       id="tspan5942">NO</tspan>
+  </text>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g5944">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#008000;stroke-width:4"
+       d="m 1255.82,63.071 a 2865.21,2865.21 0 0 0 -26.69,-1.4228"
+       id="path5946" />
+    <polygon
+       style="fill:#008000"
+       points="1221.64,61.2903 1231.85,56.7392 1229.13,61.6232 1231.41,66.7293 "
+       id="polygon5948" />
+    <polygon
+       style="fill:none;stroke:#008000;stroke-width:4"
+       points="1221.64,61.2903 1231.85,56.7392 1229.13,61.6232 1231.41,66.7293 "
+       id="polygon5950" />
+  </g>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g5952">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#008000;stroke-width:4"
+       d="m 1187.31,387.941 a 426.074,426.074 0 0 0 -42.53,11.773"
+       id="path5954" />
+    <polygon
+       style="fill:#008000"
+       points="1194.64,386.359 1185.76,393.159 1187.27,387.777 1183.87,383.339 "
+       id="polygon5956" />
+    <polygon
+       style="fill:none;stroke:#008000;stroke-width:4"
+       points="1194.64,386.359 1185.76,393.159 1187.27,387.777 1183.87,383.339 "
+       id="polygon5958" />
+  </g>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g5960">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#800000;stroke-width:4"
+       d="m 1167.34,440.623 a 946.032,946.032 0 0 0 36.51,2.794"
+       id="path5962" />
+    <polygon
+       style="fill:#800000"
+       points="1211.34,443.825 1201.13,448.377 1203.85,443.492 1201.57,438.386 "
+       id="polygon5964" />
+    <polygon
+       style="fill:none;stroke:#800000;stroke-width:4"
+       points="1211.34,443.825 1201.13,448.377 1203.85,443.492 1201.57,438.386 "
+       id="polygon5966" />
+  </g>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g5968">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#008000;stroke-width:4"
+       d="m 989.225,374.389 a 139.53,139.53 0 0 0 15.595,17.329"
+       id="path5970" />
+    <polygon
+       style="fill:#008000"
+       points="1010.36,396.741 999.411,394.465 1004.47,392.092 1005.61,386.619 "
+       id="polygon5972" />
+    <polygon
+       style="fill:none;stroke:#008000;stroke-width:4"
+       points="1010.36,396.741 999.411,394.465 1004.47,392.092 1005.61,386.619 "
+       id="polygon5974" />
+  </g>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g5976">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#800000;stroke-width:4"
+       d="m 1071.48,291.885 a 186.308,186.308 0 0 0 -46.59,10.732"
+       id="path5978" />
+    <polygon
+       style="fill:#800000"
+       points="1078.94,291.251 1069.11,296.584 1071.44,291.503 1068.78,286.589 "
+       id="polygon5980" />
+    <polygon
+       style="fill:none;stroke:#800000;stroke-width:4"
+       points="1078.94,291.251 1069.11,296.584 1071.44,291.503 1068.78,286.589 "
+       id="polygon5982" />
+  </g>
+  <text
+     font-size="22.5778"
+     style="font-size:13.01290607px;font-style:normal;font-weight:700;text-anchor:start;fill:#000000;font-family:sans-serif"
+     x="387.89255"
+     y="-133.68552"
+     id="text5984">
+    <tspan
+       x="387.89255"
+       y="-133.68552"
+       id="tspan5986">Structured Prediction</tspan>
+  </text>
+  <text
+     font-size="22.5778"
+     style="font-size:13.01290607px;font-style:normal;font-weight:700;text-anchor:start;fill:#000000;font-family:sans-serif"
+     x="411.04489"
+     y="187.91916"
+     id="text5988">
+    <tspan
+       x="411.04489"
+       y="187.91916"
+       id="tspan5990">Markov Random Fields</tspan>
+  </text>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g5992">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#008000;stroke-width:4"
+       d="m 903.521,106.355 a 189.241,189.241 0 0 0 -0.76,23.438"
+       id="path5994" />
+    <polygon
+       style="fill:#008000"
+       points="903.078,137.272 897.173,127.778 902.383,129.804 907.13,126.851 "
+       id="polygon5996" />
+    <polygon
+       style="fill:none;stroke:#008000;stroke-width:4"
+       points="903.078,137.272 897.173,127.778 902.383,129.804 907.13,126.851 "
+       id="polygon5998" />
+  </g>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g6000">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#008000;stroke-width:4"
+       d="m 1091.83,192.354 a 419.174,419.174 0 0 0 -93.487,94.845"
+       id="path6002" />
+    <polygon
+       style="fill:#008000"
+       points="994.03,293.331 995.44,282.24 998.204,287.1 1003.75,287.805 "
+       id="polygon6004" />
+    <polygon
+       style="fill:none;stroke:#008000;stroke-width:4"
+       points="994.03,293.331 995.44,282.24 998.204,287.1 1003.75,287.805 "
+       id="polygon6006" />
+  </g>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g6008">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#008000;stroke-width:4"
+       d="m 1221.36,302.852 a 10651.9,10651.9 0 0 0 23.47,0.318"
+       id="path6010" />
+    <polygon
+       style="fill:#008000"
+       points="1252.33,303.261 1242.27,308.148 1244.83,303.177 1242.39,298.149 "
+       id="polygon6012" />
+    <polygon
+       style="fill:none;stroke:#008000;stroke-width:4"
+       points="1252.33,303.261 1242.27,308.148 1244.83,303.177 1242.39,298.149 "
+       id="polygon6014" />
+  </g>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g6016">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#800000;stroke-width:4"
+       d="m 1251.14,209.056 a 312.032,312.032 0 0 0 -64.9,50.565"
+       id="path6018" />
+    <polygon
+       style="fill:#800000"
+       points="1257.64,205.32 1251.18,214.446 1251.03,208.858 1246.47,205.629 "
+       id="polygon6020" />
+    <polygon
+       style="fill:none;stroke:#800000;stroke-width:4"
+       points="1257.64,205.32 1251.18,214.446 1251.03,208.858 1246.47,205.629 "
+       id="polygon6022" />
+  </g>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g6024">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#800000;stroke-width:4"
+       d="m 1359.04,120.581 a 175.338,175.338 0 0 0 -2.3,-14.052"
+       id="path6026" />
+    <polygon
+       style="fill:#800000"
+       points="1359.85,128.021 1354.32,118.302 1359.45,120.531 1364.31,117.769 "
+       id="polygon6028" />
+    <polygon
+       style="fill:none;stroke:#800000;stroke-width:4"
+       points="1359.85,128.021 1354.32,118.302 1359.45,120.531 1364.31,117.769 "
+       id="polygon6030" />
+  </g>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g6032">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#008000;stroke-width:4"
+       d="m 795.522,228.764 a 510.049,510.049 0 0 0 -52.598,7.092"
+       id="path6034" />
+    <polygon
+       style="fill:#008000"
+       points="802.998,228.185 793.307,233.761 795.511,228.624 792.723,223.779 "
+       id="polygon6036" />
+    <polygon
+       style="fill:none;stroke:#008000;stroke-width:4"
+       points="802.998,228.185 793.307,233.761 795.511,228.624 792.723,223.779 "
+       id="polygon6038" />
+  </g>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g6040">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#800000;stroke-width:4"
+       d="m 818.605,66.4623 a 287.605,287.605 0 0 0 -90.57,42.1127"
+       id="path6042" />
+    <polygon
+       style="fill:#800000"
+       points="825.861,64.5915 817.187,71.6455 818.54,66.2216 815.013,61.8845 "
+       id="polygon6044" />
+    <polygon
+       style="fill:none;stroke:#800000;stroke-width:4"
+       points="825.861,64.5915 817.187,71.6455 818.54,66.2216 815.013,61.8845 "
+       id="polygon6046" />
+  </g>
+  <text
+     font-size="12.8"
+     style="font-size:7.37738848px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
+     x="238.2088"
+     y="32.502949"
+     id="text6608">
+    <tspan
+       x="238.2088"
+       y="32.502949"
+       id="tspan6610">YES</tspan>
+  </text>
+  <text
+     font-size="12.8"
+     style="font-size:7.37738848px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
+     x="228.79224"
+     y="77.636414"
+     id="text6612">
+    <tspan
+       x="228.79224"
+       y="77.636414"
+       id="tspan6614">NO</tspan>
+  </text>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g6616">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#800000;stroke-width:4"
+       d="m 1267.89,99.546 a 1373.3,1373.3 0 0 0 -76.62,35.323"
+       id="path6618" />
+    <polygon
+       style="fill:#800000"
+       points="1274.8,96.629 1267.47,105.074 1267.87,99.498 1263.65,95.8346 "
+       id="polygon6620" />
+    <polygon
+       style="fill:none;stroke:#800000;stroke-width:4"
+       points="1274.8,96.629 1267.47,105.074 1267.87,99.498 1263.65,95.8346 "
+       id="polygon6622" />
+  </g>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g6624">
+    <ellipse
+       sodipodi:ry="26.950001"
+       sodipodi:rx="86.272003"
+       sodipodi:cy="58.549999"
+       sodipodi:cx="1130.27"
+       d="m 1216.542,58.549999 c 0,14.884075 -38.6253,26.950001 -86.272,26.950001 -47.6467,0 -86.272,-12.065926 -86.272,-26.950001 0,-14.884074 38.6253,-26.950001 86.272,-26.950001 47.6467,0 86.272,12.065927 86.272,26.950001 z"
+       style="fill:#ffffff"
+       cx="1130.27"
+       cy="58.549999"
+       rx="86.272003"
+       ry="26.950001"
+       id="ellipse6626" />
+    <ellipse
+       sodipodi:ry="26.950001"
+       sodipodi:rx="86.272003"
+       sodipodi:cy="58.549999"
+       sodipodi:cx="1130.27"
+       d="m 1216.542,58.549999 c 0,14.884075 -38.6253,26.950001 -86.272,26.950001 -47.6467,0 -86.272,-12.065926 -86.272,-26.950001 0,-14.884074 38.6253,-26.950001 86.272,-26.950001 47.6467,0 86.272,12.065927 86.272,26.950001 z"
+       style="fill:none;stroke:#000057;stroke-width:2"
+       cx="1130.27"
+       cy="58.549999"
+       rx="86.272003"
+       ry="26.950001"
+       id="ellipse6628" />
+    <text
+       font-size="12.8"
+       style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
+       x="1130.27"
+       y="54.450001"
+       id="text6630">
+      <tspan
+         x="1130.27"
+         y="54.450001"
+         id="tspan6632">Want to make</tspan>
+      <tspan
+         x="1130.27"
+         y="70.449997"
+         id="tspan6634">a tracker?</tspan>
+    </text>
+  </g>
+  <a
+     xlink:href="ml.html#structural_track_association_trainer"
+     transform="translate(-518.26903,16.004773)"
+     id="a7669">
+    <g
+       id="g6636"
+       transform="matrix(0.57635848,0,0,0.57635848,323.21914,-112.48855)">
+      <rect
+         id="rect6638"
+         height="40"
+         width="252.39999"
+         y="-38.400002"
+         x="965.862"
+         style="fill:#ffffff" />
+      <rect
+         id="rect6640"
+         height="40"
+         width="252.39999"
+         y="-38.400002"
+         x="965.862"
+         style="fill:none;stroke:#000000;stroke-width:4" />
+      <text
+         id="text6642"
+         y="-14.5"
+         x="1092.0601"
+         style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
+         font-size="12.8">
+        <tspan
+           id="tspan6644"
+           y="-14.5"
+           x="1092.0601">structural_track_association_trainer</tspan>
+      </text>
+    </g>
+  </a>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g6646">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#008000;stroke-width:4"
+       d="m 1101.06,14.814 a 134.796,134.796 0 0 0 8.34,16.7485"
+       id="path6648" />
+    <polygon
+       style="fill:#008000"
+       points="1098.32,7.86073 1106.09,15.9059 1100.57,15.017 1096.55,18.8988 "
+       id="polygon6650" />
+    <polygon
+       style="fill:none;stroke:#008000;stroke-width:4"
+       points="1098.32,7.86073 1106.09,15.9059 1100.57,15.017 1096.55,18.8988 "
+       id="polygon6652" />
+  </g>
+  <text
+     font-size="12.8"
+     style="font-size:7.37738848px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
+     x="421.9957"
+     y="-83.697723"
+     id="text6654">
+    <tspan
+       x="421.9957"
+       y="-83.697723"
+       id="tspan6656">YES</tspan>
+  </text>
+  <g
+     transform="matrix(0.57635848,0,0,0.57635848,-189.40544,-96.483777)"
+     id="g6658">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#800000;stroke-width:4"
+       d="M 1238.09,6.30583 A 446.2,446.2 0 0 0 1171.52,34.2576"
+       id="path6660" />
+    <polygon
+       style="fill:#800000"
+       points="1245.23,4.01066 1237.08,11.659 1238.04,6.15322 1234.22,2.07578 "
+       id="polygon6662" />
+    <polygon
+       style="fill:none;stroke:#800000;stroke-width:4"
+       points="1245.23,4.01066 1237.08,11.659 1238.04,6.15322 1234.22,2.07578 "
+       id="polygon6664" />
+  </g>
+  <text
+     font-size="12.8"
+     style="font-size:7.37738848px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
+     x="476.98026"
+     y="-83.788788"
+     id="text6666">
+    <tspan
+       x="476.98026"
+       y="-83.788788"
+       id="tspan6668">NO</tspan>
+  </text>
+  <a
+     xlink:href="ml.html#svm_rank_trainer"
+     id="a3746"
+     transform="matrix(1.0345233,0,0,1.0345233,-38.179731,-15.968612)">
+    <g
+       transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
+       id="g212">
+      <rect
+         id="rect214"
+         height="40"
+         width="135"
+         y="204.75999"
+         x="788.69202"
+         style="fill:#ffffff" />
+      <rect
+         id="rect216"
+         height="40"
+         width="135"
+         y="204.75999"
+         x="788.69202"
+         style="fill:none;stroke:#000000;stroke-width:4" />
+      <text
+         id="text218"
+         y="228.66"
+         x="856.19202"
+         style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
+         font-size="12.8">
+        <tspan
+           id="tspan220"
+           y="228.66"
+           x="856.19202">svm_rank_trainer</tspan>
+      </text>
+    </g>
+  </a>
+  <a
+     xlink:href="ml.html#structural_object_detection_trainer"
+     id="a3739"
+     transform="matrix(1.0345233,0,0,1.0345233,-43.162391,-12.620922)">
+    <g
+       transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
+       id="g656">
+      <rect
+         id="rect658"
+         height="40"
+         width="247.89999"
+         y="133.55701"
+         x="768.97198"
+         style="fill:#ffffff" />
+      <rect
+         id="rect660"
+         height="40"
+         width="247.89999"
+         y="133.55701"
+         x="768.97198"
+         style="fill:none;stroke:#000000;stroke-width:4" />
+      <text
+         id="text662"
+         y="157.457"
+         x="892.922"
+         style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
+         font-size="12.8">
+        <tspan
+           id="tspan664"
+           y="157.457"
+           x="892.922">structural_object_detection_trainer</tspan>
+      </text>
+    </g>
+  </a>
+  <a
+     xlink:href="ml.html#structural_sequence_segmentation_trainer"
+     id="a3769"
+     transform="matrix(1.0345233,0,0,1.0345233,-55.464451,-35.829135)">
+    <g
+       transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
+       id="g738">
+      <rect
+         id="rect740"
+         height="40"
+         width="298.14999"
+         y="393.46799"
+         x="1208.95"
+         style="fill:#ffffff" />
+      <rect
+         id="rect742"
+         height="40"
+         width="298.14999"
+         y="393.46799"
+         x="1208.95"
+         style="fill:none;stroke:#000000;stroke-width:4" />
+      <text
+         id="text744"
+         y="417.36801"
+         x="1358.03"
+         style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
+         font-size="12.8">
+        <tspan
+           id="tspan746"
+           y="417.36801"
+           x="1358.03">structural_sequence_segmentation_trainer</tspan>
+      </text>
+    </g>
+  </a>
+  <a
+     xlink:href="ml.html#structural_sequence_labeling_trainer"
+     id="a3776"
+     transform="matrix(1.0345233,0,0,1.0345233,-66.837211,-45.449317)">
+    <g
+       transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
+       id="g748">
+      <rect
+         id="rect750"
+         height="40"
+         width="260.45001"
+         y="466.36801"
+         x="1244.25"
+         style="fill:#ffffff" />
+      <rect
+         id="rect752"
+         height="40"
+         width="260.45001"
+         y="466.36801"
+         x="1244.25"
+         style="fill:none;stroke:#000000;stroke-width:4" />
+      <text
+         id="text754"
+         y="490.26801"
+         x="1374.47"
+         style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
+         font-size="12.8">
+        <tspan
+           id="tspan756"
+           y="490.26801"
+           x="1374.47">structural_sequence_labeling_trainer</tspan>
+      </text>
+    </g>
+  </a>
+  <a
+     xlink:href="ml.html#structural_graph_labeling_trainer"
+     id="a3762"
+     transform="matrix(1.0345233,0,0,1.0345233,-57.654191,-32.79966)">
+    <g
+       transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
+       id="g758">
+      <rect
+         id="rect760"
+         height="46.961498"
+         width="236.2"
+         y="302.698"
+         x="1270.95"
+         style="fill:#ffffff" />
+      <rect
+         id="rect762"
+         height="46.961498"
+         width="236.2"
+         y="302.698"
+         x="1270.95"
+         style="fill:none;stroke:#000000;stroke-width:4" />
+      <text
+         id="text764"
+         y="330.07901"
+         x="1389.05"
+         style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
+         font-size="12.8">
+        <tspan
+           id="tspan766"
+           y="330.07901"
+           x="1389.05">structural_graph_labeling_trainer</tspan>
+      </text>
+    </g>
+  </a>
+  <a
+     xlink:href="ml.html#structural_assignment_trainer"
+     id="a3732"
+     transform="matrix(1.0345233,0,0,1.0345233,21.838539,28.457534)">
+    <g
+       transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
+       id="g788">
+      <rect
+         id="rect790"
+         height="40"
+         width="230.52299"
+         y="-105.443"
+         x="1125.4399"
+         style="fill:#ffffff" />
+      <rect
+         id="rect792"
+         height="40"
+         width="230.52299"
+         y="-105.443"
+         x="1125.4399"
+         style="fill:none;stroke:#000000;stroke-width:4" />
+      <text
+         id="text794"
+         y="-81.542603"
+         x="1240.71"
+         style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
+         font-size="12.8">
+        <tspan
+           id="tspan796"
+           y="-81.542603"
+           x="1240.71">structural_assignment_trainer</tspan>
+      </text>
+    </g>
+  </a>
+  <a
+     xlink:href="ml.html#structural_svm_problem"
+     id="a3753"
+     transform="matrix(1.0345233,0,0,1.0345233,-75.691381,-22.73941)">
+    <g
+       transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
+       id="g798">
+      <rect
+         id="rect800"
+         height="72"
+         width="188.787"
+         y="141.933"
+         x="1306.77"
+         style="fill:#ffffff" />
+      <rect
+         id="rect802"
+         height="72"
+         width="188.787"
+         y="141.933"
+         x="1306.77"
+         style="fill:none;stroke:#000000;stroke-width:4" />
+      <text
+         id="text804"
+         y="165.83299"
+         x="1401.16"
+         style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
+         font-size="12.8">
+        <tspan
+           id="tspan806"
+           y="165.83299"
+           x="1401.16">structural_svm_problem</tspan>
+        <tspan
+           id="tspan808"
+           y="181.83299"
+           x="1401.16">(Used to build your own</tspan>
+        <tspan
+           id="tspan810"
+           y="197.83299"
+           x="1401.16">structured precition tool!)</tspan>
+      </text>
+    </g>
+  </a>
   <g
      id="g40342"
      transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
@@ -482,17 +1558,6 @@
        y="-51.360909"
        id="tspan39686">YES</tspan>
   </text>
-  <text
-     font-size="12.8"
-     style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
-     x="221.85201"
-     y="-44.323776"
-     id="text39688">
-    <tspan
-       x="221.85201"
-       y="-44.323776"
-       id="tspan39690">NO</tspan>
-  </text>
   <g
      transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
      id="g39692">
@@ -769,670 +1834,6 @@
        style="fill:none;stroke:#800000;stroke-width:4"
        points="45.6616,306.423 40.9539,316.564 35.6658,306.714 40.7362,309.067 "
        id="polygon39864" />
-  </g>
-  <g
-     id="g40020"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
-    <path
-       id="path40022"
-       d="m 852.184,309.579 c 37,-40 157.996,-82.998 300.996,-82.998 143,0 339.75,-9.358 354.89,53.709 15.13,63.067 30.01,181.954 -55.5,209.382 -44.57,14.295 -339.46,51.893 -458.29,6.727 C 875.448,451.233 815.184,349.579 852.184,309.579 z"
-       style="fill:#bbdcd0"
-       inkscape:connector-curvature="0" />
-    <path
-       id="path40024"
-       d="m 852.184,309.579 c 37,-40 157.996,-82.998 300.996,-82.998 143,0 339.75,-9.358 354.89,53.709 15.13,63.067 30.01,181.954 -55.5,209.382 -44.57,14.295 -339.46,51.893 -458.29,6.727 C 875.448,451.233 815.184,349.579 852.184,309.579"
-       style="fill:none;stroke:#569e85;stroke-width:3"
-       inkscape:connector-curvature="0" />
-  </g>
-  <g
-     id="g40036"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
-    <ellipse
-       id="ellipse40038"
-       ry="48.248299"
-       rx="84.218903"
-       cy="32.59"
-       cx="916.78601"
-       style="fill:#ffffff"
-       d="m 1001.0049,32.59 c 0,26.6468 -37.70607,48.248299 -84.21889,48.248299 -46.51281,0 -84.2189,-21.601499 -84.2189,-48.248299 0,-26.6467994 37.70609,-48.248298 84.2189,-48.248298 46.51282,0 84.21889,21.6014986 84.21889,48.248298 z"
-       sodipodi:cx="916.78601"
-       sodipodi:cy="32.59"
-       sodipodi:rx="84.218903"
-       sodipodi:ry="48.248299" />
-    <ellipse
-       id="ellipse40040"
-       ry="48.248299"
-       rx="84.218903"
-       cy="32.59"
-       cx="916.78601"
-       style="fill:none;stroke:#000057;stroke-width:2"
-       d="m 1001.0049,32.59 c 0,26.6468 -37.70607,48.248299 -84.21889,48.248299 -46.51281,0 -84.2189,-21.601499 -84.2189,-48.248299 0,-26.6467994 37.70609,-48.248298 84.2189,-48.248298 46.51282,0 84.21889,21.6014986 84.21889,48.248298 z"
-       sodipodi:cx="916.78601"
-       sodipodi:cy="32.59"
-       sodipodi:rx="84.218903"
-       sodipodi:ry="48.248299" />
-    <text
-       id="text40042"
-       y="28.49"
-       x="916.78601"
-       style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
-       font-size="12.8">
-      <tspan
-         id="tspan40044"
-         y="28.49"
-         x="916.78601">Do you want to detect</tspan>
-      <tspan
-         id="tspan40046"
-         y="44.490002"
-         x="916.78601">objects in images?</tspan>
-    </text>
-  </g>
-  <g
-     id="g40058"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
-    <ellipse
-       id="ellipse40060"
-       ry="34.054901"
-       rx="87.774399"
-       cy="155.746"
-       cx="1138.3"
-       style="fill:#ffffff"
-       d="m 1226.0744,155.746 c 0,18.808 -39.2979,34.0549 -87.7744,34.0549 -48.4764,0 -87.7743,-15.2469 -87.7743,-34.0549 0,-18.808 39.2979,-34.0549 87.7743,-34.0549 48.4765,0 87.7744,15.2469 87.7744,34.0549 z"
-       sodipodi:cx="1138.3"
-       sodipodi:cy="155.746"
-       sodipodi:rx="87.774399"
-       sodipodi:ry="34.054901" />
-    <ellipse
-       id="ellipse40062"
-       ry="34.054901"
-       rx="87.774399"
-       cy="155.746"
-       cx="1138.3"
-       style="fill:none;stroke:#000057;stroke-width:2"
-       d="m 1226.0744,155.746 c 0,18.808 -39.2979,34.0549 -87.7744,34.0549 -48.4764,0 -87.7743,-15.2469 -87.7743,-34.0549 0,-18.808 39.2979,-34.0549 87.7743,-34.0549 48.4765,0 87.7744,15.2469 87.7744,34.0549 z"
-       sodipodi:cx="1138.3"
-       sodipodi:cy="155.746"
-       sodipodi:rx="87.774399"
-       sodipodi:ry="34.054901" />
-    <text
-       id="text40064"
-       y="151.646"
-       x="1138.3"
-       style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
-       font-size="12.8">
-      <tspan
-         id="tspan40066"
-         y="151.646"
-         x="1138.3">Predicting the labels</tspan>
-      <tspan
-         id="tspan40068"
-         y="167.646"
-         x="1138.3">of nodes in a graph?</tspan>
-    </text>
-  </g>
-  <g
-     id="g40070"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
-    <ellipse
-       id="ellipse40072"
-       ry="47.365101"
-       rx="68.973396"
-       cy="301.604"
-       cx="1151.63"
-       style="fill:#ffffff"
-       d="m 1220.6034,301.604 c 0,26.15903 -30.8804,47.3651 -68.9734,47.3651 -38.093,0 -68.9734,-21.20607 -68.9734,-47.3651 0,-26.15902 30.8804,-47.3651 68.9734,-47.3651 38.093,0 68.9734,21.20608 68.9734,47.3651 z"
-       sodipodi:cx="1151.63"
-       sodipodi:cy="301.604"
-       sodipodi:rx="68.973396"
-       sodipodi:ry="47.365101" />
-    <ellipse
-       id="ellipse40074"
-       ry="47.365101"
-       rx="68.973396"
-       cy="301.604"
-       cx="1151.63"
-       style="fill:none;stroke:#000057;stroke-width:2"
-       d="m 1220.6034,301.604 c 0,26.15903 -30.8804,47.3651 -68.9734,47.3651 -38.093,0 -68.9734,-21.20607 -68.9734,-47.3651 0,-26.15902 30.8804,-47.3651 68.9734,-47.3651 38.093,0 68.9734,21.20608 68.9734,47.3651 z"
-       sodipodi:cx="1151.63"
-       sodipodi:cy="301.604"
-       sodipodi:rx="68.973396"
-       sodipodi:ry="47.365101" />
-    <text
-       id="text40076"
-       y="297.504"
-       x="1151.63"
-       style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
-       font-size="12.8">
-      <tspan
-         id="tspan40078"
-         y="297.504"
-         x="1151.63">Binary labels on</tspan>
-      <tspan
-         id="tspan40080"
-         y="313.504"
-         x="1151.63">nodes in a graph?</tspan>
-    </text>
-  </g>
-  <g
-     id="g40082"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
-    <ellipse
-       id="ellipse40084"
-       ry="38.759998"
-       rx="103.487"
-       cy="335.742"
-       cx="968.53699"
-       style="fill:#ffffff"
-       d="m 1072.024,335.742 c 0,21.40656 -46.3327,38.76 -103.48701,38.76 -57.15429,0 -103.487,-17.35344 -103.487,-38.76 0,-21.40655 46.33271,-38.75999 103.487,-38.75999 57.15431,0 103.48701,17.35344 103.48701,38.75999 z"
-       sodipodi:cx="968.53699"
-       sodipodi:cy="335.742"
-       sodipodi:rx="103.487"
-       sodipodi:ry="38.759998" />
-    <ellipse
-       id="ellipse40086"
-       ry="38.759998"
-       rx="103.487"
-       cy="335.742"
-       cx="968.53699"
-       style="fill:none;stroke:#000057;stroke-width:2"
-       d="m 1072.024,335.742 c 0,21.40656 -46.3327,38.76 -103.48701,38.76 -57.15429,0 -103.487,-17.35344 -103.487,-38.76 0,-21.40655 46.33271,-38.75999 103.487,-38.75999 57.15431,0 103.48701,17.35344 103.48701,38.75999 z"
-       sodipodi:cx="968.53699"
-       sodipodi:cy="335.742"
-       sodipodi:rx="103.487"
-       sodipodi:ry="38.759998" />
-    <text
-       id="text40088"
-       y="331.642"
-       x="968.53699"
-       style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
-       font-size="12.8">
-      <tspan
-         id="tspan40090"
-         y="331.642"
-         x="968.53699">A chain structured graph?</tspan>
-      <tspan
-         id="tspan40092"
-         y="347.642"
-         x="968.53699">(e.g. words in a sentence)</tspan>
-    </text>
-  </g>
-  <g
-     id="g40094"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
-    <ellipse
-       id="ellipse40096"
-       ry="39.1562"
-       rx="92.1082"
-       cy="427.93301"
-       cx="1079.11"
-       style="fill:#ffffff"
-       d="m 1171.2182,427.93301 c 0,21.62538 -41.2383,39.1562 -92.1082,39.1562 -50.87,0 -92.10821,-17.53082 -92.10821,-39.1562 0,-21.62537 41.23821,-39.1562 92.10821,-39.1562 50.8699,0 92.1082,17.53083 92.1082,39.1562 z"
-       sodipodi:cx="1079.11"
-       sodipodi:cy="427.93301"
-       sodipodi:rx="92.1082"
-       sodipodi:ry="39.1562" />
-    <ellipse
-       id="ellipse40098"
-       ry="39.1562"
-       rx="92.1082"
-       cy="427.93301"
-       cx="1079.11"
-       style="fill:none;stroke:#000057;stroke-width:2"
-       d="m 1171.2182,427.93301 c 0,21.62538 -41.2383,39.1562 -92.1082,39.1562 -50.87,0 -92.10821,-17.53082 -92.10821,-39.1562 0,-21.62537 41.23821,-39.1562 92.10821,-39.1562 50.8699,0 92.1082,17.53083 92.1082,39.1562 z"
-       sodipodi:cx="1079.11"
-       sodipodi:cy="427.93301"
-       sodipodi:rx="92.1082"
-       sodipodi:ry="39.1562" />
-    <text
-       id="text40100"
-       y="423.83301"
-       x="1079.11"
-       style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
-       font-size="12.8">
-      <tspan
-         id="tspan40102"
-         y="423.83301"
-         x="1079.11">Are you trying to make</tspan>
-      <tspan
-         id="tspan40104"
-         y="439.83301"
-         x="1079.11">a BIO or BILOU tagger?</tspan>
-    </text>
-  </g>
-  <g
-     id="g40106"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
-    <path
-       id="path40108"
-       d="M 1083.18,119.397 A 1243.57,1243.57 0 0 0 983.122,63.3948"
-       style="fill:none;stroke:#800000;stroke-width:4"
-       inkscape:connector-curvature="0" />
-    <polygon
-       id="polygon40110"
-       points="1078.42,122.228 1083.21,119.348 1083.78,113.787 1089.54,123.37 "
-       style="fill:#800000" />
-    <polygon
-       id="polygon40112"
-       points="1078.42,122.228 1083.21,119.348 1083.78,113.787 1089.54,123.37 "
-       style="fill:none;stroke:#800000;stroke-width:4" />
-  </g>
-  <g
-     id="g40144"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
-    <ellipse
-       id="ellipse40146"
-       ry="36.265999"
-       rx="89.409203"
-       cy="33.618999"
-       cx="1153.77"
-       style="fill:#ffffff"
-       d="m 1243.1792,33.618999 c 0,20.029159 -40.0298,36.265999 -89.4092,36.265999 -49.3793,0 -89.4092,-16.23684 -89.4092,-36.265999 0,-20.029158 40.0299,-36.2659984 89.4092,-36.2659984 49.3794,0 89.4092,16.2368404 89.4092,36.2659984 z"
-       sodipodi:cx="1153.77"
-       sodipodi:cy="33.618999"
-       sodipodi:rx="89.409203"
-       sodipodi:ry="36.265999" />
-    <ellipse
-       id="ellipse40148"
-       ry="36.265999"
-       rx="89.409203"
-       cy="33.618999"
-       cx="1153.77"
-       style="fill:none;stroke:#000057;stroke-width:2"
-       d="m 1243.1792,33.618999 c 0,20.029159 -40.0298,36.265999 -89.4092,36.265999 -49.3793,0 -89.4092,-16.23684 -89.4092,-36.265999 0,-20.029158 40.0299,-36.2659984 89.4092,-36.2659984 49.3794,0 89.4092,16.2368404 89.4092,36.2659984 z"
-       sodipodi:cx="1153.77"
-       sodipodi:cy="33.618999"
-       sodipodi:rx="89.409203"
-       sodipodi:ry="36.265999" />
-    <text
-       id="text40150"
-       y="29.518999"
-       x="1153.77"
-       style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
-       font-size="12.8">
-      <tspan
-         id="tspan40152"
-         y="29.518999"
-         x="1153.77">Trying to solve an</tspan>
-      <tspan
-         id="tspan40154"
-         y="45.519001"
-         x="1153.77">assignment problem?</tspan>
-    </text>
-  </g>
-  <text
-     id="text40180"
-     y="124.88709"
-     x="469.96988"
-     style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
-     font-size="12.8">
-    <tspan
-       id="tspan40182"
-       y="124.88709"
-       x="469.96988">YES</tspan>
-  </text>
-  <text
-     id="text40184"
-     y="152.16266"
-     x="492.04642"
-     style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
-     font-size="12.8">
-    <tspan
-       id="tspan40186"
-       y="152.16266"
-       x="492.04642">NO</tspan>
-  </text>
-  <text
-     id="text40188"
-     y="42.404167"
-     x="487.27115"
-     style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
-     font-size="12.8">
-    <tspan
-       id="tspan40190"
-       y="42.404167"
-       x="487.27115">NO</tspan>
-  </text>
-  <text
-     id="text40192"
-     y="57.585503"
-     x="518.01562"
-     style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
-     font-size="12.8">
-    <tspan
-       id="tspan40194"
-       y="57.585503"
-       x="518.01562">YES</tspan>
-  </text>
-  <text
-     id="text40196"
-     y="-81.855499"
-     x="533.13135"
-     style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
-     font-size="12.8">
-    <tspan
-       id="tspan40198"
-       y="-81.855499"
-       x="533.13135">NO</tspan>
-  </text>
-  <text
-     id="text40200"
-     y="-33.781673"
-     x="472.21906"
-     style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
-     font-size="12.8">
-    <tspan
-       id="tspan40202"
-       y="-33.781673"
-       x="472.21906">NO</tspan>
-  </text>
-  <text
-     id="text40204"
-     y="21.094107"
-     x="436.72824"
-     style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
-     font-size="12.8">
-    <tspan
-       id="tspan40206"
-       y="21.094107"
-       x="436.72824">YES</tspan>
-  </text>
-  <text
-     id="text40208"
-     y="68.570694"
-     x="401.00095"
-     style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
-     font-size="12.8">
-    <tspan
-       id="tspan40210"
-       y="68.570694"
-       x="401.00095">NO</tspan>
-  </text>
-  <text
-     id="text40212"
-     y="129.75337"
-     x="366.72705"
-     style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
-     font-size="12.8">
-    <tspan
-       id="tspan40214"
-       y="129.75337"
-       x="366.72705">YES</tspan>
-  </text>
-  <text
-     id="text40216"
-     y="-109.23959"
-     x="487.55954"
-     style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
-     font-size="12.8">
-    <tspan
-       id="tspan40218"
-       y="-109.23959"
-       x="487.55954">YES</tspan>
-  </text>
-  <text
-     id="text40220"
-     y="-42.426281"
-     x="314.43146"
-     style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
-     font-size="12.8">
-    <tspan
-       id="tspan40222"
-       y="-42.426281"
-       x="314.43146">YES</tspan>
-  </text>
-  <text
-     id="text40224"
-     y="-62.629852"
-     x="390.52213"
-     style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
-     font-size="12.8">
-    <tspan
-       id="tspan40226"
-       y="-62.629852"
-       x="390.52213">NO</tspan>
-  </text>
-  <g
-     id="g40228"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
-    <path
-       id="path40230"
-       d="m 1215.65,-22.7081 a 155.111,155.111 0 0 0 -31.92,21.34378"
-       style="fill:none;stroke:#008000;stroke-width:4"
-       inkscape:connector-curvature="0" />
-    <polygon
-       id="polygon40232"
-       points="1215.02,-17.546 1215.44,-23.1204 1211.23,-26.8014 1222.38,-25.9604 "
-       style="fill:#008000" />
-    <polygon
-       id="polygon40234"
-       points="1215.02,-17.546 1215.44,-23.1204 1211.23,-26.8014 1222.38,-25.9604 "
-       style="fill:none;stroke:#008000;stroke-width:4" />
-  </g>
-  <g
-     id="g40236"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
-    <path
-       id="path40238"
-       d="m 1187.31,387.941 a 426.072,426.072 0 0 0 -42.53,11.773"
-       style="fill:none;stroke:#008000;stroke-width:4"
-       inkscape:connector-curvature="0" />
-    <polygon
-       id="polygon40240"
-       points="1185.76,393.159 1187.27,387.777 1183.87,383.34 1194.64,386.359 "
-       style="fill:#008000" />
-    <polygon
-       id="polygon40242"
-       points="1185.76,393.159 1187.27,387.777 1183.87,383.34 1194.64,386.359 "
-       style="fill:none;stroke:#008000;stroke-width:4" />
-  </g>
-  <g
-     id="g40244"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
-    <path
-       id="path40246"
-       d="m 1167.34,440.624 a 946.03,946.03 0 0 0 36.52,2.794"
-       style="fill:none;stroke:#800000;stroke-width:4"
-       inkscape:connector-curvature="0" />
-    <polygon
-       id="polygon40248"
-       points="1201.13,448.377 1203.85,443.493 1201.58,438.387 1211.34,443.826 "
-       style="fill:#800000" />
-    <polygon
-       id="polygon40250"
-       points="1201.13,448.377 1203.85,443.493 1201.58,438.387 1211.34,443.826 "
-       style="fill:none;stroke:#800000;stroke-width:4" />
-  </g>
-  <g
-     id="g40252"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
-    <path
-       id="path40254"
-       d="m 989.226,374.39 a 139.53,139.53 0 0 0 15.594,17.328"
-       style="fill:none;stroke:#008000;stroke-width:4"
-       inkscape:connector-curvature="0" />
-    <polygon
-       id="polygon40256"
-       points="999.412,394.465 1004.47,392.092 1005.61,386.619 1010.36,396.742 "
-       style="fill:#008000" />
-    <polygon
-       id="polygon40258"
-       points="999.412,394.465 1004.47,392.092 1005.61,386.619 1010.36,396.742 "
-       style="fill:none;stroke:#008000;stroke-width:4" />
-  </g>
-  <g
-     id="g40260"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
-    <path
-       id="path40262"
-       d="m 1071.48,291.885 a 186.305,186.305 0 0 0 -46.59,10.732"
-       style="fill:none;stroke:#800000;stroke-width:4"
-       inkscape:connector-curvature="0" />
-    <polygon
-       id="polygon40264"
-       points="1069.11,296.583 1071.44,291.502 1068.78,286.589 1078.94,291.251 "
-       style="fill:#800000" />
-    <polygon
-       id="polygon40266"
-       points="1069.11,296.583 1071.44,291.502 1068.78,286.589 1078.94,291.251 "
-       style="fill:none;stroke:#800000;stroke-width:4" />
-  </g>
-  <text
-     id="text40268"
-     y="-135.29562"
-     x="388.20953"
-     style="font-size:13.02086735px;font-style:normal;font-weight:700;text-anchor:start;fill:#000000;font-family:sans-serif"
-     font-size="22.5778">
-    <tspan
-       id="tspan40270"
-       y="-135.29562"
-       x="388.20953">Structured Prediction</tspan>
-  </text>
-  <text
-     id="text40272"
-     y="186.50638"
-     x="411.37601"
-     style="font-size:13.02086735px;font-style:normal;font-weight:700;text-anchor:start;fill:#000000;font-family:sans-serif"
-     font-size="22.5778">
-    <tspan
-       id="tspan40274"
-       y="186.50638"
-       x="411.37601">Markov Random Fields</tspan>
-  </text>
-  <g
-     id="g40276"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
-    <path
-       id="path40278"
-       d="m 905.224,81.3648 a 233.885,233.885 0 0 0 -1.755,35.3962"
-       style="fill:none;stroke:#008000;stroke-width:4"
-       inkscape:connector-curvature="0" />
-    <polygon
-       id="polygon40280"
-       points="897.984,114.664 903.162,116.77 907.954,113.89 903.743,124.247 "
-       style="fill:#008000" />
-    <polygon
-       id="polygon40282"
-       points="897.984,114.664 903.162,116.77 907.954,113.89 903.743,124.247 "
-       style="fill:none;stroke:#008000;stroke-width:4" />
-  </g>
-  <g
-     id="g40284"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
-    <path
-       id="path40286"
-       d="M 1093.41,185.751 A 436.428,436.428 0 0 0 997.315,287.03"
-       style="fill:none;stroke:#008000;stroke-width:4"
-       inkscape:connector-curvature="0" />
-    <polygon
-       id="polygon40288"
-       points="994.324,282.132 997.18,286.937 1002.74,287.537 993.126,293.247 "
-       style="fill:#008000" />
-    <polygon
-       id="polygon40290"
-       points="994.324,282.132 997.18,286.937 1002.74,287.537 993.126,293.247 "
-       style="fill:none;stroke:#008000;stroke-width:4" />
-  </g>
-  <g
-     id="g40292"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
-    <path
-       id="path40294"
-       d="m 1221.36,302.852 a 10652,10652 0 0 0 23.47,0.318"
-       style="fill:none;stroke:#008000;stroke-width:4"
-       inkscape:connector-curvature="0" />
-    <polygon
-       id="polygon40296"
-       points="1242.27,308.148 1244.83,303.177 1242.39,298.149 1252.33,303.261 "
-       style="fill:#008000" />
-    <polygon
-       id="polygon40298"
-       points="1242.27,308.148 1244.83,303.177 1242.39,298.149 1252.33,303.261 "
-       style="fill:none;stroke:#008000;stroke-width:4" />
-  </g>
-  <g
-     id="g40300"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
-    <path
-       id="path40302"
-       d="m 1241.78,206.916 a 300.724,300.724 0 0 0 -58.65,51.54"
-       style="fill:none;stroke:#800000;stroke-width:4"
-       inkscape:connector-curvature="0" />
-    <polygon
-       id="polygon40304"
-       points="1242.14,212.287 1241.65,206.718 1236.9,203.767 1248.04,202.792 "
-       style="fill:#800000" />
-    <polygon
-       id="polygon40306"
-       points="1242.14,212.287 1241.65,206.718 1236.9,203.767 1248.04,202.792 "
-       style="fill:none;stroke:#800000;stroke-width:4" />
-  </g>
-  <g
-     id="g40308"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
-    <path
-       id="path40310"
-       d="m 1141.3,82.3812 a 295.846,295.846 0 0 0 -3.85,38.3218"
-       style="fill:none;stroke:#800000;stroke-width:4"
-       inkscape:connector-curvature="0" />
-    <polygon
-       id="polygon40312"
-       points="1145.44,85.8099 1141.06,82.3414 1135.65,83.7676 1142.59,74.9995 "
-       style="fill:#800000" />
-    <polygon
-       id="polygon40314"
-       points="1145.44,85.8099 1141.06,82.3414 1135.65,83.7676 1142.59,74.9995 "
-       style="fill:none;stroke:#800000;stroke-width:4" />
-  </g>
-  <g
-     id="g40316"
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)">
-    <path
-       id="path40318"
-       d="M 1332.97,113.509 A 151.561,151.561 0 0 0 1244.09,35.2431"
-       style="fill:none;stroke:#800000;stroke-width:4"
-       inkscape:connector-curvature="0" />
-    <polygon
-       id="polygon40320"
-       points="1327.83,112.774 1333.4,113.305 1337.16,109.171 1336.1,120.301 "
-       style="fill:#800000" />
-    <polygon
-       id="polygon40322"
-       points="1327.83,112.774 1333.4,113.305 1337.16,109.171 1336.1,120.301 "
-       style="fill:none;stroke:#800000;stroke-width:4" />
-  </g>
-  <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
-     id="g40324">
-    <path
-       inkscape:connector-curvature="0"
-       style="fill:none;stroke:#008000;stroke-width:4"
-       d="m 789.561,226.094 a 483.289,483.289 0 0 0 -49.099,8.255"
-       id="path40326" />
-    <polygon
-       style="fill:#008000"
-       points="786.604,221.192 797.014,225.271 787.505,231.152 789.544,225.947 "
-       id="polygon40328" />
-    <polygon
-       style="fill:none;stroke:#008000;stroke-width:4"
-       points="786.604,221.192 797.014,225.271 787.505,231.152 789.544,225.947 "
-       id="polygon40330" />
-  </g>
-  <g
-     transform="matrix(0.57671105,0,0,0.57671105,-189.44156,-98.071115)"
-     id="g40332">
-    <path
-       inkscape:connector-curvature="0"
-       style="fill:none;stroke:#800000;stroke-width:4"
-       d="M 823.531,49.8907 A 314.607,314.607 0 0 0 724.514,106.158"
-       id="path40334" />
-    <polygon
-       style="fill:#800000"
-       points="819.604,45.625 830.629,47.4827 822.527,55.188 823.456,49.6756 "
-       id="polygon40336" />
-    <polygon
-       style="fill:none;stroke:#800000;stroke-width:4"
-       points="819.604,45.625 830.629,47.4827 822.527,55.188 823.456,49.6756 "
-       id="polygon40338" />
   </g>
   <g
      id="g40348"
@@ -2925,28 +3326,6 @@
        y="27.726282"
        id="tspan41126">YES</tspan>
   </text>
-  <text
-     font-size="12.8"
-     style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#008000;font-family:sans-serif"
-     x="236.12737"
-     y="29.841661"
-     id="text41128">
-    <tspan
-       x="236.12737"
-       y="29.841661"
-       id="tspan41130">YES</tspan>
-  </text>
-  <text
-     font-size="12.8"
-     style="font-size:7.38190126px;font-style:normal;font-weight:normal;text-anchor:start;fill:#800000;font-family:sans-serif"
-     x="229.12302"
-     y="74.62558"
-     id="text41132">
-    <tspan
-       x="229.12302"
-       y="74.62558"
-       id="tspan41134">NO</tspan>
-  </text>
   <g
      id="g47702"
      transform="matrix(1.0218295,0,0,1.0218295,-6.2614245,4.1682336)">
@@ -3156,8 +3535,8 @@
   </g>
   <a
      xlink:href="ml.html#svm_c_trainer"
-     id="a3653"
-     transform="matrix(1.0345233,0,0,1.0345233,11.692972,-4.0092227)">
+     transform="matrix(1.0345233,0,0,1.0345233,11.692972,-4.0092227)"
+     id="a3653">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g116">
@@ -3198,8 +3577,8 @@
   </a>
   <a
      xlink:href="ml.html#svm_c_linear_trainer"
-     id="a3662"
-     transform="matrix(1.0345233,0,0,1.0345233,11.571269,-12.413974)">
+     transform="matrix(1.0345233,0,0,1.0345233,11.571269,-12.413974)"
+     id="a3662">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g152">
@@ -3232,8 +3611,8 @@
   </a>
   <a
      xlink:href="ml.html#svm_one_class_trainer"
-     id="a3636"
-     transform="matrix(1.0345233,0,0,1.0345233,7.4344136,5.5047033)">
+     transform="matrix(1.0345233,0,0,1.0345233,7.4344136,5.5047033)"
+     id="a3636">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g346">
@@ -3270,8 +3649,8 @@
   </a>
   <a
      xlink:href="ml.html#svm_c_linear_dcd_trainer"
-     id="a3644"
-     transform="matrix(1.0345233,0,0,1.0345233,11.899438,3.6734783)">
+     transform="matrix(1.0345233,0,0,1.0345233,11.899438,3.6734783)"
+     id="a3644">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g418">
@@ -3312,8 +3691,8 @@
   </a>
   <a
      xlink:href="ml.html#svm_multiclass_linear_trainer"
-     id="a3678"
-     transform="matrix(1.0345233,0,0,1.0345233,8.7733176,-27.437303)">
+     transform="matrix(1.0345233,0,0,1.0345233,8.7733176,-27.437303)"
+     id="a3678">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g444">
@@ -3346,8 +3725,8 @@
   </a>
   <a
      xlink:href="ml.html#one_vs_one_trainer"
-     id="a3669"
-     transform="matrix(1.0345233,0,0,1.0345233,9.5637186,-19.946388)">
+     transform="matrix(1.0345233,0,0,1.0345233,9.5637186,-19.946388)"
+     id="a3669">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g472">
@@ -3388,8 +3767,8 @@
   </a>
   <a
      xlink:href="ml.html#krr_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,-7.5701194,1.6805743)"
-     id="a3628">
+     id="a3628"
+     transform="matrix(1.0345233,0,0,1.0345233,-7.5701194,1.6805743)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g18">
@@ -3426,8 +3805,8 @@
   </a>
   <a
      xlink:href="ml.html#newman_cluster"
-     transform="matrix(1.0345233,0,0,1.0345233,1296.7302,-569.23995)"
-     id="a3685">
+     id="a3685"
+     transform="matrix(1.0345233,0,0,1.0345233,1296.7302,-569.23995)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-1369.5729,428.8738)"
        id="g514">
@@ -3464,8 +3843,8 @@
   </a>
   <a
      xlink:href="ml.html#kkmeans"
-     transform="matrix(1.0345233,0,0,1.0345233,7.1212846,-24.887993)"
-     id="a3693">
+     id="a3693"
+     transform="matrix(1.0345233,0,0,1.0345233,7.1212846,-24.887993)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g526">
@@ -3502,8 +3881,8 @@
   </a>
   <a
      xlink:href="ml.html#vector_normalizer_frobmetric"
-     transform="matrix(1.0345233,0,0,1.0345233,-44.863773,9.2552823)"
-     id="a38121">
+     id="a38121"
+     transform="matrix(1.0345233,0,0,1.0345233,-44.863773,9.2552823)">
     <g
        transform="matrix(0.55795892,0,0,0.55795892,-138.86453,-79.441536)"
        id="g35901">
@@ -3536,8 +3915,8 @@
   </a>
   <a
      xlink:href="ml.html#linear_manifold_regularizer"
-     transform="matrix(1.0345233,0,0,1.0345233,-44.728164,8.0874193)"
-     id="a38128">
+     id="a38128"
+     transform="matrix(1.0345233,0,0,1.0345233,-44.728164,8.0874193)">
     <g
        transform="matrix(0.55795892,0,0,0.55795892,-138.86453,-79.441536)"
        id="g35911">
@@ -3570,8 +3949,8 @@
   </a>
   <a
      xlink:href="ml.html#krr_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,109.25334,30.388373)"
-     id="a3708">
+     id="a3708"
+     transform="matrix(1.0345233,0,0,1.0345233,109.25334,30.388373)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g196">
@@ -3607,43 +3986,9 @@
     </g>
   </a>
   <a
-     xlink:href="ml.html#svm_rank_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,-42.02178,-21.248942)"
-     id="a3746">
-    <g
-       transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
-       id="g212">
-      <rect
-         id="rect214"
-         height="40"
-         width="135"
-         y="204.75999"
-         x="788.69202"
-         style="fill:#ffffff" />
-      <rect
-         id="rect216"
-         height="40"
-         width="135"
-         y="204.75999"
-         x="788.69202"
-         style="fill:none;stroke:#000000;stroke-width:4" />
-      <text
-         id="text218"
-         y="228.66"
-         x="856.19202"
-         style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
-         font-size="12.8">
-        <tspan
-           id="tspan220"
-           y="228.66"
-           x="856.19202">svm_rank_trainer</tspan>
-      </text>
-    </g>
-  </a>
-  <a
      xlink:href="ml.html#svr_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,-145.98494,-42.08382)"
-     id="a3723">
+     id="a3723"
+     transform="matrix(1.0345233,0,0,1.0345233,-145.98494,-42.08382)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g248">
@@ -3684,8 +4029,8 @@
   </a>
   <a
      xlink:href="ml.html#svr_linear_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,-182.16362,-48.448377)"
-     id="a3716">
+     id="a3716"
+     transform="matrix(1.0345233,0,0,1.0345233,-182.16362,-48.448377)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g266">
@@ -3718,8 +4063,8 @@
   </a>
   <a
      xlink:href="ml.html#sammon_projection"
-     transform="matrix(1.0345233,0,0,1.0345233,-65.805214,95.211286)"
-     id="a3621">
+     id="a3621"
+     transform="matrix(1.0345233,0,0,1.0345233,-65.805214,95.211286)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g292">
@@ -3752,8 +4097,8 @@
   </a>
   <a
      xlink:href="ml.html#discriminant_pca"
-     transform="matrix(1.0345233,0,0,1.0345233,-182.5205,62.204516)"
-     id="a3614">
+     id="a3614"
+     transform="matrix(1.0345233,0,0,1.0345233,-182.5205,62.204516)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g594">
@@ -3786,8 +4131,8 @@
   </a>
   <a
      xlink:href="ml.html#krls"
-     transform="matrix(1.0345233,0,0,1.0345233,110.93633,24.324742)"
-     id="a3701">
+     id="a3701"
+     transform="matrix(1.0345233,0,0,1.0345233,110.93633,24.324742)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g634">
@@ -3819,221 +4164,9 @@
     </g>
   </a>
   <a
-     xlink:href="ml.html#structural_object_detection_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,-39.102206,-22.416811)"
-     id="a3739">
-    <g
-       transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
-       id="g656">
-      <rect
-         id="rect658"
-         height="40"
-         width="247.89999"
-         y="133.55701"
-         x="768.97198"
-         style="fill:#ffffff" />
-      <rect
-         id="rect660"
-         height="40"
-         width="247.89999"
-         y="133.55701"
-         x="768.97198"
-         style="fill:none;stroke:#000000;stroke-width:4" />
-      <text
-         id="text662"
-         y="157.457"
-         x="892.922"
-         style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
-         font-size="12.8">
-        <tspan
-           id="tspan664"
-           y="157.457"
-           x="892.922">structural_object_detection_trainer</tspan>
-      </text>
-    </g>
-  </a>
-  <a
-     xlink:href="ml.html#structural_sequence_segmentation_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,-55.355386,-37.158354)"
-     id="a3769">
-    <g
-       transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
-       id="g738">
-      <rect
-         id="rect740"
-         height="40"
-         width="298.14999"
-         y="393.46799"
-         x="1208.95"
-         style="fill:#ffffff" />
-      <rect
-         id="rect742"
-         height="40"
-         width="298.14999"
-         y="393.46799"
-         x="1208.95"
-         style="fill:none;stroke:#000000;stroke-width:4" />
-      <text
-         id="text744"
-         y="417.36801"
-         x="1358.03"
-         style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
-         font-size="12.8">
-        <tspan
-           id="tspan746"
-           y="417.36801"
-           x="1358.03">structural_sequence_segmentation_trainer</tspan>
-      </text>
-    </g>
-  </a>
-  <a
-     xlink:href="ml.html#structural_sequence_labeling_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,-65.599258,-46.778536)"
-     id="a3776">
-    <g
-       transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
-       id="g748">
-      <rect
-         id="rect750"
-         height="40"
-         width="260.45001"
-         y="466.36801"
-         x="1244.25"
-         style="fill:#ffffff" />
-      <rect
-         id="rect752"
-         height="40"
-         width="260.45001"
-         y="466.36801"
-         x="1244.25"
-         style="fill:none;stroke:#000000;stroke-width:4" />
-      <text
-         id="text754"
-         y="490.26801"
-         x="1374.47"
-         style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
-         font-size="12.8">
-        <tspan
-           id="tspan756"
-           y="490.26801"
-           x="1374.47">structural_sequence_labeling_trainer</tspan>
-      </text>
-    </g>
-  </a>
-  <a
-     xlink:href="ml.html#structural_graph_labeling_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,-57.545126,-32.99999)"
-     id="a3762">
-    <g
-       transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
-       id="g758">
-      <rect
-         id="rect760"
-         height="46.961498"
-         width="236.2"
-         y="302.698"
-         x="1270.95"
-         style="fill:#ffffff" />
-      <rect
-         id="rect762"
-         height="46.961498"
-         width="236.2"
-         y="302.698"
-         x="1270.95"
-         style="fill:none;stroke:#000000;stroke-width:4" />
-      <text
-         id="text764"
-         y="330.07901"
-         x="1389.05"
-         style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
-         font-size="12.8">
-        <tspan
-           id="tspan766"
-           y="330.07901"
-           x="1389.05">structural_graph_labeling_trainer</tspan>
-      </text>
-    </g>
-  </a>
-  <a
-     xlink:href="ml.html#structural_assignment_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,8.9653816,13.58165)"
-     id="a3732">
-    <g
-       transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
-       id="g788">
-      <rect
-         id="rect790"
-         height="40"
-         width="230.52299"
-         y="-105.443"
-         x="1125.4399"
-         style="fill:#ffffff" />
-      <rect
-         id="rect792"
-         height="40"
-         width="230.52299"
-         y="-105.443"
-         x="1125.4399"
-         style="fill:none;stroke:#000000;stroke-width:4" />
-      <text
-         id="text794"
-         y="-81.542603"
-         x="1240.71"
-         style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
-         font-size="12.8">
-        <tspan
-           id="tspan796"
-           y="-81.542603"
-           x="1240.71">structural_assignment_trainer</tspan>
-      </text>
-    </g>
-  </a>
-  <a
-     xlink:href="ml.html#structural_svm_problem"
-     transform="matrix(1.0345233,0,0,1.0345233,-81.22676,-29.148628)"
-     id="a3753">
-    <g
-       transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
-       id="g798">
-      <rect
-         id="rect800"
-         height="72"
-         width="188.787"
-         y="141.933"
-         x="1306.77"
-         style="fill:#ffffff" />
-      <rect
-         id="rect802"
-         height="72"
-         width="188.787"
-         y="141.933"
-         x="1306.77"
-         style="fill:none;stroke:#000000;stroke-width:4" />
-      <text
-         id="text804"
-         y="165.83299"
-         x="1401.16"
-         style="font-size:12.80000019px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;font-family:sans-serif"
-         font-size="12.8">
-        <tspan
-           id="tspan806"
-           y="165.83299"
-           x="1401.16">structural_svm_problem</tspan>
-        <tspan
-           id="tspan808"
-           y="181.83299"
-           x="1401.16">(Used to build your own</tspan>
-        <tspan
-           id="tspan810"
-           y="197.83299"
-           x="1401.16">structured precition tool!)</tspan>
-      </text>
-    </g>
-  </a>
-  <a
      xlink:href="ml.html#cca"
-     transform="matrix(1.0345233,0,0,1.0345233,-150.53989,74.867806)"
-     id="a13216">
+     id="a13216"
+     transform="matrix(1.0345233,0,0,1.0345233,-150.53989,74.867806)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g934">
