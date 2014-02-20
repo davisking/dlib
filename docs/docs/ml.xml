@@ -101,6 +101,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>structural_sequence_labeling_trainer</item> 
          <item>structural_sequence_segmentation_trainer</item> 
          <item>structural_assignment_trainer</item> 
+         <item>structural_track_association_trainer</item> 
          <item>structural_graph_labeling_trainer</item> 
          <item>svm_rank_trainer</item> 
       </section>
@@ -149,6 +150,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>cross_validate_sequence_labeler</item> 
          <item>cross_validate_sequence_segmenter</item> 
          <item>cross_validate_assignment_trainer</item> 
+         <item>cross_validate_track_association_trainer</item> 
          <item>cross_validate_graph_labeling_trainer</item> 
          <item>cross_validate_ranking_trainer</item> 
          <item>test_binary_decision_function</item> 
@@ -158,6 +160,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>test_sequence_labeler</item>
          <item>test_sequence_segmenter</item>
          <item>test_assignment_function</item>
+         <item>test_track_association_function</item>
          <item>test_graph_labeling_function</item>
          <item>test_ranking_function</item>
          <item>average_precision</item>
@@ -208,6 +211,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>sequence_labeler</item>
          <item>sequence_segmenter</item>
          <item>assignment_function</item>
+         <item>track_association_function</item>
          <item>graph_labeler</item>
       </section>
 
@@ -231,6 +235,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>is_sequence_segmentation_problem</item> 
          <item>is_graph_labeling_problem</item> 
          <item>is_assignment_problem</item> 
+         <item>is_track_association_problem</item> 
          <item>is_forced_assignment_problem</item> 
          <item>approximate_distance_function</item> 
          <item>is_learning_problem</item> 
@@ -1537,6 +1542,36 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
    <!-- ************************************************************************* -->
       
       <component>
+         <name>track_association_function</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/track_association_function_abstract.h</spec_file>
+         <description>
+                This object is a tool that helps you implement an object tracker.  So for
+                example, if you wanted to track people moving around in a video then this
+                object can help.  In particular, imagine you have a tool for detecting the
+                positions of each person in an image.  Then you can run this person
+                detector on the video and at each time step, i.e. at each frame, you get a
+                set of person detections.  However, that by itself doesn't tell you how
+                many people there are in the video and where they are moving to and from.
+                To get that information you need to figure out which detections match each
+                other from frame to frame.  This is where the track_association_function
+                comes in.  It performs the detection to track association.  It will also do
+                some of the track management tasks like creating a new track when a
+                detection doesn't match any of the existing tracks.
+
+               <p>
+                  Internally, this object is implemented using the 
+                  <a href="#assignment_function">assignment_function</a> object.  
+                In fact, it's really just a thin wrapper around assignment_function and
+                exists just to provide a more convenient interface to users doing detection
+                to track association.   
+               </p>
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>graph_labeler</name>
          <file>dlib/graph_cuts.h</file>
          <spec_file link="true">dlib/graph_cuts/graph_labeler_abstract.h</spec_file>
@@ -1821,6 +1856,19 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <description>
             This function takes a set of training data for an assignment problem
             and reports back if it could possibly be a well formed assignment problem.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>is_track_association_problem</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <description>
+            This function takes a set of training data for a track association learning problem
+            and reports back if it could possibly be a well formed track association problem.
          </description>
                                  
       </component>
@@ -2479,6 +2527,19 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
    <!-- ************************************************************************* -->
       
       <component>
+         <name>cross_validate_track_association_trainer</name>
+         <file>dlib/svm_threaded.h</file>
+         <spec_file link="true">dlib/svm/cross_validate_track_association_trainer_abstract.h</spec_file>
+         <description>
+            Performs k-fold cross validation on a user supplied track association trainer object such
+            as the <a href="#structural_track_association_trainer">structural_track_association_trainer</a>
+            and returns the fraction of detections which were correctly associated to their tracks.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>cross_validate_graph_labeling_trainer</name>
          <file>dlib/svm_threaded.h</file>
          <spec_file link="true">dlib/svm/cross_validate_graph_labeling_trainer_abstract.h</spec_file>
@@ -2557,6 +2618,19 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <examples>
             <example>assignment_learning_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>test_track_association_function</name>
+         <file>dlib/svm_threaded.h</file>
+         <spec_file link="true">dlib/svm/cross_validate_track_association_trainer_abstract.h</spec_file>
+         <description>
+            Tests a <a href="#track_association_function">track_association_function</a> on a set of data 
+            and returns the fraction of detections which were correctly associated to their tracks.
+         </description>
                                  
       </component>
       
@@ -2937,6 +3011,20 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             <example>assignment_learning_ex.cpp.html</example>
          </examples>
                                  
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>structural_track_association_trainer</name>
+         <file>dlib/svm_threaded.h</file>
+         <spec_file link="true">dlib/svm/structural_track_association_trainer_abstract.h</spec_file>
+         <description>
+                This object is a tool for learning to solve a track association problem.  That
+                is, it takes in a set of training data and outputs a 
+                <a href="#track_association_function">track_association_function</a>
+                you can use to do detection to track association.  
+         </description>
       </component>
       
    <!-- ************************************************************************* -->

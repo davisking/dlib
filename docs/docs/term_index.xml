@@ -79,18 +79,25 @@
 
          <term file="ml.html" name="is_forced_assignment_problem"          include="dlib/svm.h"/>
          <term file="ml.html" name="is_assignment_problem"                 include="dlib/svm.h"/>
+         <term file="ml.html" name="is_track_association_problem"          include="dlib/svm.h"/>
          <term file="ml.html" name="is_graph_labeling_problem"             include="dlib/svm_threaded.h"/>
          <term file="dlib/svm/structural_svm_graph_labeling_problem_abstract.h.html" name="sizes_match"  include="dlib/svm_threaded.h"/>
          <term file="dlib/svm/structural_svm_graph_labeling_problem_abstract.h.html" name="all_values_are_nonnegative"  include="dlib/svm_threaded.h"/>
          <term file="ml.html" name="assignment_function"                   include="dlib/svm.h"/>
+         <term file="ml.html" name="track_association_function"            include="dlib/svm.h"/>
+         <term file="dlib/svm/track_association_function_abstract.h.html" name="feature_extractor_track_association"
+               include="dlib/svm.h"/>
          <term file="ml.html" name="graph_labeler"                         include="dlib/graph_cuts.h"/>
          <term file="ml.html" name="test_assignment_function"              include="dlib/svm.h"/>
+         <term file="ml.html" name="test_track_association_function"       include="dlib/svm_threaded.h"/>
          <term file="ml.html" name="test_graph_labeling_function"          include="dlib/svm_threaded.h"/>
          <term file="ml.html" name="cross_validate_assignment_trainer"     include="dlib/svm.h"/>
+         <term file="ml.html" name="cross_validate_track_association_trainer"     include="dlib/svm_threaded.h"/>
          <term file="ml.html" name="cross_validate_graph_labeling_trainer" include="dlib/svm_threaded.h"/>
          <term file="ml.html" name="structural_svm_assignment_problem"     include="dlib/svm_threaded.h"/>
          <term file="ml.html" name="structural_svm_graph_labeling_problem" include="dlib/svm_threaded.h"/>
          <term file="ml.html" name="structural_assignment_trainer"         include="dlib/svm_threaded.h"/>
+         <term file="ml.html" name="structural_track_association_trainer"  include="dlib/svm_threaded.h"/>
          <term file="ml.html" name="structural_graph_labeling_trainer"     include="dlib/svm_threaded.h"/>
 
          <term file="dlib/optimization/optimization_solve_qp2_using_smo_abstract.h.html" name="invalid_nu_error"  include="dlib/optimization.h"/>
