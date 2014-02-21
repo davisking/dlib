@@ -27,9 +27,9 @@ namespace dlib
                 the example_feature_extractor defined in dlib/svm/assignment_function_abstract.h.
 
             WHAT THIS OBJECT REPRESENTS
-                This object is a tool for learning the weight vector needed to use
-                an assignment_function object.  It learns the parameter vector by 
-                formulating the problem as a structural SVM problem.  
+                This object is a tool for learning the parameters needed to use an
+                assignment_function object.  It learns the parameters by formulating the
+                problem as a structural SVM problem.  
         !*/
 
     public:
@@ -56,8 +56,8 @@ namespace dlib
                 - This object attempts to learn a mapping from the given samples to the 
                   given labels.  In particular, it attempts to learn to predict labels[i] 
                   based on samples[i].  Or in other words, this object can be used to learn 
-                  a parameter vector, w, such that an assignment_function declared as:
-                    assignment_function<feature_extractor> assigner(w,fe,force_assignment)
+                  a parameter vector and bias, w and b, such that an assignment_function declared as:
+                    assignment_function<feature_extractor> assigner(w,b,fe,force_assignment)
                   results in an assigner object which attempts to compute the following mapping:
                     labels[i] == labeler(samples[i])
                 - This object will use num_threads threads during the optimization 

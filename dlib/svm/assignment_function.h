@@ -33,13 +33,16 @@ namespace dlib
         {
             weights.set_size(fe.num_features());
             weights = 0;
+            bias = 0;
             force_assignment = false;
         }
 
         explicit assignment_function(
-            const matrix<double,0,1>& weights_
+            const matrix<double,0,1>& weights_,
+            double bias_
         ) : 
             weights(weights_),
+            bias(bias_),
             force_assignment(false)
         {
             // make sure requires clause is not broken
@@ -55,10 +58,12 @@ namespace dlib
 
         assignment_function(
             const matrix<double,0,1>& weights_,
+            double bias_,
             const feature_extractor& fe_
         ) :
             fe(fe_),
             weights(weights_),
+            bias(bias_),
             force_assignment(false)
         {
             // make sure requires clause is not broken
@@ -73,11 +78,13 @@ namespace dlib
 
         assignment_function(
             const matrix<double,0,1>& weights_,
+            double bias_,
             const feature_extractor& fe_,
             bool force_assignment_
         ) :
             fe(fe_),
             weights(weights_),
+            bias(bias_),
             force_assignment(force_assignment_)
         {
             // make sure requires clause is not broken
@@ -95,6 +102,9 @@ namespace dlib
 
         const matrix<double,0,1>& get_weights (
         ) const { return weights; }
+
+        double get_bias (
+        ) const { return bias; }
 
         bool forces_assignment (
         ) const { return force_assignment; }
@@ -130,7 +140,7 @@ namespace dlib
                     if (r < (long)lhs.size() && c < (long)rhs.size())
                     {
                         fe.get_features(lhs[r], rhs[c], feats);
-                        cost(r,c) = dot(weights, feats);
+                        cost(r,c) = dot(weights, feats) + bias;
                     }
                     else
                     {
@@ -188,6 +198,7 @@ namespace dlib
 
         feature_extractor fe;
         matrix<double,0,1> weights;
+        double bias;
         bool force_assignment;
     };
 
@@ -201,8 +212,11 @@ namespace dlib
         std::ostream& out
     )
     {
+        int version = 2;
+        serialize(version, out);
         serialize(item.get_feature_extractor(), out);
         serialize(item.get_weights(), out);
+        serialize(item.get_bias(), out);
         serialize(item.forces_assignment(), out);
     }
 
@@ -218,13 +232,19 @@ namespace dlib
     {
         feature_extractor fe;
         matrix<double,0,1> weights;
+        double bias;
         bool force_assignment;
+        int version = 0;
+        deserialize(version, in);
+        if (version != 2)
+            throw serialization_error("Unexpected version found while deserializing dlib::assignment_function.");
 
         deserialize(fe, in);
         deserialize(weights, in);
+        deserialize(bias, in);
         deserialize(force_assignment, in);
 
-        item = assignment_function<feature_extractor>(weights, fe, force_assignment);
+        item = assignment_function<feature_extractor>(weights, bias, fe, force_assignment);
     }
 
 // ----------------------------------------------------------------------------------------

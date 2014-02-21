@@ -14,16 +14,41 @@
 
 namespace dlib
 {
+    template <long n, typename T>
+    struct column_matrix_static_resize
+    {
+        typedef T type;
+    };
+
+    template <long n, typename T, long NR, long NC, typename MM, typename L>
+    struct column_matrix_static_resize<n, matrix<T,NR,NC,MM,L> >
+    {
+        typedef matrix<T,NR+n,NC,MM,L> type;
+    };
+
+    template <long n, typename T, long NC, typename MM, typename L>
+    struct column_matrix_static_resize<n, matrix<T,0,NC,MM,L> >
+    {
+        typedef matrix<T,0,NC,MM,L> type;
+    };
+
+    template <typename T>
+    struct add_one_to_static_feat_size
+    {
+        typedef typename column_matrix_static_resize<1,typename T::feature_vector_type>::type type;
+    };
+
+// ----------------------------------------------------------------------------------------
 
     template <
         typename feature_extractor
         >
     class structural_svm_assignment_problem : noncopyable,
-        public structural_svm_problem_threaded<matrix<double,0,1>, typename feature_extractor::feature_vector_type >
+        public structural_svm_problem_threaded<matrix<double,0,1>, typename add_one_to_static_feat_size<feature_extractor>::type >
     {
     public:
         typedef matrix<double,0,1> matrix_type;
-        typedef typename feature_extractor::feature_vector_type feature_vector_type;
+        typedef typename add_one_to_static_feat_size<feature_extractor>::type feature_vector_type;
 
         typedef typename feature_extractor::lhs_element lhs_element;
         typedef typename feature_extractor::rhs_element rhs_element;
@@ -77,7 +102,7 @@ namespace dlib
         virtual long get_num_dimensions (
         ) const 
         {
-            return fe.num_features();
+            return fe.num_features()+1; // +1 for the bias term
         }
 
         virtual long get_num_samples (
@@ -94,14 +119,15 @@ namespace dlib
         ) const 
         {
             typename feature_extractor::feature_vector_type feats;
-            psi.set_size(fe.num_features());
+            psi.set_size(get_num_dimensions());
             psi = 0;
             for (unsigned long i = 0; i < sample.first.size(); ++i)
             {
                 if (label[i] != -1)
                 {
                     fe.get_features(sample.first[i], sample.second[label[i]], feats);
-                    psi += feats;
+                    set_rowm(psi,range(0,feats.size()-1)) += feats;
+                    psi(get_num_dimensions()-1) += 1;
                 }
             }
         }
@@ -123,15 +149,18 @@ namespace dlib
         ) const 
         {
             psi.clear();
-            typename feature_extractor::feature_vector_type feats;
+            feature_vector_type feats;
+            int num_assignments = 0;
             for (unsigned long i = 0; i < sample.first.size(); ++i)
             {
                 if (label[i] != -1)
                 {
                     fe.get_features(sample.first[i], sample.second[label[i]], feats);
                     append_to_sparse_vect(psi, feats);
+                    ++num_assignments;
                 }
             }
+            psi.push_back(std::make_pair(get_num_dimensions()-1,num_assignments));
         }
 
         virtual void get_truth_joint_feature_vector (
@@ -176,7 +205,8 @@ namespace dlib
                         if (c < (long)samples[idx].second.size())
                         {
                             fe.get_features(samples[idx].first[r], samples[idx].second[c], feats);
-                            cost(r,c) = dot(current_solution, feats);
+                            const double bias = current_solution(current_solution.size()-1);
+                            cost(r,c) = dot(colm(current_solution,0,current_solution.size()-1), feats) + bias;
 
                             // add in the loss since this corresponds to an incorrect prediction.
                             if (c != labels[idx][r])

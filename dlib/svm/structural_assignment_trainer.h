@@ -184,9 +184,13 @@ namespace dlib
 
             matrix<double,0,1> weights; 
 
-            solver(prob, weights, num_nonnegative_weights(fe));
+            // Take the min here because we want to prevent the user from accidentally
+            // forcing the bias term to be non-negative.
+            const unsigned long num_nonneg = std::min(fe.num_features(),num_nonnegative_weights(fe));
+            solver(prob, weights, num_nonneg);
 
-            return assignment_function<feature_extractor>(weights,fe,force_assignment);
+            const double bias = weights(weights.size()-1);
+            return assignment_function<feature_extractor>(colm(weights,0,weights.size()-1), bias,fe,force_assignment);
 
         }
 

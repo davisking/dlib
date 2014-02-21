@@ -29,9 +29,9 @@ namespace dlib
                 case it is excluded from the sum.    
 
                 Finally, match_score() is defined as: 
-                    match_score(l,r) == dot(w, PSI(l,r))
-                where l is an element of LHS, r is an element of RHS, and
-                w is a parameter vector.
+                    match_score(l,r) == dot(w, PSI(l,r)) + bias
+                where l is an element of LHS, r is an element of RHS, w is a parameter
+                vector and bias is a scalar valued parameter.
 
                 Therefore, a feature extractor defines how the PSI() feature vector 
                 is calculated.  In particular, PSI() is defined by the get_features()
@@ -140,9 +140,10 @@ namespace dlib
                 case it is excluded from the sum.    
 
                 Finally, this object supports match_score() functions of the form: 
-                    match_score(l,r) == dot(w, PSI(l,r))
-                where l is an element of LHS, r is an element of RHS, w is a parameter 
-                vector, and PSI() is defined by the feature_extractor template argument.  
+                    match_score(l,r) == dot(w, PSI(l,r)) + bias
+                where l is an element of LHS, r is an element of RHS, w is a parameter
+                vector, bias is a scalar valued parameter, and PSI() is defined by the
+                feature_extractor template argument.  
 
             THREAD SAFETY
                 It is always safe to use distinct instances of this object in different
@@ -170,11 +171,13 @@ namespace dlib
                   (i.e. it will have its default value)
                 - #get_weights().size() == #get_feature_extractor().num_features()
                 - #get_weights() == 0
+                - #get_bias() == 0
                 - #forces_assignment() == false 
         !*/
 
         explicit assignment_function(
-            const matrix<double,0,1>& weights
+            const matrix<double,0,1>& weights,
+            double bias
         );
         /*!
             requires
@@ -183,11 +186,13 @@ namespace dlib
                 - #get_feature_extractor() == feature_extractor() 
                   (i.e. it will have its default value)
                 - #get_weights() == weights
+                - #get_bias() == bias
                 - #forces_assignment() == false 
         !*/
 
         assignment_function(
             const matrix<double,0,1>& weights,
+            double bias,
             const feature_extractor& fe
         );
         /*!
@@ -196,11 +201,13 @@ namespace dlib
             ensures
                 - #get_feature_extractor() == fe
                 - #get_weights() == weights
+                - #get_bias() == bias
                 - #forces_assignment() == false 
         !*/
 
         assignment_function(
             const matrix<double,0,1>& weights,
+            double bias,
             const feature_extractor& fe,
             bool force_assignment
         );
@@ -210,6 +217,7 @@ namespace dlib
             ensures
                 - #get_feature_extractor() == fe
                 - #get_weights() == weights
+                - #get_bias() == bias
                 - #forces_assignment() == force_assignment
         !*/
 
@@ -226,6 +234,13 @@ namespace dlib
             ensures
                 - returns the parameter vector (w) associated with this assignment function. 
                   The length of the vector is get_feature_extractor().num_features().  
+        !*/
+
+        double get_bias (
+        ) const;
+        /*!
+            ensures
+                - returns the bias parameter associated with this assignment function.
         !*/
 
         bool forces_assignment (

@@ -29,14 +29,14 @@ namespace
 
     struct feature_extractor_dense
     {
-        typedef matrix<double,4,1> feature_vector_type;
+        typedef matrix<double,3,1> feature_vector_type;
 
         typedef ::lhs_element lhs_element;
         typedef ::rhs_element rhs_element;
 
         unsigned long num_features() const
         {
-            return 4;
+            return 3;
         }
 
         void get_features (
@@ -45,7 +45,7 @@ namespace
             feature_vector_type& feats
         ) const
         {
-            feats = join_cols(squared(left - right), ones_matrix<double>(1,1));
+            feats = squared(left - right);
         }
 
     };
@@ -64,7 +64,7 @@ namespace
 
         unsigned long num_features() const
         {
-            return 4;
+            return 3;
         }
 
         void get_features (
@@ -77,7 +77,6 @@ namespace
             feats.push_back(make_pair(0,squared(left-right)(0)));
             feats.push_back(make_pair(1,squared(left-right)(1)));
             feats.push_back(make_pair(2,squared(left-right)(2)));
-            feats.push_back(make_pair(3,1.0));
         }
 
     };
