@@ -26,7 +26,7 @@ namespace dlib
         // Each detection object should be designed to work with a specific track object.
         // This typedef lets us determine which track type is meant for use with this
         // detection object.
-        typedef struct example_track track_type;
+        typedef class example_track track_type;
 
     };
 
