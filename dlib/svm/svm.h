@@ -310,11 +310,25 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename detection_type_,
+        typename label_type_ = long
+        >
+    struct labeled_detection
+    {
+        typedef detection_type_ detection_type;
+        typedef label_type_ label_type;
+        detection_type det;
+        label_type label;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename detection_type, 
-        typename detection_id_type 
+        typename label_type 
         >
     bool is_track_association_problem (
-        const std::vector<std::vector<std::pair<detection_type,detection_id_type> > >& samples
+        const std::vector<std::vector<labeled_detection<detection_type,label_type> > >& samples
     )
     {
         if (samples.size() == 0)
@@ -329,12 +343,12 @@ namespace dlib
         if (num_nonzero_elements < 2)
             return false;
 
-        // now make sure the detection_id_type values are unique within each time step.
+        // now make sure the label_type values are unique within each time step.
         for (unsigned long i = 0; i < samples.size(); ++i)
         {
-            std::set<detection_id_type> vals;
+            std::set<label_type> vals;
             for (unsigned long j = 0; j < samples[i].size(); ++j)
-                vals.insert(samples[i][j].second);
+                vals.insert(samples[i][j].label);
             if (vals.size() != samples[i].size())
                 return false;
         }
@@ -347,10 +361,10 @@ namespace dlib
 
     template <
         typename detection_type, 
-        typename detection_id_type 
+        typename label_type 
         >
     bool is_track_association_problem (
-        const std::vector<std::vector<std::vector<std::pair<detection_type,detection_id_type> > > >& samples
+        const std::vector<std::vector<std::vector<labeled_detection<detection_type,label_type> > > >& samples
     )
     {
         for (unsigned long i = 0; i < samples.size(); ++i)

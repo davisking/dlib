@@ -14,11 +14,11 @@ namespace dlib
     template <
         typename track_association_function,
         typename detection_type,
-        typename detection_id_type
+        typename label_type
         >
     double test_track_association_function (
         const track_association_function& assoc,
-        const std::vector<std::vector<std::vector<std::pair<detection_type,detection_id_type> > > >& samples
+        const std::vector<std::vector<std::vector<labeled_detection<detection_type,label_type> > > >& samples
     );
     /*!
         requires
@@ -38,11 +38,11 @@ namespace dlib
     template <
         typename trainer_type,
         typename detection_type,
-        typename detection_id_type
+        typename label_type
         >
     double cross_validate_track_association_trainer (
         const trainer_type& trainer,
-        const std::vector<std::vector<std::vector<std::pair<detection_type,detection_id_type> > > >& samples,
+        const std::vector<std::vector<std::vector<labeled_detection<detection_type,label_type> > > >& samples,
         const long folds
     );
     /*!

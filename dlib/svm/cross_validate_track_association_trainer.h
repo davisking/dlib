@@ -15,11 +15,11 @@ namespace dlib
         template <
             typename track_association_function,
             typename detection_type,
-            typename detection_id_type
+            typename label_type
             >
         void test_track_association_function (
             const track_association_function& assoc,
-            const std::vector<std::vector<std::pair<detection_type,detection_id_type> > >& samples,
+            const std::vector<std::vector<labeled_detection<detection_type,label_type> > >& samples,
             unsigned long& total_dets,
             unsigned long& correctly_associated_dets
         )
@@ -30,7 +30,7 @@ namespace dlib
             using namespace impl;
 
             std::vector<track_type> tracks;
-            std::map<detection_id_type,unsigned long> track_idx; // tracks[track_idx[id]] == track with ID id.
+            std::map<label_type,unsigned long> track_idx; // tracks[track_idx[id]] == track with ID id.
 
             for (unsigned long j = 0; j < samples.size(); ++j)
             {
@@ -38,32 +38,32 @@ namespace dlib
                 std::vector<long> assignments = f(get_unlabeled_dets(samples[j]), tracks);
                 std::vector<bool> updated_track(tracks.size(), false);
                 // now update all the tracks with the detections that associated to them.
-                const std::vector<std::pair<detection_type,detection_id_type> >& dets = samples[j];
+                const std::vector<labeled_detection<detection_type,label_type> >& dets = samples[j];
                 for (unsigned long k = 0; k < assignments.size(); ++k)
                 {
                     // If the detection is associated to tracks[assignments[k]]
                     if (assignments[k] != -1)
                     {
-                        tracks[assignments[k]].update_track(dets[k].first);
+                        tracks[assignments[k]].update_track(dets[k].det);
                         updated_track[assignments[k]] = true;
 
                         // if this detection was supposed to go to this track
-                        if (track_idx.count(dets[k].second) && track_idx[dets[k].second]==assignments[k])
+                        if (track_idx.count(dets[k].label) && track_idx[dets[k].label]==assignments[k])
                             ++correctly_associated_dets;
 
-                        track_idx[dets[k].second] = assignments[k];
+                        track_idx[dets[k].label] = assignments[k];
                     }
                     else
                     {
                         track_type new_track;
-                        new_track.update_track(dets[k].first);
+                        new_track.update_track(dets[k].det);
                         tracks.push_back(new_track);
 
                         // if this detection was supposed to go to a new track
-                        if (track_idx.count(dets[k].second) == 0)
+                        if (track_idx.count(dets[k].label) == 0)
                             ++correctly_associated_dets;
 
-                        track_idx[dets[k].second] = tracks.size()-1;
+                        track_idx[dets[k].label] = tracks.size()-1;
                     }
                 }
 
@@ -82,11 +82,11 @@ namespace dlib
     template <
         typename track_association_function,
         typename detection_type,
-        typename detection_id_type
+        typename label_type
         >
     double test_track_association_function (
         const track_association_function& assoc,
-        const std::vector<std::vector<std::vector<std::pair<detection_type,detection_id_type> > > >& samples
+        const std::vector<std::vector<std::vector<labeled_detection<detection_type,label_type> > > >& samples
     )
     {
         unsigned long total_dets = 0;
@@ -105,18 +105,18 @@ namespace dlib
     template <
         typename trainer_type,
         typename detection_type,
-        typename detection_id_type
+        typename label_type
         >
     double cross_validate_track_association_trainer (
         const trainer_type& trainer,
-        const std::vector<std::vector<std::vector<std::pair<detection_type,detection_id_type> > > >& samples,
+        const std::vector<std::vector<std::vector<labeled_detection<detection_type,label_type> > > >& samples,
         const long folds
     )
     {
         const long num_in_test  = samples.size()/folds;
         const long num_in_train = samples.size() - num_in_test;
 
-        std::vector<std::vector<std::vector<std::pair<detection_type,detection_id_type> > > > samples_train;
+        std::vector<std::vector<std::vector<labeled_detection<detection_type,label_type> > > > samples_train;
 
         long next_test_idx = 0;
         unsigned long total_dets = 0;

@@ -11,45 +11,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename detection_type_,
-        typename detection_id_type_ = unsigned long 
-        >
     class structural_track_association_trainer
     {
         /*!
-            REQUIREMENTS ON detection_type_
-                It must be an object that implements an interface compatible with the
-                example_detection defined in dlib/svm/track_association_function_abstract.h.  
-
-            REQUIREMENTS ON detection_id_type_
-                This can be any type that can be used as the key in a std::map.  e.g.
-                unsigned long, std::string, etc.
-            
             WHAT THIS OBJECT REPRESENTS
-                This object is a tool for learning to solve a track association problem.  That
-                is, it takes in a set of training data and outputs a track_association_function
+                This object is a tool for learning to solve a track association problem.  That 
+                is, it takes in a set of training data and outputs a track_association_function 
                 you can use to do detection to track association.  The training data takes the
                 form of a set or sets of "track histories".  Each track history is a
                 std::vector where each element contains all the detections from a single time
-                step.  Moreover, each detection is labeled with a detection_id_type_ that
-                uniquely identifies which object (e.g. person or whatever) the detection really
-                corresponds to.  That is, the detection_id_type_ values indicate the correct
-                detection to track associations.  The goal of this object is then to produce a
-                track_association_function that can perform a correct detection to track
-                association at each time step.
-
+                step.  Moreover, each detection has a label that uniquely identifies which
+                object (e.g. person or whatever) the detection really corresponds to.  That is,
+                the labels indicate the correct detection to track associations.  The goal of
+                this object is then to produce a track_association_function that can perform a
+                correct detection to track association at each time step.
         !*/
 
     public:
-        typedef detection_type_ detection_type;
-        typedef typename detection_type::track_type track_type;
-        typedef detection_id_type_ detection_id_type;
-        typedef std::pair<detection_type, detection_id_type> labeled_detection;
-        typedef std::vector<labeled_detection> detections_at_single_time_step;
-        typedef std::vector<detections_at_single_time_step> track_history;
-
-        typedef track_association_function<detection_type> trained_function_type;
 
         structural_track_association_trainer (
         );  
@@ -192,15 +170,21 @@ namespace dlib
                 - #learns_nonnegative_weights() == value
         !*/
 
+        template <
+            typename detection_type,
+            typename label_type
+            >
         const track_association_function<detection_type> train (  
-            const track_history& sample
+            const std::vector<std::vector<labeled_detection<detection_type,label_type> > >& sample
         ) const;
         /*!
             requires
-                - is_track_association_problem(samples) == true
+                - is_track_association_problem(sample) == true
             ensures
                 - This function attempts to learn to do track association from the given
-                  training data.
+                  training data.  Note that we interpret sample as a single track history such
+                  that sample[0] are all detections from the first time step, then sample[1]
+                  are detections from the second time step, and so on.  
                 - returns a function F such that:
                     - Executing F(tracks, detections) will try to correctly associate the
                       contents of detections to the contents of tracks and perform track
@@ -209,8 +193,12 @@ namespace dlib
                         - min(F.get_assignment_function().get_weights()) >= 0
         !*/
 
+        template <
+            typename detection_type,
+            typename label_type
+            >
         const track_association_function<detection_type> train (  
-            const std::vector<track_history>& samples
+            const std::vector<std::vector<std::vector<labeled_detection<detection_type,label_type> > > >& sample
         ) const;
         /*!
             requires

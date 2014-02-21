@@ -165,11 +165,35 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename detection_type_,
+        typename label_type_ = long
+        >
+    struct labeled_detection
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple object, like std::pair, it just holds two objects.  It
+                serves the same purpose as std::pair except that it has informative names
+                describing its two members and is intended for use with track association
+                problems.
+        !*/
+
+        typedef detection_type_ detection_type;
+        typedef label_type_ label_type;
+
+        detection_type det;
+        label_type label;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+
+    template <
         typename detection_type, 
-        typename detection_id_type 
+        typename label_type 
         >
     bool is_track_association_problem (
-        const std::vector<std::vector<std::pair<detection_type,detection_id_type> > >& samples
+        const std::vector<std::vector<labeled_detection<detection_type,label_type> > >& samples
     );
     /*!
         ensures
@@ -185,8 +209,8 @@ namespace dlib
                     - samples[i] is a set of labeled detections from the i-th time step.
                       Each detection has been labeled with its "true object identity".
                       That is, all the detection throughout the history with the same
-                      detection_id_type value are detections from the same object and
-                      therefore should be associated to the same track.
+                      label_type value are detections from the same object and therefore
+                      should be associated to the same track.
               Putting this all together, samples is a valid track association learning
               problem if and only if the following are all true:
                 - samples.size() > 0
@@ -198,18 +222,18 @@ namespace dlib
                   or it is impossible to learn anything.
                 - for all valid i:
                     - for all valid j and k where j!=k:
-                        - samples[i][j].second != samples[i][k].second
-                          (i.e. the detection_id_type values must be unique within each
-                          time step.  Or in other words, you can't have two detections on
-                          the same object in a single time step.)
+                        - samples[i][j].label != samples[i][k].label
+                          (i.e. the label_type values must be unique within each time step.
+                          Or in other words, you can't have two detections on the same
+                          object in a single time step.)
     !*/
 
     template <
         typename detection_type, 
-        typename detection_id_type 
+        typename label_type 
         >
     bool is_track_association_problem (
-        const std::vector<std::vector<std::vector<std::pair<detection_type,detection_id_type> > > >& samples
+        const std::vector<std::vector<std::vector<labeled_detection<detection_type,label_type> > > >& samples
     );
     /*!
         ensures

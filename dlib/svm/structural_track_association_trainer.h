@@ -20,16 +20,16 @@ namespace dlib
     {
         template <
             typename detection_type,
-            typename detection_id_type
+            typename label_type
             >
         std::vector<detection_type> get_unlabeled_dets (
-            const std::vector<std::pair<detection_type,detection_id_type> >& dets
+            const std::vector<labeled_detection<detection_type,label_type> >& dets
         )
         {
             std::vector<detection_type> temp;
             temp.reserve(dets.size());
             for (unsigned long i = 0; i < dets.size(); ++i)
-                temp.push_back(dets[i].first);
+                temp.push_back(dets[i].det);
             return temp;
         }
 
@@ -37,21 +37,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename detection_type_,
-        typename detection_id_type_ = unsigned long 
-        >
     class structural_track_association_trainer
     {
     public:
-        typedef detection_type_ detection_type;
-        typedef typename detection_type::track_type track_type;
-        typedef detection_id_type_ detection_id_type;
-        typedef std::pair<detection_type, detection_id_type> labeled_detection;
-        typedef std::vector<labeled_detection> detections_at_single_time_step;
-        typedef std::vector<detections_at_single_time_step> track_history;
-
-        typedef track_association_function<detection_type> trained_function_type;
 
         structural_track_association_trainer (
         )  
@@ -159,8 +147,12 @@ namespace dlib
             learn_nonnegative_weights = value;
         }
 
+        template <
+            typename detection_type,
+            typename label_type
+            >
         const track_association_function<detection_type> train (  
-            const std::vector<track_history>& samples
+            const std::vector<std::vector<std::vector<labeled_detection<detection_type,label_type> > > >& samples
         ) const
         {
             // make sure requires clause is not broken
@@ -170,6 +162,7 @@ namespace dlib
                         << "\n\t is_track_association_problem(samples): " << is_track_association_problem(samples)
             );
 
+            typedef typename detection_type::track_type track_type;
 
             const unsigned long num_dims = find_num_dims(samples);
 
@@ -195,21 +188,30 @@ namespace dlib
             return track_association_function<detection_type>(trainer.train(assignment_samples, labels));
         }
 
+        template <
+            typename detection_type,
+            typename label_type
+            >
         const track_association_function<detection_type> train (  
-            const track_history& sample
+            const std::vector<std::vector<labeled_detection<detection_type,label_type> > >& sample
         ) const
         {
-            std::vector<track_history> samples;
+            std::vector<std::vector<std::vector<labeled_detection<detection_type,label_type> > > > samples;
             samples.push_back(sample);
             return train(samples);
         }
 
     private:
 
+        template <
+            typename detection_type,
+            typename label_type
+            >
         static unsigned long find_num_dims (
-            const std::vector<track_history>& samples
+            const std::vector<std::vector<std::vector<labeled_detection<detection_type,label_type> > > >& samples
         )
         {
+            typedef typename detection_type::track_type track_type;
             // find a detection_type object so we can call get_similarity_features() and
             // find out how big the feature vectors are.
 
@@ -222,9 +224,9 @@ namespace dlib
                     if (samples[i][j].size() > 0)
                     {
                         track_type new_track;
-                        new_track.update_track(samples[i][j][0].first);
+                        new_track.update_track(samples[i][j][0].det);
                         typename track_type::feature_vector_type feats;
-                        new_track.get_similarity_features(samples[i][j][0].first, feats);
+                        new_track.get_similarity_features(samples[i][j][0].det, feats);
                         return feats.size();
                     }
                 }
@@ -234,6 +236,11 @@ namespace dlib
                 "No detection objects were given in the call to dlib::structural_track_association_trainer::train()");
         }
 
+        template <
+            typename detections_at_single_time_step,
+            typename detection_type,
+            typename track_type
+            >
         static void convert_dets_to_association_sets (
             const std::vector<detections_at_single_time_step>& det_history,
             std::vector<std::pair<std::vector<detection_type>, std::vector<track_type> > >& data,
@@ -243,10 +250,11 @@ namespace dlib
             if (det_history.size() < 1)
                 return;
 
+            typedef typename detections_at_single_time_step::value_type::label_type label_type;
             std::vector<track_type> tracks;
             // track_labels maps from detection labels to the index in tracks.  So track
             // with detection label X is at tracks[track_labels[X]].
-            std::map<detection_id_type,unsigned long> track_labels;
+            std::map<label_type,unsigned long> track_labels;
             add_dets_to_tracks(tracks, track_labels, det_history[0]);
 
             using namespace impl;
@@ -258,17 +266,21 @@ namespace dlib
             }
         }
 
+        template <
+            typename labeled_detection,
+            typename label_type
+            >
         static std::vector<long> get_association_labels(
             const std::vector<labeled_detection>& dets,
-            const std::map<detection_id_type,unsigned long>& track_labels
+            const std::map<label_type,unsigned long>& track_labels
         )
         {
             std::vector<long> assoc(dets.size(),-1);
             // find out which detections associate to what tracks
             for (unsigned long i = 0; i < dets.size(); ++i)
             {
-                typename std::map<detection_id_type,unsigned long>::const_iterator j;
-                j = track_labels.find(dets[i].second);
+                typename std::map<label_type,unsigned long>::const_iterator j;
+                j = track_labels.find(dets[i].label);
                 // If this detection matches one of the tracks then record which track it
                 // matched with.
                 if (j != track_labels.end())
@@ -277,9 +289,14 @@ namespace dlib
             return assoc;
         }
 
+        template <
+            typename track_type,
+            typename label_type,
+            typename labeled_detection
+            >
         static void add_dets_to_tracks (
             std::vector<track_type>& tracks,
-            std::map<detection_id_type,unsigned long>& track_labels,
+            std::map<label_type,unsigned long>& track_labels,
             const std::vector<labeled_detection>& dets
         )
         {
@@ -288,18 +305,18 @@ namespace dlib
             // first assign the dets to the tracks
             for (unsigned long i = 0; i < dets.size(); ++i)
             {
-                const detection_id_type& label = dets[i].second;
+                const label_type& label = dets[i].label;
                 if (track_labels.count(label))
                 {
                     const unsigned long track_idx = track_labels[label];
-                    tracks[track_idx].update_track(dets[i].first);
+                    tracks[track_idx].update_track(dets[i].det);
                     updated_track[track_idx] = true;
                 }
                 else
                 {
                     // this detection creates a new track
                     track_type new_track;
-                    new_track.update_track(dets[i].first);
+                    new_track.update_track(dets[i].det);
                     tracks.push_back(new_track);
                     track_labels[label] = tracks.size()-1;
                 }
