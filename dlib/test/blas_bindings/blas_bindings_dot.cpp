@@ -147,7 +147,15 @@ namespace
             DLIB_TEST(counter_dot() == 1);
 
             counter_dot() = 0;
+            val = dot(rv,colm(cv,0));
+            DLIB_TEST(counter_dot() == 1);
+
+            counter_dot() = 0;
             val = dot(cv,cv);
+            DLIB_TEST(counter_dot() == 1);
+
+            counter_dot() = 0;
+            val = dot(colm(cv,0,cv.size()),colm(cv,0));
             DLIB_TEST(counter_dot() == 1);
 
             counter_dot() = 0;
