@@ -343,7 +343,7 @@ namespace dlib
         {
             C = 100;
             verbose = false;
-            eps = 0.01;
+            eps = 0.001;
             num_threads = 2;
             max_cache_size = 5;
             learn_nonnegative_weights = false;

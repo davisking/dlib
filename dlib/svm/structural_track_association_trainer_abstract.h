@@ -35,7 +35,7 @@ namespace dlib
             ensures
                 - #get_c() == 100
                 - this object isn't verbose
-                - #get_epsilon() == 0.01
+                - #get_epsilon() == 0.001
                 - #get_num_threads() == 2
                 - #get_max_cache_size() == 5
                 - #learns_nonnegative_weights() == false
