@@ -155,6 +155,10 @@
             <name>Examples: C++</name>
             <sub>
                <item>
+                  <name>Learning_to_Track</name>
+                  <link>learning_to_track_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Structural_Support_Vector_Machines</name>
                   <link>svm_struct_ex.cpp.html</link>
                </item>
