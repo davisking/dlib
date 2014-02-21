@@ -134,7 +134,7 @@ namespace dlib
                 next = (next + 1)%samples.size();
             }
 
-            const typename trainer_type::trained_function_type& df = trainer.train(samples_train);
+            const track_association_function<detection_type>& df = trainer.train(samples_train);
             for (long cnt = 0; cnt < num_in_test; ++cnt)
             {
                 impl::test_track_association_function(df, samples[next_test_idx], total_dets, correctly_associated_dets);
