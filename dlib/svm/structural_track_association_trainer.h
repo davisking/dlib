@@ -222,6 +222,7 @@ namespace dlib
                     if (samples[i][j].size() > 0)
                     {
                         track_type new_track;
+                        new_track.update_track(samples[i][j][0].first);
                         typename track_type::feature_vector_type feats;
                         new_track.get_similarity_features(samples[i][j][0].first, feats);
                         return feats.size();

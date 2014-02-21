@@ -58,6 +58,8 @@ namespace dlib
             feature_vector_type& feats
         ) const;
         /*!
+            requires
+                - update_track() has been called on this track at least once.
             ensures
                 - #feats == A feature vector that contains information describing how
                   likely it is that det is a detection from the object corresponding to
