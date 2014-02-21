@@ -22,6 +22,10 @@
     function which is optimal, in a certain sense, for use with the Hungarian 
     algorithm.  To do this, we will make a simple dataset of example associations 
     and use them to train a supervised machine learning method. 
+
+    Finally, note that there is a whole example program dedicated to assignment learning
+    problems where you are trying to make an object tracker.  So if that is what you are
+    interested in then read the learning_to_track_ex.cpp example program.
 */
 
 
