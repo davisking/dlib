@@ -87,6 +87,7 @@
          <term file="ml.html" name="track_association_function"            include="dlib/svm.h"/>
          <term file="dlib/svm/track_association_function_abstract.h.html" name="feature_extractor_track_association"
                include="dlib/svm.h"/>
+         <term file="dlib/svm/svm_abstract.h.html" name="labeled_detection" include="dlib/svm.h"/>
          <term file="ml.html" name="graph_labeler"                         include="dlib/graph_cuts.h"/>
          <term file="ml.html" name="test_assignment_function"              include="dlib/svm.h"/>
          <term file="ml.html" name="test_track_association_function"       include="dlib/svm_threaded.h"/>
