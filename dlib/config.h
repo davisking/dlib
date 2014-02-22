@@ -10,3 +10,12 @@
 //#define ENABLE_ASSERTS       // asserts always enabled 
 //#define DLIB_DISABLE_ASSERTS // asserts always disabled 
 
+
+
+// You should also consider telling dlib to link against libjpeg, libpng, fftw, and a BLAS
+// and LAPACK library.  To do this you need to uncomment the following #defines.
+// #define DLIB_JPEG_SUPPORT
+// #define DLIB_PNG_SUPPORT
+// #define DLIB_USE_FFTW
+// #define DLIB_USE_BLAS
+// #define DLIB_USE_LAPACK
