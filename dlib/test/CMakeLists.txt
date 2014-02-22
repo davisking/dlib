@@ -64,6 +64,7 @@ set (tests
    kcentroid.cpp
    kernel_matrix.cpp
    kmeans.cpp
+   learning_to_track.cpp
    least_squares.cpp
    linear_manifold_regularizer.cpp
    lz77_buffer.cpp
