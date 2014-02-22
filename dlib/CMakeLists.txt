@@ -379,6 +379,12 @@ if (NOT TARGET dlib)
       remove_global_define(DLIB_JPEG_SUPPORT)
    endif()
 
+   if (DLIB_LINK_WITH_FFTW AND NOT DLIB_ISO_CPP_ONLY)
+      add_global_define(DLIB_USE_FFTW)
+   else()
+      remove_global_define(DLIB_USE_FFTW)
+   endif()
+
 
    if (DLIB_USE_BLAS AND blas_found)
       add_global_define(DLIB_USE_BLAS)
