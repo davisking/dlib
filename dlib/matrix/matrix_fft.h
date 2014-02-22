@@ -223,7 +223,7 @@ namespace dlib
             << "\n\t data.size():     " << data.size()
             );
 
-        matrix<std::complex<double>,NR,NC,MM,L> m2(data.size());
+        matrix<std::complex<double>,NR,NC,MM,L> m2(data.nr(),data.nc());
         fftw_complex *in, *out;
         fftw_plan p;
         in = (fftw_complex*)&data(0);
@@ -247,7 +247,7 @@ namespace dlib
             << "\n\t data.size():     " << data.size()
             );
 
-        matrix<std::complex<double>,NR,NC,MM,L> m2(data.size());
+        matrix<std::complex<double>,NR,NC,MM,L> m2(data.nr(),data.nc());
         fftw_complex *in, *out;
         fftw_plan p;
         in = (fftw_complex*)&data(0);
