@@ -25,7 +25,7 @@
 import dlib
 
 
-# Now lets make some testing data.  To make it really simple, lets suppose that
+# Now let's make some testing data.  To make it really simple, let's suppose that
 # we are ranking 2D vectors and that vectors with positive values in the first
 # dimension should rank higher than other vectors.  So what we do is make
 # examples of relevant (i.e. high ranking) and non-relevant (i.e. low ranking)
@@ -47,7 +47,7 @@ trainer = dlib.svm_rank_trainer()
 # selecting a "simpler" solution which might generalize better. 
 trainer.c = 10
 
-# So lets do the training.
+# So let's do the training.
 rank = trainer.train(data)
 
 # Now if you call rank on a vector it will output a ranking score.  In

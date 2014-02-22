@@ -78,7 +78,7 @@ def print_segment(sentence, names):
 
 
 
-# Now lets make some training data.  Each example is a sentence as well as a set of ranges
+# Now let's make some training data.  Each example is a sentence as well as a set of ranges
 # which indicate the locations of any names.   
 names = dlib.ranges()     # make an array of dlib.range objects.
 segments = dlib.rangess() # make an array of arrays of dlib.range objects.
@@ -159,13 +159,13 @@ params.C = 10
 model = dlib.train_sequence_segmenter(training_sequences, segments, params)
 
 
-# Lets print out the things the model thinks are names.  The output is a set of ranges
+# Let's print out the things the model thinks are names.  The output is a set of ranges
 # which are predicted to contain names.  If you run this example program you will see that
 # it gets them all correct. 
 for i in range(len(sentences)):
     print_segment(sentences[i], model(training_sequences[i]))
 
-# Lets also try segmenting a new sentence.  This will print out "Bob Bucket".  Note that we
+# Let's also try segmenting a new sentence.  This will print out "Bob Bucket".  Note that we
 # need to remember to use the same vector representation as we used during training.
 test_sentence = "There once was a man from Nantucket whose name rhymed with Bob Bucket"
 if use_sparse_vects:
