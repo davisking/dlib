@@ -954,11 +954,8 @@ namespace dlib
         long n = t.size()-1;
         while (n > 0)
         {
-            // put a random integer into idx
-            unsigned long idx = r.get_random_32bit_number();
-
-            // make idx be less than n
-            idx %= n;
+            // pick a random index to swap into t[n]
+            const unsigned long idx = r.get_random_32bit_number()%(n+1);
 
             // swap our randomly selected index into the n position
             exchange(t(idx), t(n));
@@ -996,11 +993,8 @@ namespace dlib
         long n = t.size()-1;
         while (n > 0)
         {
-            // put a random integer into idx
-            unsigned long idx = r.get_random_32bit_number();
-
-            // make idx be less than n
-            idx %= n;
+            // pick a random index to swap into t[n]
+            const unsigned long idx = r.get_random_32bit_number()%(n+1);
 
             // swap our randomly selected index into the n position
             exchange(t[idx], t[n]);
@@ -1055,11 +1049,8 @@ namespace dlib
         long n = t.size()-1;
         while (n > 0)
         {
-            // put a random integer into idx
-            unsigned long idx = r.get_random_32bit_number();
-
-            // make idx be less than n
-            idx %= n;
+            // pick a random index to swap into t[n]
+            const unsigned long idx = r.get_random_32bit_number()%(n+1);
 
             // swap our randomly selected index into the n position
             exchange(t(idx), t(n));
@@ -1093,11 +1084,8 @@ namespace dlib
         long n = t.size()-1;
         while (n > 0)
         {
-            // put a random integer into idx
-            unsigned long idx = r.get_random_32bit_number();
-
-            // make idx be less than n
-            idx %= n;
+            // pick a random index to swap into t[n]
+            const unsigned long idx = r.get_random_32bit_number()%(n+1);
 
             // swap our randomly selected index into the n position
             exchange(t[idx], t[n]);
@@ -1144,11 +1132,8 @@ namespace dlib
         long n = t.size()-1;
         while (n > 0)
         {
-            // put a random integer into idx
-            unsigned long idx = r.get_random_32bit_number();
-
-            // make idx be less than n
-            idx %= n;
+            // pick a random index to swap into t[n]
+            const unsigned long idx = r.get_random_32bit_number()%(n+1);
 
             // swap our randomly selected index into the n position
             exchange(t(idx), t(n));
@@ -1171,11 +1156,8 @@ namespace dlib
         long n = t.size()-1;
         while (n > 0)
         {
-            // put a random integer into idx
-            unsigned long idx = r.get_random_32bit_number();
-
-            // make idx be less than n
-            idx %= n;
+            // pick a random index to swap into t[n]
+            const unsigned long idx = r.get_random_32bit_number()%(n+1);
 
             // swap our randomly selected index into the n position
             exchange(t[idx], t[n]);
