@@ -29,16 +29,25 @@ namespace dlib
             typedef typename detection_type::track_type track_type;
             using namespace impl;
 
+            dlib::rand rnd;
             std::vector<track_type> tracks;
             std::map<label_type,unsigned long> track_idx; // tracks[track_idx[id]] == track with ID id.
 
             for (unsigned long j = 0; j < samples.size(); ++j)
             {
-                total_dets += samples[j].size();
-                std::vector<long> assignments = f(get_unlabeled_dets(samples[j]), tracks);
+                std::vector<labeled_detection<detection_type,label_type> > dets = samples[j];
+                // Shuffle the order of the detections so we can be sure that there isn't
+                // anything funny going on like the detections always coming in the same
+                // order relative to their labels and the association function just gets
+                // lucky by picking the same assignment ordering every time.  So this way
+                // we know the assignment function really is doing something rather than
+                // just being lucky.
+                randomize_samples(dets, rnd);
+
+                total_dets += dets.size();
+                std::vector<long> assignments = f(get_unlabeled_dets(dets), tracks);
                 std::vector<bool> updated_track(tracks.size(), false);
                 // now update all the tracks with the detections that associated to them.
-                const std::vector<labeled_detection<detection_type,label_type> >& dets = samples[j];
                 for (unsigned long k = 0; k < assignments.size(); ++k)
                 {
                     // If the detection is associated to tracks[assignments[k]]
