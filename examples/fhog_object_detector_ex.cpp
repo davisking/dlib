@@ -128,9 +128,10 @@ int main(int argc, char** argv)
         trainer.set_num_threads(4);  
         // The trainer is a kind of support vector machine and therefore has the usual SVM
         // C parameter.  In general, a bigger C encourages it to fit the training data
-        // better but might lead to overfitting.  You find the best C value empirically by
-        // checking how well the trained detector works on a test set of images you haven't
-        // trained on.
+        // better but might lead to overfitting.  You must find the best C value
+        // empirically by checking how well the trained detector works on a test set of
+        // images you haven't trained on.  Don't just leave the value set at 1.  Try a few
+        // different C values and see what works best for your data.
         trainer.set_c(1);
         // We can tell the trainer to print it's progress to the console if we want.  
         trainer.be_verbose();
