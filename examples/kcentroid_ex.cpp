@@ -66,7 +66,7 @@ int main()
 
     running_stats<double> rs;
 
-    // Now lets output the distance from the centroid to some points that are from the sinc function.
+    // Now let's output the distance from the centroid to some points that are from the sinc function.
     // These numbers should all be similar.  We will also calculate the statistics of these numbers
     // by accumulating them into the running_stats object called rs.  This will let us easily
     // find the mean and standard deviation of the distances for use below.
@@ -80,7 +80,7 @@ int main()
     m(0) = -0.5; m(1) = sinc(m(0)); cout << "   " << test(m) << endl;  rs.add(test(m));
 
     cout << endl;
-    // Lets output the distance from the centroid to some points that are NOT from the sinc function.
+    // Let's output the distance from the centroid to some points that are NOT from the sinc function.
     // These numbers should all be significantly bigger than previous set of numbers.  We will also
     // use the rs.scale() function to find out how many standard deviations they are away from the 
     // mean of the test points from the sinc function.  So in this case our criterion for "significantly bigger"

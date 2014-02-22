@@ -354,7 +354,7 @@ void custom_matrix_expressions_example(
 
     cout << x << endl;
 
-    // Finally, lets use the matrix expressions we defined above.
+    // Finally, let's use the matrix expressions we defined above.
 
     // prints the transpose of x
     cout << example_trans(x) << endl;
@@ -382,7 +382,7 @@ void custom_matrix_expressions_example(
     vect.push_back(3);
     vect.push_back(5);
 
-    // Now lets treat our std::vector like a matrix and print some things.
+    // Now let's treat our std::vector like a matrix and print some things.
     cout << example_vector_to_matrix(vect) << endl;
     cout << add_scalar(example_vector_to_matrix(vect), 10) << endl;
 

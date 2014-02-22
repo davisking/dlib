@@ -95,7 +95,7 @@ int main()
         cout << "params: " << trans(params) << endl;
 
 
-        // Now lets generate a bunch of input/output pairs according to our model.
+        // Now let's generate a bunch of input/output pairs according to our model.
         std::vector<std::pair<input_vector, double> > data_samples;
         input_vector input;
         for (int i = 0; i < 1000; ++i)
@@ -107,7 +107,7 @@ int main()
             data_samples.push_back(make_pair(input, output));
         }
 
-        // Before we do anything, lets make sure that our derivative function defined above matches
+        // Before we do anything, let's make sure that our derivative function defined above matches
         // the approximate derivative computed using central differences (via derivative()).  
         // If this value is big then it means we probably typed the derivative function incorrectly.
         cout << "derivative error: " << length(residual_derivative(data_samples[0], params) - 
@@ -117,7 +117,7 @@ int main()
 
 
 
-        // Now lets use the solve_least_squares_lm() routine to figure out what the
+        // Now let's use the solve_least_squares_lm() routine to figure out what the
         // parameters are based on just the data_samples.
         parameter_vector x;
         x = 1;

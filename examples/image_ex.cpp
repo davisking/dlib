@@ -46,7 +46,7 @@ int main(int argc, char** argv)
         load_image(img, argv[1]);
 
 
-        // Now lets use some image functions.  First lets blur the image a little.
+        // Now let's use some image functions.  First let's blur the image a little.
         array2d<unsigned char> blurred_img;
         gaussian_blur(img, blurred_img); 
 
@@ -58,7 +58,7 @@ int main(int argc, char** argv)
         // now we do the non-maximum edge suppression step so that our edges are nice and thin
         suppress_non_maximum_edges(horz_gradient, vert_gradient, edge_image); 
 
-        // Now we would like to see what our images look like.  So lets use a 
+        // Now we would like to see what our images look like.  So let's use a 
         // window to display them on the screen.  (Note that you can zoom into 
         // the window by holding CTRL and scrolling the mouse wheel)
         image_window my_window(edge_image, "Normal Edge Image");

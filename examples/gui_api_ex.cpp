@@ -114,7 +114,7 @@ public:
         b.set_pos(10,60);
         b.set_name("button");
 
-        // lets put the label 5 pixels below the button
+        // let's put the label 5 pixels below the button
         c.set_pos(b.left(),b.bottom()+5);
 
 
@@ -137,7 +137,7 @@ public:
         // functions or lambda functions.
 
         
-        // Lets also make a simple menu bar.  
+        // Let's also make a simple menu bar.  
         // First we say how many menus we want in our menu bar.  In this example we only want 1.
         mbar.set_number_of_menus(1);
         // Now we set the name of our menu.  The 'M' means that the M in Menu will be underlined
@@ -147,12 +147,12 @@ public:
         // Now we add some items to the menu.  Note that items in a menu are listed in the
         // order in which they were added.
 
-        // First lets make a menu item that does the same thing as our button does when it is clicked.
+        // First let's make a menu item that does the same thing as our button does when it is clicked.
         // Again, the 'C' means the C in Click is underlined in the menu. 
         mbar.menu(0).add_menu_item(menu_item_text("Click Button!",*this,&win::on_button_clicked,'C'));
-        // lets add a separator (i.e. a horizontal separating line) to the menu
+        // let's add a separator (i.e. a horizontal separating line) to the menu
         mbar.menu(0).add_menu_item(menu_item_separator());
-        // Now lets make a menu item that calls show_about when the user selects it.  
+        // Now let's make a menu item that calls show_about when the user selects it.  
         mbar.menu(0).add_menu_item(menu_item_text("About",*this,&win::show_about,'A'));
 
 

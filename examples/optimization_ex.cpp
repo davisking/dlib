@@ -201,7 +201,7 @@ int main()
         cout << "rosen solution:\n" << starting_point << endl;
 
 
-        // Now lets try doing it again with a different starting point and the version
+        // Now let's try doing it again with a different starting point and the version
         // of find_min() that doesn't require you to supply a derivative function.  
         // This version will compute a numerical approximation of the derivative since 
         // we didn't supply one to it.
@@ -285,7 +285,7 @@ int main()
 
 
 
-        // Now lets look at using the test_function object with the optimization 
+        // Now let's look at using the test_function object with the optimization 
         // functions.  
         cout << "\nFind the minimum of the test_function" << endl;
 
@@ -306,7 +306,7 @@ int main()
         // At this point the correct value of (3,5,1,7) should be found and stored in starting_point
         cout << "test_function solution:\n" << starting_point << endl;
 
-        // Now lets try it again with the conjugate gradient algorithm.
+        // Now let's try it again with the conjugate gradient algorithm.
         starting_point = -4,5,99,3;
         find_min_using_approximate_derivatives(cg_search_strategy(),
                                                objective_delta_stop_strategy(1e-7),
@@ -315,7 +315,7 @@ int main()
 
 
 
-        // Finally, lets try the BOBYQA algorithm.  This is a technique specially
+        // Finally, let's try the BOBYQA algorithm.  This is a technique specially
         // designed to minimize a function in the absence of derivative information.  
         // Generally speaking, it is the method of choice if derivatives are not available.
         starting_point = -4,5,99,3;

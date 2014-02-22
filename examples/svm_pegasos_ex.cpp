@@ -67,7 +67,7 @@ int main()
 
     center = 20, 20;
 
-    // Now lets go into a loop and randomly generate 1000 samples.
+    // Now let's go into a loop and randomly generate 1000 samples.
     srand(time(0));
     for (int i = 0; i < 10000; ++i)
     {
@@ -96,7 +96,7 @@ int main()
         }
     }
 
-    // Now we have trained our SVM.  Lets see how well it did.  
+    // Now we have trained our SVM.  Let's see how well it did.  
     // Each of these statements prints out the output of the SVM given a particular sample.  
     // The SVM outputs a number > 0 if a sample is predicted to be in the +1 class and < 0 
     // if a sample is predicted to be in the -1 class.
@@ -123,7 +123,7 @@ int main()
     // function.  To support this the dlib library provides functions for converting an online
     // training object like svm_pegasos into a batch training object.  
 
-    // First lets clear out anything in the trainer object.
+    // First let's clear out anything in the trainer object.
     trainer.clear();
 
     // Now to begin with, you might want to compute the cross validation score of a trainer object

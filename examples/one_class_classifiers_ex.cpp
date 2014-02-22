@@ -66,7 +66,7 @@ int main()
     // anomalous (i.e. not on the sinc() curve in our case).
     decision_function<kernel_type> df = trainer.train(samples);
 
-    // So for example, lets look at the output from some points on the sinc() curve.  
+    // So for example, let's look at the output from some points on the sinc() curve.  
     cout << "Points that are on the sinc function:\n";
     m(0) = -1.5; m(1) = sinc(m(0)); cout << "   " << df(m) << endl;  
     m(0) = -1.5; m(1) = sinc(m(0)); cout << "   " << df(m) << endl;  

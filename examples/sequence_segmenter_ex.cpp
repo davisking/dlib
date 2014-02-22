@@ -192,7 +192,7 @@ int main()
     sequence_segmenter<feature_extractor> segmenter = trainer.train(samples, segments);
 
 
-    // Lets print out all the segments our segmenter detects.
+    // Let's print out all the segments our segmenter detects.
     for (unsigned long i = 0; i < samples.size(); ++i)
     {
         // get all the detected segments in samples[i]
@@ -205,7 +205,7 @@ int main()
     }
 
 
-    // Now lets test it on a new sentence and see what it detects.  
+    // Now let's test it on a new sentence and see what it detects.  
     std::vector<std::string> sentence(split("There once was a man from Nantucket whose name rhymed with Bob Bucket"));
     std::vector<std::pair<unsigned long,unsigned long> > seg = segmenter(sentence);
     for (unsigned long j = 0; j < seg.size(); ++j)

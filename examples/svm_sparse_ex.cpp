@@ -45,7 +45,7 @@ int main()
     // description of what this parameter does. 
     trainer.set_lambda(0.00001);
 
-    // Lets also use the svm trainer specially optimized for the linear_kernel and
+    // Let's also use the svm trainer specially optimized for the linear_kernel and
     // sparse_linear_kernel.
     svm_c_linear_trainer<kernel_type> linear_trainer;
     // This trainer solves the "C" formulation of the SVM.  See the documentation for
@@ -59,7 +59,7 @@ int main()
     sample_type sample;
 
 
-    // Now lets go into a loop and randomly generate 10000 samples.
+    // Now let's go into a loop and randomly generate 10000 samples.
     srand(time(0));
     double label = +1;
     for (int i = 0; i < 10000; ++i)
@@ -87,11 +87,11 @@ int main()
         labels.push_back(label);
     }
 
-    // In addition to the rule we learned with the pegasos trainer lets also use our linear_trainer
-    // to learn a decision rule.
+    // In addition to the rule we learned with the pegasos trainer, let's also use our
+    // linear_trainer to learn a decision rule.
     decision_function<kernel_type> df = linear_trainer.train(samples, labels);
 
-    // Now we have trained our SVMs.  Lets test them out a bit.  
+    // Now we have trained our SVMs.  Let's test them out a bit.  
     // Each of these statements prints the output of the SVMs given a particular sample.  
     // Each SVM outputs a number > 0 if a sample is predicted to be in the +1 class and < 0 
     // if a sample is predicted to be in the -1 class.

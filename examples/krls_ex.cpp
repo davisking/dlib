@@ -82,7 +82,7 @@ int main()
     serialize(test,fout);
     fout.close();
 
-    // now lets open that file back up and load the krls object it contains
+    // Now let's open that file back up and load the krls object it contains.
     ifstream fin("saved_krls_object.dat",ios::binary);
     deserialize(test, fin);
 

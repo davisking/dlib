@@ -174,7 +174,7 @@ int main()
     trainer.set_trainer(rbf_trainer, "upper_left", "lower_right");
 
 
-    // Now lets do 5-fold cross-validation using the one_vs_one_trainer we just setup.
+    // Now let's do 5-fold cross-validation using the one_vs_one_trainer we just setup.
     // As an aside, always shuffle the order of the samples before doing cross validation.  
     // For a discussion of why this is a good idea see the svm_ex.cpp example.
     randomize_samples(samples, labels);
@@ -201,7 +201,7 @@ int main()
     */
 
 
-    // Finally, lets save our multiclass decision rule to disk.  Remember that we have
+    // Finally, let's save our multiclass decision rule to disk.  Remember that we have
     // to specify the types of binary decision function used inside the one_vs_one_decision_function.
     one_vs_one_decision_function<ovo_trainer, 
             custom_decision_function,                             // This is the output of the simple_custom_trainer 

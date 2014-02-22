@@ -23,7 +23,7 @@
         cmake --build . --config Release
     Note that you may need to install CMake (www.cmake.org) for this to work.  
 
-    Next, lets assume you have a folder of images called /tmp/images.  These images 
+    Next, let's assume you have a folder of images called /tmp/images.  These images 
     should contain examples of the objects you want to learn to detect.  You will 
     use the imglab tool to label these objects.  Do this by typing the following
         ./imglab -c mydataset.xml /tmp/images

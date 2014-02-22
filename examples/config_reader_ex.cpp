@@ -75,7 +75,7 @@ int main()
         // Use our recursive function to print everything in the config file.
         print_config_reader_contents(cr);
 
-        // Now lets access some of the fields of the config file directly.  You 
+        // Now let's access some of the fields of the config file directly.  You 
         // use [] for accessing key values and .block() for accessing sub-blocks.
 
         // Print out the string value assigned to key1 in the config file

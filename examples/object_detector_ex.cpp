@@ -226,7 +226,7 @@ int main()
 
 
 
-        // Lets display the output of the detector along with our training images.
+        // Let's display the output of the detector along with our training images.
         image_window win;
         for (unsigned long i = 0; i < images.size(); ++i)
         {

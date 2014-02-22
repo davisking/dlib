@@ -161,7 +161,7 @@ int main()
 
 
 
-        // We have now finished setting up our bayesian network.  So lets compute some 
+        // We have now finished setting up our bayesian network.  So let's compute some 
         // probability values.  The first thing we will do is compute the prior probability
         // of each node in the network.  To do this we will use the join tree algorithm which
         // is an algorithm for performing exact inference in a bayesian network.   
@@ -198,7 +198,7 @@ int main()
         cout << "\n\n\n";
 
 
-        // Now to make things more interesting lets say that we have discovered that the C 
+        // Now to make things more interesting let's say that we have discovered that the C 
         // node really has a value of 1.  That is to say, we now have evidence that 
         // C is 1.  We can represent this in the network using the following two function
         // calls.

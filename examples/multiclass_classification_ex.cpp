@@ -92,7 +92,7 @@ int main()
         // still be solved with the rbf_trainer.
         trainer.set_trainer(poly_trainer, 1, 2);
 
-        // Now lets do 5-fold cross-validation using the one_vs_one_trainer we just setup.
+        // Now let's do 5-fold cross-validation using the one_vs_one_trainer we just setup.
         // As an aside, always shuffle the order of the samples before doing cross validation.  
         // For a discussion of why this is a good idea see the svm_ex.cpp example.
         randomize_samples(samples, labels);

@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 
         cout << "hog image has " << hog.nr() << " rows and " << hog.nc() << " columns." << endl;
 
-        // Lets see what the image and FHOG features look like.
+        // Let's see what the image and FHOG features look like.
         image_window win(img);
         image_window winhog(draw_fhog(hog));
 

@@ -63,7 +63,7 @@ int main()
 
     dlib::rand rnd;
 
-    // Now lets loop over a big range of values from the sinc() function.  Each time
+    // Now let's loop over a big range of values from the sinc() function.  Each time
     // adding some random noise to the data we send to the krls object for training.
     sample_type m;
     double mse_noise = 0;

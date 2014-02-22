@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 
         cout << "Number of nodes in the network: " << bn.number_of_nodes() << endl;
 
-        // Lets compute some probability values using the loaded network using the join tree (aka. Junction 
+        // Let's compute some probability values using the loaded network using the join tree (aka. Junction 
         // Tree) algorithm.
 
         // First we need to create an undirected graph which contains set objects at each node and

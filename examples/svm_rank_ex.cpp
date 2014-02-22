@@ -38,7 +38,7 @@ int main()
         typedef matrix<double,2,1> sample_type;
 
 
-        // Now lets make some testing data.  To make it really simple, lets
+        // Now let's make some testing data.  To make it really simple, let's
         // suppose that vectors with positive values in the first dimension
         // should rank higher than other vectors.  So what we do is make
         // examples of relevant (i.e. high ranking) and non-relevant (i.e. low

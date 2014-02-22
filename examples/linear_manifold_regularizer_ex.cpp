@@ -98,7 +98,7 @@ using namespace dlib;
 
 // ----------------------------------------------------------------------------------------
 
-// First lets make a typedef for the kind of samples we will be using. 
+// First let's make a typedef for the kind of samples we will be using. 
 typedef matrix<double, 0, 1> sample_type;
 
 // We will be using the radial_basis_kernel in this example program.

@@ -103,7 +103,7 @@ void run_example_1(
 
 
 
-    // Now lets put some things into the out pipe
+    // Now let's put some things into the out pipe
     int value = 1;
     out.enqueue(value);
 
@@ -308,7 +308,7 @@ void run_example_4(
     bridge_status bs;
 
     // Once a connection is established it will generate a status message from each bridge. 
-    // Lets get those and print them.  
+    // Let's get those and print them.  
     b1_status.dequeue(bs);
     cout << "bridge 1 status: is_connected: " << boolalpha << bs.is_connected << endl;
     cout << "bridge 1 status: foreign_ip:   " << bs.foreign_ip << endl;

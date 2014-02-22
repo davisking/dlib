@@ -245,7 +245,7 @@ public:
         // are the four virtual functions defined below.
 
 
-        // So lets make an empty 9-dimensional PSI vector
+        // So let's make an empty 9-dimensional PSI vector
         feature_vector_type psi(get_num_dimensions());
         psi = 0; // zero initialize it
 

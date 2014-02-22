@@ -203,7 +203,7 @@ int main()
 
         typedef scan_image_pyramid<pyramid_down<5>, very_simple_feature_extractor> image_scanner_type;
         image_scanner_type scanner;
-        // Instead of using setup_grid_detection_templates() like in object_detector_ex.cpp, lets manually
+        // Instead of using setup_grid_detection_templates() like in object_detector_ex.cpp, let's manually
         // setup the sliding window box.  We use a window with the same shape as the white boxes we
         // are trying to detect.
         const rectangle object_box = compute_box_dimensions(1,    // width/height ratio
@@ -272,7 +272,7 @@ int main()
         */
 
 
-        // Lets display the output of the detector along with our training images.
+        // Let's display the output of the detector along with our training images.
         image_window win;
         for (unsigned long i = 0; i < images.size(); ++i)
         {

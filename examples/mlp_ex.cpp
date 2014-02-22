@@ -44,7 +44,7 @@ int main()
     // their default values.  
     mlp::kernel_1a_c net(2,5);
 
-    // Now lets put some data into our sample and train on it.  We do this
+    // Now let's put some data into our sample and train on it.  We do this
     // by looping over 41*41 points and labeling them according to their
     // distance from the origin.
     for (int i = 0; i < 1000; ++i)
@@ -65,7 +65,7 @@ int main()
         }
     }
 
-    // Now we have trained our mlp.  Lets see how well it did.  
+    // Now we have trained our mlp.  Let's see how well it did.  
     // Note that if you run this program multiple times you will get different results. This
     // is because the mlp network is randomly initialized.
 

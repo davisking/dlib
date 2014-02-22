@@ -16,7 +16,7 @@ using namespace std;
 
 int main()
 {
-    // Lets begin this example by using the library to solve a simple 
+    // Let's begin this example by using the library to solve a simple 
     // linear system.
     // 
     // We will find the value of x such that y = M*x where
@@ -32,7 +32,7 @@ int main()
     //      5.9    0.05  1
 
 
-    // First lets declare these 3 matrices.
+    // First let's declare these 3 matrices.
     // This declares a matrix that contains doubles and has 3 rows and 1 column.
     // Moreover, it's size is a compile time constant since we put it inside the <>.
     matrix<double,3,1> y;

@@ -161,7 +161,7 @@ int main(int argc, char** argv)
         // a face.
         image_window hogwin(draw_fhog(detector), "Learned fHOG detector");
 
-        // Now for the really fun part.  Lets display the testing images on the screen and
+        // Now for the really fun part.  Let's display the testing images on the screen and
         // show the output of the face detector overlaid on each image.  You will see that
         // it finds all the faces without false alarming on any non-faces.
         image_window win; 
@@ -191,7 +191,7 @@ int main(int argc, char** argv)
 
 
 
-        // Now lets talk about some optional features of this training tool as well as some
+        // Now let's talk about some optional features of this training tool as well as some
         // important points you should understand.
         //
         // The first thing that should be pointed out is that, since this is a sliding

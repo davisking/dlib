@@ -296,8 +296,8 @@ int main()
 
 
 
-    // Now lets test out the Shor 9 bit encoding
-    cout << "\n\n\n\nNow lets try playing around with Shor's 9bit error correcting code" << endl;
+    // Now let's test out the Shor 9 bit encoding
+    cout << "\n\n\n\nNow let's try playing around with Shor's 9bit error correcting code" << endl;
 
     // Reset the quantum register to contain a single bit
     reg.set_num_bits(1);

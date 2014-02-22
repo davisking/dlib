@@ -101,7 +101,7 @@ int main()
         std::vector<sample_type> samples;
         std::vector<double> labels;
 
-        // Now lets put some data into our samples and labels objects.  We do this
+        // Now let's put some data into our samples and labels objects.  We do this
         // by looping over a bunch of points and labeling them according to their
         // distance from the origin.
         for (double r = -20; r <= 20; r += 0.8)

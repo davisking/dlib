@@ -76,7 +76,7 @@ using namespace dlib;
 
 // ----------------------------------------------------------------------------------------
 
-// First lets make a typedef for the kind of samples we will be using. 
+// First let's make a typedef for the kind of samples we will be using. 
 typedef matrix<double, 0, 1> sample_type;
 
 // We will be using the radial_basis_kernel in this example program.
@@ -213,7 +213,7 @@ void test_empirical_kernel_map (
 
 
 
-    // Now lets do something more interesting.  The following loop finds the centroids
+    // Now let's do something more interesting.  The following loop finds the centroids
     // of the two classes of data.
     sample_type class1_center; 
     sample_type class2_center; 
@@ -254,7 +254,7 @@ void test_empirical_kernel_map (
 
     // Next, note that classifying a point based on its distance between two other 
     // points is the same thing as using the plane that lies between those two points 
-    // as a decision boundary.  So lets compute that decision plane and use it to classify 
+    // as a decision boundary.  So let's compute that decision plane and use it to classify 
     // all the points.
     
     sample_type plane_normal_vector = class1_center - class2_center;
@@ -291,7 +291,7 @@ void test_empirical_kernel_map (
     {
         double side = dec_funct(samples[i]);
 
-        // And lets just check that the dec_funct really does compute the same thing as the previous equation.
+        // And let's just check that the dec_funct really does compute the same thing as the previous equation.
         double side_alternate_equation = dot(plane_normal_vector, projected_samples[i]) - bias;
         if (abs(side-side_alternate_equation) > 1e-14)
             cout << "dec_funct error: " << abs(side-side_alternate_equation) << endl;

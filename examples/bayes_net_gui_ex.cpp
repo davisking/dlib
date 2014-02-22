@@ -413,7 +413,7 @@ initialize_node_cpt_if_necessary (
 {
     node_type& node = graph_drawer.graph_node(index);
 
-    // if the cpt for this node isn't properly filled out then lets clear it out
+    // if the cpt for this node isn't properly filled out then let's clear it out
     // and populate it with some reasonable default values
     if (node_cpt_filled_out(graph_drawer.graph(), index) == false)
     {

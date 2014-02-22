@@ -139,7 +139,7 @@ int main()
     typedef ukf_kernel<sample_type> kernel_type;
 
 
-    // Now lets generate some training data
+    // Now let's generate some training data
     std::vector<sample_type> samples;
     std::vector<double> labels;
     for (double r = -20; r <= 20; r += 0.9)
@@ -177,7 +177,7 @@ int main()
     trainer.use_classification_loss_for_loo_cv();
 
 
-    // Finally, lets test how good our new kernel is by doing some leave-one-out cross-validation.
+    // Finally, let's test how good our new kernel is by doing some leave-one-out cross-validation.
     cout << "\ndoing leave-one-out cross-validation" << endl;
     for (double sigma = 0.01; sigma <= 100; sigma *= 3)
     {

@@ -36,7 +36,7 @@ int main()
 
 
 
-    // Now lets make some vector objects that can hold our samples 
+    // Now let's make some vector objects that can hold our samples 
     std::vector<sample_type> samples;
     std::vector<double> labels;
 

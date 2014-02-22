@@ -95,7 +95,7 @@ int main()
     serialize(test,fout);
     fout.close();
 
-    // now lets open that file back up and load the function object it contains
+    // Now let's open that file back up and load the function object it contains.
     ifstream fin("saved_function.dat",ios::binary);
     deserialize(test, fin);
 

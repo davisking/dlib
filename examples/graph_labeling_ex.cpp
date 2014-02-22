@@ -194,13 +194,13 @@ int main()
         // indicate that all nodes were correctly classified.  
         cout << "3-fold cross-validation: " << cross_validate_graph_labeling_trainer(trainer, samples, labels, 3) << endl;
 
-        // Since the trainer is working well.  Lets have it make a graph_labeler 
+        // Since the trainer is working well.  Let's have it make a graph_labeler 
         // based on the training data.
         graph_labeler<vector_type> labeler = trainer.train(samples, labels);
 
 
         /*
-            Lets try the graph_labeler on a new test graph.  In particular, lets
+            Let's try the graph_labeler on a new test graph.  In particular, let's
             use one with 5 nodes as shown below:
 
             (0 F)-----(1 T)

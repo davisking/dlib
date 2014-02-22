@@ -28,7 +28,7 @@ int main()
         iosockstream stream("www.google.com:80");
 
         // At this point, we can use stream the same way we would use any other
-        // C++ iostream object.  So to test it out, lets make a HTTP GET request
+        // C++ iostream object.  So to test it out, let's make a HTTP GET request
         // for the main Google page.
         stream << "GET / HTTP/1.0\r\n\r\n";
 

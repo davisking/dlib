@@ -43,7 +43,7 @@ int main()
     std::vector<sample_type> samples;
     std::vector<double> labels;
 
-    // Now lets put some data into our samples and labels objects.  We do this
+    // Now let's put some data into our samples and labels objects.  We do this
     // by looping over a bunch of points and labeling them according to their
     // distance from the origin.
     for (double r = -20; r <= 20; r += 0.4)
@@ -129,7 +129,7 @@ int main()
     cout << "\nnumber of basis vectors in our learned_function is " 
          << learned_function.function.basis_vectors.size() << endl;
 
-    // Now lets try this decision_function on some samples we haven't seen before.
+    // Now let's try this decision_function on some samples we haven't seen before.
     // The decision function will return values >= 0 for samples it predicts
     // are in the +1 class and numbers < 0 for samples it predicts to be in the -1 class.
     sample_type sample;
@@ -200,7 +200,7 @@ int main()
     serialize(learned_pfunct,fout);
     fout.close();
 
-    // now lets open that file back up and load the function object it contains
+    // Now let's open that file back up and load the function object it contains.
     ifstream fin("saved_function.dat",ios::binary);
     deserialize(learned_pfunct, fin);
 
