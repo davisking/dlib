@@ -65,6 +65,9 @@ namespace dlib
                   likely it is that det is a detection from the object corresponding to
                   this track.  That is, the feature vector should contain information that
                   lets someone decide if det should be associated to this track.
+                - #feats.size() must be a constant.  That is, every time we call
+                  get_similarity_features() it must output a feature vector of the same
+                  dimensionality.
         !*/
 
         void update_track (
