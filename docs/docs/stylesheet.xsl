@@ -649,7 +649,7 @@ function BigToggle(node)
          <xsl:variable name="name" select="substring-before(.,'.html')"/>
          <xsl:if test="$fname != ''">
             <xsl:choose>
-               <xsl:when test="position() >= last()-$numcpp">
+               <xsl:when test="position() >= last()">
                   <a href="{.}"><xsl:value-of select="$name"/></a>
                </xsl:when>
                <xsl:otherwise>
