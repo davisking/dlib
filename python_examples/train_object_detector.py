@@ -32,7 +32,7 @@ if (len(sys.argv) != 2):
 faces_folder = sys.argv[1]
 
 
-# Now lets do the training.  The train_simple_object_detector() function has a
+# Now let's do the training.  The train_simple_object_detector() function has a
 # bunch of options, all of which come with reasonable default values.  The next
 # few lines goes over some of these options.
 options = dlib.simple_object_detector_training_options()
@@ -82,7 +82,7 @@ detector = dlib.simple_object_detector("detector.svm")
 win_det = dlib.image_window()
 win_det.set_image(detector)
 
-# Now lets run the detector over the images in the faces folder and display the
+# Now let's run the detector over the images in the faces folder and display the
 # results.
 print "\nShowing detections on the images in the faces folder..."
 win = dlib.image_window()
