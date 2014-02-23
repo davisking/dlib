@@ -232,6 +232,8 @@ void bind_object_detection()
                                                     &simple_object_detector_training_options::add_left_right_image_flips)
         .add_property("detection_window_size", &simple_object_detector_training_options::detection_window_size,
                                                &simple_object_detector_training_options::detection_window_size)
+        .add_property("C", &simple_object_detector_training_options::C,
+                           &simple_object_detector_training_options::C)
         .add_property("num_threads", &simple_object_detector_training_options::num_threads,
                                      &simple_object_detector_training_options::num_threads);
 
@@ -261,12 +263,64 @@ void bind_object_detection()
         "Returns the default face detector");
 
     def("train_simple_object_detector", train_simple_object_detector,
-        (arg("dataset_filename"), arg("detector_output_filename"), arg("C"), arg("options")=simple_object_detector_training_options()),
-        "whatever");
+        (arg("dataset_filename"), arg("detector_output_filename"), arg("options")),
+"requires \n\
+    - options.C > 0 \n\
+ensures \n\
+    - Uses the structural_object_detection_trainer to train a \n\
+      simple_object_detector based on the labeled images in the XML file \n\
+      dataset_filename.  This function assumes the file dataset_filename is in the \n\
+      XML format produced by dlib's save_image_dataset_metadata() routine. \n\
+    - This function will apply a reasonable set of default parameters and \n\
+      preprocessing techniques to the training procedure for simple_object_detector \n\
+      objects.  So the point of this function is to provide you with a very easy \n\
+      way to train a basic object detector.   \n\
+    - The trained object detector is serialized to the file detector_output_filename." 
+    /*!
+        requires
+            - options.C > 0
+        ensures
+            - Uses the structural_object_detection_trainer to train a
+              simple_object_detector based on the labeled images in the XML file
+              dataset_filename.  This function assumes the file dataset_filename is in the
+              XML format produced by dlib's save_image_dataset_metadata() routine.
+            - This function will apply a reasonable set of default parameters and
+              preprocessing techniques to the training procedure for simple_object_detector
+              objects.  So the point of this function is to provide you with a very easy
+              way to train a basic object detector.  
+            - The trained object detector is serialized to the file detector_output_filename.
+    !*/
+        );
 
     def("test_simple_object_detector", test_simple_object_detector,
         (arg("dataset_filename"), arg("detector_filename")),
-        "whatever");
+"ensures \n\
+    - Loads an image dataset from dataset_filename.  We assume dataset_filename is \n\
+      a file using the XML format written by save_image_dataset_metadata(). \n\
+    - Loads a simple_object_detector from the file detector_filename.  This means \n\
+      detector_filename should be a file produced by the train_simple_object_detector()  \n\
+      routine. \n\
+    - This function tests the detector against the dataset and returns the \n\
+      precision, recall, and average precision of the detector.  In fact, The \n\
+      return value of this function is identical to that of dlib's \n\
+      test_object_detection_function() routine.  Therefore, see the documentation \n\
+      for test_object_detection_function() for a detailed definition of these \n\
+      metrics. " 
+    /*!
+        ensures
+            - Loads an image dataset from dataset_filename.  We assume dataset_filename is
+              a file using the XML format written by save_image_dataset_metadata().
+            - Loads a simple_object_detector from the file detector_filename.  This means
+              detector_filename should be a file produced by the train_simple_object_detector() 
+              routine.
+            - This function tests the detector against the dataset and returns the
+              precision, recall, and average precision of the detector.  In fact, The
+              return value of this function is identical to that of dlib's
+              test_object_detection_function() routine.  Therefore, see the documentation
+              for test_object_detection_function() for a detailed definition of these
+              metrics. 
+    !*/
+        );
 
     {
     typedef simple_object_detector_py type;

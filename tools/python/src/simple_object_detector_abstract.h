@@ -19,9 +19,8 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object is a container for the more advanced options to the
-                train_simple_object_detector() routine.  The parameters have the following
-                interpretations:
+                This object is a container for the options to the train_simple_object_detector() 
+                routine.  The parameters have the following interpretations:
                     - be_verbose: If true, train_simple_object_detector() will print out a
                       lot of information to the screen while training.
                     - add_left_right_image_flips: if true, train_simple_object_detector()
@@ -33,6 +32,11 @@ namespace dlib
                       machine to obtain the fastest training speed.
                     - detection_window_size: The sliding window used will have about this
                       many pixels inside it.
+                    - C is the usual SVM C regularization parameter.  So it is passed to
+                      structural_object_detection_trainer::set_c().  Larger values of C
+                      will encourage the trainer to fit the data better but might lead to
+                      overfitting.  Therefore, you must determine the proper setting of
+                      this parameter experimentally.
         !*/
 
         fhog_training_options()
@@ -41,12 +45,14 @@ namespace dlib
             add_left_right_image_flips = false;
             num_threads = 4;
             detection_window_size = 80*80;
+            C = 1;
         }
 
         bool be_verbose;
         bool add_left_right_image_flips;
         unsigned long num_threads;
         unsigned long detection_window_size;
+        double C;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -58,12 +64,11 @@ namespace dlib
     void train_simple_object_detector (
         const std::string& dataset_filename,
         const std::string& detector_output_filename,
-        const double C,
-        const fhog_training_options& options = fhog_training_options()
+        const fhog_training_options& options 
     );
     /*!
         requires
-            - C > 0
+            - options.C > 0
         ensures
             - Uses the structural_object_detection_trainer to train a
               simple_object_detector based on the labeled images in the XML file
@@ -73,11 +78,6 @@ namespace dlib
               preprocessing techniques to the training procedure for simple_object_detector
               objects.  So the point of this function is to provide you with a very easy
               way to train a basic object detector.  
-            - C is the usual SVM C regularization parameter.  So it is passed to
-              structural_object_detection_trainer::set_c().  Larger values of C will
-              encourage the trainer to fit the data better but might lead to overfitting.
-              Therefore, you must determine the proper setting of this parameter
-              experimentally.
             - The trained object detector is serialized to the file detector_output_filename.
     !*/
 
