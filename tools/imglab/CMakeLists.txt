@@ -27,7 +27,7 @@ ADD_EXECUTABLE(${target_name}
 )
 
 
-# Tell cmake to link our target executable dlib.  
+# Tell cmake to link our target executable to dlib.  
 include(../../dlib/cmake)
 TARGET_LINK_LIBRARIES(${target_name} dlib )
 
