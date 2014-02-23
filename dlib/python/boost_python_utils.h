@@ -6,6 +6,7 @@
 #include <boost/python.hpp>
 #include <vector>
 #include <string>
+#include <dlib/serialize.h>
 
 inline bool hasattr(
     boost::python::object obj, 
@@ -53,6 +54,25 @@ boost::python::list vector_to_python_list (
     boost::python::list obj;
     for (unsigned long i = 0; i < vect.size(); ++i)
         obj.append(vect[i]);
+    return obj;
+}
+
+// ----------------------------------------------------------------------------------------
+
+template <typename T>
+boost::shared_ptr<T> load_object_from_file (
+    const std::string& filename
+)
+/*!
+    ensures
+        - deserializes an object of type T from the given file and returns it.
+!*/
+{
+    std::ifstream fin(filename.c_str(), std::ios::binary);
+    if (!fin)
+        throw dlib::error("Unable to open " + filename);
+    boost::shared_ptr<T> obj(new T());
+    deserialize(*obj, fin);
     return obj;
 }
 
