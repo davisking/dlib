@@ -37,9 +37,10 @@ build_python_interface ()
 
 add_links_between_example_programs()
 {
+    EXT=$3
     # Get the list of example program filenames
     pushd $1 > /dev/null
-    FILES=`ls *.cpp`
+    FILES=`ls *.$EXT`
     popd > /dev/null
 
     # Now run sed on all the htmlified example programs to add the links between them.
@@ -49,7 +50,7 @@ add_links_between_example_programs()
         escaped_name=`echo $f | sed -e 's/\./\\\./g'`
         pushd $1 > /dev/null
         # get a list of all the html example files that contain the name
-        matching_html_files=`grep -e "\b$escaped_name\b" -l *.cpp | sed -e "s/\.cpp\b/.cpp.html/g"`
+        matching_html_files=`grep -e "\b$escaped_name\b" -l *.$EXT | sed -e "s/\.$EXT\b/.$EXT.html/g"`
         popd > /dev/null
 
         # now actually run sed to add the links
@@ -177,7 +178,7 @@ makedocs ()
 
     echo Creating HTML version of the source
     htmlify --title "dlib C++ Library - " -i docs/cache -o htmltemp.$$
-    add_links_between_example_programs docs/cache/examples htmltemp.$$/examples
+    add_links_between_example_programs docs/cache/examples htmltemp.$$/examples cpp
 
     echo Copying files around...
     cp -r htmltemp.$$/dlib docs/web
@@ -219,6 +220,8 @@ makedocs ()
 
     htmlify_python docs/chm/docs/
     htmlify_python docs/web/
+    add_links_between_example_programs docs/cache/python_examples docs/chm/docs py
+    add_links_between_example_programs docs/cache/python_examples docs/web py
 
     cp docs/*.gif docs/web
     cp docs/*.gif docs/chm/docs
