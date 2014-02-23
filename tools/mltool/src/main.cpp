@@ -41,6 +41,7 @@ parse_args (command_line_parser& parser, int argc, char* argv[])
         parser.add_option ("train-best",
                            "Train and save a network using best parameters", 1);
 
+        parser.set_group_name("Algorithm Specific Options");
         // Algorithm-specific options
         parser.add_option ("rbk-gamma",
                            "Width of radial basis kernels: {float}.",1);
@@ -78,7 +79,7 @@ parse_args (command_line_parser& parser, int argc, char* argv[])
 
         // Check if the -h option was given
         if (parser.option("h") || parser.option("help")) {
-            std::cout << "Usage: dlib_test [-a algorithm] --in input_file\n";
+            std::cout << "Usage: mltool [-a algorithm] --in input_file\n";
             parser.print_options(std::cout);
             std::cout << std::endl;
             exit (0);
