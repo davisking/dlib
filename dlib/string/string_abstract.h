@@ -152,8 +152,8 @@ namespace dlib
         >
     const std::basic_string<charT,traits,alloc> wrap_string (
         const std::basic_string<charT,traits,alloc>& str,
-        const unsigned long first_pad,
-        const unsigned long rest_pad,
+        const unsigned long first_pad = 0,
+        const unsigned long rest_pad = 0,
         const unsigned long max_per_line = 79
     );
     /*!
