@@ -225,17 +225,55 @@ void bind_object_detection()
 {
     using boost::python::arg;
 
-    class_<simple_object_detector_training_options>("simple_object_detector_training_options")
+    class_<simple_object_detector_training_options>("simple_object_detector_training_options", 
+        "This object is a container for the options to the train_simple_object_detector() routine.")
         .add_property("be_verbose", &simple_object_detector_training_options::be_verbose, 
-                                    &simple_object_detector_training_options::be_verbose)
+                                    &simple_object_detector_training_options::be_verbose,
+                                    "If true, train_simple_object_detector() will print out a lot of information to the screen while training."
+                                    )
         .add_property("add_left_right_image_flips", &simple_object_detector_training_options::add_left_right_image_flips, 
-                                                    &simple_object_detector_training_options::add_left_right_image_flips)
+                                                    &simple_object_detector_training_options::add_left_right_image_flips,
+"if true, train_simple_object_detector() will assume the objects are \n\
+left/right symmetric and add in left right flips of the training \n\
+images.  This doubles the size of the training dataset." 
+                    /*!
+                      if true, train_simple_object_detector() will assume the objects are
+                      left/right symmetric and add in left right flips of the training
+                      images.  This doubles the size of the training dataset.
+                    !*/
+                                                    )
         .add_property("detection_window_size", &simple_object_detector_training_options::detection_window_size,
-                                               &simple_object_detector_training_options::detection_window_size)
+                                               &simple_object_detector_training_options::detection_window_size,
+                                               "The sliding window used will have about this many pixels inside it.")
         .add_property("C", &simple_object_detector_training_options::C,
-                           &simple_object_detector_training_options::C)
+                           &simple_object_detector_training_options::C,
+"C is the usual SVM C regularization parameter.  So it is passed to \n\
+structural_object_detection_trainer::set_c().  Larger values of C \n\
+will encourage the trainer to fit the data better but might lead to \n\
+overfitting.  Therefore, you must determine the proper setting of \n\
+this parameter experimentally." 
+                    /*!
+                      C is the usual SVM C regularization parameter.  So it is passed to
+                      structural_object_detection_trainer::set_c().  Larger values of C
+                      will encourage the trainer to fit the data better but might lead to
+                      overfitting.  Therefore, you must determine the proper setting of
+                      this parameter experimentally.
+                    !*/
+                           )
         .add_property("num_threads", &simple_object_detector_training_options::num_threads,
-                                     &simple_object_detector_training_options::num_threads);
+                                     &simple_object_detector_training_options::num_threads,
+"train_simple_object_detector() will use this many threads of \n\
+execution.  Set this to the number of CPU cores on your machine to \n\
+obtain the fastest training speed." 
+                    /*!
+                      train_simple_object_detector() will use this many threads of
+                      execution.  Set this to the number of CPU cores on your machine to
+                      obtain the fastest training speed.
+                    !*/
+                                     );
+
+
+
 
     class_<simple_test_results>("simple_test_results")
         .add_property("precision", &simple_test_results::precision)
