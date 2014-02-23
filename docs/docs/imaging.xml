@@ -1996,6 +1996,7 @@
             <example>train_object_detector.cpp.html</example>
 
             <example>face_detector.py.html</example>
+            <example>train_object_detector.py.html</example>
          </examples>
                                  
       </component>
