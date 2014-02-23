@@ -155,6 +155,22 @@ void deserialize (simple_object_detector_py& item, std::istream& in)
 
 // ----------------------------------------------------------------------------------------
 
+void image_window_set_image_fhog_detector (
+    image_window& win,
+    const frontal_face_detector& det
+)
+{
+    win.set_image(draw_fhog(det));
+}
+
+void image_window_set_image_simple_detector (
+    image_window& win,
+    const simple_object_detector_py& det
+)
+{
+    win.set_image(draw_fhog(det.detector));
+}
+
 void image_window_set_image (
     image_window& win,
     object img
@@ -358,6 +374,10 @@ ensures \n\
             "Create an image window that displays the given numpy image and also has the given title.")
         .def("set_image", image_window_set_image, arg("image"), 
             "Make the image_window display the given image.")
+        .def("set_image", image_window_set_image_fhog_detector, arg("detector"), 
+            "Make the image_window display the given HOG detector's filters.")
+        .def("set_image", image_window_set_image_simple_detector, arg("detector"), 
+            "Make the image_window display the given HOG detector's filters.")
         .def("set_title", (set_title_funct)&type::set_title, arg("title"),
             "Set the title of the window to the given value.")
         .def("clear_overlay", &type::clear_overlay, "Remove all overlays from the image_window.")
