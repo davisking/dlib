@@ -210,7 +210,7 @@ namespace dlib
             force_assignment = false;
             C = 100;
             verbose = false;
-            eps = 0.1;
+            eps = 0.01;
             num_threads = 2;
             max_cache_size = 5;
         }
