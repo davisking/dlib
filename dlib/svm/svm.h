@@ -321,6 +321,26 @@ namespace dlib
         label_type label;
     };
 
+    template <
+        typename detection_type_,
+        typename label_type_ 
+        >
+    inline void serialize ( const labeled_detection<detection_type_,label_type_>& item, std::ostream& out)
+    {
+        serialize(item.det, out);
+        serialize(item.label, out);
+    }
+
+    template <
+        typename detection_type_,
+        typename label_type_ 
+        >
+    inline void deserialize (labeled_detection<detection_type_,label_type_>& item, std::istream& in)
+    {
+        deserialize(item.det, in);
+        deserialize(item.label, in);
+    }
+
 // ----------------------------------------------------------------------------------------
 
     template <
