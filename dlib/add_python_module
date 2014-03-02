@@ -11,9 +11,17 @@
 # python module to that folder when you run "make install".  Note that the path
 # given to install_*_to() is relative to your CMakeLists.txt file.
 
+
+
+# A list of various paths you need to search on windows since people install
+# boost in a bunch of different places.
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} 
+        "C:/local/boost_1_*"
         "C:/Program Files (x86)/boost/boost_1_*"  
-        "C:/Program Files/boost/boost_1_*" )
+        "C:/Program Files/boost/boost_1_*")
+set(BOOST_LIBRARYDIR "C:/local/boost_1_*/lib32-msvc-*")
+
+
 
 #SET(Boost_USE_STATIC_LIBS OFF)
 #SET(Boost_USE_MULTITHREADED ON)
@@ -22,6 +30,13 @@ set(Boost_NO_BOOST_CMAKE ON)
 
 FIND_PACKAGE(Boost 1.41.0 COMPONENTS python REQUIRED)
 FIND_PACKAGE(PythonLibs 2.6 REQUIRED)
+
+if (WIN32 AND NOT Boost_LIBRARIES)
+    message(FATAL_ERROR "We couldn't find the right version of boost python.  If you installed boost and you are still "
+            "getting this error then you might have installed a version of boost that was compiled with a different "
+            "version of visual studio than the one you are using.  So you have to make sure that the version of "
+            "visual studio is the same version that was used to compile the copy of boost you are using.")
+endif()
 
 
 INCLUDE_DIRECTORIES("${Boost_INCLUDE_DIRS}")
