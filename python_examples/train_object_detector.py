@@ -44,7 +44,7 @@ options.add_left_right_image_flips = True
 # SVM C parameter.  In general, a bigger C encourages it to fit the training
 # data better but might lead to overfitting.  You must find the best C value
 # empirically by checking how well the trained detector works on a test set of
-# images you haven't trained on.  Don't just leave the value set at 1.  Try a
+# images you haven't trained on.  Don't just leave the value set at 5.  Try a
 # few different C values and see what works best for your data.
 options.C = 5 
 # Tell the code how many CPU cores your computer has for the fastest training.
