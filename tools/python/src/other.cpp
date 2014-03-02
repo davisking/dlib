@@ -31,14 +31,14 @@ void _make_sparse_vector2 (
         make_sparse_vector_inplace(v[i]);
 }
 
-tuple _load_libsvm_formatted_data (
+boost::python::tuple _load_libsvm_formatted_data(
     const std::string& file_name
 ) 
 { 
     std::vector<sparse_vect> samples;
     std::vector<double> labels;
     load_libsvm_formatted_data(file_name, samples, labels); 
-    return make_tuple(samples, labels);
+    return boost::python::make_tuple(samples, labels);
 }
 
 void _save_libsvm_formatted_data (

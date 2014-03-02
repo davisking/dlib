@@ -128,9 +128,9 @@ cv cv__getitem2__(cv& m, slice r)
     return temp;
 }
 
-tuple cv_get_matrix_size(cv& m)
+boost::python::tuple cv_get_matrix_size(cv& m)
 {
-    return make_tuple(m.nr(), m.nc());
+    return boost::python::make_tuple(m.nr(), m.nc());
 }
 
 void bind_vector()
