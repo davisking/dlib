@@ -36,7 +36,7 @@ struct detection
         copyable and contain a public typedef named track_type that tells us the track type
         meant for use with this detection object.
     */
-    typedef class track track_type;
+    typedef struct track track_type;
 
     
     
