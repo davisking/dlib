@@ -99,7 +99,7 @@ namespace dlib
             load_image_dataset_metadata(data, dataset_filename);
 
             std::ostringstream sout;
-            sout << "Error, an impossible set of object boxes was given for training. ";
+            sout << "Error!  An impossible set of object boxes was given for training. ";
             sout << "All the boxes need to have a similar aspect ratio and also not be ";
             sout << "smaller than about " << options.detection_window_size/16 << " pixels in area. ";
             sout << "The following images contain invalid boxes:\n";
