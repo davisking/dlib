@@ -127,7 +127,7 @@ namespace dlib
         if (options.C <= 0)
             throw error("Invalid C value given to train_simple_object_detector(), C must be > 0.");
 
-        dlib::array<array2d<unsigned char> > images;
+        dlib::array<array2d<rgb_pixel> > images;
         std::vector<std::vector<rectangle> > boxes, ignore;
         ignore = load_image_dataset(images, boxes, dataset_filename);
 
@@ -225,7 +225,7 @@ namespace dlib
         const std::string& detector_filename
     )
     {
-        dlib::array<array2d<unsigned char> > images;
+        dlib::array<array2d<rgb_pixel> > images;
         std::vector<std::vector<rectangle> > boxes, ignore;
         ignore = load_image_dataset(images, boxes, dataset_filename);
 

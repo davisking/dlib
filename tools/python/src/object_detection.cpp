@@ -68,10 +68,10 @@ std::vector<rectangle> run_detector (
 )
 {
     pyramid_down<2> pyr;
-    array2d<unsigned char> temp;
 
     if (is_gray_python_image(img))
     {
+        array2d<unsigned char> temp;
         if (upsampling_amount == 0)
         {
             return detector(numpy_gray_image(img));
@@ -94,6 +94,7 @@ std::vector<rectangle> run_detector (
     }
     else if (is_rgb_python_image(img))
     {
+        array2d<rgb_pixel> temp;
         if (upsampling_amount == 0)
         {
             return detector(numpy_rgb_image(img));
