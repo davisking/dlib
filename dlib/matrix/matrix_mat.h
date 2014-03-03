@@ -102,6 +102,14 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        template <typename U>
+        struct not_bool { typedef U type; };
+        template <>
+        struct not_bool<const bool&> { typedef bool type; };
+    }
+
     template <typename T>
     struct op_std_vect_to_mat : does_not_alias 
     {
@@ -113,7 +121,10 @@ namespace dlib
         const static long NR = 0;
         const static long NC = 1;
         typedef typename T::value_type type;
-        typedef const typename T::value_type& const_ret_type;
+        // Since std::vector returns a proxy for bool types we need to make sure we don't
+        // return an element by reference if it is a bool type.
+        typedef typename impl::not_bool<const typename T::value_type&>::type const_ret_type;
+
         typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
 
