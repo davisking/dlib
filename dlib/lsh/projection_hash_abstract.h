@@ -25,6 +25,11 @@ namespace dlib
                     ...
                 Where v is the vector to be hashed.  The parameters of the projection
                 hash are the P and O matrices.  
+
+            THREAD SAFETY
+                The const members of this object can be called concurrently from multiple
+                threads, however, any operation that modifies the state of an instance of
+                this object must serialize access to that instance.
         !*/
     public:
 
