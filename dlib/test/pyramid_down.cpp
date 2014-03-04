@@ -268,12 +268,17 @@ void test_pyramid_down_grayscale2()
 
 
     // make sure the coordinate mapping is invertible when it should be
-    for (long x = -10; x <= 10; ++x)
+    for (int l = 0; l < 4; ++l)
     {
-        for (long y = -10; y <= 10; ++y)
+        for (long x = -10; x <= 10; ++x)
         {
-            DLIB_TEST_MSG(point(pyr.point_down(pyr.point_up(point(x,y)))) == point(x,y), 
-                          point(x,y) << "  " << pyr.point_up(point(x,y)) << "   " << pyr.point_down(pyr.point_up(point(x,y))));
+            for (long y = -10; y <= 10; ++y)
+            {
+                DLIB_TEST_MSG(point(pyr.point_down(pyr.point_up(point(x,y),l),l)) == point(x,y), 
+                    point(x,y) << "  " << pyr.point_up(point(x,y),l) << "   " << pyr.point_down(pyr.point_up(point(x,y),l),l));
+                DLIB_TEST_MSG(point(pyr.point_down(point(pyr.point_up(point(x,y),l)),l)) == point(x,y), 
+                    point(x,y) << "  " << pyr.point_up(point(x,y),l) << "   " << pyr.point_down(point(pyr.point_up(point(x,y),l)),l));
+            }
         }
     }
 }
