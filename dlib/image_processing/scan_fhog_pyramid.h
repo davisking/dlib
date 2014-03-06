@@ -207,7 +207,7 @@ namespace dlib
                 rsort_columns(u,w);
                 rsort_columns(v,w2);
 
-                double thresh = std::max(1e-3, max(w)*0.01);
+                double thresh = std::max(1e-4, max(w)*0.001);
                 w = round_zeros(w, thresh);
 
 
