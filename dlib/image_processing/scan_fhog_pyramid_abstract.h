@@ -13,10 +13,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename Pyramid_type
+        typename Pyramid_type,
+        typename feature_extractor_type
         >
     matrix<unsigned char> draw_fhog (
-        const object_detector<scan_fhog_pyramid<Pyramid_type> >& detector,
+        const object_detector<scan_fhog_pyramid<Pyramid_type,feature_extractor_type> >& detector,
         const unsigned long weight_index = 0,
         const long cell_draw_size = 15
     );
@@ -37,10 +38,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename Pyramid_type
+        typename Pyramid_type,
+        typename feature_extractor_type
         >
     unsigned long num_separable_filters (
-        const object_detector<scan_fhog_pyramid<Pyramid_type> >& detector,
+        const object_detector<scan_fhog_pyramid<Pyramid_type,feature_extractor_type> >& detector,
         const unsigned long weight_index = 0
     );
     /*!
@@ -57,10 +59,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename Pyramid_type
+        typename Pyramid_type,
+        typename feature_extractor_type
         >
-    object_detector<scan_fhog_pyramid<Pyramid_type> > threshold_filter_singular_values (
-        const object_detector<scan_fhog_pyramid<Pyramid_type> >& detector,
+    object_detector<scan_fhog_pyramid<Pyramid_type,feature_extractor_type> > threshold_filter_singular_values (
+        const object_detector<scan_fhog_pyramid<Pyramid_type,feature_extractor_type> >& detector,
         double thresh,
         const unsigned long weight_index = 0
     );
@@ -84,8 +87,115 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class default_fhog_feature_extractor
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                The scan_fhog_pyramid object defined below is primarily meant to be used
+                with the feature extraction technique implemented by extract_fhog_features().  
+                This technique can generally be understood as taking an input image and
+                outputting a multi-planed output image of floating point numbers that
+                somehow describe the image contents.  Since there are many ways to define
+                how this feature mapping is performed, the scan_fhog_pyramid allows you to
+                replace the extract_fhog_features() method with a customized method of your
+                choosing.  To do this you implement a class with the same interface as
+                default_fhog_feature_extractor.  
+
+                Therefore, the point of default_fhog_feature_extractor is two fold.  First,
+                it provides the default FHOG feature extraction method used by scan_fhog_pyramid.
+                Second, it serves to document the interface you need to implement to define 
+                your own custom HOG style feature extraction. 
+        !*/
+
+    public:
+
+        rectangle image_to_feats (
+            const rectangle& rect,
+            int cell_size,
+            int filter_rows_padding,
+            int filter_cols_padding
+        ) const { return image_to_fhog(rect, cell_size, filter_rows_padding, filter_cols_padding); }
+        /*!
+            requires
+                - cell_size > 0
+                - filter_rows_padding > 0
+                - filter_cols_padding > 0
+            ensures
+                - Maps a rectangle from the coordinates in an input image to the corresponding
+                  area in the output feature image.
+        !*/
+
+        rectangle feats_to_image (
+            const rectangle& rect,
+            int cell_size,
+            int filter_rows_padding,
+            int filter_cols_padding
+        ) const { return fhog_to_image(rect, cell_size, filter_rows_padding, filter_cols_padding); }
+        /*!
+            requires
+                - cell_size > 0
+                - filter_rows_padding > 0
+                - filter_cols_padding > 0
+            ensures
+                - Maps a rectangle from the coordinates of the hog feature image back to
+                  the input image.
+                - Mapping from feature space to image space is an invertible
+                  transformation.  That is, for any rectangle R we have:
+                    R == image_to_feats(feats_to_image(R,cell_size,filter_rows_padding,filter_cols_padding),
+                                                         cell_size,filter_rows_padding,filter_cols_padding).
+        !*/
+
+        template <
+            typename image_type
+            >
+        void operator()(
+            const image_type& img, 
+            dlib::array<array2d<float> >& hog, 
+            int cell_size,
+            int filter_rows_padding,
+            int filter_cols_padding
+        ) const { extract_fhog_features(img,hog,cell_size,filter_rows_padding,filter_cols_padding); }
+        /*!
+            requires
+                - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+                - img contains some kind of pixel type. 
+                  (i.e. pixel_traits<typename image_type::type> is defined)
+            ensures
+                - Extracts FHOG features by calling extract_fhog_features().  The results are
+                  stored into #hog.  Note that if you are implementing your own feature extractor you can
+                  pretty much do whatever you want in terms of feature extraction so long as the following
+                  conditions are met:
+                    - #hog.size() == get_num_planes()
+                    - Each image plane in of #hog has the same dimensions.
+                    - for all valid i, r, and c:
+                        - #hog[i][r][c] == a feature value describing the image content centered at the 
+                          following pixel location in img: 
+                            feats_to_image(point(c,r),cell_size,filter_rows_padding,filter_cols_padding)
+        !*/
+
+        inline long get_num_planes (
+        ) const { return 31; }
+        /*!
+            ensures
+                - returns the number of planes in the hog image output by the operator()
+                  method.
+        !*/
+    };
+
+    inline void serialize   (const default_fhog_feature_extractor&, std::ostream&) {}
+    inline void deserialize (default_fhog_feature_extractor&, std::istream&) {}
+    /*!
+        Provides serialization support.  Note that there is no state in the default hog
+        feature extractor so these functions do nothing.  But if you define a custom
+        feature extractor then make sure you remember to serialize any state in your
+        feature extractor.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
-        typename Pyramid_type
+        typename Pyramid_type,
+        typename Feature_extractor_type = default_fhog_feature_extractor
         >
     class scan_fhog_pyramid : noncopyable
     {
@@ -94,6 +204,10 @@ namespace dlib
                 - Must be one of the pyramid_down objects defined in
                   dlib/image_transforms/image_pyramid_abstract.h or an object with a
                   compatible interface
+
+            REQUIREMENTS ON Feature_extractor_type
+                - Must be a type with an interface compatible with the
+                  default_fhog_feature_extractor.
 
             INITIAL VALUE
                 - get_padding()   == 1
@@ -129,12 +243,22 @@ namespace dlib
     public:
         typedef matrix<double,0,1> feature_vector_type;
         typedef Pyramid_type pyramid_type;
+        typedef Feature_extractor_type feature_extractor_type;
 
         scan_fhog_pyramid (
         );  
         /*!
             ensures
                 - this object is properly initialized
+        !*/
+
+        scan_fhog_pyramid (
+            const feature_extractor_type& fe
+        );  
+        /*!
+            ensures
+                - this object is properly initialized
+                - #get_feature_extractor() == fe
         !*/
 
         template <
@@ -152,6 +276,13 @@ namespace dlib
                 - #is_loaded_with_image() == true
                 - This object is ready to run a classifier over img to detect object
                   locations.  Call detect() to do this.
+        !*/
+
+        const feature_extractor_type& get_feature_extractor(
+        ) const;
+        /*!
+            ensures
+                - returns a const reference to the feature extractor used by this object.
         !*/
 
         bool is_loaded_with_image (
@@ -197,7 +328,8 @@ namespace dlib
                 - Since we use a HOG feature representation, the detection procedure works
                   as follows:
                     Step 1. Make an image pyramid.
-                    Step 2. Convert each layer of the image pyramid into a 31 band HOG "image".
+                    Step 2. Convert each layer of the image pyramid into a multi-planed HOG "image".
+                    (the number of bands is given by get_feature_extractor().get_num_planes())
                     Step 3. Scan a linear classifier over each HOG image in the pyramid. 
                   Moreover, the HOG features quantize the input image into a grid of cells,
                   each cell being get_cell_size() by get_cell_size() pixels in size.  So
@@ -289,9 +421,9 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - get_fhog_window_width()*get_fhog_window_height()*31
-                  (i.e. The number of features is equal to the size of the HOG window
-                  times 31 since there are 31 channels in the HOG feature representation.)
+                - returns get_fhog_window_width()*get_fhog_window_height()*get_feature_extractor().get_num_planes()
+                  (i.e. The number of features is equal to the size of the HOG window times
+                  the number of planes output by the feature extractor. )
         !*/
 
         inline unsigned long get_num_detection_templates (
@@ -375,7 +507,7 @@ namespace dlib
             ensures
                 - Creates and then returns a fhog_filterbank object FB such that:
                     - FB.get_num_dimensions() == get_num_dimensions()
-                    - FB.get_filters() == the values in weights unpacked into 31 filters.
+                    - FB.get_filters() == the values in weights unpacked into get_feature_extractor().get_num_planes() filters.
                     - FB.num_separable_filters() == the number of separable filters necessary to
                       represent all the filters in FB.get_filters().
         !*/
@@ -384,10 +516,10 @@ namespace dlib
         {
             /*!
                 WHAT THIS OBJECT REPRESENTS
-                    This object represents a HOG filter bank.  That is, the classifier that
-                    is slid over a HOG pyramid is a set of 31 linear filters, each
-                    get_fhog_window_width() rows by get_fhog_window_height() columns in
-                    size.  This object contains that set of 31 filters.  
+                    This object represents a HOG filter bank.  That is, the classifier that is 
+                    slid over a HOG pyramid is a set of get_feature_extractor().get_num_planes() 
+                    linear filters, each get_fhog_window_width() rows by get_fhog_window_height() 
+                    columns in size.  This object contains that set of filters.  
             !*/
 
         public:
@@ -402,7 +534,7 @@ namespace dlib
             ) const; 
             /*!
                 ensures
-                    - returns the set of 31 HOG filters in this object.
+                    - returns the set of HOG filters in this object.
             !*/
 
             unsigned long num_separable_filters(
@@ -510,7 +642,7 @@ namespace dlib
             ensures
                 - If the number of separable filters in a fhog_filterbank is small then the
                   filter bank can be scanned over an image much faster than a normal set of
-                  31 filters.  Therefore, this object provides the option to encourage
+                  filters.  Therefore, this object provides the option to encourage
                   machine learning methods that learn a HOG filter bank (i.e.
                   structural_object_detection_trainer) to select filter banks that have
                   this beneficial property.  In particular, the value returned by
