@@ -29,7 +29,7 @@ namespace dlib
             - cell_size > 0
             - filter_rows_padding > 0
             - filter_cols_padding > 0
-            - image_type  == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
             - img contains some kind of pixel type. 
               (i.e. pixel_traits<typename image_type::type> is defined)
             - T should be float or double
@@ -103,6 +103,9 @@ namespace dlib
                 - #hog[i][r][c] == vhog[r][c](i)
                   (where 0 <= i < 31)
             - #hog.size() == 31
+            - for all valid i:
+                - #hog[i].nr() == hog[0].nr()
+                - #hog[i].nc() == hog[0].nc()
     !*/
 
 // ----------------------------------------------------------------------------------------
