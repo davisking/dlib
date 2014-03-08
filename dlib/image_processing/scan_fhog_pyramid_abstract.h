@@ -252,7 +252,7 @@ namespace dlib
                 - this object is properly initialized
         !*/
 
-        scan_fhog_pyramid (
+        explicit scan_fhog_pyramid (
             const feature_extractor_type& fe
         );  
         /*!
