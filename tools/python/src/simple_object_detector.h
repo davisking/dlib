@@ -90,9 +90,7 @@ namespace dlib
         inline void throw_invalid_box_error_message (
             const std::string& dataset_filename,
             const std::vector<std::vector<rectangle> >& removed,
-            const simple_object_detector_training_options& options,
-            const unsigned long width,
-            const unsigned long height 
+            const simple_object_detector_training_options& options
         )
         {
             image_dataset_metadata::dataset data;
@@ -180,7 +178,7 @@ namespace dlib
         }
         // if we weren't able to get all the boxes to match then throw an error 
         if (impl::contains_any_boxes(removed))
-            impl::throw_invalid_box_error_message(dataset_filename, removed, options, width, height);
+            impl::throw_invalid_box_error_message(dataset_filename, removed, options);
 
         if (options.add_left_right_image_flips)
             add_image_left_right_flips(images, boxes, ignore);
