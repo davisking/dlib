@@ -1296,6 +1296,7 @@
          <term file="imaging.html" name="scan_image_movable_parts" include="dlib/image_processing.h"/>
          <term file="imaging.html" name="find_points_above_thresh" include="dlib/image_processing.h"/>
 
+         <term file="dlib/image_processing/scan_fhog_pyramid_abstract.h.html" name="default_fhog_feature_extractor" include="dlib/image_processing.h"/>
          <term file="dlib/image_processing/scan_fhog_pyramid_abstract.h.html" name="num_separable_filters" include="dlib/image_processing.h"/>
          <term file="dlib/image_processing/scan_fhog_pyramid_abstract.h.html" name="threshold_filter_singular_values" include="dlib/image_processing.h"/>
          <term file="imaging.html" name="scan_fhog_pyramid"                      include="dlib/image_processing.h"/>
