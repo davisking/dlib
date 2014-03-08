@@ -12,10 +12,46 @@
 
 <current>
 New Features:
+   - Added a Python API for working with fHOG based object detectors.  See the
+     new python example programs train_object_detector.py and face_detector.py for
+     more details.
+   - Added the ability to use a user supplied fHOG style feature extractor with 
+     the scan_fhog_pyramid object.  So now you can define your own version of HOG
+     for use with these tools.
+   - The oca solver now supports taking a user supplied prior vector. That is,
+     it lets you use a regularizer like ||w-prior||^2 instead of the usual
+     ||w||^2 regularizer.
+   - Added the structural_track_association_trainer object.  It is a structural
+     SVM tool for creating multi-target tracking algorithms.  See the
+     learning_to_track_ex.cpp example program for an introduction.
+   - Added the following minor utility functions: nearest_center(),
+     add_image_rotations(), set_aspect_ratio(), and tile_images().
 
 Non-Backwards Compatible Changes:
+   - Refactored the load_image_dataset() routines so they are easier to use and
+     more flexible. This introduces a slight backwards incompatibility in that
+     the version that loads full_object_detection objects now returns an ignore
+     rectangle set instead of a parts name list.  Other than that the changes
+     are backwards compatible with previous version of dlib.
+   - Added a bias term to the assignment_function's model so the user doesn't
+     need to remember, or even understand, that they should add it themselves.
+     However, this change breaks backwards compatibility with the previous
+     serialization format for assignment_function objects.
 
 Bug fixes:
+   - Fixed a number of compile time errors that could occur in rare cases.
+   - The stopping condition for the svr_linear_trainer was too tight, causing it
+     to take an excessive amount of time to converge in some cases. 
+   - Disabled use of XIM for X11 windowing since it makes programs hang on some
+     systems. However, this means the wide character input methods won't work on
+     X11 systems anymore.
+   - Fixed a bug in randomize_samples() which caused the outputs to be not as
+     random as they should be. 
+   - Fixed dlib's CMakeLists.txt file so that the "use FFTW" option actually
+     causes the build to use FFTW.
+   - Fixed a compile time error that triggered when trying to link with FFTW.
+   - mat() did not work correctly when used with std::vector&lt;bool&gt; objects.
+     This has been fixed.
 
 Other:
 
