@@ -239,7 +239,15 @@ int main(int argc, char** argv)
         // into a single object_detector must have been trained with the same settings for
         // the sliding window size and the scanner padding option (see the scan_fhog_pyramid 
         // documentation for a discussion of padding).  This is because they all share the
-        // same scanner object inside the object_detector.  
+        // same scanner object inside the object_detector.   
+        // 
+        // To pack multiple detectors into a single object_detector you use code like this:
+        std::vector<object_detector<image_scanner_type> > my_detectors;
+        // Add your component detectors into my_detectors.
+        my_detectors.push_back(detector);
+        // Then just construct an object_detector from the set of detectors.
+        object_detector<image_scanner_type> this_object_has_multiple_detectors(my_detectors);
+        //
         //
         // Finally, you can add a nuclear norm regularizer to the SVM trainer.  Doing has
         // two benefits.  First, it can cause the learned HOG detector to be composed of
