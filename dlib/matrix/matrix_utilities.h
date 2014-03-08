@@ -1945,12 +1945,16 @@ namespace dlib
     };
 
     template <
-        typename T
+        typename T,
+        typename U
         >
     const matrix_diag_op<op_identity_matrix_2<T> > identity_matrix (
-        const long& size 
+        const U& size 
     )
     {
+        // the size argument must be some scalar value, not a matrix!
+        COMPILE_TIME_ASSERT(is_matrix<U>::value == false);
+
         DLIB_ASSERT(size > 0, 
             "\tconst matrix_exp identity_matrix<T>(size)"
             << "\n\tsize must be bigger than 0"
