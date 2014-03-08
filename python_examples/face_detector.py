@@ -2,9 +2,9 @@
 # The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 #
 #   This example program shows how to find frontal human faces in an image.  In
-#   particular, this program shows how you can take a list of images from the
-#   command line and display each on the screen with red boxes overlaid on each
-#   human face.
+#   particular, it shows how you can take a list of images from the command
+#   line and display each on the screen with red boxes overlaid on each human
+#   face.
 #
 #   The examples/faces folder contains some jpg images of people.  You can run
 #   this program on them and see the detections by executing the following command:
