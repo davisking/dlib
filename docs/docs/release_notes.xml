@@ -32,7 +32,7 @@ Non-Backwards Compatible Changes:
      more flexible. This introduces a slight backwards incompatibility in that
      the version that loads full_object_detection objects now returns an ignore
      rectangle set instead of a parts name list.  Other than that the changes
-     are backwards compatible with previous version of dlib.
+     are backwards compatible with previous versions of dlib.
    - Added a bias term to the assignment_function's model so the user doesn't
      need to remember, or even understand, that they should add it themselves.
      However, this change breaks backwards compatibility with the previous
