@@ -3,6 +3,7 @@
 /build_clang/
 \.swp$
 \.o$
+\.a$
 \.orig$
 \.obj$
 \.pyc$
