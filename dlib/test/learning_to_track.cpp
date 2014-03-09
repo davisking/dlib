@@ -21,7 +21,7 @@ namespace
 
     struct detection_dense
     {
-        typedef class track_dense track_type;
+        typedef struct track_dense track_type;
         matrix<double,0,1> measurements;
     };
 
@@ -59,7 +59,7 @@ namespace
 
     struct detection_sparse
     {
-        typedef class track_sparse track_type;
+        typedef struct track_sparse track_type;
         matrix<double,0,1> measurements;
     };
 
