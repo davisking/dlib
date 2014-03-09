@@ -31,6 +31,7 @@ namespace dlib
             num_threads = 4;
             detection_window_size = 80*80;
             C = 1;
+            epsilon = 0.01;
         }
 
         bool be_verbose;
@@ -38,6 +39,7 @@ namespace dlib
         unsigned long num_threads;
         unsigned long detection_window_size;
         double C;
+        double epsilon;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -124,6 +126,8 @@ namespace dlib
     {
         if (options.C <= 0)
             throw error("Invalid C value given to train_simple_object_detector(), C must be > 0.");
+        if (options.epsilon <= 0)
+            throw error("Invalid epsilon value given to train_simple_object_detector(), epsilon must be > 0.");
 
         dlib::array<array2d<rgb_pixel> > images;
         std::vector<std::vector<rectangle> > boxes, ignore;
@@ -140,10 +144,11 @@ namespace dlib
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
         trainer.set_num_threads(options.num_threads);  
         trainer.set_c(options.C);
-        trainer.set_epsilon(0.01);
+        trainer.set_epsilon(options.epsilon);
         if (options.be_verbose)
         {
             std::cout << "Training with C: " << options.C << std::endl;
+            std::cout << "Training with epsilon: " << options.epsilon << std::endl;
             std::cout << "Training using " << options.num_threads << " threads."<< std::endl;
             std::cout << "Training with sliding window " << width << " pixels wide by " << height << " pixels tall." << std::endl;
             if (options.add_left_right_image_flips)
@@ -195,6 +200,7 @@ namespace dlib
         {
             std::cout << "Training complete, saved detector to file " << detector_output_filename << std::endl;
             std::cout << "Trained with C: " << options.C << std::endl;
+            std::cout << "Training with epsilon: " << options.epsilon << std::endl;
             std::cout << "Trained using " << options.num_threads << " threads."<< std::endl;
             std::cout << "Trained with sliding window " << width << " pixels wide by " << height << " pixels tall." << std::endl;
             if (upsample_amount != 0)

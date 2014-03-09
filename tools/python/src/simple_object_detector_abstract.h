@@ -37,6 +37,8 @@ namespace dlib
                       will encourage the trainer to fit the data better but might lead to
                       overfitting.  Therefore, you must determine the proper setting of
                       this parameter experimentally.
+                    - epsilon is the stopping epsilon.  Smaller values make the trainer's
+                      solver more accurate but might take longer to train.
         !*/
 
         fhog_training_options()
@@ -46,6 +48,7 @@ namespace dlib
             num_threads = 4;
             detection_window_size = 80*80;
             C = 1;
+            epsilon = 0.01;
         }
 
         bool be_verbose;
@@ -53,6 +56,7 @@ namespace dlib
         unsigned long num_threads;
         unsigned long detection_window_size;
         double C;
+        double epsilon;
     };
 
 // ----------------------------------------------------------------------------------------

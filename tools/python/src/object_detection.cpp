@@ -261,6 +261,15 @@ this parameter experimentally."
                       this parameter experimentally.
                     !*/
                            )
+        .add_property("epsilon", &simple_object_detector_training_options::epsilon,
+                                 &simple_object_detector_training_options::epsilon,
+"epsilon is the stopping epsilon.  Smaller values make the trainer's \n\
+solver more accurate but might take longer to train." 
+                    /*!
+                      epsilon is the stopping epsilon.  Smaller values make the trainer's
+                      solver more accurate but might take longer to train.
+                    !*/
+                           )
         .add_property("num_threads", &simple_object_detector_training_options::num_threads,
                                      &simple_object_detector_training_options::num_threads,
 "train_simple_object_detector() will use this many threads of \n\
