@@ -189,7 +189,7 @@ namespace dlib
                 // Here we use the line search algorithm presented in section 3.1.1 of Franc and Sonnenburg.
 
                 const scalar_type A0 = length_squared(best_so_far - w);
-                const scalar_type B0 = dot(best_so_far, w - best_so_far);
+                const scalar_type BB0 = dot(best_so_far, w - best_so_far);
 
                 const scalar_type scale_pos = (get_c()*Cpos)/samples.size();
                 const scalar_type scale_neg = (get_c()*Cneg)/samples.size();
@@ -197,7 +197,7 @@ namespace dlib
                 ks.clear();
                 ks.reserve(samples.size());
 
-                scalar_type f0 = B0;
+                scalar_type f0 = BB0;
                 for (long i = 0; i < samples.size(); ++i)
                 {
                     const scalar_type& scale = (labels(i)>0) ? scale_pos : scale_neg;
