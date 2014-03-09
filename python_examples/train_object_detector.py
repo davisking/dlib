@@ -28,7 +28,7 @@ if (len(sys.argv) != 2):
     print "program.  For example, if you are in the python_examples folder then "
     print "execute this program by running:"
     print "  ./train_object_detector.py ../examples/faces"
-    exit(1)
+    exit()
 faces_folder = sys.argv[1]
 
 
