@@ -61,11 +61,18 @@ include(${dlib_path}/cmake)
 macro(add_python_module module_name module_sources )
    ADD_LIBRARY(${module_name}_ SHARED ${module_sources} ${ARGN} )
    TARGET_LINK_LIBRARIES(${module_name}_ ${Boost_LIBRARIES} ${PYTHON_LIBRARIES}  dlib)
-   if(WIN32)
+   if(WIN32 AND NOT CYGWIN)
       SET_TARGET_PROPERTIES( ${module_name}_
          PROPERTIES
          PREFIX ""
          SUFFIX ".pyd"
+         OUTPUT_NAME ${module_name}
+         )
+   elseif(CYGWIN)
+      SET_TARGET_PROPERTIES( ${module_name}_
+         PROPERTIES
+         PREFIX ""
+         SUFFIX ".dll"
          OUTPUT_NAME ${module_name}
          )
    else()
