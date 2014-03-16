@@ -147,8 +147,21 @@ namespace dlib
         typedef decision_function<kernel_type> trained_function_type;
 
         rvm_trainer (
-        ) : eps(0.001)
+        ) : eps(0.001), max_iterations(2000)
         {
+        }
+
+        void set_max_iterations (
+            int max_iterations_
+        )
+        {
+          max_iterations = max_iterations_;
+        }
+
+        int get_max_iterations (
+        ) const
+        { 
+            return max_iterations;
         }
 
         void set_epsilon (
@@ -288,9 +301,11 @@ namespace dlib
             bool search_all_alphas = false;
             unsigned long ticker = 0;
             const unsigned long rounds_of_narrow_search = 100;
+            int iterations = 0;
 
-            while (true)
+            while (iterations != max_iterations)
             {
+                iterations++;
                 if (recompute_beta)
                 {
                     // calculate the current t_estimate. (this is the predicted t value for each sample according to the
@@ -572,6 +587,7 @@ namespace dlib
     // private member variables
         kernel_type kernel;
         scalar_type eps;
+        int max_iterations;
 
         const static scalar_type tau;
 

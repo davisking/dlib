@@ -104,6 +104,11 @@ int main()
     // reliable.  But sometimes it works out well.  0.001 is the default.
     trainer.set_epsilon(0.001);
 
+    // The relevance vector machine with radial basis function tends to learn too long and
+    // sometimes it is stuck forever. A default iterations limit is 2000, but it can be disabled by
+    // setting equal or less than zero.
+    trainer.set_max_iterations(0);
+
     // Now we loop over some different gamma values to see how good they are.  Note
     // that this is a very simple way to try out a few possible parameter choices.  You 
     // should look at the model_selection_ex.cpp program for examples of more sophisticated 
