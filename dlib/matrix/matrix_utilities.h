@@ -3903,6 +3903,51 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename T,
+        long NR_,
+        long NC_,
+        typename MM
+        >
+    struct op_mat_to_vect2
+    {
+        typedef matrix<T,NR_,NC_,MM,row_major_layout> M;
+        op_mat_to_vect2(const M& m_) : m(m_) {}
+        const M& m;
+
+        const static long cost = M::cost+2;
+        const static long NR = M::NC*M::NR;
+        const static long NC = 1;
+        typedef typename M::type type;
+        typedef typename M::const_ret_type const_ret_type;
+        typedef typename M::mem_manager_type mem_manager_type;
+        typedef typename M::layout_type layout_type;
+
+        const_ret_type apply ( long r, long ) const { return (&m(0,0))[r]; }
+
+        long nr () const { return m.size(); }
+        long nc () const { return 1; }
+
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return m.aliases(item); }
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return m.aliases(item); }
+    }; 
+
+    template <
+        typename T,
+        long NR,
+        long NC,
+        typename MM
+        >
+    const matrix_op<op_mat_to_vect2<T,NR,NC,MM> > reshape_to_column_vector (
+        const matrix<T,NR,NC,MM,row_major_layout>& m
+    )
+    {
+        typedef op_mat_to_vect2<T,NR,NC,MM> op;
+        return matrix_op<op>(op(m.ref()));
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <typename M1, typename M2>
     struct op_join_rows 
     {
