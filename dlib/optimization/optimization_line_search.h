@@ -512,7 +512,7 @@ namespace dlib
         unsigned long iter = 0;
         while (true)
         {
-            ++max_iter;
+            ++iter;
             const double val = f(alpha);
             if (val <= f0 + alpha*rho*d0 || iter >= max_iter)
             {
