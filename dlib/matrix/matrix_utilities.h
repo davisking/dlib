@@ -1608,7 +1608,7 @@ namespace dlib
         typename visual_studio_sucks_cov_helper<EXP>::type cov(m(0).nr(),m(0).nr());
         set_all_elements(cov,0);
 
-        const matrix<double,EXP::type::NR,EXP::type::NC, typename EXP::mem_manager_type> avg = mean(m);
+        const typename EXP::type avg = mean(m);
 
         for (long r = 0; r < m.nr(); ++r)
         {
