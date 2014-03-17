@@ -31,6 +31,32 @@ namespace dlib
         }
     };
 
+    template <
+        typename matrix_type
+        >
+    void serialize(const frobmetric_training_sample<matrix_type>& item, std::ostream& out)
+    {
+        int version = 1;
+        serialize(version, out);
+        serialize(item.anchor_vect, out);
+        serialize(item.near_vects, out);
+        serialize(item.far_vects, out);
+    }
+
+    template <
+        typename matrix_type
+        >
+    void deserialize(frobmetric_training_sample<matrix_type>& item, std::istream& in)
+    {
+        int version = 0;
+        deserialize(version, in);
+        if (version != 1)
+            throw serialization_error("Unexpected version found while deserializing dlib::frobmetric_training_sample.");
+        deserialize(item.anchor_vect, in);
+        deserialize(item.near_vects, in);
+        deserialize(item.far_vects, in);
+    }
+
 // ----------------------------------------------------------------------------------------
 
     template <

@@ -46,6 +46,14 @@ namespace dlib
         !*/
     };
 
+    template < typename matrix_type >
+    void serialize(const frobmetric_training_sample<matrix_type>& item, std::ostream& out)
+    template < typename matrix_type >
+    void deserialize(frobmetric_training_sample<matrix_type>& item, std::istream& in)
+    /*!
+        provides serialisation support.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <
