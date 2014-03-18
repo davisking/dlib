@@ -113,8 +113,8 @@ namespace dlib
             connection*& new_connection,
             unsigned short foreign_port, 
             const std::string& foreign_ip, 
-            unsigned short local_port = 0,
-            const std::string& local_ip = ""
+            unsigned short local_port,
+            const std::string& local_ip
         );
 
     public:
@@ -299,7 +299,7 @@ namespace dlib
         friend int create_listener (
             listener*& new_listener,
             unsigned short port,
-            const std::string& ip = ""
+            const std::string& ip
         );
 
     public:
@@ -356,15 +356,15 @@ namespace dlib
     int create_listener (
         listener*& new_listener,
         unsigned short port,
-        const std::string& ip 
+        const std::string& ip = ""
     );
 
     int create_connection ( 
         connection*& new_connection,
         unsigned short foreign_port, 
         const std::string& foreign_ip, 
-        unsigned short local_port,
-        const std::string& local_ip
+        unsigned short local_port = 0,
+        const std::string& local_ip = ""
     );
 
     int create_listener (
