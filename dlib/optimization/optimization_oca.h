@@ -152,7 +152,7 @@ namespace dlib
         typename matrix_type::type oca_impl (
             const oca_problem<matrix_type>& problem,
             matrix_type& w,
-            const matrix_type& prior,
+            const matrix_type prior,
             bool have_prior,
             unsigned long num_nonnegative,
             unsigned long force_weight_to_1
