@@ -265,7 +265,7 @@ namespace dlib
                   properties: 
                     - Z == The result of applying the linear transform we learned during
                       train() to the input vector x.
-                    - Z == transformed()*x-transformed_means()
+                    - Z == transform()*x-transformed_means()
                     - is_col_vector(Z) == true
                     - Z.size() == x.size()
                     - The expected value of each element of Z is 0.
