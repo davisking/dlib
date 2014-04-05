@@ -116,7 +116,7 @@ struct feature_extractor
     unsigned long num_features() const
     {
         // Return the dimensionality of feature vectors produced by get_features()
-        return num_dims + 1;
+        return num_dims;
     }
 
     void get_features (
@@ -132,12 +132,10 @@ struct feature_extractor
               is "good").
     !*/
     {
-        // We will have: 
-        //   - feats(i) == std::pow(left(i) - right(i), 2.0)
-        // Except for the last element of feats which will be equal to 1 and
-        // therefore function as a bias term.  Again, how you define this feature
-        // extractor is highly problem dependent.    
-        feats = join_cols(squared(left - right), ones_matrix<double>(1,1));
+        // Lets just use the squared difference between each vector as our features.
+        // However, it should be emphasized that how to compute the features here is very
+        // problem dependent.  
+        feats = squared(left - right);
     }
 
 };
