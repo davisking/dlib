@@ -193,6 +193,8 @@ namespace dlib
             }
             cost.set_size(size, size);
 
+            const double loss_for_false_association = 1;
+            const double loss_for_missed_association = 1;
             typename feature_extractor::feature_vector_type feats;
 
             // now fill out the cost assignment matrix
@@ -211,7 +213,7 @@ namespace dlib
                             // add in the loss since this corresponds to an incorrect prediction.
                             if (c != labels[idx][r])
                             {
-                                cost(r,c) += 1;
+                                cost(r,c) += loss_for_false_association;
                             }
                         }
                         else
@@ -219,7 +221,7 @@ namespace dlib
                             if (labels[idx][r] == -1)
                                 cost(r,c) = 0;
                             else
-                                cost(r,c) = 1; // 1 for the loss
+                                cost(r,c) = loss_for_missed_association; 
                         }
 
                     }
@@ -250,7 +252,12 @@ namespace dlib
                     assignment[i] = -1;
 
                 if (assignment[i] != labels[idx][i])
-                    loss += 1;
+                {
+                    if (assignment[i] == -1)
+                        loss += loss_for_missed_association;
+                    else
+                        loss += loss_for_false_association;
+                }
             }
 
             get_joint_feature_vector(samples[idx], assignment, psi);
