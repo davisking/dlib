@@ -20,6 +20,15 @@ namespace dlib
                 applies an affine transformation to them.
         !*/
     public:
+
+        point_transform_affine (
+        );
+        /*!
+            ensures
+                - This object will perform the identity transform.  That is, given a point
+                  as input it will return the same point as output.
+        !*/
+
         point_transform_affine (
             const matrix<double,2,2>& m,
             const dlib::vector<double,2>& b
@@ -56,6 +65,12 @@ namespace dlib
         !*/
 
     };
+
+    void serialize   (const point_transform_affine& item, std::ostream& out);
+    void deserialize (point_transform_affine& item, std::istream& in);
+    /*!
+        provides serialization support
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
@@ -105,6 +120,14 @@ namespace dlib
     public:
 
         point_transform_projective (
+        );
+        /*!
+            ensures
+                - This object will perform the identity transform.  That is, given a point
+                  as input it will return the same point as output.
+        !*/
+
+        point_transform_projective (
             const matrix<double,3,3>& m
         );
         /*!
@@ -144,6 +167,12 @@ namespace dlib
         !*/
 
     };
+
+    void serialize   (const point_transform_projective& item, std::ostream& out);
+    void deserialize (point_transform_projective& item, std::istream& in);
+    /*!
+        provides serialization support
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
@@ -186,6 +215,15 @@ namespace dlib
                 translates them.
         !*/
     public:
+
+        point_transform (
+        );
+        /*!
+            ensures
+                - This object will perform the identity transform.  That is, given a point
+                  as input it will return the same point as output.
+        !*/
+
         point_transform (
             const double& angle,
             const dlib::vector<double,2>& translate
@@ -226,6 +264,12 @@ namespace dlib
 
     };
 
+    void serialize   (const point_transform& item, std::ostream& out);
+    void deserialize (point_transform& item, std::istream& in);
+    /*!
+        provides serialization support
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     class point_rotator
@@ -236,6 +280,15 @@ namespace dlib
                 rotates them around the origin by a given angle.
         !*/
     public:
+
+        point_rotator (
+        );
+        /*!
+            ensures
+                - This object will perform the identity transform.  That is, given a point
+                  as input it will return the same point as output.
+        !*/
+
         point_rotator (
             const double& angle
         );
@@ -266,6 +319,12 @@ namespace dlib
                 - returns the transformation matrix used by this object.
         !*/
     };
+
+    void serialize   (const point_rotator& item, std::ostream& out);
+    void deserialize (point_rotator& item, std::istream& in);
+    /*!
+        provides serialization support
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
