@@ -59,7 +59,7 @@ namespace dlib
     );
     /*!
         ensures
-            - for all loggers L:
+            - for all loggers L (even loggers not yet constructed):
                 - #L.output_streambuf() == out.rdbuf() 
                 - Removes any previous output hook from L.  So now the logger
                   L will write all its messages to the given output stream.
@@ -81,7 +81,7 @@ namespace dlib
     );
     /*!
         ensures
-            - for all loggers L:
+            - for all loggers L (even loggers not yet constructed):
                 - #L.output_streambuf() == 0
                 - performs the equivalent to calling L.set_output_hook(object, hook);
                   (i.e. sets all loggers so that they will use the given hook function)
@@ -96,7 +96,7 @@ namespace dlib
     );
     /*!
         ensures
-            - for all loggers L:
+            - for all loggers L (even loggers not yet constructed):
                 - #L.level() == new_level
         throws
             - std::bad_alloc
