@@ -20,6 +20,13 @@ namespace dlib
     {
     public:
         point_rotator (
+        )
+        {
+            sin_angle = 0;
+            cos_angle = 1;
+        }
+
+        point_rotator (
             const double& angle
         )
         {
@@ -47,6 +54,18 @@ namespace dlib
             return temp; 
         }
 
+        inline friend void serialize (const point_rotator& item, std::ostream& out)
+        {
+            serialize(item.sin_angle, out);
+            serialize(item.cos_angle, out);
+        }
+
+        inline friend void deserialize (point_rotator& item, std::istream& in)
+        {
+            deserialize(item.sin_angle, in);
+            deserialize(item.cos_angle, in);
+        }
+
     private:
         double sin_angle;
         double cos_angle;
@@ -57,6 +76,16 @@ namespace dlib
     class point_transform
     {
     public:
+
+        point_transform (
+        )
+        {
+            sin_angle = 0;
+            cos_angle = 1;
+            translate.x() = 0;
+            translate.y() = 0;
+        }
+
         point_transform (
             const double& angle,
             const dlib::vector<double,2>& translate_
@@ -90,6 +119,20 @@ namespace dlib
         const dlib::vector<double,2> get_b(
         ) const { return translate; }
 
+        inline friend void serialize (const point_transform& item, std::ostream& out)
+        {
+            serialize(item.sin_angle, out);
+            serialize(item.cos_angle, out);
+            serialize(item.translate, out);
+        }
+
+        inline friend void deserialize (point_transform& item, std::istream& in)
+        {
+            deserialize(item.sin_angle, in);
+            deserialize(item.cos_angle, in);
+            deserialize(item.translate, in);
+        }
+
     private:
         double sin_angle;
         double cos_angle;
@@ -101,6 +144,15 @@ namespace dlib
     class point_transform_affine
     {
     public:
+
+        point_transform_affine (
+        )
+        {
+            m = identity_matrix<double>(2);
+            b.x() = 0;
+            b.y() = 0;
+        }
+
         point_transform_affine (
             const matrix<double,2,2>& m_,
             const dlib::vector<double,2>& b_
@@ -120,6 +172,18 @@ namespace dlib
 
         const dlib::vector<double,2>& get_b(
         ) const { return b; }
+
+        inline friend void serialize (const point_transform_affine& item, std::ostream& out)
+        {
+            serialize(item.m, out);
+            serialize(item.b, out);
+        }
+
+        inline friend void deserialize (point_transform_affine& item, std::istream& in)
+        {
+            deserialize(item.m, in);
+            deserialize(item.b, in);
+        }
 
     private:
         matrix<double,2,2> m;
@@ -175,6 +239,13 @@ namespace dlib
     class point_transform_projective
     {
     public:
+
+        point_transform_projective (
+        )
+        {
+            m = identity_matrix<double>(3);
+        }
+
         point_transform_projective (
             const matrix<double,3,3>& m_
         ) :m(m_)
@@ -208,6 +279,15 @@ namespace dlib
         const matrix<double,3,3>& get_m(
         ) const { return m; }
 
+        inline friend void serialize (const point_transform_projective& item, std::ostream& out)
+        {
+            serialize(item.m, out);
+        }
+
+        inline friend void deserialize (point_transform_projective& item, std::istream& in)
+        {
+            deserialize(item.m, in);
+        }
 
     private:
         matrix<double,3,3> m;
