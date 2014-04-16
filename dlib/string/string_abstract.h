@@ -530,6 +530,86 @@ namespace dlib
         typename traits,
         typename alloc
         >
+    std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> > 
+    split_on_first (
+        const std::basic_string<charT,traits,alloc>& str,
+        const charT* delim = _dT(charT, " \n\r\t")
+    );
+    /*!
+        ensures
+            - This function splits string into two parts, the split is based on the first
+              occurrence of any character from delim.  
+            - let delim_pos = str.find_first_of(delim)
+            - if (delim_pos == std::string::npos) then
+                - returns make_pair(str,"")
+            - else
+                - return make_pair(str.substr(0, delim_pos), str.substr(delim_pos+1));
+    !*/
+
+    template <
+        typename charT,
+        typename traits,
+        typename alloc
+        >
+    std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> > 
+    split_on_first (
+        const std::basic_string<charT,traits,alloc>& str,
+        const std::basic_string<charT,traits,alloc>& delim 
+    );
+    /*!
+        requires
+            - delim == a valid null-terminated C string
+        ensures
+            - returns split_on_first(str, delim.c_str())
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename charT,
+        typename traits,
+        typename alloc
+        >
+    std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> > 
+    split_on_last (
+        const std::basic_string<charT,traits,alloc>& str,
+        const charT* delim = _dT(charT, " \n\r\t")
+    );
+    /*!
+        ensures
+            - This function splits string into two parts, the split is based on the last 
+              occurrence of any character from delim.  
+            - let delim_pos = str.find_last_of(delim)
+            - if (delim_pos == std::string::npos) then
+                - returns make_pair(str,"")
+            - else
+                - return make_pair(str.substr(0, delim_pos), str.substr(delim_pos+1));
+    !*/
+
+    template <
+        typename charT,
+        typename traits,
+        typename alloc
+        >
+    std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> > 
+    split_on_last (
+        const std::basic_string<charT,traits,alloc>& str,
+        const std::basic_string<charT,traits,alloc>& delim 
+    );
+    /*!
+        requires
+            - delim == a valid null-terminated C string
+        ensures
+            - returns split_on_last(str, delim.c_str())
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename charT,
+        typename traits,
+        typename alloc
+        >
     const std::vector<std::basic_string<charT,traits,alloc> > split (
         const std::basic_string<charT,traits,alloc>& str,
         const std::basic_string<charT,traits,alloc>& delim 
