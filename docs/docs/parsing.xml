@@ -53,6 +53,8 @@
          <item>pad</item> 
          <item>lpad</item> 
          <item>rpad</item> 
+         <item>split_on_first</item> 
+         <item>split_on_last</item> 
          <item>left_substr</item> 
          <item>right_substr</item> 
          <item>split</item> 
@@ -100,6 +102,30 @@
             
    <!-- ************************************************************************* -->
 
+      <component>
+         <name>split_on_first</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>
+            Breaks a string into two parts.  The split point is selected based
+            on the first occurrence of a delimiter character.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      <component>
+         <name>split_on_last</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>
+            Breaks a string into two parts.  The split point is selected based
+            on the last occurrence of a delimiter character.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
       <component>
          <name>split</name>
          <file>dlib/string.h</file>

@@ -1428,6 +1428,8 @@
          <term file="parsing.html" name="left_substr"                include="dlib/string.h"/>
          <term file="parsing.html" name="right_substr"               include="dlib/string.h"/>
          <term file="parsing.html" name="split"                      include="dlib/string.h"/>
+         <term file="parsing.html" name="split_on_first"             include="dlib/string.h"/>
+         <term file="parsing.html" name="split_on_last"              include="dlib/string.h"/>
          <term file="parsing.html" name="unichar"                    include="dlib/unicode.h"/>
          <term file="parsing.html" name="ustring"                    include="dlib/unicode.h"/>
          <term file="parsing.html" name="convert_utf8_to_utf32"      include="dlib/unicode.h"/>
