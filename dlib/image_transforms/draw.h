@@ -261,9 +261,9 @@ namespace dlib
         assign_pixel(background_color, 0);
         temp = background_color;
         unsigned long idx = 0;
-        for (long r = 0; r < size_nr; ++r)
+        for (unsigned long r = 0; r < size_nr; ++r)
         {
-            for (long c = 0; c < size_nc; ++c)
+            for (unsigned long c = 0; c < size_nc; ++c)
             {
                 if (idx < images.size())
                 {
