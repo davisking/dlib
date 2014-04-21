@@ -72,7 +72,7 @@ namespace dlib
         unsigned long merge_sets (
             unsigned long a,
             unsigned long b
-        )
+        );
         /*!
             requires
                 - a != b
