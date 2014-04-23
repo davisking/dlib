@@ -143,6 +143,48 @@ namespace dlib
             force_assignment = new_value;
         }
 
+        void set_loss_per_false_association (
+            double loss
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(loss > 0, 
+                "\t void structural_assignment_trainer::set_loss_per_false_association(loss)"
+                << "\n\t Invalid inputs were given to this function "
+                << "\n\t loss: " << loss
+                << "\n\t this: " << this
+                );
+
+            loss_per_false_association = loss;
+        }
+
+        double get_loss_per_false_association (
+        ) const
+        {
+            return loss_per_false_association;
+        }
+
+        void set_loss_per_missed_association (
+            double loss
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(loss > 0, 
+                "\t void structural_assignment_trainer::set_loss_per_missed_association(loss)"
+                << "\n\t Invalid inputs were given to this function "
+                << "\n\t loss: " << loss
+                << "\n\t this: " << this
+                );
+
+            loss_per_missed_association = loss;
+        }
+
+        double get_loss_per_missed_association (
+        ) const
+        {
+            return loss_per_missed_association;
+        }
+
         const assignment_function<feature_extractor> train (  
             const std::vector<sample_type>& samples,
             const std::vector<label_type>& labels
@@ -173,7 +215,8 @@ namespace dlib
 
 
 
-            structural_svm_assignment_problem<feature_extractor> prob(samples,labels, fe, force_assignment, num_threads);
+            structural_svm_assignment_problem<feature_extractor> prob(samples,labels, fe, force_assignment, num_threads,
+                loss_per_false_association, loss_per_missed_association);
 
             if (verbose)
                 prob.be_verbose();
@@ -204,6 +247,8 @@ namespace dlib
         bool verbose;
         unsigned long num_threads;
         unsigned long max_cache_size;
+        double loss_per_false_association;
+        double loss_per_missed_association;
 
         void set_defaults ()
         {
@@ -213,6 +258,8 @@ namespace dlib
             eps = 0.01;
             num_threads = 2;
             max_cache_size = 5;
+            loss_per_false_association = 1;
+            loss_per_missed_association = 1;
         }
 
         feature_extractor fe;
