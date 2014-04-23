@@ -169,12 +169,13 @@ namespace dlib
                 // make sure requires clause is not broken
                 DLIB_CASSERT( N < count() && arg < number_of_arguments(),
                     "\tconst string_type& cmd_line_parser_option::argument(unsigned long,unsigned long)"
-                    << "\n\tsee the requires clause of argument()"
-                    << "\n\tthis:                      " << this
-                    << "\n\tN:                         " << N
-                    << "\n\targ:                       " << arg 
-                    << "\n\tcount():                   " << count()
-                    << "\n\tnumber_of_arguments():     " << number_of_arguments()
+                    << "\n\tInvalid arguments were given to this function."
+                    << "\n\tthis:                  " << this
+                    << "\n\tN:                     " << N
+                    << "\n\targ:                   " << arg 
+                    << "\n\tname():                " << narrow(name())
+                    << "\n\tcount():               " << count()
+                    << "\n\tnumber_of_arguments(): " << number_of_arguments()
                     );
 
                 return options[N][arg]; 
