@@ -97,7 +97,7 @@ namespace dlib
                   train.  You can think of this epsilon value as saying "solve the
                   optimization problem until the average ranking accuracy is within epsilon
                   of its optimal value".  Here we mean "ranking accuracy" in the same sense
-                  used by test_ranking_function() and cross_validate_multiclass_trainer().
+                  used by test_ranking_function() and cross_validate_ranking_trainer().
         !*/
 
         unsigned long get_max_iterations (
