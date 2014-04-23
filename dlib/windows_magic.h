@@ -14,6 +14,11 @@
 #define NOMINMAX // prevent windows from messing with std::min and std::max
 #endif
 
+// Prevent windows from #defining IN or OUT
+#ifndef _NO_W32_PSEUDO_MODIFIERS
+#define _NO_W32_PSEUDO_MODIFIERS
+#endif
+
 // now just for good measure undefine min and max if they are defined
 #ifdef min
 #undef min
