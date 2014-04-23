@@ -346,7 +346,7 @@ namespace dlib
             serialize( item.within_weight, out);
         }
 
-        const discriminant_pca operator+ (
+        discriminant_pca operator+ (
             const discriminant_pca& item
         ) const
         {
@@ -406,6 +406,14 @@ namespace dlib
             }
 
             return temp;
+        }
+
+        discriminant_pca& operator+= (
+            const discriminant_pca& rhs
+        )
+        {
+            (*this + rhs).swap(*this);
+            return *this;
         }
 
     private:

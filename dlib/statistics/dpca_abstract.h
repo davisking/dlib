@@ -281,7 +281,7 @@ namespace dlib
                   reduction to num_rows dimensions.
         !*/
 
-        const discriminant_pca operator+ (
+        discriminant_pca operator+ (
             const discriminant_pca& item
         ) const;
         /*!
@@ -296,6 +296,20 @@ namespace dlib
                   discriminant_pca object, R, that is equivalent to what you would obtain if all
                   modifying calls (e.g. the add_to_*() functions) to *this and item had instead 
                   been done to R.
+        !*/
+
+        discriminant_pca& operator+= (
+            const discriminant_pca& rhs
+        );
+        /*!
+            requires
+                - in_vector_size() == 0 || rhs.in_vector_size() == 0 || in_vector_size() == rhs.in_vector_size()
+                  (i.e. the in_vector_size() of *this and rhs must match or one must be zero)
+                - between_class_weight() == rhs.between_class_weight()
+                - within_class_weight() == rhs.within_class_weight()
+            ensures
+                - #*this == *item + rhs
+                - returns #*this
         !*/
 
         void swap (

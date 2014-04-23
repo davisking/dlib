@@ -252,7 +252,7 @@ namespace
 
             matrix<double> mat, mat2;
 
-            sum_dpca = dpca_type() + dpca_type() + add_dpca1 + dpca_type() + add_dpca2 + add_dpca3 + add_dpca4;
+            sum_dpca += dpca_type() + dpca_type() + add_dpca1 + dpca_type() + add_dpca2 + add_dpca3 + add_dpca4;
             dpca.set_within_class_weight(0);
             dpca.set_between_class_weight(0);
             sum_dpca.set_within_class_weight(0);
