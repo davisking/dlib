@@ -50,6 +50,7 @@ namespace dlib
                 - This object is properly initialized and ready to be used
                   to train a relevance vector machine.
                 - #get_epsilon() == 0.001
+                - #get_max_iterations() == 2000
         !*/
 
         void set_epsilon (
@@ -84,6 +85,22 @@ namespace dlib
         /*!
             ensures
                 - returns a copy of the kernel function in use by this object
+        !*/
+
+        unsigned long get_max_iterations (
+        ) const; 
+        /*!
+            ensures
+                - returns the maximum number of iterations the RVM optimizer is allowed to
+                  run before it is required to stop and return a result.
+        !*/
+
+        void set_max_iterations (
+            unsigned long max_iter
+        ); 
+        /*!
+            ensures
+                - #get_max_iterations() == max_iter
         !*/
 
         template <

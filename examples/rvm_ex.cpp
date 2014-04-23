@@ -103,6 +103,9 @@ int main()
     // stopping epsilon bigger.  However, this might make the outputs less
     // reliable.  But sometimes it works out well.  0.001 is the default.
     trainer.set_epsilon(0.001);
+    // You can also set an explicit limit on the number of iterations used by the numeric
+    // solver.  The default is 2000.
+    trainer.set_max_iterations(2000);
 
     // Now we loop over some different gamma values to see how good they are.  Note
     // that this is a very simple way to try out a few possible parameter choices.  You 
