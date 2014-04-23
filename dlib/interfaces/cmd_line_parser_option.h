@@ -77,7 +77,7 @@ namespace dlib
                 - arg < number_of_arguments()
                 - N < count()
             ensures
-                - returns the argth argument to the Nth occurance of this 
+                - returns the arg-th argument to the Nth occurrence of this 
                   option on the command line.
         !*/
 
