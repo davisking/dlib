@@ -566,14 +566,12 @@ namespace dlib
                 f = matrix_cast<double>(reshape(rowm(m, range(idx, idx+size-1)), nr, nc));
                 svd3(f, u,w,v);
 
-                w = round_zeros(w, std::max(1e-9,max(w)*1e-7)); 
 
                 const double norm = sum(w);
                 obj += strength*norm;
                 nuclear_norm_part += strength*norm/C;
 
-                w = w>0;
-                f = u*diagm(w)*trans(v);
+                f = u*trans(v);
 
                 set_rowm(grad, range(idx, idx+size-1)) = matrix_cast<double>(strength*reshape_to_column_vector(f));
             }
