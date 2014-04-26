@@ -788,6 +788,7 @@
          <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="sleep"                   include="dlib/misc_api.h"/>
          <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="get_current_dir"         include="dlib/misc_api.h"/>
          <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="set_current_dir"         include="dlib/misc_api.h"/>
+         <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="locally_change_current_dir" include="dlib/misc_api.h"/>
          <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="set_current_dir_error"   include="dlib/misc_api.h"/>
          <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="dir_create_error"        include="dlib/misc_api.h"/>
          <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="create_directory"        include="dlib/misc_api.h"/>
