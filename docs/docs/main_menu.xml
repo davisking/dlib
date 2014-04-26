@@ -387,6 +387,10 @@
                   <link>logger_ex_2.cpp.html</link>
                </item>
                <item>
+                  <name>Logger_Custom_Output</name>
+                  <link>logger_custom_output_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>XML_Parser</name>
                   <link>xml_parser_ex.cpp.html</link>
                </item>

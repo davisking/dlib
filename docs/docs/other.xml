@@ -277,6 +277,7 @@
          <examples>
             <example>logger_ex.cpp.html</example>
             <example>logger_ex_2.cpp.html</example>
+            <example>logger_custom_output_ex.cpp.html</example>
             <example>pipe_ex.cpp.html</example>
          </examples>
 
