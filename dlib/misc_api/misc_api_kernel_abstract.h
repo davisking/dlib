@@ -61,6 +61,41 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class locally_change_current_dir : noncopyable
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a RAII tool for safely switching the current directory
+                to a new directory and then automatically switching back to the original
+                directory upon this object's destruction.
+        !*/
+    public:
+        explicit locally_change_current_dir (
+            const std::string& new_dir
+        );
+        /*!
+            ensures
+                - calls set_current_dir(new_dir)
+                - #old_dir() == The value of get_current_dir() prior to switching to new_dir.
+        !*/
+
+        const std::string& old_dir (
+        ) const;
+        /*!
+            ensures
+                - returns the directory we switch back to once this object is destructed.
+        !*/
+
+        ~locally_change_current_dir(
+        );
+        /*!
+            ensures
+                - calls set_current_dir(old_dir())
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
     class dir_create_error : public error { 
     public:
         const std::string name
