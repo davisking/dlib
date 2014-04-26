@@ -39,8 +39,8 @@ using namespace dlib;
 
     logp is the child of itself because all loggers are their own children :)  But the other
     two are child loggers of logp because their names start with logp.name() + "." which means
-    that whenever you set a property on a log it will also set that same property on all of
-    the log's children.
+    that whenever you set a property on a logger it will also set that same property on all of
+    the logger's children.
 */
 logger logp("example");
 logger logt("example.thread");
@@ -117,7 +117,7 @@ int main()
 
     int variable = 8;
 
-    // here is a debug message.  it won't print though because its log level is too low (it is below LINFO).
+    // Here is a debug message.  It won't print though because its log level is too low (it is below LINFO).
     logp << LDEBUG << "The integer variable is set to " << variable;
 
     
