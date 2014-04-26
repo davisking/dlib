@@ -9,7 +9,7 @@
 #include <iostream>
 
 // The point of this block of code is to cause a link time error that will prevent a user
-// from compiling part of their application with DLIB_ASSERTs enabled and part with them
+// from compiling part of their application with DLIB_ASSERT enabled and part with them
 // disabled since doing that would be a violation of C++'s one definition rule. 
 extern "C"
 {
