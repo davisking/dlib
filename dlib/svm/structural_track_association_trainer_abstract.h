@@ -39,6 +39,8 @@ namespace dlib
                 - #get_num_threads() == 2
                 - #get_max_cache_size() == 5
                 - #learns_nonnegative_weights() == false
+                - #get_loss_per_track_break() == 1
+                - #get_loss_per_false_association() == 1
         !*/
 
         void set_num_threads (
@@ -111,6 +113,45 @@ namespace dlib
         /*!
             ensures
                 - this object will not print anything to standard out
+        !*/
+
+        void set_loss_per_false_association (
+            double loss
+        );
+        /*!
+            requires
+                - loss > 0
+            ensures
+                - #get_loss_per_false_association() == loss
+        !*/
+
+        double get_loss_per_false_association (
+        ) const;
+        /*!
+            ensures
+                - returns the amount of loss experienced for assigning a detection to the
+                  wrong track.  If you care more about avoiding false associations than
+                  avoiding track breaks then you can increase this value.
+        !*/
+
+        void set_loss_per_track_break (
+            double loss
+        );
+        /*!
+            requires
+                - loss > 0
+            ensures
+                - #get_loss_per_track_break() == loss
+        !*/
+
+        double get_loss_per_track_break (
+        ) const;
+        /*!
+            ensures
+                - returns the amount of loss experienced for incorrectly assigning a
+                  detection to a new track instead of assigning it to its existing track.
+                  If you care more about avoiding track breaks than avoiding things like
+                  track swaps then you can increase this value.
         !*/
 
         void set_oca (
