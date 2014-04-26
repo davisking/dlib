@@ -35,9 +35,21 @@ namespace dlib
                   is null terminated.
         !*/
 
+        bool operator< (const log_level& rhs) const { return priority <  rhs.priority; }
+        bool operator<=(const log_level& rhs) const { return priority <= rhs.priority; }
+        bool operator> (const log_level& rhs) const { return priority >  rhs.priority; }
+        bool operator>=(const log_level& rhs) const { return priority >= rhs.priority; }
+
         int priority;
         char name[20];
     };
+
+    inline std::ostream& operator<< (std::ostream& out, const log_level& item);
+    /*!
+        ensures
+            - performs out << item.name
+            - returns out
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
@@ -87,6 +99,17 @@ namespace dlib
                   (i.e. sets all loggers so that they will use the given hook function)
         throws
             - std::bad_alloc
+    !*/
+
+    template <
+        typename T
+        >
+    void set_all_logging_output_hooks (
+        T& object
+    );
+    /*!
+        ensures
+            - calls set_all_logging_output_hooks(object, &T::log);
     !*/
 
 // ----------------------------------------------------------------------------------------
