@@ -12,6 +12,19 @@
 
 <current>
 New Features:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="18.7" date="Apr 09, 2014">
+New Features:
    - Added a Python API for working with fHOG based object detectors.  See the
      new python example programs train_object_detector.py and face_detector.py for
      more details.
@@ -55,7 +68,7 @@ Bug fixes:
 
 Other:
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
