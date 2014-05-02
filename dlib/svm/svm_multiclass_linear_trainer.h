@@ -10,6 +10,7 @@
 #include "../matrix.h"
 #include "sparse_vector.h"
 #include "function.h"
+#include <algorithm>
 
 namespace dlib
 {
@@ -46,13 +47,15 @@ namespace dlib
         multiclass_svm_problem (
             const std::vector<sample_type>& samples_,
             const std::vector<label_type>& labels_,
+            const std::vector<label_type>& distinct_labels_,
+            const unsigned long dims_,
             const unsigned long num_threads
         ) :
             structural_svm_problem_threaded<matrix_type, std::vector<std::pair<unsigned long,typename matrix_type::type> > >(num_threads),
             samples(samples_),
             labels(labels_),
-            distinct_labels(select_all_distinct_labels(labels_)),
-            dims(max_index_plus_one(samples_)+1) // +1 for the bias
+            distinct_labels(distinct_labels_),
+            dims(dims_+1) // +1 for the bias
         {}
 
         virtual long get_num_dimensions (
@@ -151,7 +154,7 @@ namespace dlib
 
         const std::vector<sample_type>& samples;
         const std::vector<label_type>& labels;
-        const std::vector<label_type> distinct_labels;
+        const std::vector<label_type>& distinct_labels;
         const long dims;
     };
 
@@ -260,6 +263,7 @@ namespace dlib
         )
         {
             learn_nonnegative_weights = value;
+            prior = trained_function_type(); 
         }
 
         void set_c (
@@ -281,6 +285,20 @@ namespace dlib
         ) const
         {
             return C;
+        }
+
+        void set_prior (
+            const trained_function_type& prior_
+        )
+        {
+            prior = prior_;
+            learn_nonnegative_weights = false;
+        }
+
+        bool has_prior (
+        ) const
+        {
+            return prior.labels.size() != 0;
         }
 
         trained_function_type train (
@@ -306,9 +324,33 @@ namespace dlib
                 << "\n\t all_labels.size():      " << all_labels.size() 
                 );
 
+            trained_function_type df;
+            df.labels = select_all_distinct_labels(all_labels);
+            if (has_prior())
+            {
+                df.labels.insert(df.labels.end(), prior.labels.begin(), prior.labels.end());
+                df.labels = select_all_distinct_labels(df.labels);
+            }
+            const long input_sample_dimensionality = max_index_plus_one(all_samples);
+            // If the samples are sparse then the right thing to do is to take the max
+            // dimensionality between the prior and the new samples.  But if the samples
+            // are dense vectors then they definitely all have to have exactly the same
+            // dimensionality.
+            const long dims = std::max(df.weights.nc(),input_sample_dimensionality);
+            if (is_matrix<sample_type>::value && has_prior())
+            {
+                DLIB_ASSERT(input_sample_dimensionality == prior.weights.nc(), 
+                    "\t trained_function_type svm_multiclass_linear_trainer::train(all_samples,all_labels)"
+                    << "\n\t The training samples given to this function are not the same kind of training "
+                    << "\n\t samples used to create the prior."
+                    << "\n\t input_sample_dimensionality: " << input_sample_dimensionality 
+                    << "\n\t prior.weights.nc():          " << prior.weights.nc() 
+                );
+            }
+
             typedef matrix<scalar_type,0,1> w_type;
             w_type weights;
-            multiclass_svm_problem<w_type, sample_type, label_type> problem(all_samples, all_labels, num_threads);
+            multiclass_svm_problem<w_type, sample_type, label_type> problem(all_samples, all_labels, df.labels, dims, num_threads);
             if (verbose)
                 problem.be_verbose();
 
@@ -322,12 +364,33 @@ namespace dlib
                 num_nonnegative = problem.get_num_dimensions();
             }
 
-            svm_objective = solver(problem, weights, num_nonnegative);
+            if (!has_prior())
+            {
+                svm_objective = solver(problem, weights, num_nonnegative);
+            }
+            else
+            {
+                matrix<scalar_type> temp(df.labels.size(),dims);
+                w_type b(df.labels.size());
+                temp = 0;
+                b = 0;
 
-            trained_function_type df;
+                // Copy the prior into the temp and b matrices.  We have to do this row
+                // by row copy because the new training data might have new labels we
+                // haven't seen before and therefore the sizes of these matrices could be
+                // different.
+                for (unsigned long i = 0; i < prior.labels.size(); ++i)
+                {
+                    const long r = std::find(df.labels.begin(), df.labels.end(), prior.labels[i])-df.labels.begin();
+                    set_rowm(temp,r) = rowm(prior.weights,i);
+                    b(r) = prior.b(i);
+                }
 
-            const long dims = max_index_plus_one(all_samples);
-            df.labels  = select_all_distinct_labels(all_labels);
+                const w_type prior_vect = reshape_to_column_vector(join_rows(temp,b));
+                svm_objective = solver(problem, weights, prior_vect);
+            }
+
+
             df.weights = colm(reshape(weights, df.labels.size(), dims+1), range(0,dims-1));
             df.b       = colm(reshape(weights, df.labels.size(), dims+1), dims);
             return df;
@@ -341,6 +404,8 @@ namespace dlib
         bool verbose;
         oca solver;
         bool learn_nonnegative_weights;
+
+        trained_function_type prior;
     };
 
 // ----------------------------------------------------------------------------------------
