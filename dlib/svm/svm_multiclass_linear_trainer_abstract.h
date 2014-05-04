@@ -184,6 +184,8 @@ namespace dlib
         );
         /*!
             ensures
+                - Subsequent calls to train() will try to learn a function similar to the
+                  given prior.
                 - #has_prior() == true
                 - #learns_nonnegative_weights() == false
         !*/
