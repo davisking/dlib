@@ -263,7 +263,8 @@ namespace dlib
         )
         {
             learn_nonnegative_weights = value;
-            prior = trained_function_type(); 
+            if (learns_nonnegative_weights)
+                prior = trained_function_type(); 
         }
 
         void set_c (

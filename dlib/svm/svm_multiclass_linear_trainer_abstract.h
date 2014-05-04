@@ -175,6 +175,8 @@ namespace dlib
         /*!
             ensures
                 - #learns_nonnegative_weights() == value
+                - if (value == true) then
+                    - #has_prior() == false
         !*/
 
         void set_prior (
