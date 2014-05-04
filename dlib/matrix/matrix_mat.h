@@ -471,6 +471,35 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    inline matrix<double,1,1> mat (
+        double value
+    )
+    {
+        matrix<double,1,1> temp;
+        temp(0) = value;
+        return temp;
+    }
+
+    inline matrix<float,1,1> mat (
+        float value
+    )
+    {
+        matrix<float,1,1> temp;
+        temp(0) = value;
+        return temp;
+    }
+
+    inline matrix<long double,1,1> mat (
+        long double value
+    )
+    {
+        matrix<long double,1,1> temp;
+        temp(0) = value;
+        return temp;
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_MATRIx_MAT_H__

@@ -190,6 +190,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    matrix<double,1,1>      mat (double value);
+    matrix<float,1,1>       mat (float value);
+    matrix<long double,1,1> mat (long double value);
+    /*!
+        ensures
+            - Converts a scalar into a matrix containing just that scalar and returns the
+              results.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_MATRIx_MAT_ABSTRACT_H__
