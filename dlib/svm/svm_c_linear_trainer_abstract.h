@@ -181,7 +181,7 @@ namespace dlib
         );
         /*!
             requires
-                - prior == a function produced by a call to this classes train() function.  
+                - prior == a function produced by a call to this class's train() function.  
                   Therefore, it must be the case that:
                     - prior.basis_vectors.size() == 1
                     - prior.alpha(0) == 1
