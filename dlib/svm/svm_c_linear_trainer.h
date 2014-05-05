@@ -628,6 +628,17 @@ namespace dlib
 
             if (has_prior())
             {
+                if (is_matrix<sample_type>::value)
+                {
+                    // make sure requires clause is not broken
+                    DLIB_CASSERT(num_dims+1 == (unsigned long)prior.size(),
+                        "\t decision_function svm_c_linear_trainer::train(x,y)"
+                        << "\n\t The dimension of the training vectors must match the dimension of\n"
+                        << "\n\t those used to create the prior."
+                        << "\n\t num_dims:     " << num_dims 
+                        << "\n\t prior.size(): " << prior.size() 
+                    );
+                }
                 svm_objective = solver(
                     make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps, max_iterations), 
                     w,
