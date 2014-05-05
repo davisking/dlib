@@ -446,7 +446,10 @@ namespace
 
             typedef matrix<scalar_type,0,1> w_type;
             w_type weights;
-            multiclass_svm_problem<w_type, sample_type, label_type> problem(all_samples, all_labels,4);
+            const long dims = max_index_plus_one(all_samples);
+            trained_function_type df;
+            df.labels  = select_all_distinct_labels(all_labels);
+            multiclass_svm_problem<w_type, sample_type, label_type> problem(all_samples, all_labels, df.labels, dims, 4);
             problem.set_max_cache_size(3);
 
             problem.set_c(C);
@@ -460,10 +463,7 @@ namespace
             svm_objective = solver(problem, weights);
 
 
-            trained_function_type df;
 
-            const long dims = max_index_plus_one(all_samples);
-            df.labels  = select_all_distinct_labels(all_labels);
             df.weights = colm(reshape(weights, df.labels.size(), dims+1), range(0,dims-1));
             df.b       = colm(reshape(weights, df.labels.size(), dims+1), dims);
             return df;
