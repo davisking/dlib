@@ -297,6 +297,8 @@ namespace dlib
         )
         {
             last_weight_1 = should_last_weight_be_1;
+            if (last_weight_1)
+                prior.set_size(0);
         }
 
         void set_oca (
@@ -326,6 +328,33 @@ namespace dlib
         )
         {
             learn_nonnegative_weights = value;
+            if (learn_nonnegative_weights)
+                prior.set_size(0); 
+        }
+
+        void set_prior (
+            const trained_function_type& prior_
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(prior_.basis_vectors.size() == 1 &&
+                        prior_.alpha(0) == 1,
+                "\t void svm_rank_trainer::set_prior()"
+                << "\n\t The supplied prior could not have been created by this object's train() method."
+                << "\n\t prior_.basis_vectors.size(): " << prior_.basis_vectors.size() 
+                << "\n\t prior_.alpha(0):             " << prior_.alpha(0) 
+                << "\n\t this: " << this
+                );
+
+            prior = prior_.basis_vectors(0);
+            learn_nonnegative_weights = false;
+            last_weight_1 = false;
+        }
+
+        bool has_prior (
+        ) const
+        {
+            return prior.size() != 0;
         }
 
         void set_c (
@@ -379,10 +408,30 @@ namespace dlib
                 force_weight_1_idx = num_dims-1;
             }
 
-            solver( make_oca_problem_ranking_svm<w_type>(C, samples, verbose, eps, max_iterations), 
+            if (has_prior())
+            {
+                if (is_matrix<sample_type>::value)
+                {
+                    // make sure requires clause is not broken
+                    DLIB_CASSERT(num_dims == (unsigned long)prior.size(),
+                        "\t decision_function svm_rank_trainer::train(samples)"
+                        << "\n\t The dimension of the training vectors must match the dimension of\n"
+                        << "\n\t those used to create the prior."
+                        << "\n\t num_dims:     " << num_dims 
+                        << "\n\t prior.size(): " << prior.size() 
+                    );
+                }
+                solver( make_oca_problem_ranking_svm<w_type>(C, samples, verbose, eps, max_iterations), 
+                    w, 
+                    prior);
+            }
+            else
+            {
+                solver( make_oca_problem_ranking_svm<w_type>(C, samples, verbose, eps, max_iterations), 
                     w, 
                     num_nonnegative,
                     force_weight_1_idx);
+            }
 
 
             // put the solution into a decision function and then return it
@@ -415,6 +464,7 @@ namespace dlib
         unsigned long max_iterations;
         bool learn_nonnegative_weights;
         bool last_weight_1;
+        matrix<scalar_type,0,1> prior;
     }; 
 
 // ----------------------------------------------------------------------------------------

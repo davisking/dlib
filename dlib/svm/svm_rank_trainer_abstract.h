@@ -58,6 +58,7 @@ namespace dlib
                 - #get_max_iterations() == 10000
                 - #learns_nonnegative_weights() == false
                 - #forces_last_weight_to_1() == false
+                - #has_prior() == false
         !*/
 
         explicit svm_rank_trainer (
@@ -76,6 +77,7 @@ namespace dlib
                 - #get_max_iterations() == 10000
                 - #learns_nonnegative_weights() == false
                 - #forces_last_weight_to_1() == false
+                - #has_prior() == false
         !*/
 
         void set_epsilon (
@@ -146,6 +148,8 @@ namespace dlib
         /*!
             ensures
                 - #forces_last_weight_to_1() == should_last_weight_be_1
+                - if (should_last_weight_be_1 == true) then
+                    - #has_prior() == false
         !*/
 
         void set_oca (
@@ -190,6 +194,39 @@ namespace dlib
         /*!
             ensures
                 - #learns_nonnegative_weights() == value
+                - if (value == true) then
+                    - #has_prior() == false
+        !*/
+
+        void set_prior (
+            const trained_function_type& prior
+        );
+        /*!
+            requires
+                - prior == a function produced by a call to this class's train() function.  
+                  Therefore, it must be the case that:
+                    - prior.basis_vectors.size() == 1
+                    - prior.alpha(0) == 1
+            ensures
+                - Subsequent calls to train() will try to learn a function similar to the
+                  given prior.
+                - #has_prior() == true
+                - #learns_nonnegative_weights() == false
+                - #forces_last_weight_to_1() == false
+        !*/
+
+        bool has_prior (
+        ) const
+        /*!
+            ensures
+                - returns true if a prior has been set and false otherwise.  Having a prior
+                  set means that you have called set_prior() and supplied a previously
+                  trained function as a reference.  In this case, any call to train() will
+                  try to learn a function that matches the behavior of the prior as close
+                  as possible but also fits the supplied training data.  In more technical
+                  detail, having a prior means we replace the ||w||^2 regularizer with one
+                  of the form ||w-prior||^2 where w is the set of parameters for a learned
+                  function.
         !*/
 
         void set_c (
@@ -219,6 +256,9 @@ namespace dlib
         /*!
             requires
                 - is_ranking_problem(samples) == true
+                - if (has_prior()) then
+                    - The vectors in samples must have the same dimensionality as the
+                      vectors used to train the prior given to set_prior().  
             ensures
                 - trains a ranking support vector classifier given the training samples.  
                 - returns a decision function F with the following properties:
@@ -237,6 +277,9 @@ namespace dlib
         /*!
             requires
                 - is_ranking_problem(std::vector<ranking_pair<sample_type> >(1, sample)) == true
+                - if (has_prior()) then
+                    - The vectors in samples must have the same dimensionality as the
+                      vectors used to train the prior given to set_prior().  
             ensures
                 - This is just a convenience routine for calling the above train()
                   function.  That is, it just copies sample into a std::vector object and

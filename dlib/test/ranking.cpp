@@ -75,6 +75,40 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void run_prior_test()
+    {
+        print_spinner();
+        typedef matrix<double,3,1> sample_type;
+        typedef linear_kernel<sample_type> kernel_type;
+
+        svm_rank_trainer<kernel_type> trainer;
+
+        ranking_pair<sample_type> data;
+
+        sample_type samp;
+        samp = 0, 0, 1; data.relevant.push_back(samp); 
+        samp = 0, 1, 0; data.nonrelevant.push_back(samp); 
+
+        trainer.set_c(10);
+        decision_function<kernel_type> df = trainer.train(data);
+
+        trainer.set_prior(df);
+
+        data.relevant.clear();
+        data.nonrelevant.clear();
+        samp = 1, 0, 0; data.relevant.push_back(samp); 
+        samp = 0, 1, 0; data.nonrelevant.push_back(samp); 
+
+        df = trainer.train(data);
+
+        dlog << LINFO << trans(df.basis_vectors(0));
+        DLIB_TEST(df.basis_vectors(0)(0) > 0);
+        DLIB_TEST(df.basis_vectors(0)(1) < 0);
+        DLIB_TEST(df.basis_vectors(0)(2) > 0);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void dotest1()
     {
         print_spinner();
@@ -355,6 +389,7 @@ namespace
             dotest_sparse_vectors();
             test_svmrank_weight_force_dense<true>();
             test_svmrank_weight_force_dense<false>();
+            run_prior_test();
 
         }
     } a;
