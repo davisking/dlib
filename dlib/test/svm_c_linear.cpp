@@ -32,6 +32,44 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void run_prior_test()
+    {
+        typedef matrix<double,3,1> sample_type;
+        typedef linear_kernel<sample_type> kernel_type;
+
+        svm_c_linear_trainer<kernel_type> trainer;
+
+        std::vector<sample_type> samples;
+        std::vector<double> labels;
+
+        sample_type samp;
+        samp = 0, 0, 1; samples.push_back(samp); labels.push_back(+1);
+        samp = 0, 1, 0; samples.push_back(samp); labels.push_back(-1);
+
+        trainer.set_c(10);
+        decision_function<kernel_type> df = trainer.train(samples, labels);
+
+        trainer.set_prior(df);
+
+        samples.clear();
+        labels.clear();
+        samp = 1, 0, 0; samples.push_back(samp); labels.push_back(+1);
+        samp = 0, 1, 0; samples.push_back(samp); labels.push_back(-1);
+
+        df = trainer.train(samples, labels);
+
+        samp = 0, 0, 1; samples.push_back(samp); labels.push_back(+1);
+        matrix<double,1,2> rs = test_binary_decision_function(df, samples, labels);
+        dlog << LINFO << rs;
+        DLIB_TEST(rs(0) == 1);
+        DLIB_TEST(rs(1) == 1);
+
+        dlog << LINFO << trans(df.basis_vectors(0));
+        DLIB_TEST(df.basis_vectors(0)(0) > 0);
+        DLIB_TEST(df.basis_vectors(0)(1) < 0);
+        DLIB_TEST(df.basis_vectors(0)(2) > 0);
+    }
+
     void get_simple_points (
         std::vector<sample_type>& samples,
         std::vector<double>& labels
@@ -216,6 +254,7 @@ namespace
         {
             test_dense();
             test_sparse();
+            run_prior_test();
 
             // test mixed sparse and dense dot products
             {

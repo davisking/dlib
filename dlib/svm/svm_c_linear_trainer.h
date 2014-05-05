@@ -445,6 +445,8 @@ namespace dlib
         )
         {
             learn_nonnegative_weights = value;
+            if (learns_nonnegative_weights)
+                prior.set_size(0); 
         }
 
         bool forces_last_weight_to_1 (
@@ -458,6 +460,33 @@ namespace dlib
         )
         {
             last_weight_1 = should_last_weight_be_1;
+            if (last_weight_1)
+                prior.set_size(0);
+        }
+
+        void set_prior (
+            const trained_function_type& prior_
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(prior_.basis_vectors.size() == 1 &&
+                        prior_.alpha(0) == 1,
+                "\t void svm_c_linear_trainer::set_prior()"
+                << "\n\t The supplied prior could not have been created by this object's train() method."
+                << "\n\t prior_.basis_vectors.size(): " << prior_.basis_vectors.size() 
+                << "\n\t prior_.alpha(0):             " << prior_.alpha(0) 
+                << "\n\t this: " << this
+                );
+
+            prior = join_cols(prior_.basis_vectors(0), mat((scalar_type)prior_.b));
+            learn_nonnegative_weights = false;
+            last_weight_1 = false;
+        }
+
+        bool has_prior (
+        ) const
+        {
+            return prior.size() != 0;
         }
 
         void set_c (
@@ -597,11 +626,21 @@ namespace dlib
             }
 
 
-            svm_objective = solver(
-                make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps, max_iterations), 
-                w,
-                num_nonnegative,
-                force_weight_1_idx);
+            if (has_prior())
+            {
+                svm_objective = solver(
+                    make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps, max_iterations), 
+                    w,
+                    prior);
+            }
+            else
+            {
+                svm_objective = solver(
+                    make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps, max_iterations), 
+                    w,
+                    num_nonnegative,
+                    force_weight_1_idx);
+            }
 
             // put the solution into a decision function and then return it
             decision_function<kernel_type> df;
@@ -627,6 +666,7 @@ namespace dlib
         unsigned long max_iterations;
         bool learn_nonnegative_weights;
         bool last_weight_1;
+        matrix<scalar_type,0,1> prior;
     }; 
 
 // ----------------------------------------------------------------------------------------
