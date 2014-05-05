@@ -445,7 +445,7 @@ namespace dlib
         )
         {
             learn_nonnegative_weights = value;
-            if (learns_nonnegative_weights)
+            if (learn_nonnegative_weights)
                 prior.set_size(0); 
         }
 
