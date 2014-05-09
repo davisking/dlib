@@ -4,9 +4,8 @@
 #define DLIB_SERIALIZe_
 
 /*!
-    There are two global functions in the dlib namespace that provide 
-    serialization and deserialization support.  Their signatures and specifications
-    are as follows:
+    There are two global functions in the dlib namespace that provide serialization and
+    deserialization support.  Their signatures and specifications are as follows:
         
         void serialize (
             const serializable_type& item,
@@ -46,6 +45,16 @@
                     for its type.
                 - any other exception
         *!/
+
+    For convenience, you can also serialize to a file using this syntax:
+        serialize("your_file.dat") << some_object << another_object;
+
+    That overwrites the contents of your_file.dat with the serialized data from some_object
+    and another_object.  Then to recall the objects from the file you can do:
+        deserialize("your_file.dat") >> some_object >> another_object;
+
+    Finally, you can chain as many objects together using the << and >> operators as you
+    like.
 
 
     This file provides serialization support to the following object types:
@@ -131,6 +140,7 @@
 #include <iomanip>
 #include <cstddef>
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <complex>
@@ -145,6 +155,7 @@
 #include "unicode.h"
 #include "byte_orderer.h"
 #include "float_details.h"
+#include "smart_pointers/shared_ptr.h"
 
 namespace dlib
 {
@@ -1271,6 +1282,60 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
+    class proxy_serialize 
+    {
+    public:
+        explicit proxy_serialize (
+            const std::string& filename
+        ) 
+        {
+            fout.reset(new std::ofstream(filename.c_str()));
+            if (!(*fout))
+                throw serialization_error("Unable to open " + filename + " for writing.");
+        }
+
+        template <typename T>
+        inline proxy_serialize& operator<<(const T& item)
+        {
+            serialize(item, *fout);
+            return *this;
+        }
+
+    private:
+        shared_ptr<std::ofstream> fout;
+    };
+
+    class proxy_deserialize 
+    {
+    public:
+        explicit proxy_deserialize (
+            const std::string& filename
+        ) 
+        {
+            fin.reset(new std::ifstream(filename.c_str()));
+            if (!(*fin))
+                throw serialization_error("Unable to open " + filename + " for reading.");
+        }
+
+        template <typename T>
+        inline proxy_deserialize& operator>>(T& item)
+        {
+            deserialize(item, *fin);
+            return *this;
+        }
+
+    private:
+        shared_ptr<std::ifstream> fin;
+    };
+
+    inline proxy_serialize serialize(const std::string& filename)
+    { return proxy_serialize(filename); }
+    inline proxy_deserialize deserialize(const std::string& filename)
+    { return proxy_deserialize(filename); }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 // forward declare the MessageLite object so we can reference it below.
