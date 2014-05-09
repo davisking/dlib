@@ -138,13 +138,10 @@ int main()
         // Put df into df2 and then save df2 to disk.  Note that we could have also said
         // df2 = trainer.train(samples, labels);  But doing it this way avoids retraining.
         df2 = df;
-        ofstream fout("df.dat", ios::binary);
-        serialize(df2, fout);
-        fout.close();
+        serialize("df.dat") << df2;
 
         // load the function back in from disk and store it in df3.  
-        ifstream fin("df.dat", ios::binary);
-        deserialize(df3, fin);
+        deserialize("df.dat") >> df3;
 
 
         // Test df3 to see that this worked.

@@ -291,9 +291,7 @@ int main(int argc, char** argv)
                 object_detector<image_scanner_type> detector = trainer.train(images, object_locations, ignore);
 
                 cout << "Saving trained detector to object_detector.svm" << endl;
-                ofstream fout("object_detector.svm", ios::binary);
-                serialize(detector, fout);
-                fout.close();
+                serialize("object_detector.svm") << detector;
 
                 cout << "Testing detector on training data..." << endl;
                 cout << "Test detector (precision,recall,AP): " << test_object_detection_function(detector, images, object_locations) << endl;

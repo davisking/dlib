@@ -208,15 +208,12 @@ int main()
             decision_function<radial_basis_kernel<sample_type> >  // This is the output of the rbf_trainer
         > df2, df3;
 
-
     df2 = df;
-    ofstream fout("df.dat", ios::binary);
-    serialize(df2, fout);
-    fout.close();
+    // save to a file called df.dat
+    serialize("df.dat") << df2;
 
     // load the function back in from disk and store it in df3.  
-    ifstream fin("df.dat", ios::binary);
-    deserialize(df3, fin);
+    deserialize("df.dat") >> df3;
 
 
     // Test df3 to see that this worked.

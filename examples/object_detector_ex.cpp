@@ -247,13 +247,10 @@ int main()
 
 
         // Finally, note that the detector can be serialized to disk just like other dlib objects.
-        ofstream fout("object_detector.dat", ios::binary);
-        serialize(detector, fout);
-        fout.close();
+        serialize("object_detector.dat") << detector;
 
         // Recall from disk.
-        ifstream fin("object_detector.dat", ios::binary);
-        deserialize(detector, fin);
+        deserialize("object_detector.dat") >> detector;
     }
     catch (exception& e)
     {

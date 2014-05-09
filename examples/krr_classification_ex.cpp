@@ -196,14 +196,10 @@ int main()
 
     // Another thing that is worth knowing is that just about everything in dlib is serializable.
     // So for example, you can save the learned_pfunct object to disk and recall it later like so:
-    ofstream fout("saved_function.dat",ios::binary);
-    serialize(learned_pfunct,fout);
-    fout.close();
+    serialize("saved_function.dat") << learned_pfunct;
 
     // Now let's open that file back up and load the function object it contains.
-    ifstream fin("saved_function.dat",ios::binary);
-    deserialize(learned_pfunct, fin);
-
+    deserialize("saved_function.dat") >> learned_pfunct;
 
 }
 

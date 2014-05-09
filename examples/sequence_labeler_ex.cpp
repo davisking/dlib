@@ -292,13 +292,10 @@ int main()
 
 
     // Finally, the labeler can be serialized to disk just like most dlib objects.
-    ofstream fout("labeler.dat", ios::binary);
-    serialize(labeler, fout);
-    fout.close();
+    serialize("labeler.dat") << labeler;
 
     // recall from disk
-    ifstream fin("labeler.dat", ios::binary);
-    deserialize(labeler, fin);
+    deserialize("labeler.dat") >> labeler;
 }
 
 // ----------------------------------------------------------------------------------------

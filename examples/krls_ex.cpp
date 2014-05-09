@@ -78,21 +78,17 @@ int main()
 
     // Another thing that is worth knowing is that just about everything in dlib is serializable.
     // So for example, you can save the test object to disk and recall it later like so:
-    ofstream fout("saved_krls_object.dat",ios::binary);
-    serialize(test,fout);
-    fout.close();
+    serialize("saved_krls_object.dat") << test;
 
     // Now let's open that file back up and load the krls object it contains.
-    ifstream fin("saved_krls_object.dat",ios::binary);
-    deserialize(test, fin);
+    deserialize("saved_krls_object.dat") >> test;
 
     // If you don't want to save the whole krls object (it might be a bit large) 
     // you can save just the decision function it has learned so far.  You can get 
     // the decision function out of it by calling test.get_decision_function() and
     // then you can serialize that object instead.  E.g.
     decision_function<kernel_type> funct = test.get_decision_function();
-    fout.open("saved_krls_function.dat",ios::binary);
-    serialize(funct, fout);
+    serialize("saved_krls_function.dat") << funct;
 }
 
 

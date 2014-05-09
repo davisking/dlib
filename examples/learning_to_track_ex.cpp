@@ -344,13 +344,10 @@ int main()
 
 
     // Finally, you can save your track_association_function to disk like so:
-    ofstream fout("track_assoc.svm", ios::binary);
-    serialize(assoc, fout);
-    fout.close();
+    serialize("track_assoc.svm") << assoc;
 
     // And recall it from disk later like so:
-    ifstream fin("track_assoc.svm", ios::binary);
-    deserialize(assoc, fin);
+    deserialize("track_assoc.svm") >> assoc;
 }
 
 // ----------------------------------------------------------------------------------------

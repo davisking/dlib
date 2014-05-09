@@ -228,13 +228,10 @@ int main()
 
 
     // Finally, the segmenter can be serialized to disk just like most dlib objects.
-    ofstream fout("segmenter.dat", ios::binary);
-    serialize(segmenter, fout);
-    fout.close();
+    serialize("segmenter.dat") << segmenter;
 
     // recall from disk
-    ifstream fin("segmenter.dat", ios::binary);
-    deserialize(segmenter, fin);
+    deserialize("segmenter.dat") >> segmenter;
 }
 
 // ----------------------------------------------------------------------------------------

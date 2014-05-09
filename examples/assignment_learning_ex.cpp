@@ -195,13 +195,10 @@ int main()
 
 
         // Finally, the assigner can be serialized to disk just like most dlib objects.
-        ofstream fout("assigner.dat", ios::binary);
-        serialize(assigner, fout);
-        fout.close();
+        serialize("assigner.dat") << assigner;
 
         // recall from disk
-        ifstream fin("assigner.dat", ios::binary);
-        deserialize(assigner, fin);
+        deserialize("assigner.dat") >> assigner;
     }
     catch (std::exception& e)
     {

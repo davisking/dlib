@@ -180,14 +180,11 @@ int main(int argc, char** argv)
 
         // Like everything in dlib, you can save your detector to disk using the
         // serialize() function.
-        ofstream fout("face_detector.svm", ios::binary);
-        serialize(detector, fout);
-        fout.close();
+        serialize("face_detector.svm") << detector;
 
         // Then you can recall it using the deserialize() function.
-        ifstream fin("face_detector.svm", ios::binary);
         object_detector<image_scanner_type> detector2;
-        deserialize(detector2, fin);
+        deserialize("face_detector.svm") >> detector2;
 
 
 
