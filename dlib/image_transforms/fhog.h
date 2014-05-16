@@ -847,7 +847,10 @@ namespace dlib
         }
 
         const double thresh = mean(himg) + 4*stddev(himg);
-        return matrix_cast<unsigned char>(upperbound(round(himg*255/thresh),255));
+        if (thresh != 0)
+            return matrix_cast<unsigned char>(upperbound(round(himg*255/thresh),255));
+        else
+            return matrix_cast<unsigned char>(himg);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -927,7 +930,10 @@ namespace dlib
         }
 
         const double thresh = mean(himg) + 4*stddev(himg);
-        return matrix_cast<unsigned char>(upperbound(round(himg*255/thresh),255));
+        if (thresh != 0)
+            return matrix_cast<unsigned char>(upperbound(round(himg*255/thresh),255));
+        else
+            return matrix_cast<unsigned char>(himg);
     }
 
 // ----------------------------------------------------------------------------------------
