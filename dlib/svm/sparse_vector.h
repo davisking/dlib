@@ -182,8 +182,7 @@ namespace dlib
         typedef typename T::value_type item_type;
         for (long i = 0; i < src.size(); ++i)
         {
-            if (src(i) != 0)
-                dest.insert(dest.end(),item_type(i, src(i)));
+            dest.insert(dest.end(),item_type(i, src(i)));
         }
     }
 
@@ -220,9 +219,9 @@ namespace dlib
     namespace impl
     {
         template <typename T, typename U>
-        typename T::value_type::second_type dot (
-        const T& a,
-        const U& b
+        typename T::value_type::second_type general_dot (
+            const T& a,
+            const U& b
         )
         {
             typedef typename T::value_type::second_type scalar_type;
@@ -250,6 +249,58 @@ namespace dlib
             }
 
             return sum;
+        }
+
+        template <typename T, typename U>
+        inline typename T::value_type::second_type dot (
+            const T& a,
+            const U& b
+        )
+        {
+            return general_dot(a,b);
+        }
+
+        template <typename T, typename U, typename alloc>
+        U dot (
+            const std::vector<std::pair<T,U>,alloc>& a,
+            const std::vector<std::pair<T,U>,alloc>& b
+        )
+        {
+            // You are getting this error because you are attempting to use sparse sample vectors 
+            // but you aren't using an unsigned integer as your key type in the sparse vectors.
+            COMPILE_TIME_ASSERT(is_unsigned_type<T>::value);
+
+            if (a.size() == 0 || b.size() == 0)
+                return 0;
+
+            // if a is really a dense vector but just represented in a sparse container
+            if (a.back().first == a.size()-1)
+            {
+                double sum = 0;
+                for (unsigned long i = 0; i < b.size(); ++i)
+                {
+                    if (b[i].first >= a.size())
+                        break;
+                    sum += a[b[i].first].second * b[i].second;
+                }
+                return sum;
+            }
+            // if b is really a dense vector but just represented in a sparse container
+            else if (b.back().first == b.size()-1)
+            {
+                double sum = 0;
+                for (unsigned long i = 0; i < a.size(); ++i)
+                {
+                    if (a[i].first >= b.size())
+                        break;
+                    sum += b[a[i].first].second * a[i].second;
+                }
+                return sum;
+            }
+            else
+            {
+                return general_dot(a,b);
+            }
         }
     }
 
