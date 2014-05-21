@@ -265,7 +265,7 @@ namespace dlib
             hostent* address;
             unsigned long ipnum = inet_addr(ip.c_str());
 
-            // if inet_addr coudln't convert ip then return an error
+            // if inet_addr couldn't convert ip then return an error
             if (ipnum == INADDR_NONE)
             {
                 return OTHER_ERROR;
