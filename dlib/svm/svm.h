@@ -420,10 +420,10 @@ namespace dlib
 
         // make sure requires clause is not broken
         DLIB_ASSERT(is_binary_classification_problem(x,y) == true &&
-                    1 < folds && folds <= x.nr(),
+                    1 < folds && folds <= std::min(sum(y>0),sum(y<0)),
             "\tmatrix cross_validate_trainer()"
             << "\n\t invalid inputs were given to this function"
-            << "\n\t x.nr(): " << x.nr() 
+            << "\n\t std::min(sum(y>0),sum(y<0)): " << std::min(sum(y>0),sum(y<0))
             << "\n\t folds:  " << folds 
             << "\n\t is_binary_classification_problem(x,y): " << ((is_binary_classification_problem(x,y))? "true":"false")
             );

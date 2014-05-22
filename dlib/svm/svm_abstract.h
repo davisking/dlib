@@ -369,7 +369,8 @@ namespace dlib
     /*!
         requires
             - is_binary_classification_problem(x,y) == true
-            - 1 < folds <= x.nr()
+            - 1 < folds <= std::min(sum(y>0),sum(y<0))
+              (e.g. There must be at least as many examples of each class as there are folds)
             - trainer_type == some kind of binary classification trainer object (e.g. svm_nu_trainer)
         ensures
             - performs k-fold cross validation by using the given trainer to solve the
