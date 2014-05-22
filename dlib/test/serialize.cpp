@@ -565,6 +565,20 @@ namespace
             obj.assert_in_state_2();
             */
 
+
+        test_object obj2;
+        obj.set_state_1();
+        obj2.set_state_2();
+        dlib::serialize("serialization_test.dat") << obj << obj2;
+        obj.assert_in_state_1();
+        obj2.assert_in_state_2();
+        obj.set_state_2();
+        obj2.set_state_1();
+        obj.assert_in_state_2();
+        obj2.assert_in_state_1();
+        dlib::deserialize("serialization_test.dat") >> obj >> obj2;
+        obj.assert_in_state_1();
+        obj2.assert_in_state_2();
     }
 
 
