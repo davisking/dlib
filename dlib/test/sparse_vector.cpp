@@ -271,6 +271,25 @@ namespace
             test_sparse_matrix_vector_multiply1();
             test_sparse_matrix_vector_multiply2();
 
+            {
+                matrix<double,0,1> a, b;
+                a = gaussian_randm(6,1, 0);
+                b = gaussian_randm(6,1, 1);
+
+                std::vector<std::pair<unsigned long,double> > aa, bb;
+
+                assign(aa, a);
+                assign(bb, b);
+
+                // dot() does something special when the sparse vectors have entries for
+                // each dimension, which is what happens when they are copied from dense
+                // vectors.  So the point of the tests in this block is to make sure dot()
+                // works right in this case.
+                DLIB_TEST(std::abs(dot(a,b) - dot(aa,bb)) < 1e-14);
+                a(3) = 0;
+                assign(aa, a);
+                DLIB_TEST(std::abs(dot(a,b) - dot(aa,bb)) < 1e-14);
+            }
         }
     };
 
