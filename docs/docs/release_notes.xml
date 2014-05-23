@@ -12,12 +12,38 @@
 
 <current>
 New Features:
+   - Added the ability to set a previously trained function as a prior to the
+     svm_multiclass_linear_trainer, svm_c_linear_trainer, and svm_rank_trainer
+     objects.
+   - Added a user settable loss to the structural_assignment_trainer and
+     structural_track_association_trainer objects.  
+   - Added the new split_on_first() and split_on_last() string manipulation functions.
+   - Added locally_change_current_dir, a RAII tool for switching between directories.
+   - You can now make a 1x1 matrix containing a single value by calling mat() on a single
+     scalar value.
+   - The point transform functions and frobmetric_training_sample are now serializable.
+   - Added a simplified operator &lt;&lt; and &gt;&gt; based syntax for serializing to and
+     from files.  So now you can serialize to a file using a syntax of:
+      serialize("myfile.dat") &lt;&lt; myobject &lt;&lt; another_object;
+     and then load those objects from disk via:
+      deserialize("myfile.dat") &gt;&gt; myobject &gt;&gt; another_object;
+     An arbitrary number of objects can be serialize or deserialized by
+     chaining the &lt;&lt; and &gt;&gt; operators.
 
 Non-Backwards Compatible Changes:
 
 Bug fixes:
+   - Fixed a bug pointed out by Daniel Girardeau-Montaut. The covariance()
+     function didn't work on non-double valued matrices.
+   - Fixed a bug in the backtracking_line_search() function pointed out by
+     Ping-Chang Shih. The function ignored the max_iter parameter.
+   - Fixed a compiler error encountered when using clang 3.4 on Mac OS X 10.9.
+     Thanks to Martin Fergie for reporting this problem.
+   - Fixed a potential divide by zero in draw_fhog()
 
 Other:
+   - Added an example program showing how to set a custom logger output hook.
+   - Made linear decision_functions which use sparse vectors much faster.
 
 </current>
 
