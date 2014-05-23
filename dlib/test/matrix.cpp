@@ -1304,14 +1304,15 @@ namespace
         }
 
         {
-            matrix<int> m(4,1), mm;
+            matrix<int> m(4,1), mm, mmm;
 
-            mm = (m = 1,2,3,4);
+            mmm = mm = (m = 1,2,3,4);
             DLIB_TEST(m(0) == 1);
             DLIB_TEST(m(1) == 2);
             DLIB_TEST(m(2) == 3);
             DLIB_TEST(m(3) == 4);
             DLIB_TEST(mm == m);
+            DLIB_TEST(mmm == m);
             DLIB_TEST(mm(0) == 1);
             DLIB_TEST(mm(1) == 2);
             DLIB_TEST(mm(2) == 3);
