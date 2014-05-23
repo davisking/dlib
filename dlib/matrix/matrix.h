@@ -1592,7 +1592,7 @@ namespace dlib
             */
 
             literal_assign_helper(const literal_assign_helper& item) : m(item.m), r(item.r), c(item.c), has_been_used(false) {}
-            literal_assign_helper(matrix* m_): m(m_), r(0), c(0),has_been_used(false) {next();}
+            explicit literal_assign_helper(matrix* m_): m(m_), r(0), c(0),has_been_used(false) {next();}
             ~literal_assign_helper()
             {
                 DLIB_CASSERT(!has_been_used || r == m->nr(),
@@ -1620,6 +1620,8 @@ namespace dlib
 
         private:
 
+            friend class matrix;
+
             void next (
             ) const
             {
@@ -1638,6 +1640,14 @@ namespace dlib
         };
 
     public:
+
+        matrix& operator = (
+            const literal_assign_helper& val
+        ) 
+        {  
+            *this = *val.m;
+            return *this;
+        }
 
         const literal_assign_helper operator = (
             const T& val
