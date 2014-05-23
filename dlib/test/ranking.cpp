@@ -6,6 +6,7 @@
 #include <string>
 #include <cstdlib>
 #include <ctime>
+#include <map>
 
 #include "tester.h"
 
@@ -105,6 +106,41 @@ namespace
         DLIB_TEST(df.basis_vectors(0)(0) > 0);
         DLIB_TEST(df.basis_vectors(0)(1) < 0);
         DLIB_TEST(df.basis_vectors(0)(2) > 0);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void run_prior_sparse_test()
+    {
+        print_spinner();
+        typedef std::map<unsigned long,double> sample_type;
+        typedef sparse_linear_kernel<sample_type> kernel_type;
+
+        svm_rank_trainer<kernel_type> trainer;
+
+        ranking_pair<sample_type> data;
+
+        sample_type samp;
+        samp[0] = 1; data.relevant.push_back(samp); samp.clear();
+        samp[1] = 1; data.nonrelevant.push_back(samp); samp.clear();
+
+        trainer.set_c(10);
+        decision_function<kernel_type> df = trainer.train(data);
+
+        trainer.set_prior(df);
+
+        data.relevant.clear();
+        data.nonrelevant.clear();
+        samp[2] = 1; data.relevant.push_back(samp); samp.clear();
+        samp[1] = 1; data.nonrelevant.push_back(samp); samp.clear();
+
+        df = trainer.train(data);
+
+        matrix<double,0,1> w = sparse_to_dense(df.basis_vectors(0));
+        dlog << LINFO << trans(w);
+        DLIB_TEST(w(0) > 0.1);
+        DLIB_TEST(w(1) < -0.1);
+        DLIB_TEST(w(2) > 0.1);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -390,6 +426,7 @@ namespace
             test_svmrank_weight_force_dense<true>();
             test_svmrank_weight_force_dense<false>();
             run_prior_test();
+            run_prior_sparse_test();
 
         }
     } a;

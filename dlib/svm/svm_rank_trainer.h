@@ -37,13 +37,15 @@ namespace dlib
             const std::vector<ranking_pair<sample_type> >& samples_,
             const bool be_verbose_,
             const scalar_type eps_,
-            const unsigned long max_iter
+            const unsigned long max_iter,
+            const unsigned long dims_
         ) :
             samples(samples_),
             C(C_),
             be_verbose(be_verbose_),
             eps(eps_),
-            max_iterations(max_iter)
+            max_iterations(max_iter),
+            dims(dims_)
         {
         }
 
@@ -56,7 +58,7 @@ namespace dlib
         virtual long get_num_dimensions (
         ) const 
         {
-            return max_index_plus_one(samples);
+            return dims;
         }
 
         virtual bool optimization_status (
@@ -173,6 +175,7 @@ namespace dlib
         const bool be_verbose;
         const scalar_type eps;
         const unsigned long max_iterations;
+        const unsigned long dims;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -187,11 +190,12 @@ namespace dlib
         const std::vector<ranking_pair<sample_type> >& samples,
         const bool be_verbose,
         const scalar_type eps,
-        const unsigned long max_iterations
+        const unsigned long max_iterations,
+        const unsigned long dims
     )
     {
         return oca_problem_ranking_svm<matrix_type, sample_type>(
-            C, samples, be_verbose, eps, max_iterations);
+            C, samples, be_verbose, eps, max_iterations, dims);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -346,7 +350,7 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            prior = prior_.basis_vectors(0);
+            prior = sparse_to_dense(prior_.basis_vectors(0));
             learn_nonnegative_weights = false;
             last_weight_1 = false;
         }
@@ -421,13 +425,29 @@ namespace dlib
                         << "\n\t prior.size(): " << prior.size() 
                     );
                 }
-                solver( make_oca_problem_ranking_svm<w_type>(C, samples, verbose, eps, max_iterations), 
-                    w, 
-                    prior);
+                const unsigned long dims = std::max(num_dims, (unsigned long)prior.size());
+                // In the case of sparse sample vectors, it is possible that the input
+                // vector dimensionality is larger than the prior vector dimensionality.
+                // We need to check for this case and pad prior with zeros if it is the
+                // case.
+                if ((unsigned long)prior.size() < dims)
+                {
+                    matrix<scalar_type,0,1> prior_temp = join_cols(prior, zeros_matrix<scalar_type>(dims-prior.size(),1));
+                    solver( make_oca_problem_ranking_svm<w_type>(C, samples, verbose, eps, max_iterations, dims), 
+                        w, 
+                        prior_temp);
+                }
+                else
+                {
+                    solver( make_oca_problem_ranking_svm<w_type>(C, samples, verbose, eps, max_iterations, dims), 
+                        w, 
+                        prior);
+                }
+
             }
             else
             {
-                solver( make_oca_problem_ranking_svm<w_type>(C, samples, verbose, eps, max_iterations), 
+                solver( make_oca_problem_ranking_svm<w_type>(C, samples, verbose, eps, max_iterations, num_dims), 
                     w, 
                     num_nonnegative,
                     force_weight_1_idx);
