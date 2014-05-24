@@ -241,7 +241,7 @@ namespace dlib
     );
     /*!
         requires
-            - nr > 0 && nc > 0
+            - nr >= 0 && nc >= 0
         ensures
             - returns an nr by nc matrix with elements of type T and all set to val.
     !*/
@@ -253,7 +253,7 @@ namespace dlib
     );
     /*!
         requires
-            - mat.nr() > 0 && mat.nc() > 0
+            - mat.nr() >= 0 && mat.nc() >= 0
         ensures
             - Let T denote the type of element in mat. Then this function
               returns uniform_matrix<T>(mat.nr(), mat.nc(), 1)
@@ -270,7 +270,7 @@ namespace dlib
     );
     /*!
         requires
-            - nr > 0 && nc > 0
+            - nr >= 0 && nc >= 0
         ensures
             - returns uniform_matrix<T>(nr, nc, 1)
     !*/
@@ -282,7 +282,7 @@ namespace dlib
     );
     /*!
         requires
-            - mat.nr() > 0 && mat.nc() > 0
+            - mat.nr() >= 0 && mat.nc() >= 0
         ensures
             - Let T denote the type of element in mat. Then this function
               returns uniform_matrix<T>(mat.nr(), mat.nc(), 0)
@@ -299,7 +299,7 @@ namespace dlib
     );
     /*!
         requires
-            - nr > 0 && nc > 0
+            - nr >= 0 && nc >= 0
         ensures
             - returns uniform_matrix<T>(nr, nc, 0)
     !*/
@@ -797,7 +797,7 @@ namespace dlib
     );
     /*!
         requires
-            - a.nr() == b.nr()
+            - a.nr() == b.nr() || a.size() == 0 || b.size() == 0
             - a and b both contain the same type of element
         ensures
             - This function joins two matrices together by concatenating their rows.
@@ -820,7 +820,7 @@ namespace dlib
     );
     /*!
         requires
-            - a.nc() == b.nc()
+            - a.nc() == b.nc() || a.size() == 0 || b.size() == 0
             - a and b both contain the same type of element
         ensures
             - This function joins two matrices together by concatenating their columns.

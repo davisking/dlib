@@ -1677,7 +1677,7 @@ namespace dlib
         const T& val
     )
     {
-        DLIB_ASSERT(nr > 0 && nc > 0, 
+        DLIB_ASSERT(nr >= 0 && nc >= 0, 
             "\tconst matrix_exp uniform_matrix<T>(nr, nc, val)"
             << "\n\tnr and nc have to be bigger than 0"
             << "\n\tnr: " << nr
@@ -1697,9 +1697,9 @@ namespace dlib
         long nc
     )
     {
-        DLIB_ASSERT(nr > 0 && nc > 0, 
+        DLIB_ASSERT(nr >= 0 && nc >= 0, 
             "\tconst matrix_exp zeros_matrix<T>(nr, nc)"
-            << "\n\tnr and nc have to be bigger than 0"
+            << "\n\tnr and nc have to be >= 0"
             << "\n\tnr: " << nr
             << "\n\tnc: " << nc
             );
@@ -1716,9 +1716,9 @@ namespace dlib
         const matrix_exp<EXP>& mat
     )
     {
-        DLIB_ASSERT(mat.nr() > 0 && mat.nc() > 0, 
+        DLIB_ASSERT(mat.nr() >= 0 && mat.nc() >= 0, 
             "\tconst matrix_exp zeros_matrix(mat)"
-            << "\n\t nr and nc have to be bigger than 0"
+            << "\n\t nr and nc have to be >= 0"
             << "\n\t mat.nr(): " << mat.nr()
             << "\n\t mat.nc(): " << mat.nc()
             );
@@ -1737,9 +1737,9 @@ namespace dlib
         long nc
     )
     {
-        DLIB_ASSERT(nr > 0 && nc > 0, 
+        DLIB_ASSERT(nr >= 0 && nc >= 0, 
             "\tconst matrix_exp ones_matrix<T>(nr, nc)"
-            << "\n\tnr and nc have to be bigger than 0"
+            << "\n\tnr and nc have to be >= 0"
             << "\n\tnr: " << nr
             << "\n\tnc: " << nc
             );
@@ -1756,9 +1756,9 @@ namespace dlib
         const matrix_exp<EXP>& mat
     )
     {
-        DLIB_ASSERT(mat.nr() > 0 && mat.nc() > 0, 
+        DLIB_ASSERT(mat.nr() >= 0 && mat.nc() >= 0, 
             "\tconst matrix_exp ones_matrix(mat)"
-            << "\n\t nr and nc have to be bigger than 0"
+            << "\n\t nr and nc have to be >= 0"
             << "\n\t mat.nr(): " << mat.nr()
             << "\n\t mat.nc(): " << mat.nc()
             );
@@ -4007,11 +4007,13 @@ namespace dlib
         // don't have the same number of rows
         COMPILE_TIME_ASSERT(EXP1::NR == EXP2::NR || (EXP1::NR*EXP2::NR == 0));
 
-        DLIB_ASSERT(a.nr() == b.nr(),
+        DLIB_ASSERT(a.nr() == b.nr() || a.size() == 0 || b.size() == 0,
             "\tconst matrix_exp join_rows(const matrix_exp& a, const matrix_exp& b)"
             << "\n\tYou can only use join_rows() if both matrices have the same number of rows"
             << "\n\ta.nr(): " << a.nr()
             << "\n\tb.nr(): " << b.nr()
+            << "\n\ta.nc(): " << a.nc()
+            << "\n\tb.nc(): " << b.nc()
             );
 
         typedef op_join_rows<EXP1,EXP2> op;
@@ -4081,9 +4083,11 @@ namespace dlib
         // don't have the same number of columns 
         COMPILE_TIME_ASSERT(EXP1::NC == EXP2::NC || (EXP1::NC*EXP2::NC == 0));
 
-        DLIB_ASSERT(a.nc() == b.nc(),
+        DLIB_ASSERT(a.nc() == b.nc() || a.size() == 0 || b.size() == 0,
             "\tconst matrix_exp join_cols(const matrix_exp& a, const matrix_exp& b)"
             << "\n\tYou can only use join_cols() if both matrices have the same number of columns"
+            << "\n\ta.nr(): " << a.nr()
+            << "\n\tb.nr(): " << b.nr()
             << "\n\ta.nc(): " << a.nc()
             << "\n\tb.nc(): " << b.nc()
             );
