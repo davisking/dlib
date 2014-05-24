@@ -376,6 +376,7 @@ namespace dlib
                 temp = 0;
                 b = 0;
 
+                const long pad_size = dims-prior.weights.nc();
                 // Copy the prior into the temp and b matrices.  We have to do this row
                 // by row copy because the new training data might have new labels we
                 // haven't seen before and therefore the sizes of these matrices could be
@@ -383,7 +384,7 @@ namespace dlib
                 for (unsigned long i = 0; i < prior.labels.size(); ++i)
                 {
                     const long r = std::find(df.labels.begin(), df.labels.end(), prior.labels[i])-df.labels.begin();
-                    set_rowm(temp,r) = rowm(prior.weights,i);
+                    set_rowm(temp,r) = join_rows(rowm(prior.weights,i), zeros_matrix<scalar_type>(1,pad_size));
                     b(r) = prior.b(i);
                 }
 
