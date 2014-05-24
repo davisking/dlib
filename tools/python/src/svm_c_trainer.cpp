@@ -212,6 +212,8 @@ void bind_svm_c_trainer()
             .add_property("max_iterations", &T::get_max_iterations, &T::set_max_iterations)
             .add_property("force_last_weight_to_1", &T::forces_last_weight_to_1, &T::force_last_weight_to_1)
             .add_property("learns_nonnegative_weights", &T::learns_nonnegative_weights, &T::set_learns_nonnegative_weights)
+            .add_property("has_prior", &T::has_prior)
+            .def("set_prior", &T::set_prior)
             .def("be_verbose", &T::be_verbose)
             .def("be_quiet", &T::be_quiet);
 
@@ -227,6 +229,8 @@ void bind_svm_c_trainer()
             .add_property("max_iterations", &T::get_max_iterations, &T::set_max_iterations)
             .add_property("force_last_weight_to_1", &T::forces_last_weight_to_1, &T::force_last_weight_to_1)
             .add_property("learns_nonnegative_weights", &T::learns_nonnegative_weights, &T::set_learns_nonnegative_weights)
+            .add_property("has_prior", &T::has_prior)
+            .def("set_prior", &T::set_prior)
             .def("be_verbose", &T::be_verbose)
             .def("be_quiet", &T::be_quiet);
 

@@ -93,8 +93,10 @@ void add_ranker (
         .add_property("max_iterations", &trainer::get_max_iterations, &trainer::set_max_iterations)
         .add_property("force_last_weight_to_1", &trainer::forces_last_weight_to_1, &trainer::force_last_weight_to_1)
         .add_property("learns_nonnegative_weights", &trainer::learns_nonnegative_weights, &trainer::set_learns_nonnegative_weights)
+        .add_property("has_prior", &trainer::has_prior)
         .def("train", train1<trainer>)
         .def("train", train2<trainer>)
+        .def("set_prior", &trainer::set_prior)
         .def("be_verbose", &trainer::be_verbose)
         .def("be_quiet", &trainer::be_quiet);
 }
