@@ -44,7 +44,8 @@ namespace dlib
             const in_scalar_vector_type& labels_,
             const bool be_verbose_,
             const scalar_type eps_,
-            const unsigned long max_iter
+            const unsigned long max_iter,
+            const unsigned long dims_
         ) :
             samples(samples_),
             labels(labels_),
@@ -53,7 +54,8 @@ namespace dlib
             Cneg(C_neg/C),
             be_verbose(be_verbose_),
             eps(eps_),
-            max_iterations(max_iter)
+            max_iterations(max_iter),
+            dims(dims_)
         {
             dot_prods.resize(samples.size());
             is_first_call = true;
@@ -69,7 +71,7 @@ namespace dlib
         ) const 
         {
             // plus 1 for the bias term
-            return max_index_plus_one(samples) + 1;
+            return dims + 1;
         }
 
         virtual bool optimization_status (
@@ -300,6 +302,7 @@ namespace dlib
         const bool be_verbose;
         const scalar_type eps;
         const unsigned long max_iterations;
+        const unsigned long dims;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -317,11 +320,12 @@ namespace dlib
         const in_scalar_vector_type& labels,
         const bool be_verbose,
         const scalar_type eps,
-        const unsigned long max_iterations
+        const unsigned long max_iterations,
+        const unsigned long dims
     )
     {
         return oca_problem_c_svm<matrix_type, in_sample_vector_type, in_scalar_vector_type>(
-            C_pos, C_neg, samples, labels, be_verbose, eps, max_iterations);
+            C_pos, C_neg, samples, labels, be_verbose, eps, max_iterations, dims);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -478,7 +482,8 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            prior = join_cols(prior_.basis_vectors(0), mat((scalar_type)prior_.b));
+            prior = sparse_to_dense(prior_.basis_vectors(0));
+            prior_b = prior_.b;
             learn_nonnegative_weights = false;
             last_weight_1 = false;
         }
@@ -631,7 +636,7 @@ namespace dlib
                 if (is_matrix<sample_type>::value)
                 {
                     // make sure requires clause is not broken
-                    DLIB_CASSERT(num_dims+1 == (unsigned long)prior.size(),
+                    DLIB_CASSERT(num_dims == (unsigned long)prior.size(),
                         "\t decision_function svm_c_linear_trainer::train(x,y)"
                         << "\n\t The dimension of the training vectors must match the dimension of\n"
                         << "\n\t those used to create the prior."
@@ -639,15 +644,24 @@ namespace dlib
                         << "\n\t prior.size(): " << prior.size() 
                     );
                 }
+                const unsigned long dims = std::max(num_dims, (unsigned long)prior.size());
+                // In the case of sparse sample vectors, it is possible that the input
+                // vector dimensionality is larger than the prior vector dimensionality.
+                // We need to check for this case and pad prior with zeros if it is the
+                // case.
+                matrix<scalar_type,0,1> prior_temp = join_cols(join_cols(prior, 
+                                                                         zeros_matrix<scalar_type>(dims-prior.size(),1)),
+                                                                         mat(prior_b));
+
                 svm_objective = solver(
-                    make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps, max_iterations), 
+                    make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps, max_iterations, dims), 
                     w,
-                    prior);
+                    prior_temp);
             }
             else
             {
                 svm_objective = solver(
-                    make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps, max_iterations), 
+                    make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps, max_iterations, num_dims), 
                     w,
                     num_nonnegative,
                     force_weight_1_idx);
@@ -678,6 +692,7 @@ namespace dlib
         bool learn_nonnegative_weights;
         bool last_weight_1;
         matrix<scalar_type,0,1> prior;
+        scalar_type prior_b;
     }; 
 
 // ----------------------------------------------------------------------------------------
