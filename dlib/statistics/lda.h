@@ -68,7 +68,7 @@ namespace dlib
         std::map<unsigned long,unsigned long> class_labels = impl::make_class_labels(row_labels);
         // LDA can only give out at most class_labels.size()-1 dimensions so don't try to
         // compute more than that.
-        lda_dims = std::min(lda_dims, class_labels.size()-1);
+        lda_dims = std::min<unsigned long>(lda_dims, class_labels.size()-1);
 
         // make sure requires clause is not broken
         DLIB_CASSERT(class_labels.size() > 1,
