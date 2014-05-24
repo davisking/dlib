@@ -179,6 +179,14 @@ namespace dlib
 
     private:
 
+        static bool compare_pair_rect (
+            const std::pair<double, rectangle>& a,
+            const std::pair<double, rectangle>& b
+        )
+        {
+            return a.first < b.first;
+        }
+
         bool overlaps_any_box (
             const std::vector<rect_detection>& rects,
             const dlib::rectangle& rect
@@ -439,6 +447,8 @@ namespace dlib
 
         // Do non-max suppression
         final_dets.clear();
+        if (w.size() > 1)
+            std::sort(dets.rbegin(), dets.rend(), compare_pair_rect);
         for (unsigned long i = 0; i < dets_accum.size(); ++i)
         {
             if (overlaps_any_box(final_dets, dets_accum[i].rect))
@@ -446,7 +456,6 @@ namespace dlib
 
             final_dets.push_back(dets_accum[i]);
         }
-        std::sort(final_dets.rbegin(), final_dets.rend());
     }
 
 // ----------------------------------------------------------------------------------------
