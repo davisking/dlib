@@ -225,25 +225,13 @@ int main(int argc, char** argv)
         // trainer.train() function.  The trainer will simply disregard any detections that
         // happen to hit these boxes.  
         //
-        // Another useful thing you can do is pack multiple HOG detectors into one
-        // object_detector.  The main benefit of this is increased testing speed since it
-        // avoids recomputing the HOG features for each run of the detector.  This is how
-        // the face detector that comes with dlib works (see get_frontal_face_detector()).
-        // It contains 5 different detectors.  One for front looking faces with no
-        // rotation, another for faces rotated to the left about 30 degrees, one for a
-        // right rotation of 30 degrees.  Then two more detectors, one for faces looking to
-        // the left and another to the right.  However, note that all HOG detectors packed
-        // into a single object_detector must have been trained with the same settings for
-        // the sliding window size and the scanner padding option (see the scan_fhog_pyramid 
-        // documentation for a discussion of padding).  This is because they all share the
-        // same scanner object inside the object_detector.   
-        // 
-        // To pack multiple detectors into a single object_detector you use code like this:
+        // Another useful thing you can do is evaluate multiple HOG detectors together. The
+        // benefit of this is increased testing speed since it avoids recomputing the HOG
+        // features for each run of the detector.  You do this by storing your detectors
+        // into a std::vector and then invoking evaluate_detectors() like so:
         std::vector<object_detector<image_scanner_type> > my_detectors;
-        // Add your component detectors into my_detectors.
         my_detectors.push_back(detector);
-        // Then just construct an object_detector from the set of detectors.
-        object_detector<image_scanner_type> this_object_has_multiple_detectors(my_detectors);
+        std::vector<rectangle> dets = evaluate_detectors(my_detectors, images_train[0]); 
         //
         //
         // Finally, you can add a nuclear norm regularizer to the SVM trainer.  Doing has
