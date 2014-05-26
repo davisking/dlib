@@ -694,6 +694,70 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename pyramid_type,
+        typename image_type
+        >
+    void evaluate_detectors (
+        const std::vector<object_detector<scan_fhog_pyramid<pyramid_type>>>& detectors,
+        const image_type& img,
+        std::vector<rect_detection>& dets,
+        const double adjust_threshold = 0
+    );
+    /*!
+        ensures
+            - This function runs each of the provided object_detector objects over img and
+              stores the resulting detections into #dets.  Importantly, this function is
+              faster than running each detector individually because it computes the HOG
+              features only once and then reuses them for each detector.  However, it is
+              important to note that this speedup is only possible if all the detectors use
+              the same cell_size parameter that determines how HOG features are computed.
+              If different cell_size values are used then this function will not be any
+              faster than running the detectors individually.
+            - This function applies non-max suppression to the outputs from all detectors
+              and therefore none of the outputs will overlap with each other.
+            - To be precise, this function performs object detection on the given image and
+              stores the detected objects into #dets.  In particular, we will have that:
+                - #dets is sorted such that the highest confidence detections come first.
+                  E.g. element 0 is the best detection, element 1 the next best, and so on.
+                - #dets.size() == the number of detected objects.
+                - #dets[i].detection_confidence == The strength of the i-th detection.
+                  Larger values indicate that the detector is more confident that #dets[i]
+                  is a correct detection rather than being a false alarm.  Moreover, the
+                  detection_confidence is equal to the detection value output by the
+                  scanner minus the threshold value stored at the end of the weight vector.
+                - #dets[i].rect == the bounding box for the i-th detection.
+                - The detection #dets[i].rect was produced by detectors[#dets[i].weight_index].
+            - The detection threshold is adjusted by having adjust_threshold added to it.
+              Therefore, an adjust_threshold value > 0 makes detecting objects harder while
+              a negative value makes it easier.  Moreover, the following will be true for
+              all valid i:
+                - #dets[i].detection_confidence >= adjust_threshold
+              This means that, for example, you can obtain the maximum possible number of
+              detections by setting adjust_threshold equal to negative infinity.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename pyramid_type,
+        typename image_type
+        >
+    std::vector<rectangle> evaluate_detectors (
+        const std::vector<object_detector<scan_fhog_pyramid<pyramid_type>>>& detectors,
+        const image_type& img,
+        const double adjust_threshold = 0
+    );
+    /*!
+        ensures
+            - This function just calls the above evaluate_detectors() routine and copies
+              the output dets into a vector<rectangle> object and returns it.  Therefore,
+              this function is provided for convenience.
+    !*/
+
+// ----------------------------------------------------------------------------------------
 
 }
 
