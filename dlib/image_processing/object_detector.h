@@ -14,6 +14,26 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct rect_detection
+    {
+        double detection_confidence;
+        unsigned long weight_index;
+        rectangle rect;
+
+        bool operator<(const rect_detection& item) const { return detection_confidence < item.detection_confidence; }
+    };
+
+    struct full_detection
+    {
+        double detection_confidence;
+        unsigned long weight_index;
+        full_object_detection rect;
+
+        bool operator<(const full_detection& item) const { return detection_confidence < item.detection_confidence; }
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <typename image_scanner_type>
     struct processed_weight_vector
     {
@@ -83,6 +103,10 @@ namespace dlib
         const feature_vector_type& get_w (
             unsigned long idx = 0
         ) const { return w[idx].w; }
+        
+        const processed_weight_vector<image_scanner_type>& get_processed_w (
+            unsigned long idx = 0
+        ) const { return w[idx]; }
 
         const test_box_overlap& get_overlap_tester (
         ) const;
@@ -129,23 +153,10 @@ namespace dlib
             double adjust_threshold = 0
         );
 
-        struct rect_detection
-        {
-            double detection_confidence;
-            unsigned long weight_index;
-            rectangle rect;
-
-            bool operator<(const rect_detection& item) const { return detection_confidence < item.detection_confidence; }
-        };
-
-        struct full_detection
-        {
-            double detection_confidence;
-            unsigned long weight_index;
-            full_object_detection rect;
-
-            bool operator<(const full_detection& item) const { return detection_confidence < item.detection_confidence; }
-        };
+        // These typedefs are here for backwards compatibility with previous versions of
+        // dlib.
+        typedef ::dlib::rect_detection rect_detection;
+        typedef ::dlib::full_detection full_detection;
 
         template <
             typename image_type
@@ -178,14 +189,6 @@ namespace dlib
         );
 
     private:
-
-        static bool compare_pair_rect (
-            const std::pair<double, rectangle>& a,
-            const std::pair<double, rectangle>& b
-        )
-        {
-            return a.first < b.first;
-        }
 
         bool overlaps_any_box (
             const std::vector<rect_detection>& rects,
@@ -448,7 +451,7 @@ namespace dlib
         // Do non-max suppression
         final_dets.clear();
         if (w.size() > 1)
-            std::sort(dets.rbegin(), dets.rend(), compare_pair_rect);
+            std::sort(dets_accum.rbegin(), dets_accum.rend());
         for (unsigned long i = 0; i < dets_accum.size(); ++i)
         {
             if (overlaps_any_box(final_dets, dets_accum[i].rect))

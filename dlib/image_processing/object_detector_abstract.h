@@ -13,6 +13,22 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct rect_detection
+    {
+        double detection_confidence;
+        unsigned long weight_index;
+        rectangle rect;
+    };
+
+    struct full_detection
+    {
+        double detection_confidence;
+        unsigned long weight_index;
+        full_object_detection rect;
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename image_scanner_type
         >
@@ -200,13 +216,6 @@ namespace dlib
                 - returns #*this
         !*/
 
-        struct rect_detection
-        {
-            double detection_confidence;
-            unsigned long weight_index;
-            rectangle rect;
-        };
-
         template <
             typename image_type
             >
@@ -246,13 +255,6 @@ namespace dlib
                   This means that, for example, you can obtain the maximum possible number
                   of detections by setting adjust_threshold equal to negative infinity.
         !*/
-
-        struct full_detection
-        {
-            double detection_confidence;
-            unsigned long weight_index;
-            full_object_detection rect;
-        };
 
         template <
             typename image_type
