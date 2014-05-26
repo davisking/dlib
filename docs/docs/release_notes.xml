@@ -17,6 +17,8 @@ New Features:
      objects.
    - Added a user settable loss to the structural_assignment_trainer and
      structural_track_association_trainer objects.  
+   - Added evaluate_detectors(), a function for efficiently running multiple fHOG
+     based object detectors.
    - Added the new split_on_first() and split_on_last() string manipulation functions.
    - Added locally_change_current_dir, a RAII tool for switching between directories.
    - You can now make a 1x1 matrix containing a single value by calling mat() on a single
