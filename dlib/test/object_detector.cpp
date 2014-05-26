@@ -404,6 +404,22 @@ namespace
 
             validate_some_object_detector_stuff(images, detector, 1e-6);
         }
+
+        {
+            std::vector<object_detector<image_scanner_type> > detectors;
+            detectors.push_back(detector);
+            detectors.push_back(detector);
+            detectors.push_back(detector);
+
+            std::vector<rectangle> dets1 = evaluate_detectors(detectors, images[0]);
+            std::vector<rectangle> dets2 = detector(images[0]);
+            DLIB_TEST(dets1.size() > 0);
+            DLIB_TEST(dets2.size() == dets1.size());
+            for (unsigned long i = 0; i < dets1.size(); ++i)
+            {
+                DLIB_TEST(dets1[i] == dets2[i]);
+            }
+        }
     }
 
 // ----------------------------------------------------------------------------------------

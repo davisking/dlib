@@ -1285,7 +1285,7 @@ namespace dlib
                 const double thresh = detectors[i].get_processed_w(d).w(scanner.get_num_dimensions());
 
                 impl::detect_from_fhog_pyramid<pyramid_type>(feats, scanner.get_feature_extractor(),
-                    detectors[i].get_processed_w(d).get_detect_argument(), thresh,
+                    detectors[i].get_processed_w(d).get_detect_argument(), thresh+adjust_threshold,
                     det_box_height, det_box_width, cell_size, max_filter_height,
                     max_filter_width, temp_dets);
 
