@@ -707,6 +707,10 @@ namespace dlib
         const double adjust_threshold = 0
     );
     /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - img contains some kind of pixel type. 
+              (i.e. pixel_traits<typename image_type::type> is defined)
         ensures
             - This function runs each of the provided object_detector objects over img and
               stores the resulting detections into #dets.  Importantly, this function is
@@ -751,6 +755,10 @@ namespace dlib
         const double adjust_threshold = 0
     );
     /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - img contains some kind of pixel type. 
+              (i.e. pixel_traits<typename image_type::type> is defined)
         ensures
             - This function just calls the above evaluate_detectors() routine and copies
               the output dets into a vector<rectangle> object and returns it.  Therefore,
