@@ -26,10 +26,10 @@ New Features:
    - The point transform functions and frobmetric_training_sample are now serializable.
    - Added a simplified operator &lt;&lt; and &gt;&gt; based syntax for serializing to and
      from files.  So now you can serialize to a file using a syntax of:
-      serialize("myfile.dat") &lt;&lt; myobject &lt;&lt; another_object;
+       serialize("myfile.dat") &lt;&lt; myobject &lt;&lt; another_object;
      and then load those objects from disk via:
-      deserialize("myfile.dat") &gt;&gt; myobject &gt;&gt; another_object;
-     An arbitrary number of objects can be serialize or deserialized by
+       deserialize("myfile.dat") &gt;&gt; myobject &gt;&gt; another_object;
+     An arbitrary number of objects can be serialized or deserialized by
      chaining the &lt;&lt; and &gt;&gt; operators.
 
 Non-Backwards Compatible Changes:
