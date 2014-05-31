@@ -1229,7 +1229,7 @@ namespace dlib
         if (detectors.size() == 0)
             return;
 
-        const int cell_size = detectors[0].get_scanner().get_cell_size();
+        const unsigned long cell_size = detectors[0].get_scanner().get_cell_size();
 
         // Find the maximum sized filters and also most extreme pyramiding settings used.
         unsigned long max_filter_width = 0;
