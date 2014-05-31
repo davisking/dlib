@@ -338,6 +338,7 @@ namespace dlib
                   particular, the size of the window we scan over the HOG feature pyramid
                   is #get_fhog_window_width() by #get_fhog_window_height() HOG cells in
                   size.    
+                - #is_loaded_with_image() == false
         !*/
 
         unsigned long get_detection_window_width (
@@ -386,6 +387,7 @@ namespace dlib
         /*!
             ensures
                 - #get_padding() == new_padding
+                - #is_loaded_with_image() == false
         !*/
 
         unsigned long get_padding (
@@ -415,6 +417,7 @@ namespace dlib
                 - new_cell_size > 0
             ensures
                 - #get_cell_size() == new_cell_size
+                - #is_loaded_with_image() == false
         !*/
 
         inline long get_num_dimensions (

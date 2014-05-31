@@ -115,6 +115,7 @@ namespace dlib
 
             window_width = width;
             window_height = height;
+            feats.clear();
         }
 
         inline unsigned long get_detection_window_width (
@@ -133,6 +134,7 @@ namespace dlib
         )
         {
             padding = new_padding;
+            feats.clear();
         }
 
         unsigned long get_padding (
@@ -150,6 +152,7 @@ namespace dlib
                 );
 
             cell_size = new_cell_size;
+            feats.clear();
         }
 
         unsigned long get_cell_size (
