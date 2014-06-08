@@ -12,6 +12,22 @@
 
 <current>
 New Features:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - The new simplified serialization API that works like serialize("filename")&lt;&lt;object 
+     was not opening files in binary mode and therefore didn't work properly on Windows.  
+     This has been fixed.
+
+Other:
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="18.8" date="Jun 02, 2014">
+New Features:
    - Added the ability to set a previously trained function as a prior to the
      svm_multiclass_linear_trainer, svm_c_linear_trainer, and svm_rank_trainer
      objects.
@@ -47,7 +63,7 @@ Other:
    - Added an example program showing how to set a custom logger output hook.
    - Made linear decision_functions which use sparse vectors much faster.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
