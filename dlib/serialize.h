@@ -1290,7 +1290,7 @@ namespace dlib
             const std::string& filename
         ) 
         {
-            fout.reset(new std::ofstream(filename.c_str()));
+            fout.reset(new std::ofstream(filename.c_str(), std::ios::binary));
             if (!(*fout))
                 throw serialization_error("Unable to open " + filename + " for writing.");
         }
@@ -1313,7 +1313,7 @@ namespace dlib
             const std::string& filename
         ) 
         {
-            fin.reset(new std::ifstream(filename.c_str()));
+            fin.reset(new std::ifstream(filename.c_str(), std::ios::binary));
             if (!(*fin))
                 throw serialization_error("Unable to open " + filename + " for reading.");
         }
