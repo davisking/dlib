@@ -187,7 +187,7 @@ namespace dlib
             // get a lock on the data mutex
             auto_mutex M(data_mutex);
 
-            // loop to ensure that the new function poitner is in the data
+            // loop to ensure that the new function pointer is in the data
             while (true)
             {
                 // if the data is empty then add new data and quit loop
@@ -206,7 +206,7 @@ namespace dlib
 
 
             // get a thread for this new data
-            // if a new thread must be crated
+            // if a new thread must be created
             if (pool_count == 0)
             {
                 // make thread and add it to the pool
