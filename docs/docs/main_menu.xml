@@ -91,6 +91,10 @@
                <name>Home</name>
                <link>http://dlib.net</link>
             </item>
+            <item>
+               <name>Dlib Blog</name>
+               <link>http://blog.dlib.net</link>
+            </item>
          </web>
 
          <item>
