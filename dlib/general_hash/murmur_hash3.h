@@ -6,6 +6,7 @@
 #include "murmur_hash3_abstract.h"
 #include "../uintn.h"
 #include <utility>
+#include <string.h>
 
 namespace dlib
 {
@@ -14,7 +15,7 @@ namespace dlib
     // in the public domain. The author hereby disclaims copyright to this source code.
     // The code in this particular file was modified by Davis E. King.  In
     // particular, endian-swapping was added along with some other minor code
-    // changes.
+    // changes like avoiding strict aliasing violations.
 
 
     //-----------------------------------------------------------------------------
@@ -62,7 +63,12 @@ namespace dlib
 
     DLIB_FORCE_INLINE uint32 murmur_getblock ( const uint32 * p, int i )
     {
-        return p[i];
+        // The reason we do a memcpy() here instead of simply returning p[i] is because
+        // doing it this way avoids violations of the strict aliasing rule when all these
+        // functions are inlined into the user's code.
+        uint32 temp;
+        memcpy(&temp, p+i, 4);
+        return temp;
     }
 
     DLIB_FORCE_INLINE uint32 murmur_getblock_byte_swap ( const uint32 * p, int i )
@@ -84,7 +90,12 @@ namespace dlib
 
     DLIB_FORCE_INLINE uint64 murmur_getblock ( const uint64 * p, int i )
     {
-        return p[i];
+        // The reason we do a memcpy() here instead of simply returning p[i] is because
+        // doing it this way avoids violations of the strict aliasing rule when all these
+        // functions are inlined into the user's code.
+        uint64 temp;
+        memcpy(&temp, p+i, 8);
+        return temp;
     }
 
     DLIB_FORCE_INLINE uint64 murmur_getblock_byte_swap ( const uint64 * p, int i )

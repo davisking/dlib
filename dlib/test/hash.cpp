@@ -122,16 +122,11 @@ namespace
 
             bo.host_to_little(buf);
 
-            // Copy buf into a char buf to avoid warnings about violation of strict
-            // aliasing when calling murmur_hash3_128bit().
-            char buf2[sizeof(buf)];
-            memcpy(buf2, buf, sizeof(buf));
-
             std::pair<uint64,uint64> temp1, temp2;
 
             // Make sure the 4 integer version of murmur hash does the same thing 
             // as the memory block version.
-            temp1 = murmur_hash3_128bit(buf2, sizeof(buf2), 0);
+            temp1 = murmur_hash3_128bit(buf, sizeof(buf), 0);
             temp2 = murmur_hash3_128bit(buf[0], buf[1], buf[2], buf[3]);
             DLIB_TEST( temp1.first == temp2.first);
             DLIB_TEST( temp1.second == temp2.second);
