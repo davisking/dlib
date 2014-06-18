@@ -2,7 +2,7 @@
 # on Debian Linux using the gcc compiler.
 
 # this is the name of the output executable
-TARGET = test 
+TARGET = dtest 
 
 # these are the compile time flags passed to gcc
 CFLAGS = -ggdb  -DDEBUG -DDLIB_NO_GUI_SUPPORT  -I ../..  -Wall
