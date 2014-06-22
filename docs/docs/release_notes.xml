@@ -16,13 +16,26 @@ New Features:
 Non-Backwards Compatible Changes:
 
 Bug fixes:
+
+Other:
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="18.9" date="Jun 16, 2014">
+New Features:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
    - The new simplified serialization API that works like serialize("filename")&lt;&lt;object 
      was not opening files in binary mode and therefore didn't work properly on Windows.  
      This has been fixed.
 
 Other:
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
