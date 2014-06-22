@@ -447,7 +447,7 @@ namespace dlib
         const long num_neg_train_samples = num_neg - num_neg_test_samples; 
 
 
-        sample_vector_type x_test, x_train;
+        matrix<long,0,1> x_test, x_train;
         scalar_vector_type y_test, y_train;
         x_test.set_size (num_pos_test_samples  + num_neg_test_samples);
         y_test.set_size (num_pos_test_samples  + num_neg_test_samples);
@@ -469,7 +469,7 @@ namespace dlib
             {
                 if (y(pos_idx) == +1.0)
                 {
-                    x_test(cur) = x(pos_idx);
+                    x_test(cur) = pos_idx;
                     y_test(cur) = +1.0;
                     ++cur;
                 }
@@ -481,7 +481,7 @@ namespace dlib
             {
                 if (y(neg_idx) == -1.0)
                 {
-                    x_test(cur) = x(neg_idx);
+                    x_test(cur) = neg_idx;
                     y_test(cur) = -1.0;
                     ++cur;
                 }
@@ -499,7 +499,7 @@ namespace dlib
             {
                 if (y(train_pos_idx) == +1.0)
                 {
-                    x_train(cur) = x(train_pos_idx);
+                    x_train(cur) = train_pos_idx;
                     y_train(cur) = +1.0;
                     ++cur;
                 }
@@ -511,7 +511,7 @@ namespace dlib
             {
                 if (y(train_neg_idx) == -1.0)
                 {
-                    x_train(cur) = x(train_neg_idx);
+                    x_train(cur) = train_neg_idx;
                     y_train(cur) = -1.0;
                     ++cur;
                 }
@@ -521,7 +521,7 @@ namespace dlib
             try
             {
                 // do the training and testing
-                res += test_binary_decision_function(trainer.train(x_train,y_train),x_test,y_test);
+                res += test_binary_decision_function(trainer.train(rowm(x,x_train),y_train),rowm(x,x_test),y_test);
             }
             catch (invalid_nu_error&)
             {

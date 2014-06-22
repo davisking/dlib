@@ -32,6 +32,9 @@ namespace dlib
               (e.g. There must be at least as many examples of each class as there are folds)
             - trainer_type == some kind of trainer object (e.g. svm_nu_trainer)
             - num_threads > 0
+            - It must be safe for multiple trainer objects to access the elements of x from
+              multiple threads at the same time.  Note that all trainers and kernels in
+              dlib are thread safe in this regard since they do not mutate the elements of x.
         ensures
             - performs k-fold cross validation by using the given trainer to solve the
               given binary classification problem for the given number of folds.

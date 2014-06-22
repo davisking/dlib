@@ -26,7 +26,7 @@ namespace dlib
 
     namespace cvtti_helpers
     {
-        template <typename trainer_type>
+        template <typename trainer_type, typename in_sample_vector_type>
         struct job
         {
             typedef typename trainer_type::scalar_type scalar_type;
@@ -35,29 +35,33 @@ namespace dlib
             typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
             typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
 
+            job() : x(0) {}
+
             trainer_type trainer;
-            sample_vector_type x_test, x_train;
+            matrix<long,0,1> x_test, x_train;
             scalar_vector_type y_test, y_train;
+            const in_sample_vector_type* x;
         };
 
         struct task  
         {
             template <
                 typename trainer_type,
-                typename matrix_type
+                typename matrix_type,
+                typename in_sample_vector_type
                 >
             void operator()(
-                job<trainer_type>& j,
+                job<trainer_type,in_sample_vector_type>& j,
                 matrix_type& result
             )
             {
                 try
                 {
-                    result = test_binary_decision_function(j.trainer.train(j.x_train, j.y_train), j.x_test, j.y_test);
+                    result = test_binary_decision_function(j.trainer.train(rowm(*j.x,j.x_train), j.y_train), rowm(*j.x,j.x_test), j.y_test);
 
                     // Do this just to make j release it's memory since people might run threaded cross validation
                     // on very large datasets.  Every bit of freed memory helps out.
-                    j = job<trainer_type>();
+                    j = job<trainer_type,in_sample_vector_type>();
                 }
                 catch (invalid_nu_error&)
                 {
@@ -132,14 +136,15 @@ namespace dlib
 
 
 
-        std::vector<future<job<trainer_type> > > jobs(folds);
+        std::vector<future<job<trainer_type,in_sample_vector_type> > > jobs(folds);
         std::vector<future<matrix<scalar_type, 1, 2, mem_manager_type> > > results(folds);
 
 
         for (long i = 0; i < folds; ++i)
         {
-            job<trainer_type>& j = jobs[i].get();
+            job<trainer_type,in_sample_vector_type>& j = jobs[i].get();
 
+            j.x = &x;
             j.x_test.set_size (num_pos_test_samples  + num_neg_test_samples);
             j.y_test.set_size (num_pos_test_samples  + num_neg_test_samples);
             j.x_train.set_size(num_pos_train_samples + num_neg_train_samples);
@@ -153,7 +158,7 @@ namespace dlib
             {
                 if (y(pos_idx) == +1.0)
                 {
-                    j.x_test(cur) = x(pos_idx);
+                    j.x_test(cur) = pos_idx;
                     j.y_test(cur) = +1.0;
                     ++cur;
                 }
@@ -165,7 +170,7 @@ namespace dlib
             {
                 if (y(neg_idx) == -1.0)
                 {
-                    j.x_test(cur) = x(neg_idx);
+                    j.x_test(cur) = neg_idx;
                     j.y_test(cur) = -1.0;
                     ++cur;
                 }
@@ -183,7 +188,7 @@ namespace dlib
             {
                 if (y(train_pos_idx) == +1.0)
                 {
-                    j.x_train(cur) = x(train_pos_idx);
+                    j.x_train(cur) = train_pos_idx;
                     j.y_train(cur) = +1.0;
                     ++cur;
                 }
@@ -195,7 +200,7 @@ namespace dlib
             {
                 if (y(train_neg_idx) == -1.0)
                 {
-                    j.x_train(cur) = x(train_neg_idx);
+                    j.x_train(cur) = train_neg_idx;
                     j.y_train(cur) = -1.0;
                     ++cur;
                 }
