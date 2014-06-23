@@ -121,7 +121,25 @@ namespace
             for (int i = 0; i < 6; ++i)
             {
                 auto_mutex_readonly lock(m);
+                DLIB_TEST(lock.has_read_lock());
+                DLIB_TEST(!lock.has_write_lock());
                 do_readonly_stuff();
+
+                lock.lock_readonly();
+                DLIB_TEST(lock.has_read_lock());
+                DLIB_TEST(!lock.has_write_lock());
+                lock.unlock();
+                DLIB_TEST(!lock.has_read_lock());
+                DLIB_TEST(!lock.has_write_lock());
+                lock.lock_readonly();
+                DLIB_TEST(lock.has_read_lock());
+                DLIB_TEST(!lock.has_write_lock());
+                lock.lock_write();
+                DLIB_TEST(!lock.has_read_lock());
+                DLIB_TEST(lock.has_write_lock());
+                lock.lock_write();
+                DLIB_TEST(!lock.has_read_lock());
+                DLIB_TEST(lock.has_write_lock());
             }
 
             dlog << LINFO << "exit thread_readonly()";

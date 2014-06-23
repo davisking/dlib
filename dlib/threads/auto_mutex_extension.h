@@ -107,7 +107,7 @@ namespace dlib
 
         explicit auto_mutex_readonly (
             const read_write_mutex& rw_
-        ) : rw(rw_)
+        ) : rw(rw_), _has_write_lock(false), _has_read_lock(true)
         {
             rw.lock_readonly();
         }
@@ -115,12 +115,57 @@ namespace dlib
         ~auto_mutex_readonly (
         )
         {
-            rw.unlock_readonly();
+            unlock();
         }
+
+        void lock_readonly (
+        )
+        {
+            if (!_has_read_lock)
+            {
+                unlock();
+                rw.lock_readonly();
+                _has_read_lock = true;
+            }
+        }
+
+        void lock_write (
+        )
+        {
+            if (!_has_write_lock)
+            {
+                unlock();
+                rw.lock();
+                _has_write_lock = true;
+            }
+        }
+
+        void unlock (
+        )
+        {
+            if (_has_write_lock)
+            {
+                rw.unlock();
+                _has_write_lock = false;
+            }
+            else if (_has_read_lock)
+            {
+                rw.unlock_readonly();
+                _has_read_lock = false;
+            }
+        }
+
+        bool has_read_lock (
+        ) { return _has_read_lock; }
+
+        bool has_write_lock (
+        ) { return _has_write_lock; }
 
     private:
 
         const read_write_mutex& rw;
+        bool _has_write_lock;
+        bool _has_read_lock;
 
         // restricted functions
         auto_mutex_readonly(auto_mutex_readonly&);        // copy constructor
