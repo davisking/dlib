@@ -744,6 +744,9 @@ namespace dlib
                 - #dets[i].detection_confidence >= adjust_threshold
               This means that, for example, you can obtain the maximum possible number of
               detections by setting adjust_threshold equal to negative infinity.
+            - This function is threadsafe in the sense that multiple threads can call
+              evaluate_detectors() with the same instances of detectors and img without
+              requiring a mutex lock.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -766,6 +769,9 @@ namespace dlib
             - This function just calls the above evaluate_detectors() routine and copies
               the output dets into a vector<rectangle> object and returns it.  Therefore,
               this function is provided for convenience.
+            - This function is threadsafe in the sense that multiple threads can call
+              evaluate_detectors() with the same instances of detectors and img without
+              requiring a mutex lock.
     !*/
 
 // ----------------------------------------------------------------------------------------
