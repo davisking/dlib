@@ -77,13 +77,12 @@ public:
         matrix<double> result = cross_validate_trainer(trainer, samples, labels, 10);
         cout << "gamma: " << setw(11) << gamma << "  nu: " << setw(11) << nu <<  "  cross validation accuracy: " << result;
 
-        // Here I'm just summing the accuracy on each class.  However, you could do something else.  
-        // For example, your application might require a 90% accuracy on class +1 and so you could
-        // heavily penalize results that didn't obtain the desired accuracy.  Or similarly, you 
-        // might use the roc_c1_trainer() function to adjust the trainer output so that it always
-        // obtained roughly a 90% accuracy on class +1.  In that case returning the sum of the two
-        // class accuracies might be appropriate.  
-        return sum(result);
+        // Here I'm returning the harmonic mean between the accuracies of each class.
+        // However, you could do something else.  For example, you might care a lot more
+        // about correctly predicting the +1 class, so you could penalize results that
+        // didn't obtain a high accuracy on that class.  You might do this by using 
+        // something like a weighted version of the F1-score (see http://en.wikipedia.org/wiki/F1_score).     
+        return 2*prod(result)/sum(result);
     }
 
     const std::vector<sample_type>& samples;
