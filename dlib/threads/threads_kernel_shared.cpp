@@ -14,9 +14,9 @@
 extern "C"
 {
 #ifdef ENABLE_ASSERTS
-    int USER_ERROR__violation_of_one_definition_rule_detected__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives;
+    int USER_ERROR__missing_dlib_all_source_cpp_file__OR__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives;
 #else
-    int USER_ERROR__violation_of_one_definition_rule_detected__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives_;
+    int USER_ERROR__missing_dlib_all_source_cpp_file__OR__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives_;
 #endif
 }
 

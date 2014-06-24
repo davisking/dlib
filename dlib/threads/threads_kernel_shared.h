@@ -37,11 +37,11 @@ extern "C"
 // you have simply forgotten to compile dlib/all/source.cpp into your application.
 // =========================>>> WHY YOU ARE GETTING AN ERROR HERE <<<=========================
 #ifdef ENABLE_ASSERTS
-    extern int USER_ERROR__violation_of_one_definition_rule_detected__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives;
-    inline int dlib_check_consistent_assert_usage() { USER_ERROR__violation_of_one_definition_rule_detected__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives = 0; return 0; }
+    extern int USER_ERROR__missing_dlib_all_source_cpp_file__OR__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives;
+    inline int dlib_check_consistent_assert_usage() { USER_ERROR__missing_dlib_all_source_cpp_file__OR__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives = 0; return 0; }
 #else
-    extern int USER_ERROR__violation_of_one_definition_rule_detected__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives_;
-    inline int dlib_check_consistent_assert_usage() { USER_ERROR__violation_of_one_definition_rule_detected__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives_ = 0; return 0; }
+    extern int USER_ERROR__missing_dlib_all_source_cpp_file__OR__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives_;
+    inline int dlib_check_consistent_assert_usage() { USER_ERROR__missing_dlib_all_source_cpp_file__OR__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives_ = 0; return 0; }
 #endif
     const int dlib_check_assert_helper_variable = dlib_check_consistent_assert_usage();
 }
