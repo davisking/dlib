@@ -1860,6 +1860,7 @@
          </description>
          <examples>
             <example>fhog_object_detector_ex.cpp.html</example>
+            <example>train_object_detector.py.html</example>
          </examples>
                                  
       </component>
