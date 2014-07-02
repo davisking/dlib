@@ -599,8 +599,8 @@ namespace dlib
 
 
         // The first thing we do is get a starting set of 3 points that are inside the [begin,end] bounds
-        p1 = max(starting_point-1, begin);
-        p3 = min(starting_point+1, end);
+        p1 = max(starting_point-search_radius, begin);
+        p3 = min(starting_point+search_radius, end);
         f1 = f(p1);
         f3 = f(p3);
 
@@ -647,15 +647,16 @@ namespace dlib
             }
             
             // If the left most points are identical in function value then expand out the
-            // left a bit, unless it's already at bound.
-            if (f1==f2 && f1!=begin)
+            // left a bit, unless it's already at bound or we would drop that left most
+            // point anyway because it's bad.
+            if (f1==f2 && f1<f3 && f1!=begin)
             {
                 p1 = max(p1 - search_radius, begin);
                 f1 = f(p1);
                 search_radius *= 2;
                 continue;
             }
-            if (f2==f3 && f3!=end)
+            if (f2==f3 && f3<f1 && f3!=end)
             {
                 p3 = min(p3 + search_radius, end);
                 f3 = f(p3);
