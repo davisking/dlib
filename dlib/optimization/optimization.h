@@ -104,27 +104,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename funct>
-    class negate_function_object 
-    {
-    public:
-        negate_function_object(const funct& f_) : f(f_){}
-
-        template <typename T>
-        double operator()(const T& x) const
-        {
-            return -f(x);
-        }
-
-    private:
-        const funct& f;
-    };
-
-    template <typename funct>
-    const negate_function_object<funct> negate_function(const funct& f) { return negate_function_object<funct>(f); }
-
-// ----------------------------------------------------------------------------------------
-
     template <typename funct, typename EXP1, typename EXP2>
     struct clamped_function_object
     {

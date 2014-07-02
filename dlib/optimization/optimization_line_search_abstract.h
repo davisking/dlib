@@ -251,6 +251,22 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename funct
+        >
+    const negate_function_object<funct> negate_function(
+        const funct& f
+    );
+    /*!
+        requires
+            - f == a function that returns a scalar
+        ensures
+            - returns a function that represents the negation of f.  That is,
+              the returned function object represents g(x) == -f(x)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     class optimize_single_variable_failure : public error;
     /*!
         This is the exception class used by the functions defined below.

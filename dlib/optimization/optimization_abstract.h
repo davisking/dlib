@@ -71,22 +71,6 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename funct
-        >
-    const negate_function_object<funct> negate_function(
-        const funct& f
-    );
-    /*!
-        requires
-            - f == a function that returns a scalar
-        ensures
-            - returns a function that represents the negation of f.  That is,
-              the returned function object represents g(x) == -f(x)
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
         typename funct, 
         typename EXP1, 
         typename EXP2
