@@ -113,7 +113,7 @@
       <component>
          <name>negate_function</name>
          <file>dlib/optimization.h</file>
-         <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
+         <spec_file link="true">dlib/optimization/optimization_line_search_abstract.h</spec_file>
          <description>
             This is a function that takes another function as input and returns
             a function object that computes the negation of the input function.
