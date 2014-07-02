@@ -649,17 +649,19 @@ namespace dlib
             // If the left most points are identical in function value then expand out the
             // left a bit, unless it's already at bound or we would drop that left most
             // point anyway because it's bad.
-            if (f1==f2 && f1<f3 && f1!=begin)
+            if (f1==f2 && f1<f3 && p1!=begin)
             {
                 p1 = max(p1 - search_radius, begin);
                 f1 = f(p1);
+                ++f_evals;
                 search_radius *= 2;
                 continue;
             }
-            if (f2==f3 && f3<f1 && f3!=end)
+            if (f2==f3 && f3<f1 && p3!=end)
             {
                 p3 = min(p3 + search_radius, end);
                 f3 = f(p3);
+                ++f_evals;
                 search_radius *= 2;
                 continue;
             }
