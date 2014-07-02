@@ -666,7 +666,7 @@ namespace dlib
 
 
             // if f1 is small then take a step to the left
-            if (f1 < f3)
+            if (f1 <= f3)
             { 
                 // check if the minimum is butting up against the bounds and if so then pick
                 // a point between p1 and p2 in the hopes that shrinking the interval will
@@ -769,7 +769,7 @@ namespace dlib
             // make sure one side of the bracket isn't super huge compared to the other
             // side.  If it is then contract it.
             const double bracket_ratio = abs(p1-p2)/abs(p2-p3);
-            if ( !( bracket_ratio < 100 && bracket_ratio > 0.01) )
+            if ( !( bracket_ratio < 10 && bracket_ratio > 0.1) )
             {
                 // Force p_min to be on a reasonable side.  But only if lagrange_poly_min_extrap()
                 // didn't put it on a good side already.
