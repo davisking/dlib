@@ -562,18 +562,23 @@ namespace dlib
         const double begin = -1e200,
         const double end = 1e200,
         const double eps = 1e-3,
-        const long max_iter = 100
+        const long max_iter = 100,
+        const double initial_search_radius = 1
     )
     {
         DLIB_CASSERT( eps > 0 &&
                       max_iter > 1 &&
-                      begin <= starting_point && starting_point <= end,
+                      begin <= starting_point && starting_point <= end && 
+                      initial_search_radius > 0,
                       "eps: " << eps
                       << "\n max_iter: "<< max_iter 
                       << "\n begin: "<< begin 
                       << "\n end:   "<< end 
                       << "\n starting_point: "<< starting_point 
+                      << "\n initial_search_radius: "<< initial_search_radius 
         );
+
+        double search_radius = initial_search_radius;
 
         double p1=0, p2=0, p3=0, f1=0, f2=0, f3=0;
         long f_evals = 1;
@@ -614,7 +619,6 @@ namespace dlib
 
         // Now we have 3 points on the function.  Start looking for a bracketing set such that
         // f1 > f2 < f3 is the case.
-        double jump_size = 1;
         while ( !(f1 > f2 && f2 < f3))
         {
             // check for hitting max_iter or if the interval is now too small
@@ -641,6 +645,24 @@ namespace dlib
                 starting_point = p3;
                 return f3;
             }
+            
+            // If the left most points are identical in function value then expand out the
+            // left a bit, unless it's already at bound.
+            if (f1==f2 && f1!=begin)
+            {
+                p1 = max(p1 - search_radius, begin);
+                f1 = f(p1);
+                search_radius *= 2;
+                continue;
+            }
+            if (f2==f3 && f3!=end)
+            {
+                p3 = min(p3 + search_radius, end);
+                f3 = f(p3);
+                search_radius *= 2;
+                continue;
+            }
+
 
             // if f1 is small then take a step to the left
             if (f1 < f3)
@@ -649,7 +671,7 @@ namespace dlib
                 // a point between p1 and p2 in the hopes that shrinking the interval will
                 // be a good thing to do.  Or if p1 and p2 aren't differentiated then try and
                 // get them to obtain different values.
-                if (p1 == begin || (f1 == f2 && (end-begin) < jump_size ))
+                if (p1 == begin || (f1 == f2 && (end-begin) < search_radius ))
                 {
                     p3 = p2;
                     f3 = f2;
@@ -666,10 +688,10 @@ namespace dlib
                     p2 = p1;
                     f2 = f1;
 
-                    p1 = max(p1 - jump_size, begin);
+                    p1 = max(p1 - search_radius, begin);
                     f1 = f(p1);
 
-                    jump_size *= 2;
+                    search_radius *= 2;
                 }
 
             }
@@ -680,7 +702,7 @@ namespace dlib
                 // a point between p2 and p3 in the hopes that shrinking the interval will
                 // be a good thing to do.  Or if p2 and p3 aren't differentiated then try and
                 // get them to obtain different values.
-                if (p3 == end || (f2 == f3 && (end-begin) < jump_size))
+                if (p3 == end || (f2 == f3 && (end-begin) < search_radius))
                 {
                     p1 = p2;
                     f1 = f2;
@@ -697,10 +719,10 @@ namespace dlib
                     p2 = p3;
                     f2 = f3;
 
-                    p3 = min(p3 + jump_size, end);
+                    p3 = min(p3 + search_radius, end);
                     f3 = f(p3);
 
-                    jump_size *= 2;
+                    search_radius *= 2;
                 }
             }
 
@@ -837,10 +859,11 @@ namespace dlib
         const double begin = -1e200,
         const double end = 1e200,
         const double eps = 1e-3,
-        const long max_iter = 100
+        const long max_iter = 100,
+        const double initial_search_radius = 1
     )
     {
-        return -find_min_single_variable(negate_function(f), starting_point, begin, end, eps, max_iter);
+        return -find_min_single_variable(negate_function(f), starting_point, begin, end, eps, max_iter, initial_search_radius);
     }
 
 // ----------------------------------------------------------------------------------------
