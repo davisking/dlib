@@ -6,7 +6,8 @@
    This work is published from United States. 
 -->
 
-   <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+   <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+   xmlns:gcse="googleCustomSearch">
    <xsl:output method='html' version='1.0' encoding='UTF-8' indent='no' />
    <xsl:strip-space elements="*" />
    <xsl:preserve-space elements="pre code_box preserve_space" />
@@ -282,12 +283,19 @@ function BigToggle(node)
       text-align: center;
    }
 
-   div#entire_page {
-      width:<xsl:value-of select="$main_width"/>;  
+   div#entire_page_header {
+      width:62.5em;  
       text-align: left;
       margin-top: 0.4em;
       margin-left: auto;
       margin-right: auto;
+   }
+   div#entire_page {
+      width:62.5em;  
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      clear:both;
    }
 </style>
          <xsl:if test="$is_chm != 'true'">
@@ -305,8 +313,26 @@ function BigToggle(node)
          </head>
          <body bgcolor="{$background_color}">
             <a name="top" />
+            <div id="entire_page_header">
+               <xsl:if test="$is_chm != 'true'">
+                  <div style="float:right;width:450px">
+                           <script>
+                              (function() {
+                                 var cx = '017764538452368798135:fin3a18x_ns';
+                                 var gcse = document.createElement('script');
+                                 gcse.type = 'text/javascript';
+                                 gcse.async = true;
+                                 gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+                                    '//www.google.com/cse/cse.js?cx=' + cx;
+                                 var s = document.getElementsByTagName('script')[0];
+                                 s.parentNode.insertBefore(gcse, s);
+                              })();
+                        </script><gcse:search></gcse:search>
+                  </div>
+               </xsl:if>
+               <a href="http://dlib.net"><img src="dlib-logo.png"/></a>
+            </div>
             <div id="entire_page">
-            <a href="http://dlib.net"><img src="dlib-logo.png"/></a>
 
             <table bgcolor="white" height="100%" bordercolor="{$background_color}" 
                 CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px">
