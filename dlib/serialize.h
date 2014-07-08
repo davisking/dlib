@@ -1283,6 +1283,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline void serialize(const char* item, std::ostream& out)
+    {
+        // We serialize literal strings the same way we serialize std::string, that is, we
+        // write the data but no trailing 0 byte.
+        const unsigned long length = strlen(item);
+        serialize(length, out);
+        out.write(item, length);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class proxy_serialize 
     {
     public:
@@ -1298,6 +1309,24 @@ namespace dlib
         template <typename T>
         inline proxy_serialize& operator<<(const T& item)
         {
+            serialize(item, *fout);
+            return *this;
+        }
+
+        template <size_t length>
+        proxy_serialize& operator<<(const char (&item)[length])
+        {
+            // We serialize char arrays like we do all other arrays.  That is, we write
+            // every element.
+            serialize(length, *fout);
+            fout->write(item, length);
+            return *this;
+        }
+
+        proxy_serialize& operator<<(const char* item)
+        {
+            // We serialize literal strings the same way we serialize std::string, that is,
+            // we write the data but no trailing 0 byte.
             serialize(item, *fout);
             return *this;
         }

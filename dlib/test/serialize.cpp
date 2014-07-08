@@ -942,6 +942,58 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_strings()
+    {
+        string str1 = "stuff";
+        char buf[6];
+        buf[0] = 0;
+        buf[1] = 1;
+        buf[2] = 2;
+        buf[3] = 0;
+        buf[4] = 3;
+        buf[5] = 3;
+
+        dlib::serialize("ser_test_string.dat") << str1 << buf << "morestuff";
+
+        string str2, str3;
+        char buf2[6];
+        memset(buf2,0,sizeof(buf2));
+        dlib::deserialize("ser_test_string.dat") >> str2 >> buf2 >> str3;
+        DLIB_TEST(str2 == "stuff");
+        DLIB_TEST(str3 == "morestuff");
+        DLIB_TEST(buf2[0] == 0);
+        DLIB_TEST(buf2[1] == 1);
+        DLIB_TEST(buf2[2] == 2);
+        DLIB_TEST(buf2[3] == 0);
+        DLIB_TEST(buf2[4] == 3);
+        DLIB_TEST(buf2[5] == 3);
+
+
+        ofstream fout("ser_test_string.dat", ios::binary);
+        dlib::serialize(str1, fout);
+        dlib::serialize(buf, fout);
+        dlib::serialize("morestuff", fout);
+        fout.close();
+        ifstream fin("ser_test_string.dat", ios::binary);
+        memset(buf2,0,sizeof(buf2));
+        str2.clear();
+        str3.clear();
+        dlib::deserialize(str2, fin);
+        dlib::deserialize(buf2, fin);
+        dlib::deserialize(str3, fin);
+
+        DLIB_TEST(str2 == "stuff");
+        DLIB_TEST(str3 == "morestuff");
+        DLIB_TEST(buf2[0] == 0);
+        DLIB_TEST(buf2[1] == 1);
+        DLIB_TEST(buf2[2] == 2);
+        DLIB_TEST(buf2[3] == 0);
+        DLIB_TEST(buf2[4] == 3);
+        DLIB_TEST(buf2[5] == 3);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class serialize_tester : public tester
     {
         /*!
@@ -966,6 +1018,7 @@ namespace
             test_vector<int>();
             test_vector_bool();
             test_array2d_and_matrix_serialization();
+            test_strings();
         }
     } a;
 
