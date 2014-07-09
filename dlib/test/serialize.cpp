@@ -953,14 +953,15 @@ namespace
         buf[4] = 3;
         buf[5] = 3;
 
-        dlib::serialize("ser_test_string.dat") << str1 << buf << "morestuff";
+        dlib::serialize("ser_test_string.dat") << str1 << buf << "morestuff" << "";
 
-        string str2, str3;
+        string str2, str3, str4;
         char buf2[6];
         memset(buf2,0,sizeof(buf2));
-        dlib::deserialize("ser_test_string.dat") >> str2 >> buf2 >> str3;
+        dlib::deserialize("ser_test_string.dat") >> str2 >> buf2 >> str3 >> str4;
         DLIB_TEST(str2 == "stuff");
         DLIB_TEST(str3 == "morestuff");
+        DLIB_TEST(str4 == "");
         DLIB_TEST(buf2[0] == 0);
         DLIB_TEST(buf2[1] == 1);
         DLIB_TEST(buf2[2] == 2);
