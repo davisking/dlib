@@ -413,7 +413,6 @@ namespace dlib
     )
     {
         typedef typename in_scalar_vector_type::value_type scalar_type;
-        typedef typename trainer_type::sample_type sample_type;
         typedef typename trainer_type::mem_manager_type mem_manager_type;
         typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
 
