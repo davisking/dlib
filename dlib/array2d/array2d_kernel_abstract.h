@@ -128,8 +128,7 @@ namespace dlib
         );
         /*!
             requires
-                - cols > 0 && rows > 0 or
-                  cols == 0 && rows == 0
+                - rows >= 0 && cols >= 0
             ensures
                 - #nc() == cols
                 - #nr() == rows
@@ -174,8 +173,7 @@ namespace dlib
         );
         /*!
             requires
-                - cols > 0 && rows > 0 or
-                  cols == 0 && rows == 0
+                - rows >= 0 && cols >= 0
             ensures
                 - #nc() == cols
                 - #nr() == rows

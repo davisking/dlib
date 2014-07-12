@@ -149,10 +149,9 @@ namespace dlib
             at_start_(true)
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT((nc__ > 0 && nr__ > 0) ||
-                        (nc__ == 0 && nr__ == 0),
+            DLIB_ASSERT((nc__ >= 0 && nr__ >= 0),
                         "\t array2d::array2d(long nr__, long nc__)"
-                        << "\n\t You have to give a non zero nc and nr or just make both zero."
+                        << "\n\t The array2d can't have negative rows or columns."
                         << "\n\t this: " << this
                         << "\n\t nc__: " << nc__ 
                         << "\n\t nr__: " << nr__ 
@@ -419,10 +418,9 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT((nc__ > 0 && nr__ > 0) ||
-                (nc__ == 0 && nr__ == 0),
+        DLIB_ASSERT((nc__ >= 0 && nr__ >= 0) ,
                "\tvoid array2d::set_size(long nr__, long nc__)"
-               << "\n\tYou have to give a non zero nc and nr or just make both zero."
+               << "\n\tThe array2d can't have negative rows or columns."
                << "\n\tthis: " << this
                << "\n\tnc__: " << nc__ 
                << "\n\tnr__: " << nr__ 
