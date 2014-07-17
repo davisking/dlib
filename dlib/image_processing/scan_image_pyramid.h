@@ -10,6 +10,7 @@
 #include "../array2d.h"
 #include <vector>
 #include "full_object_detection.h"
+#include "../image_processing/generic_image.h"
 
 namespace dlib
 {

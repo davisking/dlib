@@ -30,7 +30,7 @@ namespace dlib
         unsigned int bit_depth () const { return bit_depth_; }
 
         template<typename T>
-        void get_image( T& t) const
+        void get_image( T& t_) const
         {
 #ifndef DLIB_PNG_SUPPORT
             /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -42,7 +42,8 @@ namespace dlib
             COMPILE_TIME_ASSERT(sizeof(T) == 0);
 #endif
 
-            typedef typename T::type pixel_type;
+            typedef typename image_traits<T>::pixel_type pixel_type;
+            image_view<T> t(t_);
             t.set_size( height_, width_ );
 
 
@@ -148,7 +149,7 @@ namespace dlib
             }
             else if (is_rgba() && bit_depth_ == 8)
             {
-                if (!pixel_traits<typename T::type>::has_alpha)
+                if (!pixel_traits<pixel_type>::has_alpha)
                     assign_all_pixels(t,0);
 
                 for ( unsigned n = 0; n < height_;n++ )
@@ -167,7 +168,7 @@ namespace dlib
             }
             else if (is_rgba() && bit_depth_ == 16)
             {
-                if (!pixel_traits<typename T::type>::has_alpha)
+                if (!pixel_traits<pixel_type>::has_alpha)
                     assign_all_pixels(t,0);
 
                 for ( unsigned n = 0; n < height_;n++ )

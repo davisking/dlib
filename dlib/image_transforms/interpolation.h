@@ -20,14 +20,14 @@ namespace dlib
     {
     public:
 
-        template <typename image_type, typename pixel_type>
+        template <typename image_view_type, typename pixel_type>
         bool operator() (
-            const image_type& img,
+            const image_view_type& img,
             const dlib::point& p,
             pixel_type& result
         ) const
         {
-            COMPILE_TIME_ASSERT(pixel_traits<typename image_type::type>::has_alpha == false);
+            COMPILE_TIME_ASSERT(pixel_traits<typename image_view_type::pixel_type>::has_alpha == false);
 
             if (get_rect(img).contains(p))
             {
@@ -49,19 +49,19 @@ namespace dlib
         template <typename T>
         struct is_rgb_image 
         {
-            const static bool value = pixel_traits<typename T::type>::rgb;
+            const static bool value = pixel_traits<typename T::pixel_type>::rgb;
         };
 
     public:
 
-        template <typename T, typename image_type, typename pixel_type>
-        typename disable_if<is_rgb_image<image_type>,bool>::type operator() (
-            const image_type& img,
+        template <typename T, typename image_view_type, typename pixel_type>
+        typename disable_if<is_rgb_image<image_view_type>,bool>::type operator() (
+            const image_view_type& img,
             const dlib::vector<T,2>& p,
             pixel_type& result
         ) const
         {
-            COMPILE_TIME_ASSERT(pixel_traits<typename image_type::type>::has_alpha == false);
+            COMPILE_TIME_ASSERT(pixel_traits<typename image_view_type::pixel_type>::has_alpha == false);
 
             const long left   = static_cast<long>(std::floor(p.x()));
             const long top    = static_cast<long>(std::floor(p.y()));
@@ -90,14 +90,14 @@ namespace dlib
             return true;
         }
 
-        template <typename T, typename image_type, typename pixel_type>
-        typename enable_if<is_rgb_image<image_type>,bool>::type operator() (
-            const image_type& img,
+        template <typename T, typename image_view_type, typename pixel_type>
+        typename enable_if<is_rgb_image<image_view_type>,bool>::type operator() (
+            const image_view_type& img,
             const dlib::vector<T,2>& p,
             pixel_type& result
         ) const
         {
-            COMPILE_TIME_ASSERT(pixel_traits<typename image_type::type>::has_alpha == false);
+            COMPILE_TIME_ASSERT(pixel_traits<typename image_view_type::pixel_type>::has_alpha == false);
 
             const long left   = static_cast<long>(std::floor(p.x()));
             const long top    = static_cast<long>(std::floor(p.y()));
@@ -151,19 +151,19 @@ namespace dlib
         template <typename T>
         struct is_rgb_image 
         {
-            const static bool value = pixel_traits<typename T::type>::rgb;
+            const static bool value = pixel_traits<typename T::pixel_type>::rgb;
         };
 
     public:
 
-        template <typename T, typename image_type, typename pixel_type>
-        typename disable_if<is_rgb_image<image_type>,bool>::type operator() (
-            const image_type& img,
+        template <typename T, typename image_view_type, typename pixel_type>
+        typename disable_if<is_rgb_image<image_view_type>,bool>::type operator() (
+            const image_view_type& img,
             const dlib::vector<T,2>& p,
             pixel_type& result
         ) const
         {
-            COMPILE_TIME_ASSERT(pixel_traits<typename image_type::type>::has_alpha == false);
+            COMPILE_TIME_ASSERT(pixel_traits<typename image_view_type::pixel_type>::has_alpha == false);
 
             const point pp(p);
 
@@ -189,14 +189,14 @@ namespace dlib
             return true;
         }
 
-        template <typename T, typename image_type, typename pixel_type>
-        typename enable_if<is_rgb_image<image_type>,bool>::type operator() (
-            const image_type& img,
+        template <typename T, typename image_view_type, typename pixel_type>
+        typename enable_if<is_rgb_image<image_view_type>,bool>::type operator() (
+            const image_view_type& img,
             const dlib::vector<T,2>& p,
             pixel_type& result
         ) const
         {
-            COMPILE_TIME_ASSERT(pixel_traits<typename image_type::type>::has_alpha == false);
+            COMPILE_TIME_ASSERT(pixel_traits<typename image_view_type::pixel_type>::has_alpha == false);
 
             const point pp(p);
 
@@ -342,13 +342,15 @@ namespace dlib
             << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
             );
 
+        const_image_view<image_type1> imgv(in_img);
+        image_view<image_type2> out_imgv(out_img);
 
         for (long r = area.top(); r <= area.bottom(); ++r)
         {
             for (long c = area.left(); c <= area.right(); ++c)
             {
-                if (!interp(in_img, map_point(dlib::vector<double,2>(c,r)), out_img[r][c]))
-                    set_background(out_img[r][c]);
+                if (!interp(imgv, map_point(dlib::vector<double,2>(c,r)), out_imgv[r][c]))
+                    set_background(out_imgv[r][c]);
             }
         }
     }
@@ -522,9 +524,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename image_type>
-    struct is_rgb_image { const static bool value = pixel_traits<typename image_type::type>::rgb; };
+    struct is_rgb_image { const static bool value = pixel_traits<typename image_traits<image_type>::pixel_type>::rgb; };
     template <typename image_type>
-    struct is_grayscale_image { const static bool value = pixel_traits<typename image_type::type>::grayscale; };
+    struct is_grayscale_image { const static bool value = pixel_traits<typename image_traits<image_type>::pixel_type>::grayscale; };
 
     // This is an optimized version of resize_image for the case where bilinear
     // interpolation is used.
@@ -535,17 +537,21 @@ namespace dlib
     typename disable_if_c<(is_rgb_image<image_type1>::value&&is_rgb_image<image_type2>::value) || 
                           (is_grayscale_image<image_type1>::value&&is_grayscale_image<image_type2>::value)>::type 
     resize_image (
-        const image_type1& in_img,
-        image_type2& out_img,
+        const image_type1& in_img_,
+        image_type2& out_img_,
         interpolate_bilinear
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
+        DLIB_ASSERT( is_same_object(in_img_, out_img_) == false ,
             "\t void resize_image()"
             << "\n\t Invalid inputs were given to this function."
-            << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
+            << "\n\t is_same_object(in_img_, out_img_):  " << is_same_object(in_img_, out_img_)
             );
+
+        const_image_view<image_type1> in_img(in_img_);
+        image_view<image_type2> out_img(out_img_);
+
         if (out_img.nr() <= 1 || out_img.nc() <= 1)
         {
             assign_all_pixels(out_img, 0);
@@ -553,8 +559,8 @@ namespace dlib
         }
 
 
-        typedef typename image_type1::type T;
-        typedef typename image_type2::type U;
+        typedef typename image_traits<image_type1>::pixel_type T;
+        typedef typename image_traits<image_type2>::pixel_type U;
         const double x_scale = (in_img.nc()-1)/(double)std::max<long>((out_img.nc()-1),1);
         const double y_scale = (in_img.nr()-1)/(double)std::max<long>((out_img.nr()-1),1);
         double y = -y_scale;
@@ -618,24 +624,28 @@ namespace dlib
         typename image_type
         >
     typename enable_if<is_grayscale_image<image_type> >::type resize_image (
-        const image_type& in_img,
-        image_type& out_img,
+        const image_type& in_img_,
+        image_type& out_img_,
         interpolate_bilinear
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
+        DLIB_ASSERT( is_same_object(in_img_, out_img_) == false ,
             "\t void resize_image()"
             << "\n\t Invalid inputs were given to this function."
-            << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
+            << "\n\t is_same_object(in_img_, out_img_):  " << is_same_object(in_img_, out_img_)
             );
+
+        const_image_view<image_type> in_img(in_img_);
+        image_view<image_type> out_img(out_img_);
+
         if (out_img.nr() <= 1 || out_img.nc() <= 1)
         {
             assign_all_pixels(out_img, 0);
             return;
         }
 
-        typedef typename image_type::type T;
+        typedef typename image_traits<image_type>::pixel_type T;
         const double x_scale = (in_img.nc()-1)/(double)std::max<long>((out_img.nc()-1),1);
         const double y_scale = (in_img.nr()-1)/(double)std::max<long>((out_img.nr()-1),1);
         double y = -y_scale;
@@ -716,17 +726,21 @@ namespace dlib
         typename image_type
         >
     typename enable_if<is_rgb_image<image_type> >::type resize_image (
-        const image_type& in_img,
-        image_type& out_img,
+        const image_type& in_img_,
+        image_type& out_img_,
         interpolate_bilinear
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
+        DLIB_ASSERT( is_same_object(in_img_, out_img_) == false ,
             "\t void resize_image()"
             << "\n\t Invalid inputs were given to this function."
-            << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
+            << "\n\t is_same_object(in_img_, out_img_):  " << is_same_object(in_img_, out_img_)
             );
+
+        const_image_view<image_type> in_img(in_img_);
+        image_view<image_type> out_img(out_img_);
+
         if (out_img.nr() <= 1 || out_img.nc() <= 1)
         {
             assign_all_pixels(out_img, 0);
@@ -734,7 +748,7 @@ namespace dlib
         }
 
 
-        typedef typename image_type::type T;
+        typedef typename image_traits<image_type>::pixel_type T;
         const double x_scale = (in_img.nc()-1)/(double)std::max<long>((out_img.nc()-1),1);
         const double y_scale = (in_img.nr()-1)/(double)std::max<long>((out_img.nr()-1),1);
         double y = -y_scale;
@@ -1046,7 +1060,7 @@ namespace dlib
         for (unsigned long i = 0; i < images.size(); ++i)
         {
             flip_image_left_right(images[i], temp); 
-            temp.swap(images[i]);
+            swap(temp,images[i]);
             for (unsigned long j = 0; j < objects[i].size(); ++j)
             {
                 objects[i][j] = impl::flip_rect_left_right(objects[i][j], get_rect(images[i]));
@@ -1077,7 +1091,7 @@ namespace dlib
         for (unsigned long i = 0; i < images.size(); ++i)
         {
             flip_image_left_right(images[i], temp); 
-            temp.swap(images[i]);
+            swap(temp, images[i]);
             for (unsigned long j = 0; j < objects[i].size(); ++j)
             {
                 objects[i][j] = impl::flip_rect_left_right(objects[i][j], get_rect(images[i]));
@@ -1113,7 +1127,7 @@ namespace dlib
         for (unsigned long i = 0; i < images.size(); ++i)
         {
             pyramid_up(images[i], temp, pyr);
-            temp.swap(images[i]);
+            swap(temp, images[i]);
             for (unsigned long j = 0; j < objects[i].size(); ++j)
             {
                 objects[i][j] = pyr.rect_up(objects[i][j]);
@@ -1146,7 +1160,7 @@ namespace dlib
         for (unsigned long i = 0; i < images.size(); ++i)
         {
             pyramid_up(images[i], temp, pyr);
-            temp.swap(images[i]);
+            swap(temp, images[i]);
             for (unsigned long j = 0; j < objects[i].size(); ++j)
             {
                 objects[i][j] = pyr.rect_up(objects[i][j]);
@@ -1179,7 +1193,7 @@ namespace dlib
         for (unsigned long i = 0; i < images.size(); ++i)
         {
             const point_transform_affine tran = rotate_image(images[i], temp, angle);
-            temp.swap(images[i]);
+            swap(temp, images[i]);
             for (unsigned long j = 0; j < objects[i].size(); ++j)
             {
                 const rectangle rect = objects[i][j];
@@ -1210,7 +1224,7 @@ namespace dlib
         for (unsigned long i = 0; i < images.size(); ++i)
         {
             const point_transform_affine tran = rotate_image(images[i], temp, angle);
-            temp.swap(images[i]);
+            swap(temp, images[i]);
             for (unsigned long j = 0; j < objects[i].size(); ++j)
             {
                 const rectangle rect = objects[i][j];
@@ -1325,9 +1339,9 @@ namespace dlib
             << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
             );
 
-        if (in_img.size() == 0)
+        if (image_size(in_img) == 0)
         {
-            out_img.clear();
+            set_image_size(out_img, 0, 0);
             return;
         }
 
@@ -1335,10 +1349,10 @@ namespace dlib
         rectangle uprect = pyr.rect_up(rect);
         if (uprect.is_empty())
         {
-            out_img.clear();
+            set_image_size(out_img, 0, 0);
             return;
         }
-        out_img.set_size(uprect.bottom()+1, uprect.right()+1);
+        set_image_size(out_img, uprect.bottom()+1, uprect.right()+1);
 
         resize_image(in_img, out_img, interp);
     }
@@ -1379,7 +1393,7 @@ namespace dlib
     {
         image_type temp;
         pyramid_up(img, temp, pyr);
-        temp.swap(img);
+        swap(temp, img);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1502,7 +1516,7 @@ namespace dlib
         chips.resize(chip_locations.size());
         for (unsigned long i = 0; i < chips.size(); ++i)
         {
-            chips[i].set_size(chip_locations[i].rows, chip_locations[i].cols);
+            set_image_size(chips[i], chip_locations[i].rows, chip_locations[i].cols);
 
             // figure out which level in the pyramid to use to extract the chip
             int level = -1;
@@ -1545,7 +1559,7 @@ namespace dlib
         std::vector<chip_details> chip_locations(1,location);
         dlib::array<image_type2> chips;
         extract_image_chips(img, chip_locations, chips);
-        chips[0].swap(chip);
+        swap(chips[0], chip);
     }
 
 // ----------------------------------------------------------------------------------------

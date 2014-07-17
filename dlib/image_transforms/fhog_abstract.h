@@ -29,9 +29,8 @@ namespace dlib
             - cell_size > 0
             - filter_rows_padding > 0
             - filter_cols_padding > 0
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - img contains some kind of pixel type. 
-              (i.e. pixel_traits<typename image_type::type> is defined)
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
             - T should be float or double
         ensures
             - This function implements the HOG feature extraction method described in 
@@ -89,9 +88,8 @@ namespace dlib
             - cell_size > 0
             - filter_rows_padding > 0
             - filter_cols_padding > 0
-            - image_type  == is an implementation of array2d/array2d_kernel_abstract.h
-            - img contains some kind of pixel type. 
-              (i.e. pixel_traits<typename image_type::type> is defined)
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
             - T should be float or double
         ensures
             - This function is identical to the above extract_fhog_features() routine
@@ -124,9 +122,8 @@ namespace dlib
             - cell_size > 0
             - filter_rows_padding > 0
             - filter_cols_padding > 0
-            - image_type  == is an implementation of array2d/array2d_kernel_abstract.h
-            - img contains some kind of pixel type. 
-              (i.e. pixel_traits<typename image_type::type> is defined)
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
         ensures
             - This function calls the above extract_fhog_features() routine and simply
               packages the entire output into a dlib::matrix.  The matrix is constructed
@@ -158,9 +155,8 @@ namespace dlib
             - cell_size > 0
             - filter_rows_padding > 0
             - filter_cols_padding > 0
-            - image_type  == is an implementation of array2d/array2d_kernel_abstract.h
-            - img contains some kind of pixel type. 
-              (i.e. pixel_traits<typename image_type::type> is defined)
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
             - T is float, double, or long double
         ensures
             - This function is identical to the above version of extract_fhog_features()

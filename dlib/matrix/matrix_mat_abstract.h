@@ -28,14 +28,20 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T,
-        typename MM
+        typename image_type
         >
     const matrix_exp mat (
-        const array2d<T,MM>& array
+        const image_type& img
     );
     /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h or image_type is a image_view or
+              const_image_view object.
         ensures
+            - This function converts any kind of generic image object into a dlib::matrix
+              expression.  Therefore, it is capable of converting objects like dlib::array2d
+              of dlib::cv_image.
             - returns a matrix R such that:
                 - R.nr() == array.nr() 
                 - R.nc() == array.nc()

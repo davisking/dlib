@@ -3253,12 +3253,12 @@ namespace dlib
 
             // if the new image has a different size when compared to the previous image
             // then we should readjust the total rectangle size.
-            if (new_img.nr() != img.nr() || new_img.nc() != img.nc())
+            if (num_rows(new_img) != img.nr() || num_columns(new_img) != img.nc())
             {
                 if (zoom_in_scale != 1)
-                    set_total_rect_size(new_img.nc()*zoom_in_scale, new_img.nr()*zoom_in_scale);
+                    set_total_rect_size(num_columns(new_img)*zoom_in_scale, num_rows(new_img)*zoom_in_scale);
                 else
-                    set_total_rect_size(new_img.nc()/zoom_out_scale, new_img.nr()/zoom_out_scale);
+                    set_total_rect_size(num_columns(new_img)/zoom_out_scale, num_rows(new_img)/zoom_out_scale);
             }
             else
             {

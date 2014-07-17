@@ -14,52 +14,34 @@ namespace dlib
 
     template <
         typename dest_image_type,
-        typename src_pixel_type
+        typename src_image_type
         >
-    typename enable_if<is_matrix<dest_image_type> >::type impl_assign_single_pixel (
-        dest_image_type& img,
-        long r,
-        long c,
-        const src_pixel_type& pix
+    void impl_assign_image (
+        image_view<dest_image_type>& dest,
+        const src_image_type& src
     )
     {
-        assign_pixel(img(r,c), pix);
+        dest.set_size(src.nr(),src.nc());
+        for (long r = 0; r < src.nr(); ++r)
+        {
+            for (long c = 0; c < src.nc(); ++c)
+            {
+                assign_pixel(dest[r][c], src(r,c));
+            }
+        }
     }
-
-    template <
-        typename dest_image_type,
-        typename src_pixel_type
-        >
-    typename disable_if<is_matrix<dest_image_type> >::type impl_assign_single_pixel (
-        dest_image_type& img,
-        long r,
-        long c,
-        const src_pixel_type& pix
-    )
-    {
-        assign_pixel(img[r][c], pix);
-    }
-
-// ----------------------------------------------------------------------------------------
 
     template <
         typename dest_image_type,
         typename src_image_type
         >
     void impl_assign_image (
-        dest_image_type& dest,
+        dest_image_type& dest_,
         const src_image_type& src
     )
     {
-        dest.set_size(src.nr(),src.nc());
-
-        for (long r = 0; r < src.nr(); ++r)
-        {
-            for (long c = 0; c < src.nc(); ++c)
-            {
-                impl_assign_single_pixel(dest,r,c, src(r,c));
-            }
-        }
+        image_view<dest_image_type> dest(dest_);
+        impl_assign_image(dest, src);
     }
 
     template <
@@ -85,9 +67,9 @@ namespace dlib
         typename src_image_type
         >
     void impl_assign_image_scaled (
-        dest_image_type& dest,
+        image_view<dest_image_type>& dest,
         const src_image_type& src,
-        const double thresh = 4
+        const double thresh 
     )
     {
         DLIB_ASSERT( thresh > 0,
@@ -96,12 +78,15 @@ namespace dlib
             << "\n\t thresh: " << thresh 
             );
 
+
+        typedef typename image_traits<dest_image_type>::pixel_type dest_pixel;
+
         // If the destination has a dynamic range big enough to contain the source image data then just do a 
         // regular assign_image()
-        if (pixel_traits<typename dest_image_type::type>::max() >= pixel_traits<typename src_image_type::type>::max() &&
-            pixel_traits<typename dest_image_type::type>::min() <= pixel_traits<typename src_image_type::type>::min() )
+        if (pixel_traits<dest_pixel>::max() >= pixel_traits<typename src_image_type::type>::max() &&
+            pixel_traits<dest_pixel>::min() <= pixel_traits<typename src_image_type::type>::min() )
         {
-            assign_image(dest, src);
+            impl_assign_image(dest, src);
             return;
         }
 
@@ -112,7 +97,7 @@ namespace dlib
 
         if (src.size() == 1)
         {
-            impl_assign_single_pixel(dest,0,0, src(0,0));
+            impl_assign_image(dest, src);
             return;
         }
 
@@ -131,8 +116,8 @@ namespace dlib
         {
             // If the destination has a dynamic range big enough to contain the source image data then just do a 
             // regular assign_image()
-            if (pixel_traits<typename dest_image_type::type>::max() >= rs.max() &&
-                pixel_traits<typename dest_image_type::type>::min() <= rs.min() )
+            if (pixel_traits<dest_pixel>::max() >= rs.max() &&
+                pixel_traits<dest_pixel>::min() <= rs.min() )
             {
                 impl_assign_image(dest, src);
                 return;
@@ -145,8 +130,8 @@ namespace dlib
         const double lower = std::max(rs.mean() - thresh*rs.stddev(), rs.min());
 
 
-        const double dest_min = pixel_traits<typename dest_image_type::type>::min();
-        const double dest_max = pixel_traits<typename dest_image_type::type>::max();
+        const double dest_min = pixel_traits<dest_pixel>::min();
+        const double dest_max = pixel_traits<dest_pixel>::max();
 
         const double scale = (upper!=lower)? ((dest_max - dest_min) / (upper - lower)) : 0;
 
@@ -156,9 +141,23 @@ namespace dlib
             {
                 const double val = get_pixel_intensity(src(r,c)) - lower;
 
-                impl_assign_single_pixel(dest,r,c, scale*val + dest_min);
+                assign_pixel(dest[r][c], scale*val + dest_min);
             }
         }
+    }
+
+    template <
+        typename dest_image_type,
+        typename src_image_type
+        >
+    void impl_assign_image_scaled (
+        dest_image_type& dest_,
+        const src_image_type& src,
+        const double thresh 
+    )
+    {
+        image_view<dest_image_type> dest(dest_);
+        impl_assign_image_scaled(dest, src, thresh);
     }
 
     template <
@@ -185,7 +184,7 @@ namespace dlib
         typename src_pixel_type
         >
     void assign_all_pixels (
-        dest_image_type& dest_img,
+        image_view<dest_image_type>& dest_img,
         const src_pixel_type& src_pixel
     )
     {
@@ -201,13 +200,28 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename dest_image_type,
+        typename src_pixel_type
+        >
+    void assign_all_pixels (
+        dest_image_type& dest_img_,
+        const src_pixel_type& src_pixel
+    )
+    {
+        image_view<dest_image_type> dest_img(dest_img_);
+        assign_all_pixels(dest_img, src_pixel);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename image_type
         >
     void assign_border_pixels (
-        image_type& img,
+        image_view<image_type>& img,
         long x_border_size,
         long y_border_size,
-        const typename image_type::type& p
+        const typename image_traits<image_type>::pixel_type& p
     )
     {
         DLIB_ASSERT( x_border_size >= 0 && y_border_size >= 0,
@@ -251,6 +265,20 @@ namespace dlib
         }
     }
 
+    template <
+        typename image_type
+        >
+    void assign_border_pixels (
+        image_type& img_,
+        long x_border_size,
+        long y_border_size,
+        const typename image_traits<image_type>::pixel_type& p
+    )
+    {
+        image_view<image_type> img(img_);
+        assign_border_pixels(img, x_border_size, y_border_size, p);
+    }
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -269,7 +297,7 @@ namespace dlib
             << "\n\ty_border_size: " << y_border_size
             );
 
-        typename image_type::type zero_pixel;
+        typename image_traits<image_type>::pixel_type zero_pixel;
         assign_pixel_intensity(zero_pixel, 0);
         assign_border_pixels(img, x_border_size, y_border_size, zero_pixel);
     }
@@ -280,7 +308,30 @@ namespace dlib
         typename image_type
         >
     void zero_border_pixels (
-        image_type& img,
+        image_view<image_type>& img,
+        long x_border_size,
+        long y_border_size
+    )
+    {
+        DLIB_ASSERT( x_border_size >= 0 && y_border_size >= 0,
+            "\tvoid zero_border_pixels(img, p, border_size)"
+            << "\n\tYou have given an invalid border_size"
+            << "\n\tx_border_size: " << x_border_size
+            << "\n\ty_border_size: " << y_border_size
+            );
+
+        typename image_traits<image_type>::pixel_type zero_pixel;
+        assign_pixel_intensity(zero_pixel, 0);
+        assign_border_pixels(img, x_border_size, y_border_size, zero_pixel);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    void zero_border_pixels (
+        image_view<image_type>& img,
         rectangle inside
     )
     {
@@ -305,6 +356,20 @@ namespace dlib
             for (long c = 0; c < img.nc(); ++c)
                 assign_pixel(img[r][c], 0);
         }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    void zero_border_pixels (
+        image_type& img_,
+        const rectangle& inside
+    )
+    {
+        image_view<image_type> img(img_);
+        zero_border_pixels(img, inside);
     }
 
 // ----------------------------------------------------------------------------------------

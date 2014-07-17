@@ -133,8 +133,10 @@ namespace dlib
         requires
             - max_points > 0
             - detection_threshold >= 0
-            - image_type == a type that implements the array2d/array2d_kernel_abstract.h interface
-            - pixel_traits<image_type::type> must be defined
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - Let P denote the type of pixel in img, then we require:
+                - pixel_traits<P>::has_alpha == false 
         ensures
             - This function runs the complete SURF algorithm on the given input image and 
               returns the points it found. 

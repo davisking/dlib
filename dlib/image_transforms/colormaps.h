@@ -25,7 +25,7 @@ namespace dlib
         const static long NC = 0;
         typedef rgb_pixel type;
         typedef const rgb_pixel const_ret_type;
-        typedef typename T::mem_manager_type mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
 
         const_ret_type apply (long r, long c ) const 
@@ -47,8 +47,8 @@ namespace dlib
             }
         }
 
-        long nr () const { return img.nr(); }
-        long nc () const { return img.nc(); }
+        long nr () const { return num_rows(img); }
+        long nc () const { return num_columns(img); }
     }; 
 
     template <
@@ -84,7 +84,7 @@ namespace dlib
         const static long NC = 0;
         typedef rgb_pixel type;
         typedef const rgb_pixel const_ret_type;
-        typedef typename T::mem_manager_type mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
 
         const_ret_type apply (long r, long c ) const 
@@ -107,8 +107,8 @@ namespace dlib
             return pix;
         }
 
-        long nr () const { return img.nr(); }
-        long nc () const { return img.nc(); }
+        long nr () const { return num_rows(img); }
+        long nc () const { return num_columns(img); }
     }; 
 
     template <
@@ -158,7 +158,7 @@ namespace dlib
         const static long NC = 0;
         typedef rgb_pixel type;
         typedef const rgb_pixel const_ret_type;
-        typedef typename T::mem_manager_type mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
 
         const_ret_type apply (long r, long c ) const 
@@ -203,8 +203,8 @@ namespace dlib
             return pix;
         }
 
-        long nr () const { return img.nr(); }
-        long nc () const { return img.nc(); }
+        long nr () const { return num_rows(img); }
+        long nc () const { return num_columns(img); }
     }; 
 
     template <

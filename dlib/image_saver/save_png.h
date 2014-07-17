@@ -41,10 +41,12 @@ namespace dlib
         typename image_type
         >
     typename disable_if<is_matrix<image_type> >::type save_png(
-        const image_type& img,
+        const image_type& img_,
         const std::string& file_name
     )
     {
+        const_image_view<image_type> img(img_);
+
         // make sure requires clause is not broken
         DLIB_CASSERT(img.size() != 0,
             "\t save_png()"
@@ -62,7 +64,7 @@ namespace dlib
             COMPILE_TIME_ASSERT(sizeof(image_type) == 0);
 #else
         std::vector<unsigned char*> row_pointers(img.nr());
-        typedef typename image_type::type pixel_type;
+        typedef typename image_traits<image_type>::pixel_type pixel_type;
 
         if (is_same_type<rgb_pixel,pixel_type>::value)
         {
@@ -82,7 +84,7 @@ namespace dlib
         {
             // convert from HSI to RGB (Or potentially RGB pixels that aren't laid out as R G B)
             array2d<rgb_pixel> temp_img;
-            assign_image(temp_img, img);
+            assign_image(temp_img, img_);
             for (unsigned long i = 0; i < row_pointers.size(); ++i)
                 row_pointers[i] = (unsigned char*)(&temp_img[i][0]);
 
@@ -92,7 +94,7 @@ namespace dlib
         {
             // convert from RGBA pixels that aren't laid out as R G B A
             array2d<rgb_alpha_pixel> temp_img;
-            assign_image(temp_img, img);
+            assign_image(temp_img, img_);
             for (unsigned long i = 0; i < row_pointers.size(); ++i)
                 row_pointers[i] = (unsigned char*)(&temp_img[i][0]);
 
@@ -120,7 +122,7 @@ namespace dlib
             {
                 // convert from whatever this is to 16bit grayscale 
                 array2d<dlib::uint16> temp_img;
-                assign_image(temp_img, img);
+                assign_image(temp_img, img_);
                 for (unsigned long i = 0; i < row_pointers.size(); ++i)
                     row_pointers[i] = (unsigned char*)(&temp_img[i][0]);
 

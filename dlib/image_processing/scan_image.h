@@ -56,8 +56,8 @@ namespace dlib
 
         for (unsigned long i = 0; i < images.size(); ++i)
         {
-            if (images[0].nr() != images[i].nr() ||
-                images[0].nc() != images[i].nc())
+            if (num_rows(images[0]) != num_rows(images[i]) ||
+                num_columns(images[0]) != num_columns(images[i]))
                 return false;
         }
 
@@ -93,7 +93,7 @@ namespace dlib
 #endif
 
 
-        typedef typename image_array_type::type::type pixel_type;
+        typedef typename image_traits<typename image_array_type::type>::pixel_type pixel_type;
         typedef typename promote<pixel_type>::type ptype;
 
         ptype temp = 0;
@@ -151,7 +151,7 @@ namespace dlib
             );
         }
 #endif
-        typedef typename image_array_type::type::type pixel_type;
+        typedef typename image_traits<typename image_array_type::type>::pixel_type pixel_type;
         typedef typename promote<pixel_type>::type ptype;
 
         ptype temp = 0;
@@ -190,12 +190,13 @@ namespace dlib
         >
     void find_points_above_thresh (
         std::vector<std::pair<double, point> >& dets,
-        const image_type& img,
+        const image_type& img_,
         const double thresh,
         const unsigned long max_dets
     )
     {
-        typedef typename image_type::type ptype;
+        const_image_view<image_type> img(img_);
+        typedef typename image_traits<image_type>::pixel_type ptype;
 
         dets.clear();
         if (max_dets == 0)
@@ -269,7 +270,7 @@ namespace dlib
 
 
 
-        typedef typename image_array_type::type::type pixel_type;
+        typedef typename image_traits<typename image_array_type::type>::pixel_type pixel_type;
         typedef typename promote<pixel_type>::type ptype;
 
         array2d<ptype> accum(images[0].nr(), images[0].nc());
@@ -338,7 +339,7 @@ namespace dlib
         if (movable_rects.size() == 0 && fixed_rects.size() == 0)
             return;
 
-        typedef typename image_array_type::type::type pixel_type;
+        typedef typename image_traits<typename image_array_type::type>::pixel_type pixel_type;
         typedef typename promote<pixel_type>::type ptype;
 
         array2d<ptype> accum(images[0].nr(), images[0].nc());

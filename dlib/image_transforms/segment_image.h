@@ -125,18 +125,28 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        namespace impl
+        {
+            template <typename image_view_type>
+            struct uint8_or_uint16_pixels
+            {
+                typedef typename image_view_type::pixel_type pixel_type;
+                const static bool value = is_same_type<pixel_type,uint8>::value ||
+                                          is_same_type<pixel_type,uint16>::value;
+            };
+        }
+
         // This is an overload of get_pixel_edges() that is optimized to segment images
         // with 8bit or 16bit  pixels very quickly.  We do this by using a radix sort
         // instead of quicksort.
         template <typename in_image_type, typename T>
-        typename enable_if_c<is_same_type<typename in_image_type::type,uint8>::value ||
-                             is_same_type<typename in_image_type::type,uint16>::value>::type 
+        typename enable_if<impl::uint8_or_uint16_pixels<in_image_type> >::type 
         get_pixel_edges (
             const in_image_type& in_img,
             std::vector<segment_image_edge_data_T<T> >& sorted_edges
         )
         {
-            typedef typename in_image_type::type ptype;
+            typedef typename in_image_type::pixel_type ptype;
             typedef T diff_type;
             std::vector<unsigned long> counts(std::numeric_limits<ptype>::max()+1, 0);
 
@@ -243,8 +253,7 @@ namespace dlib
 
         // This is the general purpose version of get_pixel_edges().  It handles all pixel types.
         template <typename in_image_type, typename T>
-        typename disable_if_c<is_same_type<typename in_image_type::type,uint8>::value ||
-                              is_same_type<typename in_image_type::type,uint16>::value>::type 
+        typename disable_if<impl::uint8_or_uint16_pixels<in_image_type> >::type 
         get_pixel_edges (
             const in_image_type& in_img,
             std::vector<segment_image_edge_data_T<T> >& sorted_edges
@@ -253,7 +262,7 @@ namespace dlib
             const rectangle area = get_rect(in_img);
             sorted_edges.reserve(area.area()*4);
 
-            typedef typename in_image_type::type ptype;
+            typedef typename in_image_type::pixel_type ptype;
             edge_diff_funct<ptype> edge_diff;
             typedef T diff_type;
             typedef segment_image_edge_data_T<T> segment_image_edge_data;
@@ -327,23 +336,26 @@ namespace dlib
         typename out_image_type
         >
     void segment_image (
-        const in_image_type& in_img,
-        out_image_type& out_img,
+        const in_image_type& in_img_,
+        out_image_type& out_img_,
         const double k = 200,
         const unsigned long min_size = 10
     )
     {
         using namespace dlib::impl;
-        typedef typename in_image_type::type ptype;
+        typedef typename image_traits<in_image_type>::pixel_type ptype;
         typedef typename edge_diff_funct<ptype>::diff_type diff_type;
 
         // make sure requires clause is not broken
-        DLIB_ASSERT(is_same_object(in_img, out_img) == false,
+        DLIB_ASSERT(is_same_object(in_img_, out_img_) == false,
             "\t void segment_image()"
             << "\n\t The input images can't be the same object."
             );
 
-        COMPILE_TIME_ASSERT(is_unsigned_type<typename out_image_type::type>::value);
+        COMPILE_TIME_ASSERT(is_unsigned_type<typename image_traits<out_image_type>::pixel_type>::value);
+
+        const_image_view<in_image_type> in_img(in_img_);
+        image_view<out_image_type> out_img(out_img_);
 
         out_img.set_size(in_img.nr(), in_img.nc());
         // don't bother doing anything if the image is too small
@@ -610,7 +622,7 @@ namespace dlib
         typename EXP
         >
     void find_candidate_object_locations (
-        const in_image_type& in_img,
+        const in_image_type& in_img_,
         std::vector<rectangle>& rects,
         const matrix_exp<EXP>& kvals,
         const unsigned long min_size = 20,
@@ -629,9 +641,10 @@ namespace dlib
         typedef dlib::set<rectangle, mm_type>::kernel_1a set_of_rects;
 
         using namespace dlib::impl;
-        typedef typename in_image_type::type ptype;
+        typedef typename image_traits<in_image_type>::pixel_type ptype;
         typedef typename edge_diff_funct<ptype>::diff_type diff_type;
 
+        const_image_view<in_image_type> in_img(in_img_);
 
         // don't bother doing anything if the image is too small
         if (in_img.nr() < 2 || in_img.nc() < 2)

@@ -21,9 +21,9 @@ namespace dlib
     );
     /*!
         requires
-            - image_type is an implementation of array2d/array2d_kernel_abstract.h, a
-              dlib::matrix, or something convertible to a matrix via mat().
-            - pixel_traits<image_type::type> must be defined
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h, or something convertible to a matrix
+              via mat().
         ensures
             - randomly generates a mapping from gray level pixel values
               to the RGB pixel space and then uses this mapping to create
@@ -46,9 +46,9 @@ namespace dlib
     );
     /*!
         requires
-            - image_type is an implementation of array2d/array2d_kernel_abstract.h, a
-              dlib::matrix, or something convertible to a matrix via mat().
-            - pixel_traits<image_type::type> must be defined
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h, or something convertible to a matrix
+              via mat().
         ensures
             - Interprets img as a grayscale image and returns a new matrix
               which represents a colored version of img.  In particular, the
@@ -68,9 +68,9 @@ namespace dlib
     );
     /*!
         requires
-            - image_type is an implementation of array2d/array2d_kernel_abstract.h, a
-              dlib::matrix, or something convertible to a matrix via mat().
-            - pixel_traits<image_type::type> must be defined
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h, or something convertible to a matrix
+              via mat().
         ensures
             - returns heatmap(img, max(mat(img)), min(mat(img)))
     !*/
@@ -88,9 +88,9 @@ namespace dlib
     );
     /*!
         requires
-            - image_type is an implementation of array2d/array2d_kernel_abstract.h, a 
-              dlib::matrix, or something convertible to a matrix via mat().
-            - pixel_traits<image_type::type> must be defined
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h, or something convertible to a matrix
+              via mat().
         ensures
             - Interprets img as a grayscale image and returns a new matrix which represents
               a colored version of img.  In particular, the colors will depict img using a
@@ -110,9 +110,9 @@ namespace dlib
     );
     /*!
         requires
-            - image_type is an implementation of array2d/array2d_kernel_abstract.h, a
-              dlib::matrix, or something convertible to a matrix via mat().
-            - pixel_traits<image_type::type> must be defined
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h, or something convertible to a matrix
+              via mat().
         ensures
             - returns jet(img, max(mat(img)), min(mat(img)))
     !*/

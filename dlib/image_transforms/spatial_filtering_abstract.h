@@ -27,15 +27,17 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename in_image_type::type>::has_alpha == false
-            - pixel_traits<typename out_image_type::type>::has_alpha == false 
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - in_img and out_img do not contain pixels with an alpha channel.  That is,
+              pixel_traits::has_alpha is false for the pixels in these objects.
             - is_same_object(in_img, out_img) == false 
             - T must be some scalar type
             - filter.size() != 0
             - scale != 0
-            - if (pixel_traits<typename in_image_type::type>::grayscale == false) then
+            - if (in_img doesn't contain grayscale pixels) then
                 - use_abs == false && add_to == false
                   (i.e. You can only use the use_abs and add_to options with grayscale images)
         ensures
@@ -47,7 +49,7 @@ namespace dlib
               any applicable color space conversion or value saturation is performed.  Note that if 
               add_to is true then the filtered output value will be added to out_img rather than 
               overwriting the original value.
-            - if (pixel_traits<typename in_image_type::type>::grayscale == false) then
+            - if (in_img doesn't contain grayscale pixels) then
                 - The filter is applied to each color channel independently.
             - if (use_abs == true) then
                 - pixel values after filtering that are < 0 are converted to their absolute values.
@@ -88,10 +90,12 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename in_image_type::type>::has_alpha == false
-            - pixel_traits<typename out_image_type::type>::has_alpha == false 
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - in_img and out_img do not contain pixels with an alpha channel.  That is,
+              pixel_traits::has_alpha is false for the pixels in these objects.
             - is_same_object(in_img, out_img) == false 
             - T must be some scalar type
             - scale != 0
@@ -99,7 +103,7 @@ namespace dlib
             - col_filter.size() != 0
             - is_vector(row_filter) == true
             - is_vector(col_filter) == true
-            - if (pixel_traits<typename in_image_type::type>::grayscale == false) then
+            - if (in_img doesn't contain grayscale pixels) then
                 - use_abs == false && add_to == false
                   (i.e. You can only use the use_abs and add_to options with grayscale images)
         ensures
@@ -114,7 +118,7 @@ namespace dlib
               any applicable color space conversion or value saturation is performed.  Note that if 
               add_to is true then the filtered output value will be added to out_img rather than 
               overwriting the original value.
-            - if (pixel_traits<typename in_image_type::type>::grayscale == false) then
+            - if (in_img doesn't contain grayscale pixels) then
                 - The filter is applied to each color channel independently.
             - if (use_abs == true) then
                 - pixel values after filtering that are < 0 are converted to their absolute values
@@ -153,8 +157,10 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
             - in_img, out_img, row_filter, and col_filter must all contain float type elements.
             - is_same_object(in_img, out_img) == false 
             - row_filter.size() != 0
@@ -196,11 +202,13 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename in_image_type::type>::has_alpha == false
-            - pixel_traits<typename out_image_type::type>::has_alpha == false 
-            - pixel_traits<typename out_image_type::type>::grayscale == true 
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - in_img and out_img do not contain pixels with an alpha channel.  That is,
+              pixel_traits::has_alpha is false for the pixels in these objects.
+            - out_img contains grayscale pixels.
             - is_same_object(in_img, out_img) == false 
             - T must be some scalar type
             - scale != 0
@@ -244,8 +252,8 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename in_image_type::type> must be defined 
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
             - T and U should be scalar types
             - shrink_rect(get_rect(img),1).contains(c,r)
             - shrink_rect(get_rect(img),1).contains(c+NC-1,r+NR-1)
@@ -281,8 +289,10 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename in_image_type::type>::rgb == true
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - img must contain RGB pixels, that is pixel_traits::rgb == true for the pixels
+              in img.
             - T should be a struct with .red .green and .blue members.
             - U should be a scalar type
             - shrink_rect(get_rect(img),1).contains(c,r)
@@ -350,10 +360,12 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type  == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename in_image_type::type>::has_alpha == false
-            - pixel_traits<typename out_image_type::type>::has_alpha == false 
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - in_img and out_img do not contain pixels with an alpha channel.  That is,
+              pixel_traits::has_alpha is false for the pixels in these objects.
             - is_same_object(in_img, out_img) == false 
             - sigma > 0
             - max_size > 0
@@ -365,7 +377,7 @@ namespace dlib
               results are stored into #out_img.
             - Pixel values are stored into out_img using the assign_pixel() function and therefore
               any applicable color space conversion or value saturation is performed.
-            - if (pixel_traits<typename in_image_type::type>::grayscale == false) then
+            - if (in_img doesn't contain grayscale pixels) then
                 - The filter is applied to each color channel independently.
             - Pixels close enough to the edge of in_img to not have the filter still fit 
               inside the image are set to zero.
@@ -388,10 +400,10 @@ namespace dlib
         requires
             - out.nr() == img.nr() 
             - out.nc() == img.nc()
-            - image_type1 == an implementation of array2d/array2d_kernel_abstract.h
-              and it must contain a scalar type
-            - image_type2 == an implementation of array2d/array2d_kernel_abstract.h
-              and it must contain a scalar type
+            - image_type1 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+            - image_type2 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h and it must contain grayscale pixels.
             - is_same_object(img,out) == false
         ensures
             - for all valid r and c:
@@ -413,10 +425,10 @@ namespace dlib
     );
     /*!
         requires
-            - image_type1 == an implementation of array2d/array2d_kernel_abstract.h
-              and it must contain a scalar type
-            - image_type2 == an implementation of array2d/array2d_kernel_abstract.h
-              and it must contain a scalar type
+            - image_type1 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+            - image_type2 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h and it must contain grayscale pixels.
             - is_same_object(img,out) == false
         ensures
             - #out.nr() == img.nr() 
@@ -438,16 +450,16 @@ namespace dlib
         image_type2& out,
         const long width,
         const long height,
-        const typename image_type1::type& thresh
+        const typename image_traits<image_type1>::pixel_type& thresh
     );
     /*!
         requires
             - out.nr() == img.nr() 
             - out.nc() == img.nc()
-            - image_type1 == an implementation of array2d/array2d_kernel_abstract.h
-              and it must contain a scalar type
-            - image_type2 == an implementation of array2d/array2d_kernel_abstract.h
-              and it must contain a scalar type
+            - image_type1 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+            - image_type2 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h and it must contain grayscale pixels.
             - is_same_object(img,out) == false
             - width > 0 && height > 0
         ensures

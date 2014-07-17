@@ -127,9 +127,9 @@ namespace dlib
                 - image_type must be a type with the following properties:
                     - image_type is default constructable.
                     - image_type is swappable by the global swap() function.
-                    - image_type logically represents some kind of image and therefore
-                      has .nr() and .nc() member functions.  .nr() should return the
-                      number of rows while .nc() returns the number of columns.
+                    - image_type logically represents some kind of image and therefore its
+                      number of rows and columns can be queried via num_rows(img) and
+                      num_columns(img) respectively.
                     - image_type objects can be loaded into Feature_extractor_type
                       objects via Feature_extractor_type::load().
                     - image_type objects can be used with Pyramid_type.  That is,

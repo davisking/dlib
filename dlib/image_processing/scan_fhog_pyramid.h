@@ -589,8 +589,6 @@ namespace dlib
             feats.set_size(levels);
 
 
-            typedef typename image_type::type pixel_type;
-            typedef typename image_type::mem_manager_type mem_manager_type;
 
             // build our feature pyramid
             fe(img, feats[0], cell_size,filter_rows_padding,filter_cols_padding);
@@ -600,7 +598,7 @@ namespace dlib
 
             if (feats.size() > 1)
             {
-                array2d<pixel_type,mem_manager_type> temp1, temp2;
+                image_type temp1, temp2;
                 pyr(img, temp1);
                 fe(temp1, feats[1], cell_size,filter_rows_padding,filter_cols_padding);
                 swap(temp1,temp2);

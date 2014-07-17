@@ -59,8 +59,10 @@ namespace dlib
         );
         /*!
             requires
-                - image_type == a type that implements the array2d/array2d_kernel_abstract.h interface
-                - pixel_traits<typename image_type::type>::has_alpha == false 
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+                - Let P denote the type of pixel in img, then we require:
+                    - pixel_traits<P>::has_alpha == false 
             ensures
                 - #nr() == img.nr()
                 - #nc() == img.nc()

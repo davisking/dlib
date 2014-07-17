@@ -7,6 +7,7 @@
 #include "../algs.h"
 #include "../pixel.h"
 #include "../matrix/matrix_mat.h"
+#include "../image_processing/generic_image.h"
 
 namespace dlib
 {
@@ -135,6 +136,51 @@ namespace dlib
     {
         typedef op_array2d_to_mat<cv_image<T> > op;
         return matrix_op<op>(op(m));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+// Define the global functions that make cv_image a proper "generic image" according to
+// ../image_processing/generic_image.h
+    template <typename T>
+    struct image_traits<cv_image<T> >
+    {
+        typedef T pixel_type;
+    };
+
+    template <typename T>
+    inline long num_rows( const cv_image<T>& img) { return img.nr(); }
+    template <typename T>
+    inline long num_columns( const cv_image<T>& img) { return img.nc(); }
+
+    template <typename T>
+    inline void* image_data(
+        cv_image<T>& img
+    )
+    {
+        if (img.size() != 0)
+            return &img[0][0];
+        else
+            return 0;
+    }
+
+    template <typename T>
+    inline const void* image_data(
+        const cv_image<T>& img
+    )
+    {
+        if (img.size() != 0)
+            return &img[0][0];
+        else
+            return 0;
+    }
+
+    template <typename T>
+    inline long width_step(
+        const cv_image<T>& img
+    ) 
+    { 
+        return img.width_step(); 
     }
 
 // ----------------------------------------------------------------------------------------

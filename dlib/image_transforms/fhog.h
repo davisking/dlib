@@ -22,7 +22,7 @@ namespace dlib
     namespace impl_fhog
     {
         template <typename image_type>
-        inline typename dlib::enable_if_c<pixel_traits<typename image_type::type>::rgb>::type get_gradient (
+        inline typename dlib::enable_if_c<pixel_traits<typename image_type::pixel_type>::rgb>::type get_gradient (
             const int r,
             const int c,
             const image_type& img,
@@ -60,7 +60,7 @@ namespace dlib
         }
 
         template <typename image_type>
-        inline typename dlib::enable_if_c<pixel_traits<typename image_type::type>::rgb>::type get_gradient (
+        inline typename dlib::enable_if_c<pixel_traits<typename image_type::pixel_type>::rgb>::type get_gradient (
             const int r,
             const int c,
             const image_type& img,
@@ -145,7 +145,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <typename image_type>
-        inline typename dlib::disable_if_c<pixel_traits<typename image_type::type>::rgb>::type get_gradient (
+        inline typename dlib::disable_if_c<pixel_traits<typename image_type::pixel_type>::rgb>::type get_gradient (
             const int r,
             const int c,
             const image_type& img,
@@ -159,7 +159,7 @@ namespace dlib
         }
 
         template <typename image_type>
-        inline typename dlib::disable_if_c<pixel_traits<typename image_type::type>::rgb>::type get_gradient (
+        inline typename dlib::disable_if_c<pixel_traits<typename image_type::pixel_type>::rgb>::type get_gradient (
             int r,
             int c,
             const image_type& img,
@@ -275,13 +275,14 @@ namespace dlib
             typename out_type
             >
         void impl_extract_fhog_features(
-            const image_type& img, 
+            const image_type& img_, 
             out_type& hog, 
             int cell_size,
             int filter_rows_padding,
             int filter_cols_padding
         ) 
         {
+            const_image_view<image_type> img(img_);
             // make sure requires clause is not broken
             DLIB_ASSERT( cell_size > 0 &&
                          filter_rows_padding > 0 &&

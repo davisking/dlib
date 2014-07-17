@@ -21,13 +21,16 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename in_image_type::type>::has_alpha == false
-            - pixel_traits<typename out_image_type::type>::has_alpha == false 
-            - pixel_traits<typename in_image_type::type>::is_unsigned == true 
-            - pixel_traits<typename out_image_type::type>::is_unsigned == true 
-            - pixel_traits<typename in_image_type::type>::max() <= 65535 
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - Let pixel_type be the type of pixel in either input or output images, then we
+              must have:
+                - pixel_traits<pixel_type>::has_alpha == false
+                - pixel_traits<pixel_type>::is_unsigned == true 
+            - For the input image pixel type, we have the additional requirement that:
+                - pixel_traits<pixel_type>::max() <= 65535 
         ensures
             - #out_img == the histogram equalized version of in_img
             - #out_img.nc() == in_img.nc()
@@ -61,9 +64,11 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename in_image_type::type>::is_unsigned == true 
-            - pixel_traits<typename in_image_type::type>::max() <= 65535 
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - Let pixel_type denote the type of pixel in in_img, then we must have:
+                - pixel_traits<pixel_type>::is_unsigned == true 
+                - pixel_traits<pixel_type>::max() <= 65535 
             - hist must be capable of representing a column vector of length 
               pixel_traits<typename in_image_type>::max(). I.e. if R and C are nonzero
               then they must be values that don't conflict with the previous sentence.

@@ -29,9 +29,8 @@ namespace dlib
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h or
-              a dlib::matrix
-            - pixel_traits<typename image_type::type> is defined  
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h or any kind of matrix expression.
         ensures
             - writes the image to the out stream in the Microsoft Windows BMP format.
             - image[0][0] will be in the upper left corner of the image.
@@ -58,9 +57,8 @@ namespace dlib
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h or
-              a dlib::matrix
-            - pixel_traits<typename image_type::type> is defined  
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h or any kind of matrix expression.
         ensures
             - opens the file indicated by file_name with an output file stream named fout
               and performs:
@@ -85,9 +83,8 @@ namespace dlib
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h or
-              a dlib::matrix
-            - pixel_traits<typename image_type::type> is defined  
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h or any kind of matrix expression.
         ensures
             - writes the image to the out stream in the dlib dng format.
             - image[0][0] will be in the upper left corner of the image.
@@ -114,9 +111,8 @@ namespace dlib
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h or
-              a dlib::matrix
-            - pixel_traits<typename image_type::type> is defined  
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h or any kind of matrix expression.
         ensures
             - opens the file indicated by file_name with an output file stream named fout 
               and performs:

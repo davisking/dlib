@@ -309,7 +309,7 @@ namespace dlib
             // use the inverse frequency as the scale for each feature.  We also scale
             // these counts so that they are invariant to the size of the image (we scale
             // them so they all look like they come from a 500x400 images).
-            const double scale = img.size()/(500.0*400.0);
+            const double scale = image_size(img)/(500.0*400.0);
             for (unsigned long i = 0; i < feat_counts.size(); ++i)
             {
                 feat_counts[i] = scale/feat_counts[i];

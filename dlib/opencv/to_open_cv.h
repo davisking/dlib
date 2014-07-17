@@ -19,49 +19,20 @@ namespace dlib
         image_type& img
     )
     {
-        if (img.size() == 0)
+        if (image_size(img) == 0)
             return cv::Mat();
 
-        typedef typename image_type::type type;
+        typedef typename image_traits<image_type>::pixel_type type;
         if (pixel_traits<type>::num == 1)
         {
-            return cv::Mat(img.nr(), img.nc(), cv::DataType<type>::type, (void*)&img[0][0], img.width_step());
+            return cv::Mat(num_rows(img), num_columns(img), cv::DataType<type>::type, image_data(img), width_step(img));
         }
         else
         {
             int depth = sizeof(typename pixel_traits<type>::basic_pixel_type)*8;
             int channels = pixel_traits<type>::num;
             int thetype = CV_MAKETYPE(depth, channels);
-            return cv::Mat(img.nr(), img.nc(), thetype, (void*)&img[0][0], img.width_step());
-        }
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T,
-        long NR,
-        long NC,
-        typename MM
-        >
-    cv::Mat toMat (
-        matrix<T,NR,NC,MM>& img
-    )
-    {
-        if (img.size() == 0)
-            return cv::Mat();
-
-        typedef T type;
-        if (pixel_traits<type>::num == 1)
-        {
-            return cv::Mat(img.nr(), img.nc(), cv::DataType<type>::type, (void*)&img(0,0), img.nc()*sizeof(type));
-        }
-        else
-        {
-            int depth = sizeof(typename pixel_traits<type>::basic_pixel_type)*8;
-            int channels = pixel_traits<type>::num;
-            int thetype = CV_MAKETYPE(depth, channels);
-            return cv::Mat(img.nr(), img.nc(), thetype, (void*)&img(0,0), img.nc()*sizeof(type));
+            return cv::Mat(num_rows(img), num_columns(img), thetype, image_data(img), width_step(img));
         }
     }
 

@@ -138,7 +138,7 @@ namespace dlib
             const image_type& img
         )
         {
-            COMPILE_TIME_ASSERT( pixel_traits<typename image_type::type>::has_alpha == false );
+            COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false );
 
             poly_coef.resize(get_num_dimensions());
             des.set_size(get_num_dimensions());

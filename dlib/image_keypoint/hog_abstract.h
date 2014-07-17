@@ -158,8 +158,8 @@ namespace dlib
         /*!
             requires
                 - image_type is a dlib::matrix or something convertible to a matrix
-                  via mat()
-                - pixel_traits<typename image_type::type>::has_alpha == false
+                  via mat().
+                - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false
             ensures
                 - if (img.nr() < min_size || img.nc() < min_size) then
                     - the image is too small so we don't compute anything on it

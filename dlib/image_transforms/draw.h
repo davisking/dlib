@@ -23,10 +23,11 @@ namespace dlib
         long y1,
         long x2,
         long y2,
-        image_type& c,
+        image_type& c_,
         const pixel_type& val
     ) 
     {
+        image_view<image_type> c(c_);
         if (x1 == x2)
         {
             // make sure y1 comes before y2
@@ -214,11 +215,12 @@ namespace dlib
         typename pixel_type
         >
     void fill_rect (
-        image_type& img,
+        image_type& img_,
         const rectangle& rect,
         const pixel_type& pixel
     )
     {
+        image_view<image_type> img(img_);
         rectangle area = rect.intersect(get_rect(img));
 
         for (long r = area.top(); r <= area.bottom(); ++r)
@@ -235,11 +237,11 @@ namespace dlib
     template <
         typename image_array_type
         >
-    matrix<typename image_array_type::value_type::type> tile_images (
+    matrix<typename image_traits<typename image_array_type::value_type>::pixel_type> tile_images (
         const image_array_type& images
     )
     {
-        typedef typename image_array_type::value_type::type T;
+        typedef typename image_traits<typename image_array_type::value_type>::pixel_type T;
 
         if (images.size() == 0)
             return matrix<T>();
@@ -252,8 +254,8 @@ namespace dlib
         long nc = 0;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
-            nr = std::max(images[i].nr(), nr);
-            nc = std::max(images[i].nc(), nc);
+            nr = std::max(num_rows(images[i]), nr);
+            nc = std::max(num_columns(images[i]), nc);
         }
 
         matrix<T> temp(size_nr*nr, size_nc*nc);

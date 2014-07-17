@@ -27,17 +27,17 @@ namespace dlib
             typename T
             >
         rectangle grayscale_spatially_filter_image (
-            const in_image_type& in_img,
-            out_image_type& out_img,
-            const matrix_exp<EXP>& _filter,
+            const in_image_type& in_img_,
+            out_image_type& out_img_,
+            const matrix_exp<EXP>& filter_,
             T scale,
             bool use_abs,
             bool add_to
         )
         {
-            const_temp_matrix<EXP> filter(_filter);
-            COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-            COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+            const_temp_matrix<EXP> filter(filter_);
+            COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<in_image_type>::pixel_type>::has_alpha == false );
+            COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<out_image_type>::pixel_type>::has_alpha == false );
 
             DLIB_ASSERT(scale != 0 && filter.size() != 0,
                 "\trectangle spatially_filter_image()"
@@ -46,12 +46,14 @@ namespace dlib
                 << "\n\t filter.nr(): "<< filter.nr()
                 << "\n\t filter.nc(): "<< filter.nc()
             );
-            DLIB_ASSERT(is_same_object(in_img, out_img) == false,
+            DLIB_ASSERT(is_same_object(in_img_, out_img_) == false,
                 "\trectangle spatially_filter_image()"
                 << "\n\tYou must give two different image objects"
             );
 
 
+            const_image_view<in_image_type> in_img(in_img_);
+            image_view<out_image_type> out_img(out_img_);
 
             // if there isn't any input image then don't do anything
             if (in_img.size() == 0)
@@ -71,7 +73,7 @@ namespace dlib
 
             const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
             if (!add_to)
-                zero_border_pixels(out_img, non_border); 
+                zero_border_pixels(out_img_, non_border); 
 
             // apply the filter to the image
             for (long r = first_row; r < last_row; ++r)
@@ -121,26 +123,28 @@ namespace dlib
             typename EXP
             >
         rectangle float_spatially_filter_image (
-            const in_image_type& in_img,
-            out_image_type& out_img,
-            const matrix_exp<EXP>& _filter,
+            const in_image_type& in_img_,
+            out_image_type& out_img_,
+            const matrix_exp<EXP>& filter_,
             bool add_to
         )
         {
 
-            const_temp_matrix<EXP> filter(_filter);
+            const_temp_matrix<EXP> filter(filter_);
             DLIB_ASSERT(filter.size() != 0,
                 "\trectangle spatially_filter_image()"
                 << "\n\t You can't give an empty filter."
                 << "\n\t filter.nr(): "<< filter.nr()
                 << "\n\t filter.nc(): "<< filter.nc()
             );
-            DLIB_ASSERT(is_same_object(in_img, out_img) == false,
+            DLIB_ASSERT(is_same_object(in_img_, out_img_) == false,
                 "\trectangle spatially_filter_image()"
                 << "\n\tYou must give two different image objects"
             );
 
 
+            const_image_view<in_image_type> in_img(in_img_);
+            image_view<out_image_type> out_img(out_img_);
 
             // if there isn't any input image then don't do anything
             if (in_img.size() == 0)
@@ -160,7 +164,7 @@ namespace dlib
 
             const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
             if (!add_to)
-                zero_border_pixels(out_img, non_border); 
+                zero_border_pixels(out_img_, non_border); 
 
             // apply the filter to the image
             for (long r = first_row; r < last_row; ++r)
@@ -243,8 +247,8 @@ namespace dlib
         >
     struct is_float_filtering2
     {
-        const static bool value = is_same_type<typename in_image_type::type,float>::value &&
-                                  is_same_type<typename out_image_type::type,float>::value &&
+        const static bool value = is_same_type<typename image_traits<in_image_type>::pixel_type,float>::value &&
+                                  is_same_type<typename image_traits<out_image_type>::pixel_type,float>::value &&
                                   is_same_type<typename EXP::type,float>::value;
     };
 
@@ -256,7 +260,7 @@ namespace dlib
         typename EXP,
         typename T
         >
-    typename enable_if_c<pixel_traits<typename out_image_type::type>::grayscale && 
+    typename enable_if_c<pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale && 
                          is_float_filtering2<in_image_type,out_image_type,EXP>::value,rectangle>::type 
     spatially_filter_image (
         const in_image_type& in_img,
@@ -288,7 +292,7 @@ namespace dlib
         typename EXP,
         typename T
         >
-    typename enable_if_c<pixel_traits<typename out_image_type::type>::grayscale && 
+    typename enable_if_c<pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale && 
                          !is_float_filtering2<in_image_type,out_image_type,EXP>::value,rectangle>::type 
     spatially_filter_image (
         const in_image_type& in_img,
@@ -310,17 +314,17 @@ namespace dlib
         typename EXP,
         typename T
         >
-    typename disable_if_c<pixel_traits<typename out_image_type::type>::grayscale,rectangle>::type 
+    typename disable_if_c<pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale,rectangle>::type 
     spatially_filter_image (
-        const in_image_type& in_img,
-        out_image_type& out_img,
-        const matrix_exp<EXP>& _filter,
+        const in_image_type& in_img_,
+        out_image_type& out_img_,
+        const matrix_exp<EXP>& filter_,
         T scale
     )
     {
-        const_temp_matrix<EXP> filter(_filter);
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+        const_temp_matrix<EXP> filter(filter_);
+        COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<in_image_type>::pixel_type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<out_image_type>::pixel_type>::has_alpha == false );
 
         DLIB_ASSERT(scale != 0 && filter.size() != 0,
             "\trectangle spatially_filter_image()"
@@ -329,12 +333,14 @@ namespace dlib
             << "\n\t filter.nr(): "<< filter.nr()
             << "\n\t filter.nc(): "<< filter.nc()
             );
-        DLIB_ASSERT(is_same_object(in_img, out_img) == false,
+        DLIB_ASSERT(is_same_object(in_img_, out_img_) == false,
             "\trectangle spatially_filter_image()"
             << "\n\tYou must give two different image objects"
             );
 
 
+        const_image_view<in_image_type> in_img(in_img_);
+        image_view<out_image_type> out_img(out_img_);
 
         // if there isn't any input image then don't do anything
         if (in_img.size() == 0)
@@ -360,7 +366,8 @@ namespace dlib
         {
             for (long c = first_col; c < last_col; ++c)
             {
-                typedef matrix<typename EXP::type,pixel_traits<typename in_image_type::type>::num,1> ptype;
+                typedef typename image_traits<in_image_type>::pixel_type pixel_type;
+                typedef matrix<typename EXP::type,pixel_traits<pixel_type>::num,1> ptype;
                 ptype p;
                 ptype temp;
                 temp = 0;
@@ -376,7 +383,7 @@ namespace dlib
 
                 temp /= scale;
 
-                typename in_image_type::type pp;
+                pixel_type pp;
                 vector_to_pixel(pp, temp);
                 assign_pixel(out_img[r][c], pp);
             }
@@ -415,8 +422,8 @@ namespace dlib
             typename T
             >
         rectangle grayscale_spatially_filter_image_separable (
-            const in_image_type& in_img,
-            out_image_type& out_img,
+            const in_image_type& in_img_,
+            out_image_type& out_img_,
             const matrix_exp<EXP1>& _row_filter,
             const matrix_exp<EXP2>& _col_filter,
             T scale,
@@ -426,8 +433,8 @@ namespace dlib
         {
             const_temp_matrix<EXP1> row_filter(_row_filter);
             const_temp_matrix<EXP2> col_filter(_col_filter);
-            COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-            COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+            COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<in_image_type>::pixel_type>::has_alpha == false );
+            COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<out_image_type>::pixel_type>::has_alpha == false );
 
             DLIB_ASSERT(scale != 0 && row_filter.size() != 0 && col_filter.size() != 0 &&
                 is_vector(row_filter) &&
@@ -440,12 +447,14 @@ namespace dlib
                 << "\n\t is_vector(row_filter): "<< is_vector(row_filter)
                 << "\n\t is_vector(col_filter): "<< is_vector(col_filter)
             );
-            DLIB_ASSERT(is_same_object(in_img, out_img) == false,
+            DLIB_ASSERT(is_same_object(in_img_, out_img_) == false,
                 "\trectangle spatially_filter_image_separable()"
                 << "\n\tYou must give two different image objects"
             );
 
 
+            const_image_view<in_image_type> in_img(in_img_);
+            image_view<out_image_type> out_img(out_img_);
 
             // if there isn't any input image then don't do anything
             if (in_img.size() == 0)
@@ -467,10 +476,9 @@ namespace dlib
             if (!add_to)
                 zero_border_pixels(out_img, non_border); 
 
-            typedef typename out_image_type::mem_manager_type mem_manager_type;
             typedef typename EXP1::type ptype;
 
-            array2d<ptype,mem_manager_type> temp_img;
+            array2d<ptype> temp_img;
             temp_img.set_size(in_img.nr(), in_img.nc());
 
             // apply the row filter
@@ -534,8 +542,8 @@ namespace dlib
         >
     struct is_float_filtering
     {
-        const static bool value = is_same_type<typename in_image_type::type,float>::value &&
-                                  is_same_type<typename out_image_type::type,float>::value &&
+        const static bool value = is_same_type<typename image_traits<in_image_type>::pixel_type,float>::value &&
+                                  is_same_type<typename image_traits<out_image_type>::pixel_type,float>::value &&
                                   is_same_type<typename EXP1::type,float>::value &&
                                   is_same_type<typename EXP2::type,float>::value;
     };
@@ -551,11 +559,11 @@ namespace dlib
         typename EXP2
         >
     rectangle float_spatially_filter_image_separable (
-        const in_image_type& in_img,
-        out_image_type& out_img,
+        const in_image_type& in_img_,
+        out_image_type& out_img_,
         const matrix_exp<EXP1>& _row_filter,
         const matrix_exp<EXP2>& _col_filter,
-        out_image_type& scratch,
+        out_image_type& scratch_,
         bool add_to = false
     )
     {
@@ -576,12 +584,14 @@ namespace dlib
             << "\n\t is_vector(row_filter): "<< is_vector(row_filter)
             << "\n\t is_vector(col_filter): "<< is_vector(col_filter)
         );
-        DLIB_ASSERT(is_same_object(in_img, out_img) == false,
+        DLIB_ASSERT(is_same_object(in_img_, out_img_) == false,
             "\trectangle float_spatially_filter_image_separable()"
             << "\n\tYou must give two different image objects"
         );
 
 
+        const_image_view<in_image_type> in_img(in_img_);
+        image_view<out_image_type> out_img(out_img_);
 
         // if there isn't any input image then don't do anything
         if (in_img.size() == 0)
@@ -602,6 +612,7 @@ namespace dlib
         if (!add_to)
             zero_border_pixels(out_img, non_border); 
 
+        image_view<out_image_type> scratch(scratch_);
         scratch.set_size(in_img.nr(), in_img.nc());
 
         // apply the row filter
@@ -712,7 +723,7 @@ namespace dlib
         typename EXP2,
         typename T
         >
-    typename enable_if_c<pixel_traits<typename out_image_type::type>::grayscale && 
+    typename enable_if_c<pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale && 
                          is_float_filtering<in_image_type,out_image_type,EXP1,EXP2>::value,rectangle>::type 
     spatially_filter_image_separable (
         const in_image_type& in_img,
@@ -747,7 +758,7 @@ namespace dlib
         typename EXP2,
         typename T
         >
-    typename enable_if_c<pixel_traits<typename out_image_type::type>::grayscale && 
+    typename enable_if_c<pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale && 
                          !is_float_filtering<in_image_type,out_image_type,EXP1,EXP2>::value,rectangle>::type 
     spatially_filter_image_separable (
         const in_image_type& in_img,
@@ -771,10 +782,10 @@ namespace dlib
         typename EXP2,
         typename T
         >
-    typename disable_if_c<pixel_traits<typename out_image_type::type>::grayscale,rectangle>::type 
+    typename disable_if_c<pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale,rectangle>::type 
     spatially_filter_image_separable (
-        const in_image_type& in_img,
-        out_image_type& out_img,
+        const in_image_type& in_img_,
+        out_image_type& out_img_,
         const matrix_exp<EXP1>& _row_filter,
         const matrix_exp<EXP2>& _col_filter,
         T scale
@@ -782,8 +793,8 @@ namespace dlib
     {
         const_temp_matrix<EXP1> row_filter(_row_filter);
         const_temp_matrix<EXP2> col_filter(_col_filter);
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<in_image_type>::pixel_type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<out_image_type>::pixel_type>::has_alpha == false );
 
         DLIB_ASSERT(scale != 0 && row_filter.size() != 0 && col_filter.size() != 0 &&
                     is_vector(row_filter) &&
@@ -796,12 +807,14 @@ namespace dlib
             << "\n\t is_vector(row_filter): "<< is_vector(row_filter)
             << "\n\t is_vector(col_filter): "<< is_vector(col_filter)
             );
-        DLIB_ASSERT(is_same_object(in_img, out_img) == false,
+        DLIB_ASSERT(is_same_object(in_img_, out_img_) == false,
             "\trectangle spatially_filter_image_separable()"
             << "\n\tYou must give two different image objects"
             );
 
 
+        const_image_view<in_image_type> in_img(in_img_);
+        image_view<out_image_type> out_img(out_img_);
 
         // if there isn't any input image then don't do anything
         if (in_img.size() == 0)
@@ -822,10 +835,10 @@ namespace dlib
         const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
         zero_border_pixels(out_img, non_border); 
 
-        typedef typename out_image_type::mem_manager_type mem_manager_type;
-        typedef matrix<typename EXP1::type,pixel_traits<typename in_image_type::type>::num,1> ptype;
+        typedef typename image_traits<in_image_type>::pixel_type pixel_type;
+        typedef matrix<typename EXP1::type,pixel_traits<pixel_type>::num,1> ptype;
 
-        array2d<ptype,mem_manager_type> temp_img;
+        array2d<ptype> temp_img;
         temp_img.set_size(in_img.nr(), in_img.nc());
 
         // apply the row filter
@@ -862,7 +875,7 @@ namespace dlib
 
 
                 // save this pixel to the output image
-                typename in_image_type::type p;
+                pixel_type p;
                 vector_to_pixel(p, temp);
                 assign_pixel(out_img[r][c], p);
             }
@@ -901,8 +914,8 @@ namespace dlib
         >
     rectangle spatially_filter_image_separable_down (
         const unsigned long downsample,
-        const in_image_type& in_img,
-        out_image_type& out_img,
+        const in_image_type& in_img_,
+        out_image_type& out_img_,
         const matrix_exp<EXP1>& row_filter,
         const matrix_exp<EXP2>& col_filter,
         T scale,
@@ -910,9 +923,9 @@ namespace dlib
         bool add_to = false
     )
     {
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::grayscale == true );
+        COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<in_image_type>::pixel_type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<out_image_type>::pixel_type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale == true );
 
         DLIB_ASSERT(downsample > 0 &&
                     scale != 0 &&
@@ -929,12 +942,14 @@ namespace dlib
             << "\n\t is_vector(row_filter): "<< is_vector(row_filter)
             << "\n\t is_vector(col_filter): "<< is_vector(col_filter)
             );
-        DLIB_ASSERT(is_same_object(in_img, out_img) == false,
+        DLIB_ASSERT(is_same_object(in_img_, out_img_) == false,
             "\trectangle spatially_filter_image_separable_down()"
             << "\n\tYou must give two different image objects"
             );
 
 
+        const_image_view<in_image_type> in_img(in_img_);
+        image_view<out_image_type> out_img(out_img_);
 
         // if there isn't any input image then don't do anything
         if (in_img.size() == 0)
@@ -961,8 +976,7 @@ namespace dlib
 
         typedef typename EXP1::type ptype;
 
-        typedef typename out_image_type::mem_manager_type mem_manager_type;
-        array2d<ptype,mem_manager_type> temp_img;
+        array2d<ptype> temp_img;
         temp_img.set_size(in_img.nr(), out_img.nc());
 
         // apply the row filter
@@ -1043,7 +1057,7 @@ namespace dlib
         >
     inline void separable_3x3_filter_block_grayscale (
         T (&block)[NR][NC],
-        const in_image_type& img,
+        const in_image_type& img_,
         const long& r,
         const long& c,
         const U& fe1, // separable filter end
@@ -1051,6 +1065,7 @@ namespace dlib
         const U& fe2 // separable filter end 2
     ) 
     {
+        const_image_view<in_image_type> img(img_);
         // make sure requires clause is not broken
         DLIB_ASSERT(shrink_rect(get_rect(img),1).contains(c,r) &&
                     shrink_rect(get_rect(img),1).contains(c+NC-1,r+NR-1),
@@ -1096,7 +1111,7 @@ namespace dlib
         >
     inline void separable_3x3_filter_block_rgb (
         T (&block)[NR][NC],
-        const in_image_type& img,
+        const in_image_type& img_,
         const long& r,
         const long& c,
         const U& fe1, // separable filter end
@@ -1104,6 +1119,7 @@ namespace dlib
         const U& fe2  // separable filter end 2
     ) 
     {
+        const_image_view<in_image_type> img(img_);
         // make sure requires clause is not broken
         DLIB_ASSERT(shrink_rect(get_rect(img),1).contains(c,r) &&
                     shrink_rect(get_rect(img),1).contains(c+NC-1,r+NR-1),
@@ -1217,7 +1233,7 @@ namespace dlib
             << "\n\t is_same_object(in_img,out_img): " << is_same_object(in_img,out_img) 
         );
 
-        typedef typename pixel_traits<typename out_image_type::type>::basic_pixel_type type;
+        typedef typename pixel_traits<typename image_traits<out_image_type>::pixel_type>::basic_pixel_type type;
         typedef typename promote<type>::type ptype;
 
         const matrix<ptype,0,1>& filt = create_gaussian_filter<ptype>(sigma, max_size);
@@ -1239,24 +1255,26 @@ namespace dlib
         typename image_type2
         >
     void sum_filter (
-        const image_type1& img,
-        image_type2& out,
+        const image_type1& img_,
+        image_type2& out_,
         const rectangle& rect
     )
     {
+        const_image_view<image_type1> img(img_);
+        image_view<image_type2> out(out_);
         DLIB_ASSERT(img.nr() == out.nr() &&
                     img.nc() == out.nc() &&
-                    is_same_object(img,out) == false,
+                    is_same_object(img_,out_) == false,
             "\t void sum_filter()"
             << "\n\t Invalid arguments given to this function."
             << "\n\t img.nr(): " << img.nr() 
             << "\n\t img.nc(): " << img.nc() 
             << "\n\t out.nr(): " << out.nr() 
             << "\n\t out.nc(): " << out.nc() 
-            << "\n\t is_same_object(img,out): " << is_same_object(img,out) 
+            << "\n\t is_same_object(img_,out_): " << is_same_object(img_,out_) 
         );
 
-        typedef typename image_type1::type pixel_type;
+        typedef typename image_traits<image_type1>::pixel_type pixel_type;
         typedef typename promote<pixel_type>::type ptype;
 
         std::vector<ptype> column_sum;
@@ -1324,9 +1342,9 @@ namespace dlib
                 cur_sum = cur_sum + column_sum[c+width] - column_sum[c];
 
                 if (add_to)
-                    out[r][c] += static_cast<typename image_type2::type>(cur_sum);
+                    out[r][c] += static_cast<typename image_traits<image_type2>::pixel_type>(cur_sum);
                 else
-                    out[r][c] = static_cast<typename image_type2::type>(cur_sum);
+                    out[r][c] = static_cast<typename image_traits<image_type2>::pixel_type>(cur_sum);
             }
         }
     }
@@ -1355,7 +1373,7 @@ namespace dlib
         const rectangle& rect
     )
     {
-        out.set_size(img.nr(), img.nc());
+        set_image_size(out, num_rows(img), num_columns(img));
         impl::sum_filter<false>(img,out,rect);
     }
 
@@ -1446,18 +1464,20 @@ namespace dlib
         typename image_type2
         >
     void max_filter (
-        image_type1& img,
-        image_type2& out,
+        image_type1& img_,
+        image_type2& out_,
         const long width,
         const long height,
-        const typename image_type1::type& thresh
+        const typename image_traits<image_type1>::pixel_type& thresh
     )
     {
+        image_view<image_type1> img(img_);
+        image_view<image_type2> out(out_);
         DLIB_ASSERT( width > 0 &&
                      height > 0 &&
                      out.nr() == img.nr() &&
                      out.nc() == img.nc() &&
-                     is_same_object(img,out) == false,
+                     is_same_object(img_,out_) == false,
                 "\t void max_filter()"
                 << "\n\t Invalid arguments given to this function."
                 << "\n\t img.nr(): " << img.nr() 
@@ -1466,10 +1486,10 @@ namespace dlib
                 << "\n\t out.nc(): " << out.nc() 
                 << "\n\t width:    " << width 
                 << "\n\t height:   " << height 
-                << "\n\t is_same_object(img,out): " << is_same_object(img,out) 
+                << "\n\t is_same_object(img_,out_): " << is_same_object(img_,out_) 
                      );
 
-        typedef typename image_type1::type pixel_type;
+        typedef typename image_traits<image_type1>::pixel_type pixel_type;
 
 
         dlib::impl::fast_deque<std::pair<long,pixel_type> > Q(std::max(width,height));

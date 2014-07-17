@@ -9,6 +9,7 @@
 #include <iostream>
 #include "../serialize.h"
 #include "vector.h"
+#include "../image_processing/generic_image.h"
 
 namespace dlib
 {
@@ -645,7 +646,7 @@ namespace dlib
         const T& m
     )
     {
-        return rectangle(0, 0, m.nc()-1, m.nr()-1);
+        return rectangle(0, 0, num_columns(m)-1, num_rows(m)-1);
     }
 
 // ----------------------------------------------------------------------------------------

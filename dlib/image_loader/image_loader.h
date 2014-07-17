@@ -31,10 +31,11 @@ namespace dlib
         typename image_type 
         >
     void load_bmp (
-        image_type& image,
+        image_type& image_,
         std::istream& in_
     )
     {
+        image_view<image_type> image(image_);
         try
         {
             unsigned long bytes_read_so_far = 0;
@@ -550,10 +551,11 @@ namespace dlib
         typename image_type 
         >
     void load_dng (
-        image_type& image,
+        image_type& image_,
         std::istream& in
     )
     {
+        image_view<image_type> image(image_);
         using namespace dng_helpers_namespace;
         try
         {
@@ -788,7 +790,7 @@ namespace dlib
                         
                         // Only use long double precision if the target image contains long
                         // doubles because it's slower to use those.
-                        if (!is_same_type<typename image_type::type,long double>::value)
+                        if (!is_same_type<typename image_traits<image_type>::pixel_type,long double>::value)
                         {
                             double temp = cur;
                             assign_pixel(image[r][c],temp);

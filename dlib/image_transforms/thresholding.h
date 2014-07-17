@@ -22,15 +22,18 @@ namespace dlib
         typename out_image_type
         >
     void threshold_image (
-        const in_image_type& in_img,
-        out_image_type& out_img,
-        typename pixel_traits<typename in_image_type::type>::basic_pixel_type thresh
+        const in_image_type& in_img_,
+        out_image_type& out_img_,
+        typename pixel_traits<typename image_traits<in_image_type>::pixel_type>::basic_pixel_type thresh
     )
     {
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<in_image_type>::pixel_type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<out_image_type>::pixel_type>::has_alpha == false );
 
-        COMPILE_TIME_ASSERT(pixel_traits<typename out_image_type::type>::grayscale);
+        COMPILE_TIME_ASSERT(pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale);
+
+        const_image_view<in_image_type> in_img(in_img_);
+        image_view<out_image_type> out_img(out_img_);
 
         // if there isn't any input image then don't do anything
         if (in_img.size() == 0)
@@ -60,7 +63,7 @@ namespace dlib
         >
     void threshold_image (
         image_type& img,
-        typename pixel_traits<typename image_type::type>::basic_pixel_type thresh
+        typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type thresh
     )
     {
         threshold_image(img,img,thresh);
@@ -73,16 +76,19 @@ namespace dlib
         typename out_image_type
         >
     void auto_threshold_image (
-        const in_image_type& in_img,
-        out_image_type& out_img
+        const in_image_type& in_img_,
+        out_image_type& out_img_
     )
     {
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::is_unsigned == true );
-        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::is_unsigned == true );
+        COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<in_image_type>::pixel_type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<out_image_type>::pixel_type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<in_image_type>::pixel_type>::is_unsigned == true );
+        COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<out_image_type>::pixel_type>::is_unsigned == true );
 
-        COMPILE_TIME_ASSERT(pixel_traits<typename out_image_type::type>::grayscale);
+        COMPILE_TIME_ASSERT(pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale);
+
+        const_image_view<in_image_type> in_img(in_img_);
+        image_view<out_image_type> out_img(out_img_);
 
         // if there isn't any input image then don't do anything
         if (in_img.size() == 0)
@@ -171,7 +177,7 @@ namespace dlib
         thresh = (a + b)/2;
 
         // now actually apply the threshold
-        threshold_image(in_img,out_img,thresh);
+        threshold_image(in_img_,out_img_,thresh);
     }
 
     template <
@@ -191,24 +197,27 @@ namespace dlib
         typename out_image_type
         >
     void hysteresis_threshold (
-        const in_image_type& in_img,
-        out_image_type& out_img,
-        typename pixel_traits<typename in_image_type::type>::basic_pixel_type lower_thresh,
-        typename pixel_traits<typename in_image_type::type>::basic_pixel_type upper_thresh
+        const in_image_type& in_img_,
+        out_image_type& out_img_,
+        typename pixel_traits<typename image_traits<in_image_type>::pixel_type>::basic_pixel_type lower_thresh,
+        typename pixel_traits<typename image_traits<in_image_type>::pixel_type>::basic_pixel_type upper_thresh
     )
     {
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<in_image_type>::pixel_type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<out_image_type>::pixel_type>::has_alpha == false );
 
-        COMPILE_TIME_ASSERT(pixel_traits<typename out_image_type::type>::grayscale);
+        COMPILE_TIME_ASSERT(pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale);
 
-        DLIB_ASSERT( lower_thresh <= upper_thresh && is_same_object(in_img, out_img) == false,
-            "\tvoid hysteresis_threshold(in_img, out_img, lower_thresh, upper_thresh)"
+        DLIB_ASSERT( lower_thresh <= upper_thresh && is_same_object(in_img_, out_img_) == false,
+            "\tvoid hysteresis_threshold(in_img_, out_img_, lower_thresh, upper_thresh)"
             << "\n\tYou can't use an upper_thresh that is less than your lower_thresh"
             << "\n\tlower_thresh: " << lower_thresh 
             << "\n\tupper_thresh: " << upper_thresh 
-            << "\n\tis_same_object(in_img,out_img): " << is_same_object(in_img,out_img) 
+            << "\n\tis_same_object(in_img_,out_img_): " << is_same_object(in_img_,out_img_) 
             );
+
+        const_image_view<in_image_type> in_img(in_img_);
+        image_view<out_image_type> out_img(out_img_);
 
         // if there isn't any input image then don't do anything
         if (in_img.size() == 0)
@@ -229,7 +238,7 @@ namespace dlib
         {
             for (long c = 0; c < in_img.nc(); ++c)
             {
-                typename pixel_traits<typename in_image_type::type>::basic_pixel_type p;
+                typename pixel_traits<typename image_traits<in_image_type>::pixel_type>::basic_pixel_type p;
                 assign_pixel(p,in_img[r][c]);
                 if (p >= upper_thresh)
                 {

@@ -119,8 +119,10 @@ namespace dlib
                         << "\n\t this:                           " << this
                         );
 
-            COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-            COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+            typedef typename image_traits<in_image_type>::pixel_type in_pixel_type;
+            typedef typename image_traits<out_image_type>::pixel_type out_pixel_type;
+            COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type>::has_alpha == false );
+            COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::has_alpha == false );
 
             down.clear();
         }
@@ -220,8 +222,9 @@ namespace dlib
             template <typename T, typename U>
             struct both_images_rgb
             {
-                const static bool value = pixel_traits<typename T::type>::rgb &&
-                                        pixel_traits<typename U::type>::rgb;
+                typedef typename image_traits<T>::pixel_type T_pix;
+                typedef typename image_traits<U>::pixel_type U_pix;
+                const static bool value = pixel_traits<T_pix>::rgb && pixel_traits<U_pix>::rgb;
             };
         public:
 
@@ -230,19 +233,24 @@ namespace dlib
                 typename out_image_type
                 >
             typename disable_if<both_images_rgb<in_image_type,out_image_type> >::type operator() (
-                const in_image_type& original,
-                out_image_type& down
+                const in_image_type& original_,
+                out_image_type& down_
             ) const
             {
                 // make sure requires clause is not broken
-                DLIB_ASSERT( is_same_object(original, down) == false, 
+                DLIB_ASSERT( is_same_object(original_, down_) == false, 
                             "\t void pyramid_down_2_1::operator()"
-                            << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
+                            << "\n\t is_same_object(original_, down_): " << is_same_object(original_, down_) 
                             << "\n\t this:                           " << this
                             );
 
-                COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-                COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+                typedef typename image_traits<in_image_type>::pixel_type in_pixel_type;
+                typedef typename image_traits<out_image_type>::pixel_type out_pixel_type;
+                COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type>::has_alpha == false );
+                COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::has_alpha == false );
+
+                const_image_view<in_image_type> original(original_);
+                image_view<out_image_type> down(down_);
 
                 if (original.nr() <= 8 || original.nc() <= 8)
                 {
@@ -250,7 +258,7 @@ namespace dlib
                     return;
                 }
 
-                typedef typename pixel_traits<typename in_image_type::type>::basic_pixel_type bp_type;
+                typedef typename pixel_traits<in_pixel_type>::basic_pixel_type bp_type;
                 typedef typename promote<bp_type>::type ptype;
                 array2d<ptype> temp_img;
                 temp_img.set_size(original.nr(), (original.nc()-3)/2);
@@ -326,19 +334,24 @@ namespace dlib
                 typename out_image_type
                 >
             typename enable_if<both_images_rgb<in_image_type,out_image_type> >::type operator() (
-                const in_image_type& original,
-                out_image_type& down
+                const in_image_type& original_,
+                out_image_type& down_
             ) const
             {
                 // make sure requires clause is not broken
-                DLIB_ASSERT( is_same_object(original, down) == false, 
+                DLIB_ASSERT( is_same_object(original_, down_) == false, 
                             "\t void pyramid_down_2_1::operator()"
-                            << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
+                            << "\n\t is_same_object(original_, down_): " << is_same_object(original_, down_) 
                             << "\n\t this:                           " << this
                             );
 
-                COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-                COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+                typedef typename image_traits<in_image_type>::pixel_type in_pixel_type;
+                typedef typename image_traits<out_image_type>::pixel_type out_pixel_type;
+                COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type>::has_alpha == false );
+                COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::has_alpha == false );
+
+                const_image_view<in_image_type> original(original_);
+                image_view<out_image_type> down(down_);
 
                 if (original.nr() <= 8 || original.nc() <= 8)
                 {
@@ -539,8 +552,9 @@ namespace dlib
             template <typename T, typename U>
             struct both_images_rgb
             {
-                const static bool value = pixel_traits<typename T::type>::rgb &&
-                                        pixel_traits<typename U::type>::rgb;
+                typedef typename image_traits<T>::pixel_type T_pix;
+                typedef typename image_traits<U>::pixel_type U_pix;
+                const static bool value = pixel_traits<T_pix>::rgb && pixel_traits<U_pix>::rgb;
             };
         public:
 
@@ -549,19 +563,24 @@ namespace dlib
                 typename out_image_type
                 >
             typename disable_if<both_images_rgb<in_image_type,out_image_type> >::type operator() (
-                const in_image_type& original,
-                out_image_type& down
+                const in_image_type& original_,
+                out_image_type& down_
             ) const
             {
                 // make sure requires clause is not broken
-                DLIB_ASSERT(is_same_object(original, down) == false, 
+                DLIB_ASSERT(is_same_object(original_, down_) == false, 
                             "\t void pyramid_down_3_2::operator()"
-                            << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
+                            << "\n\t is_same_object(original_, down_): " << is_same_object(original_, down_) 
                             << "\n\t this:                           " << this
                             );
 
-                COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-                COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+                typedef typename image_traits<in_image_type>::pixel_type in_pixel_type;
+                typedef typename image_traits<out_image_type>::pixel_type out_pixel_type;
+                COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type>::has_alpha == false );
+                COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::has_alpha == false );
+
+                const_image_view<in_image_type> original(original_);
+                image_view<out_image_type> down(down_);
 
                 if (original.nr() <= 8 || original.nc() <= 8)
                 {
@@ -572,7 +591,7 @@ namespace dlib
                 const long size_in = 3;
                 const long size_out = 2;
 
-                typedef typename pixel_traits<typename in_image_type::type>::basic_pixel_type bp_type;
+                typedef typename pixel_traits<in_pixel_type>::basic_pixel_type bp_type;
                 typedef typename promote<bp_type>::type ptype;
                 const long full_nr =  size_out*((original.nr()-2)/size_in);
                 const long part_nr = (size_out*(original.nr()-2))/size_in;
@@ -590,7 +609,7 @@ namespace dlib
                     for (c = 0; c < full_nc; c+=size_out)
                     {
                         ptype block[size_in][size_in];
-                        separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
+                        separable_3x3_filter_block_grayscale(block, original_, rr, cc, 2, 12, 2);
 
                         // bi-linearly interpolate block 
                         assign_pixel(down[r][c]     , (block[0][0]*9 + block[1][0]*3 + block[0][1]*3 + block[1][1])/(16*256));
@@ -603,7 +622,7 @@ namespace dlib
                     if (part_nc - full_nc == 1)
                     {
                         ptype block[size_in][2];
-                        separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
+                        separable_3x3_filter_block_grayscale(block, original_, rr, cc, 2, 12, 2);
 
                         // bi-linearly interpolate partial block 
                         assign_pixel(down[r][c]     , (block[0][0]*9 + block[1][0]*3 + block[0][1]*3 + block[1][1])/(16*256));
@@ -618,7 +637,7 @@ namespace dlib
                     for (c = 0; c < full_nc; c+=size_out)
                     {
                         ptype block[2][size_in];
-                        separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
+                        separable_3x3_filter_block_grayscale(block, original_, rr, cc, 2, 12, 2);
 
                         // bi-linearly interpolate partial block 
                         assign_pixel(down[r][c]     , (block[0][0]*9 + block[1][0]*3 + block[0][1]*3 + block[1][1])/(16*256));
@@ -629,7 +648,7 @@ namespace dlib
                     if (part_nc - full_nc == 1)
                     {
                         ptype block[2][2];
-                        separable_3x3_filter_block_grayscale(block, original, rr, cc, 2, 12, 2);
+                        separable_3x3_filter_block_grayscale(block, original_, rr, cc, 2, 12, 2);
 
                         // bi-linearly interpolate partial block 
                         assign_pixel(down[r][c]     , (block[0][0]*9 + block[1][0]*3 + block[0][1]*3 + block[1][1])/(16*256));
@@ -655,19 +674,24 @@ namespace dlib
                 typename out_image_type
                 >
             typename enable_if<both_images_rgb<in_image_type,out_image_type> >::type operator() (
-                const in_image_type& original,
-                out_image_type& down
+                const in_image_type& original_,
+                out_image_type& down_
             ) const
             {
                 // make sure requires clause is not broken
-                DLIB_ASSERT( is_same_object(original, down) == false, 
+                DLIB_ASSERT( is_same_object(original_, down_) == false, 
                             "\t void pyramid_down_3_2::operator()"
-                            << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
+                            << "\n\t is_same_object(original_, down_): " << is_same_object(original_, down_) 
                             << "\n\t this:                           " << this
                             );
 
-                COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-                COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+                typedef typename image_traits<in_image_type>::pixel_type in_pixel_type;
+                typedef typename image_traits<out_image_type>::pixel_type out_pixel_type;
+                COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type>::has_alpha == false );
+                COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::has_alpha == false );
+
+                const_image_view<in_image_type> original(original_);
+                image_view<out_image_type> down(down_);
 
                 if (original.nr() <= 8 || original.nc() <= 8)
                 {
@@ -694,7 +718,7 @@ namespace dlib
                     for (c = 0; c < full_nc; c+=size_out)
                     {
                         rgbptype block[size_in][size_in];
-                        separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
+                        separable_3x3_filter_block_rgb(block, original_, rr, cc, 2, 12, 2);
 
                         // bi-linearly interpolate block 
                         down[r][c].red       = (block[0][0].red*9   + block[1][0].red*3   + block[0][1].red*3   + block[1][1].red)/(16*256);
@@ -718,7 +742,7 @@ namespace dlib
                     if (part_nc - full_nc == 1)
                     {
                         rgbptype block[size_in][2];
-                        separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
+                        separable_3x3_filter_block_rgb(block, original_, rr, cc, 2, 12, 2);
 
                         // bi-linearly interpolate partial block 
                         down[r][c].red       = (block[0][0].red*9   + block[1][0].red*3   + block[0][1].red*3   + block[1][1].red)/(16*256);
@@ -738,7 +762,7 @@ namespace dlib
                     for (c = 0; c < full_nc; c+=size_out)
                     {
                         rgbptype block[2][size_in];
-                        separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
+                        separable_3x3_filter_block_rgb(block, original_, rr, cc, 2, 12, 2);
 
                         // bi-linearly interpolate partial block 
                         down[r][c].red       = (block[0][0].red*9   + block[1][0].red*3   + block[0][1].red*3   + block[1][1].red)/(16*256);
@@ -754,7 +778,7 @@ namespace dlib
                     if (part_nc - full_nc == 1)
                     {
                         rgbptype block[2][2];
-                        separable_3x3_filter_block_rgb(block, original, rr, cc, 2, 12, 2);
+                        separable_3x3_filter_block_rgb(block, original_, rr, cc, 2, 12, 2);
 
                         // bi-linearly interpolate partial block 
                         down[r][c].red       = (block[0][0].red*9   + block[1][0].red*3   + block[0][1].red*3   + block[1][1].red)/(16*256);
@@ -878,12 +902,13 @@ namespace dlib
                         << "\n\t this:                           " << this
                         );
 
-            COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-            COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+            typedef typename image_traits<in_image_type>::pixel_type in_pixel_type;
+            typedef typename image_traits<out_image_type>::pixel_type out_pixel_type;
+            COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type>::has_alpha == false );
+            COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::has_alpha == false );
 
 
-            down.set_size(((N-1)*original.nr())/N,
-                          ((N-1)*original.nc())/N);
+            set_image_size(down, ((N-1)*num_rows(original))/N, ((N-1)*num_columns(original))/N);
             resize_image(original, down);
         }
     };

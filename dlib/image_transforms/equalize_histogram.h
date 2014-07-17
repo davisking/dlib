@@ -21,24 +21,26 @@ namespace dlib
         typename MM
         >
     void get_histogram (
-        const in_image_type& in_img,
+        const in_image_type& in_img_,
         matrix<unsigned long,R,C,MM>& hist
     )
     {
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::is_unsigned == true );
+        typedef typename image_traits<in_image_type>::pixel_type pixel_type;
+        COMPILE_TIME_ASSERT( pixel_traits<pixel_type>::is_unsigned == true );
 
-        typedef typename pixel_traits<typename in_image_type::type>::basic_pixel_type in_image_basic_pixel_type;
+        typedef typename pixel_traits<pixel_type>::basic_pixel_type in_image_basic_pixel_type;
         COMPILE_TIME_ASSERT( sizeof(in_image_basic_pixel_type) <= 2);
 
         // make sure hist is the right size
         if (R == 1)
-            hist.set_size(1,pixel_traits<typename in_image_type::type>::max()+1);
+            hist.set_size(1,pixel_traits<pixel_type>::max()+1);
         else
-            hist.set_size(pixel_traits<typename in_image_type::type>::max()+1,1);
+            hist.set_size(pixel_traits<pixel_type>::max()+1,1);
 
 
         set_all_elements(hist,0);
 
+        const_image_view<in_image_type> in_img(in_img_);
         // compute the histogram 
         for (long r = 0; r < in_img.nr(); ++r)
         {
@@ -57,20 +59,25 @@ namespace dlib
         typename out_image_type 
         >
     void equalize_histogram (
-        const in_image_type& in_img,
-        out_image_type& out_img
+        const in_image_type& in_img_,
+        out_image_type& out_img_
     )
     {
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+        const_image_view<in_image_type> in_img(in_img_);
+        image_view<out_image_type> out_img(out_img_);
 
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::is_unsigned == true );
-        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::is_unsigned == true );
+        typedef typename image_traits<in_image_type>::pixel_type in_pixel_type;
+        typedef typename image_traits<out_image_type>::pixel_type out_pixel_type;
 
-        typedef typename pixel_traits<typename in_image_type::type>::basic_pixel_type in_image_basic_pixel_type;
+        COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::has_alpha == false );
+
+        COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type>::is_unsigned == true );
+        COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::is_unsigned == true );
+
+        typedef typename pixel_traits<in_pixel_type>::basic_pixel_type in_image_basic_pixel_type;
         COMPILE_TIME_ASSERT( sizeof(in_image_basic_pixel_type) <= 2);
 
-        typedef typename out_image_type::type out_pixel_type;
 
         // if there isn't any input image then don't do anything
         if (in_img.size() == 0)
@@ -83,8 +90,9 @@ namespace dlib
 
         unsigned long p;
 
-        matrix<unsigned long,1,0,typename in_image_type::mem_manager_type> histogram;
-        get_histogram(in_img, histogram);
+        matrix<unsigned long,1,0> histogram;
+        get_histogram(in_img_, histogram);
+        in_img = in_img_;
 
         double scale = pixel_traits<out_pixel_type>::max();
         if (in_img.size() > histogram(0))

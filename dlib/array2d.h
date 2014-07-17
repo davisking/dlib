@@ -6,6 +6,7 @@
 
 #include "array2d/array2d_kernel.h"
 #include "array2d/serialize_pixel_overloads.h"
+#include "array2d/array2d_generic_image.h"
 
 #endif // DLIB_ARRAY2d_
 

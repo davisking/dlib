@@ -25,7 +25,7 @@ namespace dlib
         bool is_rgb() const;
 
         template<typename T>
-        void get_image( T& t) const
+        void get_image( T& t_) const
         {
 #ifndef DLIB_JPEG_SUPPORT
             /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -36,6 +36,7 @@ namespace dlib
             !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
             COMPILE_TIME_ASSERT(sizeof(T) == 0);
 #endif
+            image_view<T> t(t_);
 
             t.set_size( height_, width_ );
             for ( unsigned n = 0; n < height_;n++ )

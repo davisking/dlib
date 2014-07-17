@@ -31,9 +31,10 @@ namespace dlib
 
         template <typename image_type>
         void load (
-            const image_type& img
+            const image_type& img_
         )
         {
+            const_image_view<image_type> img(img_);
             T pixel;
             int_img.set_size(img.nr(), img.nc());
 

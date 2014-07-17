@@ -16,14 +16,15 @@ namespace dlib
     {
         template <typename image_type>
         bool is_binary_image (
-            const image_type& img
+            const image_type& img_
         )
         /*!
             ensures
-                - returns true if img contains only on_pixel and off_pixel values.
+                - returns true if img_ contains only on_pixel and off_pixel values.
                 - returns false otherwise
         !*/
         {
+            const_image_view<image_type> img(img_);
             for (long r = 0; r < img.nr(); ++r)
             {
                 for (long c = 0; c < img.nc(); ++c)
@@ -75,23 +76,25 @@ namespace dlib
         long N
         >
     void binary_dilation (
-        const in_image_type& in_img,
-        out_image_type& out_img,
+        const in_image_type& in_img_,
+        out_image_type& out_img_,
         const unsigned char (&structuring_element)[M][N]
     )
     {
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+        typedef typename image_traits<in_image_type>::pixel_type in_pixel_type;
+        typedef typename image_traits<out_image_type>::pixel_type out_pixel_type;
+        COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::has_alpha == false );
 
         using namespace morphological_operations_helpers;
         COMPILE_TIME_ASSERT(M%2 == 1);
         COMPILE_TIME_ASSERT(N%2 == 1);
-        DLIB_ASSERT(is_same_object(in_img,out_img) == false,
+        DLIB_ASSERT(is_same_object(in_img_,out_img_) == false,
             "\tvoid binary_dilation()"
             << "\n\tYou must give two different image objects"
             );
-        COMPILE_TIME_ASSERT(pixel_traits<typename in_image_type::type>::grayscale);
-        DLIB_ASSERT(is_binary_image(in_img) ,
+        COMPILE_TIME_ASSERT(pixel_traits<in_pixel_type>::grayscale);
+        DLIB_ASSERT(is_binary_image(in_img_) ,
             "\tvoid binary_dilation()"
             << "\n\tin_img must be a binary image"
             );
@@ -101,6 +104,8 @@ namespace dlib
             );
 
 
+        const_image_view<in_image_type> in_img(in_img_);
+        image_view<out_image_type> out_img(out_img_);
 
         // if there isn't any input image then don't do anything
         if (in_img.size() == 0)
@@ -147,23 +152,25 @@ namespace dlib
         long N
         >
     void binary_erosion (
-        const in_image_type& in_img,
-        out_image_type& out_img,
+        const in_image_type& in_img_,
+        out_image_type& out_img_,
         const unsigned char (&structuring_element)[M][N]
     )
     {
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+        typedef typename image_traits<in_image_type>::pixel_type in_pixel_type;
+        typedef typename image_traits<out_image_type>::pixel_type out_pixel_type;
+        COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::has_alpha == false );
 
         using namespace morphological_operations_helpers;
         COMPILE_TIME_ASSERT(M%2 == 1);
         COMPILE_TIME_ASSERT(N%2 == 1);
-        DLIB_ASSERT(is_same_object(in_img,out_img) == false,
+        DLIB_ASSERT(is_same_object(in_img_,out_img_) == false,
             "\tvoid binary_erosion()"
             << "\n\tYou must give two different image objects"
             );
-        COMPILE_TIME_ASSERT(pixel_traits<typename in_image_type::type>::grayscale);
-        DLIB_ASSERT(is_binary_image(in_img) ,
+        COMPILE_TIME_ASSERT(pixel_traits<in_pixel_type>::grayscale);
+        DLIB_ASSERT(is_binary_image(in_img_) ,
             "\tvoid binary_erosion()"
             << "\n\tin_img must be a binary image"
             );
@@ -172,6 +179,8 @@ namespace dlib
             << "\n\tthe structuring_element must be a binary image"
             );
 
+        const_image_view<in_image_type> in_img(in_img_);
+        image_view<out_image_type> out_img(out_img_);
 
 
         // if there isn't any input image then don't do anything
@@ -229,8 +238,10 @@ namespace dlib
         const unsigned long iter = 1
     )
     {
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+        typedef typename image_traits<in_image_type>::pixel_type in_pixel_type;
+        typedef typename image_traits<out_image_type>::pixel_type out_pixel_type;
+        COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::has_alpha == false );
 
         using namespace morphological_operations_helpers;
         COMPILE_TIME_ASSERT(M%2 == 1);
@@ -239,7 +250,7 @@ namespace dlib
             "\tvoid binary_open()"
             << "\n\tYou must give two different image objects"
             );
-        COMPILE_TIME_ASSERT(pixel_traits<typename in_image_type::type>::grayscale);
+        COMPILE_TIME_ASSERT(pixel_traits<in_pixel_type>::grayscale);
         DLIB_ASSERT(is_binary_image(in_img) ,
             "\tvoid binary_open()"
             << "\n\tin_img must be a binary image"
@@ -251,13 +262,13 @@ namespace dlib
 
 
         // if there isn't any input image then don't do anything
-        if (in_img.size() == 0)
+        if (num_rows(in_img)*num_columns(in_img) == 0)
         {
-            out_img.clear();
+            set_image_size(out_img, 0,0);
             return;
         }
 
-        out_img.set_size(in_img.nr(),in_img.nc());
+        set_image_size(out_img, num_rows(in_img), num_columns(in_img));
 
         if (iter == 0)
         {
@@ -278,14 +289,14 @@ namespace dlib
             // do the extra erosions
             for (unsigned long i = 1; i < iter; ++i)
             {
-                temp1.swap(temp2);
+                swap(temp1, temp2);
                 binary_erosion(temp2,temp1,structuring_element);
             }
 
             // do the extra dilations 
             for (unsigned long i = 1; i < iter; ++i)
             {
-                temp1.swap(temp2);
+                swap(temp1, temp2);
                 binary_dilation(temp2,temp1,structuring_element);
             }
 
@@ -308,8 +319,11 @@ namespace dlib
         const unsigned long iter = 1
     )
     {
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+        typedef typename image_traits<in_image_type>::pixel_type in_pixel_type;
+        typedef typename image_traits<out_image_type>::pixel_type out_pixel_type;
+        COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::has_alpha == false );
+
 
         using namespace morphological_operations_helpers;
         COMPILE_TIME_ASSERT(M%2 == 1);
@@ -318,7 +332,7 @@ namespace dlib
             "\tvoid binary_close()"
             << "\n\tYou must give two different image objects"
             );
-        COMPILE_TIME_ASSERT(pixel_traits<typename in_image_type::type>::grayscale);
+        COMPILE_TIME_ASSERT(pixel_traits<in_pixel_type>::grayscale);
         DLIB_ASSERT(is_binary_image(in_img) ,
             "\tvoid binary_close()"
             << "\n\tin_img must be a binary image"
@@ -330,13 +344,13 @@ namespace dlib
 
 
         // if there isn't any input image then don't do anything
-        if (in_img.size() == 0)
+        if (num_rows(in_img)*num_columns(in_img) == 0)
         {
-            out_img.clear();
+            set_image_size(out_img, 0,0);
             return;
         }
 
-        out_img.set_size(in_img.nr(),in_img.nc());
+        set_image_size(out_img, num_rows(in_img), num_columns(in_img));
 
         if (iter == 0)
         {
@@ -357,14 +371,14 @@ namespace dlib
             // do the extra dilations 
             for (unsigned long i = 1; i < iter; ++i)
             {
-                temp1.swap(temp2);
+                swap(temp1, temp2);
                 binary_dilation(temp2,temp1,structuring_element);
             }
 
             // do the extra erosions 
             for (unsigned long i = 1; i < iter; ++i)
             {
-                temp1.swap(temp2);
+                swap(temp1, temp2);
                 binary_erosion(temp2,temp1,structuring_element);
             }
 
@@ -380,26 +394,34 @@ namespace dlib
         typename out_image_type
         >
     void binary_intersection (
-        const in_image_type1& in_img1,
-        const in_image_type2& in_img2,
-        out_image_type& out_img
+        const in_image_type1& in_img1_,
+        const in_image_type2& in_img2_,
+        out_image_type& out_img_
     )
     {
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type1::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type2::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+        typedef typename image_traits<in_image_type1>::pixel_type in_pixel_type1;
+        typedef typename image_traits<in_image_type2>::pixel_type in_pixel_type2;
+        typedef typename image_traits<out_image_type>::pixel_type out_pixel_type;
+        COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type1>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type2>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::has_alpha == false );
 
         using namespace morphological_operations_helpers;
-        COMPILE_TIME_ASSERT(pixel_traits<typename in_image_type1::type>::grayscale);
-        COMPILE_TIME_ASSERT(pixel_traits<typename in_image_type2::type>::grayscale);
-        DLIB_ASSERT(is_binary_image(in_img1) ,
+        COMPILE_TIME_ASSERT(pixel_traits<in_pixel_type1>::grayscale);
+        COMPILE_TIME_ASSERT(pixel_traits<in_pixel_type2>::grayscale);
+        DLIB_ASSERT(is_binary_image(in_img1_) ,
             "\tvoid binary_intersection()"
             << "\n\tin_img1 must be a binary image"
             );
-        DLIB_ASSERT(is_binary_image(in_img2) ,
+        DLIB_ASSERT(is_binary_image(in_img2_) ,
             "\tvoid binary_intersection()"
             << "\n\tin_img2 must be a binary image"
             );
+
+        const_image_view<in_image_type1> in_img1(in_img1_);
+        const_image_view<in_image_type2> in_img2(in_img2_);
+        image_view<out_image_type> out_img(out_img_);
+
         DLIB_ASSERT(in_img1.nc() == in_img2.nc(),
             "\tvoid binary_intersection()"
             << "\n\tin_img1 and in_img2 must have the same ncs."
@@ -444,26 +466,35 @@ namespace dlib
         typename out_image_type
         >
     void binary_union (
-        const in_image_type1& in_img1,
-        const in_image_type2& in_img2,
-        out_image_type& out_img
+        const in_image_type1& in_img1_,
+        const in_image_type2& in_img2_,
+        out_image_type& out_img_
     )
     {
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type1::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type2::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+        typedef typename image_traits<in_image_type1>::pixel_type in_pixel_type1;
+        typedef typename image_traits<in_image_type2>::pixel_type in_pixel_type2;
+        typedef typename image_traits<out_image_type>::pixel_type out_pixel_type;
+        COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type1>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type2>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::has_alpha == false );
+
 
         using namespace morphological_operations_helpers;
-        COMPILE_TIME_ASSERT(pixel_traits<typename in_image_type1::type>::grayscale);
-        COMPILE_TIME_ASSERT(pixel_traits<typename in_image_type2::type>::grayscale);
-        DLIB_ASSERT(is_binary_image(in_img1) ,
+        COMPILE_TIME_ASSERT(pixel_traits<in_pixel_type1>::grayscale);
+        COMPILE_TIME_ASSERT(pixel_traits<in_pixel_type2>::grayscale);
+        DLIB_ASSERT(is_binary_image(in_img1_) ,
             "\tvoid binary_intersection()"
             << "\n\tin_img1 must be a binary image"
             );
-        DLIB_ASSERT(is_binary_image(in_img2) ,
+        DLIB_ASSERT(is_binary_image(in_img2_) ,
             "\tvoid binary_intersection()"
             << "\n\tin_img2 must be a binary image"
             );
+
+        const_image_view<in_image_type1> in_img1(in_img1_);
+        const_image_view<in_image_type2> in_img2(in_img2_);
+        image_view<out_image_type> out_img(out_img_);
+
         DLIB_ASSERT(in_img1.nc() == in_img2.nc(),
             "\tvoid binary_intersection()"
             << "\n\tin_img1 and in_img2 must have the same ncs."
@@ -508,26 +539,34 @@ namespace dlib
         typename out_image_type
         >
     void binary_difference (
-        const in_image_type1& in_img1,
-        const in_image_type2& in_img2,
-        out_image_type& out_img
+        const in_image_type1& in_img1_,
+        const in_image_type2& in_img2_,
+        out_image_type& out_img_
     )
     {
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type1::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type2::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+        typedef typename image_traits<in_image_type1>::pixel_type in_pixel_type1;
+        typedef typename image_traits<in_image_type2>::pixel_type in_pixel_type2;
+        typedef typename image_traits<out_image_type>::pixel_type out_pixel_type;
+        COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type1>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type2>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::has_alpha == false );
 
         using namespace morphological_operations_helpers;
-        COMPILE_TIME_ASSERT(pixel_traits<typename in_image_type1::type>::grayscale);
-        COMPILE_TIME_ASSERT(pixel_traits<typename in_image_type2::type>::grayscale);
-        DLIB_ASSERT(is_binary_image(in_img1) ,
+        COMPILE_TIME_ASSERT(pixel_traits<in_pixel_type1>::grayscale);
+        COMPILE_TIME_ASSERT(pixel_traits<in_pixel_type2>::grayscale);
+        DLIB_ASSERT(is_binary_image(in_img1_) ,
             "\tvoid binary_difference()"
             << "\n\tin_img1 must be a binary image"
             );
-        DLIB_ASSERT(is_binary_image(in_img2) ,
+        DLIB_ASSERT(is_binary_image(in_img2_) ,
             "\tvoid binary_difference()"
             << "\n\tin_img2 must be a binary image"
             );
+
+        const_image_view<in_image_type1> in_img1(in_img1_);
+        const_image_view<in_image_type2> in_img2(in_img2_);
+        image_view<out_image_type> out_img(out_img_);
+
         DLIB_ASSERT(in_img1.nc() == in_img2.nc(),
             "\tvoid binary_difference()"
             << "\n\tin_img1 and in_img2 must have the same ncs."
@@ -571,20 +610,25 @@ namespace dlib
         typename out_image_type
         >
     void binary_complement (
-        const in_image_type& in_img,
-        out_image_type& out_img
+        const in_image_type& in_img_,
+        out_image_type& out_img_
     )
     {
-        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
-        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+        typedef typename image_traits<in_image_type>::pixel_type in_pixel_type;
+        typedef typename image_traits<out_image_type>::pixel_type out_pixel_type;
+        COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::has_alpha == false );
+
 
         using namespace morphological_operations_helpers;
-        COMPILE_TIME_ASSERT(pixel_traits<typename in_image_type::type>::grayscale);
-        DLIB_ASSERT(is_binary_image(in_img) ,
+        COMPILE_TIME_ASSERT(pixel_traits<in_pixel_type>::grayscale);
+        DLIB_ASSERT(is_binary_image(in_img_) ,
             "\tvoid binary_complement()"
             << "\n\tin_img must be a binary image"
             );
 
+        const_image_view<in_image_type> in_img(in_img_);
+        image_view<out_image_type> out_img(out_img_);
 
         // if there isn't any input image then don't do anything
         if (in_img.size() == 0)

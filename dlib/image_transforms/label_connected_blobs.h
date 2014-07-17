@@ -113,19 +113,21 @@ namespace dlib
         typename connected_functor_type
         >
     unsigned long label_connected_blobs (
-        const image_type& img,
+        const image_type& img_,
         const background_functor_type& is_background,
         const neighbors_functor_type&  get_neighbors,
         const connected_functor_type&  is_connected,
-        label_image_type& label_img
+        label_image_type& label_img_
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(is_same_object(img, label_img) == false,
+        DLIB_ASSERT(is_same_object(img_, label_img_) == false,
             "\t unsigned long label_connected_blobs()"
             << "\n\t The input image and output label image can't be the same object."
             );
 
+        const_image_view<image_type> img(img_);
+        image_view<label_image_type> label_img(label_img_);
 
         std::stack<point> neighbors;
         label_img.set_size(img.nr(), img.nc());

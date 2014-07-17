@@ -47,10 +47,12 @@ namespace dlib
         /*!
             requires
                 - is_same_object(original, down) == false
-                - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-                - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-                - pixel_traits<typename in_image_type::type>::has_alpha == false
-                - pixel_traits<typename out_image_type::type>::has_alpha == false
+                - in_image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+                - out_image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+                - for both pixel types P in the input and output images, we require:
+                    - pixel_traits<P>::has_alpha == false
             ensures
                 - #down will contain an image that is roughly (N-1)/N times the size of the
                   original image.  

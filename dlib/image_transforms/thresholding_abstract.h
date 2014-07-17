@@ -22,15 +22,15 @@ namespace dlib
     void threshold_image (
         const in_image_type& in_img,
         out_image_type& out_img,
-        typename pixel_traits<typename in_image_type::type>::basic_pixel_type thresh
+        typename pixel_traits<typename image_traits<in_image_type>::pixel_type>::basic_pixel_type thresh
     );
     /*!
         requires
             - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
             - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename out_image_type::type>::grayscale == true  
-            - pixel_traits<typename in_image_type::type>::has_alpha == false
-            - pixel_traits<typename out_image_type::type>::has_alpha == false 
+            - pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale == true  
+            - pixel_traits<typename image_traits<in_image_type>::pixel_type>::has_alpha == false
+            - pixel_traits<typename image_traits<out_image_type>::pixel_type>::has_alpha == false 
         ensures
             - #out_img == the thresholded version of in_img (in_img is converted to a grayscale
               intensity image if it is color).  Pixels in in_img with grayscale values >= thresh 
@@ -44,7 +44,7 @@ namespace dlib
         >
     void threshold_image (
         image_type& img,
-        typename pixel_traits<typename image_type::type>::basic_pixel_type thresh
+        typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type thresh
     );
     /*!
         requires
@@ -67,12 +67,12 @@ namespace dlib
         requires
             - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
             - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename in_image_type::type>::max() <= 65535 
-            - pixel_traits<typename in_image_type::type>::has_alpha   == false
-            - pixel_traits<typename in_image_type::type>::is_unsigned == true 
-            - pixel_traits<typename out_image_type::type>::grayscale  == true  
-            - pixel_traits<typename out_image_type::type>::has_alpha  == false 
-            - pixel_traits<typename out_image_type::type>::is_unsigned == true 
+            - pixel_traits<typename image_traits<in_image_type>::pixel_type>::max() <= 65535 
+            - pixel_traits<typename image_traits<in_image_type>::pixel_type>::has_alpha   == false
+            - pixel_traits<typename image_traits<in_image_type>::pixel_type>::is_unsigned == true 
+            - pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale  == true  
+            - pixel_traits<typename image_traits<out_image_type>::pixel_type>::has_alpha  == false 
+            - pixel_traits<typename image_traits<out_image_type>::pixel_type>::is_unsigned == true 
         ensures
             - #out_img == the thresholded version of in_img (in_img is converted to a grayscale
               intensity image if it is color).  Pixels in in_img with grayscale values >= thresh 
@@ -106,16 +106,16 @@ namespace dlib
     void hysteresis_threshold (
         const in_image_type& in_img,
         out_image_type& out_img,
-        typename pixel_traits<typename in_image_type::type>::basic_pixel_type lower_thresh,
-        typename pixel_traits<typename in_image_type::type>::basic_pixel_type upper_thresh
+        typename pixel_traits<typename image_traits<in_image_type>::pixel_type>::basic_pixel_type lower_thresh,
+        typename pixel_traits<typename image_traits<in_image_type>::pixel_type>::basic_pixel_type upper_thresh
     );
     /*!
         requires
             - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
             - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename out_image_type::type>::grayscale == true  
-            - pixel_traits<typename in_image_type::type>::has_alpha == false
-            - pixel_traits<typename out_image_type::type>::has_alpha == false 
+            - pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale == true  
+            - pixel_traits<typename image_traits<in_image_type>::pixel_type>::has_alpha == false
+            - pixel_traits<typename image_traits<out_image_type>::pixel_type>::has_alpha == false 
             - lower_thresh <= upper_thresh
             - is_same_object(in_img, out_img) == false
         ensures

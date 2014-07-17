@@ -24,11 +24,11 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename in_image_type::type>::grayscale == true   
-            - pixel_traits<typename in_image_type::type>::has_alpha == false
-            - pixel_traits<typename out_image_type::type>::has_alpha == false 
+            - in_image_type and out_image_type are image objects that implement the
+              interface defined in dlib/image_processing/generic_image.h 
+            - in_img must contain a grayscale pixel type.
+            - both in_img and out_img must contain pixels with no alpha channel.
+              (i.e. pixel_traits::has_alpha==false for their pixels)
             - is_same_object(in_img,out_img) == false
             - M % 2 == 1  (i.e. M must be odd)
             - N % 2 == 1  (i.e. N must be odd)
@@ -58,11 +58,11 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename in_image_type::type>::grayscale == true   
-            - pixel_traits<typename in_image_type::type>::has_alpha == false
-            - pixel_traits<typename out_image_type::type>::has_alpha == false 
+            - in_image_type and out_image_type are image objects that implement the
+              interface defined in dlib/image_processing/generic_image.h 
+            - in_img must contain a grayscale pixel type.
+            - both in_img and out_img must contain pixels with no alpha channel.
+              (i.e. pixel_traits::has_alpha==false for their pixels)
             - is_same_object(in_img,out_img) == false
             - M % 2 == 1  (i.e. M must be odd)
             - N % 2 == 1  (i.e. N must be odd)
@@ -93,11 +93,11 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename in_image_type::type>::grayscale == true   
-            - pixel_traits<typename in_image_type::type>::has_alpha == false
-            - pixel_traits<typename out_image_type::type>::has_alpha == false 
+            - in_image_type and out_image_type are image objects that implement the
+              interface defined in dlib/image_processing/generic_image.h 
+            - in_img must contain a grayscale pixel type.
+            - both in_img and out_img must contain pixels with no alpha channel.
+              (i.e. pixel_traits::has_alpha==false for their pixels)
             - is_same_object(in_img,out_img) == false
             - M % 2 == 1  (i.e. M must be odd)
             - N % 2 == 1  (i.e. N must be odd)
@@ -129,11 +129,11 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename in_image_type::type>::grayscale == true   
-            - pixel_traits<typename in_image_type::type>::has_alpha == false
-            - pixel_traits<typename out_image_type::type>::has_alpha == false 
+            - in_image_type and out_image_type are image objects that implement the
+              interface defined in dlib/image_processing/generic_image.h 
+            - in_img must contain a grayscale pixel type.
+            - both in_img and out_img must contain pixels with no alpha channel.
+              (i.e. pixel_traits::has_alpha==false for their pixels)
             - is_same_object(in_img,out_img) == false
             - M % 2 == 1  (i.e. M must be odd)
             - N % 2 == 1  (i.e. N must be odd)
@@ -163,14 +163,11 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type1 == is an implementation of array2d/array2d_kernel_abstract.h
-            - in_image_type2 == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename in_image_type1::type>::grayscale == true   
-            - pixel_traits<typename in_image_type2::type>::grayscale == true   
-            - pixel_traits<typename in_image_type1::type>::has_alpha == false
-            - pixel_traits<typename in_image_type2::type>::has_alpha == false
-            - pixel_traits<typename out_image_type::type>::has_alpha == false 
+            - in_image_type1, in_image_type2, and out_image_type are image objects that
+              implement the interface defined in dlib/image_processing/generic_image.h 
+            - in_img1 and in_img2 must contain grayscale pixel types.
+            - in_img1, in_img2, and out_img must contain pixels with no alpha channel.
+              (i.e. pixel_traits::has_alpha==false for their pixels)
             - all pixels in in_img1 and in_img2 are set to either on_pixel or off_pixel
               (i.e. they must be binary images)
             - in_img1.nc() == in_img2.nc()
@@ -197,14 +194,11 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type1 == is an implementation of array2d/array2d_kernel_abstract.h
-            - in_image_type2 == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename in_image_type1::type>::grayscale == true   
-            - pixel_traits<typename in_image_type2::type>::grayscale == true   
-            - pixel_traits<typename in_image_type1::type>::has_alpha == false
-            - pixel_traits<typename in_image_type2::type>::has_alpha == false
-            - pixel_traits<typename out_image_type::type>::has_alpha == false 
+            - in_image_type1, in_image_type2, and out_image_type are image objects that
+              implement the interface defined in dlib/image_processing/generic_image.h 
+            - in_img1 and in_img2 must contain grayscale pixel types.
+            - in_img1, in_img2, and out_img must contain pixels with no alpha channel.
+              (i.e. pixel_traits::has_alpha==false for their pixels)
             - all pixels in in_img1 and in_img2 are set to either on_pixel or off_pixel
               (i.e. they must be binary images)
             - in_img1.nc() == in_img2.nc()
@@ -231,14 +225,11 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type1 == is an implementation of array2d/array2d_kernel_abstract.h
-            - in_image_type2 == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename in_image_type1::type>::grayscale == true   
-            - pixel_traits<typename in_image_type2::type>::grayscale == true   
-            - pixel_traits<typename in_image_type1::type>::has_alpha == false
-            - pixel_traits<typename in_image_type2::type>::has_alpha == false
-            - pixel_traits<typename out_image_type::type>::has_alpha == false 
+            - in_image_type1, in_image_type2, and out_image_type are image objects that
+              implement the interface defined in dlib/image_processing/generic_image.h 
+            - in_img1 and in_img2 must contain grayscale pixel types.
+            - in_img1, in_img2, and out_img must contain pixels with no alpha channel.
+              (i.e. pixel_traits::has_alpha==false for their pixels)
             - all pixels in in_img1 and in_img2 are set to either on_pixel or off_pixel
               (i.e. they must be binary images)
             - in_img1.nc() == in_img2.nc()
@@ -263,11 +254,11 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename in_image_type::type>::grayscale == true   
-            - pixel_traits<typename in_image_type::type>::has_alpha == false
-            - pixel_traits<typename out_image_type::type>::has_alpha == false 
+            - in_image_type and out_image_type are image objects that implement the
+              interface defined in dlib/image_processing/generic_image.h 
+            - in_img must contain a grayscale pixel type.
+            - both in_img and out_img must contain pixels with no alpha channel.
+              (i.e. pixel_traits::has_alpha==false for their pixels)
             - all pixels in in_img are set to either on_pixel or off_pixel
               (i.e. it must be a binary image)
         ensures

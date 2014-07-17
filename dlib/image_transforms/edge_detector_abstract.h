@@ -45,10 +45,11 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename in_image_type::type> must be defined
-            - pixel_traits<typename out_image_type::type>::is_unsigned == false
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type must use signed grayscale pixels
             - is_same_object(in_img,horz) == false
             - is_same_object(in_img,vert) == false
             - is_same_object(horz,vert) == false
@@ -79,14 +80,15 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename out_image_type::type> must be defined
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
             - horz.nr() == vert.nr()
             - horz.nc() == vert.nc()
             - is_same_object(out_img, horz) == false
             - is_same_object(out_img, vert) == false
-            - in_image_type::type == A signed scalar type (e.g. int, double, etc.) 
+            - image_traits<in_image_type>::pixel_type == A signed scalar type (e.g. int, double, etc.) 
         ensures
             - #out_img.nr() = horz.nr()
             - #out_img.nc() = horz.nc()

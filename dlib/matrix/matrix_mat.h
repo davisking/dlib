@@ -9,6 +9,7 @@
 #include "matrix_op.h"
 #include "../array2d.h"
 #include "../array.h"
+#include "../image_processing/generic_image.h"
 
 
 namespace dlib
@@ -28,39 +29,112 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T>
-    struct op_array2d_to_mat : does_not_alias 
+    template <typename image_type, typename pixel_type>
+    struct op_image_to_mat : does_not_alias 
     {
-        op_array2d_to_mat( const T& array_) : array(array_){}
+        op_image_to_mat( const image_type& img) : imgview(img){}
 
-        const T& array;
+        const_image_view<image_type> imgview;
 
         const static long cost = 1;
         const static long NR = 0;
         const static long NC = 0;
-        typedef typename T::type type;
-        typedef const typename T::type& const_ret_type;
-        typedef typename T::mem_manager_type mem_manager_type;
+        typedef pixel_type type;
+        typedef const pixel_type& const_ret_type;
+        typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
 
-        const_ret_type apply (long r, long c ) const { return array[r][c]; }
+        const_ret_type apply (long r, long c ) const { return imgview[r][c]; }
 
-        long nr () const { return array.nr(); }
-        long nc () const { return array.nc(); }
+        long nr () const { return imgview.nr(); }
+        long nc () const { return imgview.nc(); }
     }; 
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T,
-        typename MM
-        >
-    const matrix_op<op_array2d_to_mat<array2d<T,MM> > > mat (
-        const array2d<T,MM>& array
+        typename image_type
+        > // The reason we disable this if it is a matrix is because this matrix_op claims
+          // to not alias any matrix.  But obviously that would be a problem if we let it
+          // take a matrix.
+    const typename disable_if<is_matrix<image_type>,matrix_op<op_image_to_mat<image_type, typename image_traits<image_type>::pixel_type> > >::type mat (
+        const image_type& img 
     )
     {
-        typedef op_array2d_to_mat<array2d<T,MM> > op;
-        return matrix_op<op>(op(array));
+        typedef op_image_to_mat<image_type, typename image_traits<image_type>::pixel_type> op;
+        return matrix_op<op>(op(img));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename image_type>
+    struct op_image_view_to_mat : does_not_alias 
+    {
+        op_image_view_to_mat( const image_view<image_type>& img) : imgview(img){}
+
+        typedef typename image_traits<image_type>::pixel_type pixel_type;
+
+        const image_view<image_type>& imgview;
+
+        const static long cost = 1;
+        const static long NR = 0;
+        const static long NC = 0;
+        typedef pixel_type type;
+        typedef const pixel_type& const_ret_type;
+        typedef default_memory_manager mem_manager_type;
+        typedef row_major_layout layout_type;
+
+        const_ret_type apply (long r, long c ) const { return imgview[r][c]; }
+
+        long nr () const { return imgview.nr(); }
+        long nc () const { return imgview.nc(); }
+    }; 
+
+    template <
+        typename image_type
+        > 
+    const matrix_op<op_image_view_to_mat<image_type> > mat (
+        const image_view<image_type>& img 
+    )
+    {
+        typedef op_image_view_to_mat<image_type> op;
+        return matrix_op<op>(op(img));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename image_type>
+    struct op_const_image_view_to_mat : does_not_alias 
+    {
+        op_const_image_view_to_mat( const const_image_view<image_type>& img) : imgview(img){}
+
+        typedef typename image_traits<image_type>::pixel_type pixel_type;
+
+        const const_image_view<image_type>& imgview;
+
+        const static long cost = 1;
+        const static long NR = 0;
+        const static long NC = 0;
+        typedef pixel_type type;
+        typedef const pixel_type& const_ret_type;
+        typedef default_memory_manager mem_manager_type;
+        typedef row_major_layout layout_type;
+
+        const_ret_type apply (long r, long c ) const { return imgview[r][c]; }
+
+        long nr () const { return imgview.nr(); }
+        long nc () const { return imgview.nc(); }
+    }; 
+
+    template <
+        typename image_type
+        > 
+    const matrix_op<op_const_image_view_to_mat<image_type> > mat (
+        const const_image_view<image_type>& img 
+    )
+    {
+        typedef op_const_image_view_to_mat<image_type> op;
+        return matrix_op<op>(op(img));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -416,6 +490,42 @@ namespace dlib
     )
     {
         return array;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    struct op_array2d_to_mat : does_not_alias 
+    {
+        op_array2d_to_mat( const T& array_) : array(array_){}
+
+        const T& array;
+
+        const static long cost = 1;
+        const static long NR = 0;
+        const static long NC = 0;
+        typedef typename T::type type;
+        typedef const typename T::type& const_ret_type;
+        typedef typename T::mem_manager_type mem_manager_type;
+        typedef row_major_layout layout_type;
+
+        const_ret_type apply (long r, long c ) const { return array[r][c]; }
+
+        long nr () const { return array.nr(); }
+        long nc () const { return array.nc(); }
+    }; 
+
+    // Note that we have this version of mat() because it's slightly faster executing
+    // than the general one that handles any generic image.  This is because it avoids
+    // calling image_data() which for array2d involves a single if statement but this
+    // version here has no if statement in its construction.
+    template < typename T, typename MM >
+    const matrix_op<op_array2d_to_mat<array2d<T,MM> > > mat (
+        const array2d<T,MM>& array
+    )
+    {
+        typedef op_array2d_to_mat<array2d<T,MM> > op;
+        return matrix_op<op>(op(array));
     }
 
     template <

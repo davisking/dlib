@@ -166,8 +166,9 @@ namespace dlib
         );
         /*!
             requires
-                - image_type == is an implementation of array2d/array2d_kernel_abstract.h
-                - pixel_traits<typename image_type::type>::has_alpha == false
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+                - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false
             ensures
                 - Performs the feature extraction described in the WHAT THIS OBJECT REPRESENTS
                   section above.  This means after load() finishes you can call (*this)(row,col) 

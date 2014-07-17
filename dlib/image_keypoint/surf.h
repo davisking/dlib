@@ -248,7 +248,7 @@ namespace dlib
         );
 
         // Figure out the proper scalar type we should use to work with these pixels.  
-        typedef typename pixel_traits<typename image_type::type>::basic_pixel_type bp_type;
+        typedef typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type bp_type;
         typedef typename promote<bp_type>::type working_pixel_type;
 
         // make an integral image first

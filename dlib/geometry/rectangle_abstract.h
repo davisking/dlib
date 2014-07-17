@@ -715,9 +715,12 @@ namespace dlib
     );
     /*!
         requires
-            - T has nr() and nc() functions that return longs
+            - It must be possible to determine the number of "rows" and "columns" in m.
+              Either by calling num_rows(m) and num_columns(m) or by calling m.nr() and
+              m.nc() to obtain the number of rows and columns respectively.  Moreover,
+              these routines should return longs.
         ensures
-            - returns rectangle(0, 0, m.nc()-1, m.nr()-1)
+            - returns rectangle(0, 0, num_columns(m)-1, num_rows(m)-1)
               (i.e. assuming T represents some kind of rectangular grid, such as
               the dlib::matrix or dlib::array2d objects, this function returns the
               bounding rectangle for that gridded object.)
