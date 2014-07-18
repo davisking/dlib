@@ -515,8 +515,8 @@ namespace dlib
             << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
             );
 
-        const double x_scale = (in_img.nc()-1)/(double)std::max<long>((out_img.nc()-1),1);
-        const double y_scale = (in_img.nr()-1)/(double)std::max<long>((out_img.nr()-1),1);
+        const double x_scale = (num_columns(in_img)-1)/(double)std::max<long>((num_columns(out_img)-1),1);
+        const double y_scale = (num_rows(in_img)-1)/(double)std::max<long>((num_rows(out_img)-1),1);
         transform_image(in_img, out_img, interp, 
                         dlib::impl::helper_resize_image(x_scale,y_scale));
     }

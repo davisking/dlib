@@ -13,8 +13,6 @@
 class numpy_gray_image
 {
 public:
-    typedef unsigned char type;
-    typedef dlib::default_memory_manager mem_manager_type;
 
     numpy_gray_image() : _data(0), _nr(0), _nc(0) {}
     numpy_gray_image (boost::python::object& img) 
@@ -25,34 +23,26 @@ public:
         _nc = shape[1];
     }
 
-    unsigned long size () const { return static_cast<unsigned long>(_nr*_nc); }
-
-    inline type* operator[](const long row ) 
-    { return _data + _nc*row; }
-
-    inline const type* operator[](const long row ) const
-    { return _data + _nc*row; }
-
-    long nr() const { return _nr; }
-    long nc() const { return _nc; }
-    long width_step() const { return nc()*sizeof(type); }
+    friend inline long num_rows(const numpy_gray_image& img) { return img._nr; } 
+    friend inline long num_columns(const numpy_gray_image& img) { return img._nc; } 
+    friend inline void* image_data(numpy_gray_image& img) { return img._data; } 
+    friend inline const void* image_data(const numpy_gray_image& img) { return img._data; }
+    friend inline long width_step(const numpy_gray_image& img) { return img._nc*sizeof(unsigned char); }
 
 private:
 
-    type* _data;
+    unsigned char* _data;
     long _nr;
     long _nc;
 };
 
-// ----------------------------------------------------------------------------------------
-
-inline const dlib::matrix_op<dlib::op_array2d_to_mat<numpy_gray_image> > mat (
-    const numpy_gray_image& m 
-)
+namespace dlib
 {
-    using namespace dlib;
-    typedef op_array2d_to_mat<numpy_gray_image> op;
-    return matrix_op<op>(op(m));
+    template <>
+    struct image_traits<numpy_gray_image >
+    {
+        typedef unsigned char pixel_type;
+    };
 }
 
 // ----------------------------------------------------------------------------------------
@@ -75,8 +65,6 @@ inline bool is_gray_python_image (boost::python::object& img)
 class numpy_rgb_image
 {
 public:
-    typedef dlib::rgb_pixel type;
-    typedef dlib::default_memory_manager mem_manager_type;
 
     numpy_rgb_image() : _data(0), _nr(0), _nc(0) {}
     numpy_rgb_image (boost::python::object& img) 
@@ -89,37 +77,31 @@ public:
             throw dlib::error("Error, python object is not a three band image and therefore can't be a RGB image.");
     }
 
-    unsigned long size () const { return static_cast<unsigned long>(_nr*_nc); }
+    friend inline long num_rows(const numpy_rgb_image& img) { return img._nr; } 
+    friend inline long num_columns(const numpy_rgb_image& img) { return img._nc; } 
+    friend inline void* image_data(numpy_rgb_image& img) { return img._data; } 
+    friend inline const void* image_data(const numpy_rgb_image& img) { return img._data; }
+    friend inline long width_step(const numpy_rgb_image& img) { return img._nc*sizeof(dlib::rgb_pixel); }
 
-    inline type* operator[](const long row ) 
-    { return _data + _nc*row; }
-
-    inline const type* operator[](const long row ) const
-    { return _data + _nc*row; }
-
-    long nr() const { return _nr; }
-    long nc() const { return _nc; }
-    long width_step() const { return nc()*sizeof(type); }
 
 private:
 
-    type* _data;
+    dlib::rgb_pixel* _data;
     long _nr;
     long _nc;
 };
 
-// ----------------------------------------------------------------------------------------
-
-inline const dlib::matrix_op<dlib::op_array2d_to_mat<numpy_rgb_image> > mat (
-    const numpy_rgb_image& m 
-)
+namespace dlib
 {
-    using namespace dlib;
-    typedef op_array2d_to_mat<numpy_rgb_image> op;
-    return matrix_op<op>(op(m));
+    template <>
+    struct image_traits<numpy_rgb_image >
+    {
+        typedef rgb_pixel pixel_type;
+    };
 }
 
 // ----------------------------------------------------------------------------------------
+
 
 inline bool is_rgb_python_image (boost::python::object& img)
 {

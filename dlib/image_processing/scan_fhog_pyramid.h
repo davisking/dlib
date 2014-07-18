@@ -598,7 +598,8 @@ namespace dlib
 
             if (feats.size() > 1)
             {
-                image_type temp1, temp2;
+                typedef typename image_traits<image_type>::pixel_type pixel_type;
+                array2d<pixel_type> temp1, temp2;
                 pyr(img, temp1);
                 fe(temp1, feats[1], cell_size,filter_rows_padding,filter_cols_padding);
                 swap(temp1,temp2);
