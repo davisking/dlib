@@ -22,12 +22,12 @@
 #define DLIB_TEST_MSG(_exp,_message)                                        \
     {increment_test_count(); if ( !(_exp) )                                 \
     {                                                                       \
-        std::ostringstream dlib__out;                                       \
-        dlib__out << "\n\nError occurred at line " << __LINE__ << ".\n";    \
-        dlib__out << "Error occurred in file " << __FILE__ << ".\n";        \
-        dlib__out << "Failing expression was " << #_exp << ".\n";           \
-        dlib__out << _message << "\n";                                      \
-        throw dlib::error(dlib__out.str());                                 \
+        std::ostringstream dlib_o_out;                                       \
+        dlib_o_out << "\n\nError occurred at line " << __LINE__ << ".\n";    \
+        dlib_o_out << "Error occurred in file " << __FILE__ << ".\n";        \
+        dlib_o_out << "Failing expression was " << #_exp << ".\n";           \
+        dlib_o_out << _message << "\n";                                      \
+        throw dlib::error(dlib_o_out.str());                                 \
     }}
 
 namespace test

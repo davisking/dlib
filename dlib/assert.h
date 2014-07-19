@@ -92,13 +92,13 @@ namespace dlib
     {if ( !(_exp) )                                                         \
     {                                                                       \
         dlib_assert_breakpoint();                                           \
-        std::ostringstream dlib__out;                                       \
-        dlib__out << "\n\nError detected at line " << __LINE__ << ".\n";    \
-        dlib__out << "Error detected in file " << __FILE__ << ".\n";      \
-        dlib__out << "Error detected in function " << DLIB_FUNCTION_NAME << ".\n\n";      \
-        dlib__out << "Failing expression was " << #_exp << ".\n";           \
-        dlib__out << std::boolalpha << _message << "\n";                    \
-        throw dlib::fatal_error(dlib::EBROKEN_ASSERT,dlib__out.str());      \
+        std::ostringstream dlib_o_out;                                       \
+        dlib_o_out << "\n\nError detected at line " << __LINE__ << ".\n";    \
+        dlib_o_out << "Error detected in file " << __FILE__ << ".\n";      \
+        dlib_o_out << "Error detected in function " << DLIB_FUNCTION_NAME << ".\n\n";      \
+        dlib_o_out << "Failing expression was " << #_exp << ".\n";           \
+        dlib_o_out << std::boolalpha << _message << "\n";                    \
+        throw dlib::fatal_error(dlib::EBROKEN_ASSERT,dlib_o_out.str());      \
     }}                                                                      
 
 

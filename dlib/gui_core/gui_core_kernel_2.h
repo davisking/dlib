@@ -113,14 +113,14 @@ namespace dlib
 
 
         canvas (
-            unsigned char* bits__,
-            unsigned long left__,
-            unsigned long top__,            
-            unsigned long right__,            
-            unsigned long bottom__   
+            unsigned char* bits_,
+            unsigned long left_,
+            unsigned long top_,            
+            unsigned long right_,            
+            unsigned long bottom_   
         ) : 
-            rectangle(left__,top__,right__,bottom__),
-            bits(bits__),
+            rectangle(left_,top_,right_,bottom_),
+            bits(bits_),
             width_(width()),
             height_(height()),
             row_width(width_*4)

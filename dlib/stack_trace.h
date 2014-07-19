@@ -69,15 +69,15 @@ namespace dlib
 #define DLIB_CASSERT(_exp,_message)                                              \
     {if ( !(_exp) )                                                         \
     {                                                                       \
-        std::ostringstream dlib__out;                                       \
-        dlib__out << "\n\nError occurred at line " << __LINE__ << ".\n";    \
-        dlib__out << "Error occurred in file " << __FILE__ << ".\n";      \
-        dlib__out << "Error occurred in function " << DLIB_FUNCTION_NAME << ".\n\n";      \
-        dlib__out << "Failing expression was " << #_exp << ".\n";           \
-        dlib__out << _message << "\n\n";                                      \
-        dlib__out << "Stack Trace: \n" << dlib::get_stack_trace() << "\n";        \
+        std::ostringstream dlib_o_out;                                       \
+        dlib_o_out << "\n\nError occurred at line " << __LINE__ << ".\n";    \
+        dlib_o_out << "Error occurred in file " << __FILE__ << ".\n";      \
+        dlib_o_out << "Error occurred in function " << DLIB_FUNCTION_NAME << ".\n\n";      \
+        dlib_o_out << "Failing expression was " << #_exp << ".\n";           \
+        dlib_o_out << _message << "\n\n";                                      \
+        dlib_o_out << "Stack Trace: \n" << dlib::get_stack_trace() << "\n";        \
         dlib_assert_breakpoint();                                           \
-        throw dlib::fatal_error(dlib::EBROKEN_ASSERT,dlib__out.str());      \
+        throw dlib::fatal_error(dlib::EBROKEN_ASSERT,dlib_o_out.str());      \
     }}                                                                      
 
 

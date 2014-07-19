@@ -64,12 +64,12 @@ namespace dlib
     struct op_subm 
     {
         op_subm (
-            const M& m_,
-            const long& r__,
-            const long& c__,
-            const long& nr__,
-            const long& nc__
-        ) : m(m_), r_(r__), c_(c__), nr_(nr__), nc_(nc__) { }
+            const M& m_x,
+            const long& r_x,
+            const long& c_x,
+            const long& nr_x,
+            const long& nc_x
+        ) : m(m_x), r_(r_x), c_(c_x), nr_(nr_x), nc_(nc_x) { }
 
         const M& m;
         const long r_;

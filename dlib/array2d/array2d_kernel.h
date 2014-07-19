@@ -113,7 +113,7 @@ namespace dlib
 
         private:
 
-            row(T* data_, long nc__) : data(data_), nc_(nc__) {}
+            row(T* data_, long cols) : data(data_), nc_(cols) {}
 
             T* data; 
             long nc_;
@@ -138,8 +138,8 @@ namespace dlib
         }
 
         array2d(
-            long nr__,
-            long nc__
+            long rows,
+            long cols
         ) : 
             data(0),
             nc_(0),
@@ -149,15 +149,15 @@ namespace dlib
             at_start_(true)
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT((nc__ >= 0 && nr__ >= 0),
-                        "\t array2d::array2d(long nr__, long nc__)"
+            DLIB_ASSERT((cols >= 0 && rows >= 0),
+                        "\t array2d::array2d(long rows, long cols)"
                         << "\n\t The array2d can't have negative rows or columns."
                         << "\n\t this: " << this
-                        << "\n\t nc__: " << nc__ 
-                        << "\n\t nr__: " << nr__ 
+                        << "\n\t cols: " << cols 
+                        << "\n\t rows: " << rows 
             );
 
-            set_size(nr__,nc__);
+            set_size(rows,cols);
         }
 
         virtual ~array2d (
@@ -230,8 +230,8 @@ namespace dlib
         }
 
         void set_size (
-            long nr__,
-            long nc__
+            long rows,
+            long cols
         );
 
         bool at_start (
@@ -413,17 +413,17 @@ namespace dlib
         >
     void array2d<T,mem_manager>::
     set_size (
-        long nr__,
-        long nc__
+        long rows,
+        long cols
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT((nc__ >= 0 && nr__ >= 0) ,
-               "\tvoid array2d::set_size(long nr__, long nc__)"
+        DLIB_ASSERT((cols >= 0 && rows >= 0) ,
+               "\tvoid array2d::set_size(long rows, long cols)"
                << "\n\tThe array2d can't have negative rows or columns."
                << "\n\tthis: " << this
-               << "\n\tnc__: " << nc__ 
-               << "\n\tnr__: " << nr__ 
+               << "\n\tcols: " << cols 
+               << "\n\trows: " << rows 
         );
 
         // set the enumerator back at the start
@@ -431,13 +431,13 @@ namespace dlib
         cur = 0;
 
         // don't do anything if we are already the right size.
-        if (nc_ == nc__ && nr_ == nr__)
+        if (nc_ == cols && nr_ == rows)
         {
             return;
         }
 
-        nc_ = nc__;
-        nr_ = nr__;
+        nc_ = cols;
+        nr_ = rows;
 
         // free any existing memory
         if (data != 0)
