@@ -67,11 +67,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_scanner_type
+        typename image_scanner_type_
         >
     class object_detector
     {
     public:
+        typedef image_scanner_type_ image_scanner_type;
         typedef typename image_scanner_type::feature_vector_type feature_vector_type;
 
         object_detector (
