@@ -571,7 +571,7 @@ namespace dlib
             const long bottom = std::min(top+1, in_img.nr()-1);
             const double tb_frac = y - top;
             double x = -x_scale;
-            if (!pixel_traits<U>::rgb)
+            if (pixel_traits<U>::grayscale)
             {
                 for (long c = 0; c < out_img.nc(); ++c)
                 {
