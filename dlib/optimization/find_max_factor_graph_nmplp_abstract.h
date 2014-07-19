@@ -360,6 +360,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_FIND_MAX_FACTOR_GRAPH_nMPLP_H__
+#endif // DLIB_FIND_MAX_FACTOR_GRAPH_nMPLP_ABSTRACT_H__
 
 

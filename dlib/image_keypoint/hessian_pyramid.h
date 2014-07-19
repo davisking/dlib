@@ -527,5 +527,5 @@ namespace dlib
 
 }
 
-#endif  // DLIB_HESSIAN_PYRAMID_H__
+#endif  // DLIB_HESSIAN_PYRAMId_H__
 

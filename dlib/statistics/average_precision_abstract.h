@@ -62,6 +62,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_AVERAGE_PREcISION_H__
+#endif // DLIB_AVERAGE_PREcISION_ABSTRACT_H__
 
 

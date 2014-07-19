@@ -90,5 +90,4 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-#endif //DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSON.h__
-
+#endif // DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSON__

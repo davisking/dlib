@@ -29,5 +29,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_NULL_DECISION_FUnCTION_ABSTRACT_H__
+#endif // DLIB_NULL_DECISION_FUnCTION_H__
 

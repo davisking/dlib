@@ -702,5 +702,5 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
 
-#endif // DLIB_OCA_PROBLeM_SVM_C_H__
+#endif // DLIB_SVM_C_LiNEAR_TRAINER_H__
 
