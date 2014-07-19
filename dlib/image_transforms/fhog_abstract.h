@@ -61,8 +61,11 @@ namespace dlib
               area of a hog image (note that you should use the following planar version of
               extract_fhog_features() instead of the interlaced version if you want to use
               spatially_filter_image() on a hog image).
-            - #hog.nr() is approximately equal to img.nr()/cell_size + filter_rows_padding-1.
-            - #hog.nc() is approximately equal to img.nc()/cell_size + filter_cols_padding-1.
+            - #hog.nr() == max(round(img.nr()/(double)cell_size)-2,0) + filter_rows_padding-1.
+            - #hog.nc() == max(round(img.nc()/(double)cell_size)-2,0) + filter_cols_padding-1.
+              (i.e.  Each output dimension is roughly 1/cell_size the original size but
+              there is a one cell_size border all around the image that is lost and then we
+              add on any additional padding that is requested.)
             - for all valid r and c:
                 - #hog[r][c] == the FHOG vector describing the cell centered at the pixel location 
                   fhog_to_image(point(c,r),cell_size,filter_rows_padding,filter_cols_padding) in img.

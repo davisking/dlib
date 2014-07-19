@@ -637,7 +637,12 @@ namespace dlib
         int filter_cols_padding = 1
     ) 
     {
-        return impl_fhog::impl_extract_fhog_features(img, hog, cell_size, filter_rows_padding, filter_cols_padding);
+        impl_fhog::impl_extract_fhog_features(img, hog, cell_size, filter_rows_padding, filter_cols_padding);
+        // If the image is too small then the above function outputs an empty feature map.
+        // But to make things very uniform in usage we require the output to still have the
+        // 31 planes (but they are just empty).
+        if (hog.size() == 0)
+            hog.resize(31);
     }
 
     template <
@@ -653,7 +658,7 @@ namespace dlib
         int filter_cols_padding = 1
     ) 
     {
-        return impl_fhog::impl_extract_fhog_features(img, hog, cell_size, filter_rows_padding, filter_cols_padding);
+        impl_fhog::impl_extract_fhog_features(img, hog, cell_size, filter_rows_padding, filter_cols_padding);
     }
 
 // ----------------------------------------------------------------------------------------

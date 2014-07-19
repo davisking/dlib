@@ -60,6 +60,10 @@ namespace
         {
             dlib::array<array2d<float> > hog;
             extract_fhog_features(img, hog, sbin);
+            DLIB_TEST(hog.size() == 31);
+            DLIB_TEST_MSG(hog[0].nr() == max(static_cast<int>(img.nr()/(double)sbin+0.5)-2,0),
+                hog[0].nr() << "   " << max(static_cast<int>(img.nr()/(double)sbin+0.5)-2,0));
+            DLIB_TEST(hog[0].nc() == max(static_cast<int>(img.nc()/(double)sbin+0.5)-2,0));
 
             DLIB_TEST(hog.size() == 31);
             for (long o = 0; o < (long)hog.size(); ++o)
@@ -88,18 +92,28 @@ namespace
                 img.set_size(i,i);
                 assign_all_pixels(img, i);
                 extract_fhog_features(img, hog);
+
+                DLIB_TEST(hog.size() == 31);
+                DLIB_TEST(hog[0].nr() == max(static_cast<int>(img.nr()/8.0+0.5)-2,0));
+                DLIB_TEST(hog[0].nc() == max(static_cast<int>(img.nc()/8.0+0.5)-2,0));
             }
             for (int i = 1; i < 10; ++i)
             {
                 img.set_size(i,i+1);
                 assign_all_pixels(img, i);
                 extract_fhog_features(img, hog);
+                DLIB_TEST(hog.size() == 31);
+                DLIB_TEST(hog[0].nr() == max(static_cast<int>(img.nr()/8.0+0.5)-2,0));
+                DLIB_TEST(hog[0].nc() == max(static_cast<int>(img.nc()/8.0+0.5)-2,0));
             }
             for (int i = 1; i < 10; ++i)
             {
                 img.set_size(i+1,i);
                 assign_all_pixels(img, i);
                 extract_fhog_features(img, hog);
+                DLIB_TEST(hog.size() == 31);
+                DLIB_TEST(hog[0].nr() == max(static_cast<int>(img.nr()/8.0+0.5)-2,0));
+                DLIB_TEST(hog[0].nc() == max(static_cast<int>(img.nc()/8.0+0.5)-2,0));
             }
         }
 
