@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_MAX_SUM_SUBMaTRIX_H__
-#define DLIB_MAX_SUM_SUBMaTRIX_H__
+#ifndef DLIB_MAX_SUM_SUBMaTRIX_Hh_
+#define DLIB_MAX_SUM_SUBMaTRIX_Hh_
 
 #include "max_sum_submatrix_abstract.h"
 #include "../matrix.h"
@@ -281,5 +281,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_MAX_SUM_SUBMaTRIX_H__
+#endif // DLIB_MAX_SUM_SUBMaTRIX_Hh_
 

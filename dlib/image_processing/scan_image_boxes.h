@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SCAN_IMAGE_bOXES_H__
-#define DLIB_SCAN_IMAGE_bOXES_H__
+#ifndef DLIB_SCAN_IMAGE_bOXES_Hh_
+#define DLIB_SCAN_IMAGE_bOXES_Hh_
 
 #include "scan_image_boxes_abstract.h"
 #include "../matrix.h"
@@ -625,7 +625,7 @@ namespace dlib
 
 }
 
-#endif // DLIB_SCAN_IMAGE_bOXES_H__
+#endif // DLIB_SCAN_IMAGE_bOXES_Hh_
 
 
 

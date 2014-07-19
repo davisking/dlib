@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_LIBSVM_iO_H__
-#define DLIB_LIBSVM_iO_H__
+#ifndef DLIB_LIBSVM_iO_Hh_
+#define DLIB_LIBSVM_iO_Hh_
 
 #include "libsvm_io_abstract.h"
 
@@ -270,5 +270,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_LIBSVM_iO_H__
+#endif // DLIB_LIBSVM_iO_Hh_
 

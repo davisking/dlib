@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_IMAGE_PYRaMID_H__
-#define DLIB_IMAGE_PYRaMID_H__
+#ifndef DLIB_IMAGE_PYRaMID_Hh_
+#define DLIB_IMAGE_PYRaMID_Hh_
 
 #include "image_pyramid_abstract.h"
 #include "../pixel.h"
@@ -928,5 +928,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_IMAGE_PYRaMID_H__
+#endif // DLIB_IMAGE_PYRaMID_Hh_
 

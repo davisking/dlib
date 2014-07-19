@@ -1,7 +1,7 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SOLVE_QP2_USING_SMo_H__
-#define DLIB_SOLVE_QP2_USING_SMo_H__
+#ifndef DLIB_SOLVE_QP2_USING_SMo_Hh_
+#define DLIB_SOLVE_QP2_USING_SMo_Hh_
 
 #include "optimization_solve_qp2_using_smo_abstract.h"
 #include <cmath>
@@ -463,6 +463,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_SOLVE_QP2_USING_SMo_H__
+#endif // DLIB_SOLVE_QP2_USING_SMo_Hh_
 
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2006  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_ARRAY2D_SERIALIZE_PIXEL_OvERLOADS_H__
-#define DLIB_ARRAY2D_SERIALIZE_PIXEL_OvERLOADS_H__
+#ifndef DLIB_ARRAY2D_SERIALIZE_PIXEL_OvERLOADS_Hh_
+#define DLIB_ARRAY2D_SERIALIZE_PIXEL_OvERLOADS_Hh_
 
 #include "array2d_kernel.h"
 #include "../pixel.h"
@@ -367,5 +367,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_ARRAY2D_SERIALIZE_PIXEL_OvERLOADS_H__
+#endif // DLIB_ARRAY2D_SERIALIZE_PIXEL_OvERLOADS_Hh_
 

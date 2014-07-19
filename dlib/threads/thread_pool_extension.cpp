@@ -1,7 +1,7 @@
 // Copyright (C) 2008  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_THREAD_POOl_CPP__
-#define DLIB_THREAD_POOl_CPP__ 
+#ifndef DLIB_THREAD_POOl_CPPh_
+#define DLIB_THREAD_POOl_CPPh_ 
 
 #include "thread_pool_extension.h"
 
@@ -316,5 +316,5 @@ namespace dlib
 }
 
 
-#endif // DLIB_THREAD_POOl_CPP__
+#endif // DLIB_THREAD_POOl_CPPh_
 

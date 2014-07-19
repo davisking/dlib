@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_COUNT_BiTS_ABSTRACT_H__
-#ifdef DLIB_COUNT_BiTS_ABSTRACT_H__
+#undef DLIB_COUNT_BiTS_ABSTRACT_Hh_
+#ifdef DLIB_COUNT_BiTS_ABSTRACT_Hh_
 
 
 namespace dlib
@@ -43,6 +43,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_COUNT_BiTS_ABSTRACT_H__
+#endif // DLIB_COUNT_BiTS_ABSTRACT_Hh_
 
 

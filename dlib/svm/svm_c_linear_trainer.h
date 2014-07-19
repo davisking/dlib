@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SVM_C_LiNEAR_TRAINER_H__
-#define DLIB_SVM_C_LiNEAR_TRAINER_H__
+#ifndef DLIB_SVM_C_LiNEAR_TRAINER_Hh_
+#define DLIB_SVM_C_LiNEAR_TRAINER_Hh_
 
 #include "svm_c_linear_trainer_abstract.h"
 #include "../algs.h"
@@ -702,5 +702,5 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
 
-#endif // DLIB_SVM_C_LiNEAR_TRAINER_H__
+#endif // DLIB_SVM_C_LiNEAR_TRAINER_Hh_
 

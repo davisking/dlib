@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_RLS_FiLTER_H__
-#define DLIB_RLS_FiLTER_H__
+#ifndef DLIB_RLS_FiLTER_Hh_
+#define DLIB_RLS_FiLTER_Hh_
 
 #include "rls_filter_abstract.h"
 #include "../svm/rls.h"
@@ -194,5 +194,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_RLS_FiLTER_H__
+#endif // DLIB_RLS_FiLTER_Hh_
 

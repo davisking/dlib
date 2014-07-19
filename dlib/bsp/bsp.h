@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_BsP_H__
-#define DLIB_BsP_H__
+#ifndef DLIB_BsP_Hh_
+#define DLIB_BsP_Hh_
 
 #include "bsp_abstract.h"
 #include "../sockets.h"
@@ -1037,5 +1037,5 @@ namespace dlib
 #include "bsp.cpp"
 #endif
 
-#endif // DLIB_BsP_H__
+#endif // DLIB_BsP_Hh_
 

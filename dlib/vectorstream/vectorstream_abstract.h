@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_VECTORStREAM_ABSTRACT_H__
-#ifdef DLIB_VECTORStREAM_ABSTRACT_H__
+#undef DLIB_VECTORStREAM_ABSTRACT_Hh_
+#ifdef DLIB_VECTORStREAM_ABSTRACT_Hh_
 
 #include <iostream>
 #include <vector>
@@ -57,6 +57,6 @@ namespace dlib
     };
 }
 
-#endif // DLIB_VECTORStREAM_ABSTRACT_H__
+#endif // DLIB_VECTORStREAM_ABSTRACT_Hh_
 
 

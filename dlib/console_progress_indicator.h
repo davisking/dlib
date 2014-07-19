@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_CONSOLE_PROGRESS_INDiCATOR_H__
-#define DLIB_CONSOLE_PROGRESS_INDiCATOR_H__
+#ifndef DLIB_CONSOLE_PROGRESS_INDiCATOR_Hh_
+#define DLIB_CONSOLE_PROGRESS_INDiCATOR_Hh_
 
 #include <ctime>
 #include <cmath>
@@ -198,5 +198,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_CONSOLE_PROGRESS_INDiCATOR_H__
+#endif // DLIB_CONSOLE_PROGRESS_INDiCATOR_Hh_
 

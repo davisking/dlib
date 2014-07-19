@@ -1,7 +1,7 @@
 // Copyright (C) 2009  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_HESSIAN_PYRAMId_ABSTRACT_H__
-#ifdef DLIB_HESSIAN_PYRAMId_ABSTRACT_H__
+#undef DLIB_HESSIAN_PYRAMId_ABSTRACT_Hh_
+#ifdef DLIB_HESSIAN_PYRAMId_ABSTRACT_Hh_
 
 #include "../image_transforms/integral_image_abstract.h"
 #include "../noncopyable.h"
@@ -240,5 +240,5 @@ namespace dlib
 
 }
 
-#endif  // DLIB_HESSIAN_PYRAMId_ABSTRACT_H__
+#endif  // DLIB_HESSIAN_PYRAMId_ABSTRACT_Hh_
 

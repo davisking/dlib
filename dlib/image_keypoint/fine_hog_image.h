@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_FINE_HOG_IMaGE_H__
-#define DLIB_FINE_HOG_IMaGE_H__
+#ifndef DLIB_FINE_HOG_IMaGE_Hh_
+#define DLIB_FINE_HOG_IMaGE_Hh_
 
 #include "fine_hog_image_abstract.h"
 #include "../array2d.h"
@@ -374,5 +374,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_FINE_HOG_IMaGE_H__
+#endif // DLIB_FINE_HOG_IMaGE_Hh_
 

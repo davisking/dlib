@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_DETECTION_TEMPlATE_TOOLS_ABSTRACT_H__
-#ifdef DLIB_DETECTION_TEMPlATE_TOOLS_ABSTRACT_H__
+#undef DLIB_DETECTION_TEMPlATE_TOOLS_ABSTRACT_Hh_
+#ifdef DLIB_DETECTION_TEMPlATE_TOOLS_ABSTRACT_Hh_
 
 #include "../geometry.h"
 #include <utility>
@@ -89,7 +89,7 @@ namespace dlib
 }
 
 
-#endif // DLIB_DETECTION_TEMPlATE_TOOLS_ABSTRACT_H__
+#endif // DLIB_DETECTION_TEMPlATE_TOOLS_ABSTRACT_Hh_
 
 
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_TO_OPEN_Cv_H__
-#define DLIB_TO_OPEN_Cv_H__
+#ifndef DLIB_TO_OPEN_Cv_Hh_
+#define DLIB_TO_OPEN_Cv_Hh_
 
 #include "to_open_cv_abstract.h"
 #include "../pixel.h"
@@ -40,5 +40,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_TO_OPEN_Cv_H__
+#endif // DLIB_TO_OPEN_Cv_Hh_
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_CROSS_VALIDATE_SEQUENCE_sEGMENTER_ABSTRACT_H__
-#ifdef DLIB_CROSS_VALIDATE_SEQUENCE_sEGMENTER_ABSTRACT_H__
+#undef DLIB_CROSS_VALIDATE_SEQUENCE_sEGMENTER_ABSTRACT_Hh_
+#ifdef DLIB_CROSS_VALIDATE_SEQUENCE_sEGMENTER_ABSTRACT_Hh_
 
 #include "sequence_segmenter_abstract.h"
 #include "../matrix.h"
@@ -76,5 +76,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_CROSS_VALIDATE_SEQUENCE_sEGMENTER_ABSTRACT_H__
+#endif // DLIB_CROSS_VALIDATE_SEQUENCE_sEGMENTER_ABSTRACT_Hh_
 

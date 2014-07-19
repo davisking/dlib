@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_CCA_h__
-#define DLIB_CCA_h__
+#ifndef DLIB_CCA_hh_
+#define DLIB_CCA_hh_
 
 #include "cca_abstract.h"
 #include "../algs.h"
@@ -181,6 +181,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_CCA_h__
+#endif // DLIB_CCA_hh_
 
 

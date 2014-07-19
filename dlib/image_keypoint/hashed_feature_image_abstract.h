@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_HASHED_IMAGE_FEATUrES_ABSTRACT_H__
-#ifdef DLIB_HASHED_IMAGE_FEATUrES_ABSTRACT_H__
+#undef DLIB_HASHED_IMAGE_FEATUrES_ABSTRACT_Hh_
+#ifdef DLIB_HASHED_IMAGE_FEATUrES_ABSTRACT_Hh_
 
 #include "../lsh/projection_hash_abstract.h"
 #include <vector>
@@ -297,7 +297,7 @@ namespace dlib
 
 }
 
-#endif // DLIB_HASHED_IMAGE_FEATUrES_ABSTRACT_H__
+#endif // DLIB_HASHED_IMAGE_FEATUrES_ABSTRACT_Hh_
 
 
 

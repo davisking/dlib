@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SETUP_HAShED_FEATURES_H__
-#define DLIB_SETUP_HAShED_FEATURES_H__
+#ifndef DLIB_SETUP_HAShED_FEATURES_Hh_
+#define DLIB_SETUP_HAShED_FEATURES_Hh_
 
 #include "setup_hashed_features_abstract.h"
 #include "scan_image_pyramid.h"
@@ -214,6 +214,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_SETUP_HAShED_FEATURES_H__
+#endif // DLIB_SETUP_HAShED_FEATURES_Hh_
 
 

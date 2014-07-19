@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_FIND_K_NEAREST_NEIGHBOrS_LSH_ABSTRACT_H__
-#ifdef DLIB_FIND_K_NEAREST_NEIGHBOrS_LSH_ABSTRACT_H__
+#undef DLIB_FIND_K_NEAREST_NEIGHBOrS_LSH_ABSTRACT_Hh_
+#ifdef DLIB_FIND_K_NEAREST_NEIGHBOrS_LSH_ABSTRACT_Hh_
 
 #include "../lsh/hashes_abstract.h"
 #include "sample_pair_abstract.h"
@@ -98,5 +98,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_FIND_K_NEAREST_NEIGHBOrS_LSH_ABSTRACT_H__
+#endif // DLIB_FIND_K_NEAREST_NEIGHBOrS_LSH_ABSTRACT_Hh_
 

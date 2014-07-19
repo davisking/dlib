@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_MIN_CuT_ABSTRACT_H__
-#ifdef DLIB_MIN_CuT_ABSTRACT_H__
+#undef DLIB_MIN_CuT_ABSTRACT_Hh_
+#ifdef DLIB_MIN_CuT_ABSTRACT_Hh_
 
 #include "../graph_utils.h"
 
@@ -471,6 +471,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_MIN_CuT_ABSTRACT_H__
+#endif // DLIB_MIN_CuT_ABSTRACT_Hh_
 
 

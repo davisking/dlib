@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_OPTIMIZATION_LEAST_SQuARES_H___
-#define DLIB_OPTIMIZATION_LEAST_SQuARES_H___
+#ifndef DLIB_OPTIMIZATION_LEAST_SQuARES_H_h_
+#define DLIB_OPTIMIZATION_LEAST_SQuARES_H_h_
 
 #include "../matrix.h"
 #include "optimization_trust_region.h"
@@ -340,6 +340,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_OPTIMIZATION_LEAST_SQuARES_H___
+#endif // DLIB_OPTIMIZATION_LEAST_SQuARES_H_h_
 
 

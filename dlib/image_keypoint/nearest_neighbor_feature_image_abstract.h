@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_NEAREST_NEIGHBOR_FeATURE_IMAGE_ABSTRACT_H__
-#ifdef DLIB_NEAREST_NEIGHBOR_FeATURE_IMAGE_ABSTRACT_H__
+#undef DLIB_NEAREST_NEIGHBOR_FeATURE_IMAGE_ABSTRACT_Hh_
+#ifdef DLIB_NEAREST_NEIGHBOR_FeATURE_IMAGE_ABSTRACT_Hh_
 
 #include <vector>
 #include "../algs.h"
@@ -248,7 +248,7 @@ namespace dlib
 
 }
 
-#endif // DLIB_NEAREST_NEIGHBOR_FeATURE_IMAGE_ABSTRACT_H__
+#endif // DLIB_NEAREST_NEIGHBOR_FeATURE_IMAGE_ABSTRACT_Hh_
 
 
 

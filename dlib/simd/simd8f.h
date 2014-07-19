@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_sIMD8F_H__
-#define DLIB_sIMD8F_H__
+#ifndef DLIB_sIMD8F_Hh_
+#define DLIB_sIMD8F_Hh_
 
 #include "simd_check.h"
 #include "simd4f.h"
@@ -392,5 +392,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_sIMD8F_H__
+#endif // DLIB_sIMD8F_Hh_
 

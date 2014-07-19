@@ -1,7 +1,7 @@
 // Copyright (C) 2014  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_CROSS_VALIDATE_TRACK_ASSOCIATION_TrAINER_H__
-#define DLIB_CROSS_VALIDATE_TRACK_ASSOCIATION_TrAINER_H__
+#ifndef DLIB_CROSS_VALIDATE_TRACK_ASSOCIATION_TrAINER_Hh_
+#define DLIB_CROSS_VALIDATE_TRACK_ASSOCIATION_TrAINER_Hh_
 
 #include "cross_validate_track_association_trainer_abstract.h"
 #include "structural_track_association_trainer.h"
@@ -158,6 +158,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_CROSS_VALIDATE_TRACK_ASSOCIATION_TrAINER_H__
+#endif // DLIB_CROSS_VALIDATE_TRACK_ASSOCIATION_TrAINER_Hh_
 
 

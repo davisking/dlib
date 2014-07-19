@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SEGMENT_ImAGE_H__
-#define DLIB_SEGMENT_ImAGE_H__
+#ifndef DLIB_SEGMENT_ImAGE_Hh_
+#define DLIB_SEGMENT_ImAGE_Hh_
 
 #include "segment_image_abstract.h"
 #include "../algs.h"
@@ -729,5 +729,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_SEGMENT_ImAGE_H__
+#endif // DLIB_SEGMENT_ImAGE_Hh_
 

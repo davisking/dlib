@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_BOX_OVERlAP_TESTING_ABSTRACT_H__
-#ifdef DLIB_BOX_OVERlAP_TESTING_ABSTRACT_H__
+#undef DLIB_BOX_OVERlAP_TESTING_ABSTRACT_Hh_
+#ifdef DLIB_BOX_OVERlAP_TESTING_ABSTRACT_Hh_
 
 #include "../geometry.h"
 
@@ -145,6 +145,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_BOX_OVERlAP_TESTING_ABSTRACT_H__
+#endif // DLIB_BOX_OVERlAP_TESTING_ABSTRACT_Hh_
 
 

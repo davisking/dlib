@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SCAN_IMAGE_CuSTOM_H__
-#define DLIB_SCAN_IMAGE_CuSTOM_H__
+#ifndef DLIB_SCAN_IMAGE_CuSTOM_Hh_
+#define DLIB_SCAN_IMAGE_CuSTOM_Hh_
 
 #include "scan_image_custom_abstract.h"
 #include "../matrix.h"
@@ -397,5 +397,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_SCAN_IMAGE_CuSTOM_H__
+#endif // DLIB_SCAN_IMAGE_CuSTOM_Hh_
 

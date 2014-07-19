@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_FFt_ABSTRACT_H__
-#ifdef DLIB_FFt_ABSTRACT_H__
+#undef DLIB_FFt_ABSTRACT_Hh_
+#ifdef DLIB_FFt_ABSTRACT_Hh_
 
 #include "matrix_abstract.h"
 #include "../algs.h"
@@ -73,5 +73,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_FFt_ABSTRACT_H__
+#endif // DLIB_FFt_ABSTRACT_Hh_
 

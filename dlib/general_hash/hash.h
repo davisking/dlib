@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_HAsH_H__ 
-#define DLIB_HAsH_H__ 
+#ifndef DLIB_HAsH_Hh_ 
+#define DLIB_HAsH_Hh_ 
 
 #include "hash_abstract.h"
 #include <vector>
@@ -138,5 +138,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_HAsH_H__
+#endif // DLIB_HAsH_Hh_
 

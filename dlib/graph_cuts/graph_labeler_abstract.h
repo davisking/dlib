@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_GRAPH_LaBELER_ABSTRACT_H__
-#ifdef DLIB_GRAPH_LaBELER_ABSTRACT_H__
+#undef DLIB_GRAPH_LaBELER_ABSTRACT_Hh_
+#ifdef DLIB_GRAPH_LaBELER_ABSTRACT_Hh_
 
 #include "find_max_factor_graph_potts_abstract.h"
 #include "../graph/graph_kernel_abstract.h"
@@ -181,5 +181,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_GRAPH_LaBELER_ABSTRACT_H__
+#endif // DLIB_GRAPH_LaBELER_ABSTRACT_Hh_
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SVm_NU_TRAINER_H__ 
-#define DLIB_SVm_NU_TRAINER_H__
+#ifndef DLIB_SVm_NU_TRAINER_Hh_ 
+#define DLIB_SVm_NU_TRAINER_Hh_
 
 //#include "local/make_label_kernel_matrix.h"
 
@@ -322,5 +322,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_SVm_NU_TRAINER_H__
+#endif // DLIB_SVm_NU_TRAINER_Hh_
 

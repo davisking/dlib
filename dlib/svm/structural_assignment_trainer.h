@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_STRUCTURAL_ASSiGNMENT_TRAINER_H__
-#define DLIB_STRUCTURAL_ASSiGNMENT_TRAINER_H__
+#ifndef DLIB_STRUCTURAL_ASSiGNMENT_TRAINER_Hh_
+#define DLIB_STRUCTURAL_ASSiGNMENT_TRAINER_Hh_
 
 #include "structural_assignment_trainer_abstract.h"
 #include "../algs.h"
@@ -269,7 +269,7 @@ namespace dlib
 
 }
 
-#endif // DLIB_STRUCTURAL_ASSiGNMENT_TRAINER_H__
+#endif // DLIB_STRUCTURAL_ASSiGNMENT_TRAINER_Hh_
 
 
 

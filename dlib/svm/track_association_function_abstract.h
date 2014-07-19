@@ -1,7 +1,7 @@
 // Copyright (C) 2014  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_TRACK_ASSOCiATION_FUNCTION_ABSTRACT_H__
-#ifdef DLIB_TRACK_ASSOCiATION_FUNCTION_ABSTRACT_H__
+#undef DLIB_TRACK_ASSOCiATION_FUNCTION_ABSTRACT_Hh_
+#ifdef DLIB_TRACK_ASSOCiATION_FUNCTION_ABSTRACT_Hh_
 
 #include <vector>
 #include "assignment_function_abstract.h"
@@ -266,6 +266,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_TRACK_ASSOCiATION_FUNCTION_ABSTRACT_H__
+#endif // DLIB_TRACK_ASSOCiATION_FUNCTION_ABSTRACT_Hh_
 
 

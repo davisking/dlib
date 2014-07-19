@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_IMAGE_PYRaMID_ABSTRACT_H__
-#ifdef DLIB_IMAGE_PYRaMID_ABSTRACT_H__
+#undef DLIB_IMAGE_PYRaMID_ABSTRACT_Hh_
+#ifdef DLIB_IMAGE_PYRaMID_ABSTRACT_Hh_
 
 #include "../pixel.h"
 #include "../array2d.h"
@@ -180,6 +180,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_IMAGE_PYRaMID_ABSTRACT_H__
+#endif // DLIB_IMAGE_PYRaMID_ABSTRACT_Hh_
 
 

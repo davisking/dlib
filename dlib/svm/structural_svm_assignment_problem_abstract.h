@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_STRUCTURAL_SVM_ASSiGNMENT_PROBLEM_ABSTRACT_H__
-#ifdef DLIB_STRUCTURAL_SVM_ASSiGNMENT_PROBLEM_ABSTRACT_H__
+#undef DLIB_STRUCTURAL_SVM_ASSiGNMENT_PROBLEM_ABSTRACT_Hh_
+#ifdef DLIB_STRUCTURAL_SVM_ASSiGNMENT_PROBLEM_ABSTRACT_Hh_
 
 
 #include "../matrix.h"
@@ -81,7 +81,7 @@ namespace dlib
 
 }
 
-#endif // DLIB_STRUCTURAL_SVM_ASSiGNMENT_PROBLEM_ABSTRACT_H__
+#endif // DLIB_STRUCTURAL_SVM_ASSiGNMENT_PROBLEM_ABSTRACT_Hh_
 
 
 

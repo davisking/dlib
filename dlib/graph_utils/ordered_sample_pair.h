@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_ORDERED_SAMPLE_PaIR_H__
-#define DLIB_ORDERED_SAMPLE_PaIR_H__
+#ifndef DLIB_ORDERED_SAMPLE_PaIR_Hh_
+#define DLIB_ORDERED_SAMPLE_PaIR_Hh_
 
 #include "ordered_sample_pair_abstract.h"
 #include <limits>
@@ -121,5 +121,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_ORDERED_SAMPLE_PaIR_H__
+#endif // DLIB_ORDERED_SAMPLE_PaIR_Hh_
 

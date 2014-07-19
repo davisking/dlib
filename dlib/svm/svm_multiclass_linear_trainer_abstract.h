@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_SVm_MULTICLASS_LINEAR_TRAINER_ABSTRACT_H__ 
-#ifdef DLIB_SVm_MULTICLASS_LINEAR_TRAINER_ABSTRACT_H__
+#undef DLIB_SVm_MULTICLASS_LINEAR_TRAINER_ABSTRACT_Hh_ 
+#ifdef DLIB_SVm_MULTICLASS_LINEAR_TRAINER_ABSTRACT_Hh_
 
 #include "../matrix/matrix_abstract.h"
 #include "../algs.h"
@@ -253,6 +253,6 @@ namespace dlib
 }
 
 
-#endif // DLIB_SVm_MULTICLASS_LINEAR_TRAINER_ABSTRACT_H__
+#endif // DLIB_SVm_MULTICLASS_LINEAR_TRAINER_ABSTRACT_Hh_
 
 

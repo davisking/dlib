@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_CROSS_VALIDATE_GRAPh_LABELING_TRAINER_H__
-#define DLIB_CROSS_VALIDATE_GRAPh_LABELING_TRAINER_H__
+#ifndef DLIB_CROSS_VALIDATE_GRAPh_LABELING_TRAINER_Hh_
+#define DLIB_CROSS_VALIDATE_GRAPh_LABELING_TRAINER_Hh_
 
 #include "../array.h"
 #include "../graph_cuts/min_cut.h"
@@ -253,6 +253,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_CROSS_VALIDATE_GRAPh_LABELING_TRAINER_H__
+#endif // DLIB_CROSS_VALIDATE_GRAPh_LABELING_TRAINER_Hh_
 
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_GET_OPTiON_H__
-#define DLIB_GET_OPTiON_H__
+#ifndef DLIB_GET_OPTiON_Hh_
+#define DLIB_GET_OPTiON_Hh_
 
 #include "get_option_abstract.h"
 #include "../string.h"
@@ -177,5 +177,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_GET_OPTiON_H__
+#endif // DLIB_GET_OPTiON_Hh_
 

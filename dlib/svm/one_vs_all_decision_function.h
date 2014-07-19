@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_ONE_VS_ALL_DECISION_FUnCTION_H__
-#define DLIB_ONE_VS_ALL_DECISION_FUnCTION_H__
+#ifndef DLIB_ONE_VS_ALL_DECISION_FUnCTION_Hh_
+#define DLIB_ONE_VS_ALL_DECISION_FUnCTION_Hh_
 
 #include "one_vs_all_decision_function_abstract.h"
 
@@ -259,7 +259,7 @@ namespace dlib
 
 }
 
-#endif // DLIB_ONE_VS_ALL_DECISION_FUnCTION_H__
+#endif // DLIB_ONE_VS_ALL_DECISION_FUnCTION_Hh_
 
 
 

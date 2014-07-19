@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_NUM_NONNEGATIVE_WEIGHtS_H__
-#define DLIB_NUM_NONNEGATIVE_WEIGHtS_H__
+#ifndef DLIB_NUM_NONNEGATIVE_WEIGHtS_Hh_
+#define DLIB_NUM_NONNEGATIVE_WEIGHtS_Hh_
 
 #include "../enable_if.h"
 
@@ -72,5 +72,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_NUM_NONNEGATIVE_WEIGHtS_H__
+#endif // DLIB_NUM_NONNEGATIVE_WEIGHtS_Hh_
 

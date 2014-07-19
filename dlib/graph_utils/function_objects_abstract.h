@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_MR_FUNCTION_ObJECTS_ABSTRACT_H__
-#ifdef DLIB_MR_FUNCTION_ObJECTS_ABSTRACT_H__
+#undef DLIB_MR_FUNCTION_ObJECTS_ABSTRACT_Hh_
+#ifdef DLIB_MR_FUNCTION_ObJECTS_ABSTRACT_Hh_
 
 #include "../matrix.h"
 #include <cmath>
@@ -203,7 +203,7 @@ namespace dlib
 
 }
 
-#endif // DLIB_MR_FUNCTION_ObJECTS_ABSTRACT_H__
+#endif // DLIB_MR_FUNCTION_ObJECTS_ABSTRACT_Hh_
 
 
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_IMAGE_DAtASET_METADATA_H__
-#define DLIB_IMAGE_DAtASET_METADATA_H__
+#ifndef DLIB_IMAGE_DAtASET_METADATA_Hh_
+#define DLIB_IMAGE_DAtASET_METADATA_Hh_
 
 #include <string>
 #include <vector>
@@ -148,5 +148,5 @@ namespace dlib
 #include "image_dataset_metadata.cpp"
 #endif
 
-#endif // DLIB_IMAGE_DAtASET_METADATA_H__
+#endif // DLIB_IMAGE_DAtASET_METADATA_Hh_
 

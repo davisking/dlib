@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_AVERAGE_PREcISION_H__
-#define DLIB_AVERAGE_PREcISION_H__
+#ifndef DLIB_AVERAGE_PREcISION_Hh_
+#define DLIB_AVERAGE_PREcISION_Hh_
 
 #include "average_precision_abstract.h"
 #include <vector>
@@ -62,5 +62,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_AVERAGE_PREcISION_H__
+#endif // DLIB_AVERAGE_PREcISION_Hh_
 

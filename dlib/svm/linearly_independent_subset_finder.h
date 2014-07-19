@@ -1,7 +1,7 @@
 // Copyright (C) 2008  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_LISf__
-#define DLIB_LISf__
+#ifndef DLIB_LISfh_
+#define DLIB_LISfh_
 
 #include <vector>
 
@@ -536,5 +536,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_LISf__
+#endif // DLIB_LISfh_
 

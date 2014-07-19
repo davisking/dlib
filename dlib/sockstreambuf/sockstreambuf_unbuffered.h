@@ -1,7 +1,7 @@
 // Copyright (C) 2003  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SOCKSTrEAMBUF_UNBUFFERED_H__
-#define DLIB_SOCKSTrEAMBUF_UNBUFFERED_H__
+#ifndef DLIB_SOCKSTrEAMBUF_UNBUFFERED_Hh_
+#define DLIB_SOCKSTrEAMBUF_UNBUFFERED_Hh_
 
 #include <iosfwd>
 #include <streambuf>
@@ -114,5 +114,5 @@ namespace dlib
 #include "sockstreambuf_unbuffered.cpp"
 #endif
 
-#endif // DLIB_SOCKSTrEAMBUF_UNBUFFERED_H__
+#endif // DLIB_SOCKSTrEAMBUF_UNBUFFERED_Hh_
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_ASSIGNMENT_FuNCTION_ABSTRACT_H__
-#ifdef DLIB_ASSIGNMENT_FuNCTION_ABSTRACT_H__
+#undef DLIB_ASSIGNMENT_FuNCTION_ABSTRACT_Hh_
+#ifdef DLIB_ASSIGNMENT_FuNCTION_ABSTRACT_Hh_
 
 #include <vector>
 #include "../optimization/max_cost_assignment_abstract.h"
@@ -338,5 +338,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_ASSIGNMENT_FuNCTION_ABSTRACT_H__
+#endif // DLIB_ASSIGNMENT_FuNCTION_ABSTRACT_Hh_
 

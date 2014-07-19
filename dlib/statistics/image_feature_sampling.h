@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_IMAGE_FEATURE_SaMPLING_H__
-#define DLIB_IMAGE_FEATURE_SaMPLING_H__
+#ifndef DLIB_IMAGE_FEATURE_SaMPLING_Hh_
+#define DLIB_IMAGE_FEATURE_SaMPLING_Hh_
 
 #include "image_feature_sampling_abstract.h"
 #include "../statistics.h"
@@ -78,5 +78,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_IMAGE_FEATURE_SaMPLING_H__
+#endif // DLIB_IMAGE_FEATURE_SaMPLING_Hh_
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_IMAGE_DAtASET_METADATA_CPP__
-#define DLIB_IMAGE_DAtASET_METADATA_CPP__
+#ifndef DLIB_IMAGE_DAtASET_METADATA_CPPh_
+#define DLIB_IMAGE_DAtASET_METADATA_CPPh_
 
 #include "image_dataset_metadata.h"
 
@@ -382,6 +382,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-#endif // DLIB_IMAGE_DAtASET_METADATA_CPP__
+#endif // DLIB_IMAGE_DAtASET_METADATA_CPPh_
 
 

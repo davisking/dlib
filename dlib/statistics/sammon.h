@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Emanuele Cesena (emanuele.cesena@gmail.com), Davis E. King
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SAMMoN_H__
-#define DLIB_SAMMoN_H__
+#ifndef DLIB_SAMMoN_Hh_
+#define DLIB_SAMMoN_Hh_
 
 #include "sammon_abstract.h"
 #include "../matrix.h"
@@ -265,5 +265,5 @@ namespace dlib
 
 } // namespace dlib
 
-#endif // DLIB_SAMMoN_H__
+#endif // DLIB_SAMMoN_Hh_
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_ACTIVE_LEARnING_ABSTRACT_H__
-#ifdef DLIB_ACTIVE_LEARnING_ABSTRACT_H__
+#undef DLIB_ACTIVE_LEARnING_ABSTRACT_Hh_
+#ifdef DLIB_ACTIVE_LEARnING_ABSTRACT_Hh_
 
 #include "svm_c_linear_dcd_trainer_abstract.h"
 #include <vector>
@@ -70,6 +70,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_ACTIVE_LEARnING_ABSTRACT_H__
+#endif // DLIB_ACTIVE_LEARnING_ABSTRACT_Hh_
 
 

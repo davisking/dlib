@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_STRUCTURAL_OBJECT_DETECTION_TRAiNER_H_ABSTRACT__
-#ifdef DLIB_STRUCTURAL_OBJECT_DETECTION_TRAiNER_H_ABSTRACT__
+#undef DLIB_STRUCTURAL_OBJECT_DETECTION_TRAiNER_H_ABSTRACTh_
+#ifdef DLIB_STRUCTURAL_OBJECT_DETECTION_TRAiNER_H_ABSTRACTh_
 
 #include "structural_svm_object_detection_problem_abstract.h"
 #include "../image_processing/object_detector_abstract.h"
@@ -385,6 +385,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_STRUCTURAL_OBJECT_DETECTION_TRAiNER_H_ABSTRACT__
+#endif // DLIB_STRUCTURAL_OBJECT_DETECTION_TRAiNER_H_ABSTRACTh_
 
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_LINEAR_MANIFOLD_ReGULARIZER_H__
-#define DLIB_LINEAR_MANIFOLD_ReGULARIZER_H__
+#ifndef DLIB_LINEAR_MANIFOLD_ReGULARIZER_Hh_
+#define DLIB_LINEAR_MANIFOLD_ReGULARIZER_Hh_
 
 #include "linear_manifold_regularizer_abstract.h"
 #include <limits>
@@ -324,5 +324,5 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-#endif // DLIB_LINEAR_MANIFOLD_ReGULARIZER_H__
+#endif // DLIB_LINEAR_MANIFOLD_ReGULARIZER_Hh_
 

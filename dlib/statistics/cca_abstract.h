@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_CCA_AbSTRACT_H__
-#ifdef DLIB_CCA_AbSTRACT_H__
+#undef DLIB_CCA_AbSTRACT_Hh_
+#ifdef DLIB_CCA_AbSTRACT_Hh_
 
 #include "../matrix/matrix_la_abstract.h"
 #include "random_subset_selector_abstract.h"
@@ -186,6 +186,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_CCA_AbSTRACT_H__
+#endif // DLIB_CCA_AbSTRACT_Hh_
 
 

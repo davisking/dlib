@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_fHOG_H__
-#define DLIB_fHOG_H__
+#ifndef DLIB_fHOG_Hh_
+#define DLIB_fHOG_Hh_
 
 #include "fhog_abstract.h"
 #include "../matrix.h"
@@ -941,5 +941,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_fHOG_H__
+#endif // DLIB_fHOG_Hh_
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_STRUCTURAL_GRAPH_LABELING_tRAINER_H__
-#define DLIB_STRUCTURAL_GRAPH_LABELING_tRAINER_H__
+#ifndef DLIB_STRUCTURAL_GRAPH_LABELING_tRAINER_Hh_
+#define DLIB_STRUCTURAL_GRAPH_LABELING_tRAINER_Hh_
 
 #include "structural_graph_labeling_trainer_abstract.h"
 #include "../algs.h"
@@ -278,5 +278,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_STRUCTURAL_GRAPH_LABELING_tRAINER_H__
+#endif // DLIB_STRUCTURAL_GRAPH_LABELING_tRAINER_Hh_
 

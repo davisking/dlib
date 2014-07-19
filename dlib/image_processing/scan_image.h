@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SCAN_iMAGE_H__
-#define DLIB_SCAN_iMAGE_H__
+#ifndef DLIB_SCAN_iMAGE_Hh_
+#define DLIB_SCAN_iMAGE_Hh_
 
 #include <vector>
 #include <utility>
@@ -363,6 +363,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_SCAN_iMAGE_H__
+#endif // DLIB_SCAN_iMAGE_Hh_
 
 

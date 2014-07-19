@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_FIND_MAX_FACTOR_GRAPH_PoTTS_H__
-#define DLIB_FIND_MAX_FACTOR_GRAPH_PoTTS_H__
+#ifndef DLIB_FIND_MAX_FACTOR_GRAPH_PoTTS_Hh_
+#define DLIB_FIND_MAX_FACTOR_GRAPH_PoTTS_Hh_
 
 #include "find_max_factor_graph_potts_abstract.h"
 #include "../matrix.h"
@@ -955,5 +955,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_FIND_MAX_FACTOR_GRAPH_PoTTS_H__
+#endif // DLIB_FIND_MAX_FACTOR_GRAPH_PoTTS_Hh_
 

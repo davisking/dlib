@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_RLs_H__
-#define DLIB_RLs_H__
+#ifndef DLIB_RLs_Hh_
+#define DLIB_RLs_Hh_
 
 #include "rls_abstract.h"
 #include "../matrix.h"
@@ -195,5 +195,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_RLs_H__
+#endif // DLIB_RLs_Hh_
 

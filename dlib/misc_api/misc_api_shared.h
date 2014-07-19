@@ -1,7 +1,7 @@
 // Copyright (C) 2014  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_MISC_API_ShARED_H__
-#define DLIB_MISC_API_ShARED_H__
+#ifndef DLIB_MISC_API_ShARED_Hh_
+#define DLIB_MISC_API_ShARED_Hh_
 
 #include <string>
 #include "../noncopyable.h"
@@ -41,5 +41,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_MISC_API_ShARED_H__
+#endif // DLIB_MISC_API_ShARED_Hh_
 

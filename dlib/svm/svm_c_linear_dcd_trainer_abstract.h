@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_SVm_C_LINEAR_DCD_TRAINER_ABSTRACT_H__ 
-#ifdef DLIB_SVm_C_LINEAR_DCD_TRAINER_ABSTRACT_H__
+#undef DLIB_SVm_C_LINEAR_DCD_TRAINER_ABSTRACT_Hh_ 
+#ifdef DLIB_SVm_C_LINEAR_DCD_TRAINER_ABSTRACT_Hh_
 
 #include "function_abstract.h"
 #include "kernel_abstract.h"
@@ -351,5 +351,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_SVm_C_LINEAR_DCD_TRAINER_ABSTRACT_H__
+#endif // DLIB_SVm_C_LINEAR_DCD_TRAINER_ABSTRACT_Hh_
 

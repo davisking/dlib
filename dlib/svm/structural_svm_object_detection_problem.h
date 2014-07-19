@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_STRUCTURAL_SVM_ObJECT_DETECTION_PROBLEM_H__
-#define DLIB_STRUCTURAL_SVM_ObJECT_DETECTION_PROBLEM_H__
+#ifndef DLIB_STRUCTURAL_SVM_ObJECT_DETECTION_PROBLEM_Hh_
+#define DLIB_STRUCTURAL_SVM_ObJECT_DETECTION_PROBLEM_Hh_
 
 #include "structural_svm_object_detection_problem_abstract.h"
 #include "../matrix.h"
@@ -533,6 +533,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_STRUCTURAL_SVM_ObJECT_DETECTION_PROBLEM_H__
+#endif // DLIB_STRUCTURAL_SVM_ObJECT_DETECTION_PROBLEM_Hh_
 
 

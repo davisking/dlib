@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SYMMETRIC_MATRIX_CAcHE_H__
-#define DLIB_SYMMETRIC_MATRIX_CAcHE_H__
+#ifndef DLIB_SYMMETRIC_MATRIX_CAcHE_Hh_
+#define DLIB_SYMMETRIC_MATRIX_CAcHE_Hh_
 
 #include "symmetric_matrix_cache_abstract.h"
 #include <vector>
@@ -460,5 +460,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_SYMMETRIC_MATRIX_CAcHE_H__
+#endif // DLIB_SYMMETRIC_MATRIX_CAcHE_Hh_
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_OPTIMIZATION_TRUST_REGIoN_H__
-#define DLIB_OPTIMIZATION_TRUST_REGIoN_H__
+#ifndef DLIB_OPTIMIZATION_TRUST_REGIoN_Hh_
+#define DLIB_OPTIMIZATION_TRUST_REGIoN_Hh_
 
 #include "../matrix.h"
 #include "optimization_trust_region_abstract.h"
@@ -396,5 +396,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_OPTIMIZATION_TRUST_REGIoN_H__
+#endif // DLIB_OPTIMIZATION_TRUST_REGIoN_Hh_
 

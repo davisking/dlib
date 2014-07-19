@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_FLOAT_DEtAILS_H__
-#define DLIB_FLOAT_DEtAILS_H__
+#ifndef DLIB_FLOAT_DEtAILS_Hh_
+#define DLIB_FLOAT_DEtAILS_Hh_
 
 #include <math.h>
 #include "algs.h"
@@ -175,5 +175,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_FLOAT_DEtAILS_H__
+#endif // DLIB_FLOAT_DEtAILS_Hh_
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2014  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_MATRIX_GENERIC_iMAGE_H__
-#define DLIB_MATRIX_GENERIC_iMAGE_H__
+#ifndef DLIB_MATRIX_GENERIC_iMAGE_Hh_
+#define DLIB_MATRIX_GENERIC_iMAGE_Hh_
 
 #include "matrix.h"
 #include "../image_processing/generic_image.h"
@@ -94,6 +94,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_MATRIX_GENERIC_iMAGE_H__
+#endif // DLIB_MATRIX_GENERIC_iMAGE_Hh_
 
 

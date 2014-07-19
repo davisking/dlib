@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_STRUCTURAL_SVM_PRObLEM_H__
-#define DLIB_STRUCTURAL_SVM_PRObLEM_H__
+#ifndef DLIB_STRUCTURAL_SVM_PRObLEM_Hh_
+#define DLIB_STRUCTURAL_SVM_PRObLEM_Hh_
 
 #include "structural_svm_problem_abstract.h"
 #include "../algs.h"
@@ -618,5 +618,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_STRUCTURAL_SVM_PRObLEM_H__
+#endif // DLIB_STRUCTURAL_SVM_PRObLEM_Hh_
 

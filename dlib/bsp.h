@@ -1,12 +1,12 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_BSP__
-#define DLIB_BSP__ 
+#ifndef DLIB_BSPh_
+#define DLIB_BSPh_ 
 
 
 #include "bsp/bsp.h"
 
-#endif // DLIB_BSP__ 
+#endif // DLIB_BSPh_ 
 
 
 

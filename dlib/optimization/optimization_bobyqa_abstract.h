@@ -1,7 +1,7 @@
 // Copyright (C) 2009  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_OPTIMIZATIOn_BOBYQA_ABSTRACT_H__
-#ifdef DLIB_OPTIMIZATIOn_BOBYQA_ABSTRACT_H__
+#undef DLIB_OPTIMIZATIOn_BOBYQA_ABSTRACT_Hh_
+#ifdef DLIB_OPTIMIZATIOn_BOBYQA_ABSTRACT_Hh_
 
 #include "../matrix.h"
 
@@ -116,5 +116,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_OPTIMIZATIOn_BOBYQA_ABSTRACT_H__
+#endif // DLIB_OPTIMIZATIOn_BOBYQA_ABSTRACT_Hh_
 

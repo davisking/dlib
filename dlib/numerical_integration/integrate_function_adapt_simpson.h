@@ -1,7 +1,7 @@
 // Copyright (C) 2013 Steve Taylor (steve98654@gmail.com)
 // License: Boost Software License  See LICENSE.txt for full license
-#ifndef DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSON__
-#define DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSON__
+#ifndef DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSONh_
+#define DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSONh_
 
 #include "integrate_function_adapt_simpson_abstract.h"
 #include "../assert.h"
@@ -90,4 +90,4 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-#endif // DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSON__
+#endif // DLIB_INTEGRATE_FUNCTION_ADAPT_SIMPSONh_

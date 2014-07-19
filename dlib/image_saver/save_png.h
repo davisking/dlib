@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SAVE_PnG_H__
-#define DLIB_SAVE_PnG_H__
+#ifndef DLIB_SAVE_PnG_Hh_
+#define DLIB_SAVE_PnG_Hh_
 
 #include "save_png_abstract.h"
 #include "image_saver.h"
@@ -158,5 +158,5 @@ namespace dlib
 #include "save_png.cpp"
 #endif
 
-#endif // DLIB_SAVE_PnG_H__
+#endif // DLIB_SAVE_PnG_Hh_
 

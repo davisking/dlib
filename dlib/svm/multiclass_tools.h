@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_MULTICLASS_TOoLS_H__
-#define DLIB_MULTICLASS_TOoLS_H__
+#ifndef DLIB_MULTICLASS_TOoLS_Hh_
+#define DLIB_MULTICLASS_TOoLS_Hh_
 
 #include "multiclass_tools_abstract.h"
 
@@ -63,6 +63,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_MULTICLASS_TOoLS_H__
+#endif // DLIB_MULTICLASS_TOoLS_Hh_
 
 

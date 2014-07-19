@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_RANKING_ToOLS_ABSTRACT_H__
-#ifdef DLIB_RANKING_ToOLS_ABSTRACT_H__
+#undef DLIB_RANKING_ToOLS_ABSTRACT_Hh_
+#ifdef DLIB_RANKING_ToOLS_ABSTRACT_Hh_
 
 
 #include "../algs.h"
@@ -242,6 +242,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_RANKING_ToOLS_ABSTRACT_H__
+#endif // DLIB_RANKING_ToOLS_ABSTRACT_Hh_
 
 

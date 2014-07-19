@@ -1,7 +1,7 @@
 // Copyright (C) 2009  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_HESSIAN_PYRAMId_H__
-#define DLIB_HESSIAN_PYRAMId_H__
+#ifndef DLIB_HESSIAN_PYRAMId_Hh_
+#define DLIB_HESSIAN_PYRAMId_Hh_
 
 #include "hessian_pyramid_abstract.h"
 #include "../algs.h"
@@ -527,5 +527,5 @@ namespace dlib
 
 }
 
-#endif  // DLIB_HESSIAN_PYRAMId_H__
+#endif  // DLIB_HESSIAN_PYRAMId_Hh_
 

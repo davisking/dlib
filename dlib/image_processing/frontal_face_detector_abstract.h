@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_FRONTAL_FACE_DETECTOr_ABSTRACT_H__
-#ifdef DLIB_FRONTAL_FACE_DETECTOr_ABSTRACT_H__
+#undef DLIB_FRONTAL_FACE_DETECTOr_ABSTRACT_Hh_
+#ifdef DLIB_FRONTAL_FACE_DETECTOr_ABSTRACT_Hh_
 
 #include "object_detector_abstract.h"
 #include "scan_fhog_pyramid_abstract.h"
@@ -21,5 +21,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_FRONTAL_FACE_DETECTOr_ABSTRACT_H__
+#endif // DLIB_FRONTAL_FACE_DETECTOr_ABSTRACT_Hh_
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_IOSOCKSTrEAM_H__
-#define DLIB_IOSOCKSTrEAM_H__
+#ifndef DLIB_IOSOCKSTrEAM_Hh_
+#define DLIB_IOSOCKSTrEAM_Hh_
 
 #include "iosockstream_abstract.h"
 
@@ -152,6 +152,6 @@ namespace dlib
 }
 
 
-#endif // DLIB_IOSOCKSTrEAM_H__
+#endif // DLIB_IOSOCKSTrEAM_Hh_
 
 

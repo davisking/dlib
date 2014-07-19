@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_COUNT_BiTS_H__
-#define DLIB_COUNT_BiTS_H__
+#ifndef DLIB_COUNT_BiTS_Hh_
+#define DLIB_COUNT_BiTS_Hh_
 
 #include "../algs.h"
 #include <climits>
@@ -58,5 +58,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_COUNT_BiTS_H__
+#endif // DLIB_COUNT_BiTS_Hh_
 

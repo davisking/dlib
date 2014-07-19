@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_BRIDGe_H__
-#define DLIB_BRIDGe_H__
+#ifndef DLIB_BRIDGe_Hh_
+#define DLIB_BRIDGe_Hh_
 
 #include "bridge_abstract.h"
 #include <string>
@@ -663,5 +663,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_BRIDGe_H__
+#endif // DLIB_BRIDGe_Hh_
 

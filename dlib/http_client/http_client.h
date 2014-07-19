@@ -1,5 +1,5 @@
-#ifndef DLIB__BROWSER_H
-#define DLIB__BROWSER_H
+#ifndef DLIB_BROWSERhH
+#define DLIB_BROWSERhH
 
 
 #include <map>
@@ -97,5 +97,5 @@ namespace dlib
 #include "http_client.cpp"
 #endif
 
-#endif // DLIB__BROWSER_H
+#endif // DLIB_BROWSERhH
 

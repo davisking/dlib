@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_CREATE_IRIS_DAtAFILE_H__
-#define DLIB_CREATE_IRIS_DAtAFILE_H__
+#ifndef DLIB_CREATE_IRIS_DAtAFILE_Hh_
+#define DLIB_CREATE_IRIS_DAtAFILE_Hh_
 
 namespace dlib
 {
@@ -16,4 +16,4 @@ namespace dlib
     !*/
 }
 
-#endif // DLIB_CREATE_IRIS_DAtAFILE_H__
+#endif // DLIB_CREATE_IRIS_DAtAFILE_Hh_

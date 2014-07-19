@@ -1,7 +1,7 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_TIMEr_H__
-#define DLIB_TIMEr_H__
+#ifndef DLIB_TIMEr_Hh_
+#define DLIB_TIMEr_Hh_
 
 #include "../threads.h"
 #include "../algs.h"
@@ -421,6 +421,6 @@ namespace dlib
 #include "timer.cpp"
 #endif
 
-#endif // DLIB_TIMEr_H__
+#endif // DLIB_TIMEr_Hh_
 
 

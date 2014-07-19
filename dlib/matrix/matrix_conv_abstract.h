@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_MATRIx_CONV_ABSTRACT_H__
-#ifdef DLIB_MATRIx_CONV_ABSTRACT_H__
+#undef DLIB_MATRIx_CONV_ABSTRACT_Hh_
+#ifdef DLIB_MATRIx_CONV_ABSTRACT_Hh_
 
 #include "matrix_abstract.h"
 
@@ -136,6 +136,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_MATRIx_CONV_ABSTRACT_H__
+#endif // DLIB_MATRIx_CONV_ABSTRACT_Hh_
 
 

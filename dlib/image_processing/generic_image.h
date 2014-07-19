@@ -1,7 +1,7 @@
 // Copyright (C) 2014  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_GeNERIC_IMAGE_H__
-#define DLIB_GeNERIC_IMAGE_H__
+#ifndef DLIB_GeNERIC_IMAGE_Hh_
+#define DLIB_GeNERIC_IMAGE_Hh_
 
 namespace dlib
 {
@@ -344,5 +344,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_GeNERIC_IMAGE_H__
+#endif // DLIB_GeNERIC_IMAGE_Hh_
 

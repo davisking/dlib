@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_SEQUENCE_SeGMENTER_ABSTRACT_H___
-#ifdef DLIB_SEQUENCE_SeGMENTER_ABSTRACT_H___
+#undef DLIB_SEQUENCE_SeGMENTER_ABSTRACT_H_h_
+#ifdef DLIB_SEQUENCE_SeGMENTER_ABSTRACT_H_h_
 
 #include "../matrix.h"
 #include <vector>
@@ -448,5 +448,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_SEQUENCE_SeGMENTER_ABSTRACT_H___
+#endif // DLIB_SEQUENCE_SeGMENTER_ABSTRACT_H_h_
 

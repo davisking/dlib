@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_ACTIVE_LEARnING_H__
-#define DLIB_ACTIVE_LEARnING_H__
+#ifndef DLIB_ACTIVE_LEARnING_Hh_
+#define DLIB_ACTIVE_LEARnING_Hh_
 
 #include "active_learning_abstract.h"
 
@@ -158,5 +158,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_ACTIVE_LEARnING_H__
+#endif // DLIB_ACTIVE_LEARnING_Hh_
 

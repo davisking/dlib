@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_MAX_COST_ASSIgNMENT_H__
-#define DLIB_MAX_COST_ASSIgNMENT_H__
+#ifndef DLIB_MAX_COST_ASSIgNMENT_Hh_
+#define DLIB_MAX_COST_ASSIgNMENT_Hh_
 
 #include "max_cost_assignment_abstract.h"
 #include "../matrix.h"
@@ -283,6 +283,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_MAX_COST_ASSIgNMENT_H__
+#endif // DLIB_MAX_COST_ASSIgNMENT_Hh_
 
 

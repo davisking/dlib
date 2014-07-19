@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_CREATE_RANDOM_PROJECTION_HAsH_H__
-#define DLIB_CREATE_RANDOM_PROJECTION_HAsH_H__
+#ifndef DLIB_CREATE_RANDOM_PROJECTION_HAsH_Hh_
+#define DLIB_CREATE_RANDOM_PROJECTION_HAsH_Hh_
 
 #include "create_random_projection_hash_abstract.h"
 #include "projection_hash.h"
@@ -228,5 +228,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_CREATE_RANDOM_PROJECTION_HAsH_H__
+#endif // DLIB_CREATE_RANDOM_PROJECTION_HAsH_Hh_
 

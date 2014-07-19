@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_INTERPOlATION__
-#define DLIB_INTERPOlATION__ 
+#ifndef DLIB_INTERPOlATIONh_
+#define DLIB_INTERPOlATIONh_ 
 
 #include "interpolation_abstract.h"
 #include "../pixel.h"
@@ -1566,5 +1566,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_INTERPOlATION__
+#endif // DLIB_INTERPOlATIONh_
 

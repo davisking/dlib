@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_KRR_TRAInER_ABSTRACT_H__
-#ifdef DLIB_KRR_TRAInER_ABSTRACT_H__
+#undef DLIB_KRR_TRAInER_ABSTRACT_Hh_
+#ifdef DLIB_KRR_TRAInER_ABSTRACT_Hh_
 
 #include "../algs.h"
 #include "function_abstract.h"
@@ -318,5 +318,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_KRR_TRAInER_ABSTRACT_H__
+#endif // DLIB_KRR_TRAInER_ABSTRACT_Hh_
 

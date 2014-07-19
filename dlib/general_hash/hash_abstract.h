@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_HAsH_ABSTRACT_H__
-#ifdef DLIB_HAsH_ABSTRACT_H__ 
+#undef DLIB_HAsH_ABSTRACT_Hh_
+#ifdef DLIB_HAsH_ABSTRACT_Hh_ 
 
 #include "murmur_hash3_abstract.h"
 #include <vector>
@@ -177,6 +177,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_HAsH_ABSTRACT_H__
+#endif // DLIB_HAsH_ABSTRACT_Hh_
 
 

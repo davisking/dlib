@@ -1,7 +1,7 @@
 // Copyright (C) 2009 M.J.D. Powell, Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_OPTIMIZATIOn_BOBYQA_H__
-#define DLIB_OPTIMIZATIOn_BOBYQA_H__
+#ifndef DLIB_OPTIMIZATIOn_BOBYQA_Hh_
+#define DLIB_OPTIMIZATIOn_BOBYQA_Hh_
 
 /*
     The code in this file is derived from Powell's BOBYQA Fortran code.
@@ -3418,5 +3418,5 @@ L210:
 
 }
 
-#endif // DLIB_OPTIMIZATIOn_BOBYQA_H__
+#endif // DLIB_OPTIMIZATIOn_BOBYQA_Hh_
 

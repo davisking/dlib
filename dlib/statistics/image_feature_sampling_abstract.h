@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_IMAGE_FEATURE_SaMPLING_ABSTRACT_H__
-#ifdef DLIB_IMAGE_FEATURE_SaMPLING_ABSTRACT_H__
+#undef DLIB_IMAGE_FEATURE_SaMPLING_ABSTRACT_Hh_
+#ifdef DLIB_IMAGE_FEATURE_SaMPLING_ABSTRACT_Hh_
 
 #include "random_subset_selector_abstract.h"
 
@@ -40,6 +40,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_IMAGE_FEATURE_SaMPLING_ABSTRACT_H__
+#endif // DLIB_IMAGE_FEATURE_SaMPLING_ABSTRACT_Hh_
 
 

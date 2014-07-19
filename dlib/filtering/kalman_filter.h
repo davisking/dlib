@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_KALMAN_FiLTER_H__
-#define DLIB_KALMAN_FiLTER_H__
+#ifndef DLIB_KALMAN_FiLTER_Hh_
+#define DLIB_KALMAN_FiLTER_Hh_
 
 #include "kalman_filter_abstract.h"
 #include "../matrix.h"
@@ -156,5 +156,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_KALMAN_FiLTER_H__
+#endif // DLIB_KALMAN_FiLTER_Hh_
 

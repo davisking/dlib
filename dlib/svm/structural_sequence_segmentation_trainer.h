@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_STRUCTURAL_SEQUENCE_sEGMENTATION_TRAINER_H__
-#define DLIB_STRUCTURAL_SEQUENCE_sEGMENTATION_TRAINER_H__
+#ifndef DLIB_STRUCTURAL_SEQUENCE_sEGMENTATION_TRAINER_Hh_
+#define DLIB_STRUCTURAL_SEQUENCE_sEGMENTATION_TRAINER_Hh_
 
 #include "structural_sequence_segmentation_trainer_abstract.h"
 #include "structural_sequence_labeling_trainer.h"
@@ -267,5 +267,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_STRUCTURAL_SEQUENCE_sEGMENTATION_TRAINER_H__
+#endif // DLIB_STRUCTURAL_SEQUENCE_sEGMENTATION_TRAINER_Hh_
 

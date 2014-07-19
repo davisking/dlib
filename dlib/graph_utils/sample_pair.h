@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SAMPLE_PaIR_H__
-#define DLIB_SAMPLE_PaIR_H__
+#ifndef DLIB_SAMPLE_PaIR_Hh_
+#define DLIB_SAMPLE_PaIR_Hh_
 
 #include "sample_pair_abstract.h"
 #include <limits>
@@ -175,5 +175,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_SAMPLE_PaIR_H__
+#endif // DLIB_SAMPLE_PaIR_Hh_
 

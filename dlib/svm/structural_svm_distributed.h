@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_STRUCTURAL_SVM_DISTRIBUTeD_H__
-#define DLIB_STRUCTURAL_SVM_DISTRIBUTeD_H__
+#ifndef DLIB_STRUCTURAL_SVM_DISTRIBUTeD_Hh_
+#define DLIB_STRUCTURAL_SVM_DISTRIBUTeD_Hh_
 
 
 #include "structural_svm_distributed_abstract.h"
@@ -684,5 +684,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_STRUCTURAL_SVM_DISTRIBUTeD_H__
+#endif // DLIB_STRUCTURAL_SVM_DISTRIBUTeD_Hh_
 

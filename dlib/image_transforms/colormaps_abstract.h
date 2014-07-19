@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_RANDOMLY_COlOR_IMAGE_ABSTRACT_H__
-#ifdef DLIB_RANDOMLY_COlOR_IMAGE_ABSTRACT_H__
+#undef DLIB_RANDOMLY_COlOR_IMAGE_ABSTRACT_Hh_
+#ifdef DLIB_RANDOMLY_COlOR_IMAGE_ABSTRACT_Hh_
 
 #include "../hash.h"
 #include "../pixel.h"
@@ -122,6 +122,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_RANDOMLY_COlOR_IMAGE_ABSTRACT_H__
+#endif // DLIB_RANDOMLY_COlOR_IMAGE_ABSTRACT_Hh_
 
 

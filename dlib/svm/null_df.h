@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_NULL_DECISION_FUnCTION_H__
-#define DLIB_NULL_DECISION_FUnCTION_H__
+#ifndef DLIB_NULL_DECISION_FUnCTION_Hh_
+#define DLIB_NULL_DECISION_FUnCTION_Hh_
 
 #include <iostream>
 
@@ -29,5 +29,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_NULL_DECISION_FUnCTION_H__
+#endif // DLIB_NULL_DECISION_FUnCTION_Hh_
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_STRUCTURAL_SVM_PRObLEM_ABSTRACT_H__
-#ifdef DLIB_STRUCTURAL_SVM_PRObLEM_ABSTRACT_H__
+#undef DLIB_STRUCTURAL_SVM_PRObLEM_ABSTRACT_Hh_
+#ifdef DLIB_STRUCTURAL_SVM_PRObLEM_ABSTRACT_Hh_
 
 #include "../optimization/optimization_oca_abstract.h"
 #include "sparse_vector_abstract.h"
@@ -326,6 +326,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_STRUCTURAL_SVM_PRObLEM_ABSTRACT_H__
+#endif // DLIB_STRUCTURAL_SVM_PRObLEM_ABSTRACT_Hh_
 
 

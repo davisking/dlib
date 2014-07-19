@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SEQUENCE_LAbELER_H___
-#define DLIB_SEQUENCE_LAbELER_H___
+#ifndef DLIB_SEQUENCE_LAbELER_H_h_
+#define DLIB_SEQUENCE_LAbELER_H_h_
 
 #include "sequence_labeler_abstract.h"
 #include "../matrix.h"
@@ -335,5 +335,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_SEQUENCE_LAbELER_H___
+#endif // DLIB_SEQUENCE_LAbELER_H_h_
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_MATRIx_READ_FROM_ISTREAM_H___
-#define DLIB_MATRIx_READ_FROM_ISTREAM_H___
+#ifndef DLIB_MATRIx_READ_FROM_ISTREAM_H_h_
+#define DLIB_MATRIx_READ_FROM_ISTREAM_H_h_
 
 #include "matrix.h"
 #include <vector>
@@ -104,5 +104,5 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-#endif // DLIB_MATRIx_READ_FROM_ISTREAM_H___
+#endif // DLIB_MATRIx_READ_FROM_ISTREAM_H_h_
 

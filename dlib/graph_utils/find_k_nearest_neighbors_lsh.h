@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_FIND_K_NEAREST_NEIGHBOrS_LSH_H__
-#define DLIB_FIND_K_NEAREST_NEIGHBOrS_LSH_H__
+#ifndef DLIB_FIND_K_NEAREST_NEIGHBOrS_LSH_Hh_
+#define DLIB_FIND_K_NEAREST_NEIGHBOrS_LSH_Hh_
 
 #include "find_k_nearest_neighbors_lsh_abstract.h"
 #include "../threads.h"
@@ -212,6 +212,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_FIND_K_NEAREST_NEIGHBOrS_LSH_H__
+#endif // DLIB_FIND_K_NEAREST_NEIGHBOrS_LSH_Hh_
 
 

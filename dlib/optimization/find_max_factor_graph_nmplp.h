@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_FIND_MAX_FACTOR_GRAPH_nMPLP_H__
-#define DLIB_FIND_MAX_FACTOR_GRAPH_nMPLP_H__
+#ifndef DLIB_FIND_MAX_FACTOR_GRAPH_nMPLP_Hh_
+#define DLIB_FIND_MAX_FACTOR_GRAPH_nMPLP_Hh_
 
 #include "find_max_factor_graph_nmplp_abstract.h"
 #include <vector>
@@ -333,5 +333,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_FIND_MAX_FACTOR_GRAPH_nMPLP_H__
+#endif // DLIB_FIND_MAX_FACTOR_GRAPH_nMPLP_Hh_
 

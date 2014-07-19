@@ -1,7 +1,7 @@
 // Copyright (C) 2006  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_MATRIx_MAT_H__
-#define DLIB_MATRIx_MAT_H__
+#ifndef DLIB_MATRIx_MAT_Hh_
+#define DLIB_MATRIx_MAT_Hh_
 
 #include "matrix_mat_abstract.h"
 #include "../stl_checked.h"
@@ -612,6 +612,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_MATRIx_MAT_H__
+#endif // DLIB_MATRIx_MAT_Hh_
 
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_CROSS_VALIDATE_OBJECT_DETECTION_TRaINER_H__
-#define DLIB_CROSS_VALIDATE_OBJECT_DETECTION_TRaINER_H__
+#ifndef DLIB_CROSS_VALIDATE_OBJECT_DETECTION_TRaINER_Hh_
+#define DLIB_CROSS_VALIDATE_OBJECT_DETECTION_TRaINER_Hh_
 
 #include "cross_validate_object_detection_trainer_abstract.h"
 #include <vector>
@@ -413,5 +413,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_CROSS_VALIDATE_OBJECT_DETECTION_TRaINER_H__
+#endif // DLIB_CROSS_VALIDATE_OBJECT_DETECTION_TRaINER_Hh_
 

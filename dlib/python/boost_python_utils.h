@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_BOOST_PYTHON_UtILS_H__
-#define DLIB_BOOST_PYTHON_UtILS_H__
+#ifndef DLIB_BOOST_PYTHON_UtILS_Hh_
+#define DLIB_BOOST_PYTHON_UtILS_Hh_
 
 #include <boost/python.hpp>
 #include <vector>
@@ -79,5 +79,5 @@ boost::shared_ptr<T> load_object_from_file (
 // ----------------------------------------------------------------------------------------
 
 
-#endif // DLIB_BOOST_PYTHON_UtILS_H__
+#endif // DLIB_BOOST_PYTHON_UtILS_Hh_
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_FULL_OBJECT_DeTECTION_H__
-#define DLIB_FULL_OBJECT_DeTECTION_H__
+#ifndef DLIB_FULL_OBJECT_DeTECTION_Hh_
+#define DLIB_FULL_OBJECT_DeTECTION_Hh_
 
 #include "../geometry.h"
 #include "full_object_detection_abstract.h"

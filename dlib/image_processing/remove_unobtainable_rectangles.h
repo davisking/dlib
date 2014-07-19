@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_REMOVE_UnOBTAINABLE_RECTANGLES_H__
-#define DLIB_REMOVE_UnOBTAINABLE_RECTANGLES_H__
+#ifndef DLIB_REMOVE_UnOBTAINABLE_RECTANGLES_Hh_
+#define DLIB_REMOVE_UnOBTAINABLE_RECTANGLES_Hh_
 
 #include "remove_unobtainable_rectangles_abstract.h"
 #include "scan_image_pyramid.h"
@@ -312,5 +312,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_REMOVE_UnOBTAINABLE_RECTANGLES_H__
+#endif // DLIB_REMOVE_UnOBTAINABLE_RECTANGLES_Hh_
 

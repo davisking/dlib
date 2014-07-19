@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_PROJECTION_HASh_H__
-#define DLIB_PROJECTION_HASh_H__
+#ifndef DLIB_PROJECTION_HASh_Hh_
+#define DLIB_PROJECTION_HASh_Hh_
 
 #include "projection_hash_abstract.h"
 #include "../matrix.h"
@@ -114,5 +114,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_PROJECTION_HASh_H__
+#endif // DLIB_PROJECTION_HASh_Hh_
 

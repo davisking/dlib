@@ -1,7 +1,7 @@
 // Copyright (C) 2014  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_PYTHON_NuMPY_H__
-#define DLIB_PYTHON_NuMPY_H__
+#ifndef DLIB_PYTHON_NuMPY_Hh_
+#define DLIB_PYTHON_NuMPY_Hh_
 
 #include <boost/python.hpp>
 #include <dlib/error.h>
@@ -114,5 +114,5 @@ void get_numpy_ndarray_parts (
 
 // ----------------------------------------------------------------------------------------
 
-#endif // DLIB_PYTHON_NuMPY_H__
+#endif // DLIB_PYTHON_NuMPY_Hh_
 

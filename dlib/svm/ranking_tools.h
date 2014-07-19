@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_RANKING_ToOLS_H__
-#define DLIB_RANKING_ToOLS_H__
+#ifndef DLIB_RANKING_ToOLS_Hh_
+#define DLIB_RANKING_ToOLS_Hh_
 
 #include "ranking_tools_abstract.h"
 
@@ -444,5 +444,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_RANKING_ToOLS_H__
+#endif // DLIB_RANKING_ToOLS_Hh_
 

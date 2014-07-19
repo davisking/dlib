@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SCAN_IMaGE_PYRAMID_H__
-#define DLIB_SCAN_IMaGE_PYRAMID_H__
+#ifndef DLIB_SCAN_IMaGE_PYRAMID_Hh_
+#define DLIB_SCAN_IMaGE_PYRAMID_Hh_
 
 #include "scan_image_pyramid_abstract.h"
 #include "../matrix.h"
@@ -1096,6 +1096,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_SCAN_IMaGE_PYRAMID_H__
+#endif // DLIB_SCAN_IMaGE_PYRAMID_Hh_
 
 

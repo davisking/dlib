@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_UNORDERED_PAiR_H__
-#define DLIB_UNORDERED_PAiR_H__
+#ifndef DLIB_UNORDERED_PAiR_Hh_
+#define DLIB_UNORDERED_PAiR_Hh_
 
 #include "serialize.h"
 
@@ -172,5 +172,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_UNORDERED_PAiR_H__
+#endif // DLIB_UNORDERED_PAiR_Hh_
 

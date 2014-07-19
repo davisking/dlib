@@ -1,7 +1,7 @@
 // Copyright (C) 2014  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_PYTHON_NuMPY_IMAGE_H__
-#define DLIB_PYTHON_NuMPY_IMAGE_H__
+#ifndef DLIB_PYTHON_NuMPY_IMAGE_Hh_
+#define DLIB_PYTHON_NuMPY_IMAGE_Hh_
 
 #include "numpy.h"
 #include <dlib/pixel.h>
@@ -118,5 +118,5 @@ inline bool is_rgb_python_image (boost::python::object& img)
 
 // ----------------------------------------------------------------------------------------
 
-#endif // DLIB_PYTHON_NuMPY_IMAGE_H__
+#endif // DLIB_PYTHON_NuMPY_IMAGE_Hh_
 

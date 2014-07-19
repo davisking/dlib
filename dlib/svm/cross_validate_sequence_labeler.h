@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_CROSS_VALIDATE_SEQUENCE_LABeLER_H__
-#define DLIB_CROSS_VALIDATE_SEQUENCE_LABeLER_H__
+#ifndef DLIB_CROSS_VALIDATE_SEQUENCE_LABeLER_Hh_
+#define DLIB_CROSS_VALIDATE_SEQUENCE_LABeLER_Hh_
 
 #include "cross_validate_sequence_labeler_abstract.h"
 #include <vector>
@@ -147,6 +147,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_CROSS_VALIDATE_SEQUENCE_LABeLER_H__
+#endif // DLIB_CROSS_VALIDATE_SEQUENCE_LABeLER_Hh_
 
 

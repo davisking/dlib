@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_RANDOM_HAsHING_H__ 
-#define DLIB_RANDOM_HAsHING_H__ 
+#ifndef DLIB_RANDOM_HAsHING_Hh_ 
+#define DLIB_RANDOM_HAsHING_Hh_ 
 
 #include "random_hashing_abstract.h"
 #include "murmur_hash3.h"
@@ -873,5 +873,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_RANDOM_HAsHING_H__
+#endif // DLIB_RANDOM_HAsHING_Hh_
 

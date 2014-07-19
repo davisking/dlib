@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net), Nils Labugt
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_LOAd_IMAGE_H__
-#define DLIB_LOAd_IMAGE_H__
+#ifndef DLIB_LOAd_IMAGE_Hh_
+#define DLIB_LOAd_IMAGE_Hh_
 
 #include "load_image_abstract.h"
 #include "../string.h"
@@ -43,5 +43,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_LOAd_IMAGE_H__ 
+#endif // DLIB_LOAd_IMAGE_Hh_ 
 

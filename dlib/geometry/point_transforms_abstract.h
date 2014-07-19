@@ -1,7 +1,7 @@
 // Copyright (C) 2003  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_POINT_TrANSFORMS_ABSTRACT_H__
-#ifdef DLIB_POINT_TrANSFORMS_ABSTRACT_H__
+#undef DLIB_POINT_TrANSFORMS_ABSTRACT_Hh_
+#ifdef DLIB_POINT_TrANSFORMS_ABSTRACT_Hh_
 
 #include "../matrix/matrix_abstract.h"
 #include "vector_abstract.h"
@@ -365,6 +365,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_POINT_TrANSFORMS_ABSTRACT_H__
+#endif // DLIB_POINT_TrANSFORMS_ABSTRACT_Hh_
 
 

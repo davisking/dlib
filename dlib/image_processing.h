@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_IMAGE_PROCESSInG_H___
-#define DLIB_IMAGE_PROCESSInG_H___ 
+#ifndef DLIB_IMAGE_PROCESSInG_H_h_
+#define DLIB_IMAGE_PROCESSInG_H_h_ 
 
 #include "image_processing/scan_image.h"
 #include "image_processing/scan_image_pyramid.h"
@@ -15,6 +15,6 @@
 #include "image_processing/remove_unobtainable_rectangles.h"
 #include "image_processing/scan_fhog_pyramid.h"
 
-#endif // DLIB_IMAGE_PROCESSInG_H___
+#endif // DLIB_IMAGE_PROCESSInG_H_h_
 
 

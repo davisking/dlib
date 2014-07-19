@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_PARALLEL_FoR_ABSTRACT_H__
-#ifdef DLIB_PARALLEL_FoR_ABSTRACT_H__ 
+#undef DLIB_PARALLEL_FoR_ABSTRACT_Hh_
+#ifdef DLIB_PARALLEL_FoR_ABSTRACT_Hh_ 
 
 #include "thread_pool_extension_abstract.h"
 
@@ -403,6 +403,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_PARALLEL_FoR_ABSTRACT_H__
+#endif // DLIB_PARALLEL_FoR_ABSTRACT_Hh_
 
 

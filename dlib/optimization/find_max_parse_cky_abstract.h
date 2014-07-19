@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_FIND_MAX_PARsE_CKY_ABSTRACT_H__
-#ifdef DLIB_FIND_MAX_PARsE_CKY_ABSTRACT_H__
+#undef DLIB_FIND_MAX_PARsE_CKY_ABSTRACT_Hh_
+#ifdef DLIB_FIND_MAX_PARsE_CKY_ABSTRACT_Hh_
 
 #include <vector>
 #include <string>
@@ -384,5 +384,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_FIND_MAX_PARsE_CKY_ABSTRACT_H__
+#endif // DLIB_FIND_MAX_PARsE_CKY_ABSTRACT_Hh_
 

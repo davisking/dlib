@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_TImING_H__
-#define DLIB_TImING_H__
+#ifndef DLIB_TImING_Hh_
+#define DLIB_TImING_Hh_
 
 #include "misc_api.h"
 #include <cstring>
@@ -191,5 +191,5 @@ namespace dlib
 }
 
 
-#endif // DLIB_TImING_H__
+#endif // DLIB_TImING_Hh_
 

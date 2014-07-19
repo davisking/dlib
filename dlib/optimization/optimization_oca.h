@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_OPTIMIZATIoN_OCA_H__
-#define DLIB_OPTIMIZATIoN_OCA_H__
+#ifndef DLIB_OPTIMIZATIoN_OCA_Hh_
+#define DLIB_OPTIMIZATIoN_OCA_Hh_
 
 #include "optimization_oca_abstract.h"
 
@@ -354,5 +354,5 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-#endif // DLIB_OPTIMIZATIoN_OCA_H__
+#endif // DLIB_OPTIMIZATIoN_OCA_Hh_
 

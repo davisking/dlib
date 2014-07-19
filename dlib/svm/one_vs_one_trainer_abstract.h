@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_ONE_VS_ONE_TRAiNER_ABSTRACT_H__
-#ifdef DLIB_ONE_VS_ONE_TRAiNER_ABSTRACT_H__
+#undef DLIB_ONE_VS_ONE_TRAiNER_ABSTRACT_Hh_
+#ifdef DLIB_ONE_VS_ONE_TRAiNER_ABSTRACT_Hh_
 
 
 #include "one_vs_one_decision_function_abstract.h"
@@ -161,6 +161,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_ONE_VS_ONE_TRAiNER_ABSTRACT_H__
+#endif // DLIB_ONE_VS_ONE_TRAiNER_ABSTRACT_Hh_
 
 

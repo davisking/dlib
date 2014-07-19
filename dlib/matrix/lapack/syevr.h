@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_LAPACk_EVR_H__
-#define DLIB_LAPACk_EVR_H__
+#ifndef DLIB_LAPACk_EVR_Hh_
+#define DLIB_LAPACk_EVR_Hh_
 
 #include "fortran_id.h"
 #include "../matrix.h"
@@ -439,7 +439,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-#endif // DLIB_LAPACk_EVR_H__
+#endif // DLIB_LAPACk_EVR_Hh_
 
 
 

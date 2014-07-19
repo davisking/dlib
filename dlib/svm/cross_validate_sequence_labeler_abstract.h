@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_CROSS_VALIDATE_SEQUENCE_LABeLER_ABSTRACT_H__
-#ifdef DLIB_CROSS_VALIDATE_SEQUENCE_LABeLER_ABSTRACT_H__
+#undef DLIB_CROSS_VALIDATE_SEQUENCE_LABeLER_ABSTRACT_Hh_
+#ifdef DLIB_CROSS_VALIDATE_SEQUENCE_LABeLER_ABSTRACT_Hh_
 
 #include <vector>
 #include "../matrix.h"
@@ -77,7 +77,7 @@ namespace dlib
 
 }
 
-#endif // DLIB_CROSS_VALIDATE_SEQUENCE_LABeLER_ABSTRACT_H__
+#endif // DLIB_CROSS_VALIDATE_SEQUENCE_LABeLER_ABSTRACT_Hh_
 
 
 

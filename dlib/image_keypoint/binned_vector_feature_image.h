@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_BINNED_VECTOR_IMAGE_FEATUrES_H__
-#define DLIB_BINNED_VECTOR_IMAGE_FEATUrES_H__
+#ifndef DLIB_BINNED_VECTOR_IMAGE_FEATUrES_Hh_
+#define DLIB_BINNED_VECTOR_IMAGE_FEATUrES_Hh_
 
 #include "../lsh/projection_hash.h"
 #include "binned_vector_feature_image_abstract.h"
@@ -428,6 +428,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_BINNED_VECTOR_IMAGE_FEATUrES_H__
+#endif // DLIB_BINNED_VECTOR_IMAGE_FEATUrES_Hh_
 
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_OBJECT_DeTECTOR_H__
-#define DLIB_OBJECT_DeTECTOR_H__
+#ifndef DLIB_OBJECT_DeTECTOR_Hh_
+#define DLIB_OBJECT_DeTECTOR_Hh_
 
 #include "object_detector_abstract.h"
 #include "../geometry.h"
@@ -622,6 +622,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_OBJECT_DeTECTOR_H__
+#endif // DLIB_OBJECT_DeTECTOR_Hh_
 
 

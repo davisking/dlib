@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_OPTIMIZATION_SOLVE_QP_UsING_SMO_H__
-#define DLIB_OPTIMIZATION_SOLVE_QP_UsING_SMO_H__
+#ifndef DLIB_OPTIMIZATION_SOLVE_QP_UsING_SMO_Hh_
+#define DLIB_OPTIMIZATION_SOLVE_QP_UsING_SMO_Hh_
 
 #include "optimization_solve_qp_using_smo_abstract.h"
 #include "../matrix.h"
@@ -383,5 +383,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_OPTIMIZATION_SOLVE_QP_UsING_SMO_H__
+#endif // DLIB_OPTIMIZATION_SOLVE_QP_UsING_SMO_Hh_
 

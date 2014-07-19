@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_CHINESE_WHISPErS_ABSTRACT_H__
-#ifdef DLIB_CHINESE_WHISPErS_ABSTRACT_H__
+#undef DLIB_CHINESE_WHISPErS_ABSTRACT_Hh_
+#ifdef DLIB_CHINESE_WHISPErS_ABSTRACT_Hh_
 
 #include <vector>
 #include "../rand.h"
@@ -93,5 +93,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_CHINESE_WHISPErS_ABSTRACT_H__
+#endif // DLIB_CHINESE_WHISPErS_ABSTRACT_Hh_
 

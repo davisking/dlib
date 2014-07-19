@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_SAMPLE_PaIR_ABSTRACT_H__
-#ifdef DLIB_SAMPLE_PaIR_ABSTRACT_H__
+#undef DLIB_SAMPLE_PaIR_ABSTRACT_Hh_
+#ifdef DLIB_SAMPLE_PaIR_ABSTRACT_Hh_
 
 #include <limits>
 #include "../serialize.h"
@@ -187,6 +187,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_SAMPLE_PaIR_ABSTRACT_H__
+#endif // DLIB_SAMPLE_PaIR_ABSTRACT_Hh_
 
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_GENERAL_POTTS_PRoBLEM_H__
-#define DLIB_GENERAL_POTTS_PRoBLEM_H__
+#ifndef DLIB_GENERAL_POTTS_PRoBLEM_Hh_
+#define DLIB_GENERAL_POTTS_PRoBLEM_Hh_
 
 #include "../graph_utils.h"
 #include "min_cut.h"
@@ -94,6 +94,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_GENERAL_POTTS_PRoBLEM_H__
+#endif // DLIB_GENERAL_POTTS_PRoBLEM_Hh_
 
 

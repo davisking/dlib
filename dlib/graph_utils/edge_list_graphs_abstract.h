@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_EDGE_LIST_GrAPHS_ABSTRACT_H__
-#ifdef DLIB_EDGE_LIST_GrAPHS_ABSTRACT_H__
+#undef DLIB_EDGE_LIST_GrAPHS_ABSTRACT_Hh_
+#ifdef DLIB_EDGE_LIST_GrAPHS_ABSTRACT_Hh_
 
 #include <vector>
 #include "../string.h"
@@ -354,5 +354,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_EDGE_LIST_GrAPHS_ABSTRACT_H__
+#endif // DLIB_EDGE_LIST_GrAPHS_ABSTRACT_Hh_
 

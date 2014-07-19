@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_POLY_ImAGE_H__
-#define DLIB_POLY_ImAGE_H__
+#ifndef DLIB_POLY_ImAGE_Hh_
+#define DLIB_POLY_ImAGE_Hh_
 
 #include "poly_image_abstract.h"
 #include "build_separable_poly_filters.h"
@@ -644,6 +644,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_POLY_ImAGE_H__
+#endif // DLIB_POLY_ImAGE_Hh_
 
 

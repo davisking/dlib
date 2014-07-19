@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SVM_C_EKm_TRAINER_H__
-#define DLIB_SVM_C_EKm_TRAINER_H__
+#ifndef DLIB_SVM_C_EKm_TRAINER_Hh_
+#define DLIB_SVM_C_EKm_TRAINER_Hh_
 
 #include "../algs.h"
 #include "function.h"
@@ -630,7 +630,7 @@ namespace dlib
 
 }
 
-#endif // DLIB_SVM_C_EKm_TRAINER_H__
+#endif // DLIB_SVM_C_EKm_TRAINER_Hh_
 
 
 

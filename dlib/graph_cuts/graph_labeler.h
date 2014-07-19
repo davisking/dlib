@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_GRAPH_LaBELER_H__
-#define DLIB_GRAPH_LaBELER_H__
+#ifndef DLIB_GRAPH_LaBELER_Hh_
+#define DLIB_GRAPH_LaBELER_Hh_
 
 #include "graph_labeler_abstract.h"
 #include "../matrix.h"
@@ -206,6 +206,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_GRAPH_LaBELER_H__
+#endif // DLIB_GRAPH_LaBELER_Hh_
 
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_LOAD_IMAGE_DaTASET_ABSTRACT_H__
-#ifdef DLIB_LOAD_IMAGE_DaTASET_ABSTRACT_H__
+#undef DLIB_LOAD_IMAGE_DaTASET_ABSTRACT_Hh_
+#ifdef DLIB_LOAD_IMAGE_DaTASET_ABSTRACT_Hh_
 
 #include "image_dataset_metadata.h"
 #include "../array/array_kernel_abstract.h"
@@ -280,6 +280,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_LOAD_IMAGE_DaTASET_ABSTRACT_H__
+#endif // DLIB_LOAD_IMAGE_DaTASET_ABSTRACT_Hh_
 
 

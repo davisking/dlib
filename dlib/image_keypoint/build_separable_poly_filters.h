@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_BUILD_SEPARABLE_PoLY_FILTERS_H__
-#define DLIB_BUILD_SEPARABLE_PoLY_FILTERS_H__
+#ifndef DLIB_BUILD_SEPARABLE_PoLY_FILTERS_Hh_
+#define DLIB_BUILD_SEPARABLE_PoLY_FILTERS_Hh_
 
 #include "../matrix.h"
 #include "surf.h"
@@ -182,5 +182,5 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-#endif // DLIB_BUILD_SEPARABLE_PoLY_FILTERS_H__
+#endif // DLIB_BUILD_SEPARABLE_PoLY_FILTERS_Hh_
 

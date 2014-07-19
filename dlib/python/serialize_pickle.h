@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SERIALIZE_PiCKLE_H__
-#define DLIB_SERIALIZE_PiCKLE_H__
+#ifndef DLIB_SERIALIZE_PiCKLE_Hh_
+#define DLIB_SERIALIZE_PiCKLE_Hh_
 
 #include <dlib/serialize.h>
 #include <boost/python.hpp>
@@ -43,5 +43,5 @@ struct serialize_pickle : boost::python::pickle_suite
     }
 };
 
-#endif // DLIB_SERIALIZE_PiCKLE_H__
+#endif // DLIB_SERIALIZE_PiCKLE_Hh_
 

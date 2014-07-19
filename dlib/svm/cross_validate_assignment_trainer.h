@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_CROSS_VALIDATE_ASSiGNEMNT_TRAINER_H__
-#define DLIB_CROSS_VALIDATE_ASSiGNEMNT_TRAINER_H__
+#ifndef DLIB_CROSS_VALIDATE_ASSiGNEMNT_TRAINER_Hh_
+#define DLIB_CROSS_VALIDATE_ASSiGNEMNT_TRAINER_Hh_
 
 #include "cross_validate_assignment_trainer_abstract.h"
 #include <vector>
@@ -177,5 +177,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_CROSS_VALIDATE_ASSiGNEMNT_TRAINER_H__
+#endif // DLIB_CROSS_VALIDATE_ASSiGNEMNT_TRAINER_Hh_
 

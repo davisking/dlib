@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_SVR_LINEAR_TrAINER_ABSTRACT_H__
-#ifdef DLIB_SVR_LINEAR_TrAINER_ABSTRACT_H__
+#undef DLIB_SVR_LINEAR_TrAINER_ABSTRACT_Hh_
+#ifdef DLIB_SVR_LINEAR_TrAINER_ABSTRACT_Hh_
 
 #include "sparse_vector_abstract.h"
 #include "function_abstract.h"
@@ -264,6 +264,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_SVR_LINEAR_TrAINER_ABSTRACT_H__
+#endif // DLIB_SVR_LINEAR_TrAINER_ABSTRACT_Hh_
 
 

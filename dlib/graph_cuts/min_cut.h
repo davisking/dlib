@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_MIN_CuT_H__
-#define DLIB_MIN_CuT_H__
+#ifndef DLIB_MIN_CuT_Hh_
+#define DLIB_MIN_CuT_Hh_
 
 #include "min_cut_abstract.h"
 #include "../matrix.h"
@@ -567,5 +567,5 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-#endif // DLIB_MIN_CuT_H__
+#endif // DLIB_MIN_CuT_Hh_
 

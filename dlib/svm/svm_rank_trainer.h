@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SVM_RANK_TrAINER_H__
-#define DLIB_SVM_RANK_TrAINER_H__
+#ifndef DLIB_SVM_RANK_TrAINER_Hh_
+#define DLIB_SVM_RANK_TrAINER_Hh_
 
 #include "svm_rank_trainer_abstract.h"
 
@@ -491,5 +491,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_SVM_RANK_TrAINER_H__
+#endif // DLIB_SVM_RANK_TrAINER_Hh_
 

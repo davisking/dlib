@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SAVE_PnG_CPP__
-#define DLIB_SAVE_PnG_CPP__
+#ifndef DLIB_SAVE_PnG_CPPh_
+#define DLIB_SAVE_PnG_CPPh_
 
 // only do anything with this file if DLIB_PNG_SUPPORT is defined
 #ifdef DLIB_PNG_SUPPORT
@@ -119,6 +119,6 @@ namespace dlib
 
 #endif // DLIB_PNG_SUPPORT
 
-#endif // DLIB_SAVE_PnG_CPP__
+#endif // DLIB_SAVE_PnG_CPPh_
 
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_VECTOR_NORMALIZER_FRoBMETRIC_H__
-#define DLIB_VECTOR_NORMALIZER_FRoBMETRIC_H__
+#ifndef DLIB_VECTOR_NORMALIZER_FRoBMETRIC_Hh_
+#define DLIB_VECTOR_NORMALIZER_FRoBMETRIC_Hh_
 
 #include "vector_normalizer_frobmetric_abstract.h"
 #include "../matrix.h"
@@ -563,5 +563,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_VECTOR_NORMALIZER_FRoBMETRIC_H__
+#endif // DLIB_VECTOR_NORMALIZER_FRoBMETRIC_Hh_
 
