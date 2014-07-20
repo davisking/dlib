@@ -449,11 +449,12 @@ load_image_and_set_size(
 	if (needed_width < 300) needed_width = 300;
 	if (needed_height < 300) needed_height = 300;
 
-    if (needed_width+50 < screen_width &&
-        needed_height+50 < screen_height)
-    {
-        set_size(needed_width, needed_height);
-    }
+    if (needed_width > 100 + screen_width)
+        needed_width = screen_width - 100;
+    if (needed_height > 100 + screen_height)
+        needed_height = screen_height - 100;
+
+    set_size(needed_width, needed_height);
 
 
     display.set_image(img);
