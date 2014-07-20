@@ -9,7 +9,7 @@ namespace dlib
     /*!
         In dlib, an "image" is any object that implements the generic image interface.  In
         particular, this simply means that an image type (let's refer to it as image_type
-        from here on) implements the following seven global functions:
+        from here on) has the following seven global functions defined for it:
             - long        num_rows      (const image_type& img)
             - long        num_columns   (const image_type& img)
             - void        set_image_size(      image_type& img, long rows, long cols)
