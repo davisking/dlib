@@ -1286,6 +1286,18 @@
          <term file="imaging.html" name="interest_point"          include="dlib/image_keypoint.h"/>
          <term file="imaging.html" name="surf_point"              include="dlib/image_keypoint.h"/>
 
+         <term link="dlib/image_processing/generic_image.h.html" name="Generic image interface"/>
+         <term link="dlib/image_processing/generic_image.h.html" name="num_rows"          include="dlib/image_processing.h"/>
+         <term link="dlib/image_processing/generic_image.h.html" name="num_columns"       include="dlib/image_processing.h"/>
+         <term link="dlib/image_processing/generic_image.h.html" name="set_image_size"    include="dlib/image_processing.h"/>
+         <term link="dlib/image_processing/generic_image.h.html" name="image_size"        include="dlib/image_processing.h"/>
+         <term link="dlib/image_processing/generic_image.h.html" name="image_data"        include="dlib/image_processing.h"/>
+         <term link="dlib/image_processing/generic_image.h.html" name="width_step"        include="dlib/image_processing.h"/>
+         <term file="dlib/image_processing/generic_image.h.html" name="image_traits"      include="dlib/image_processing.h"/>
+         <term file="dlib/image_processing/generic_image.h.html" name="image_view"        include="dlib/image_processing.h"/>
+         <term file="dlib/image_processing/generic_image.h.html" name="const_image_view"  include="dlib/image_processing.h"/>
+         <term file="dlib/image_processing/generic_image.h.html" name="make_image_view"   include="dlib/image_processing.h"/>
+
          <term file="dlib/image_processing/box_overlap_testing_abstract.h.html" name="overlaps_any_box"        include="dlib/image_processing.h"/>
          <term file="imaging.html" name="test_box_overlap"        include="dlib/image_processing.h"/>
          <term file="imaging.html" name="remove_unobtainable_rectangles"        include="dlib/image_processing.h"/>

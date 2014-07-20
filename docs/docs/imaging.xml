@@ -13,8 +13,10 @@
             This page documents the functionality present in this library that deals with the
             management and manipulation of images.  One thing to note is that there is no 
             explicit image object.  Instead, everything deals with <a href="containers.html#array2d">
-            array2d</a> objects that contain various kinds of pixels.  
+            array2d</a> objects that contain various kinds of pixels or user defined <a href="dlib/image_processing/generic_image.h.html">
+            generic image</a> objects.  
          </p>
+
 
          <p>
             <h2>Pixel Types</h2>
@@ -41,9 +43,15 @@
                   <ul>Any built in scalar type may be used as a grayscale pixel type.  For example, unsigned char, int, double, etc.</ul>
                </li>
             </ul>
-
-
          </p>
+
+         <p>
+            <h2>Object Detection</h2>
+            If you want to create object detectors then try the 
+            <a href="#scan_fhog_pyramid">scan_fhog_pyramid</a> tool first.  It is quite
+            easy to use and train and will, in many cases, give excellent results.
+         </p>
+
    </body>
 
    <!-- ************************************************************************* -->
