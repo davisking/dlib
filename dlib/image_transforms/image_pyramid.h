@@ -124,7 +124,19 @@ namespace dlib
             COMPILE_TIME_ASSERT( pixel_traits<in_pixel_type>::has_alpha == false );
             COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::has_alpha == false );
 
-            down.clear();
+            set_image_size(down, 0, 0);
+        }
+
+        template <
+            typename image_type
+            >
+        void operator() (
+            image_type& img
+        ) const
+        {
+            typedef typename image_traits<image_type>::pixel_type pixel_type;
+            COMPILE_TIME_ASSERT( pixel_traits<pixel_type>::has_alpha == false );
+            set_image_size(img, 0, 0);
         }
     };
 
@@ -452,6 +464,18 @@ namespace dlib
                     ++dr;
                 }
 
+            }
+
+            template <
+                typename image_type
+                >
+            void operator() (
+                image_type& img
+            ) const
+            {
+                image_type temp;
+                (*this)(img, temp);
+                swap(temp, img);
             }
 
         private:
@@ -788,6 +812,17 @@ namespace dlib
                 }
             }
 
+            template <
+                typename image_type
+                >
+            void operator() (
+                image_type& img
+            ) const
+            {
+                image_type temp;
+                (*this)(img, temp);
+                swap(temp, img);
+            }
         private:
 
 
@@ -910,6 +945,18 @@ namespace dlib
 
             set_image_size(down, ((N-1)*num_rows(original))/N, ((N-1)*num_columns(original))/N);
             resize_image(original, down);
+        }
+
+        template <
+            typename image_type
+            >
+        void operator() (
+            image_type& img
+        ) const
+        {
+            image_type temp;
+            (*this)(img, temp);
+            swap(temp, img);
         }
     };
 

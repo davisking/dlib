@@ -64,6 +64,24 @@ namespace dlib
                   points outside the #down image.  
         !*/
 
+        template <
+            typename image_type
+            >
+        void operator() (
+            image_type& img
+        ) const;
+        /*!
+            requires
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+                - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false
+            ensures
+                - This function downsamples the given image and stores the results in #img.
+                  In particular, it is equivalent to performing: 
+                    (*this)(img, temp); 
+                    swap(img, temp);
+        !*/
+
     // -------------------------------
 
         template <typename T>
