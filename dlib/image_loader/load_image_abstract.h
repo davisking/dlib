@@ -5,6 +5,7 @@
 
 #include "load_image_abstract.h"
 #include "../string.h"
+#include "../image_processing/generic_image.h"
 
 namespace dlib
 {

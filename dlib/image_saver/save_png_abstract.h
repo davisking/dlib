@@ -4,6 +4,7 @@
 #ifdef DLIB_SAVE_PnG_ABSTRACT_
 
 #include "../pixel.h"
+#include "../image_processing/generic_image.h"
 
 namespace dlib
 {

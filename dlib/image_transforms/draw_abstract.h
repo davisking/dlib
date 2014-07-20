@@ -4,6 +4,7 @@
 #ifdef DLIB_DRAW_IMAGe_ABSTRACT
 
 #include "../matrix.h"
+#include "../image_processing/generic_image.h"
 
 namespace dlib
 {

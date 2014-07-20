@@ -5,6 +5,7 @@
 
 #include "../pixel.h"
 #include "thresholding_abstract.h"
+#include "../image_processing/generic_image.h"
 
 namespace dlib
 {

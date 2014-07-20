@@ -6,6 +6,7 @@
 #include "../pixel.h"
 #include "../array2d.h"
 #include "../geometry.h"
+#include "../image_processing/generic_image.h"
 
 namespace dlib
 {

@@ -6,6 +6,7 @@
 #include "../hash.h"
 #include "../pixel.h"
 #include "../matrix.h"
+#include "../image_processing/generic_image.h"
 
 namespace dlib
 {

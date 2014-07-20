@@ -7,6 +7,7 @@
 #include "../matrix.h"
 #include "../geometry/rectangle_abstract.h"
 #include <cmath>
+#include "../image_processing/generic_image.h"
 
 namespace dlib
 {

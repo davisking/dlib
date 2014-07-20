@@ -5,6 +5,7 @@
 
 #include <vector>
 #include "../matrix.h"
+#include "../image_processing/generic_image.h"
 
 namespace dlib
 {

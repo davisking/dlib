@@ -7,6 +7,7 @@
 #include "../array2d/array2d_kernel_abstract.h"
 #include "../pixel.h"
 #include "../noncopyable.h"
+#include "../image_processing/generic_image.h"
 
 namespace dlib
 {

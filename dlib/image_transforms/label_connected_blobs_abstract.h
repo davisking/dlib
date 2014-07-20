@@ -5,6 +5,7 @@
 
 #include "../geometry.h"
 #include <vector>
+#include "../image_processing/generic_image.h"
 
 namespace dlib
 {

@@ -6,6 +6,7 @@
 #include <vector>
 #include <utility>
 #include "../algs.h"
+#include "../image_processing/generic_image.h"
 
 namespace dlib
 {

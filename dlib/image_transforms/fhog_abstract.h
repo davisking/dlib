@@ -6,6 +6,7 @@
 #include "../matrix/matrix_abstract.h"
 #include "../array2d/array2d_kernel_abstract.h"
 #include "../array/array_kernel_abstract.h"
+#include "../image_processing/generic_image.h"
 
 namespace dlib
 {

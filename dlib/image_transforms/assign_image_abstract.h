@@ -4,6 +4,7 @@
 #ifdef DLIB_ASSIGN_IMAGe_ABSTRACT
 
 #include "../pixel.h"
+#include "../image_processing/generic_image.h"
 
 namespace dlib
 {

@@ -6,6 +6,7 @@
 #include <iosfwd>
 #include "../algs.h"
 #include "../pixel.h"
+#include "../image_processing/generic_image.h"
 
 namespace dlib
 {

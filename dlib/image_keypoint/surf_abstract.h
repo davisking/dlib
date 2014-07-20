@@ -6,6 +6,7 @@
 #include "hessian_pyramid_abstract.h"
 #include "../geometry/vector_abstract.h"
 #include "../matrix/matrix_abstract.h"
+#include "../image_processing/generic_image.h"
 
 namespace dlib
 {

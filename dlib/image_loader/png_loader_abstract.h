@@ -7,6 +7,7 @@
 #include "../algs.h"
 #include "../pixel.h"
 #include "../dir_nav.h"
+#include "../image_processing/generic_image.h"
 
 namespace dlib
 {
