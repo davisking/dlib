@@ -29,6 +29,12 @@ namespace dlib
             return *this;
         }
 
+        inline simd4f& operator=(const float& val)
+        {
+            x = simd4f(val);
+            return *this;
+        }
+
         inline simd4f& operator=(const __m128& val)
         {
             x = val;
@@ -97,6 +103,12 @@ namespace dlib
             temp.a[2] = (int32)x[2];
             temp.a[3] = (int32)x[3];
             return temp;
+        }
+
+        inline simd4f& operator=(const float& val)
+        {
+            *this = simd4f(val);
+            return *this;
         }
 
         inline simd4f& operator=(const simd4i& val)
