@@ -1102,6 +1102,27 @@ namespace
             DLIB_TEST(m == m2);
         }
 
+        {
+            print_spinner();
+            matrix<double,1,1> m1;
+            matrix<double,2,2> m2;
+            matrix<double,3,3> m3;
+            matrix<double,4,4> m4;
+
+            dlib::rand rnd;
+            for (int i = 0; i < 50; ++i)
+            {
+                m1 = randm(1,1,rnd);
+                m2 = randm(2,2,rnd);
+                m3 = randm(3,3,rnd);
+                m4 = randm(4,4,rnd);
+
+                DLIB_TEST(max(abs(m1*inv(m1) - identity_matrix(m1))) < 1e-13);
+                DLIB_TEST(max(abs(m2*inv(m2) - identity_matrix(m2))) < 1e-13);
+                DLIB_TEST(max(abs(m3*inv(m3) - identity_matrix(m3))) < 1e-13);
+                DLIB_TEST(max(abs(m4*inv(m4) - identity_matrix(m4))) < 1e-13);
+            }
+        }
 
     }
 
