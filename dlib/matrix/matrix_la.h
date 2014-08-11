@@ -1541,16 +1541,21 @@ convergence:
         COMPILE_TIME_ASSERT(wX == 0 || wX == 1);
 
 #ifdef DLIB_USE_LAPACK
-        matrix<typename matrix_exp<EXP>::type, uNR, uNC,MM1,L1> temp(m);
-        lapack::gesvd('S','A', temp, w, u, v);
-        v = trans(v);
-        // if u isn't the size we want then pad it (and v) with zeros
-        if (u.nc() < m.nc())
+        // use LAPACK but only if it isn't a really small matrix we are taking the SVD of.
+        if (NR*NC == 0 || NR*NC > 3*3)
         {
-            w = join_cols(w, zeros_matrix<T>(m.nc()-u.nc(),1));
-            u = join_rows(u, zeros_matrix<T>(u.nr(), m.nc()-u.nc()));
+            matrix<typename matrix_exp<EXP>::type, uNR, uNC,MM1,L1> temp(m);
+            lapack::gesvd('S','A', temp, w, u, v);
+            v = trans(v);
+            // if u isn't the size we want then pad it (and v) with zeros
+            if (u.nc() < m.nc())
+            {
+                w = join_cols(w, zeros_matrix<T>(m.nc()-u.nc(),1));
+                u = join_rows(u, zeros_matrix<T>(u.nr(), m.nc()-u.nc()));
+            }
+            return;
         }
-#else
+#endif
         v.set_size(m.nc(),m.nc());
 
         u = m;
@@ -1558,7 +1563,6 @@ convergence:
         w.set_size(m.nc(),1);
         matrix<T,matrix_exp<EXP>::NC,1,MM1> rv1(m.nc(),1);
         nric::svdcmp(u,w,v,rv1);
-#endif
     }
 
 // ----------------------------------------------------------------------------------------
