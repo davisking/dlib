@@ -220,6 +220,39 @@ string print_simple_test_results(const simple_test_results& r)
     return sout.str();
 }
 
+inline void train_simple_object_detector_on_images_py (
+    const object& pyimages,
+    const object& pyboxes,
+    const std::string& detector_output_filename,
+    const simple_object_detector_training_options& options 
+)
+{
+    const unsigned long num_images = len(pyimages);
+    if (num_images != len(pyboxes))
+        throw dlib::error("The length of the boxes list must match the length of the images list.");
+
+    // We never have any ignore boxes for this version of the API.
+    std::vector<std::vector<rectangle> > ignore(num_images), boxes(num_images);
+    dlib::array<array2d<rgb_pixel> > images(num_images);
+    // Now copy the data into dlib based objects so we can call the trainer.
+    for (unsigned long i = 0; i < num_images; ++i)
+    {
+        const unsigned long num_boxes = len(pyboxes[i]);
+        for (unsigned long j = 0; j < num_boxes; ++j)
+            boxes[i].push_back(extract<rectangle>(pyboxes[i][j]));
+
+        object img = pyimages[i];
+        if (is_gray_python_image(img))
+            assign_image(images[i], numpy_gray_image(img));
+        else if (is_rgb_python_image(img))
+            assign_image(images[i], numpy_rgb_image(img));
+        else
+            throw dlib::error("Unsupported image type, must be 8bit gray or RGB image.");
+    }
+
+    train_simple_object_detector_on_images("", images, boxes, ignore, detector_output_filename, options);
+}
+
 // ----------------------------------------------------------------------------------------
 
 void bind_object_detection()
@@ -332,6 +365,39 @@ ensures \n\
               simple_object_detector based on the labeled images in the XML file
               dataset_filename.  This function assumes the file dataset_filename is in the
               XML format produced by dlib's save_image_dataset_metadata() routine.
+            - This function will apply a reasonable set of default parameters and
+              preprocessing techniques to the training procedure for simple_object_detector
+              objects.  So the point of this function is to provide you with a very easy
+              way to train a basic object detector.  
+            - The trained object detector is serialized to the file detector_output_filename.
+    !*/
+        );
+
+    def("train_simple_object_detector", train_simple_object_detector_on_images_py,
+        (arg("images"), arg("boxes"), arg("detector_output_filename"), arg("options")),
+"requires \n\
+    - options.C > 0 \n\
+    - len(images) == len(boxes) \n\
+    - images should be a list of numpy matrices that represent images, either RGB or grayscale. \n\
+    - boxes should be a list of lists of dlib.rectangle object. \n\
+ensures \n\
+    - Uses the structural_object_detection_trainer to train a \n\
+      simple_object_detector based on the labeled images and bounding boxes.  \n\
+    - This function will apply a reasonable set of default parameters and \n\
+      preprocessing techniques to the training procedure for simple_object_detector \n\
+      objects.  So the point of this function is to provide you with a very easy \n\
+      way to train a basic object detector.   \n\
+    - The trained object detector is serialized to the file detector_output_filename." 
+    /*!
+        requires
+            - options.C > 0
+            - len(images) == len(boxes)
+            - images should be a list of numpy matrices that represent images, either RGB or grayscale.
+            - boxes should be a dlib.rectangles object (i.e. an array of rectangles).
+            - boxes should be a list of lists of dlib.rectangle object.
+        ensures
+            - Uses the structural_object_detection_trainer to train a
+              simple_object_detector based on the labeled images and bounding boxes. 
             - This function will apply a reasonable set of default parameters and
               preprocessing techniques to the training procedure for simple_object_detector
               objects.  So the point of this function is to provide you with a very easy
