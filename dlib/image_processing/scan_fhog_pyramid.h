@@ -814,7 +814,9 @@ namespace dlib
         {
             for (unsigned long i = 0; i < rects.size(); ++i)
             {
-                if (tester(rects[i].rect, rect.rect))
+                // Only compare detections from the same detector.  That is, we don't want
+                // the output of one detector to stop on the output of another detector. 
+                if (rects[i].weight_index == rect.weight_index && tester(rects[i].rect, rect.rect))
                     return true;
             }
             return false;

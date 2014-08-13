@@ -11,6 +11,7 @@
 #include <dlib/pixel.h>
 #include <dlib/svm_threaded.h>
 #include <dlib/array.h>
+#include <dlib/set_utils.h>
 #include <dlib/array2d.h>
 #include <dlib/image_keypoint.h>
 #include <dlib/image_processing.h>
@@ -414,11 +415,20 @@ namespace
             std::vector<rectangle> dets1 = evaluate_detectors(detectors, images[0]);
             std::vector<rectangle> dets2 = detector(images[0]);
             DLIB_TEST(dets1.size() > 0);
-            DLIB_TEST(dets2.size() == dets1.size());
+            DLIB_TEST(dets2.size()*3 == dets1.size());
+            dlib::set<rectangle>::kernel_1a_c d1, d2;
             for (unsigned long i = 0; i < dets1.size(); ++i)
             {
-                DLIB_TEST(dets1[i] == dets2[i]);
+                if (!d1.is_member(dets1[i]))
+                    d1.add(dets1[i]);
             }
+            for (unsigned long i = 0; i < dets2.size(); ++i)
+            {
+                if (!d2.is_member(dets2[i]))
+                    d2.add(dets2[i]);
+            }
+            DLIB_TEST(d1.size() == d2.size());
+            DLIB_TEST(set_intersection_size(d1,d2) == d1.size());
         }
     }
 

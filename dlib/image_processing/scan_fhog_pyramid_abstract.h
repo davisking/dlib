@@ -723,8 +723,9 @@ namespace dlib
               the same cell_size parameter that determines how HOG features are computed.
               If different cell_size values are used then this function will not be any
               faster than running the detectors individually.
-            - This function applies non-max suppression to the outputs from all detectors
-              and therefore none of the outputs will overlap with each other.
+            - This function applies non-max suppression individually to the output of each
+              detector.  Therefore, the output is the same as if you ran each detector
+              individually and then concatenated the results. 
             - To be precise, this function performs object detection on the given image and
               stores the detected objects into #dets.  In particular, we will have that:
                 - #dets is sorted such that the highest confidence detections come first.
