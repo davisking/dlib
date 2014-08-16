@@ -236,6 +236,71 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
+    point_transform_affine find_similarity_transform (
+        const std::vector<dlib::vector<T,2> >& from_points,
+        const std::vector<dlib::vector<T,2> >& to_points
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(from_points.size() == to_points.size() &&
+                    from_points.size() >= 2,
+            "\t point_transform_affine find_similarity_transform(from_points, to_points)"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t from_points.size(): " << from_points.size()
+            << "\n\t to_points.size():   " << to_points.size()
+            );
+
+        // We use the formulas from the paper: Least-squares estimation of transformation
+        // parameters between two point patterns by Umeyama.  They are equations 34 through
+        // 42.
+
+        dlib::vector<double,2> mean_from, mean_to;
+        double sigma_from = 0, sigma_to = 0;
+        matrix<double,2,2> cov;
+        cov = 0;
+
+        for (unsigned long i = 0; i < from_points.size(); ++i)
+        {
+            mean_from += from_points[i];
+            mean_to += to_points[i];
+        }
+        mean_from /= from_points.size();
+        mean_to   /= from_points.size();
+
+        for (unsigned long i = 0; i < from_points.size(); ++i)
+        {
+            sigma_from += length_squared(from_points[i] - mean_from);
+            sigma_to += length_squared(to_points[i] - mean_to);
+            cov += (to_points[i] - mean_to)*trans(from_points[i] - mean_from);
+        }
+
+        sigma_from /= from_points.size();
+        sigma_to   /= from_points.size();
+        cov        /= from_points.size();
+
+        matrix<double,2,2> u, v, s, d;
+        svd(cov, u,d,v);
+        s = identity_matrix(cov);
+        if (det(cov) < 0)
+        {
+            if (d(1,1) < d(0,0))
+                s(1,1) = -1;
+            else
+                s(0,0) = -1;
+        }
+
+        matrix<double,2,2> r = u*s*trans(v);
+        double c = 1; 
+        if (sigma_from != 0)
+            c = 1.0/sigma_from * trace(d*s);
+        vector<double,2> t = mean_to - c*r*mean_from;
+
+        return point_transform_affine(c*r, t);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class point_transform_projective
     {
     public:
