@@ -125,22 +125,19 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        namespace impl
+        template <typename image_view_type>
+        struct uint8_or_uint16_pixels
         {
-            template <typename image_view_type>
-            struct uint8_or_uint16_pixels
-            {
-                typedef typename image_view_type::pixel_type pixel_type;
-                const static bool value = is_same_type<pixel_type,uint8>::value ||
-                                          is_same_type<pixel_type,uint16>::value;
-            };
-        }
+            typedef typename image_view_type::pixel_type pixel_type;
+            const static bool value = is_same_type<pixel_type,uint8>::value ||
+                is_same_type<pixel_type,uint16>::value;
+        };
 
         // This is an overload of get_pixel_edges() that is optimized to segment images
         // with 8bit or 16bit  pixels very quickly.  We do this by using a radix sort
         // instead of quicksort.
         template <typename in_image_type, typename T>
-        typename enable_if<impl::uint8_or_uint16_pixels<in_image_type> >::type 
+        typename enable_if<uint8_or_uint16_pixels<in_image_type> >::type 
         get_pixel_edges (
             const in_image_type& in_img,
             std::vector<segment_image_edge_data_T<T> >& sorted_edges
@@ -253,7 +250,7 @@ namespace dlib
 
         // This is the general purpose version of get_pixel_edges().  It handles all pixel types.
         template <typename in_image_type, typename T>
-        typename disable_if<impl::uint8_or_uint16_pixels<in_image_type> >::type 
+        typename disable_if<uint8_or_uint16_pixels<in_image_type> >::type 
         get_pixel_edges (
             const in_image_type& in_img,
             std::vector<segment_image_edge_data_T<T> >& sorted_edges
