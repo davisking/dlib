@@ -18,7 +18,7 @@ RUNNING THE UNIT TEST SUITE
        cd build
        cmake ..
        cmake --build . --config Release
-       ./test --runall
+       ./dtest --runall
 
    Note that on windows your compiler might put the test executable in a
    subfolder called Release.  If that's the case then you have to go to that
