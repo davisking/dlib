@@ -120,8 +120,8 @@
                 broken rather than causing "undefined results")
 
                <br/><br/><u>ensures</u>:    This defines what the function does.  It is a list of conditions that will be 
-                true after the function finishes executing.  Note that if an exception is thrown or the function returns 
-                indicating an error occurred then nothing in the ensures clause is guaranteed to be true.
+                true after the function finishes executing.  Note that if an exception is thrown then nothing in the 
+                ensures clause is guaranteed to be true.
 
                <br/><br/><u>throws</u>:     This defines what exceptions may be thrown by this function.  It generally
                 tells you why the exception might be thrown.  It also tells you what the function does in this event: 
@@ -167,8 +167,8 @@
         - something &gt; 4     
     ensures
         - #some_other_function() == 9
-        - #funct() == something 
         - #something == something + 1
+        - returns something
 !*/</font>
 </code_box>
 

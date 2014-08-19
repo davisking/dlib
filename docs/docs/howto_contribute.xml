@@ -419,7 +419,7 @@ for (int i = 0; i &lt; my_std_vector.size(); ++i)
                   be able to easily find out what exception was thrown.  Additionally, exceptions typically contain a
                   message telling you all about the error.  Moreover, 
                   any debugger worth its
-                  salt will be able to show you a stack trace that let's you see exactly where the exception came from.
+                  salt will be able to show you a stack trace that lets you see exactly where the exception came from.
                    The exception <i>forces</i> you, the user, to 
                   be aware of this potential error and to add a catch block to deal with it. 
                   This is where the "hard to use wrong" comes from. 
