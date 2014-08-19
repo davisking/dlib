@@ -89,6 +89,7 @@
          <name>Object Detection</name>
          <item>get_frontal_face_detector</item>
          <item>object_detector</item>
+         <item>evaluate_detectors</item>
          <item>full_object_detection</item>
          <item>scan_image</item>
          <item>scan_image_movable_parts</item>
@@ -2006,6 +2007,26 @@
 
             <example>face_detector.py.html</example>
             <example>train_object_detector.py.html</example>
+         </examples>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>evaluate_detectors</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/scan_fhog_pyramid_abstract.h</spec_file>
+         <description>        
+            This function allows you to efficiently run a bunch of
+            <a href="#scan_fhog_pyramid">scan_fhog_pyramid</a> based 
+            <a href="#object_detector">object_detectors</a>
+            over an image.  Importantly, this function is faster than running
+            each detector individually because it computes the HOG features
+            only once and then reuses them for each detector.  
+         </description>
+         <examples>
+            <example>fhog_object_detector_ex.cpp.html</example>
          </examples>
                                  
       </component>
