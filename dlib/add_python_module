@@ -51,7 +51,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 # include dlib so we can link against it
-string(REPLACE "add_python_module" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
+string(REGEX REPLACE "add_python_module$" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
 include(${dlib_path}/cmake)
 
 # We put the extra _ on the end of the name just so it's possible to
@@ -86,7 +86,7 @@ macro(add_python_module module_name module_sources )
 
    macro(install_${module_name}_to path)
        # Determine the path to our CMakeLists.txt file.
-       string(REPLACE "CMakeLists.txt" "" base_path ${CMAKE_CURRENT_LIST_FILE})
+       string(REGEX REPLACE "CMakeLists.txt$" "" base_path ${CMAKE_CURRENT_LIST_FILE})
        INSTALL(TARGETS ${module_name}_ 
             DESTINATION "${base_path}/${path}"
            )
@@ -97,8 +97,8 @@ macro(add_python_module module_name module_sources )
        if (WIN32)
            list(GET Boost_LIBRARIES 1 boostlibs1)
            list(GET Boost_LIBRARIES 3 boostlibs2)
-           string(REPLACE ".lib" ".dll" boostdlls1 ${boostlibs1})
-           string(REPLACE ".lib" ".dll" boostdlls2 ${boostlibs2})
+           string(REGEX REPLACE ".lib$" ".dll" boostdlls1 ${boostlibs1})
+           string(REGEX REPLACE ".lib$" ".dll" boostdlls2 ${boostlibs2})
            INSTALL(FILES ${boostdlls1} ${boostdlls2} 
                 DESTINATION "${base_path}/${path}"
                 )

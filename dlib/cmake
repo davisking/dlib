@@ -3,7 +3,7 @@
 if (NOT TARGET dlib)
 
     # Determine the path to dlib.
-    string(REPLACE "cmake" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
+    string(REGEX REPLACE "cmake$" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
 
     if (CMAKE_COMPILER_IS_GNUCXX)
         # By default, g++ won't warn or error if you forget to return a value in a
