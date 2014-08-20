@@ -3,6 +3,8 @@
 #ifndef DLIB_GeNERIC_IMAGE_Hh_
 #define DLIB_GeNERIC_IMAGE_Hh_
 
+#include "../assert.h"
+
 namespace dlib
 {
 
@@ -194,6 +196,7 @@ namespace dlib
                 - returns the number of pixels in this image.
         !*/
 
+#ifndef ENABLE_ASSERTS
         pixel_type* operator[] (long row) { return (pixel_type*)(_data+_width_step*row); }
         /*!
             requires
@@ -212,8 +215,51 @@ namespace dlib
                   the pixel at row and column position r,c can be accessed via
                   (*this)[r][c].
         !*/
+#else
+        // If asserts are enabled then we need to return a proxy class so we can make sure
+        // the column accesses don't go out of bounds.
+        struct pix_row
+        {
+            pix_row(pixel_type* data_, long nc_) : data(data_),_nc(nc_) {}
+            const pixel_type& operator[] (long col) const
+            {
+                DLIB_ASSERT(0 <= col && col < _nc, 
+                    "\t The given column index is out of range."
+                    << "\n\t col: " << col 
+                    << "\n\t _nc: " << _nc);
+                return data[col];
+            }
+            pixel_type& operator[] (long col)
+            {
+                DLIB_ASSERT(0 <= col && col < _nc, 
+                    "\t The given column index is out of range."
+                    << "\n\t col: " << col 
+                    << "\n\t _nc: " << _nc);
+                return data[col];
+            }
+        private:
+            pixel_type* const data;
+            const long _nc;
+        };
+        pix_row operator[] (long row) 
+        { 
+            DLIB_ASSERT(0 <= row && row < _nr, 
+                "\t The given row index is out of range."
+                << "\n\t row: " << row 
+                << "\n\t _nr: " << _nr);
+            return pix_row((pixel_type*)(_data+_width_step*row), _nc); 
+        }
+        const pix_row operator[] (long row) const 
+        { 
+            DLIB_ASSERT(0 <= row && row < _nr, 
+                "\t The given row index is out of range."
+                << "\n\t row: " << row 
+                << "\n\t _nr: " << _nr);
+            return pix_row((pixel_type*)(_data+_width_step*row), _nc); 
+        }
+#endif
 
-        void set_size(long rows, long cols) { set_image_size(*_img, rows, cols); *this = *_img; }
+        void set_size(long rows, long cols) 
         /*!
             requires
                 - rows >= 0 && cols >= 0
@@ -223,6 +269,15 @@ namespace dlib
                 - #nr() == rows
                 - #nc() == cols
         !*/
+        { 
+            DLIB_ASSERT((cols >= 0 && rows >= 0),
+                        "\t image_view::set_size(long rows, long cols)"
+                        << "\n\t The images can't have negative rows or columns."
+                        << "\n\t cols: " << cols 
+                        << "\n\t rows: " << rows 
+            );
+            set_image_size(*_img, rows, cols); *this = *_img; 
+        }
 
         void clear() { set_size(0,0); }
         /*!
@@ -269,7 +324,35 @@ namespace dlib
         long nr() const { return _nr; }
         long nc() const { return _nc; }
         unsigned long size() const { return static_cast<unsigned long>(nr()*nc()); }
+#ifndef ENABLE_ASSERTS
         const pixel_type* operator[] (long row) const { return (const pixel_type*)(_data+_width_step*row); }
+#else
+        // If asserts are enabled then we need to return a proxy class so we can make sure
+        // the column accesses don't go out of bounds.
+        struct pix_row
+        {
+            pix_row(pixel_type* data_, long nc_) : data(data_),_nc(nc_) {}
+            const pixel_type& operator[] (long col) const
+            {
+                DLIB_ASSERT(0 <= col && col < _nc, 
+                    "\t The given column index is out of range."
+                    << "\n\t col: " << col 
+                    << "\n\t _nc: " << _nc);
+                return data[col];
+            }
+        private:
+            pixel_type* const data;
+            const long _nc;
+        };
+        const pix_row operator[] (long row) const 
+        { 
+            DLIB_ASSERT(0 <= row && row < _nr, 
+                "\t The given row index is out of range."
+                << "\n\t row: " << row 
+                << "\n\t _nr: " << _nr);
+            return pix_row((pixel_type*)(_data+_width_step*row), _nc); 
+        }
+#endif
 
     private:
         const char* _data;
