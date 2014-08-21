@@ -66,6 +66,7 @@ namespace dlib
 #ifdef DLIB_JPEG_SUPPORT
             case image_file_type::JPG: load_jpeg(image, file_name); return;
 #endif
+            default:  ;
         }
 
         if (im_type == image_file_type::JPG)
