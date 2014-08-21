@@ -23,11 +23,11 @@ namespace dlib
             UNKNOWN
         };
 
-        type read_type(const std::string& fileName) 
+        inline type read_type(const std::string& file_name) 
         {
-            std::ifstream file(fileName, std::ios::in|std::ios::binary);
+            std::ifstream file(file_name.c_str(), std::ios::in|std::ios::binary);
             if (!file)
-                throw image_load_error("Unable to open file: " + fileName);
+                throw image_load_error("Unable to open file: " + file_name);
 
             char buffer[9];
             file.read((char*)buffer, 8);
