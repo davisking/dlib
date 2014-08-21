@@ -19,18 +19,10 @@ namespace dlib
             - image_type == an image object that implements the interface defined in
               dlib/image_processing/generic_image.h 
         ensures
-            - let EXT == the extension of the file given by file_name converted
-              to lower case (i.e.  the part of the file after the '.')
-            - if (EXT == "png") then
-                - performs: load_png(image, file_name);
-            - else if (EXT == "jpg" || EXT == "jpeg") then
-                - performs: load_jpeg(image, file_name);
-            - else if (EXT == "bmp") then
-                - performs: load_bmp(image, file_name);
-            - else if (EXT == "dng") then
-                - performs: load_dng(image, file_name);
-            - else
-                - throws image_load_error
+            - This function looks at the file extensions and file headers to try and figure
+              out what kind of image format is inside the given file.  It then calls one of
+              load_png(), load_jpeg(), load_bmp(), or load_dng() as appropriate and stores
+              the resulting image into #image.
         throws
             - image_load_error
                 This exception is thrown if there is some error that prevents
