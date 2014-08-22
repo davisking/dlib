@@ -14,6 +14,7 @@
 #include "image_processing/scan_image_custom.h"
 #include "image_processing/remove_unobtainable_rectangles.h"
 #include "image_processing/scan_fhog_pyramid.h"
+#include "image_processing/shape_predictor.h"
 
 #endif // DLIB_IMAGE_PROCESSInG_H_h_
 
