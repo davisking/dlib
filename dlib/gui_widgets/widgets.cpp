@@ -5992,7 +5992,7 @@ namespace dlib
             std::map<std::string,point>::const_iterator itr;
             for (itr = overlay_rects[i].parts.begin(); itr != overlay_rects[i].parts.end(); ++itr)
             {
-                rectangle temp = get_rect_on_screen(centered_rect(itr->second,part_width,part_width));
+                rectangle temp = centered_rect(get_rect_on_screen(centered_rect(itr->second,1,1)), part_width, part_width);
 
                 if (rect_is_selected && selected_rect == i && 
                     selected_part_name.size() != 0 && selected_part_name == itr->first)
@@ -6243,7 +6243,7 @@ namespace dlib
                 std::map<std::string,point>::const_iterator itr;
                 for (itr = overlay_rects[i].parts.begin(); itr != overlay_rects[i].parts.end(); ++itr)
                 {
-                    rectangle temp = get_rect_on_screen(centered_rect(itr->second,part_width,part_width));
+                    rectangle temp = centered_rect(get_rect_on_screen(centered_rect(itr->second,1,1)), part_width, part_width);
                     point c = center(temp);
 
                     // distance from edge of part circle
