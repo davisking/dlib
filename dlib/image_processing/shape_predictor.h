@@ -972,7 +972,7 @@ namespace dlib
         unsigned long _feature_pool_size;
         double _lambda;
         unsigned long _num_test_splits;
-        unsigned long _feature_pool_region_padding;
+        double _feature_pool_region_padding;
         bool _verbose;
     };
 
