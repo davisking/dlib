@@ -59,6 +59,7 @@ SRC += ekm_and_lisf.cpp
 SRC += empirical_kernel_map.cpp
 SRC += entropy_coder.cpp
 SRC += entropy_encoder_model.cpp
+SRC += face.cpp
 SRC += fft.cpp
 SRC += fhog.cpp
 SRC += filtering.cpp

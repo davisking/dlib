@@ -44,6 +44,7 @@ set (tests
    entropy_coder.cpp
    entropy_encoder_model.cpp
    example_args.cpp
+   face.cpp
    fft.cpp
    fhog.cpp
    filtering.cpp
