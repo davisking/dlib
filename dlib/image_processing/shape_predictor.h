@@ -397,7 +397,7 @@ namespace dlib
         )
         {
             _cascade_depth = 10;
-            _tree_depth = 2;
+            _tree_depth = 4;
             _num_trees_per_cascade_level = 500;
             _nu = 0.1;
             _oversampling_amount = 20;

@@ -18,9 +18,9 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool that takes in an image region containing some object
-                and outputs a "shape" or set of point locations that define the pose of the
-                object.  The classic example of this is human face pose prediction, where
-                you take an image of a human face as input and are expected to identify the
+                and outputs a set of point locations that define the pose of the object.
+                The classic example of this is human face pose prediction, where you take
+                an image of a human face as input and are expected to identify the
                 locations of important facial landmarks such as the corners of the mouth
                 and eyes, tip of the nose, and so forth.
 
@@ -88,28 +88,35 @@ namespace dlib
                 images.  Its implementation uses the algorithm described in:
                     One Millisecond Face Alignment with an Ensemble of Regression Trees
                     by Vahid Kazemi and Josephine Sullivan, CVPR 2014
+
         !*/
 
     public:
 
         shape_predictor_trainer (
-        )
-        {
-            _cascade_depth = 10;
-            _tree_depth = 2;
-            _num_trees_per_cascade_level = 500;
-            _nu = 0.1;
-            _oversampling_amount = 20;
-            _feature_pool_size = 400;
-            _lambda = 0.1;
-            _num_test_splits = 20;
-            _feature_pool_region_padding = 0;
-            _verbose = false;
-        }
+        );
+        /*!
+            ensures
+                - #get_cascade_depth() == 10
+                - #get_tree_depth() == 4
+                - #get_num_trees_per_cascade_level() == 500
+                - #get_nu() == 0.1
+                - #get_oversampling_amount() == 20
+                - #get_feature_pool_size() == 400
+                - #get_lambda() == 0.1
+                - #get_num_test_splits() == 20
+                - #get_feature_pool_region_padding() == 0
+                - #get_random_seed() == ""
+                - This object will not be verbose
+        !*/
 
         unsigned long get_cascade_depth (
         ) const;
         /*!
+            ensures
+                - returns the number of cascades created when you train a model.  This
+                  means that the total number of trees in the learned model is equal to
+                  get_cascade_depth()*get_num_trees_per_cascade_level().
         !*/
 
         void set_cascade_depth (
@@ -125,6 +132,9 @@ namespace dlib
         unsigned long get_tree_depth (
         ) const; 
         /*!
+            ensures
+                - returns the depth of the trees used in the cascade.  In particular, there
+                  are pow(2,get_tree_depth()) leaves in each tree.
         !*/
 
         void set_tree_depth (
@@ -140,6 +150,10 @@ namespace dlib
         unsigned long get_num_trees_per_cascade_level (
         ) const;
         /*!
+            ensures
+                - returns the number of trees created for each cascade.  This means that
+                  the total number of trees in the learned model is equal to
+                  get_cascade_depth()*get_num_trees_per_cascade_level().  
         !*/
 
         void set_num_trees_per_cascade_level (
@@ -155,6 +169,10 @@ namespace dlib
         double get_nu (
         ) const; 
         /*!
+            ensures
+                - returns the regularization parameter.  Larger values of this parameter
+                  will cause the algorithm to fit the training data better but may also
+                  cause overfitting.
         !*/
 
         void set_nu (
@@ -170,6 +188,11 @@ namespace dlib
         std::string get_random_seed (
         ) const;
         /*!
+            ensures
+                - returns the random seed used by the internal random number generator.
+                  Since this algorithm is a random forest style algorithm it relies on a
+                  random number generator for generating the trees.  So each setting of the
+                  random seed will produce slightly different outputs.  
         !*/
 
         void set_random_seed (
@@ -183,6 +206,17 @@ namespace dlib
         unsigned long get_oversampling_amount (
         ) const;
         /*!
+            ensures
+                - You give annotated images to this object as training examples.  You
+                  can effectively increase the amount of training data by adding in each
+                  training example multiple times but with a randomly selected deformation
+                  applied to it.  That is what this parameter controls.  That is, if you
+                  supply N training samples to train() then the algorithm runs internally
+                  with N*get_oversampling_amount() training samples.  So the bigger this
+                  parameter the better (excepting that larger values make training take
+                  longer).  In terms of the Kazemi paper, this parameter is the number of
+                  randomly selected initial starting points sampled for each training
+                  example.
         !*/
 
         void set_oversampling_amount (
@@ -198,6 +232,11 @@ namespace dlib
         unsigned long get_feature_pool_size (
         ) const;
         /*!
+            ensures
+                - At each level of the cascade we randomly sample get_feature_pool_size()
+                  pixels from the image.  These pixels are used to generate features for
+                  the random trees.  So in general larger settings of this parameter give
+                  better accuracy but make the algorithm run slower.  
         !*/
 
         void set_feature_pool_size (
@@ -210,9 +249,51 @@ namespace dlib
                 - #get_feature_pool_size() == size
         !*/
 
+        double get_feature_pool_region_padding (
+        ) const; 
+        /*!
+            ensures
+                - When we randomly sample the pixels for the feature pool we do so in a box
+                  fit around the provided training landmarks.  By default, this box is the
+                  tightest box that contains the landmarks (i.e. this is what happens when
+                  get_feature_pool_region_padding()==0).  However, you can expand or shrink
+                  the size of the pixel sampling region by setting a different value of
+                  get_feature_pool_region_padding().  
+
+                  To explain this precisely, for a padding of 0 we say that the pixels are
+                  sampled from a box of size 1x1.  The padding value is added to each side
+                  of the box.  So a padding of 0.5 would cause the algorithm to sample
+                  pixels from a box that was 2x2, effectively multiplying the area pixels
+                  are sampled from by 4.  Similarly, setting the padding to -0.2 would
+                  cause it to sample from a box 0.8x0.8 in size.
+        !*/
+
+        void set_feature_pool_region_padding (
+            double padding 
+        );
+        /*!
+            ensures
+                - #get_feature_pool_region_padding() == padding
+        !*/
+
+
         double get_lambda (
         ) const;
         /*!
+            ensures
+                - To decide how to split nodes in the regression trees the algorithm looks
+                  at pairs of pixels in the image.  These pixel pairs are sampled randomly
+                  but with a preference for selecting pixels that are near each other.
+                  get_lambda() controls this "nearness" preference.  In particular, smaller
+                  values of get_lambda() will make the algorithm prefer to select pixels
+                  close together and larger values of get_lambda() will make it care less
+                  about picking nearby pixel pairs.  
+
+                  Note that this is the inverse of how it is defined in the Kazemi paper.
+                  For this object, you should think of lambda as "the fraction of the
+                  bounding box will we traverse to find a neighboring pixel".  Nominally,
+                  this is normalized between 0 and 1.  So reasonable settings of lambda are
+                  values in the range 0 < lambda < 1.
         !*/
 
         void set_lambda (
@@ -228,6 +309,11 @@ namespace dlib
         unsigned long get_num_test_splits (
         ) const;
         /*!
+            ensures
+                - When generating the random trees we randomly sample get_num_test_splits()
+                  possible split features at each node and pick the one that gives the best
+                  split.  Larger values of this parameter will usually give more accurate
+                  outputs but take longer to train.
         !*/
 
         void set_num_test_splits (
@@ -238,19 +324,6 @@ namespace dlib
                 - num > 0
             ensures
                 - #get_num_test_splits() == num
-        !*/
-
-        double get_feature_pool_region_padding (
-        ) const; 
-        /*!
-        !*/
-
-        void set_feature_pool_region_padding (
-            double padding 
-        );
-        /*!
-            ensures
-                - #get_feature_pool_region_padding() == padding
         !*/
 
         void be_verbose (
@@ -265,7 +338,7 @@ namespace dlib
         );
         /*!
             ensures
-                - this object will not print anything to standard out
+                - This object will not print anything to standard out
         !*/
 
         template <typename image_array>
@@ -339,6 +412,14 @@ namespace dlib
         const std::vector<std::vector<full_object_detection> >& objects
     );
     /*!
+        requires
+            - images.size() == objects.size()
+            - for all valid i and j:
+                - objects[i][j].num_parts() == sp.num_parts()
+        ensures
+            - returns test_shape_predictor(sp, images, objects, no_scales) where no_scales
+              is an empty vector.  So this is just a convenience function for calling the
+              above test_shape_predictor() routine without a scales argument.
     !*/
 
 // ----------------------------------------------------------------------------------------
