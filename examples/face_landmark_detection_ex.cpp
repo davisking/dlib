@@ -16,6 +16,9 @@
         Vahid Kazemi and Josephine Sullivan, CVPR 2014
     and was trained on the iBUG 300-W face landmark dataset.  
 
+    Also, note that you can train your own models using dlib's machine learning
+    tools.  See train_shape_predictor_ex.cpp to see an example.
+
     
 
 
@@ -67,8 +70,10 @@ int main(int argc, char** argv)
         // We need a face detector.  We will use this to get bounding boxes for
         // each face in an image.
         frontal_face_detector detector = get_frontal_face_detector();
-        // And we also need a shape_predictor.  This takes as input an image and bounding
-        // box and outputs a fully landmarked face shape.
+        // And we also need a shape_predictor.  This is the tool that will predict face
+        // landmark positions given an image and face bounding box.  Here we are just
+        // loading the model from the shape_predictor_68_face_landmarks.dat file you gave
+        // as a command line argument.
         shape_predictor sp;
         deserialize(argv[1]) >> sp;
 
