@@ -9,6 +9,7 @@
 #include "../matrix.h"
 #include "../geometry.h"
 #include "../pixel.h"
+#include "../console_progress_indicator.h"
 
 namespace dlib
 {
@@ -392,34 +393,131 @@ namespace dlib
         !*/
     public:
 
+        shape_predictor_trainer (
+        )
+        {
+            _cascade_depth = 10;
+            _tree_depth = 2;
+            _num_trees_per_cascade_level = 500;
+            _nu = 0.1;
+            _oversampling_amount = 20;
+            _feature_pool_size = 400;
+            _lambda = 0.1;
+            _num_test_splits = 20;
+            _feature_pool_region_padding = 0;
+            _verbose = false;
+        }
 
-        unsigned long cascade_depth (
-        ) const { return 10; }
+        unsigned long get_cascade_depth (
+        ) const { return _cascade_depth; }
 
-        unsigned long tree_depth (
-        ) const { return 2; }
+        void set_cascade_depth (
+            unsigned long depth
+        )
+        {
+            DLIB_CASSERT(depth > 0, "");
+            _cascade_depth = depth;
+        }
 
-        unsigned long num_trees_per_cascade_level (
-        ) const { return 500; }
+        unsigned long get_tree_depth (
+        ) const { return _tree_depth; }
+
+        void set_tree_depth (
+            unsigned long depth
+        )
+        {
+            DLIB_CASSERT(depth > 0, "");
+            _tree_depth = depth;
+        }
+
+        unsigned long get_num_trees_per_cascade_level (
+        ) const { return _num_trees_per_cascade_level; }
+
+        void set_num_trees_per_cascade_level (
+            unsigned long num
+        )
+        {
+            DLIB_CASSERT( num > 0, "");
+            _num_trees_per_cascade_level = num;
+        }
 
         double get_nu (
-        ) const { return 0.1; } // the regularizer 
+        ) const { return _nu; } 
+        void set_nu (
+            double nu
+        )
+        {
+            DLIB_CASSERT(nu > 0,"");
+            _nu = nu;
+        }
 
-        std::string random_seed (
-        ) const { return "dlib rules"; }
+        std::string get_random_seed (
+        ) const { return rnd.get_seed(); }
+        void set_random_seed (
+            const std::string& seed
+        ) { rnd.set_seed(seed); }
 
-        unsigned long oversampling_amount (
-        ) const { return 20; }
+        unsigned long get_oversampling_amount (
+        ) const { return _oversampling_amount; }
+        void set_oversampling_amount (
+            unsigned long amount
+        )
+        {
+            DLIB_CASSERT(amount > 0, "");
+            _oversampling_amount = amount;
+        }
 
-        // feature sampling parameters
-        unsigned long feature_pool_size (
-        ) const { return 400; }// this must be > 1
+        unsigned long get_feature_pool_size (
+        ) const { return _feature_pool_size; }
+        void set_feature_pool_size (
+            unsigned long size
+        ) 
+        {
+            DLIB_CASSERT(size > 1, "");
+            _feature_pool_size = size;
+        }
+
         double get_lambda (
-        ) const { return 0.1; }
+        ) const { return _lambda; }
+        void set_lambda (
+            double lambda
+        )
+        {
+            DLIB_CASSERT(lambda > 0, "");
+            _lambda = lambda;
+        }
+
         unsigned long get_num_test_splits (
-        ) const { return 20; }
+        ) const { return _num_test_splits; }
+        void set_num_test_splits (
+            unsigned long num
+        )
+        {
+            DLIB_CASSERT(num > 0, "");
+            _num_test_splits = num;
+        }
+
+
         double get_feature_pool_region_padding (
-        ) const { return 0; }
+        ) const { return _feature_pool_region_padding; }
+        void set_feature_pool_region_padding (
+            double padding 
+        )
+        {
+            _feature_pool_region_padding = padding;
+        }
+
+        void be_verbose (
+        )
+        {
+            _verbose = true;
+        }
+
+        void be_quiet (
+        )
+        {
+            _verbose = false;
+        }
 
         template <typename image_array>
         shape_predictor train (
@@ -430,17 +528,21 @@ namespace dlib
             using namespace impl;
             DLIB_CASSERT(images.size() == objects.size() && images.size() > 0, "");
 
+            rnd.set_seed(get_random_seed());
+
             std::vector<training_sample> samples;
             const matrix<float,0,1> initial_shape = populate_training_sample_shapes(objects, samples);
             const std::vector<std::vector<dlib::vector<float,2> > > pixel_coordinates = randomly_sample_pixel_coordinates(initial_shape);
 
-            rnd.set_seed(random_seed());
+            unsigned long trees_fit_so_far = 0;
+            console_progress_indicator pbar(get_cascade_depth()*get_num_trees_per_cascade_level());
+            if (_verbose)
+                std::cout << "Fitting trees..." << std::endl;
 
-            std::vector<std::vector<impl::regression_tree> > forests(cascade_depth());
+            std::vector<std::vector<impl::regression_tree> > forests(get_cascade_depth());
             // Now start doing the actual training by filling in the forests
-            for (unsigned long cascade = 0; cascade < cascade_depth(); ++cascade)
+            for (unsigned long cascade = 0; cascade < get_cascade_depth(); ++cascade)
             {
-                // TODO, add some verbose option that prints here
                 // Each cascade uses a different set of pixels for its features.  We compute
                 // their representations relative to the initial shape first.
                 std::vector<unsigned long> anchor_idx; 
@@ -457,11 +559,20 @@ namespace dlib
                 }
 
                 // Now start building the trees at this cascade level.
-                for (unsigned long i = 0; i < num_trees_per_cascade_level(); ++i)
+                for (unsigned long i = 0; i < get_num_trees_per_cascade_level(); ++i)
                 {
                     forests[cascade].push_back(make_regression_tree(samples, pixel_coordinates[cascade]));
+
+                    if (_verbose)
+                    {
+                        ++trees_fit_so_far;
+                        pbar.print_status(trees_fit_so_far);
+                    }
                 }
             }
+
+            if (_verbose)
+                std::cout << "Training complete                          " << std::endl;
 
             return shape_predictor(initial_shape, forests, pixel_coordinates);
         }
@@ -488,7 +599,7 @@ namespace dlib
             /*!
 
             CONVENTION
-                - feature_pixel_values.size() == feature_pool_size()
+                - feature_pixel_values.size() == get_feature_pool_size()
                 - feature_pixel_values[j] == the value of the j-th feature pool
                   pixel when you look it up relative to the shape in current_shape.
 
@@ -527,7 +638,7 @@ namespace dlib
             impl::regression_tree tree;
 
             // walk the tree in breadth first order
-            const unsigned long num_split_nodes = static_cast<unsigned long>(std::pow(2.0, (double)tree_depth())-1);
+            const unsigned long num_split_nodes = static_cast<unsigned long>(std::pow(2.0, (double)get_tree_depth())-1);
             std::vector<matrix<float,0,1> > sums(num_split_nodes*2+1);
             for (unsigned long i = 0; i < samples.size(); ++i)
                 sums[0] += samples[i].target_shape - samples[i].current_shape;
@@ -574,8 +685,8 @@ namespace dlib
             double accept_prob;
             do 
             {
-                feat.idx1   = rnd.get_random_32bit_number()%feature_pool_size();
-                feat.idx2   = rnd.get_random_32bit_number()%feature_pool_size();
+                feat.idx1   = rnd.get_random_32bit_number()%get_feature_pool_size();
+                feat.idx2   = rnd.get_random_32bit_number()%get_feature_pool_size();
                 const double dist = length(pixel_coordinates[feat.idx1]-pixel_coordinates[feat.idx2]);
                 accept_prob = std::exp(-dist/lambda);
             }
@@ -699,7 +810,7 @@ namespace dlib
                     sample.image_idx = i;
                     sample.rect = objects[i][j].get_rect();
                     sample.target_shape = object_to_shape(objects[i][j]);
-                    for (unsigned long itr = 0; itr < oversampling_amount(); ++itr)
+                    for (unsigned long itr = 0; itr < get_oversampling_amount(); ++itr)
                         samples.push_back(sample);
                     mean_shape += sample.target_shape;
                     ++count;
@@ -711,7 +822,7 @@ namespace dlib
             // now go pick random initial shapes
             for (unsigned long i = 0; i < samples.size(); ++i)
             {
-                if ((i%oversampling_amount()) == 0)
+                if ((i%get_oversampling_amount()) == 0)
                 {
                     // The mean shape is what we really use as an initial shape so always
                     // include it in the training set as an example starting shape.
@@ -742,13 +853,13 @@ namespace dlib
         ) const
         /*!
             ensures
-                - #pixel_coordinates.size() == feature_pool_size() 
+                - #pixel_coordinates.size() == get_feature_pool_size() 
                 - for all valid i:
                     - pixel_coordinates[i] == a point in the box defined by the min/max x/y arguments.
         !*/
         {
-            pixel_coordinates.resize(feature_pool_size());
-            for (unsigned long i = 0; i < feature_pool_size(); ++i)
+            pixel_coordinates.resize(get_feature_pool_size());
+            for (unsigned long i = 0; i < get_feature_pool_size(); ++i)
             {
                 pixel_coordinates[i].x() = rnd.get_random_double()*(max_x-min_x) + min_x;
                 pixel_coordinates[i].y() = rnd.get_random_double()*(max_y-min_y) + min_y;
@@ -769,15 +880,26 @@ namespace dlib
             const double max_y = max(colm(temp,1))+padding;
 
             std::vector<std::vector<dlib::vector<float,2> > > pixel_coordinates;
-            pixel_coordinates.resize(cascade_depth());
-            for (unsigned long i = 0; i < cascade_depth(); ++i)
+            pixel_coordinates.resize(get_cascade_depth());
+            for (unsigned long i = 0; i < get_cascade_depth(); ++i)
                 randomly_sample_pixel_coordinates(pixel_coordinates[i], min_x, min_y, max_x, max_y);
             return pixel_coordinates;
         }
 
 
+
         mutable dlib::rand rnd;
 
+        unsigned long _cascade_depth;
+        unsigned long _tree_depth;
+        unsigned long _num_trees_per_cascade_level;
+        double _nu;
+        unsigned long _oversampling_amount;
+        unsigned long _feature_pool_size;
+        double _lambda;
+        unsigned long _num_test_splits;
+        unsigned long _feature_pool_region_padding;
+        bool _verbose;
     };
 
 // ----------------------------------------------------------------------------------------
