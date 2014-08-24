@@ -120,6 +120,7 @@
       <section>
          <name>Feature Extraction</name>
          <item>get_surf_points</item>
+         <item>shape_predictor</item>
          <item nolink="true">
             <name>SURF Tools</name>
             <sub>
@@ -207,23 +208,23 @@
       </section>
 
       <section>
-         <name>Colormaps</name>
+         <name>Visualization</name>
          <item>randomly_color_image</item>
          <item>heatmap</item>
          <item>jet</item>
-      </section>
- 
-      <section>
-         <name>Miscellaneous</name>
-
-         <item>cv_image</item>
-         <item>toMat</item>
-
+         <item>render_face_detections</item> 
          <item>draw_line</item> 
+         <item>draw_surf_points</item> 
          <item>draw_rectangle</item> 
          <item>tile_images</item> 
          <item>draw_fhog</item> 
          <item>fill_rect</item> 
+      </section>
+ 
+      <section>
+         <name>Miscellaneous</name>
+         <item>cv_image</item>
+         <item>toMat</item>
          <item>assign_image</item> 
          <item>assign_image_scaled</item> 
          <item>assign_all_pixels</item> 
@@ -358,6 +359,41 @@
          </description>
          <examples>
             <example>surf_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>shape_predictor</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/shape_predictor_abstract.h</spec_file>
+         <description>
+                This object is a tool that takes in an image region containing some object
+                and outputs a "shape" or set of point locations that define the pose of the
+                object.  The classic example of this is human face pose prediction, where
+                you take an image of a human face as input and are expected to identify the
+                locations of important facial landmarks such as the corners of the mouth
+                and eyes, tip of the nose, and so forth.  For example, here is the output
+                of dlib's <a href="http://sourceforge.net/projects/dclib/files/dlib/v18.10/shape_predictor_68_face_landmarks.dat.bz2">68-face-landmark shape_predictor</a> on an image from the HELEN dataset: <br/><br/>
+
+                <img src='face_landmarking_example.png'/>
+                <br/><br/>
+
+                To create useful instantiations of this object you need to use the
+                <a href="ml.html#shape_predictor_trainer">shape_predictor_trainer</a> object to train a 
+                shape_predictor using a set of training images, each annotated with shapes you want to predict.
+                To do this, the shape_predictor_trainer uses the state-of-the-art method from the
+                paper:
+             <blockquote>
+                    One Millisecond Face Alignment with an Ensemble of Regression Trees
+                    by Vahid Kazemi and Josephine Sullivan, CVPR 2014
+             </blockquote>
+         </description>
+         <examples>
+            <example>face_landmark_detection_ex.cpp.html</example>
+            <example>train_shape_predictor_ex.cpp.html</example>
          </examples>
                                  
       </component>
@@ -1017,6 +1053,31 @@
          <description>        
             This global function draws a line on an image.
          </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>render_face_detections</name>
+         <file>dlib/image_processing/render_face_detections.h</file>
+         <spec_file link="true">dlib/image_processing/render_face_detections_abstract.h</spec_file>
+         <description>        
+            This function takes a set of <a href="#full_object_detection">full_object_detections</a>
+            which represent human faces annotated with 68 facial landmarks (according to the iBUG 300-W
+            scheme) and converts them into a form suitable for display on an 
+            <a href="dlib/gui_widgets/widgets_abstract.h.html#image_window">image_window</a>.
+
+            <p>
+               For example, it will take the output of a <a href="#shape_predictor">shape_predictor</a>
+               that uses this facial landmarking scheme and will produce visualizations like this:
+            </p>
+            <img src='face_landmarking_example.png'/>
+
+         </description>
+         <examples>
+            <example>face_landmark_detection_ex.cpp.html</example>
+         </examples>
                                  
       </component>
             

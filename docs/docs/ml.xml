@@ -104,6 +104,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>structural_track_association_trainer</item> 
          <item>structural_graph_labeling_trainer</item> 
          <item>svm_rank_trainer</item> 
+         <item>shape_predictor_trainer</item> 
       </section>
       <section>
          <name>Clustering</name>
@@ -163,6 +164,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>test_track_association_function</item>
          <item>test_graph_labeling_function</item>
          <item>test_ranking_function</item>
+         <item>test_shape_predictor</item>
          <item>average_precision</item>
       </section>
 
@@ -1311,6 +1313,30 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <examples>
             <example>svm_rank_ex.cpp.html</example>
             <example>svm_rank.py.html</example>
+         </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>shape_predictor_trainer</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/shape_predictor_abstract.h</spec_file>
+         <description>
+               This object is a tool for training <a href="imaging.html#shape_predictor">shape_predictors</a> 
+               based on annotated training images.  Its implementation uses the algorithm described in:
+                <blockquote>
+                    One Millisecond Face Alignment with an Ensemble of Regression Trees
+                    by Vahid Kazemi and Josephine Sullivan, CVPR 2014
+                </blockquote>
+               It is capable of learning high quality shape models.  For example, this is an example output
+               for one of the faces in the HELEN face dataset: <br/><br/>
+               <img src='face_landmarking_example.png'/>
+
+         </description>
+         <examples>
+            <example>train_shape_predictor_ex.cpp.html</example>
          </examples>
                                  
       </component>
@@ -2680,6 +2706,25 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <examples>
             <example>svm_rank_ex.cpp.html</example>
             <example>svm_rank.py.html</example>
+         </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>test_shape_predictor</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/shape_predictor_abstract.h</spec_file>
+         <description>
+            Tests a <a href="imaging.html#shape_predictor">shape_predictor</a>'s ability to correctly 
+            predict the part locations of objects.  The output is the average distance (measured in pixels) between
+            each part and its true location.  You can optionally normalize each distance using a 
+            user supplied scale.  For example, when performing face landmarking, you might want to
+            normalize the distances by the interocular distance.
+         </description>
+         <examples>
+            <example>train_shape_predictor_ex.cpp.html</example>
          </examples>
                                  
       </component>

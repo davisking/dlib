@@ -343,6 +343,10 @@
          <term file="ml.html" name="svm_c_linear_trainer"                           include="dlib/svm.h"/>
          <term file="ml.html" name="svm_c_linear_dcd_trainer"                       include="dlib/svm.h"/>
          <term file="ml.html" name="svm_rank_trainer"                               include="dlib/svm.h"/>
+         <term file="ml.html" name="shape_predictor_trainer"                        include="dlib/image_processing.h"/>
+         <term file="ml.html" name="test_shape_predictor"                           include="dlib/image_processing.h"/>
+         <term file="imaging.html" name="shape_predictor"                           include="dlib/image_processing.h"/>
+         <term file="imaging.html" name="render_face_detections"                    include="dlib/image_processing/render_face_detections.h"/>
          <term file="ml.html" name="ranking_pair"                                   include="dlib/svm.h"/>
          <term file="ml.html" name="is_ranking_problem"                             include="dlib/svm.h"/>
          <term file="ml.html" name="count_ranking_inversions"                       include="dlib/svm.h"/>
