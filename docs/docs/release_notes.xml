@@ -12,13 +12,50 @@
 
 <current>
 New Features:
+   - Added find_similarity_transform()
+   - Added the ability to upgrade a auto_mutex_readonly from a readonly lock to a write
+     lock. 
+   - Added an implementation of the paper "One Millisecond Face Alignment with an Ensemble
+     of Regression Trees" by Vahid Kazemi and Josephine Sullivan which appeared in this
+     year's CVPR conference.  Therefore, dlib now includes tools for learning shape models
+     and also comes with a state-of-the-art face landmark locator.  See the
+     face_landmark_detection_ex.cpp and train_shape_predictor_ex.cpp example programs for
+     an introduction.
 
 Non-Backwards Compatible Changes:
+   - Made the interface to all the image processing routines more generic.  In particular, 
+     it is now easier to use arbitrary image types with dlib.  The new generic image
+     interface is defined in dlib/image_processing/generic_image.h and simply consists of
+     seven user defined global functions and a traits template.  Any user code that was
+     using array2d objects to represent images will still work.  However, if you had been
+     using your own custom image object you will need to provide implementations of the
+     seven functions.  Instructions for how to do this are in
+     dlib/image_processing/generic_image.h.
 
 Bug fixes:
+   - Changed the murmur hash implementation to avoid any possibility of strict aliasing
+     violations in user code, even when things get inlined in unfavorable ways.
+   - Fixed a color space handling bug in resize_image() that caused bad looking outputs in
+     some cases.
+   - If "cmake" was a substring of the full path to your source code folder then the cmake
+     scripts would fail. This has been fixed.
+   - Fixed a compile time error that could occur when using find_max_single_variable().
 
 Other:
-
+   - load_image() now uses the internal file header information to detect the
+     image format rather than looking at the file extension.
+   - Renamed unit test program to dtest avoid warnings from CMake.
+   - cross_validate_trainer() and cross_validate_trainer_threaded() no loner make copies
+     of the training data.  This significantly reduces their RAM usage for large datasets.
+   - Changed the serialization code for C-strings so that they don't save the null
+     terminator byte. This makes their serialization format the same as the format for
+     std::string.  The code should still be able to read all previously serialized data
+     correctly, so the change is backwards compatible with previous versions of dlib. 
+   - Changed the evaluate_detectors() routine so that it applies non-max suppression to
+     each detector individually. This way one detector doesn't stomp on the output of
+     another detector.
+   - Made the version of draw_line() that draws onto a regular image use alpha blending
+     for drawing diagonal lines.
 </current>
 
 <!-- **************************************************************************************  -->
