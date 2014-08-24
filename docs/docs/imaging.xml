@@ -371,7 +371,7 @@
          <spec_file link="true">dlib/image_processing/shape_predictor_abstract.h</spec_file>
          <description>
                 This object is a tool that takes in an image region containing some object
-                and outputs a "shape" or set of point locations that define the pose of the
+                and outputs a set of point locations that define the pose of the
                 object.  The classic example of this is human face pose prediction, where
                 you take an image of a human face as input and are expected to identify the
                 locations of important facial landmarks such as the corners of the mouth
