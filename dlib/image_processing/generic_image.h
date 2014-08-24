@@ -155,7 +155,7 @@ namespace dlib
                 image object to reallocate its memory, thus invalidating the pointer to its
                 pixel data stored in the image_view.    
 
-                As an side, there reason why this object stores a pointer to the image
+                As an side, the reason why this object stores a pointer to the image
                 object's data and uses that pointer instead of calling image_data() each
                 time a pixel is accessed is to allow for image objects to implement
                 complex, and possibly slow, image_data() functions.  For example, an image
