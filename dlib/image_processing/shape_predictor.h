@@ -171,7 +171,7 @@ namespace dlib
             const matrix<float,0,1>& to_shape
         )
         {
-            DLIB_CASSERT(from_shape.size() == to_shape.size() && (from_shape.size()%2) == 0 && from_shape.size() > 0,"");
+            DLIB_ASSERT(from_shape.size() == to_shape.size() && (from_shape.size()%2) == 0 && from_shape.size() > 0,"");
             std::vector<vector<float,2> > from_points, to_points;
             const unsigned long num = from_shape.size()/2;
             from_points.reserve(num);
@@ -415,7 +415,12 @@ namespace dlib
             unsigned long depth
         )
         {
-            DLIB_CASSERT(depth > 0, "");
+            DLIB_CASSERT(depth > 0, 
+                "\t void shape_predictor_trainer::set_cascade_depth()"
+                << "\n\t Invalid inputs were given to this function. "
+                << "\n\t depth:  " << depth
+            );
+
             _cascade_depth = depth;
         }
 
@@ -426,7 +431,12 @@ namespace dlib
             unsigned long depth
         )
         {
-            DLIB_CASSERT(depth > 0, "");
+            DLIB_CASSERT(depth > 0, 
+                "\t void shape_predictor_trainer::set_tree_depth()"
+                << "\n\t Invalid inputs were given to this function. "
+                << "\n\t depth:  " << depth
+            );
+
             _tree_depth = depth;
         }
 
@@ -437,7 +447,11 @@ namespace dlib
             unsigned long num
         )
         {
-            DLIB_CASSERT( num > 0, "");
+            DLIB_CASSERT( num > 0,
+                "\t void shape_predictor_trainer::set_num_trees_per_cascade_level()"
+                << "\n\t Invalid inputs were given to this function. "
+                << "\n\t num:  " << num
+            );
             _num_trees_per_cascade_level = num;
         }
 
@@ -447,7 +461,12 @@ namespace dlib
             double nu
         )
         {
-            DLIB_CASSERT(nu > 0,"");
+            DLIB_CASSERT(nu > 0,
+                "\t void shape_predictor_trainer::set_nu()"
+                << "\n\t Invalid inputs were given to this function. "
+                << "\n\t nu:  " << nu 
+            );
+
             _nu = nu;
         }
 
@@ -463,7 +482,12 @@ namespace dlib
             unsigned long amount
         )
         {
-            DLIB_CASSERT(amount > 0, "");
+            DLIB_CASSERT(amount > 0, 
+                "\t void shape_predictor_trainer::set_oversampling_amount()"
+                << "\n\t Invalid inputs were given to this function. "
+                << "\n\t amount: " << amount 
+            );
+
             _oversampling_amount = amount;
         }
 
@@ -473,7 +497,12 @@ namespace dlib
             unsigned long size
         ) 
         {
-            DLIB_CASSERT(size > 1, "");
+            DLIB_CASSERT(size > 1, 
+                "\t void shape_predictor_trainer::set_feature_pool_size()"
+                << "\n\t Invalid inputs were given to this function. "
+                << "\n\t size: " << size 
+            );
+
             _feature_pool_size = size;
         }
 
@@ -483,7 +512,12 @@ namespace dlib
             double lambda
         )
         {
-            DLIB_CASSERT(lambda > 0, "");
+            DLIB_CASSERT(lambda > 0,
+                "\t void shape_predictor_trainer::set_lambda()"
+                << "\n\t Invalid inputs were given to this function. "
+                << "\n\t lambda: " << lambda 
+            );
+
             _lambda = lambda;
         }
 
@@ -493,7 +527,12 @@ namespace dlib
             unsigned long num
         )
         {
-            DLIB_CASSERT(num > 0, "");
+            DLIB_CASSERT(num > 0, 
+                "\t void shape_predictor_trainer::set_num_test_splits()"
+                << "\n\t Invalid inputs were given to this function. "
+                << "\n\t num: " << num 
+            );
+
             _num_test_splits = num;
         }
 
@@ -526,7 +565,42 @@ namespace dlib
         ) const
         {
             using namespace impl;
-            DLIB_CASSERT(images.size() == objects.size() && images.size() > 0, "");
+            DLIB_CASSERT(images.size() == objects.size() && images.size() > 0,
+                "\t shape_predictor shape_predictor_trainer::train()"
+                << "\n\t Invalid inputs were given to this function. "
+                << "\n\t images.size():  " << images.size() 
+                << "\n\t objects.size(): " << objects.size() 
+            );
+            // make sure the objects agree on the number of parts and that there is at
+            // least one full_object_detection. 
+            unsigned long num_parts = 0;
+            for (unsigned long i = 0; i < objects.size(); ++i)
+            {
+                for (unsigned long j = 0; j < objects[i].size(); ++j)
+                {
+                    if (num_parts == 0)
+                    {
+                        num_parts = objects[i][j].num_parts();
+                    }
+                    else
+                    {
+                        DLIB_CASSERT(objects[i][j].num_parts() == num_parts,
+                            "\t shape_predictor shape_predictor_trainer::train()"
+                            << "\n\t All the objects must agree on the number of parts. "
+                            << "\n\t objects["<<i<<"]["<<j<<"].num_parts(): " << objects[i][j].num_parts()
+                            << "\n\t num_parts:  " << num_parts 
+                        );
+                    }
+                }
+            }
+            DLIB_CASSERT(num_parts != 0,
+                "\t shape_predictor shape_predictor_trainer::train()"
+                << "\n\t You must give at least one full_object_detection if you want to train a shape model and it must have parts."
+            );
+
+
+
+
 
             rnd.set_seed(get_random_seed());
 
@@ -917,6 +991,38 @@ namespace dlib
         const std::vector<std::vector<double> >& scales
     )
     {
+        // make sure requires clause is not broken
+#ifdef ENABLE_ASSERTS
+        DLIB_CASSERT( images.size() == objects.size() ,
+            "\t double test_shape_predictor()"
+            << "\n\t Invalid inputs were given to this function. "
+            << "\n\t images.size():  " << images.size() 
+            << "\n\t objects.size(): " << objects.size() 
+        );
+        for (unsigned long i = 0; i < objects.size(); ++i)
+        {
+            for (unsigned long j = 0; j < objects[i].size(); ++j)
+            {
+                DLIB_CASSERT(objects[i][j].num_parts() == sp.num_parts(), 
+                    "\t double test_shape_predictor()"
+                    << "\n\t Invalid inputs were given to this function. "
+                    << "\n\t objects["<<i<<"]["<<j<<"].num_parts(): " << objects[i][j].num_parts()
+                    << "\n\t sp.num_parts(): " << sp.num_parts()
+                );
+            }
+            if (scales.size() != 0)
+            {
+                DLIB_CASSERT(objects[i].size() == scales[i].size(), 
+                    "\t double test_shape_predictor()"
+                    << "\n\t Invalid inputs were given to this function. "
+                    << "\n\t objects["<<i<<"].size(): " << objects[i].size()
+                    << "\n\t scales["<<i<<"].size(): " << scales[i].size()
+                );
+
+            }
+        }
+#endif
+
         running_stats<double> rs;
         for (unsigned long i = 0; i < objects.size(); ++i)
         {

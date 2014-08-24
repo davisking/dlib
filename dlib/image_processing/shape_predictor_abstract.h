@@ -348,8 +348,16 @@ namespace dlib
         ) const;
         /*!
             requires
+                - image_array is a dlib::array of image objects where each image object
+                  implements the interface defined in dlib/image_processing/generic_image.h 
                 - images.size() == objects.size()
                 - images.size() > 0
+                - for some i: objects[i].size() != 0
+                  (i.e. there has to be at least one full_object_detection in the training set)
+                - for all valid i,j,k,l:
+                    - objects[i][j].num_parts() == objects[k][l].num_parts()
+                      (i.e. all objects must agree on the number of parts)
+                    - objects[i][j].num_parts() > 0
             ensures
                 - This object will try to learn to predict the locations of an object's parts 
                   based on the object bounding box (i.e.  full_object_detection::get_rect()) 
@@ -376,6 +384,8 @@ namespace dlib
     );
     /*!
         requires
+            - image_array is a dlib::array of image objects where each image object
+              implements the interface defined in dlib/image_processing/generic_image.h 
             - images.size() == objects.size()
             - for all valid i and j:
                 - objects[i][j].num_parts() == sp.num_parts()
@@ -413,6 +423,8 @@ namespace dlib
     );
     /*!
         requires
+            - image_array is a dlib::array of image objects where each image object
+              implements the interface defined in dlib/image_processing/generic_image.h 
             - images.size() == objects.size()
             - for all valid i and j:
                 - objects[i][j].num_parts() == sp.num_parts()

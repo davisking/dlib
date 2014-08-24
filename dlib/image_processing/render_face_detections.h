@@ -18,6 +18,12 @@ namespace dlib
         std::vector<image_window::overlay_line> lines;
         for (unsigned long i = 0; i < dets.size(); ++i)
         {
+            DLIB_CASSERT(dets[i].num_parts() == 68,
+                "\t std::vector<image_window::overlay_line> render_face_detections()"
+                << "\n\t Invalid inputs were given to this function. "
+                << "\n\t dets["<<i<<"].num_parts():  " << dets[i].num_parts() 
+            );
+
             const full_object_detection& d = dets[i];
             for (unsigned long i = 1; i <= 16; ++i)
                 lines.push_back(image_window::overlay_line(d.part(i), d.part(i-1), color));
