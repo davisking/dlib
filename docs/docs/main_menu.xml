@@ -287,6 +287,14 @@
                   <link>face_detection_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Face_Landmark_Detection</name>
+                  <link>face_landmark_detection_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Train_Shape_Predictor</name>
+                  <link>train_shape_predictor_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>SURF</name>
                   <link>surf_ex.cpp.html</link>
                </item>
