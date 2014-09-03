@@ -67,7 +67,7 @@ namespace dlib
     {
         std::vector<full_object_detection> dets;
         dets.push_back(det);
-        return render_face_detections(dets);
+        return render_face_detections(dets, color);
     }
 
 // ----------------------------------------------------------------------------------------
