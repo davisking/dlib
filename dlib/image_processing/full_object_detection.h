@@ -33,11 +33,27 @@ namespace dlib
         ) : rect(rect_) {}
 
         const rectangle& get_rect() const { return rect; }
+        rectangle& get_rect() { return rect; }
         unsigned long num_parts() const { return parts.size(); }
 
         const point& part(
             unsigned long idx
         ) const 
+        { 
+            // make sure requires clause is not broken
+            DLIB_ASSERT(idx < num_parts(),
+                "\t point full_object_detection::part()"
+                << "\n\t Invalid inputs were given to this function "
+                << "\n\t idx:         " << idx  
+                << "\n\t num_parts(): " << num_parts()  
+                << "\n\t this:        " << this
+                );
+            return parts[idx]; 
+        }
+
+        point& part(
+            unsigned long idx
+        )  
         { 
             // make sure requires clause is not broken
             DLIB_ASSERT(idx < num_parts(),
