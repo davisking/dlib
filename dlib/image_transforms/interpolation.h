@@ -1459,6 +1459,25 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline point_transform_affine get_mapping_to_chip (
+        const chip_details& details
+    )
+    {
+        std::vector<dlib::vector<double,2> > from, to;
+        point p1(0,0);
+        point p2(details.cols-1,0);
+        point p3(details.cols-1, details.rows-1);
+        to.push_back(p1);  
+        from.push_back(rotate_point<double>(center(details.rect),details.rect.tl_corner(),details.angle));
+        to.push_back(p2);  
+        from.push_back(rotate_point<double>(center(details.rect),details.rect.tr_corner(),details.angle));
+        to.push_back(p3);  
+        from.push_back(rotate_point<double>(center(details.rect),details.rect.br_corner(),details.angle));
+        return find_similarity_transform(from, to);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename image_type1,
         typename image_type2
@@ -1534,7 +1553,7 @@ namespace dlib
             from.push_back(get_rect(chips[i]).tl_corner());  to.push_back(rotate_point<double>(center(rect),rect.tl_corner(),chip_locations[i].angle));
             from.push_back(get_rect(chips[i]).tr_corner());  to.push_back(rotate_point<double>(center(rect),rect.tr_corner(),chip_locations[i].angle));
             from.push_back(get_rect(chips[i]).bl_corner());  to.push_back(rotate_point<double>(center(rect),rect.bl_corner(),chip_locations[i].angle));
-            point_transform_affine trns = find_affine_transform(from,to);
+            point_transform_affine trns = find_similarity_transform(from,to);
 
             // now extract the actual chip
             if (level == -1)

@@ -1006,6 +1006,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    point_transform_affine get_mapping_to_chip (
+        const chip_details& details
+    );
+    /*!
+        ensures
+            - returns a transformation that maps from the pixels in the original image
+              to the pixels in the cropped image defined by the given details object.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename image_type1,
         typename image_type2
