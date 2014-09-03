@@ -58,6 +58,20 @@ namespace dlib
         return lines;
     }
 
+// ----------------------------------------------------------------------------------------
+
+    inline std::vector<image_window::overlay_line> render_face_detections (
+        const full_object_detection& det,
+        const rgb_pixel color = rgb_pixel(0,255,0)
+    )
+    {
+        std::vector<full_object_detection> dets;
+        dets.push_back(det);
+        return render_face_detections(dets);
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_RENDER_FACE_DeTECTIONS_H_
