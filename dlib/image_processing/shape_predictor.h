@@ -581,6 +581,10 @@ namespace dlib
                     if (num_parts == 0)
                     {
                         num_parts = objects[i][j].num_parts();
+                        DLIB_CASSERT(objects[i][j].num_parts() != 0,
+                            "\t shape_predictor shape_predictor_trainer::train()"
+                            << "\n\t You can't give objects that don't have any parts to the trainer."
+                        );
                     }
                     else
                     {
