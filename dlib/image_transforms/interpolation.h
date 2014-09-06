@@ -1670,6 +1670,21 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline std::vector<chip_details> get_face_chip_details (
+        const std::vector<full_object_detection>& dets,
+        const unsigned long size = 100,
+        const double padding = 0.2
+    )
+    {
+        std::vector<chip_details> res;
+        res.reserve(dets.size());
+        for (unsigned long i = 0; i < dets.size(); ++i)
+            res.push_back(get_face_chip_details(dets[i], size, padding));
+        return res;
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_INTERPOlATIONh_

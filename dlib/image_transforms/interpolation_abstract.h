@@ -1121,6 +1121,25 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+
+    std::vector<chip_details> get_face_chip_details (
+        const std::vector<full_object_detection>& dets,
+        const unsigned long size = 100,
+        const double padding = 0.2
+    );
+    /*!
+        requires
+            - for all valid i:
+                - det[i].num_parts() == 68
+            - size > 0
+            - padding >= 0
+        ensures
+            - This function is identical to the version of get_face_chip_details() defined
+              above except that it creates and returns an array of chip_details objects,
+              one for each input full_object_detection.
+    !*/
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
 }
