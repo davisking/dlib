@@ -1096,6 +1096,31 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+
+    chip_details get_face_chip_details (
+        const full_object_detection& det,
+        const unsigned long size = 100,
+        const double padding = 0.2
+    );
+    /*!
+        requires
+            - det.num_parts() == 68
+            - size > 0
+            - padding >= 0
+        ensures
+            - This function assumes det contains a human face detection with face parts
+              annotated using the annotation scheme from the iBUG 300-W face landmark
+              dataset.  Given these assumptions, it creates a chip_details object that will
+              extract a copy of the face that has been rotated upright, centered, and
+              scaled to a standard size when given to extract_image_chip(). 
+            - The extracted chips will have size rows and columns in them.
+            - if padding == 0 then the chip will be closely cropped around the face.
+              Setting larger padding values will result a looser cropping.  In particular,
+              a padding of 0.5 would double the width of the cropped area, a value of 1
+              would tripple it, and so forth.
+    !*/
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
 }
