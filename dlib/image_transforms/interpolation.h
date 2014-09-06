@@ -1658,6 +1658,13 @@ namespace dlib
         std::vector<dlib::vector<double,2> > from_points, to_points;
         for (unsigned long i = 17; i < det.num_parts(); ++i)
         {
+            // Ignore the lower lip
+            if ((55 <= i && i <= 59) || (65 <= i && i <= 67))
+                continue;
+            // Ignore the eyebrows 
+            if (17 <= i && i <= 26)
+                continue;
+
             dlib::vector<double,2> p;
             p.x() = (padding+mean_face_shape_x[i-17])/(2*padding+1);
             p.y() = (padding+mean_face_shape_y[i-17])/(2*padding+1);
