@@ -1436,6 +1436,38 @@ namespace dlib
         chip_details(const rectangle& rect_, const chip_dims& dims, double angle_) : 
             rect(rect_),angle(angle_),rows(dims.rows), cols(dims.cols) {}
 
+        template <typename T>
+        chip_details(
+            const std::vector<dlib::vector<T,2> >& chip_points,
+            const std::vector<dlib::vector<T,2> >& img_points,
+            const chip_dims& dims
+        ) : 
+            rows(dims.rows), cols(dims.cols) 
+        {
+            DLIB_CASSERT( chip_points.size() == img_points.size() && chip_points.size() >= 2,
+                "\t chip_details::chip_details(chip_points,img_points,dims)"
+                << "\n\t Invalid inputs were given to this function."
+                << "\n\t chip_points.size(): " << chip_points.size() 
+                << "\n\t img_points.size():  " << img_points.size() 
+            );
+
+            const point_transform_affine tform = find_similarity_transform(chip_points,img_points);
+            dlib::vector<double,2> p(1,0);
+            p = tform.get_m()*p;
+
+            // There are only 3 things happening in a similarity transform.  There is a
+            // rescaling, a rotation, and a translation.  So here we pick out the scale and
+            // rotation parameters.
+            angle = std::atan2(p.y(),p.x());
+            // Note that the translation and scale part are represented by the extraction
+            // rectangle.  So here we build the appropriate rectangle.
+            const double scale = length(p); 
+            rect = centered_rect(tform(point(dims.cols,dims.rows)/2.0), 
+                static_cast<unsigned long>(dims.cols*scale + 0.5), 
+                static_cast<unsigned long>(dims.rows*scale + 0.5));
+        }
+
+
         rectangle rect;
         double angle;
         unsigned long rows; 

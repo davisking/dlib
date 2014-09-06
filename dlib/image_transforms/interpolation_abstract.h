@@ -992,6 +992,30 @@ namespace dlib
                 - #cols == dims.cols
         !*/
 
+        template <typename T>
+        chip_details(
+            const std::vector<dlib::vector<T,2> >& chip_points,
+            const std::vector<dlib::vector<T,2> >& img_points,
+            const chip_dims& dims
+        );
+        /*!
+            requires
+                - chip_points.size() == img_points.size()
+                - chip_points.size() >= 2 
+            ensures
+                - The chip will be extracted such that the pixel locations chip_points[i]
+                  in the chip are mapped to img_points[i] in the original image by a
+                  similarity transform.  That is, if you know the pixelwize mapping you
+                  want between the chip and the original image then you use this function
+                  of chip_details constructor to define the mapping.
+                - #rows == dims.rows
+                - #cols == dims.cols
+                - #size() == dims.rows*dims.cols 
+                - #rect and #angle are computed based on the given size of the output chip
+                  (specified by dims) and the similairty transform between the chip and
+                  image (specified by chip_points and img_points).
+        !*/
+
         inline unsigned long size() const { return rows*cols; }
         /*!
             ensures
