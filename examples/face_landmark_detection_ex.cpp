@@ -78,7 +78,7 @@ int main(int argc, char** argv)
         deserialize(argv[1]) >> sp;
 
 
-        image_window win;
+        image_window win, win_faces;
         // Loop over all the images provided on the command line.
         for (int i = 2; i < argc; ++i)
         {
@@ -112,6 +112,12 @@ int main(int argc, char** argv)
             win.clear_overlay();
             win.set_image(img);
             win.add_overlay(render_face_detections(shapes));
+
+            // We can also extract copies of each face that are cropped, rotated upright,
+            // and scaled to a standard size as shown here:
+            dlib::array<array2d<rgb_pixel> > face_chips;
+            extract_image_chips(img, get_face_chip_details(shapes), face_chips);
+            win_faces.set_image(tile_images(face_chips));
 
             cout << "Hit enter to process the next image..." << endl;
             cin.get();
