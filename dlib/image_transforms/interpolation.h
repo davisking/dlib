@@ -1617,7 +1617,7 @@ namespace dlib
 
     inline chip_details get_face_chip_details (
         const full_object_detection& det,
-        const unsigned long size = 100,
+        const unsigned long size = 200,
         const double padding = 0.2
     )
     {
@@ -1679,7 +1679,7 @@ namespace dlib
 
     inline std::vector<chip_details> get_face_chip_details (
         const std::vector<full_object_detection>& dets,
-        const unsigned long size = 100,
+        const unsigned long size = 200,
         const double padding = 0.2
     )
     {
