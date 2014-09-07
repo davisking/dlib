@@ -188,6 +188,9 @@ namespace dlib
                 Finding Structure with Randomness: Probabilistic Algorithms for
                 Constructing Approximate Matrix Decompositions by Halko et al.
               Therefore, it is very fast and suitable for use with very large matrices.
+              Moreover, q is the number of subspace iterations performed.  Larger
+              values of q might increase the accuracy of the solution but the default
+              value should be good for many problems.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -241,6 +244,9 @@ namespace dlib
                 Finding Structure with Randomness: Probabilistic Algorithms for
                 Constructing Approximate Matrix Decompositions by Halko et al.
               Therefore, it is very fast and suitable for use with very large matrices.
+              Moreover, q is the number of subspace iterations performed.  Larger
+              values of q might increase the accuracy of the solution but the default
+              value should be good for many problems.
     !*/
 
 // ----------------------------------------------------------------------------------------
