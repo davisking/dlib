@@ -1117,7 +1117,7 @@ namespace dlib
             - if padding == 0 then the chip will be closely cropped around the face.
               Setting larger padding values will result a looser cropping.  In particular,
               a padding of 0.5 would double the width of the cropped area, a value of 1
-              would tripple it, and so forth.
+              would triple it, and so forth.
     !*/
 
 // ----------------------------------------------------------------------------------------
