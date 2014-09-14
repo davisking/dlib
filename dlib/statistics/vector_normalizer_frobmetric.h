@@ -81,8 +81,9 @@ namespace dlib
         {
             objective (
                 const std::vector<compact_frobmetric_training_sample>& samples_,
-                matrix<double,0,0,mem_manager_type>& Aminus_
-            ) : samples(samples_), Aminus(Aminus_) {}
+                matrix<double,0,0,mem_manager_type>& Aminus_,
+                const matrix<double,0,1,mem_manager_type>& bias_ 
+            ) : samples(samples_), Aminus(Aminus_), bias(bias_) {}
             
             double operator()(const matrix<double,0,1,mem_manager_type>& u) const
             {
@@ -118,12 +119,13 @@ namespace dlib
                 // computation can make Aminus slightly non-symmetric.
                 Aminus = make_symmetric(Aminus);
 
-                return sum(u) - 0.5*sum(squared(Aminus));
+                return dot(u,bias) - 0.5*sum(squared(Aminus));
             }
 
         private:
             const std::vector<compact_frobmetric_training_sample>& samples;
             matrix<double,0,0,mem_manager_type>& Aminus;
+            const matrix<double,0,1,mem_manager_type>& bias;
         };
 
         struct derivative
@@ -131,8 +133,9 @@ namespace dlib
             derivative (
                 unsigned long num_triples_,
                 const std::vector<compact_frobmetric_training_sample>& samples_,
-                matrix<double,0,0,mem_manager_type>& Aminus_
-            ) : num_triples(num_triples_), samples(samples_), Aminus(Aminus_) {}
+                matrix<double,0,0,mem_manager_type>& Aminus_,
+                const matrix<double,0,1,mem_manager_type>& bias_ 
+            ) : num_triples(num_triples_), samples(samples_), Aminus(Aminus_), bias(bias_) {}
             
             matrix<double,0,1,mem_manager_type> operator()(const matrix<double,0,1,mem_manager_type>& ) const
             {
@@ -158,7 +161,8 @@ namespace dlib
                     {
                         for (unsigned long k = 0; k < samples[i].far_vects.size(); ++k)
                         {
-                            grad(idx++) = 1 + ufar[k]-unear[j];
+                            grad(idx) = bias(idx) + ufar[k]-unear[j];
+                            idx++;
                         }
                     }
                 }
@@ -170,6 +174,7 @@ namespace dlib
             const unsigned long num_triples;
             const std::vector<compact_frobmetric_training_sample>& samples;
             matrix<double,0,0,mem_manager_type>& Aminus;
+            const matrix<double,0,1,mem_manager_type>& bias;
         };
 
 
@@ -245,6 +250,20 @@ namespace dlib
             eps = 0.1;
             C = 1;
             max_iter = 5000;
+            _use_identity_matrix_prior = false;
+        }
+
+        bool uses_identity_matrix_prior (
+        ) const
+        {
+            return _use_identity_matrix_prior;
+        }
+
+        void set_uses_identity_matrix_prior (
+            bool use_prior
+        )
+        {
+            _use_identity_matrix_prior = use_prior;
         }
 
         void be_verbose(
@@ -402,27 +421,50 @@ namespace dlib
                 num_triples += samples[i].near_vects.size()*samples[i].far_vects.size();
 
             matrix<double,0,1,mem_manager_type> u(num_triples);
+            matrix<double,0,1,mem_manager_type> bias(num_triples);
             u = 0;
+            bias = 1;
 
 
             // precompute all the anchor_vect to far_vects/near_vects pairs
             std::vector<compact_frobmetric_training_sample> data(samples.size());
+            unsigned long cnt = 0;
+            std::vector<double> far_norm, near_norm;
             for (unsigned long i = 0; i < data.size(); ++i)
             {
+                far_norm.clear();
+                near_norm.clear();
                 data[i].far_vects.reserve(samples[i].far_vects.size());
                 data[i].near_vects.reserve(samples[i].near_vects.size());
                 for (unsigned long j = 0; j < samples[i].far_vects.size(); ++j)
+                {
                     data[i].far_vects.push_back(samples[i].anchor_vect - samples[i].far_vects[j]);
+                    if (_use_identity_matrix_prior)
+                        far_norm.push_back(length_squared(data[i].far_vects.back()));
+                }
                 for (unsigned long j = 0; j < samples[i].near_vects.size(); ++j)
+                {
                     data[i].near_vects.push_back(samples[i].anchor_vect - samples[i].near_vects[j]);
+                    if (_use_identity_matrix_prior)
+                        near_norm.push_back(length_squared(data[i].near_vects.back()));
+                }
+
+                // Note that this loop only executes if _use_identity_matrix_prior == true.
+                for (unsigned long j = 0; j < near_norm.size(); ++j)
+                {
+                    for (unsigned long k = 0; k < far_norm.size(); ++k)
+                    {
+                        bias(cnt++) = 1 - (far_norm[k] - near_norm[j]);
+                    }
+                }
             }
 
             // Now run the main part of the algorithm
             matrix<double,0,0,mem_manager_type> Aminus;
             find_max_box_constrained(lbfgs_search_strategy(10),
                                      custom_stop_strategy(C, eps, verbose, max_iter),
-                                     objective(data, Aminus),
-                                     derivative(num_triples, data, Aminus),
+                                     objective(data, Aminus, bias),
+                                     derivative(num_triples, data, Aminus, bias),
                                      u, 0, C/num_triples);
 
 
@@ -437,7 +479,10 @@ namespace dlib
                 if (eigs(i) < tol)
                     eigs(i) = 0;
             }
-            tform = matrix_cast<scalar_type>(diagm(sqrt(eigs))*trans(ed.get_pseudo_v()));
+            if (_use_identity_matrix_prior)
+                tform = matrix_cast<scalar_type>(identity_matrix(Aminus) + diagm(sqrt(eigs))*trans(ed.get_pseudo_v()));
+            else
+                tform = matrix_cast<scalar_type>(diagm(sqrt(eigs))*trans(ed.get_pseudo_v()));
 
             // Pre-apply the transform to m so we don't have to do it inside operator()
             // every time it's called.
@@ -509,6 +554,7 @@ namespace dlib
         double eps;
         double C;
         unsigned long max_iter;
+        bool _use_identity_matrix_prior;
 
         // This is just a temporary variable that doesn't contribute to the
         // state of this object.
@@ -525,7 +571,7 @@ namespace dlib
         std::ostream& out 
     )
     {
-        const int version = 1;
+        const int version = 2;
         serialize(version, out);
 
         serialize(item.m, out);
@@ -534,6 +580,7 @@ namespace dlib
         serialize(item.eps, out);
         serialize(item.C, out);
         serialize(item.max_iter, out);
+        serialize(item._use_identity_matrix_prior, out);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -548,7 +595,7 @@ namespace dlib
     {
         int version = 0;
         deserialize(version, in);
-        if (version != 1)
+        if (version != 1 && version != 2)
             throw serialization_error("Unsupported version found while deserializing dlib::vector_normalizer_frobmetric.");
 
         deserialize(item.m, in);
@@ -557,6 +604,10 @@ namespace dlib
         deserialize(item.eps, in);
         deserialize(item.C, in);
         deserialize(item.max_iter, in);
+        if (version == 2)
+            deserialize(item._use_identity_matrix_prior, in);
+        else
+            item._use_identity_matrix_prior = false;
     }
 
 // ----------------------------------------------------------------------------------------

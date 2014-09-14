@@ -73,6 +73,7 @@ namespace dlib
                 - get_c() == 1
                 - get_max_iterations() == 5000
                 - This object is not verbose
+                - uses_identity_matrix_prior() == false
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for performing the FrobMetric distance metric
@@ -108,6 +109,27 @@ namespace dlib
         /*!
             ensures
                 - this object is properly initialized
+        !*/
+
+        bool uses_identity_matrix_prior (
+        ) const;
+        /*!
+            ensures
+                - Normally this object will try and find a matrix transform() that
+                  minimizes sum(squared(transform())) but also fits the training data.
+                  However, if #uses_identity_matrix_prior() == true then it will instead
+                  try to find the transformation matrix that minimizes
+                  sum(squared(identity_matrix()-transform())).  That is, it will try to
+                  find the matrix most similar to the identity matrix that best fits the
+                  training data.
+        !*/
+
+        void set_uses_identity_matrix_prior (
+            bool use_prior
+        );
+        /*!
+            ensures
+                - #uses_identity_matrix_prior() == use_prior
         !*/
 
         void be_verbose(

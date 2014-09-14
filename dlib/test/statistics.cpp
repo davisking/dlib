@@ -692,10 +692,51 @@ namespace
 
         }
 
+        void prior_frobnorm_test()
+        {
+            frobmetric_training_sample<matrix<double,0,1> > sample;
+            std::vector<frobmetric_training_sample<matrix<double,0,1> > > samples;
+
+            matrix<double,3,1> x, near, far;
+            x    = 0,0,0;
+            near = 1,0,0;
+            far  = 0,1,0;
+
+            sample.anchor_vect = x;
+            sample.near_vects.push_back(near);
+            sample.far_vects.push_back(far);
+
+            samples.push_back(sample);
+
+            vector_normalizer_frobmetric<matrix<double,0,1> > trainer;
+            trainer.set_c(100);
+            print_spinner();
+            trainer.train(samples);
+
+            matrix<double,3,3> correct;
+            correct = 0, 0, 0,
+                      0, 1, 0, 
+                      0, 0, 0;
+
+            dlog << LDEBUG << trainer.transform();
+            DLIB_TEST(max(abs(trainer.transform()-correct)) < 1e-8);
+
+            trainer.set_uses_identity_matrix_prior(true);
+            print_spinner();
+            trainer.train(samples);
+            correct = 1, 0, 0,
+                      0, 2, 0, 
+                      0, 0, 1;
+
+            dlog << LDEBUG << trainer.transform();
+            DLIB_TEST(max(abs(trainer.transform()-correct)) < 1e-8);
+
+        }
 
         void perform_test (
         )
         {
+            prior_frobnorm_test();
             dlib::rand rnd;
             for (int i = 0; i < 5; ++i)
                 test_vector_normalizer_frobmetric(rnd);
