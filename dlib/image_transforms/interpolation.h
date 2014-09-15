@@ -1510,6 +1510,28 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline full_object_detection map_det_to_chip(
+        const full_object_detection& det,
+        const chip_details& details
+    )
+    {
+        point_transform_affine tform = get_mapping_to_chip(details);
+        full_object_detection res(det);
+        // map the parts
+        for (unsigned long l = 0; l < det.num_parts(); ++l)
+            res.part(l) = tform(det.part(l));
+        // map the main rectangle
+        rectangle rect;
+        rect += tform(det.get_rect().tl_corner());
+        rect += tform(det.get_rect().tr_corner());
+        rect += tform(det.get_rect().bl_corner());
+        rect += tform(det.get_rect().br_corner());
+        res.get_rect() = rect;
+        return res;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename image_type1,
         typename image_type2

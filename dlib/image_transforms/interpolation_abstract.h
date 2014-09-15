@@ -1041,6 +1041,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    full_object_detection map_det_to_chip (
+        const full_object_detection& det,
+        const chip_details& details
+    );
+    /*!
+        ensures
+            - Maps the given detection into the pixel space of the image chip defined by
+              the given details object.  That is, this function returns an object D such
+              that:
+                - D.get_rect() == a box that bounds the same thing in the image chip as
+                  det.get_rect() bounds in the original image the chip is extracted from.
+                - for all valid i:
+                    - D.part(i) == the location in the image chip corresponding to
+                      det.part(i) in the original image.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename image_type1,
         typename image_type2
