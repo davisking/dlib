@@ -17,6 +17,7 @@
 #include "image_transforms/segment_image.h"
 #include "image_transforms/interpolation.h"
 #include "image_transforms/fhog.h"
+#include "image_transforms/lbp.h"
 
 #endif // DLIB_IMAGE_TRANSFORMs_
 
