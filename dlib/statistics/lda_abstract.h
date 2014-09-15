@@ -32,7 +32,7 @@ namespace dlib
             - We interpret X as a collection X.nr() of input vectors, where each row of X
               is one of the vectors.
             - We interpret row_labels[i] as the label of the vector rowm(X,i).
-            - This function performs the dimensionality reducing version of Linear
+            - This function performs the dimensionality reducing version of linear
               discriminant analysis.  That is, you give it a set of labeled vectors and it
               returns a linear transform that maps the input vectors into a new space that
               is good for distinguishing between the different classes.  In particular,
