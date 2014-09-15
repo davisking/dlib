@@ -86,8 +86,8 @@ namespace dlib
             - cell_size >= 1
         ensures
             - Extracts histograms of uniform local-binary-patterns from img.  The
-              histograms are densely tiled windows that are cell_size pixels wide and tall.
-              The windows do not overlap and cover all of img.
+              histograms are from densely tiled windows that are cell_size pixels wide and
+              tall.  The windows do not overlap and cover all of img.
             - #feats.size() == 59*(number of windows that fit into img)
               (i.e. #feats contains the LBP histograms)
             - We will have taken the square root of all the histogram elements.  That is,
