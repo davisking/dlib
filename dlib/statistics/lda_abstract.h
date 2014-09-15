@@ -54,7 +54,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    std::pair<double,double> compute_equal_error_rate (
+    std::pair<double,double> equal_error_rate (
         const std::vector<double>& low_vals,
         const std::vector<double>& high_vals 
     );
