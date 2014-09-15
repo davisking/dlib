@@ -351,6 +351,7 @@
          <term file="ml.html" name="is_ranking_problem"                             include="dlib/svm.h"/>
          <term file="ml.html" name="count_ranking_inversions"                       include="dlib/svm.h"/>
          <term file="ml.html" name="average_precision"                              include="dlib/statistics.h"/>
+         <term file="ml.html" name="equal_error_rate"                               include="dlib/statistics.h"/>
          <term file="ml.html" name="test_ranking_function"                          include="dlib/svm.h"/>
          <term file="ml.html" name="cross_validate_ranking_trainer"                 include="dlib/svm.h"/>
          <term file="ml.html" name="svm_c_ekm_trainer"                              include="dlib/svm.h"/>
@@ -398,6 +399,7 @@
          <term file="ml.html" name="rank_unlabeled_training_samples"                include="dlib/svm.h"/>
          <term file="ml.html" name="vector_normalizer"                              include="dlib/statistics.h"/>
          <term file="ml.html" name="vector_normalizer_frobmetric"                   include="dlib/statistics.h"/>
+         <term file="ml.html" name="compute_lda_transform"                          include="dlib/statistics.h"/>
          <term file="ml.html" name="frobmetric_training_sample"                     include="dlib/statistics.h"/>
          <term file="ml.html" name="vector_normalizer_pca"                          include="dlib/statistics.h"/>
          <term file="ml.html" name="discriminant_pca"                               include="dlib/statistics.h"/>
@@ -1256,6 +1258,7 @@
          <term file="dlib/image_transforms/interpolation_abstract.h.html" name="chip_details"           include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/interpolation_abstract.h.html" name="get_face_chip_details"  include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/interpolation_abstract.h.html" name="get_mapping_to_chip" include="dlib/image_transforms.h"/>
+         <term file="dlib/image_transforms/interpolation_abstract.h.html" name="map_det_to_chip" include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/interpolation_abstract.h.html" name="chip_dims"      include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="pyramid_up"              include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="add_image_left_right_flips" include="dlib/image_transforms.h"/>
@@ -1269,6 +1272,11 @@
          <term file="dlib/image_transforms/interpolation_abstract.h.html" name="black_background" include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/interpolation_abstract.h.html" name="white_background" include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/interpolation_abstract.h.html" name="no_background"    include="dlib/image_transforms.h"/>
+         
+         <term file="imaging.html" name="make_uniform_lbp_image"                 include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="extract_histogram_descriptors"          include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="extract_uniform_lbp_descriptors"        include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="extract_highdim_face_lbp_descriptors"   include="dlib/image_transforms.h"/>
 
          <term file="imaging.html" name="integral_image"          include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="integral_image_generic"  include="dlib/image_transforms.h"/>

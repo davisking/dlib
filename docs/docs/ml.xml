@@ -132,6 +132,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>linear_manifold_regularizer</item>
          <item>discriminant_pca</item> 
          <item>vector_normalizer_frobmetric</item> 
+         <item>compute_lda_transform</item> 
       </section>
       <section>
          <name>Feature Selection</name>
@@ -166,6 +167,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>test_ranking_function</item>
          <item>test_shape_predictor</item>
          <item>average_precision</item>
+         <item>equal_error_rate</item>
       </section>
 
       <section>
@@ -617,6 +619,20 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                 form it.  This object then tries to find a transformation matrix that makes
                 the "near" vectors close to their anchors while the "far" vectors are
                 farther away.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>compute_lda_transform</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/lda_abstract.h</spec_file>
+         <description>
+            This function performs the dimensionality reducing version of linear
+            discriminant analysis.  That is, you give it a set of labeled vectors and it
+            returns a linear transform that maps the input vectors into a new space that
+            is good for distinguishing between the different classes. 
          </description>
       </component>
       
@@ -2690,6 +2706,19 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <spec_file link="true">dlib/statistics/average_precision_abstract.h</spec_file>
          <description>
             This function computes the average precision of a ranking.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>equal_error_rate</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/lda_abstract.h</spec_file>
+         <description>
+              This function finds a threshold that best separates the elements of two
+              vectors by selecting the threshold with equal error rate.  It also reports
+              the value of the equal error rate.
          </description>
       </component>
       

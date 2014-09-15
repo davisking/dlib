@@ -144,6 +144,11 @@
          <item>binned_vector_feature_image</item>
          <item>nearest_neighbor_feature_image</item>
          <item>randomly_sample_image_features</item> 
+
+         <item>make_uniform_lbp_image</item>
+         <item>extract_histogram_descriptors</item>
+         <item>extract_uniform_lbp_descriptors</item>
+         <item>extract_highdim_face_lbp_descriptors</item>
       </section>
 
 
@@ -2264,6 +2269,71 @@
             from a set of images.  
          </description>
                                  
+      </component>
+
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>make_uniform_lbp_image</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/lbp_abstract.h</spec_file>
+         <description>
+              This function extracts the uniform local-binary-pattern feature at every pixel
+              of an image and stores the output in a new image object.  
+              We use the idea of uniform LBPs from the paper: 
+              <blockquote>
+                Face Description with Local Binary Patterns: Application to Face Recognition
+                by Ahonen, Hadid, and Pietikainen.
+              </blockquote>
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>extract_histogram_descriptors</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/lbp_abstract.h</spec_file>
+         <description>
+              This function extracts histograms of pixel values from a set of windows in an
+              image and returns the histograms.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>extract_uniform_lbp_descriptors</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/lbp_abstract.h</spec_file>
+         <description>
+              Extracts histograms of uniform local-binary-patterns from an image.  The
+              histograms are from densely tiled windows that do not overlap and cover all
+              of the image.
+              We use the idea of uniform LBPs from the paper: 
+              <blockquote>
+                Face Description with Local Binary Patterns: Application to Face Recognition
+                by Ahonen, Hadid, and Pietikainen.
+              </blockquote>
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>extract_highdim_face_lbp_descriptors</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/lbp_abstract.h</spec_file>
+         <description>
+              This function extracts the high-dimensional LBP feature described in the
+              paper:
+              <blockquote>
+                Blessing of Dimensionality: High-dimensional Feature and Its Efficient
+                Compression for Face Verification by Dong Chen, Xudong Cao, Fang Wen, and
+                Jian Sun
+              </blockquote>
+         </description>
       </component>
       
    <!-- ************************************************************************* -->
