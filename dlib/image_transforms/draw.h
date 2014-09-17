@@ -215,7 +215,7 @@ namespace dlib
         unsigned int thickness
     ) 
     {
-        for (int i = 0; i < thickness; ++i)
+        for (unsigned int i = 0; i < thickness; ++i)
         {
             if ((i%2)==0)
                 draw_rectangle(c,shrink_rect(rect,(i+1)/2),val);
