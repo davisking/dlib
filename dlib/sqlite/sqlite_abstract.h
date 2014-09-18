@@ -22,7 +22,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is the exception object used by the SQLite tools to indicate
-                that an error has occurred.  An of the functions defined in this
+                that an error has occurred.  Any of the functions defined in this
                 file might throw this exception.
         !*/
     };
@@ -128,7 +128,7 @@ namespace dlib
                   successful INSERT into the database via this database instance.  
                 - If an INSERT has not been performed on the current database instance then
                   the return value is 0.  This is true even if the database is not empty.
-                - See the sqlite documention for the full details on how this function
+                - See the sqlite documentation for the full details on how this function
                   behaves: http://www.sqlite.org/c3ref/last_insert_rowid.html
         !*/
     };
