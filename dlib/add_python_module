@@ -46,9 +46,8 @@ else()
    INCLUDE_DIRECTORIES("${PYTHON_INCLUDE_DIRS}" )
 endif()
 
-if (CMAKE_COMPILER_IS_GNUCXX)
-   add_definitions("-fPIC")
-endif()
+
+set(CMAKE_POSITION_INDEPENDENT_CODE True)
 
 # include dlib so we can link against it
 string(REGEX REPLACE "add_python_module$" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
