@@ -27,8 +27,8 @@
                   border-width:1px; 
                   border-color:red;
                   border-radius:7px;
-                  width:14px; 
-                  height: 14px;
+                  width:1px; 
+                  height: 1px;
                }
 
                div#label{
@@ -89,11 +89,12 @@
                         </xsl:if>
 
                         <xsl:for-each select="part">
+                           <!--
                            <div id="label" style="top: {@y+7}px; left: {@x}px;">
                               <xsl:value-of select="@name"/>
                            </div>
-
-                           <div id="circle" style="top: {(@y)-7}px; left: {(@x)-7}px; "></div>
+                           -->
+                           <div id="circle" style="top: {(@y)}px; left: {(@x)}px; "></div>
                         </xsl:for-each>
                      </xsl:for-each>
                   </div>
