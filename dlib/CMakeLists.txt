@@ -261,7 +261,7 @@ if (NOT TARGET dlib)
 
       if (DLIB_LINK_WITH_LIBJPEG)
          # try to find libjpeg 
-         include(FindJPEG)
+         find_package(JPEG QUIET)
          if (JPEG_FOUND)
             include_directories(${JPEG_INCLUDE_DIR})
             set (dlib_needed_libraries ${dlib_needed_libraries} ${JPEG_LIBRARY})
