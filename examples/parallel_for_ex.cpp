@@ -148,7 +148,7 @@ void example_using_lambda_functions()
     // parallel for loop is implemented using threads, all the usual techniques for
     // ensuring thread safety can be used. 
     int sum = 0;
-    mutex m;
+    dlib::mutex m;
     vect.assign(10, 2);
     parallel_for(num_threads, 0, vect.size(), [&](long i){
         // The sleep statements still execute in parallel.  
@@ -194,7 +194,7 @@ struct function_object_sum
 
     const std::vector<int>& vect;
     int& sum;
-    mutex m;
+    dlib::mutex m;
 
     void operator() (long i) const
     {

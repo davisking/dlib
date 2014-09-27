@@ -23,7 +23,7 @@ using namespace std;
 using namespace dlib;
 
 int thread_count = 10;
-mutex count_mutex; // This is a mutex we will use to guard the thread_count variable.  Note that the mutex doesn't know
+dlib::mutex count_mutex; // This is a mutex we will use to guard the thread_count variable.  Note that the mutex doesn't know
                    // anything about the thread_count variable.  Only our usage of a mutex determines what it guards.  
                    // In this case we are going to make sure this mutex is always locked before we touch the
                    // thread_count variable.
