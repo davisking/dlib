@@ -120,7 +120,7 @@ namespace dlib
                 result = result->ai_next;
 
                 ip.assign(temp);
-                if (sos.is_member(ip) == false)
+                if (sos.is_member(ip) == false && ip != "0.0.0.0")
                     sos.add(ip);
             }
 
