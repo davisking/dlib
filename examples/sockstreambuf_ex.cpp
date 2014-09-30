@@ -41,7 +41,7 @@ int main()
             iostream stream(&buf);
             // This command causes the iostream to flush its output buffers
             // whenever someone makes a read request. 
-            stream.tie(&stream);
+            buf.flush_output_on_read();
 
             // Now we make the HTTP GET request for the main Google page.
             stream << "GET / HTTP/1.0\r\n\r\n";
