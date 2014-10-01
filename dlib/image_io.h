@@ -9,6 +9,7 @@
 #include "image_loader/load_image.h"
 #include "image_saver/image_saver.h"
 #include "image_saver/save_png.h"
+#include "image_saver/save_jpeg.h"
 
 #endif // DLIB_IMAGe_IO_ 
 
