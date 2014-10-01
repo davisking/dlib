@@ -43,6 +43,12 @@ namespace dlib
         int quality
     )
     {
+        // make sure requires clause is not broken
+        DLIB_CASSERT(img.size() != 0,
+            "\t save_jpeg()"
+            << "\n\t You can't save an empty image as a JPEG."
+            );
+
         FILE* outfile = fopen(filename.c_str(), "wb");
         if (!outfile)
             throw image_save_error("Can't open file " + filename + " for writing.");
@@ -93,6 +99,12 @@ namespace dlib
         int quality
     )
     {
+        // make sure requires clause is not broken
+        DLIB_CASSERT(img.size() != 0,
+            "\t save_jpeg()"
+            << "\n\t You can't save an empty image as a JPEG."
+            );
+
         FILE* outfile = fopen(filename.c_str(), "wb");
         if (!outfile)
             throw image_save_error("Can't open file " + filename + " for writing.");
