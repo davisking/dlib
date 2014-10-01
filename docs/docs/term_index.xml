@@ -1223,6 +1223,7 @@
          <term link="imaging.html#rgb_alpha_pixel" name="alpha"/>
          <term file="imaging.html" name="save_bmp"             include="dlib/image_io.h"/>
          <term file="imaging.html" name="save_png"             include="dlib/image_io.h"/>
+         <term file="imaging.html" name="save_jpeg"            include="dlib/image_io.h"/>
          <term file="imaging.html" name="load_image"           include="dlib/image_io.h"/>
          <term file="imaging.html" name="save_dng"             include="dlib/image_io.h"/>
          <term file="dlib/image_transforms/spatial_filtering_abstract.h.html" name="create_gaussian_filter" include="dlib/image_transforms.h"/>
