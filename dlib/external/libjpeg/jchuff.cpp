@@ -297,7 +297,7 @@ dump_buffer (working_state * state)
  * between calls, so 24 bits are sufficient.
  */
 
-INLINE
+inline
 LOCAL(int)
 emit_bits (working_state * state, unsigned int code, int size)
 /* Emit some bits; return TRUE if successful, FALSE if must suspend */
@@ -827,7 +827,7 @@ jpeg_gen_optimal_table (j_compress_ptr cinfo, JHUFF_TBL * htbl, long freq[])
   for (i = 1; i <= MAX_CLEN; i++) {
     for (j = 0; j <= 255; j++) {
       if (codesize[j] == i) {
-	htbl->huffval[p] = (unsigned short) j;
+	htbl->huffval[p] = (unsigned char) j;
 	p++;
       }
     }
