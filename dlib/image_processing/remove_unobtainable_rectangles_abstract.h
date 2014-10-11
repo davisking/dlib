@@ -18,8 +18,7 @@ namespace dlib
 
     template <
         typename image_scanner_type,
-        typename image_array_type,
-        typename Pyramid_type
+        typename image_array_type
         >
     std::vector<std::vector<rectangle> > remove_unobtainable_rectangles (
         const structural_object_detection_trainer<image_scanner_type>& trainer,
