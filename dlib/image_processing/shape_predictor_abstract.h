@@ -28,6 +28,11 @@ namespace dlib
                 shape_predictor_trainer object defined below to train a shape_predictor
                 using a set of training images, each annotated with shapes you want to
                 predict.
+
+            THREAD SAFETY
+                No synchronization is required when using this object.  In particular, a
+                single instance of this object can be used from multiple threads at the
+                same time.  
         !*/
 
     public:
