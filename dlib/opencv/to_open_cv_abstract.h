@@ -3,6 +3,7 @@
 #undef DLIB_TO_OPEN_Cv_ABSTRACTh_
 #ifdef DLIB_TO_OPEN_Cv_ABSTRACTh_
 
+#include <opencv2/core/core.hpp>
 #include "../pixel.h"
 
 namespace dlib

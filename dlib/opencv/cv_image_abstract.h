@@ -3,6 +3,8 @@
 #undef DLIB_OPENCV_IMAGE_AbSTRACT_H_
 #ifdef DLIB_OPENCV_IMAGE_AbSTRACT_H_
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/core/types_c.h>
 #include "../algs.h"
 #include "../pixel.h"
 
