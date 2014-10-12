@@ -63,7 +63,17 @@ cmake --build . --config Release
 </code_box>
 Note that you also need to have a C++ compiler installed on your system.  There are free C++ compilers
 for most operating systems.  For example, Visual Studio Express is free on Windows and GCC is free and
-works well on Mac OS X and Linux systems.
+works well on Mac OS X and Linux systems.  
+<p>
+   Finally, note that when using Visual Studio CMake will, by default, generate a 32bit executable.  
+   This means the programs you compile will only be able to use 2GB of RAM.  To avoid this, you need
+   to tell CMake to generate a 64bit executable.  You do this by using a command like 
+   <code_box>cmake -G "Visual Studio 10 2010 Win64" ..</code_box> instead of <code_box>cmake ..</code_box>  
+   You can see the list of valid arguments to <tt>-G</tt> by running <tt>cmake</tt> with no options.
+</p>
+
+
+
 
         <h2>Compiling on Linux From Command Line</h2>
         From within the examples folder, you can compile any of the examples with a single command like so:
@@ -98,6 +108,12 @@ sudo apt-get install libx11-dev
            folder containing the dlib folder to the #include search path.  Then you can compile any example program 
            by adding it to your project.  
         </p>
+        <p>
+           Note that dlib will only be able to work with JPEG and PNG files if you also add all the source
+           files in the dlib/external folder into your project and also add the DLIB_PNG_SUPPORT and DLIB_JPEG_SUPPORT
+           preprocessor directives.  If you don't know how to configure Visual Studio then you should use
+           CMake as shown above since it will take care of everything for you.
+        </p>
 
 
         <center><h1>Preprocessor Directives</h1></center>
@@ -114,7 +130,7 @@ sudo apt-get install libx11-dev
         <h3>#define ENABLE_ASSERTS</h3>
         <p>
            Defining this directive causes all the <a href="metaprogramming.html#DLIB_ASSERT">DLIB_ASSERT</a> macros to
-           be active.  If you are using visual studio or CMake then ENABLE_ASSERTS will be automatically enabled
+           be active.  If you are using Visual Studio or CMake then ENABLE_ASSERTS will be automatically enabled
            for you when you compile in debug mode.  However, if you are using a different build system then you
            might have to manually enable it if you want to turn the asserts on.
         </p>
