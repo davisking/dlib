@@ -176,8 +176,10 @@ namespace dlib
         double f_value = f(x);
         g = der(x);
 
-        DLIB_ASSERT(is_finite(f_value), "The objective function generated non-finite outputs");
-        DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
+        if (!is_finite(f_value))
+            throw error("The objective function generated non-finite outputs");
+        if (!is_finite(g))
+            throw error("The objective function generated non-finite outputs");
 
         while(stop_strategy.should_continue_search(x, f_value, g) && f_value > min_f)
         {
@@ -194,8 +196,10 @@ namespace dlib
             // Take the search step indicated by the above line search
             x += alpha*s;
 
-            DLIB_ASSERT(is_finite(f_value), "The objective function generated non-finite outputs");
-            DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
+            if (!is_finite(f_value))
+                throw error("The objective function generated non-finite outputs");
+            if (!is_finite(g))
+                throw error("The objective function generated non-finite outputs");
         }
 
         return f_value;
@@ -238,8 +242,10 @@ namespace dlib
         double f_value = -f(x);
         g = -der(x);
 
-        DLIB_ASSERT(is_finite(f_value), "The objective function generated non-finite outputs");
-        DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
+        if (!is_finite(f_value))
+            throw error("The objective function generated non-finite outputs");
+        if (!is_finite(g))
+            throw error("The objective function generated non-finite outputs");
 
         while(stop_strategy.should_continue_search(x, f_value, g) && f_value > -max_f)
         {
@@ -262,8 +268,10 @@ namespace dlib
             g *= -1;
             f_value *= -1;
 
-            DLIB_ASSERT(is_finite(f_value), "The objective function generated non-finite outputs");
-            DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
+            if (!is_finite(f_value))
+                throw error("The objective function generated non-finite outputs");
+            if (!is_finite(g))
+                throw error("The objective function generated non-finite outputs");
         }
 
         return -f_value;
@@ -303,8 +311,10 @@ namespace dlib
         double f_value = f(x);
         g = derivative(f,derivative_eps)(x);
 
-        DLIB_ASSERT(is_finite(f_value), "The objective function generated non-finite outputs");
-        DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
+        if (!is_finite(f_value))
+            throw error("The objective function generated non-finite outputs");
+        if (!is_finite(g))
+            throw error("The objective function generated non-finite outputs");
 
         while(stop_strategy.should_continue_search(x, f_value, g) && f_value > min_f)
         {
@@ -325,8 +335,10 @@ namespace dlib
 
             g = derivative(f,derivative_eps)(x);
 
-            DLIB_ASSERT(is_finite(f_value), "The objective function generated non-finite outputs");
-            DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
+            if (!is_finite(f_value))
+                throw error("The objective function generated non-finite outputs");
+            if (!is_finite(g))
+                throw error("The objective function generated non-finite outputs");
         }
 
         return f_value;
@@ -481,8 +493,10 @@ namespace dlib
         double f_value = f(x);
         g = der(x);
 
-        DLIB_ASSERT(is_finite(f_value), "The objective function generated non-finite outputs");
-        DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
+        if (!is_finite(f_value))
+            throw error("The objective function generated non-finite outputs");
+        if (!is_finite(g))
+            throw error("The objective function generated non-finite outputs");
 
         // gap_eps determines how close we have to get to a bound constraint before we
         // start basically dropping it from the optimization and consider it to be an
@@ -516,8 +530,10 @@ namespace dlib
             x = clamp(x + alpha*s, x_lower, x_upper);
             g = der(x);
 
-            DLIB_ASSERT(is_finite(f_value), "The objective function generated non-finite outputs");
-            DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
+            if (!is_finite(f_value))
+                throw error("The objective function generated non-finite outputs");
+            if (!is_finite(g))
+                throw error("The objective function generated non-finite outputs");
         }
 
         return f_value;
@@ -608,8 +624,10 @@ namespace dlib
         double f_value = -f(x);
         g = -der(x);
 
-        DLIB_ASSERT(is_finite(f_value), "The objective function generated non-finite outputs");
-        DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
+        if (!is_finite(f_value))
+            throw error("The objective function generated non-finite outputs");
+        if (!is_finite(g))
+            throw error("The objective function generated non-finite outputs");
 
         // gap_eps determines how close we have to get to a bound constraint before we
         // start basically dropping it from the optimization and consider it to be an
@@ -647,8 +665,10 @@ namespace dlib
             // unnegated version of f() 
             f_value *= -1;
 
-            DLIB_ASSERT(is_finite(f_value), "The objective function generated non-finite outputs");
-            DLIB_ASSERT(is_finite(g), "The objective function generated non-finite outputs");
+            if (!is_finite(f_value))
+                throw error("The objective function generated non-finite outputs");
+            if (!is_finite(g))
+                throw error("The objective function generated non-finite outputs");
         }
 
         return -f_value;
