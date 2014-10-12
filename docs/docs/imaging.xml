@@ -735,8 +735,7 @@
 
                <p>
                   Note that you can do the reverse conversion, from dlib to OpenCV,
-                  using the <a href="#toMat">toMat</a> routine.  Also note that you
-                  have to #include OpenCV's header before you #include dlib/opencv.h.
+                  using the <a href="#toMat">toMat</a> routine.  
                </p>
          </description>
                                  
@@ -753,8 +752,7 @@
             This is done by setting up the Mat object to point to the same memory as the dlib image.
                <p>
                   Note that you can do the reverse conversion, from OpenCV to dlib,
-                  using the <a href="#cv_image">cv_image</a> object.  Also note that you
-                  have to #include OpenCV's header before you #include dlib/opencv.h.
+                  using the <a href="#cv_image">cv_image</a> object.  
                </p>
          </description>
                                  
