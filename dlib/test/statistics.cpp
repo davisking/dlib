@@ -697,14 +697,14 @@ namespace
             frobmetric_training_sample<matrix<double,0,1> > sample;
             std::vector<frobmetric_training_sample<matrix<double,0,1> > > samples;
 
-            matrix<double,3,1> x, near, far;
+            matrix<double,3,1> x, near_, far_;
             x    = 0,0,0;
-            near = 1,0,0;
-            far  = 0,1,0;
+            near_ = 1,0,0;
+            far_  = 0,1,0;
 
             sample.anchor_vect = x;
-            sample.near_vects.push_back(near);
-            sample.far_vects.push_back(far);
+            sample.near_vects.push_back(near_);
+            sample.far_vects.push_back(far_);
 
             samples.push_back(sample);
 
