@@ -48,6 +48,11 @@ namespace dlib
             "\t save_jpeg()"
             << "\n\t You can't save an empty image as a JPEG."
             );
+        DLIB_CASSERT(0 <= quality && quality <= 100,
+            "\t save_jpeg()"
+            << "\n\t Invalid quality value."
+            << "\n\t quality: " << quality
+            );
 
         FILE* outfile = fopen(filename.c_str(), "wb");
         if (!outfile)
@@ -104,6 +109,12 @@ namespace dlib
             "\t save_jpeg()"
             << "\n\t You can't save an empty image as a JPEG."
             );
+        DLIB_CASSERT(0 <= quality && quality <= 100,
+            "\t save_jpeg()"
+            << "\n\t Invalid quality value."
+            << "\n\t quality: " << quality
+            );
+
 
         FILE* outfile = fopen(filename.c_str(), "wb");
         if (!outfile)
