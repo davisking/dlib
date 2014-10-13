@@ -12,6 +12,34 @@
 
 <current>
 New Features:
+   - Added save_jpeg()
+   - Added the option to use an identity matrix prior to vector_normalizer_frobmetric.
+   - Made the extract_image_chips() routine more flexible, in particular: Added
+     get_mapping_to_chip(), get_face_chip_details(), map_det_to_chip(), and also
+     upgraded chip_details so you can specify a chip extraction by a bunch of
+     point correspondences between the chip and the original image.
+   - Added a set of local-binary-pattern based feature extractors:
+     make_uniform_lbp_image(), extract_histogram_descriptors(),
+     extract_uniform_lbp_descriptors(), and extract_highdim_face_lbp_descriptors() 
+   - Added compute_lda_transform() 
+   - Added equal_error_rate()
+   - Added cast_to() to the type_safe_union. This allows you to get the
+     contents of a const type_safe_union.
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Changed noncopyable.h to avoid a name clash with boost 1.56
+   - On some platforms hostname_to_ip() would erroneously return 0.0.0.0. This
+     has been fixed.
+
+Other:
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="18.10" date="Aug 28, 2014">
+New Features:
    - Added find_similarity_transform()
    - Added the ability to upgrade a auto_mutex_readonly from a readonly lock to a write
      lock. 
@@ -56,7 +84,7 @@ Other:
      another detector.
    - Made the version of draw_line() that draws onto a regular image use alpha blending
      for drawing diagonal lines.
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
