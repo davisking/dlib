@@ -1145,7 +1145,8 @@
          <term file="dlib/ref.h.html" name="cref"                       include="dlib/ref.h"/>
          <term file="containers.html" name="reference_wrapper"          include="dlib/ref.h"/>
          <term file="containers.html" name="tuple"                      include="dlib/tuple.h"/>
-         <term file="containers.html" name="type_safe_union"            include="dlib/type_safe_union.h"/>
+         <term file="dlib/type_safe_union/type_safe_union_kernel_abstract.h.html" 
+               name="bad_type_safe_union_cast"            include="dlib/type_safe_union.h"/>
 
          <term file="containers.html" name="array2d"                    include="dlib/array2d.h"/>
 
