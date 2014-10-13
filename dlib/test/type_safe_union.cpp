@@ -97,6 +97,13 @@ namespace
 
             f_val = 4.345f;
             a.get<float>() = f_val;
+            DLIB_TEST(a.cast_to<float>() == f_val);
+            DLIB_TEST(const_cast<const tsu&>(a).cast_to<float>() == f_val);
+            bool exception_thrown = false;
+            try {a.cast_to<char>(); }
+            catch (bad_type_safe_union_cast&) { exception_thrown = true;}
+            DLIB_TEST(exception_thrown);
+
 
             DLIB_TEST(a.is_empty() == false);
             DLIB_TEST(a.contains<char>() == false);
@@ -133,6 +140,12 @@ namespace
             last_kind = NONE;
             a.apply_to_contents(*this);
             DLIB_TEST(last_kind == STRING);
+
+            DLIB_TEST(a.cast_to<std::string>() == s_val);
+            exception_thrown = false;
+            try {a.cast_to<float>(); }
+            catch (bad_type_safe_union_cast&) { exception_thrown = true;}
+            DLIB_TEST(exception_thrown);
 
         // -----------
             DLIB_TEST(a.is_empty() == false);

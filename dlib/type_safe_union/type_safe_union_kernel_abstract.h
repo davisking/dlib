@@ -11,6 +11,16 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class bad_type_safe_union_cast : public std::bad_cast 
+    {
+        /*!
+            This is the exception object thrown by type_safe_union::cast_to() if the
+            type_safe_union does not contain the type of object being requested.
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename T1,
         typename T2 = _void,  // _void indicates parameter not used.
@@ -222,6 +232,32 @@ namespace dlib
                     - Any previous object stored in this type_safe_union is destructed and its
                       state is lost.
                     - returns a non-const reference to the newly created T object.
+        !*/
+
+        template <typename T>
+        const T& cast_to (
+        ) const;
+        /*!
+            requires
+                - T must be one of the types given to this object's template arguments
+            ensures
+                - if (contains<T>() == true) then
+                    - returns a const reference to the object contained in this type_safe_union.
+                - else
+                    - throws bad_type_safe_union_cast
+        !*/
+
+        template <typename T>
+        T& cast_to (
+        );
+        /*!
+            requires
+                - T must be one of the types given to this object's template arguments
+            ensures
+                - if (contains<T>() == true) then
+                    - returns a non-const reference to the object contained in this type_safe_union.
+                - else
+                    - throws bad_type_safe_union_cast
         !*/
 
         template <typename T>

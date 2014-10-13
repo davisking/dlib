@@ -15,6 +15,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class bad_type_safe_union_cast : public std::bad_cast 
+    {
+    public:
+          virtual const char * what() const throw()
+          {
+              return "bad_type_safe_union_cast";
+          }
+    };
+
+// ----------------------------------------------------------------------------------------
+
     struct _void{};
     inline void serialize( const _void&, std::ostream&){}
     inline void deserialize(  _void&, std::istream&){}
@@ -105,7 +116,7 @@ namespace dlib
         // --------------------------------------------
 
         template <typename T>
-        void validate_type()
+        void validate_type() const
         {
             // ERROR: You are trying to get a type of object that isn't
             // representable by this type_safe_union.  I.e. The given
@@ -519,6 +530,28 @@ namespace dlib
             validate_type<T>();
             construct<T>();  
             return *static_cast<T*>(mem.get()); 
+        }
+
+        template <typename T>
+        const T& cast_to (
+        ) const
+        {
+            validate_type<T>();
+            if (contains<T>())
+                return *static_cast<const T*>(mem.get());
+            else
+                throw bad_type_safe_union_cast();
+        }
+
+        template <typename T>
+        T& cast_to (
+        ) 
+        {
+            validate_type<T>();
+            if (contains<T>())
+                return *static_cast<T*>(mem.get());
+            else
+                throw bad_type_safe_union_cast();
         }
 
         template <typename T>
