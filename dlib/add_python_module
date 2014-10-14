@@ -48,6 +48,11 @@ endif()
 
 
 set(CMAKE_POSITION_INDEPENDENT_CODE True)
+# Just setting CMAKE_POSITION_INDEPENDENT_CODE should be enough to set -fPIC
+# for GCC but sometimes it still doesn't get set, so make sure it does.
+if (CMAKE_COMPILER_IS_GNUCXX)
+    add_definitions("-fPIC")
+endif()
 
 # include dlib so we can link against it
 string(REGEX REPLACE "add_python_module$" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
