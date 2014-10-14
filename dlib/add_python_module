@@ -47,11 +47,13 @@ else()
 endif()
 
 
-set(CMAKE_POSITION_INDEPENDENT_CODE True)
-# Just setting CMAKE_POSITION_INDEPENDENT_CODE should be enough to set -fPIC
-# for GCC but sometimes it still doesn't get set, so make sure it does.
 if (CMAKE_COMPILER_IS_GNUCXX)
+    # Just setting CMAKE_POSITION_INDEPENDENT_CODE should be enough to set
+    # -fPIC for GCC but sometimes it still doesn't get set, so make sure it
+    # does.
     add_definitions("-fPIC")
+else()
+    set(CMAKE_POSITION_INDEPENDENT_CODE True)
 endif()
 
 # include dlib so we can link against it
