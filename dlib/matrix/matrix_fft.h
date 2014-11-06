@@ -40,7 +40,7 @@ namespace dlib
             typename EXP::matrix_type& outdata 
         )  
         {
-            outdata.set_size(data.size());
+            outdata.set_size(data.nr(), data.nc());
             if (data.size() == 0)
                 return;
 
