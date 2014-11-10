@@ -17,44 +17,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    namespace impl
-    {
-        inline unsigned long reverse_bits (
-            unsigned long val,
-            unsigned long num
-        )
-        {
-            unsigned long temp = 0;
-            for (unsigned long i = 0; i < num; ++i)
-            {
-                temp <<= 1;
-                temp |= val&0x1;
-                val >>= 1;
-            }
-            return temp;
-        }
-
-        template <typename EXP>
-        void permute (
-            const matrix_exp<EXP>& data, 
-            typename EXP::matrix_type& outdata 
-        )  
-        {
-            outdata.set_size(data.nr(), data.nc());
-            if (data.size() == 0)
-                return;
-
-            const unsigned long num = static_cast<unsigned long>(std::log((double)data.size())/std::log(2.0) + 0.5);
-            for (unsigned long i = 0; i < (unsigned long)data.size(); ++i)
-            {
-                outdata(impl::reverse_bits(i,num)) = data(i);
-            }
-        }
-
-    }
-
-// ----------------------------------------------------------------------------------------
-
     inline bool is_power_of_two (
         const unsigned long& value
     )
@@ -67,143 +29,429 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP>
-    typename EXP::matrix_type fft (
-        const matrix_exp<EXP>& data
-    )  
+    namespace impl
     {
-        if (data.size() == 0)
-            return data;
 
-        // You have to give a complex matrix
-        COMPILE_TIME_ASSERT(is_complex<typename EXP::type>::value);
-        // make sure requires clause is not broken
-        DLIB_CASSERT(is_vector(data) && is_power_of_two(data.size()),
-            "\t void ifft(data)"
-            << "\n\t data must be a vector with a size that is a power of two."
-            << "\n\t is_vector(data): " << is_vector(data)
-            << "\n\t data.size():     " << data.size()
-            );
+    // ------------------------------------------------------------------------------------
 
-        typedef typename EXP::type::value_type T;
+        /*
+            The next few functions related to doing FFTs are derived from Stefan
+            Gustavson's (stegu@itn.liu.se) public domain 2D Fourier transformation code.
+            The code has a long history, originally a FORTRAN implementation published in:
+            Programming for Digital Signal Processing, IEEE Press 1979, Section 1, by G. D.
+            Bergland and M. T. Dolan.  In 2003 it was cleaned up and turned into modern C
+            by Steven Gustavson.  Davis King then rewrote it in modern C++ in 2014 and also
+            changed the transform so that the outputs are identical to those given from FFTW.
+        */
 
-        typename EXP::matrix_type outdata(data);
+    // ------------------------------------------------------------------------------------
 
-        const long half = outdata.size()/2;
-
-        typedef std::complex<T> ct;
-        matrix<ct,0,1,typename EXP::mem_manager_type> twiddle_factors(half);
-
-        // compute the complex root of unity w
-        const T temp = -2.0*pi/outdata.size();
-        ct w = ct(std::cos(temp),std::sin(temp));
-
-        ct w_pow = 1;
-
-        // compute the twiddle factors
-        for (long j = 0; j < twiddle_factors.size(); ++j)
+        /* Get binary log of integer argument - exact if n is a power of 2 */
+        inline long fastlog2(long n)
         {
-            twiddle_factors(j) = w_pow; 
-            w_pow *= w;
+            long log = -1;
+            while(n) {
+                log++;
+                n >>= 1;
+            }
+            return log ;
         }
 
+    // ------------------------------------------------------------------------------------
 
-        // now compute the decimation in frequency.  This first
-        // outer loop loops log2(outdata.size()) number of times
-        long skip = 1;
-        for (long step = half; step != 0; step >>= 1)
+        /* Radix-2 iteration subroutine */
+        template <typename T>
+        void R2TX(int nthpo, std::complex<T> *c0, std::complex<T> *c1)
         {
-            // do blocks of butterflies in this loop
-            for (long j = 0; j < outdata.size(); j += step*2)
+            for(int k=0; k<nthpo; k+=2) 
             {
-                // do step butterflies
-                for (long k = 0; k < step; ++k)
+                std::complex<T> temp = c0[k] + c1[k];
+                c1[k] = c0[k] - c1[k];
+                c0[k] = temp;
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        /* Radix-4 iteration subroutine */
+        template <typename T>
+        void R4TX(int nthpo, std::complex<T> *c0, std::complex<T> *c1,
+            std::complex<T> *c2, std::complex<T> *c3)
+        {
+            for(int k=0;k<nthpo;k+=4) 
+            {
+                std::complex<T> t1, t2, t3, t4;
+                t1 = c0[k] + c2[k];
+                t2 = c0[k] - c2[k];
+                t3 = c1[k] + c3[k];
+                t4 = c1[k] - c3[k];
+
+                c0[k] = t1 + t3;
+                c1[k] = t1 - t3;
+                c2[k] = std::complex<T>(t2.real()-t4.imag(), t2.imag()+t4.real());
+                c3[k] = std::complex<T>(t2.real()+t4.imag(), t2.imag()-t4.real());
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        /* Radix-8 iteration subroutine */
+        template <typename T>
+        void R8TX(int nxtlt, int nthpo, int length,
+            std::complex<T> *cc0, std::complex<T> *cc1, std::complex<T> *cc2, std::complex<T> *cc3,
+            std::complex<T> *cc4, std::complex<T> *cc5, std::complex<T> *cc6, std::complex<T> *cc7)
+        {
+            const T irt2 = 0.707106781186548;  /* 1.0/sqrt(2.0) */
+            const T twopi = 6.2831853071795865; /* 2.0 * pi */
+            const T scale = twopi/length;
+
+            for(int j=0; j<nxtlt; j++) 
+            {
+                const T arg = j*scale;
+                const std::complex<T> cs1(std::cos(arg),std::sin(arg));
+                const std::complex<T> cs2 = cs1*cs1;
+                const std::complex<T> cs3 = cs2*cs1;
+                const std::complex<T> cs4 = cs2*cs2;
+                const std::complex<T> cs5 = cs3*cs2;
+                const std::complex<T> cs6 = cs3*cs3;
+                const std::complex<T> cs7 = cs4*cs3;
+
+                for(int k=j;k<nthpo;k+=length) 
                 {
-                    const long a_idx = j+k;
-                    const long b_idx = j+k+step;
-                    const ct a = outdata(a_idx) + outdata(b_idx);
-                    const ct b = (outdata(a_idx) - outdata(b_idx))*twiddle_factors(k*skip);
-                    outdata(a_idx) = a;
-                    outdata(b_idx) = b;
+                    std::complex<T> a0, a1, a2, a3, a4, a5, a6, a7;
+                    std::complex<T> b0, b1, b2, b3, b4, b5, b6, b7;
+                    a0 = cc0[k] + cc4[k];
+                    a1 = cc1[k] + cc5[k];
+                    a2 = cc2[k] + cc6[k];
+                    a3 = cc3[k] + cc7[k];
+                    a4 = cc0[k] - cc4[k];
+                    a5 = cc1[k] - cc5[k];
+                    a6 = cc2[k] - cc6[k];
+                    a7 = cc3[k] - cc7[k];
+
+                    b0 = a0 + a2;
+                    b1 = a1 + a3;
+                    b2 = a0 - a2;
+                    b3 = a1 - a3;
+
+                    b4 = std::complex<T>(a4.real()-a6.imag(), a4.imag()+a6.real());
+                    b5 = std::complex<T>(a5.real()-a7.imag(), a5.imag()+a7.real());
+                    b6 = std::complex<T>(a4.real()+a6.imag(), a4.imag()-a6.real());
+                    b7 = std::complex<T>(a5.real()+a7.imag(), a5.imag()-a7.real());
+
+                    const std::complex<T> tmp0(-b3.imag(), b3.real());
+                    const std::complex<T> tmp1(irt2*(b5.real()-b5.imag()), irt2*(b5.real()+b5.imag()));
+                    const std::complex<T> tmp2(-irt2*(b7.real()+b7.imag()), irt2*(b7.real()-b7.imag()));
+
+                    cc0[k] = b0 + b1;
+                    if(j>0) 
+                    {
+                        cc1[k] = cs4*(b0-b1);
+                        cc2[k] = cs2*(b2+tmp0);
+                        cc3[k] = cs6*(b2-tmp0);
+                        cc4[k] = cs1*(b4+tmp1);
+                        cc5[k] = cs5*(b4-tmp1);
+                        cc6[k] = cs3*(b6+tmp2);
+                        cc7[k] = cs7*(b6-tmp2);
+                    }
+                    else 
+                    {
+                        cc1[k] = b0 - b1;
+                        cc2[k] = b2 + tmp0;
+                        cc3[k] = b2 - tmp0;
+                        cc4[k] = b4 + tmp1;
+                        cc5[k] = b4 - tmp1;
+                        cc6[k] = b6 + tmp2;
+                        cc7[k] = b6 - tmp2;
+                    }
                 }
             }
-            skip *= 2;
         }
 
-        typename EXP::matrix_type outperm;
-        impl::permute(outdata, outperm);
-        return outperm;
-    }
+    // ------------------------------------------------------------------------------------
+
+        template <typename T, long NR, long NC, typename MM, typename layout>
+        void fft1d_inplace(matrix<std::complex<T>,NR,NC,MM,layout>& data, bool do_backward_fft)
+        /*!
+            requires
+                - is_vector(data) == true
+                - is_power_of_two(data.size()) == true
+            ensures
+                - This routine replaces the input std::complex<double> vector by its finite
+                  discrete complex fourier transform if do_backward_fft==true.  It replaces
+                  the input std::complex<double> vector by its finite discrete complex
+                  inverse fourier transform if do_backward_fft==false.
+
+                  The implementation is a radix-2 FFT, but with faster shortcuts for
+                  radix-4 and radix-8. It performs as many radix-8 iterations as possible,
+                  and then finishes with a radix-2 or -4 iteration if needed.
+        !*/
+        {
+            if (data.size() == 0)
+                return;
+
+            std::complex<T>* const b = &data(0);
+            int L[16],L1,L2,L3,L4,L5,L6,L7,L8,L9,L10,L11,L12,L13,L14,L15;
+            int j1,j2,j3,j4,j5,j6,j7,j8,j9,j10,j11,j12,j13,j14;
+            int j, ij, ji, ij1, ji1;
+            int n2pow, n8pow, nthpo, ipass, nxtlt, length;
+
+            n2pow = fastlog2(data.size());
+            nthpo = data.size();
+
+            n8pow = n2pow/3;
+
+            if(n8pow)
+            {
+                /* Radix 8 iterations */
+                for(ipass=1;ipass<=n8pow;ipass++) 
+                {
+                    nxtlt = 0x1 << (n2pow - 3*ipass);
+                    length = 8*nxtlt;
+                    R8TX(nxtlt, nthpo, length,
+                        b, b+nxtlt, b+2*nxtlt, b+3*nxtlt,
+                        b+4*nxtlt, b+5*nxtlt, b+6*nxtlt, b+7*nxtlt);
+                }
+            }
+
+            if(n2pow%3 == 1) 
+            {
+                /* A final radix 2 iteration is needed */
+                R2TX(nthpo, b, b+1); 
+            }
+
+            if(n2pow%3 == 2)  
+            {
+                /* A final radix 4 iteration is needed */
+                R4TX(nthpo, b, b+1, b+2, b+3); 
+            }
+
+            for(j=1;j<=15;j++) 
+            {
+                L[j] = 1;
+                if(j-n2pow <= 0) L[j] = 0x1 << (n2pow + 1 - j);
+            }
+
+            L15=L[1];L14=L[2];L13=L[3];L12=L[4];L11=L[5];L10=L[6];L9=L[7];
+            L8=L[8];L7=L[9];L6=L[10];L5=L[11];L4=L[12];L3=L[13];L2=L[14];L1=L[15];
+
+            ij = 1;
+
+            for(j1=1;j1<=L1;j1++)
+                for(j2=j1;j2<=L2;j2+=L1)
+                    for(j3=j2;j3<=L3;j3+=L2)
+                        for(j4=j3;j4<=L4;j4+=L3)
+                            for(j5=j4;j5<=L5;j5+=L4)
+                                for(j6=j5;j6<=L6;j6+=L5)
+                                    for(j7=j6;j7<=L7;j7+=L6)
+                                        for(j8=j7;j8<=L8;j8+=L7)
+                                            for(j9=j8;j9<=L9;j9+=L8)
+                                                for(j10=j9;j10<=L10;j10+=L9)
+                                                    for(j11=j10;j11<=L11;j11+=L10)
+                                                        for(j12=j11;j12<=L12;j12+=L11)
+                                                            for(j13=j12;j13<=L13;j13+=L12)
+                                                                for(j14=j13;j14<=L14;j14+=L13)
+                                                                    for(ji=j14;ji<=L15;ji+=L14) 
+                                                                    {
+                                                                        ij1 = ij-1;
+                                                                        ji1 = ji-1;     
+                                                                        if(ij-ji<0)
+                                                                            swap(b[ij1], b[ji1]);
+                                                                        ij++;
+                                                                    }
+
+
+            // unscramble outputs
+            if(!do_backward_fft) 
+            {
+                for(long i=1, j=data.size()-1; i<data.size()/2; i++,j--)
+                {
+                    swap(b[j], b[i]);
+                }
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template < typename T, long NR, long NC, typename MM, typename L >
+        void fft2d_inplace(
+            matrix<std::complex<T>,NR,NC,MM,L>& data,
+            bool do_backward_fft
+        )
+        {
+            if (data.size() == 0)
+                return;
+
+            matrix<std::complex<double> > buff;
+
+            // Compute transform row by row
+            for(long r=0; r<data.nr(); ++r) 
+            {
+                buff = matrix_cast<std::complex<double> >(rowm(data,r));
+                fft1d_inplace(buff, do_backward_fft);
+                set_rowm(data,r) = matrix_cast<std::complex<T> >(buff);
+            }
+
+            // Compute transform column by column
+            for(long c=0; c<data.nc(); ++c) 
+            {
+                buff = matrix_cast<std::complex<double> >(colm(data,c));
+                fft1d_inplace(buff, do_backward_fft);
+                set_colm(data,c) = matrix_cast<std::complex<T> >(buff);
+            }
+        }
+        
+    // ----------------------------------------------------------------------------------------
+
+        template <
+            typename EXP, 
+            typename T
+            >
+        void fft2d(
+            const matrix_exp<EXP>& data, 
+            matrix<std::complex<T> >& data_out,
+            bool do_backward_fft
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_CASSERT(is_power_of_two(data.nr()) && is_power_of_two(data.nc()),
+                "\t matrix fft(data)"
+                << "\n\t The number of rows and columns must be powers of two."
+                << "\n\t data.nr(): "<< data.nr()
+                << "\n\t data.nc(): "<< data.nc()
+                << "\n\t is_power_of_two(data.nr()): " << is_power_of_two(data.nr())
+                << "\n\t is_power_of_two(data.nc()): " << is_power_of_two(data.nc())
+            );
+
+            if (data.size() == 0)
+                return;
+
+            matrix<std::complex<double> > buff;
+            data_out.set_size(data.nr(), data.nc());
+
+            // Compute transform row by row
+            for(long r=0; r<data.nr(); ++r) 
+            {
+                buff = matrix_cast<std::complex<double> >(rowm(data,r));
+                fft1d_inplace(buff, do_backward_fft);
+                set_rowm(data_out,r) = matrix_cast<std::complex<T> >(buff);
+            }
+
+            // Compute transform column by column
+            for(long c=0; c<data_out.nc(); ++c) 
+            {
+                buff = matrix_cast<std::complex<double> >(colm(data_out,c));
+                fft1d_inplace(buff, do_backward_fft);
+                set_colm(data_out,c) = matrix_cast<std::complex<T> >(buff);
+            }
+        }
+        
+    // ------------------------------------------------------------------------------------
+
+    } // end namespace impl
 
 // ----------------------------------------------------------------------------------------
 
     template <typename EXP>
-    typename EXP::matrix_type ifft (
-        const matrix_exp<EXP>& data
-    )  
+    matrix<typename EXP::type> fft (const matrix_exp<EXP>& data)
     {
-        if (data.size() == 0)
-            return data;
-
         // You have to give a complex matrix
         COMPILE_TIME_ASSERT(is_complex<typename EXP::type>::value);
         // make sure requires clause is not broken
-        DLIB_CASSERT(is_vector(data) && is_power_of_two(data.size()),
-            "\t void ifft(data)"
-            << "\n\t data must be a vector with a size that is a power of two."
-            << "\n\t is_vector(data): " << is_vector(data)
-            << "\n\t data.size():     " << data.size()
+        DLIB_CASSERT(is_power_of_two(data.nr()) && is_power_of_two(data.nc()),
+            "\t matrix fft(data)"
+            << "\n\t The number of rows and columns must be powers of two."
+            << "\n\t data.nr(): "<< data.nr()
+            << "\n\t data.nc(): "<< data.nc()
+            << "\n\t is_power_of_two(data.nr()): " << is_power_of_two(data.nr())
+            << "\n\t is_power_of_two(data.nc()): " << is_power_of_two(data.nc())
             );
 
-
-        typedef typename EXP::type::value_type T;
-
-        typename EXP::matrix_type outdata;
-        impl::permute(data,outdata);
-
-        const long half = outdata.size()/2;
-
-        typedef std::complex<T> ct;
-        matrix<ct,0,1,typename EXP::mem_manager_type> twiddle_factors(half);
-
-        // compute the complex root of unity w
-        const T temp = 2.0*pi/outdata.size();
-        ct w = ct(std::cos(temp),std::sin(temp));
-
-        ct w_pow = 1;
-
-        // compute the twiddle factors
-        for (long j = 0; j < twiddle_factors.size(); ++j)
+        if (data.nr() == 1 || data.nc() == 1)
         {
-            twiddle_factors(j) = w_pow; 
-            w_pow *= w;
+            matrix<typename EXP::type> temp(data);
+            impl::fft1d_inplace(temp, false);
+            return temp;
         }
-
-        // now compute the inverse decimation in frequency.  This first
-        // outer loop loops log2(outdata.size()) number of times
-        long skip = half;
-        for (long step = 1; step <= half; step <<= 1)
+        else
         {
-            // do blocks of butterflies in this loop
-            for (long j = 0; j < outdata.size(); j += step*2)
-            {
-                // do step butterflies
-                for (long k = 0; k < step; ++k)
-                {
-                    const long a_idx = j+k;
-                    const long b_idx = j+k+step;
-                    outdata(b_idx) *= twiddle_factors(k*skip);
-                    const ct a = outdata(a_idx) + outdata(b_idx);
-                    const ct b = outdata(a_idx) - outdata(b_idx);
-                    outdata(a_idx) = a;
-                    outdata(b_idx) = b;
-                }
-            }
-            skip /= 2;
+            matrix<typename EXP::type> temp;
+            impl::fft2d(data, temp, false);
+            return temp;
         }
+    }
 
-        outdata /= outdata.size();
-        return outdata;
+    template <typename EXP>
+    matrix<typename EXP::type> ifft (const matrix_exp<EXP>& data)
+    {
+        // You have to give a complex matrix
+        COMPILE_TIME_ASSERT(is_complex<typename EXP::type>::value);
+        // make sure requires clause is not broken
+        DLIB_CASSERT(is_power_of_two(data.nr()) && is_power_of_two(data.nc()),
+            "\t matrix ifft(data)"
+            << "\n\t The number of rows and columns must be powers of two."
+            << "\n\t data.nr(): "<< data.nr()
+            << "\n\t data.nc(): "<< data.nc()
+            << "\n\t is_power_of_two(data.nr()): " << is_power_of_two(data.nr())
+            << "\n\t is_power_of_two(data.nc()): " << is_power_of_two(data.nc())
+            );
+
+        matrix<typename EXP::type> temp;
+        if (data.size() == 0)
+            return temp;
+
+        if (data.nr() == 1 || data.nc() == 1)
+        {
+            temp = data;
+            impl::fft1d_inplace(temp, true);
+        }
+        else
+        {
+            impl::fft2d(data, temp, true);
+        }
+        temp /= data.size();
+        return temp;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template < typename T, long NR, long NC, typename MM, typename L >
+    void fft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
+    // Note that we don't divide the outputs by data.size() so this isn't quite the inverse.
+    {
+        // make sure requires clause is not broken
+        DLIB_CASSERT(is_power_of_two(data.nr()) && is_power_of_two(data.nc()),
+            "\t void fft_inplace(data)"
+            << "\n\t The number of rows and columns must be powers of two."
+            << "\n\t data.nr(): "<< data.nr()
+            << "\n\t data.nc(): "<< data.nc()
+            << "\n\t is_power_of_two(data.nr()): " << is_power_of_two(data.nr())
+            << "\n\t is_power_of_two(data.nc()): " << is_power_of_two(data.nc())
+            );
+
+        if (data.nr() == 1 || data.nc() == 1)
+            impl::fft1d_inplace(data, false);
+        else
+            impl::fft2d_inplace(data, false);
+    }
+
+    template < typename T, long NR, long NC, typename MM, typename L >
+    void ifft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
+    {
+        // make sure requires clause is not broken
+        DLIB_CASSERT(is_power_of_two(data.nr()) && is_power_of_two(data.nc()),
+            "\t void ifft_inplace(data)"
+            << "\n\t The number of rows and columns must be powers of two."
+            << "\n\t data.nr(): "<< data.nr()
+            << "\n\t data.nc(): "<< data.nc()
+            << "\n\t is_power_of_two(data.nr()): " << is_power_of_two(data.nr())
+            << "\n\t is_power_of_two(data.nc()): " << is_power_of_two(data.nc())
+            );
+
+        if (data.nr() == 1 || data.nc() == 1)
+            impl::fft1d_inplace(data, true);
+        else
+            impl::fft2d_inplace(data, true);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -216,19 +464,27 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT(is_vector(data) && is_power_of_two(data.size()),
-            "\t void fft(data)"
-            << "\n\t data must be a vector with a size that is a power of two."
-            << "\n\t is_vector(data): " << is_vector(data)
-            << "\n\t data.size():     " << data.size()
+        DLIB_CASSERT(is_power_of_two(data.nr()) && is_power_of_two(data.nc()),
+            "\t matrix fft(data)"
+            << "\n\t The number of rows and columns must be powers of two."
+            << "\n\t data.nr(): "<< data.nr()
+            << "\n\t data.nc(): "<< data.nc()
+            << "\n\t is_power_of_two(data.nr()): " << is_power_of_two(data.nr())
+            << "\n\t is_power_of_two(data.nc()): " << is_power_of_two(data.nc())
             );
+
+        if (data.size() == 0)
+            return data;
 
         matrix<std::complex<double>,NR,NC,MM,L> m2(data.nr(),data.nc());
         fftw_complex *in, *out;
         fftw_plan p;
-        in = (fftw_complex*)&data(0);
-        out = (fftw_complex*)&m2(0);
-        p = fftw_plan_dft_1d(data.size(), in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+        in = (fftw_complex*)&data(0,0);
+        out = (fftw_complex*)&m2(0,0);
+        if (data.nr() == 1 || data.nc() == 1)
+            p = fftw_plan_dft_1d(data.size(), in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+        else
+            p = fftw_plan_dft_2d(data.nr(), data.nc(), in, out, FFTW_FORWARD, FFTW_ESTIMATE);
         fftw_execute(p); 
         fftw_destroy_plan(p);
         return m2;
@@ -240,33 +496,48 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT(is_vector(data) && is_power_of_two(data.size()),
-            "\t void ifft(data)"
-            << "\n\t data must be a vector with a size that is a power of two."
-            << "\n\t is_vector(data): " << is_vector(data)
-            << "\n\t data.size():     " << data.size()
+        DLIB_CASSERT(is_power_of_two(data.nr()) && is_power_of_two(data.nc()),
+            "\t matrix ifft(data)"
+            << "\n\t The number of rows and columns must be powers of two."
+            << "\n\t data.nr(): "<< data.nr()
+            << "\n\t data.nc(): "<< data.nc()
+            << "\n\t is_power_of_two(data.nr()): " << is_power_of_two(data.nr())
+            << "\n\t is_power_of_two(data.nc()): " << is_power_of_two(data.nc())
             );
+
+        if (data.size() == 0)
+            return data;
 
         matrix<std::complex<double>,NR,NC,MM,L> m2(data.nr(),data.nc());
         fftw_complex *in, *out;
         fftw_plan p;
-        in = (fftw_complex*)&data(0);
-        out = (fftw_complex*)&m2(0);
-        p = fftw_plan_dft_1d(data.size(), in, out, FFTW_BACKWARD, FFTW_ESTIMATE);
+        in = (fftw_complex*)&data(0,0);
+        out = (fftw_complex*)&m2(0,0);
+        if (data.nr() == 1 || data.nc() == 1)
+            p = fftw_plan_dft_1d(data.size(), in, out, FFTW_BACKWARD, FFTW_ESTIMATE);
+        else
+            p = fftw_plan_dft_2d(data.nr(), data.nc(), in, out, FFTW_BACKWARD, FFTW_ESTIMATE);
         fftw_execute(p); 
         fftw_destroy_plan(p);
-        return m2/data.size();
+        return m2;
     }
 
 // ----------------------------------------------------------------------------------------
 
 // call FFTW for these cases:
     inline matrix<std::complex<double>,0,1> fft (const matrix<std::complex<double>,0,1>& data) {return call_fftw_fft(data);}
-    inline matrix<std::complex<double>,0,1> ifft(const matrix<std::complex<double>,0,1>& data) {return call_fftw_ifft(data);}
+    inline matrix<std::complex<double>,0,1> ifft(const matrix<std::complex<double>,0,1>& data) {return call_fftw_ifft(data)/data.size();}
     inline matrix<std::complex<double>,1,0> fft (const matrix<std::complex<double>,1,0>& data) {return call_fftw_fft(data);}
-    inline matrix<std::complex<double>,1,0> ifft(const matrix<std::complex<double>,1,0>& data) {return call_fftw_ifft(data);}
+    inline matrix<std::complex<double>,1,0> ifft(const matrix<std::complex<double>,1,0>& data) {return call_fftw_ifft(data)/data.size();}
     inline matrix<std::complex<double> > fft (const matrix<std::complex<double> >& data) {return call_fftw_fft(data);}
-    inline matrix<std::complex<double> > ifft(const matrix<std::complex<double> >& data) {return call_fftw_ifft(data);}
+    inline matrix<std::complex<double> > ifft(const matrix<std::complex<double> >& data) {return call_fftw_ifft(data)/data.size();}
+
+    inline void fft_inplace (matrix<std::complex<double>,0,1>& data) {data = call_fftw_fft(data);}
+    inline void ifft_inplace(matrix<std::complex<double>,0,1>& data) {data = call_fftw_ifft(data);}
+    inline void fft_inplace (matrix<std::complex<double>,1,0>& data) {data = call_fftw_fft(data);}
+    inline void ifft_inplace(matrix<std::complex<double>,1,0>& data) {data = call_fftw_ifft(data);}
+    inline void fft_inplace (matrix<std::complex<double> >& data) {data = call_fftw_fft(data);}
+    inline void ifft_inplace(matrix<std::complex<double> >& data) {data = call_fftw_ifft(data);}
 
 #endif // DLIB_USE_FFTW
 
