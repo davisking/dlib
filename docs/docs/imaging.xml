@@ -400,6 +400,7 @@
          <examples>
             <example>face_landmark_detection_ex.cpp.html</example>
             <example>train_shape_predictor_ex.cpp.html</example>
+            <example>webcam_face_pose_ex.cpp.html</example>
          </examples>
                                  
       </component>
@@ -738,6 +739,9 @@
                   using the <a href="#toMat">toMat</a> routine.  
                </p>
          </description>
+         <examples>
+            <example>webcam_face_pose_ex.cpp.html</example>
+         </examples>
                                  
       </component>
             
@@ -1105,6 +1109,7 @@
          </description>
          <examples>
             <example>face_landmark_detection_ex.cpp.html</example>
+            <example>webcam_face_pose_ex.cpp.html</example>
          </examples>
                                  
       </component>
@@ -2059,6 +2064,7 @@
          <examples>
             <example>face_detection_ex.cpp.html</example>
             <example>face_detector.py.html</example>
+            <example>webcam_face_pose_ex.cpp.html</example>
          </examples>
                                  
       </component>

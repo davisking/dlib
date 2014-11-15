@@ -12,6 +12,18 @@
 
 <current>
 New Features:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="18.11" date="Nov 13, 2014">
+New Features:
    - Added save_jpeg()
    - Added the option to use an identity matrix prior to vector_normalizer_frobmetric.
    - Made the extract_image_chips() routine more flexible, in particular: Added
@@ -34,7 +46,7 @@ Bug fixes:
      has been fixed.
 
 Other:
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
