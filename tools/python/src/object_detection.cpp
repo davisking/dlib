@@ -7,7 +7,9 @@
 #include <dlib/geometry.h>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <dlib/image_processing/frontal_face_detector.h>
-#include <dlib/gui_widgets.h>
+#ifndef DLIB_NO_GUI_SUPPORT
+  #include <dlib/gui_widgets.h>
+#endif
 #include "simple_object_detector.h"
 
 
@@ -155,7 +157,7 @@ void deserialize (simple_object_detector_py& item, std::istream& in)
 }
 
 // ----------------------------------------------------------------------------------------
-
+#ifndef DLIB_NO_GUI_SUPPORT
 void image_window_set_image_fhog_detector (
     image_window& win,
     const frontal_face_detector& det
@@ -210,7 +212,7 @@ boost::shared_ptr<image_window> make_image_window_from_image_and_title(object im
     win->set_title(title);
     return win;
 }
-
+#endif
 // ----------------------------------------------------------------------------------------
 
 string print_simple_test_results(const simple_test_results& r)
@@ -530,6 +532,7 @@ ensures \n\
         .def_pickle(serialize_pickle<type>());
     }
 
+#ifndef DLIB_NO_GUI_SUPPORT
     {
     typedef image_window type;
     typedef void (image_window::*set_title_funct)(const std::string&);
@@ -556,6 +559,7 @@ ensures \n\
         .def("wait_until_closed", &type::wait_until_closed, 
             "This function blocks until the window is closed.");
     }
+#endif
 
     {
     typedef std::vector<rectangle> type;
