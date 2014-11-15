@@ -87,11 +87,10 @@ namespace dlib
 
         COMPILE_TIME_ASSERT(pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale);
 
-        const_image_view<in_image_type> in_img(in_img_);
         image_view<out_image_type> out_img(out_img_);
 
         // if there isn't any input image then don't do anything
-        if (in_img.size() == 0)
+        if (image_size(in_img_) == 0)
         {
             out_img.clear();
             return;
@@ -100,7 +99,9 @@ namespace dlib
         unsigned long thresh;
         // find the threshold we should use
         matrix<unsigned long,1> hist;
-        get_histogram(in_img,hist);
+        get_histogram(in_img_,hist);
+
+        const_image_view<in_image_type> in_img(in_img_);
 
         // Start our two means (a and b) out at the ends of the histogram
         long a = 0;
