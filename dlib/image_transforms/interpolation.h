@@ -1426,6 +1426,7 @@ namespace dlib
     struct chip_details
     {
         chip_details() : angle(0), rows(0), cols(0) {}
+        chip_details(const rectangle& rect_) : rect(rect_),angle(0), rows(rect_.height()), cols(rect_.width()) {}
         chip_details(const rectangle& rect_, unsigned long size) : rect(rect_),angle(0) 
         { compute_dims_from_size(size); }
         chip_details(const rectangle& rect_, unsigned long size, double angle_) : rect(rect_),angle(angle_) 
@@ -1532,6 +1533,49 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        template <
+            typename image_type1,
+            typename image_type2
+            >
+        void basic_extract_image_chip (
+            const image_type1& img,
+            const rectangle& location,
+            image_type2& chip
+        )
+        /*!
+            ensures
+                - This function doesn't do any scaling or rotating. It just pulls out the
+                  chip in the given rectangle.  This also means the output image has the
+                  same dimensions as the location rectangle.
+        !*/
+        {
+            const_image_view<image_type1> vimg(img);
+            image_view<image_type2> vchip(chip);
+
+            vchip.set_size(location.height(), location.width());
+
+            // location might go outside img so clip it
+            rectangle area = location.intersect(get_rect(img));
+
+            // find the part of the chip that corresponds to area in img.
+            rectangle chip_area = translate_rect(area, -location.tl_corner());
+
+            zero_border_pixels(chip, chip_area);
+            // now pull out the contents of area/chip_area.
+            for (long r = chip_area.top(), rr = area.top(); r <= chip_area.bottom(); ++r,++rr)
+            {
+                for (long c = chip_area.left(), cc = area.left(); c <= chip_area.right(); ++c,++cc)
+                {
+                    assign_pixel(vchip[r][c], vimg[rr][cc]);
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename image_type1,
         typename image_type2
@@ -1589,31 +1633,42 @@ namespace dlib
         chips.resize(chip_locations.size());
         for (unsigned long i = 0; i < chips.size(); ++i)
         {
-            set_image_size(chips[i], chip_locations[i].rows, chip_locations[i].cols);
-
-            // figure out which level in the pyramid to use to extract the chip
-            int level = -1;
-            rectangle rect = chip_locations[i].rect;
-            while (pyr.rect_down(rect).area() > chip_locations[i].size())
+            // If the chip doesn't have any rotation or scaling then use the basic version
+            // of chip extraction that just does a fast copy.
+            if (chip_locations[i].angle == 0 && 
+                chip_locations[i].rows == chip_locations[i].rect.height() &&
+                chip_locations[i].cols == chip_locations[i].rect.width())
             {
-                ++level;
-                rect = pyr.rect_down(rect);
+                impl::basic_extract_image_chip(img, chip_locations[i].rect, chips[i]);
             }
-
-            // find the appropriate transformation that maps from the chip to the input
-            // image
-            from.clear();
-            to.clear();
-            from.push_back(get_rect(chips[i]).tl_corner());  to.push_back(rotate_point<double>(center(rect),rect.tl_corner(),chip_locations[i].angle));
-            from.push_back(get_rect(chips[i]).tr_corner());  to.push_back(rotate_point<double>(center(rect),rect.tr_corner(),chip_locations[i].angle));
-            from.push_back(get_rect(chips[i]).bl_corner());  to.push_back(rotate_point<double>(center(rect),rect.bl_corner(),chip_locations[i].angle));
-            point_transform_affine trns = find_similarity_transform(from,to);
-
-            // now extract the actual chip
-            if (level == -1)
-                transform_image(img,chips[i],interpolate_bilinear(),trns);
             else
-                transform_image(levels[level],chips[i],interpolate_bilinear(),trns);
+            {
+                set_image_size(chips[i], chip_locations[i].rows, chip_locations[i].cols);
+
+                // figure out which level in the pyramid to use to extract the chip
+                int level = -1;
+                rectangle rect = chip_locations[i].rect;
+                while (pyr.rect_down(rect).area() > chip_locations[i].size())
+                {
+                    ++level;
+                    rect = pyr.rect_down(rect);
+                }
+
+                // find the appropriate transformation that maps from the chip to the input
+                // image
+                from.clear();
+                to.clear();
+                from.push_back(get_rect(chips[i]).tl_corner());  to.push_back(rotate_point<double>(center(rect),rect.tl_corner(),chip_locations[i].angle));
+                from.push_back(get_rect(chips[i]).tr_corner());  to.push_back(rotate_point<double>(center(rect),rect.tr_corner(),chip_locations[i].angle));
+                from.push_back(get_rect(chips[i]).bl_corner());  to.push_back(rotate_point<double>(center(rect),rect.bl_corner(),chip_locations[i].angle));
+                point_transform_affine trns = find_similarity_transform(from,to);
+
+                // now extract the actual chip
+                if (level == -1)
+                    transform_image(img,chips[i],interpolate_bilinear(),trns);
+                else
+                    transform_image(levels[level],chips[i],interpolate_bilinear(),trns);
+            }
         }
     }
 
@@ -1629,10 +1684,21 @@ namespace dlib
         image_type2& chip
     )
     {
-        std::vector<chip_details> chip_locations(1,location);
-        dlib::array<image_type2> chips;
-        extract_image_chips(img, chip_locations, chips);
-        swap(chips[0], chip);
+        // If the chip doesn't have any rotation or scaling then use the basic version of
+        // chip extraction that just does a fast copy.
+        if (location.angle == 0 && 
+            location.rows == location.rect.height() &&
+            location.cols == location.rect.width())
+        {
+            impl::basic_extract_image_chip(img, location.rect, chip);
+        }
+        else
+        {
+            std::vector<chip_details> chip_locations(1,location);
+            dlib::array<image_type2> chips;
+            extract_image_chips(img, chip_locations, chips);
+            swap(chips[0], chip);
+        }
     }
 
 // ----------------------------------------------------------------------------------------

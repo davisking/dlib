@@ -907,8 +907,8 @@ namespace dlib
                 contained within the rectangle this->rect and that prior to extraction the
                 image should be rotated counter-clockwise by this->angle radians.  Finally,
                 the extracted chip should have this->rows rows and this->cols columns in it
-                regardless of the shape of this->rect.
-
+                regardless of the shape of this->rect.  This means that the extracted chip
+                will be stretched to fit via bilinear interpolation when necessary.
         !*/
 
         chip_details(
@@ -920,6 +920,18 @@ namespace dlib
                 - #angle == 0
                 - #rows == 0
                 - #cols == 0
+        !*/
+
+        chip_details(
+            const rectangle& rect_
+        );
+        /*!
+            ensures
+                - #rect == rect_
+                - #size() == rect_.area()
+                - #angle == 0
+                - #rows == rect_.height()
+                - #cols == rect_.width()
         !*/
 
         chip_details(
@@ -1012,7 +1024,7 @@ namespace dlib
                 - #cols == dims.cols
                 - #size() == dims.rows*dims.cols 
                 - #rect and #angle are computed based on the given size of the output chip
-                  (specified by dims) and the similairty transform between the chip and
+                  (specified by dims) and the similarity transform between the chip and
                   image (specified by chip_points and img_points).
         !*/
 
