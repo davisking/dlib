@@ -443,17 +443,17 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type,
+        typename image_array_type,
         typename T
         >
     void add_image_left_right_flips (
-        dlib::array<image_type>& images,
+        image_array_type& images,
         std::vector<std::vector<T> >& objects
     );
     /*!
         requires
-            - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+            - image_array_type == an array of image objects that implement the interface
+              defined in dlib/image_processing/generic_image.h
             - T == rectangle or full_object_detection
             - images.size() == objects.size()
         ensures
@@ -472,19 +472,19 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type,
+        typename image_array_type,
         typename T,
         typename U
         >
     void add_image_left_right_flips (
-        dlib::array<image_type>& images,
+        image_array_type& images,
         std::vector<std::vector<T> >& objects,
         std::vector<std::vector<U> >& objects2
     );
     /*!
         requires
-            - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+            - image_array_type == an array of image objects that implement the interface
+              defined in dlib/image_processing/generic_image.h
             - images.size() == objects.size()
             - images.size() == objects2.size()
             - T == rectangle or full_object_detection
@@ -507,21 +507,21 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
+        typename image_array_type,
         typename EXP, 
         typename T, 
         typename U
         >
     void add_image_rotations (
         const matrix_exp<EXP>& angles,
-        dlib::array<image_type>& images,
+        image_array_type& images,
         std::vector<std::vector<T> >& objects,
         std::vector<std::vector<U> >& objects2
     );
     /*!
         requires
-            - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+            - image_array_type == an array of image objects that implement the interface
+              defined in dlib/image_processing/generic_image.h
             - is_vector(angles) == true
             - angles.size() > 0
             - images.size() == objects.size()
@@ -547,19 +547,19 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
+        typename image_array_type,
         typename EXP,
         typename T
         >
     void add_image_rotations (
         const matrix_exp<EXP>& angles,
-        dlib::array<image_type>& images,
+        image_array_type& images,
         std::vector<std::vector<T> >& objects
     );
     /*!
         requires
-            - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+            - image_array_type == an array of image objects that implement the interface
+              defined in dlib/image_processing/generic_image.h
             - is_vector(angles) == true
             - angles.size() > 0
             - images.size() == objects.size()
@@ -572,16 +572,16 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type
+        typename image_array_type
         >
     void flip_image_dataset_left_right (
-        dlib::array<image_type>& images, 
+        image_array_type& images,
         std::vector<std::vector<rectangle> >& objects
     );
     /*!
         requires
-            - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+            - image_array_type == an array of image objects that implement the interface
+              defined in dlib/image_processing/generic_image.h
             - images.size() == objects.size()
         ensures
             - This function replaces each image in images with the left/right flipped
@@ -597,17 +597,17 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type
+        typename image_array_type
         >
     void flip_image_dataset_left_right (
-        dlib::array<image_type>& images, 
+        image_array_type& images,
         std::vector<std::vector<rectangle> >& objects,
         std::vector<std::vector<rectangle> >& objects2
     );
     /*!
         requires
-            - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+            - image_array_type == an array of image objects that implement the interface
+              defined in dlib/image_processing/generic_image.h
             - images.size() == objects.size()
             - images.size() == objects2.size()
         ensures
@@ -628,16 +628,16 @@ namespace dlib
 
     template <
         typename pyramid_type,
-        typename image_type
+        typename image_array_type
         >
     void upsample_image_dataset (
-        dlib::array<image_type>& images,
+        image_array_type& images,
         std::vector<std::vector<rectangle> >& objects
     );
     /*!
         requires
-            - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+            - image_array_type == an array of image objects that implement the interface
+              defined in dlib/image_processing/generic_image.h 
             - images.size() == objects.size()
         ensures
             - This function replaces each image in images with an upsampled version of that
@@ -655,17 +655,17 @@ namespace dlib
 
     template <
         typename pyramid_type,
-        typename image_type
+        typename image_array_type,
         >
     void upsample_image_dataset (
-        dlib::array<image_type>& images,
+        image_array_type& images,
         std::vector<std::vector<rectangle> >& objects,
         std::vector<std::vector<rectangle> >& objects2 
     );
     /*!
         requires
-            - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+            - image_array_type == an array of image objects that implement the interface
+              defined in dlib/image_processing/generic_image.h
             - images.size() == objects.size()
             - images.size() == objects2.size()
         ensures
@@ -685,16 +685,16 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename image_type>
+    template <typename image_array_type>
     void rotate_image_dataset (
         double angle,
-        dlib::array<image_type>& images,
+        image_array_type& images,
         std::vector<std::vector<rectangle> >& objects
     );
     /*!
         requires
-            - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+            - image_array_type == an array of image objects that implement the interface
+              defined in dlib/image_processing/generic_image.h
             - images.size() == objects.size()
         ensures
             - This function replaces each image in images with a rotated version of that
@@ -715,17 +715,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename image_type>
+    template <typename image_array_type>
     void rotate_image_dataset (
         double angle,
-        dlib::array<image_type>& images,
+        image_array_type& images,
         std::vector<std::vector<rectangle> >& objects,
         std::vector<std::vector<rectangle> >& objects2
     );
     /*!
         requires
-            - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+            - image_array_type == an array of image objects that implement the interface
+              defined in dlib/image_processing/generic_image.h
             - images.size() == objects.size()
             - images.size() == objects2.size()
         ensures
