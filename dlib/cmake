@@ -1,4 +1,6 @@
 
+cmake_minimum_required(VERSION 2.6.4)
+
 # Don't add dlib if it's already been added to the cmake project
 if (NOT TARGET dlib)
 
