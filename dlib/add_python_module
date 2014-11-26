@@ -10,6 +10,10 @@
 # takes a folder name and creates an install target that will copy the compiled
 # python module to that folder when you run "make install".  Note that the path
 # given to install_*_to() is relative to your CMakeLists.txt file.
+#
+# Also note that if you set the cmake variable PYTHON3 equal to any non-zero
+# value then we will try and produce a Python 3 compatible library, otherwise
+# we will make a Pyhton 2 library.
 
 
 
@@ -28,8 +32,15 @@ set(BOOST_LIBRARYDIR "C:/local/boost_1_*/lib32-msvc-*")
 #SET(Boost_USE_STATIC_RUNTIME OFF)
 set(Boost_NO_BOOST_CMAKE ON)
 
-FIND_PACKAGE(Boost 1.41.0 COMPONENTS python REQUIRED)
-FIND_PACKAGE(PythonLibs 2.6 REQUIRED)
+
+set(BOOST_LIBRARYDIR  /usr/lib/x86_64-linux-gnu/)
+if (PYTHON3)
+    FIND_PACKAGE(Boost 1.41.0 COMPONENTS python-py34 REQUIRED)
+    FIND_PACKAGE(PythonLibs 3.4 REQUIRED)
+else()
+    FIND_PACKAGE(Boost 1.41.0 COMPONENTS python REQUIRED)
+    FIND_PACKAGE(PythonLibs 2.6 REQUIRED)
+endif()
 
 if (WIN32 AND NOT Boost_LIBRARIES)
     message(FATAL_ERROR "We couldn't find the right version of boost python.  If you installed boost and you are still "
