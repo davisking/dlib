@@ -167,7 +167,7 @@ function BigToggle(node)
 
    li#term { list-style: none; }
 
-   div#component {
+   div.component {
       background-color:white; 
       border: 2px solid rgb(102,102,102); 
       text-align:left;
@@ -175,7 +175,7 @@ function BigToggle(node)
       padding: 0.7em;
    }
 
-   div#question {
+   div.question {
       background-color:white; 
       border: 2px solid rgb(102,102,102); 
       text-align:left;
@@ -184,7 +184,7 @@ function BigToggle(node)
       padding: 0.7em;
    }
 
-   div#function {
+   div.function {
       background-color:white; 
       border: 2px solid rgb(102,102,255); 
       text-align:left;
@@ -192,7 +192,7 @@ function BigToggle(node)
       padding: 0.3em;
    }
 
-   div#class {
+   div.class {
       background-color:white; 
       border: 2px solid rgb(255,102,102); 
       text-align:left;
@@ -200,7 +200,7 @@ function BigToggle(node)
       padding: 0.3em;
    }
 
-   div#extension {
+   div.extension {
       background-color:#FDFDFD; 
       border: 1px solid rgb(102,102,102); 
       text-align:left;
@@ -208,7 +208,7 @@ function BigToggle(node)
       padding: 0.7em;
    }
 
-   div#logb {
+   div.logb {
       text-align:left;
       padding: 0.0em;
       float: left;
@@ -217,19 +217,19 @@ function BigToggle(node)
       margin: 0.5em;
    }
 
-   div#name {
+   div.name {
       float: left;
    }
-   div#line1 {
+   div.line1 {
       float:left;
       width:100%;
       background-color:#dfdfdf; 
    }
-   div#line2 {
+   div.line2 {
       float:left;
       width:100%;
    }
-   div#inc {
+   div.inc {
       float: right;
    }
 
@@ -257,21 +257,21 @@ function BigToggle(node)
    .binset {border-bottom: 1px inset}
    .boutset {border-bottom: 1px outset}
 
-   div#row1 {
+   div.row1 {
       background-color:#dfdfdf; 
    }
-   div#row2 {
+   div.row2 {
       background-color:#f2f2f2; 
    }
 
-   div#typedefs {
+   div.typedefs {
       margin-left: 1.5em;
       margin-top: 0.2em;
       border: 1px dotted;
       width: 52em;
    }
 
-   div#tdn {
+   div.tdn {
       width: 10em;
    }
 
@@ -283,14 +283,14 @@ function BigToggle(node)
       text-align: center;
    }
 
-   div#entire_page_header {
+   div.entire_page_header {
       width:62.5em;  
       text-align: left;
       margin-top: 0.4em;
       margin-left: auto;
       margin-right: auto;
    }
-   div#entire_page {
+   div.entire_page {
       width:62.5em;  
       text-align: left;
       margin-left: auto;
@@ -313,7 +313,7 @@ function BigToggle(node)
          </head>
          <body bgcolor="{$background_color}">
             <a name="top" />
-            <div id="entire_page_header">
+            <div class="entire_page_header">
                <xsl:if test="$is_chm != 'true'">
                   <div style="float:right;width:450px">
                            <script>
@@ -332,7 +332,7 @@ function BigToggle(node)
                </xsl:if>
                <a href="http://dlib.net"><img src="dlib-logo.png"/></a>
             </div>
-            <div id="entire_page">
+            <div class="entire_page">
 
             <table bgcolor="white" height="100%" bordercolor="{$background_color}" 
                 CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px">
@@ -528,7 +528,7 @@ function BigToggle(node)
          <xsl:sort select="translate(@text,$lcletters, $ucletters)"/> 
 
          <a name = "{@text}">
-            <div id="question">
+            <div class="question">
                <a href="#top"><font size='2'><center>[top]</center></font></a>
                <h2><xsl:value-of select="@text"/></h2>
                <xsl:apply-templates select="."/>
@@ -546,7 +546,7 @@ function BigToggle(node)
          <xsl:variable name="checked" select="@checked"/>
 
          <a name = "{name}">
-         <div id="component"  >
+         <div class="component"  >
       
          <a href="#top"><font size='2'><center>[top]</center></font></a>
          <h1 style="margin:0px;"><xsl:value-of select="name"/></h1>
@@ -596,7 +596,7 @@ function BigToggle(node)
             
             <xsl:for-each select="extensions/extension">
             <xsl:sort select="translate(name,$lcletters, $ucletters)"/> 
-               <div id="extension">
+               <div class="extension">
                <a name="{name}"><B><font size='5'><xsl:value-of select="name"/></font></B></a><Br/>
                <BR/>
                <xsl:apply-templates select="description"/>
@@ -716,19 +716,19 @@ function BigToggle(node)
       <xsl:param name="checked" />
       
    
-      <div id="typedefs"><table CELLSPACING='0' CELLPADDING='0' bgcolor="white" >       
+      <div class="typedefs"><table CELLSPACING='0' CELLPADDING='0' bgcolor="white" >       
          <xsl:for-each select="typedef">
          
             <xsl:choose>
                <xsl:when test="$checked = 'true'">
                   <tr><td bgcolor="{$gray}" valign="top"> 
-                  <div id="tdn"><xsl:value-of select="name"/></div>  
+                  <div class="tdn"><xsl:value-of select="name"/></div>  
                   </td><td width="100%" bgcolor="{$gray}"> 
                   <xsl:apply-templates select="description"/>
                   </td></tr>                 
                
                   <tr><td valign="top"> 
-                  <div id="tdn"><xsl:value-of select="name"/>_c</div>
+                  <div class="tdn"><xsl:value-of select="name"/>_c</div>
                   </td><td width="100%"> 
                   is a typedef for <xsl:value-of select="name"/> that checks its preconditions.             
                   </td></tr>                 
@@ -737,14 +737,14 @@ function BigToggle(node)
                   <xsl:choose>
                      <xsl:when test="position() mod 2 = 0">
                         <tr><td valign="top"> 
-                        <div id="tdn"><xsl:value-of select="name"/></div>  
+                        <div class="tdn"><xsl:value-of select="name"/></div>  
                         </td><td width="100%"> 
                         <xsl:apply-templates select="description"/>
                         </td></tr>                                
                      </xsl:when>
                      <xsl:otherwise>
                         <tr><td bgcolor="{$gray}" valign="top"> 
-                        <div id="tdn"><xsl:value-of select="name"/></div>  
+                        <div class="tdn"><xsl:value-of select="name"/></div>  
                         </td><td width="100%" bgcolor="{$gray}"> 
                         <xsl:apply-templates select="description"/>
                         </td></tr>  
@@ -1020,13 +1020,13 @@ function BigToggle(node)
                <xsl:if test="$cur_letter = substring(translate(@name,$lcletters, $ucletters),1,1)">
                <xsl:choose>
                   <xsl:when test="@link">
-                     <div id='{$line}'><div id='name'><a href="{@link}"><xsl:value-of select="@name"/></a></div>
-                     <div id='inc'><xsl:if test='@include'><b>#include &lt;<xsl:value-of select="@include"/>&gt;</b></xsl:if></div>
+                     <div class='{$line}'><div class='name'><a href="{@link}"><xsl:value-of select="@name"/></a></div>
+                     <div class='inc'><xsl:if test='@include'><b>#include &lt;<xsl:value-of select="@include"/>&gt;</b></xsl:if></div>
                      </div>
                   </xsl:when>
                   <xsl:when test="@file">
-                     <div id='{$line}'><div id='name'><a href="{@file}#{@name}"><xsl:value-of select="@name"/></a></div>
-                     <div id='inc'><xsl:if test='@include'><b>#include &lt;<xsl:value-of select="@include"/>&gt;</b></xsl:if></div>
+                     <div class='{$line}'><div class='name'><a href="{@file}#{@name}"><xsl:value-of select="@name"/></a></div>
+                     <div class='inc'><xsl:if test='@include'><b>#include &lt;<xsl:value-of select="@include"/>&gt;</b></xsl:if></div>
                      </div>
                   </xsl:when>
                   <xsl:otherwise>
@@ -1036,8 +1036,8 @@ function BigToggle(node)
                         <xsl:sort order="ascending" select="translate(@name,$lcletters, $ucletters)"/> 
                         <xsl:variable name="alt2" select="1+(($alt+position()) mod 2)"/>
                         <xsl:variable name="line2" select="concat('line',format-number($alt2,'0'))"/>
-                           <div id='{$line2}'><div id='name'><a href="{@link}"><xsl:value-of select="@name"/></a></div>
-                           <div id='inc'><xsl:if test='@include'><b>#include &lt;<xsl:value-of select="@include"/>&gt;</b></xsl:if></div>
+                           <div class='{$line2}'><div class='name'><a href="{@link}"><xsl:value-of select="@name"/></a></div>
+                           <div class='inc'><xsl:if test='@include'><b>#include &lt;<xsl:value-of select="@include"/>&gt;</b></xsl:if></div>
                            </div>
                         </xsl:for-each>
                       </div>
@@ -1181,16 +1181,16 @@ function BigToggle(node)
 
      <xsl:if test="path[@action=$type]">
 
-      <div id="logb">
+      <div class="logb">
          <div class="bsolid"><b><font color="{$color}"><xsl:value-of select="$name"/></font></b></div>
             <xsl:for-each select="path[@action = $type]">
             <xsl:sort select="."/>
                <xsl:choose>
                   <xsl:when test="position() mod 2 = 0">
-                     <div id="row1"><xsl:value-of select="."/></div>
+                     <div class="row1"><xsl:value-of select="."/></div>
                   </xsl:when>
                   <xsl:otherwise>
-                     <div id="row2"><xsl:value-of select="."/></div>
+                     <div class="row2"><xsl:value-of select="."/></div>
                   </xsl:otherwise>
                </xsl:choose>
             </xsl:for-each>
@@ -1244,7 +1244,7 @@ function BigToggle(node)
       <h1>Global Functions:</h1>
       <xsl:for-each select="global_functions/function">  
          <xsl:sort select="translate(concat(name,.),$lcletters, $ucletters)"/>  
-         <div id="function">
+         <div class="function">
             <a onclick="Toggle(this)" style="cursor: pointer"><img src="plus.gif" border="0"/><font color="blue">
                <u><b><xsl:value-of select="name"/>()</b></u></font></a>
             <div style="display:none;">
@@ -1267,7 +1267,7 @@ function BigToggle(node)
    <!-- ************************************************************************* -->
 
    <xsl:template match="class">
-         <div id="class">
+         <div class="class">
             <a onclick="Toggle(this)" style="cursor: pointer"><img src="plus.gif" border="0"/><font color="blue">
                <u><b><xsl:value-of select="name"/></b></u></font></a>
             <div style="display:none;">
@@ -1338,7 +1338,7 @@ function BigToggle(node)
                      <u style="font-size:2em">Protected Methods</u></font></a>
                   <div style="display:none;">
                   <xsl:for-each select="protected_methods/method">
-                     <div id="function">
+                     <div class="function">
                         <u>Method Name</u>: <b><xsl:value-of select="name"/></b> <br/><br/>
                         <div style="margin-left:1.5em">
                            <pre style="font-size:1.1em;"><xsl:value-of select="declaration"/>;</pre> 
@@ -1355,7 +1355,7 @@ function BigToggle(node)
                      <u style="font-size:2em">Public Methods</u></font></a>
                   <div style="display:none;">
                   <xsl:for-each select="public_methods/method">
-                     <div id="function">
+                     <div class="function">
                         <u>Method Name</u>: <b><xsl:value-of select="name"/></b> <br/><br/>
                         <div style="margin-left:1.5em">
                            <pre style="font-size:1.1em;"><xsl:value-of select="declaration"/>;</pre> 
