@@ -93,7 +93,31 @@ if (UNIX)
         /usr/lib
         /usr/lib/atlas-sse3
         /usr/lib/atlas-sse2
-        /usr/lib/atlas)
+        /usr/lib/atlas
+        /opt/OpenBLAS/lib
+        )
+
+   INCLUDE (CheckFunctionExists)
+
+   if (NOT blas_found)
+      find_library(cblas_lib openblas PATHS ${extra_paths})
+      if (cblas_lib)
+         set(blas_libraries ${cblas_lib})
+         set(blas_found 1)
+         message(STATUS "Found OpenBLAS library")
+         set(CMAKE_REQUIRED_LIBRARIES ${blas_libraries})
+         # If you compiled OpenBLAS with LAPACK in it then it should have the
+         # sgetrf_single function in it.  So if we find that function in
+         # OpenBLAS then just use OpenBLAS's LAPACK. 
+         CHECK_FUNCTION_EXISTS(sgetrf_single OPENBLAS_HAS_LAPACK)
+         if (OPENBLAS_HAS_LAPACK)
+            message(STATUS "Using OpenBLAS's built in LAPACK")
+            set(lapack_libraries gfortran) 
+            set(lapack_found 1)
+         endif()
+      endif()
+      mark_as_advanced( cblas_lib)
+   endif()
 
 
    if (NOT lapack_found)
@@ -151,7 +175,6 @@ if (UNIX)
    # we found the Intel MKL since for some reason CHECK_FUNCTION_EXISTS doesn't work
    # with it.  But it's fine since the MKL should always have cblas.
    if (blas_found AND NOT found_intel_mkl)
-      INCLUDE (CheckFunctionExists)
       set(CMAKE_REQUIRED_LIBRARIES ${blas_libraries})
       CHECK_FUNCTION_EXISTS(cblas_ddot HAVE_CBLAS)
       if (NOT HAVE_CBLAS)
@@ -165,9 +188,13 @@ if (UNIX)
    if (NOT blas_found)
       message(" *****************************************************************************")
       message(" *** No BLAS library found so using dlib's built in BLAS.  However, if you ***")
-      message(" *** install an optimized BLAS such as openblas or the Intel MKL your code ***")
-      message(" *** will run faster.  On Ubuntu you can install openblas by executing:    ***")
+      message(" *** install an optimized BLAS such as OpenBLAS or the Intel MKL your code ***")
+      message(" *** will run faster.  On Ubuntu you can install OpenBLAS by executing:    ***")
       message(" ***    sudo apt-get install libopenblas-dev liblapack-dev                 ***")
+      message(" *** Or you can easily install OpenBLAS from source by downloading the     ***")
+      message(" *** source tar file from http://www.openblas.net, extracting it, and      ***")
+      message(" *** running:                                                              ***")
+      message(" ***    make; sudo make install                                            ***")
       message(" *****************************************************************************")
    endif()
 
