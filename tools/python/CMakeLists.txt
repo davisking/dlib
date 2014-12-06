@@ -1,5 +1,6 @@
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4)
+
 
 # Uncomment this to make a Python 3 compatible library instead of a Python 2
 # library.

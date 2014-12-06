@@ -3,8 +3,7 @@
 # information about it at http://www.cmake.org
 #
 
-#SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.4)
 
 # create a variable called target_name and set it to the string "mltool"
 set (target_name mltool)
