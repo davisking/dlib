@@ -358,6 +358,14 @@
                   <link>dlib/matrix/matrix_utilities_abstract.h.html#find_min_and_max</link>
                </item>
                <item>
+                  <name>max_point</name>
+                  <link>dlib/matrix/matrix_utilities_abstract.h.html#max_point</link>
+               </item>
+               <item>
+                  <name>min_point</name>
+                  <link>dlib/matrix/matrix_utilities_abstract.h.html#min_point</link>
+               </item>
+               <item>
                   <name>index_of_min</name>
                   <link>dlib/matrix/matrix_utilities_abstract.h.html#index_of_min</link>
                </item>
