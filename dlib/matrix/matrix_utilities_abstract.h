@@ -1411,6 +1411,19 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    point max_point (
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - m.size() > 0
+        ensures
+            - returns the location of the maximum element of the array, that is, if the
+              returned point is P then it will be the case that: m(P.y(),P.x()) == max(m).
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp::type sum (
         const matrix_exp& m
     );
