@@ -962,11 +962,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type,
+        typename image_array_type,
         typename T
         >
     void add_image_left_right_flips (
-        dlib::array<image_type>& images,
+        image_array_type& images,
         std::vector<std::vector<T> >& objects
     )
     {
@@ -978,7 +978,7 @@ namespace dlib
             << "\n\t objects.size(): " << objects.size() 
             );
 
-        image_type temp;
+        typename image_array_type::value_type temp;
         std::vector<T> rects;
 
         const unsigned long num = images.size();
@@ -998,12 +998,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type,
+        typename image_array_type,
         typename T,
         typename U
         >
     void add_image_left_right_flips (
-        dlib::array<image_type>& images,
+        image_array_type& images,
         std::vector<std::vector<T> >& objects,
         std::vector<std::vector<U> >& objects2
     )
@@ -1018,7 +1018,7 @@ namespace dlib
             << "\n\t objects2.size(): " << objects2.size() 
             );
 
-        image_type temp;
+        typename image_array_type::value_type temp;
         std::vector<T> rects;
         std::vector<U> rects2;
 
@@ -1042,9 +1042,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename image_type>
+    template <typename image_array_type>
     void flip_image_dataset_left_right (
-        dlib::array<image_type>& images, 
+        image_array_type& images, 
         std::vector<std::vector<rectangle> >& objects
     )
     {
@@ -1056,7 +1056,7 @@ namespace dlib
             << "\n\t objects.size():  " << objects.size() 
             );
 
-        image_type temp;
+        typename image_array_type::value_type temp;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
             flip_image_left_right(images[i], temp); 
@@ -1070,9 +1070,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename image_type>
+    template <typename image_array_type>
     void flip_image_dataset_left_right (
-        dlib::array<image_type>& images, 
+        image_array_type& images, 
         std::vector<std::vector<rectangle> >& objects,
         std::vector<std::vector<rectangle> >& objects2
     )
@@ -1087,7 +1087,7 @@ namespace dlib
             << "\n\t objects2.size(): " << objects2.size() 
             );
 
-        image_type temp;
+        typename image_array_type::value_type temp;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
             flip_image_left_right(images[i], temp); 
@@ -1107,10 +1107,10 @@ namespace dlib
 
     template <
         typename pyramid_type,
-        typename image_type
+        typename image_array_type
         >
     void upsample_image_dataset (
-        dlib::array<image_type>& images,
+        image_array_type& images,
         std::vector<std::vector<rectangle> >& objects
     )
     {
@@ -1122,7 +1122,7 @@ namespace dlib
             << "\n\t objects.size():  " << objects.size() 
             );
 
-        image_type temp;
+        typename image_array_type::value_type temp;
         pyramid_type pyr;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
@@ -1137,10 +1137,10 @@ namespace dlib
 
     template <
         typename pyramid_type,
-        typename image_type
+        typename image_array_type
         >
     void upsample_image_dataset (
-        dlib::array<image_type>& images,
+        image_array_type& images,
         std::vector<std::vector<rectangle> >& objects,
         std::vector<std::vector<rectangle> >& objects2 
     )
@@ -1155,7 +1155,7 @@ namespace dlib
             << "\n\t objects2.size(): " << objects2.size() 
             );
 
-        image_type temp;
+        typename image_array_type::value_type temp;
         pyramid_type pyr;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
@@ -1174,10 +1174,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename image_type>
+    template <typename image_array_type>
     void rotate_image_dataset (
         double angle,
-        dlib::array<image_type>& images,
+        image_array_type& images,
         std::vector<std::vector<rectangle> >& objects
     )
     {
@@ -1189,7 +1189,7 @@ namespace dlib
             << "\n\t objects.size():  " << objects.size() 
             );
 
-        image_type temp;
+        typename image_array_type::value_type temp;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
             const point_transform_affine tran = rotate_image(images[i], temp, angle);
@@ -1202,10 +1202,10 @@ namespace dlib
         }
     }
 
-    template <typename image_type>
+    template <typename image_array_type>
     void rotate_image_dataset (
         double angle,
-        dlib::array<image_type>& images,
+        image_array_type& images,
         std::vector<std::vector<rectangle> >& objects,
         std::vector<std::vector<rectangle> >& objects2
     )
@@ -1220,7 +1220,7 @@ namespace dlib
             << "\n\t objects2.size(): " << objects2.size() 
             );
 
-        image_type temp;
+        typename image_array_type::value_type temp;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
             const point_transform_affine tran = rotate_image(images[i], temp, angle);
@@ -1241,14 +1241,14 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
+        typename image_array_type, 
         typename EXP, 
         typename T, 
         typename U
         >
     void add_image_rotations (
         const matrix_exp<EXP>& angles,
-        dlib::array<image_type>& images,
+        image_array_type& images,
         std::vector<std::vector<T> >& objects,
         std::vector<std::vector<U> >& objects2
     )
@@ -1266,7 +1266,7 @@ namespace dlib
             << "\n\t objects2.size():   " << objects2.size() 
             );
 
-        dlib::array<image_type> new_images;
+        image_array_type new_images;
         std::vector<std::vector<T> > new_objects;
         std::vector<std::vector<U> > new_objects2;
 
@@ -1274,7 +1274,7 @@ namespace dlib
 
         std::vector<T> objtemp;
         std::vector<U> objtemp2;
-        image_type temp;
+        typename image_array_type::image_type temp;
         for (long i = 0; i < angles.size(); ++i)
         {
             for (unsigned long j = 0; j < images.size(); ++j)
@@ -1302,13 +1302,13 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
+        typename image_array_type, 
         typename EXP,
         typename T
         >
     void add_image_rotations (
         const matrix_exp<EXP>& angles,
-        dlib::array<image_type>& images,
+        image_array_type& images,
         std::vector<std::vector<T> >& objects
     )
     {
