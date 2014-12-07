@@ -1424,6 +1424,19 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    point min_point (
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - m.size() > 0
+        ensures
+            - returns the location of the minimum element of the array, that is, if the
+              returned point is P then it will be the case that: m(P.y(),P.x()) == min(m).
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp::type sum (
         const matrix_exp& m
     );

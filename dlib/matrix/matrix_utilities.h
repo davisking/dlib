@@ -162,6 +162,41 @@ namespace dlib
     template <
         typename EXP
         >
+    point min_point (
+        const matrix_exp<EXP>& m
+    )
+    {
+        DLIB_ASSERT(m.size() > 0, 
+            "\tpoint min_point(const matrix_exp& m)"
+            << "\n\tm can't be empty"
+            << "\n\tm.size():   " << m.size() 
+            << "\n\tm.nr():     " << m.nr() 
+            << "\n\tm.nc():     " << m.nc() 
+            );
+        typedef typename matrix_exp<EXP>::type type;
+
+        point best_point(0,0);
+        type val = m(0,0);
+        for (long r = 0; r < m.nr(); ++r)
+        {
+            for (long c = 0; c < m.nc(); ++c)
+            {
+                type temp = m(r,c);
+                if (dlib::impl::magnitude(temp) < dlib::impl::magnitude(val))
+                {
+                    val = temp;
+                    best_point = point(c,r);
+                }
+            }
+        }
+        return best_point;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP
+        >
     long index_of_max (
         const matrix_exp<EXP>& m
     )
