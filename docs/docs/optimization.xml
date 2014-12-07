@@ -536,6 +536,7 @@ subject to the following constraint:
 
          </description>
          <examples>
+            <example>max_cost_assignment_ex.cpp.html</example>
             <example>max_cost_assignment.py.html</example>
          </examples>
                                  

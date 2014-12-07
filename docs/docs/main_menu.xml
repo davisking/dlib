@@ -167,6 +167,10 @@
                   <link>webcam_face_pose_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Linear_Assignment_Problems</name>
+                  <link>max_cost_assignment_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Learning_to_Track</name>
                   <link>learning_to_track_ex.cpp.html</link>
                </item>
