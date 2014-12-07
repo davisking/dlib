@@ -226,8 +226,10 @@ namespace
         DLIB_TEST(floor(det(m3)+0.01) == -444);
         DLIB_TEST(floor(det(dm3)+0.01) == -444);
         DLIB_TEST(min(m3) == 1);
+        DLIB_TEST(m3(min_point(m3).y(),min_point(m3).x()) == 1);
         DLIB_TEST(min(dm3) == 1);
         DLIB_TEST(max(m3) == 52);
+        DLIB_TEST(m3(max_point(m3).y(),max_point(m3).x()) == 52);
         DLIB_TEST(max(dm3) == 52);
         DLIB_TEST(sum(m3) == 112);
         DLIB_TEST(sum(dm3) == 112);
