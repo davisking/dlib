@@ -9,6 +9,7 @@
 #include "algs.h"
 #include "uintn.h"
 #include <limits>
+#include <complex>
 #include "enable_if.h"
 
 namespace dlib
@@ -467,6 +468,12 @@ namespace dlib
     template <> struct pixel_traits<float>          : public float_grayscale_pixel_traits<float> {};
     template <> struct pixel_traits<double>         : public float_grayscale_pixel_traits<double> {};
     template <> struct pixel_traits<long double>    : public float_grayscale_pixel_traits<long double> {};
+
+    // These are here mainly so you can easily copy images into complex arrays.  This is
+    // useful when you want to do a FFT on an image or some similar operation.
+    template <> struct pixel_traits<std::complex<float> > :       public float_grayscale_pixel_traits<float> {};
+    template <> struct pixel_traits<std::complex<double> > :      public float_grayscale_pixel_traits<double> {};
+    template <> struct pixel_traits<std::complex<long double> > : public float_grayscale_pixel_traits<long double> {};
 
 // ----------------------------------------------------------------------------------------
 
