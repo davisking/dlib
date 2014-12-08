@@ -183,8 +183,8 @@
                    <a href="imaging.html#hog_image">HOG</a>, and <a href="imaging.html#extract_fhog_features">FHOG</a> 
                    feature extraction algorithms.</li>
                   <li>Tools for <a href="imaging.html#object_detector">detecting objects</a> in images including
-                  a <a href="imaging.html#get_frontal_face_detector">frontal face detector</a> and
-                  <a href="imaging.html#shape_predictor">predicting object pose</a>.</li>
+                  <a href="imaging.html#get_frontal_face_detector">frontal face detection</a> and
+                   <a href="imaging.html#shape_predictor">object pose estimation</a>.</li>
                </ul>
             </li>
 
