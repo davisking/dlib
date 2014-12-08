@@ -58,6 +58,7 @@ namespace dlib
             - image_type == an image object that implements the interface defined in
               dlib/image_processing/generic_image.h 
             - image_type contains unsigned char valued pixels.
+            - T is some scalar type like int or double
             - All pixel values in img are <= max_val
             - cell_size >= 1
             - block_size >= 1
@@ -84,6 +85,7 @@ namespace dlib
     /*!
         requires
             - cell_size >= 1
+            - T is some scalar type like int or double
         ensures
             - Extracts histograms of uniform local-binary-patterns from img.  The
               histograms are from densely tiled windows that are cell_size pixels wide and
@@ -108,6 +110,7 @@ namespace dlib
     );
     /*!
         requires
+            - T is some scalar type like int or double
             - det.num_parts() == 68
         ensures
             - This function extracts the high-dimensional LBP feature described in the
