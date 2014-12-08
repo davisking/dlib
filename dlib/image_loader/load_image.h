@@ -70,11 +70,21 @@ namespace dlib
         }
 
         if (im_type == image_file_type::JPG)
-            throw image_load_error("DLIB_JPEG_SUPPORT not #defined: Unable to load image in file " + file_name);
+        {
+            throw image_load_error("Unable to load image in file " + file_name + ".\n" +
+                "You must #define DLIB_JPEG_SUPPORT and link to libjpeg to read JPEG files.\n" +
+                "Do this by following the instructions at http://dlib.net/compile.html.");
+        }
         else if (im_type == image_file_type::PNG)
-            throw image_load_error("DLIB_PNG_SUPPORT not #defined: Unable to load image in file " + file_name);
+        {
+            throw image_load_error("Unable to load image in file " + file_name + ".\n" +
+                "You must #define DLIB_PNG_SUPPORT and link to libpng to read PNG files.\n" +
+                "Do this by following the instructions at http://dlib.net/compile.html.");
+        }
         else
+        {
             throw image_load_error("Unknown image file format: Unable to load image in file " + file_name);
+        }
     }
 
 }
