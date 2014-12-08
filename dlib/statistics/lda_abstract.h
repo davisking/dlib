@@ -37,7 +37,7 @@ namespace dlib
               returns a linear transform that maps the input vectors into a new space that
               is good for distinguishing between the different classes.  In particular,
               this function finds matrices Z and M such that:
-                - Given an put vector x, Z*x-M, is the transformed version of x.  That is,
+                - Given an input vector x, Z*x-M, is the transformed version of x.  That is,
                   Z*x-M maps x into a space where x vectors that share the same class label
                   are near each other. 
                 - Z*x-M results in the transformed vectors having zero expected mean.
