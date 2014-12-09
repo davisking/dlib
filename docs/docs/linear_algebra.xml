@@ -620,6 +620,8 @@
          <item>move_rect</item> 
          <item>nearest_point</item> 
          <item>distance_to_rect_edge</item> 
+         <item>clip_line_to_rectangle</item> 
+         <item>distance_to_line</item> 
       </section>
 
 
@@ -855,6 +857,32 @@
             the rectangle's edge and the point.
          </description>
                                  
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>distance_to_line</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
+         <description>        
+            This function takes a line and a <a href="#point">point</a>
+            and returns the distance from the line to the point.  
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>clip_line_to_rectangle</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="#rectangle">rectangle</a> and a line segment and
+            returns the part of the line segment that is entirely contained within the
+            rectangle.
+         </description>
       </component>
 
    <!-- ************************************************************************* -->

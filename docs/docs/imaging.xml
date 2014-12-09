@@ -240,6 +240,7 @@
          <item>zero_border_pixels</item> 
          <item>integral_image</item>
          <item>integral_image_generic</item>
+         <item>hough_transform</item>
 
       </section>
 
@@ -252,6 +253,24 @@
 
    <components>
    
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>hough_transform</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/hough_transform_abstract.h</spec_file>
+         <description>
+                This object is a tool for computing the line finding version of
+                the Hough transform given some kind of edge detection image as
+                input.  It also allows the edge pixels to be weighted such that
+                higher weighted edge pixels contribute correspondingly more to
+                the output of the Hough transform, allowing stronger edges to
+                create correspondingly stronger line detections in the final
+                Hough transform.
+         </description>
+                                 
+      </component>
+
    <!-- ************************************************************************* -->
       
       <component>
