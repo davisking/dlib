@@ -1249,6 +1249,9 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                      <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm">http://www.csie.ntu.edu.tw/~cjlin/libsvm</a></li>
                </ul>
          </description>
+         <examples>
+            <example>svm_c_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       

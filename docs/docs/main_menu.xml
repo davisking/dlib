@@ -331,8 +331,12 @@
                   <link>krr_classification_ex.cpp.html</link>
                </item>
                <item>
-                  <name>Support_Vector_Machine</name>
+                  <name>Nu-Support_Vector_Machine</name>
                   <link>svm_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>C-Support_Vector_Machine</name>
+                  <link>svm_c_ex.cpp.html</link>
                </item>
                <item>
                   <name>Using_Custom_Kernels</name>
