@@ -163,6 +163,10 @@
             <name>Examples: C++</name>
             <sub>
                <item>
+                  <name>Hough_Transform</name>
+                  <link>hough_transform_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Webcam_Face_Pose_Estimation</name>
                   <link>webcam_face_pose_ex.cpp.html</link>
                </item>
