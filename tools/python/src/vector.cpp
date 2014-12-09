@@ -5,6 +5,7 @@
 #include <boost/shared_ptr.hpp>
 #include <dlib/matrix.h>
 #include <boost/python/slice.hpp>
+#include <dlib/geometry/vector.h>
 
 
 using namespace dlib;
@@ -84,9 +85,9 @@ void cv__setitem__(cv& c, long p, double val)
         p = c.size() + p; // negative index
     }
     if (p > c.size()-1) {
-        PyErr_SetString( PyExc_IndexError, "index out of range" 
-        );                                            
-        boost::python::throw_error_already_set();   
+        PyErr_SetString( PyExc_IndexError, "index out of range"
+        );
+        boost::python::throw_error_already_set();
     }
     c(p) = val;
 }
@@ -97,9 +98,9 @@ double cv__getitem__(cv& m, long r)
         r = m.size() + r; // negative index
     }
     if (r > m.size()-1 || r < 0) {
-        PyErr_SetString( PyExc_IndexError, "index out of range" 
-        );                                            
-        boost::python::throw_error_already_set();   
+        PyErr_SetString( PyExc_IndexError, "index out of range"
+        );
+        boost::python::throw_error_already_set();
     }
     return m(r);
 }
@@ -133,8 +134,30 @@ boost::python::tuple cv_get_matrix_size(cv& m)
     return boost::python::make_tuple(m.nr(), m.nc());
 }
 
+// ----------------------------------------------------------------------------------------
+
+string point__repr__ (const point& p)
+{
+    std::ostringstream sout;
+    sout << "point(" << p.x() << ", " << p.y() << ")";
+    return sout.str();
+}
+
+string point__str__(const point& p)
+{
+    std::ostringstream sout;
+    sout << "(" << p.x() << ", " << p.y() << ")";
+    return sout.str();
+}
+
+long point_x(const point& p) { return p.x(); }
+long point_y(const point& p) { return p.y(); }
+
+// ----------------------------------------------------------------------------------------
 void bind_vector()
 {
+    using boost::python::arg;
+    {
     class_<cv>("vector", "This object represents the mathematical idea of a column vector.", init<>())
         .def("set_size", &cv_set_size)
         .def("resize", &cv_set_size)
@@ -147,7 +170,16 @@ void bind_vector()
         .def("__setitem__", &cv__setitem__)
         .add_property("shape", &cv_get_matrix_size)
         .def_pickle(serialize_pickle<cv>());
-
+    }
+    {
+    typedef point type;
+    class_<type>("point", "This object represents a single point of integer coordinates that maps directly to a dlib::point.")
+            .def(init<long,long>((arg("x"), arg("y"))))
+            .def("__repr__", &point__repr__)
+            .def("__str__", &point__str__)
+            .def("x", &point_x)
+            .def("y", &point_y)
+            .def_pickle(serialize_pickle<type>());
+    }
     def("dot", dotprod, "Compute the dot product between two dense column vectors.");
 }
-
