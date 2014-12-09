@@ -152,6 +152,13 @@ namespace dlib
                 - returns the length of the vector
         !*/
 
+        double length_squared(
+        ) const;
+        /*!
+            ensures
+                - returns length()*length() 
+        !*/
+
         T& x (
         );
         /*!
