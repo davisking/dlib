@@ -252,15 +252,14 @@ namespace dlib
         double average_precision;
     };
 
-    inline const simple_test_results test_simple_object_detector (
-        const std::string& dataset_filename,
-        const std::string& detector_filename
+    template <typename image_array>
+    inline const simple_test_results test_simple_object_detector_with_images (
+            image_array& images,
+            std::vector<std::vector<rectangle> >& boxes,
+            std::vector<std::vector<rectangle> >& ignore,
+            const std::string& detector_filename
     )
     {
-        dlib::array<array2d<rgb_pixel> > images;
-        std::vector<std::vector<rectangle> > boxes, ignore;
-        ignore = load_image_dataset(images, boxes, dataset_filename);
-
         simple_object_detector detector;
         int version = 0;
         unsigned int upsample_amount = 0;
@@ -282,6 +281,18 @@ namespace dlib
         ret.recall = res(1);
         ret.average_precision = res(2);
         return ret;
+    }
+
+    inline const simple_test_results test_simple_object_detector (
+        const std::string& dataset_filename,
+        const std::string& detector_filename
+    )
+    {
+        dlib::array<array2d<rgb_pixel> > images;
+        std::vector<std::vector<rectangle> > boxes, ignore;
+        ignore = load_image_dataset(images, boxes, dataset_filename);
+
+        return test_simple_object_detector_with_images(images, boxes, ignore, detector_filename);
     }
 
 // ----------------------------------------------------------------------------------------

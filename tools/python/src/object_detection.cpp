@@ -222,20 +222,14 @@ string print_simple_test_results(const simple_test_results& r)
     return sout.str();
 }
 
-inline void train_simple_object_detector_on_images_py (
-    const object& pyimages,
-    const object& pyboxes,
-    const std::string& detector_output_filename,
-    const simple_object_detector_training_options& options 
+void python_detections_to_dlib(
+        const object& pyimages,
+        const object& pyboxes,
+        dlib::array<array2d<rgb_pixel> >& images,
+        std::vector<std::vector<rectangle> >& boxes
 )
 {
     const unsigned long num_images = len(pyimages);
-    if (num_images != len(pyboxes))
-        throw dlib::error("The length of the boxes list must match the length of the images list.");
-
-    // We never have any ignore boxes for this version of the API.
-    std::vector<std::vector<rectangle> > ignore(num_images), boxes(num_images);
-    dlib::array<array2d<rgb_pixel> > images(num_images);
     // Now copy the data into dlib based objects so we can call the trainer.
     for (unsigned long i = 0; i < num_images; ++i)
     {
@@ -251,8 +245,43 @@ inline void train_simple_object_detector_on_images_py (
         else
             throw dlib::error("Unsupported image type, must be 8bit gray or RGB image.");
     }
+}
+
+inline void train_simple_object_detector_on_images_py (
+    const object& pyimages,
+    const object& pyboxes,
+    const std::string& detector_output_filename,
+    const simple_object_detector_training_options& options 
+)
+{
+    const unsigned long num_images = len(pyimages);
+    if (num_images != len(pyboxes))
+        throw dlib::error("The length of the boxes list must match the length of the images list.");
+
+    // We never have any ignore boxes for this version of the API.
+    std::vector<std::vector<rectangle> > ignore(num_images), boxes(num_images);
+    dlib::array<array2d<rgb_pixel> > images(num_images);
+    python_detections_to_dlib(pyimages, pyboxes, images, boxes);
 
     train_simple_object_detector_on_images("", images, boxes, ignore, detector_output_filename, options);
+}
+
+inline simple_test_results test_simple_object_detector_with_images_py (
+        const object& pyimages,
+        const object& pyboxes,
+        const std::string& detector_filename
+)
+{
+    const unsigned long num_images = len(pyimages);
+    if (num_images != len(pyboxes))
+        throw dlib::error("The length of the boxes list must match the length of the images list.");
+
+    // We never have any ignore boxes for this version of the API.
+    std::vector<std::vector<rectangle> > ignore(num_images), boxes(num_images);
+    dlib::array<array2d<rgb_pixel> > images(num_images);
+    python_detections_to_dlib(pyimages, pyboxes, images, boxes);
+
+    return test_simple_object_detector_with_images(images, boxes, ignore, detector_filename);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -409,35 +438,52 @@ ensures \n\
         );
 
     def("test_simple_object_detector", test_simple_object_detector,
-        (arg("dataset_filename"), arg("detector_filename")),
-"ensures \n\
-    - Loads an image dataset from dataset_filename.  We assume dataset_filename is \n\
-      a file using the XML format written by save_image_dataset_metadata(). \n\
-    - Loads a simple_object_detector from the file detector_filename.  This means \n\
-      detector_filename should be a file produced by the train_simple_object_detector()  \n\
-      routine. \n\
-    - This function tests the detector against the dataset and returns the \n\
-      precision, recall, and average precision of the detector.  In fact, The \n\
-      return value of this function is identical to that of dlib's \n\
-      test_object_detection_function() routine.  Therefore, see the documentation \n\
-      for test_object_detection_function() for a detailed definition of these \n\
-      metrics. " 
-    /*!
-        ensures
-            - Loads an image dataset from dataset_filename.  We assume dataset_filename is
-              a file using the XML format written by save_image_dataset_metadata().
-            - Loads a simple_object_detector from the file detector_filename.  This means
-              detector_filename should be a file produced by the train_simple_object_detector() 
-              routine.
-            - This function tests the detector against the dataset and returns the
-              precision, recall, and average precision of the detector.  In fact, The
-              return value of this function is identical to that of dlib's
-              test_object_detection_function() routine.  Therefore, see the documentation
-              for test_object_detection_function() for a detailed definition of these
-              metrics. 
-    !*/
+            (arg("dataset_filename"), arg("detector_filename")),
+            "ensures \n\
+                - Loads an image dataset from dataset_filename.  We assume dataset_filename is \n\
+                  a file using the XML format written by save_image_dataset_metadata(). \n\
+                - Loads a simple_object_detector from the file detector_filename.  This means \n\
+                  detector_filename should be a file produced by the train_simple_object_detector()  \n\
+                  routine. \n\
+                - This function tests the detector against the dataset and returns the \n\
+                  precision, recall, and average precision of the detector.  In fact, The \n\
+                  return value of this function is identical to that of dlib's \n\
+                  test_object_detection_function() routine.  Therefore, see the documentation \n\
+                  for test_object_detection_function() for a detailed definition of these \n\
+                  metrics. "
+            /*!
+                ensures
+                    - Loads an image dataset from dataset_filename.  We assume dataset_filename is
+                      a file using the XML format written by save_image_dataset_metadata().
+                    - Loads a simple_object_detector from the file detector_filename.  This means
+                      detector_filename should be a file produced by the train_simple_object_detector()
+                      routine.
+                    - This function tests the detector against the dataset and returns the
+                      precision, recall, and average precision of the detector.  In fact, The
+                      return value of this function is identical to that of dlib's
+                      test_object_detection_function() routine.  Therefore, see the documentation
+                      for test_object_detection_function() for a detailed definition of these
+                      metrics.
+            !*/
         );
 
+    def("test_simple_object_detector", test_simple_object_detector_with_images_py,
+            (arg("images"), arg("boxes"), arg("detector_filename")),
+            "requires \n\
+               - len(images) == len(boxes) \n\
+               - images should be a list of numpy matrices that represent images, either RGB or grayscale. \n\
+               - boxes should be a list of lists of dlib.rectangle object. \n\
+             ensures \n\
+               - Loads a simple_object_detector from the file detector_filename.  This means \n\
+                 detector_filename should be a file produced by the train_simple_object_detector() \n\
+                 routine. \n\
+               - This function tests the detector against the dataset and returns the \n\
+                 precision, recall, and average precision of the detector.  In fact, The \n\
+                 return value of this function is identical to that of dlib's \n\
+                 test_object_detection_function() routine.  Therefore, see the documentation \n\
+                 for test_object_detection_function() for a detailed definition of these \n\
+                 metrics. "
+    );
     {
     typedef simple_object_detector_py type;
     class_<type>("simple_object_detector", 
