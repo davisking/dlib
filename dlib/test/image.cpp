@@ -1611,12 +1611,12 @@ namespace
                 if (get_rect(out).contains(rect))
                 {
                     T val = sum(pointwise_multiply(filt, subm(mat(img),rect)));
-                    DLIB_CASSERT(val == out[r][c],"err: " << val-out[r][c]);
-                    DLIB_CASSERT(area.contains(point(c,r)),"");
+                    DLIB_TEST_MSG(val == out[r][c],"err: " << val-out[r][c]);
+                    DLIB_TEST(area.contains(point(c,r)));
                 }
                 else
                 {
-                    DLIB_CASSERT(!area.contains(point(c,r)),"");
+                    DLIB_TEST(!area.contains(point(c,r)));
                 }
             }
         }
@@ -1673,6 +1673,64 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void run_hough_test()
+    {
+        array2d<unsigned char> img(300,300);
+
+
+        for (int k = -2; k <= 2; ++k)
+        {
+            print_spinner();
+            running_stats<double> rs;
+            array2d<int> himg;
+            hough_transform ht(200+k);
+            double angle1 = 0;
+            double angle2 = 0;
+            const int len = 90;
+            // Draw a bunch of random lines, hough transform them, then make sure the hough
+            // transform detects them accurately.
+            for (int i = 0; i < 500; ++i)
+            {
+                point cent = center(get_rect(img));
+                point arc = cent + point(len,0);
+                arc = rotate_point(cent, arc, angle1);
+
+                point l = arc + point(500,0);
+                point r = arc - point(500,0);
+                l = rotate_point(arc, l, angle2);
+                r = rotate_point(arc, r, angle2);
+
+                angle1 += pi/13;
+                angle2 += pi/40;
+
+                assign_all_pixels(img, 0);
+                draw_line(img, l, r, 255);
+                rectangle box = translate_rect(get_rect(ht),point(50,50));
+                ht(img, box, himg);
+
+                point p = max_point(mat(himg));
+                DLIB_TEST(himg[p.y()][p.x()] > 255*3);
+
+                l -= point(50,50);
+                r -= point(50,50);
+                std::pair<point,point> line = ht.get_line(p);
+                // make sure the best scoring hough point matches the line we drew.
+                double dist1 = distance_to_line(make_pair(l,r), line.first);
+                double dist2 = distance_to_line(make_pair(l,r), line.second);
+                //cout << "DIST1: " << dist1 << endl;
+                //cout << "DIST2: " << dist2 << endl;
+                rs.add(dist1);
+                rs.add(dist2);
+                DLIB_TEST(dist1 < 2.5);
+                DLIB_TEST(dist2 < 2.5);
+            }
+            //cout << "rs.mean(): " << rs.mean() << endl;
+            DLIB_TEST(rs.mean() < 0.7);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class image_tester : public tester
     {
     public:
@@ -1686,6 +1744,7 @@ namespace
         )
         {
             image_test();
+            run_hough_test();
             test_integral_image<long, unsigned char>();
             test_integral_image<double, int>();
             test_integral_image<long, unsigned char>();
