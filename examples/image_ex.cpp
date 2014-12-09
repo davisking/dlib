@@ -86,6 +86,13 @@ int main(int argc, char** argv)
         // terminate.
         win_hot.wait_until_closed();
         my_window2.wait_until_closed();
+
+
+        // Finally, note that you can access the elements of an image using the normal [row][column]
+        // operator like so:
+        cout << horz_gradient[0][3] << endl;
+        cout << "number of rows in image:    " << horz_gradient.nr() << endl;
+        cout << "number of columns in image: " << horz_gradient.nc() << endl;
     }
     catch (exception& e)
     {
