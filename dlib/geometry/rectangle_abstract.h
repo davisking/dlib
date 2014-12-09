@@ -707,6 +707,41 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T, typename U>
+    double distance_to_line (
+        const std::pair<vector<T,2>,vector<T,2> >& line,
+        const vector<U,2>& p
+    );
+    /*!
+        ensures
+            - returns the euclidean distance between the given line and the point p.  That
+              is, given a line that passes though the points line.first and line.second,
+              what is the distance between p and the nearest point on the line?  This
+              function returns that distance.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    void clip_line_to_rectangle (
+        const rectangle& box,
+        point& p1,
+        point& p2
+    );
+    /*!
+        ensures
+            - clips the line segment that goes from points p1 to p2 so that it is entirely
+              within the given box.  In particular, we will have:
+                - box.contains(#p1) == true
+                - box.contains(#p2) == true
+                - The line segment #p1 to #p2 is entirely contained within the line segment
+                  p1 to p2.  Moreover, #p1 to #p2 is the largest such line segment that
+                  fits within the given box.
+            - If the line segment does not intersect the box then the result is some
+              arbitrary line segment inside the box.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename T 
         >
