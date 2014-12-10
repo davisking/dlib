@@ -12,11 +12,20 @@
 #endif
 #include "simple_object_detector.h"
 #include "indexing.h"
-
+#include "conversion.h"
 
 using namespace dlib;
 using namespace std;
 using namespace boost::python;
+
+// ----------------------------------------------------------------------------------------
+
+string print_simple_test_results(const simple_test_results& r)
+{
+    std::ostringstream sout;
+    sout << "precision: "<<r.precision << ", recall: "<< r.recall << ", average precision: " << r.average_precision;
+    return sout.str();
+}
 
 // ----------------------------------------------------------------------------------------
 
@@ -195,38 +204,6 @@ boost::shared_ptr<image_window> make_image_window_from_image_and_title(object im
 #endif
 // ----------------------------------------------------------------------------------------
 
-string print_simple_test_results(const simple_test_results& r)
-{
-    std::ostringstream sout;
-    sout << "precision: "<<r.precision << ", recall: "<< r.recall << ", average precision: " << r.average_precision;
-    return sout.str();
-}
-
-void python_detections_to_dlib(
-        const object& pyimages,
-        const object& pyboxes,
-        dlib::array<array2d<rgb_pixel> >& images,
-        std::vector<std::vector<rectangle> >& boxes
-)
-{
-    const unsigned long num_images = len(pyimages);
-    // Now copy the data into dlib based objects so we can call the trainer.
-    for (unsigned long i = 0; i < num_images; ++i)
-    {
-        const unsigned long num_boxes = len(pyboxes[i]);
-        for (unsigned long j = 0; j < num_boxes; ++j)
-            boxes[i].push_back(extract<rectangle>(pyboxes[i][j]));
-
-        object img = pyimages[i];
-        if (is_gray_python_image(img))
-            assign_image(images[i], numpy_gray_image(img));
-        else if (is_rgb_python_image(img))
-            assign_image(images[i], numpy_rgb_image(img));
-        else
-            throw dlib::error("Unsupported image type, must be 8bit gray or RGB image.");
-    }
-}
-
 inline void train_simple_object_detector_on_images_py (
     const object& pyimages,
     const object& pyboxes,
@@ -241,7 +218,7 @@ inline void train_simple_object_detector_on_images_py (
     // We never have any ignore boxes for this version of the API.
     std::vector<std::vector<rectangle> > ignore(num_images), boxes(num_images);
     dlib::array<array2d<rgb_pixel> > images(num_images);
-    python_detections_to_dlib(pyimages, pyboxes, images, boxes);
+    images_and_nested_params_to_dlib(pyimages, pyboxes, images, boxes);
 
     train_simple_object_detector_on_images("", images, boxes, ignore, detector_output_filename, options);
 }
@@ -259,7 +236,7 @@ inline simple_test_results test_simple_object_detector_with_images_py (
     // We never have any ignore boxes for this version of the API.
     std::vector<std::vector<rectangle> > ignore(num_images), boxes(num_images);
     dlib::array<array2d<rgb_pixel> > images(num_images);
-    python_detections_to_dlib(pyimages, pyboxes, images, boxes);
+    images_and_nested_params_to_dlib(pyimages, pyboxes, images, boxes);
 
     return test_simple_object_detector_with_images(images, boxes, ignore, detector_filename);
 }
