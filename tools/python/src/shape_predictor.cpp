@@ -225,11 +225,12 @@ train_shape_predictor() routine.")
     - box is the bounding box to begin the shape prediction inside. \n\
 ensures \n\
     - This function runs the shape predictor on the input image and returns \n\
-      a single full object detection.");
+      a single full object detection.")
+        .def_pickle(serialize_pickle<type>());
     }
     {
     def("train_shape_predictor", train_shape_predictor_on_images_py,
-        (arg("images"), arg("object_detections"), arg("detector_filename"), arg("options")),
+        (arg("images"), arg("object_detections"), arg("predictor_output_filename"), arg("options")),
 "requires \n\
     - options.lambda > 0 \n\
     - options.nu > 0 \n\
