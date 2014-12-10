@@ -66,11 +66,11 @@ dlib.train_simple_object_detector(faces_folder+"/training.xml", "detector.svm", 
 # Now that we have a face detector we can test it.  The first statement tests
 # it on the training data.  It will print(the precision, recall, and then)
 # average precision.
-print("\ntraining accuracy:", dlib.test_simple_object_detector(faces_folder+"/training.xml", "detector.svm"))
+print("\ntraining accuracy: {}".format(dlib.test_simple_object_detector(faces_folder+"/training.xml", "detector.svm")))
 # However, to get an idea if it really worked without overfitting we need to
 # run it on images it wasn't trained on.  The next line does this.  Happily, we
 # see that the object detector works perfectly on the testing images.
-print("testing accuracy: ", dlib.test_simple_object_detector(faces_folder+"/testing.xml", "detector.svm"))
+print("testing accuracy: {}".format(dlib.test_simple_object_detector(faces_folder+"/testing.xml", "detector.svm")))
 
 
 
@@ -128,4 +128,8 @@ detector2 = dlib.simple_object_detector("detector2.svm")
 win_det.set_image(detector2)
 raw_input("Hit enter to continue")
 
-
+# Note that you don't have to use the XML based input to
+# test_simple_object_detector().  If you have already loaded your training
+# images and bounding boxes for the objects then you can call it as shown
+# below.
+print("Training accuracy: {}".format(dlib.test_simple_object_detector(images, boxes, "detector.svm")))
