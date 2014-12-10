@@ -24,10 +24,10 @@ from skimage import io
 # the path to this faces folder as a command line argument so we will know
 # where it is.
 if (len(sys.argv) != 2):
-    print "Give the path to the examples/faces directory as the argument to this"
-    print "program.  For example, if you are in the python_examples folder then "
-    print "execute this program by running:"
-    print "  ./train_object_detector.py ../examples/faces"
+    print("Give the path to the examples/faces directory as the argument to this")
+    print("program.  For example, if you are in the python_examples folder then ")
+    print("execute this program by running:")
+    print("  ./train_object_detector.py ../examples/faces")
     exit()
 faces_folder = sys.argv[1]
 
@@ -59,18 +59,18 @@ options.be_verbose = True
 # images with boxes.  To see how to use it read the tools/imglab/README.txt
 # file.  But for this example, we just use the training.xml file included with
 # dlib.
-dlib.train_simple_object_detector(faces_folder+"/training.xml","detector.svm", options)
+dlib.train_simple_object_detector(faces_folder+"/training.xml", "detector.svm", options)
 
 
 
 # Now that we have a face detector we can test it.  The first statement tests
-# it on the training data.  It will print the precision, recall, and then
+# it on the training data.  It will print(the precision, recall, and then)
 # average precision.
-print "\ntraining accuracy:", dlib.test_simple_object_detector(faces_folder+"/training.xml", "detector.svm")
+print("\ntraining accuracy:", dlib.test_simple_object_detector(faces_folder+"/training.xml", "detector.svm"))
 # However, to get an idea if it really worked without overfitting we need to
 # run it on images it wasn't trained on.  The next line does this.  Happily, we
 # see that the object detector works perfectly on the testing images.
-print "testing accuracy: ", dlib.test_simple_object_detector(faces_folder+"/testing.xml", "detector.svm")
+print("testing accuracy: ", dlib.test_simple_object_detector(faces_folder+"/testing.xml", "detector.svm"))
 
 
 
@@ -84,15 +84,15 @@ win_det.set_image(detector)
 
 # Now let's run the detector over the images in the faces folder and display the
 # results.
-print "\nShowing detections on the images in the faces folder..."
+print("\nShowing detections on the images in the faces folder...")
 win = dlib.image_window()
 for f in glob.glob(faces_folder+"/*.jpg"):
-    print "processing file:", f
+    print("processing file:", f)
     img = io.imread(f)
     dets = detector(img)
-    print "number of faces detected:", len(dets)
+    print("number of faces detected:", len(dets))
     for d in dets:
-        print "  detection position left,top,right,bottom:", d.left(), d.top(), d.right(), d.bottom()
+        print("  detection position left,top,right,bottom:", d.left(), d.top(), d.right(), d.bottom())
 
     win.clear_overlay()
     win.set_image(img)

@@ -35,15 +35,15 @@ detector = dlib.get_frontal_face_detector()
 win = dlib.image_window()
 
 for f in sys.argv[1:]:
-    print "processing file: ", f
+    print("processing file: ", f)
     img = io.imread(f)
     # The 1 in the second argument indicates that we should upsample the image
     # 1 time.  This will make everything bigger and allow us to detect more
     # faces.
     dets = detector(img,1)
-    print "number of faces detected: ", len(dets)
+    print("number of faces detected: ", len(dets))
     for d in dets:
-        print "  detection position left,top,right,bottom:", d.left(), d.top(), d.right(), d.bottom()
+        print("  detection position left,top,right,bottom:", d.left(), d.top(), d.right(), d.bottom())
 
     win.clear_overlay()
     win.set_image(img)

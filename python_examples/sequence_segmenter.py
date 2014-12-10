@@ -176,9 +176,9 @@ else:
 # We can also measure the accuracy of a model relative to some labeled data.  This
 # statement prints the precision, recall, and F1-score of the model relative to the data in
 # training_sequences/segments.
-print "Test on training data:", dlib.test_sequence_segmenter(model, training_sequences, segments)
+print("Test on training data:", dlib.test_sequence_segmenter(model, training_sequences, segments))
 
 # We can also do 5-fold cross-validation and print the resulting precision, recall, and F1-score.
-print "cross validation:", dlib.cross_validate_sequence_segmenter(training_sequences, segments, 5, params)
+print("cross validation:", dlib.cross_validate_sequence_segmenter(training_sequences, segments, 5, params))
 
 
