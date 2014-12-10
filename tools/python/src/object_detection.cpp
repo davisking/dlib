@@ -11,14 +11,12 @@
   #include <dlib/gui_widgets.h>
 #endif
 #include "simple_object_detector.h"
+#include "indexing.h"
 
 
 using namespace dlib;
 using namespace std;
 using namespace boost::python;
-
-template <typename T>
-void resize(T& v, unsigned long n) { v.resize(n); }
 
 // ----------------------------------------------------------------------------------------
 
@@ -40,24 +38,6 @@ string print_rectangle_repr(const rectangle& r)
 {
     std::ostringstream sout;
     sout << "rectangle(" << r.left() << "," << r.top() << "," << r.right() << "," << r.bottom() << ")";
-    return sout.str();
-}
-
-// ----------------------------------------------------------------------------------------
-
-string print_rgb_pixel_str(const rgb_pixel& p)
-{
-    std::ostringstream sout;
-    sout << "red: "<< (int)p.red 
-         << ", green: "<< (int)p.green 
-         << ", blue: "<< (int)p.blue;
-    return sout.str();
-}
-
-string print_rgb_pixel_repr(const rgb_pixel& p)
-{
-    std::ostringstream sout;
-    sout << "rgb_pixel(" << p.red << "," << p.green << "," << p.blue << ")";
     return sout.str();
 }
 
@@ -615,14 +595,6 @@ ensures \n\
         .def("resize", resize<type>)
         .def_pickle(serialize_pickle<type>());
     }
-
-    class_<rgb_pixel>("rgb_pixel")
-        .def(init<unsigned char,unsigned char,unsigned char>( (arg("red"),arg("green"),arg("blue")) ))
-        .def("__str__", &print_rgb_pixel_str)
-        .def("__repr__", &print_rgb_pixel_repr)
-        .add_property("red", &rgb_pixel::red)
-        .add_property("green", &rgb_pixel::green)
-        .add_property("blue", &rgb_pixel::blue);
 }
 
 // ----------------------------------------------------------------------------------------

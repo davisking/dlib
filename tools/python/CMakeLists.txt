@@ -21,6 +21,7 @@ add_python_module(dlib
    src/cca.cpp
    src/sequence_segmenter.cpp
    src/svm_struct.cpp
+   src/image.cpp
    src/object_detection.cpp
    )
 

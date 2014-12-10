@@ -7,6 +7,7 @@
 #include <dlib/matrix.h>
 #include <boost/python/slice.hpp>
 #include <dlib/geometry/vector.h>
+#include "indexing.h"
 
 
 using namespace dlib;
@@ -14,9 +15,6 @@ using namespace std;
 using namespace boost::python;
 
 typedef matrix<double,0,1> cv;
-
-template <typename T>
-void resize(T& v, unsigned long n) { v.resize(n); }
 
 void cv_set_size(cv& m, long s)
 {
