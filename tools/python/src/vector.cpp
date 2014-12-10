@@ -3,6 +3,7 @@
 
 #include <dlib/python.h>
 #include <boost/shared_ptr.hpp>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <dlib/matrix.h>
 #include <boost/python/slice.hpp>
 #include <dlib/geometry/vector.h>
@@ -13,6 +14,9 @@ using namespace std;
 using namespace boost::python;
 
 typedef matrix<double,0,1> cv;
+
+template <typename T>
+void resize(T& v, unsigned long n) { v.resize(n); }
 
 void cv_set_size(cv& m, long s)
 {
@@ -170,6 +174,8 @@ void bind_vector()
         .def("__setitem__", &cv__setitem__)
         .add_property("shape", &cv_get_matrix_size)
         .def_pickle(serialize_pickle<cv>());
+
+    def("dot", dotprod, "Compute the dot product between two dense column vectors.");
     }
     {
     typedef point type;
@@ -177,9 +183,16 @@ void bind_vector()
             .def(init<long,long>((arg("x"), arg("y"))))
             .def("__repr__", &point__repr__)
             .def("__str__", &point__str__)
-            .def("x", &point_x)
-            .def("y", &point_y)
+            .add_property("x", &point_x, "The x-coordinate of the point.")
+            .add_property("y", &point_y, "The y-coordinate of the point.")
             .def_pickle(serialize_pickle<type>());
     }
-    def("dot", dotprod, "Compute the dot product between two dense column vectors.");
+    {
+    typedef std::vector<point> type;
+    class_<type>("points", "An array of point objects.")
+        .def(vector_indexing_suite<type>())
+        .def("clear", &type::clear)
+        .def("resize", resize<type>)
+        .def_pickle(serialize_pickle<type>());
+    }
 }
