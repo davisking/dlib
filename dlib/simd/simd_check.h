@@ -9,10 +9,18 @@
 #ifndef DLIB_DO_NOT_USE_SIMD
     #if defined(_MSC_VER) 
         #ifdef __AVX__
-            #define DLIB_HAVE_SSE2
-            #define DLIB_HAVE_SSE3
-            #define DLIB_HAVE_SSE41
-            #define DLIB_HAVE_AVX
+            #ifndef DLIB_HAVE_SSE2
+                #define DLIB_HAVE_SSE2
+            #endif 
+            #ifndef DLIB_HAVE_SSE3
+                #define DLIB_HAVE_SSE3
+            #endif
+            #ifndef DLIB_HAVE_SSE41
+                #define DLIB_HAVE_SSE41
+            #endif
+            #ifndef DLIB_HAVE_AVX
+                #define DLIB_HAVE_AVX
+            #endif
         #endif
         #if defined(_M_IX86_FP) && _M_IX86_FP >= 2 && !defined(DLIB_HAVE_SSE2)
             #define DLIB_HAVE_SSE2
