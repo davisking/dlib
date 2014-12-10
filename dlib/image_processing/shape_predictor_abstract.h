@@ -270,7 +270,7 @@ namespace dlib
                   of the box.  So a padding of 0.5 would cause the algorithm to sample
                   pixels from a box that was 2x2, effectively multiplying the area pixels
                   are sampled from by 4.  Similarly, setting the padding to -0.2 would
-                  cause it to sample from a box 0.8x0.8 in size.
+                  cause it to sample from a box 0.6x0.6 in size.
         !*/
 
         void set_feature_pool_region_padding (
