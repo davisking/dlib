@@ -15,6 +15,7 @@ void bind_sequence_segmenter();
 void bind_svm_struct();
 void bind_image_classes();
 void bind_object_detection();
+void bind_shape_predictors();
 
 
 BOOST_PYTHON_MODULE(dlib)
@@ -35,5 +36,6 @@ BOOST_PYTHON_MODULE(dlib)
     bind_svm_struct();
     bind_image_classes();
     bind_object_detection();
+    bind_shape_predictors();
 }
 

@@ -23,6 +23,7 @@ add_python_module(dlib
    src/svm_struct.cpp
    src/image.cpp
    src/object_detection.cpp
+   src/shape_predictor.cpp
    )
 
 # When you run "make install" we will copy the compiled dlib.so (or dlib.pyd) 
