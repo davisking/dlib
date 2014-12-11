@@ -6,10 +6,6 @@
 #include <boost/python/args.hpp>
 #include <dlib/geometry.h>
 #include <dlib/image_processing/frontal_face_detector.h>
-#ifndef DLIB_NO_GUI_SUPPORT
-  #include <dlib/image_processing/render_face_detections.h>
-  #include <dlib/gui_widgets.h>
-#endif
 #include "indexing.h"
 #include "simple_object_detector.h"
 #include "conversion.h"
@@ -52,8 +48,8 @@ string print_rectangle_repr(const rectangle& r)
 
 // ----------------------------------------------------------------------------------------
 
-std::vector<rectangle> run_detector (
-    frontal_face_detector& detector,
+std::vector<rectangle> run_detector_with_upscale (
+    simple_object_detector& detector,
     object img,
     const unsigned int upsampling_amount
 )
@@ -112,125 +108,6 @@ std::vector<rectangle> run_detector (
     }
 }
 
-
-// ----------------------------------------------------------------------------------------
-
-struct simple_object_detector_py
-{
-    simple_object_detector detector;
-    unsigned int upsampling_amount;
-    
-    std::vector<rectangle> run_detector1 (object img, const unsigned int upsampling_amount_) 
-    { return ::run_detector(detector, img, upsampling_amount_); }
-
-    std::vector<rectangle> run_detector2 (object img) 
-    { return ::run_detector(detector, img, upsampling_amount); }
-};
-
-void serialize (const simple_object_detector_py& item, std::ostream& out)
-{
-    int version = 1;
-    serialize(item.detector, out);
-    serialize(version, out);
-    serialize(item.upsampling_amount, out);
-}
-
-void deserialize (simple_object_detector_py& item, std::istream& in)
-{
-    int version = 0;
-    deserialize(item.detector, in);
-    deserialize(version, in);
-    if (version != 1)
-        throw dlib::serialization_error("Unexpected version found while deserializing a simple_object_detector.");
-    deserialize(item.upsampling_amount, in);
-}
-
-// ----------------------------------------------------------------------------------------
-#ifndef DLIB_NO_GUI_SUPPORT
-void image_window_set_image_fhog_detector (
-    image_window& win,
-    const frontal_face_detector& det
-)
-{
-    win.set_image(draw_fhog(det));
-}
-
-void image_window_set_image_simple_detector (
-    image_window& win,
-    const simple_object_detector_py& det
-)
-{
-    win.set_image(draw_fhog(det.detector));
-}
-
-void image_window_set_image (
-    image_window& win,
-    object img
-)
-{
-    if (is_gray_python_image(img))
-        return win.set_image(numpy_gray_image(img));
-    else if (is_rgb_python_image(img))
-        return win.set_image(numpy_rgb_image(img));
-    else
-        throw dlib::error("Unsupported image type, must be 8bit gray or RGB image.");
-}
-
-
-void add_red_overlay_rects (
-    image_window& win,
-    const std::vector<rectangle>& rects
-)
-{
-    win.add_overlay(rects, rgb_pixel(255, 0, 0));
-}
-
-void add_overlay_parts (
-    image_window& win,
-    const object& pydetections,
-    const rgb_pixel& color
-)
-{
-    std::vector<full_object_detection> detections;
-    extract<boost::python::list> list_check(pydetections);
-    if (list_check.check())
-    {
-        const unsigned long num_detections = len(pydetections);
-        for (unsigned long i = 0; i < num_detections; ++i)
-            detections.push_back(extract<full_object_detection>(pydetections[i]));
-    }
-    else
-    {
-        detections.push_back(extract<full_object_detection>(pydetections));
-    }
-    win.add_overlay(render_face_detections(detections, color));
-}
-
-void add_blue_overlay_parts (
-    image_window& win,
-    const object& pydetections
-)
-{
-    add_overlay_parts(win, pydetections, rgb_pixel(0, 0, 255));
-}
-
-// ----------------------------------------------------------------------------------------
-
-boost::shared_ptr<image_window> make_image_window_from_image(object img)
-{
-    boost::shared_ptr<image_window> win(new image_window);
-    image_window_set_image(*win, img);
-    return win;
-}
-
-boost::shared_ptr<image_window> make_image_window_from_image_and_title(object img, const string& title)
-{
-    boost::shared_ptr<image_window> win(new image_window);
-    image_window_set_image(*win, img);
-    win->set_title(title);
-    return win;
-}
-#endif
 // ----------------------------------------------------------------------------------------
 
 inline void train_simple_object_detector_on_images_py (
@@ -471,7 +348,7 @@ ensures \n\
                  metrics. "
     );
     {
-    typedef simple_object_detector_py type;
+    typedef simple_object_detector type;
     class_<type>("simple_object_detector", 
         "This object represents a sliding window histogram-of-oriented-gradients based object detector.")
         .def("__init__", make_constructor(&load_object_from_file<type>),  
@@ -481,7 +358,7 @@ train_simple_object_detector() routine."
                 Loads a simple_object_detector from a file that contains the output of the
                 train_simple_object_detector() routine.
             !*/)
-        .def("__call__", &type::run_detector1, (arg("image"), arg("upsample_num_times")),
+        .def("__call__", run_detector_with_upscale, (arg("image"), arg("upsample_num_times")=0),
 "requires \n\
     - image is a numpy ndarray containing either an 8bit grayscale or RGB \n\
       image. \n\
@@ -507,96 +384,8 @@ ensures \n\
                       default will be used.
             !*/
             )
-        .def("__call__", &type::run_detector2, (arg("image")),
-"requires \n\
-    - image is a numpy ndarray containing either an 8bit grayscale or RGB \n\
-      image. \n\
-ensures \n\
-    - This function runs the object detector on the input image and returns \n\
-      a list of detections.  " 
-            /*!
-                requires
-                    - image is a numpy ndarray containing either an 8bit grayscale or RGB
-                      image.
-                ensures
-                    - This function runs the object detector on the input image and returns
-                      a list of detections.  
-            !*/
-            )
         .def_pickle(serialize_pickle<type>());
     }
-
-    {
-    typedef frontal_face_detector type;
-    class_<type>("fhog_object_detector", 
-        "This object represents a sliding window histogram-of-oriented-gradients based object detector.")
-        .def("__init__", make_constructor(&load_object_from_file<type>),  
-"Loads a fhog_object_detector from a file that contains a serialized  \n\
-object_detector<scan_fhog_pyramid<pyramid_down<6>>> object.  " )
-        .def("__call__", &::run_detector, (arg("image"), arg("upsample_num_times")=0),
-"requires \n\
-    - image is a numpy ndarray containing either an 8bit \n\
-      grayscale or RGB image. \n\
-    - upsample_num_times >= 0 \n\
-ensures \n\
-    - This function runs the object detector on the input image \n\
-      and returns a list of detections.   \n\
-    - You can detect smaller objects by upsampling the image \n\
-      before running the detector.  This function can do that \n\
-      for you automatically if you set upsample_num_times to a \n\
-      non-zero value.  Specifically, the image is doubled in \n\
-      size upsample_num_times times.   " 
-            /*!
-                requires
-                    - image is a numpy ndarray containing either an 8bit
-                      grayscale or RGB image.
-                    - upsample_num_times >= 0
-                ensures
-                    - This function runs the object detector on the input image
-                      and returns a list of detections.  
-                    - You can detect smaller objects by upsampling the image
-                      before running the detector.  This function can do that
-                      for you automatically if you set upsample_num_times to a
-                      non-zero value.  Specifically, the image is doubled in
-                      size upsample_num_times times.   
-            !*/
-            )
-        .def_pickle(serialize_pickle<type>());
-    }
-
-#ifndef DLIB_NO_GUI_SUPPORT
-    {
-    typedef image_window type;
-    typedef void (image_window::*set_title_funct)(const std::string&);
-    typedef void (image_window::*add_overlay_funct)(const std::vector<rectangle>& r, rgb_pixel p);
-    class_<type,boost::noncopyable>("image_window", 
-        "This is a GUI window capable of showing images on the screen.")
-        .def("__init__", make_constructor(&make_image_window_from_image), 
-            "Create an image window that displays the given numpy image.")
-        .def("__init__", make_constructor(&make_image_window_from_image_and_title),
-            "Create an image window that displays the given numpy image and also has the given title.")
-        .def("set_image", image_window_set_image, arg("image"), 
-            "Make the image_window display the given image.")
-        .def("set_image", image_window_set_image_fhog_detector, arg("detector"), 
-            "Make the image_window display the given HOG detector's filters.")
-        .def("set_image", image_window_set_image_simple_detector, arg("detector"), 
-            "Make the image_window display the given HOG detector's filters.")
-        .def("set_title", (set_title_funct)&type::set_title, arg("title"),
-            "Set the title of the window to the given value.")
-        .def("clear_overlay", &type::clear_overlay, "Remove all overlays from the image_window.")
-        .def("add_overlay", (add_overlay_funct)&type::add_overlay<rgb_pixel>, (arg("rectangles"), arg("color")),
-            "Add a list of rectangles to the image_window.  They will be displayed as boxes of the given color.")
-        .def("add_overlay", add_red_overlay_rects, 
-            "Add a list of rectangles to the image_window.  They will be displayed as red boxes.")
-        .def("add_overlay", add_blue_overlay_parts,
-            "Add either a single or a list of full_object_detection parts to the image window. They will be displayed as blue lines.")
-        .def("add_overlay", add_overlay_parts, (arg("detections"), arg("color")),
-            "Add either a single or a list of full_object_detection parts to the image window. They will be displayed as lines of the given color.")
-        .def("wait_until_closed", &type::wait_until_closed, 
-            "This function blocks until the window is closed.");
-    }
-#endif
-
     {
     typedef std::vector<rectangle> type;
     class_<type>("rectangles", "An array of rectangle objects.")

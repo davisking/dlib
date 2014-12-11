@@ -16,7 +16,7 @@ void bind_svm_struct();
 void bind_image_classes();
 void bind_object_detection();
 void bind_shape_predictors();
-
+void bind_gui();
 
 BOOST_PYTHON_MODULE(dlib)
 {
@@ -37,5 +37,6 @@ BOOST_PYTHON_MODULE(dlib)
     bind_image_classes();
     bind_object_detection();
     bind_shape_predictors();
+    bind_gui();
 }
 

@@ -24,6 +24,7 @@ add_python_module(dlib
    src/image.cpp
    src/object_detection.cpp
    src/shape_predictor.cpp
+   src/gui.cpp
    )
 
 # When you run "make install" we will copy the compiled dlib.so (or dlib.pyd) 
