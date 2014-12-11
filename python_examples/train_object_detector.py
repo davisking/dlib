@@ -73,12 +73,14 @@ dlib.train_simple_object_detector(training_xml_path, "detector.svm", options)
 # average precision.
 print("")  # Print blank line to create gap from previous output
 print("Training accuracy: {}".format(
-    dlib.test_simple_object_detector(training_xml_path, "detector.svm")))
+    dlib.test_simple_object_detector(training_xml_path, "detector.svm",
+                                     upsample_amount=1)))
 # However, to get an idea if it really worked without overfitting we need to
 # run it on images it wasn't trained on.  The next line does this.  Happily, we
 # see that the object detector works perfectly on the testing images.
 print("Testing accuracy: {}".format(
-    dlib.test_simple_object_detector(testing_xml_path, "detector.svm")))
+    dlib.test_simple_object_detector(testing_xml_path, "detector.svm",
+                                     upsample_amount=1)))
 
 # Now let's use the detector as you would in a normal application.  First we
 # will load it from disk.
@@ -92,7 +94,7 @@ win_det.set_image(detector)
 # results.
 print("Showing detections on the images in the faces folder...")
 win = dlib.image_window()
-for f in glob.glob(faces_folder + "/*.jpg"):
+for f in glob.glob(os.path.join(faces_folder, "*.jpg")):
     print("Processing file: {}".format(f))
     img = io.imread(f)
     dets = detector(img)
@@ -125,10 +127,11 @@ boxes_img2 = ([dlib.rectangle(left=154, top=46, right=228, bottom=121),
 # train_simple_object_detector().
 boxes = [boxes_img1, boxes_img2]
 
-dlib.train_simple_object_detector(images, boxes, "detector2.svm", options)
+detector2 = dlib.train_simple_object_detector(images, boxes, options)
+# We could save this detector by uncommenting the following
+#detector2.save('detector2.svm')
 
 # Now let's load the trained detector and look at its HOG filter!
-detector2 = dlib.simple_object_detector("detector2.svm")
 win_det.set_image(detector2)
 raw_input("Hit enter to continue")
 
@@ -136,5 +139,5 @@ raw_input("Hit enter to continue")
 # test_simple_object_detector().  If you have already loaded your training
 # images and bounding boxes for the objects then you can call it as shown
 # below.
-print("Training accuracy: {}".format(
-    dlib.test_simple_object_detector(images, boxes, "detector.svm")))
+print("\nTraining accuracy: {}".format(
+    dlib.test_simple_object_detector(images, boxes, detector2)))
