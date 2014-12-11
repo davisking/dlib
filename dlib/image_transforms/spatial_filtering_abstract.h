@@ -353,7 +353,7 @@ namespace dlib
         typename in_image_type,
         typename out_image_type
         >
-    void gaussian_blur (
+    rectangle gaussian_blur (
         const in_image_type& in_img,
         out_image_type& out_img,
         double sigma = 1,
@@ -384,6 +384,8 @@ namespace dlib
               inside the image are set to zero.
             - #out_img.nc() == in_img.nc()
             - #out_img.nr() == in_img.nr()
+            - returns a rectangle which indicates what pixels in #out_img are considered 
+              non-border pixels and therefore contain output from the filter.
     !*/
 
 // ----------------------------------------------------------------------------------------
