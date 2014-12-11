@@ -84,10 +84,9 @@ boost::shared_ptr<full_object_detection> full_obj_det_init(object& pyrect, objec
 
 // ----------------------------------------------------------------------------------------
 
-inline void train_shape_predictor_on_images_py (
-        const object& pyimages,
-        const object& pydetections,
-        const std::string& predictor_output_filename,
+inline shape_predictor train_shape_predictor_on_images_py (
+        const boost::python::list& pyimages,
+        const boost::python::list& pydetections,
         const shape_predictor_training_options& options
 )
 {
@@ -99,15 +98,15 @@ inline void train_shape_predictor_on_images_py (
     dlib::array<array2d<rgb_pixel> > images(num_images);
     images_and_nested_params_to_dlib(pyimages, pydetections, images, detections);
 
-    train_shape_predictor_on_images("", images, detections, predictor_output_filename, options);
+    return train_shape_predictor_on_images(images, detections, options);
 }
 
 
 inline double test_shape_predictor_with_images_py (
-        const object& pyimages,
-        const object& pydetections,
-        const object& pyscales,
-        const std::string& predictor_filename
+        const boost::python::list& pyimages,
+        const boost::python::list& pydetections,
+        const boost::python::list& pyscales,
+        const shape_predictor& predictor
 )
 {
     const unsigned long num_images = len(pyimages);
@@ -141,17 +140,17 @@ inline double test_shape_predictor_with_images_py (
         }
     }
 
-    return test_shape_predictor_with_images(images, detections, scales, predictor_filename);
+    return test_shape_predictor_with_images(images, detections, scales, predictor);
 }
 
 inline double test_shape_predictor_with_images_no_scales_py (
-        const object& pyimages,
-        const object& pydetections,
-        const std::string& predictor_filename
+        const boost::python::list& pyimages,
+        const boost::python::list& pydetections,
+        const shape_predictor& predictor
 )
 {
     boost::python::list pyscales;
-    return test_shape_predictor_with_images_py(pyimages, pydetections, pyscales, predictor_filename);
+    return test_shape_predictor_with_images_py(pyimages, pydetections, pyscales, predictor);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -239,7 +238,7 @@ ensures \n\
     }
     {
     def("train_shape_predictor", train_shape_predictor_on_images_py,
-        (arg("images"), arg("object_detections"), arg("predictor_output_filename"), arg("options")),
+        (arg("images"), arg("object_detections"), arg("options")),
 "requires \n\
     - options.lambda > 0 \n\
     - options.nu > 0 \n\
@@ -254,8 +253,8 @@ ensures \n\
     - This function will apply a reasonable set of default parameters and \n\
       preprocessing techniques to the training procedure for shape_predictors \n\
       objects.  So the point of this function is to provide you with a very easy \n\
-      way to train a basic shape predictor.   \n\
-    - The trained shape predictor is serialized to the file predictor_output_filename.");
+      way to train a basic shape predictor. \n\
+    - The trained shape_predictor is returned");
 
     def("train_shape_predictor", train_shape_predictor,
         (arg("dataset_filename"), arg("predictor_output_filename"), arg("options")),
@@ -289,15 +288,14 @@ ensures \n\
       for shape_predictor_trainer() for a detailed definition of the mean average error.");
 
     def("test_shape_predictor", test_shape_predictor_with_images_no_scales_py,
-            (arg("images"), arg("detections"), arg("predictor_filename")),
+            (arg("images"), arg("detections"), arg("shape_predictor")),
 "requires \n\
     - len(images) == len(object_detections) \n\
     - images should be a list of numpy matrices that represent images, either RGB or grayscale. \n\
     - object_detections should be a list of lists of dlib.full_object_detection objects. \
       Each dlib.full_object_detection contains the bounding box and the lists of points that make up the object parts.\n\
  ensures \n\
-    - Loads a shape_predictor from the file predictor_filename.  This means \n\
-      predictor_filename should be a file produced by the train_shape_predictor()  \n\
+    - shape_predictor should be a file produced by the train_shape_predictor()  \n\
       routine. \n\
     - This function tests the predictor against the dataset and returns the \n\
       mean average error of the detector.  In fact, The \n\
@@ -307,7 +305,7 @@ ensures \n\
 
 
     def("test_shape_predictor", test_shape_predictor_with_images_py,
-            (arg("images"), arg("detections"), arg("scales"), arg("predictor_filename")),
+            (arg("images"), arg("detections"), arg("scales"), arg("shape_predictor")),
 "requires \n\
     - len(images) == len(object_detections) \n\
     - len(object_detections) == len(scales) \n\
@@ -318,8 +316,7 @@ ensures \n\
     - object_detections should be a list of lists of dlib.full_object_detection objects. \
       Each dlib.full_object_detection contains the bounding box and the lists of points that make up the object parts.\n\
  ensures \n\
-    - Loads a shape_predictor from the file predictor_filename.  This means \n\
-      predictor_filename should be a file produced by the train_shape_predictor()  \n\
+    - shape_predictor should be a file produced by the train_shape_predictor()  \n\
       routine. \n\
     - This function tests the predictor against the dataset and returns the \n\
       mean average error of the detector.  In fact, The \n\

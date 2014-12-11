@@ -65,11 +65,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename image_array>
-    inline void train_shape_predictor_on_images (
-        const std::string& dataset_filename, // can be "" if it's not applicable
+    inline shape_predictor train_shape_predictor_on_images (
         image_array& images,
         std::vector<std::vector<full_object_detection> >& detections,
-        const std::string& predictor_output_filename,
         const shape_predictor_training_options& options
     )
     {
@@ -116,13 +114,7 @@ namespace dlib
 
         shape_predictor predictor = trainer.train(images, detections);
 
-        std::ofstream fout(predictor_output_filename.c_str(), std::ios::binary);
-        int version = 1;
-        serialize(predictor, fout);
-        serialize(version, fout);
-
-        if (options.be_verbose)
-            std::cout << "Training complete, saved predictor to file " << predictor_output_filename << std::endl;
+        return predictor;
     }
 
     inline void train_shape_predictor (
@@ -135,7 +127,15 @@ namespace dlib
         std::vector<std::vector<full_object_detection> > objects;
         load_image_dataset(images, objects, dataset_filename);
 
-        train_shape_predictor_on_images(dataset_filename, images, objects, predictor_output_filename, options);
+        shape_predictor predictor = train_shape_predictor_on_images(images, objects, options);
+
+        std::ofstream fout(predictor_output_filename.c_str(), std::ios::binary);
+        int version = 1;
+        serialize(predictor, fout);
+        serialize(version, fout);
+
+        if (options.be_verbose)
+            std::cout << "Training complete, saved predictor to file " << predictor_output_filename << std::endl;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -145,23 +145,13 @@ namespace dlib
             image_array& images,
             std::vector<std::vector<full_object_detection> >& detections,
             std::vector<std::vector<double> >& scales,
-            const std::string& predictor_filename
+            const shape_predictor& predictor
     )
     {
         if (images.size() != detections.size())
             throw error("The list of images must have the same length as the list of detections.");
         if (scales.size() > 0  && scales.size() != images.size())
             throw error("The list of scales must have the same length as the list of detections.");
-
-        shape_predictor predictor;
-        int version = 0;
-        std::ifstream fin(predictor_filename.c_str(), std::ios::binary);
-        if (!fin)
-            throw error("Unable to open file " + predictor_filename);
-        deserialize(predictor, fin);
-        deserialize(version, fin);
-        if (version != 1)
-            throw error("Unknown shape_predictor format.");
 
         if (scales.size() > 0)
             return test_shape_predictor(predictor, images, detections, scales);
@@ -174,13 +164,25 @@ namespace dlib
         const std::string& predictor_filename
     )
     {
+        // Load the images, no scales can be provided
         dlib::array<array2d<rgb_pixel> > images;
         // This interface cannot take the scales parameter.
         std::vector<std::vector<double> > scales;
         std::vector<std::vector<full_object_detection> > objects;
         load_image_dataset(images, objects, dataset_filename);
 
-        return test_shape_predictor_with_images(images, objects, scales, predictor_filename);
+        // Load the shape predictor
+        shape_predictor predictor;
+        int version = 0;
+        std::ifstream fin(predictor_filename.c_str(), std::ios::binary);
+        if (!fin)
+            throw error("Unable to open file " + predictor_filename);
+        deserialize(predictor, fin);
+        deserialize(version, fin);
+        if (version != 1)
+            throw error("Unknown shape_predictor format.");
+
+        return test_shape_predictor_with_images(images, objects, scales, predictor);
     }
 
 // ----------------------------------------------------------------------------------------

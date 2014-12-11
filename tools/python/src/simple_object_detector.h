@@ -127,12 +127,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename image_array>
-    inline void train_simple_object_detector_on_images (
+    inline simple_object_detector train_simple_object_detector_on_images (
         const std::string& dataset_filename, // can be "" if it's not applicable
         image_array& images,
         std::vector<std::vector<rectangle> >& boxes,
         std::vector<std::vector<rectangle> >& ignore,
-        const std::string& detector_output_filename,
         const simple_object_detector_training_options& options 
     )
     {
@@ -169,7 +168,6 @@ namespace dlib
             trainer.be_verbose();
         }
 
-
         unsigned long upsample_amount = 0;
 
         // now make sure all the boxes are obtainable by the scanner.  We will try and
@@ -194,14 +192,9 @@ namespace dlib
 
         simple_object_detector detector = trainer.train(images, boxes, ignore);
 
-        std::ofstream fout(detector_output_filename.c_str(), std::ios::binary);
-        int version = 1;
-        serialize(detector, fout);
-        serialize(version, fout);
-
         if (options.be_verbose)
         {
-            std::cout << "Training complete, saved detector to file " << detector_output_filename << std::endl;
+            std::cout << "Training complete." << std::endl;
             std::cout << "Trained with C: " << options.C << std::endl;
             std::cout << "Training with epsilon: " << options.epsilon << std::endl;
             std::cout << "Trained using " << options.num_threads << " threads."<< std::endl;
@@ -216,6 +209,8 @@ namespace dlib
             if (options.add_left_right_image_flips)
                 std::cout << "Trained on both left and right flipped versions of images." << std::endl;
         }
+
+        return detector;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -230,7 +225,15 @@ namespace dlib
         std::vector<std::vector<rectangle> > boxes, ignore;
         ignore = load_image_dataset(images, boxes, dataset_filename);
 
-        train_simple_object_detector_on_images(dataset_filename, images, boxes, ignore, detector_output_filename, options);
+        simple_object_detector detector = train_simple_object_detector_on_images(dataset_filename, images, boxes, ignore, options);
+
+        std::ofstream fout(detector_output_filename.c_str(), std::ios::binary);
+        int version = 1;
+        serialize(detector, fout);
+        serialize(version, fout);
+
+        if (options.be_verbose)
+            std::cout << "Saved detector to file " << detector_output_filename << std::endl;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -245,21 +248,14 @@ namespace dlib
     template <typename image_array>
     inline const simple_test_results test_simple_object_detector_with_images (
             image_array& images,
+            const unsigned int upsample_amount,
             std::vector<std::vector<rectangle> >& boxes,
             std::vector<std::vector<rectangle> >& ignore,
-            const std::string& detector_filename
+            simple_object_detector& detector
     )
     {
-        simple_object_detector detector;
-        int version = 0;
-        unsigned int upsample_amount = 0;
-        std::ifstream fin(detector_filename.c_str(), std::ios::binary);
-        if (!fin)
-            throw error("Unable to open file " + detector_filename);
-        deserialize(detector, fin);
-        deserialize(version, fin);
-        if (version != 1)
-            throw error("Unknown simple_object_detector format.");
+        for (unsigned int i = 0; i < upsample_amount; ++i)
+            upsample_image_dataset<pyramid_down<2> >(images, boxes);
 
         matrix<double,1,3> res = test_object_detection_function(detector, images, boxes, ignore);
         simple_test_results ret;
@@ -271,14 +267,27 @@ namespace dlib
 
     inline const simple_test_results test_simple_object_detector (
         const std::string& dataset_filename,
-        const std::string& detector_filename
+        const std::string& detector_filename,
+        const unsigned int upsample_amount
     )
     {
+        // Load all the testing images
         dlib::array<array2d<rgb_pixel> > images;
         std::vector<std::vector<rectangle> > boxes, ignore;
         ignore = load_image_dataset(images, boxes, dataset_filename);
 
-        return test_simple_object_detector_with_images(images, boxes, ignore, detector_filename);
+        // Load the detector off disk
+        simple_object_detector detector;
+        int version = 0;
+        std::ifstream fin(detector_filename.c_str(), std::ios::binary);
+        if (!fin)
+            throw error("Unable to open file " + detector_filename);
+        deserialize(detector, fin);
+        deserialize(version, fin);
+        if (version != 1)
+            throw error("Unknown simple_object_detector format.");
+
+        return test_simple_object_detector_with_images(images, upsample_amount, boxes, ignore, detector);
     }
 
 // ----------------------------------------------------------------------------------------
