@@ -35,6 +35,14 @@ full_object_detection run_predictor (
     }
 }
 
+void save_shape_predictor(const shape_predictor& predictor, const std::string& predictor_output_filename)
+{
+    std::ofstream fout(predictor_output_filename.c_str(), std::ios::binary);
+    int version = 1;
+    serialize(predictor, fout);
+    serialize(version, fout);
+}
+
 // ----------------------------------------------------------------------------------------
 
 rectangle full_obj_det_get_rect (const full_object_detection& detection)
@@ -226,6 +234,7 @@ train_shape_predictor() routine.")
 ensures \n\
     - This function runs the shape predictor on the input image and returns \n\
       a single full object detection.")
+        .def("save", save_shape_predictor, (arg("predictor_output_filename")), "Save a shape_predictor to the provided path.")
         .def_pickle(serialize_pickle<type>());
     }
     {

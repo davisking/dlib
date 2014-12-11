@@ -176,23 +176,14 @@ namespace dlib
         // upsample the images at most two times to help make the boxes obtainable.
         std::vector<std::vector<rectangle> > temp(boxes), removed;
         removed = remove_unobtainable_rectangles(trainer, images, temp);
-        if (impl::contains_any_boxes(removed))
+        while (impl::contains_any_boxes(removed) && upsample_amount < 2)
         {
             ++upsample_amount;
             if (options.be_verbose)
-                std::cout << "upsample images..." << std::endl;
+                std::cout << "Upsample images..." << std::endl;
             upsample_image_dataset<pyramid_down<2> >(images, boxes, ignore);
             temp = boxes;
             removed = remove_unobtainable_rectangles(trainer, images, temp);
-            if (impl::contains_any_boxes(removed))
-            {
-                ++upsample_amount;
-                if (options.be_verbose)
-                    std::cout << "upsample images..." << std::endl;
-                upsample_image_dataset<pyramid_down<2> >(images, boxes, ignore);
-                temp = boxes;
-                removed = remove_unobtainable_rectangles(trainer, images, temp);
-            }
         }
         // if we weren't able to get all the boxes to match then throw an error 
         if (impl::contains_any_boxes(removed))
@@ -207,7 +198,6 @@ namespace dlib
         int version = 1;
         serialize(detector, fout);
         serialize(version, fout);
-        serialize(upsample_amount, fout);
 
         if (options.be_verbose)
         {
@@ -218,10 +208,10 @@ namespace dlib
             std::cout << "Trained with sliding window " << width << " pixels wide by " << height << " pixels tall." << std::endl;
             if (upsample_amount != 0)
             {
-                if (upsample_amount == 1)
-                    std::cout << "Upsampled images " << upsample_amount << " time to allow detection of small boxes." << std::endl;
-                else
-                    std::cout << "Upsampled images " << upsample_amount << " times to allow detection of small boxes." << std::endl;
+                // Unsampled images # time(s) to allow detection of small boxes
+                std::cout << "Upsampled images " << upsample_amount;
+                std::cout << (upsample_amount == 1) ? " time" : " times";
+                std::cout << " to allow detection of small boxes." << std::endl;
             }
             if (options.add_left_right_image_flips)
                 std::cout << "Trained on both left and right flipped versions of images." << std::endl;
@@ -270,10 +260,6 @@ namespace dlib
         deserialize(version, fin);
         if (version != 1)
             throw error("Unknown simple_object_detector format.");
-        deserialize(upsample_amount, fin);
-
-        for (unsigned int i = 0; i < upsample_amount; ++i)
-            upsample_image_dataset<pyramid_down<2> >(images, boxes);
 
         matrix<double,1,3> res = test_object_detection_function(detector, images, boxes, ignore);
         simple_test_results ret;

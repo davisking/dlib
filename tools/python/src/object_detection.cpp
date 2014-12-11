@@ -108,6 +108,14 @@ std::vector<rectangle> run_detector_with_upscale (
     }
 }
 
+void save_simple_object_detector(const simple_object_detector& detector, const std::string& detector_output_filename)
+{
+    std::ofstream fout(detector_output_filename.c_str(), std::ios::binary);
+    int version = 1;
+    serialize(detector, fout);
+    serialize(version, fout);
+}
+
 // ----------------------------------------------------------------------------------------
 
 inline void train_simple_object_detector_on_images_py (
@@ -384,6 +392,7 @@ ensures \n\
                       default will be used.
             !*/
             )
+        .def("save", save_simple_object_detector, (arg("detector_output_filename")), "Save a simple_object_detector to the provided path.")
         .def_pickle(serialize_pickle<type>());
     }
     {
