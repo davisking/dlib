@@ -5,13 +5,13 @@
 #include <dlib/matrix.h>
 #include <boost/python/args.hpp>
 #include <dlib/geometry.h>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <dlib/image_processing/frontal_face_detector.h>
 #ifndef DLIB_NO_GUI_SUPPORT
+  #include <dlib/image_processing/render_face_detections.h>
   #include <dlib/gui_widgets.h>
 #endif
-#include "simple_object_detector.h"
 #include "indexing.h"
+#include "simple_object_detector.h"
 #include "conversion.h"
 
 using namespace dlib;
@@ -182,7 +182,36 @@ void add_red_overlay_rects (
     const std::vector<rectangle>& rects
 )
 {
-    win.add_overlay(rects, rgb_pixel(255,0,0));
+    win.add_overlay(rects, rgb_pixel(255, 0, 0));
+}
+
+void add_overlay_parts (
+    image_window& win,
+    const object& pydetections,
+    const rgb_pixel& color
+)
+{
+    std::vector<full_object_detection> detections;
+    extract<boost::python::list> list_check(pydetections);
+    if (list_check.check())
+    {
+        const unsigned long num_detections = len(pydetections);
+        for (unsigned long i = 0; i < num_detections; ++i)
+            detections.push_back(extract<full_object_detection>(pydetections[i]));
+    }
+    else
+    {
+        detections.push_back(extract<full_object_detection>(pydetections));
+    }
+    win.add_overlay(render_face_detections(detections, color));
+}
+
+void add_blue_overlay_parts (
+    image_window& win,
+    const object& pydetections
+)
+{
+    add_overlay_parts(win, pydetections, rgb_pixel(0, 0, 255));
 }
 
 // ----------------------------------------------------------------------------------------
@@ -559,6 +588,10 @@ ensures \n\
             "Add a list of rectangles to the image_window.  They will be displayed as boxes of the given color.")
         .def("add_overlay", add_red_overlay_rects, 
             "Add a list of rectangles to the image_window.  They will be displayed as red boxes.")
+        .def("add_overlay", add_blue_overlay_parts,
+            "Add either a single or a list of full_object_detection parts to the image window. They will be displayed as blue lines.")
+        .def("add_overlay", add_overlay_parts, (arg("detections"), arg("color")),
+            "Add either a single or a list of full_object_detection parts to the image window. They will be displayed as lines of the given color.")
         .def("wait_until_closed", &type::wait_until_closed, 
             "This function blocks until the window is closed.");
     }

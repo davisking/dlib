@@ -3,7 +3,6 @@
 
 #include <dlib/python.h>
 #include <boost/shared_ptr.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <dlib/matrix.h>
 #include <boost/python/slice.hpp>
 #include <dlib/geometry/vector.h>
