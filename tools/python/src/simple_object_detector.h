@@ -203,7 +203,7 @@ namespace dlib
             {
                 // Unsampled images # time(s) to allow detection of small boxes
                 std::cout << "Upsampled images " << upsample_amount;
-                std::cout << (upsample_amount == 1) ? " time" : " times";
+                std::cout << ((upsample_amount > 1) ? " times" : " time");
                 std::cout << " to allow detection of small boxes." << std::endl;
             }
             if (options.add_left_right_image_flips)
