@@ -7,7 +7,8 @@
 #   face.
 #
 #   The examples/faces folder contains some jpg images of people.  You can run
-#   this program on them and see the detections by executing the following command:
+#   this program on them and see the detections by executing the
+#   following command:
 #       ./face_detector.py ../examples/faces/*.jpg
 #
 #   This face detector is made using the now classic Histogram of Oriented
@@ -20,14 +21,17 @@
 #
 #
 # COMPILING THE DLIB PYTHON INTERFACE
-#   Dlib comes with a compiled python interface for python 2.7 on MS Windows.  If
+#   Dlib comes with a compiled python interface for python 2.7 on MS Windows. If
 #   you are using another python version or operating system then you need to
 #   compile the dlib python interface before you can use this file.  To do this,
-#   run compile_dlib_python_module.bat.  This should work on any operating system
-#   so long as you have CMake and boost-python installed.  On Ubuntu, this can be
-#   done easily by running the command:  sudo apt-get install libboost-python-dev cmake
+#   run compile_dlib_python_module.bat.  This should work on any operating
+#   system so long as you have CMake and boost-python installed.
+#   On Ubuntu, this can be done easily by running the command:
+#       sudo apt-get install libboost-python-dev cmake
 
-import dlib, sys
+import sys
+
+import dlib
 from skimage import io
 
 
@@ -35,18 +39,18 @@ detector = dlib.get_frontal_face_detector()
 win = dlib.image_window()
 
 for f in sys.argv[1:]:
-    print("processing file: ", f)
+    print("Processing file: {}".format(f))
     img = io.imread(f)
     # The 1 in the second argument indicates that we should upsample the image
     # 1 time.  This will make everything bigger and allow us to detect more
     # faces.
-    dets = detector(img,1)
-    print("number of faces detected: ", len(dets))
-    for d in dets:
-        print("  detection position left,top,right,bottom:", d.left(), d.top(), d.right(), d.bottom())
+    dets = detector(img, 1)
+    print("Number of faces detected: {}".format(len(dets)))
+    for k, d in enumerate(dets):
+        print("Detection {}: Left: {} Top: {} Right: {} Bottom: {}".format(
+            k, d.left(), d.top(), d.right(), d.bottom()))
 
     win.clear_overlay()
     win.set_image(img)
     win.add_overlay(dets)
     raw_input("Hit enter to continue")
-

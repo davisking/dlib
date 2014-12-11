@@ -14,9 +14,7 @@ letter to
     San Francisco, California, 94105, USA.
 
 
-
 Public domain dedications are not recognized by some countries.  So
 if you live in an area where the above dedication isn't valid then
 you can consider the example programs to be licensed under the Boost
 Software License.   
-

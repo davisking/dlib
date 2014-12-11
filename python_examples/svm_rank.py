@@ -14,23 +14,21 @@
 # come to the top of the ranked list.
 #
 # COMPILING THE DLIB PYTHON INTERFACE
-#   Dlib comes with a compiled python interface for python 2.7 on MS Windows.  If
+#   Dlib comes with a compiled python interface for python 2.7 on MS Windows. If
 #   you are using another python version or operating system then you need to
 #   compile the dlib python interface before you can use this file.  To do this,
-#   run compile_dlib_python_module.bat.  This should work on any operating system
-#   so long as you have CMake and boost-python installed.  On Ubuntu, this can be
-#   done easily by running the command:  sudo apt-get install libboost-python-dev cmake
-
-
+#   run compile_dlib_python_module.bat.  This should work on any operating
+#   system so long as you have CMake and boost-python installed.
+#   On Ubuntu, this can be done easily by running the command:
+#       sudo apt-get install libboost-python-dev cmake
 import dlib
 
 
-# Now let's make some testing data.  To make it really simple, let's suppose that
-# we are ranking 2D vectors and that vectors with positive values in the first
-# dimension should rank higher than other vectors.  So what we do is make
+# Now let's make some testing data.  To make it really simple, let's suppose
+# that we are ranking 2D vectors and that vectors with positive values in the
+# first dimension should rank higher than other vectors.  So what we do is make
 # examples of relevant (i.e. high ranking) and non-relevant (i.e. low ranking)
 # vectors and store them into a ranking_pair object like so:
-
 data = dlib.ranking_pair()
 # Here we add two examples.  In real applications, you would want lots of
 # examples of relevant and non-relevant vectors.
@@ -53,8 +51,10 @@ rank = trainer.train(data)
 # Now if you call rank on a vector it will output a ranking score.  In
 # particular, the ranking score for relevant vectors should be larger than the
 # score for non-relevant vectors.  
-print("ranking score for a relevant vector:     ", rank(data.relevant[0]))
-print("ranking score for a non-relevant vector: ", rank(data.nonrelevant[0]))
+print("Ranking score for a relevant vector:     {}".format(
+    rank(data.relevant[0])))
+print("Ranking score for a non-relevant vector: {}".format(
+    rank(data.nonrelevant[0])))
 # The output is the following:
 #    ranking score for a relevant vector:     0.5
 #    ranking score for a non-relevant vector: -0.5
@@ -70,13 +70,10 @@ print(dlib.test_ranking_function(rank, data))
 # The ranking scores are computed by taking the dot product between a learned
 # weight vector and a data vector.  If you want to see the learned weight vector
 # you can display it like so:
-print("weights: \n", rank.weights)
+print("Weights: {}".format(rank.weights))
 # In this case the weights are:
 #  0.5 
 # -0.5 
-
-
-
 
 # In the above example, our data contains just two sets of objects.  The
 # relevant set and non-relevant set.  The trainer is attempting to find a
@@ -94,7 +91,6 @@ print("weights: \n", rank.weights)
 # to the trainer.  Therefore, each ranking_pair would represent the
 # relevant/non-relevant sets for a particular query.  An example is shown below
 # (for simplicity, we reuse our data from above to make 4 identical "queries").
-
 queries = dlib.ranking_pairs()
 queries.append(data)
 queries.append(data)
@@ -104,7 +100,6 @@ queries.append(data)
 # We can train just as before.  
 rank = trainer.train(queries)
 
-
 # Now that we have multiple ranking_pair instances, we can also use
 # cross_validate_ranking_trainer().  This performs cross-validation by splitting
 # the queries up into folds.  That is, it lets the trainer train on a subset of
@@ -112,9 +107,8 @@ rank = trainer.train(queries)
 # splits and returns the overall ranking accuracy based on the held out data.
 # Just like test_ranking_function(), it reports both the ordering accuracy and
 # mean average precision.
-print("cross validation results: ", dlib.cross_validate_ranking_trainer(trainer, queries, 4))
-
-
+print("Cross validation results: {}".format(
+    dlib.cross_validate_ranking_trainer(trainer, queries, 4)))
 
 # Finally, note that the ranking tools also support the use of sparse vectors in
 # addition to dense vectors (which we used above).  So if we wanted to do
@@ -131,19 +125,20 @@ samp = dlib.sparse_vector()
 # increasing order and no index value shows up more than once.  If necessary,
 # you can use the dlib.make_sparse_vector() routine to make a sparse vector
 # object properly sorted and contain unique indices. 
-samp.append(dlib.pair(0,1))  
+samp.append(dlib.pair(0, 1))
 data.relevant.append(samp)
 
 # Now make samp represent the same vector as dlib.vector([0, 1])
 samp.clear()
-samp.append(dlib.pair(1,1))
+samp.append(dlib.pair(1, 1))
 data.nonrelevant.append(samp)
 
 trainer = dlib.svm_rank_trainer_sparse()
 rank = trainer.train(data)
-print("ranking score for a relevant vector:     ", rank(data.relevant[0]))
-print("ranking score for a non-relevant vector: ", rank(data.nonrelevant[0]))
+print("Ranking score for a relevant vector:     {}".format(
+    rank(data.relevant[0])))
+print("Ranking score for a non-relevant vector: {}".format(
+    rank(data.nonrelevant[0])))
 # Just as before, the output is the following:
 #    ranking score for a relevant vector:     0.5
 #    ranking score for a non-relevant vector: -0.5
-
