@@ -6,6 +6,7 @@
 #include <dlib/image_processing/frontal_face_detector.h>
 #include <dlib/image_processing/render_face_detections.h>
 #include <dlib/gui_widgets.h>
+#include "simple_object_detector_py.h"
 
 using namespace dlib;
 using namespace std;
@@ -13,23 +14,20 @@ using namespace boost::python;
 
 // ----------------------------------------------------------------------------------------
 
-// Forward declaration of the simple_object_detector
-typedef object_detector<scan_fhog_pyramid<pyramid_down<6> > > simple_object_detector;
-
 void image_window_set_image_fhog_detector (
-    image_window& win,
-    const frontal_face_detector& det
-)
-{
-    win.set_image(draw_fhog(det));
-}
-
-void image_window_set_image_simple_detector (
     image_window& win,
     const simple_object_detector& det
 )
 {
     win.set_image(draw_fhog(det));
+}
+
+void image_window_set_image_simple_detector_py (
+    image_window& win,
+    const simple_object_detector_py& det
+)
+{
+    win.set_image(draw_fhog(det.detector));
 }
 
 // ----------------------------------------------------------------------------------------
@@ -103,7 +101,7 @@ void bind_gui()
             "Make the image_window display the given image.")
         .def("set_image", image_window_set_image_fhog_detector, arg("detector"),
             "Make the image_window display the given HOG detector's filters.")
-        .def("set_image", image_window_set_image_simple_detector, arg("detector"),
+        .def("set_image", image_window_set_image_simple_detector_py, arg("detector"),
             "Make the image_window display the given HOG detector's filters.")
         .def("set_title", (set_title_funct)&type::set_title, arg("title"),
             "Set the title of the window to the given value.")

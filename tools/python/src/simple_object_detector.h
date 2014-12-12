@@ -3,7 +3,6 @@
 #ifndef DLIB_SIMPLE_ObJECT_DETECTOR_H__
 #define DLIB_SIMPLE_ObJECT_DETECTOR_H__
 
-#include "simple_object_detector_abstract.h"
 #include "dlib/image_processing/object_detector.h"
 #include "dlib/string.h"
 #include "dlib/image_processing/scan_fhog_pyramid.h"
@@ -11,6 +10,7 @@
 #include "dlib/geometry.h"
 #include "dlib/data_io/load_image_dataset.h"
 #include "dlib/image_processing/remove_unobtainable_rectangles.h"
+#include "serialize_object_detector.h"
 
 
 namespace dlib
@@ -127,7 +127,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename image_array>
-    inline simple_object_detector train_simple_object_detector_on_images (
+    inline simple_object_detector_py train_simple_object_detector_on_images (
         const std::string& dataset_filename, // can be "" if it's not applicable
         image_array& images,
         std::vector<std::vector<rectangle> >& boxes,
@@ -168,15 +168,15 @@ namespace dlib
             trainer.be_verbose();
         }
 
-        unsigned long upsample_amount = 0;
+        unsigned long upsampling_amount = 0;
 
         // now make sure all the boxes are obtainable by the scanner.  We will try and
         // upsample the images at most two times to help make the boxes obtainable.
         std::vector<std::vector<rectangle> > temp(boxes), removed;
         removed = remove_unobtainable_rectangles(trainer, images, temp);
-        while (impl::contains_any_boxes(removed) && upsample_amount < 2)
+        while (impl::contains_any_boxes(removed) && upsampling_amount < 2)
         {
-            ++upsample_amount;
+            ++upsampling_amount;
             if (options.be_verbose)
                 std::cout << "Upsample images..." << std::endl;
             upsample_image_dataset<pyramid_down<2> >(images, boxes, ignore);
@@ -199,18 +199,18 @@ namespace dlib
             std::cout << "Training with epsilon: " << options.epsilon << std::endl;
             std::cout << "Trained using " << options.num_threads << " threads."<< std::endl;
             std::cout << "Trained with sliding window " << width << " pixels wide by " << height << " pixels tall." << std::endl;
-            if (upsample_amount != 0)
+            if (upsampling_amount != 0)
             {
                 // Unsampled images # time(s) to allow detection of small boxes
-                std::cout << "Upsampled images " << upsample_amount;
-                std::cout << ((upsample_amount > 1) ? " times" : " time");
+                std::cout << "Upsampled images " << upsampling_amount;
+                std::cout << ((upsampling_amount > 1) ? " times" : " time");
                 std::cout << " to allow detection of small boxes." << std::endl;
             }
             if (options.add_left_right_image_flips)
                 std::cout << "Trained on both left and right flipped versions of images." << std::endl;
         }
 
-        return detector;
+        return simple_object_detector_py(detector, upsampling_amount);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -225,12 +225,9 @@ namespace dlib
         std::vector<std::vector<rectangle> > boxes, ignore;
         ignore = load_image_dataset(images, boxes, dataset_filename);
 
-        simple_object_detector detector = train_simple_object_detector_on_images(dataset_filename, images, boxes, ignore, options);
+        simple_object_detector_py detector = train_simple_object_detector_on_images(dataset_filename, images, boxes, ignore, options);
 
-        std::ofstream fout(detector_output_filename.c_str(), std::ios::binary);
-        int version = 1;
-        serialize(detector, fout);
-        serialize(version, fout);
+        save_simple_object_detector_py(detector, detector_output_filename);
 
         if (options.be_verbose)
             std::cout << "Saved detector to file " << detector_output_filename << std::endl;
@@ -268,7 +265,7 @@ namespace dlib
     inline const simple_test_results test_simple_object_detector (
         const std::string& dataset_filename,
         const std::string& detector_filename,
-        const unsigned int upsample_amount
+        const int upsample_amount
     )
     {
         // Load all the testing images
@@ -276,7 +273,8 @@ namespace dlib
         std::vector<std::vector<rectangle> > boxes, ignore;
         ignore = load_image_dataset(images, boxes, dataset_filename);
 
-        // Load the detector off disk
+        // Load the detector off disk (We have to use the explicit serialization here
+        // so that we have an open file stream)
         simple_object_detector detector;
         int version = 0;
         std::ifstream fin(detector_filename.c_str(), std::ios::binary);
@@ -287,7 +285,25 @@ namespace dlib
         if (version != 1)
             throw error("Unknown simple_object_detector format.");
 
-        return test_simple_object_detector_with_images(images, upsample_amount, boxes, ignore, detector);
+        /*  Here we need a little hack to deal with whether we are going to be loading a
+         *  simple_object_detector (possibly trained outside of Python) or a
+         *  simple_object_detector_py (definitely trained from Python). In order to do
+         *  this we peek into the filestream to see if there is more data after the
+         *  version number. If there is, it will be the upsampling amount. Therefore,
+         *  by default we set the upsampling amount to -1 so that we can catch when
+         *  no upsampling amount has been passed (numbers less than 0). If -1 is
+         *  passed, we assume no upsampling and use 0. If a number > 0 is passed,
+         *  we use that, else we use the upsampling amount cached with the detector
+         *  (if it exists).
+         */
+        unsigned int final_upsampling_amount = 0;
+        const unsigned int cached_upsample_amount = fin.peek();
+        if (upsample_amount >= 0)
+            final_upsampling_amount = upsample_amount;
+        else if (cached_upsample_amount != std::char_traits<wchar_t>::eof())  // peek() returns EOF if no more data
+            deserialize(final_upsampling_amount, fin);
+
+        return test_simple_object_detector_with_images(images, final_upsampling_amount, boxes, ignore, detector);
     }
 
 // ----------------------------------------------------------------------------------------

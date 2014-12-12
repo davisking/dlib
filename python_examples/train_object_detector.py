@@ -73,14 +73,12 @@ dlib.train_simple_object_detector(training_xml_path, "detector.svm", options)
 # average precision.
 print("")  # Print blank line to create gap from previous output
 print("Training accuracy: {}".format(
-    dlib.test_simple_object_detector(training_xml_path, "detector.svm",
-                                     upsample_amount=1)))
+    dlib.test_simple_object_detector(training_xml_path, "detector.svm")))
 # However, to get an idea if it really worked without overfitting we need to
 # run it on images it wasn't trained on.  The next line does this.  Happily, we
 # see that the object detector works perfectly on the testing images.
 print("Testing accuracy: {}".format(
-    dlib.test_simple_object_detector(testing_xml_path, "detector.svm",
-                                     upsample_amount=1)))
+    dlib.test_simple_object_detector(testing_xml_path, "detector.svm")))
 
 # Now let's use the detector as you would in a normal application.  First we
 # will load it from disk.

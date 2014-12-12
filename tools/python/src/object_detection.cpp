@@ -8,6 +8,7 @@
 #include <dlib/image_processing/frontal_face_detector.h>
 #include "indexing.h"
 #include "simple_object_detector.h"
+#include "simple_object_detector_py.h"
 #include "conversion.h"
 
 using namespace dlib;
@@ -48,77 +49,7 @@ string print_rectangle_repr(const rectangle& r)
 
 // ----------------------------------------------------------------------------------------
 
-std::vector<rectangle> run_detector_with_upscale (
-    simple_object_detector& detector,
-    object img,
-    const unsigned int upsampling_amount
-)
-{
-    pyramid_down<2> pyr;
-
-    if (is_gray_python_image(img))
-    {
-        array2d<unsigned char> temp;
-        if (upsampling_amount == 0)
-        {
-            return detector(numpy_gray_image(img));
-        }
-        else
-        {
-            pyramid_up(numpy_gray_image(img), temp, pyr);
-            unsigned int levels = upsampling_amount-1;
-            while (levels > 0)
-            {
-                levels--;
-                pyramid_up(temp);
-            }
-
-            std::vector<rectangle> res = detector(temp);
-            for (unsigned long i = 0; i < res.size(); ++i)
-                res[i] = pyr.rect_down(res[i], upsampling_amount);
-            return res;
-        }
-    }
-    else if (is_rgb_python_image(img))
-    {
-        array2d<rgb_pixel> temp;
-        if (upsampling_amount == 0)
-        {
-            return detector(numpy_rgb_image(img));
-        }
-        else
-        {
-            pyramid_up(numpy_rgb_image(img), temp, pyr);
-            unsigned int levels = upsampling_amount-1;
-            while (levels > 0)
-            {
-                levels--;
-                pyramid_up(temp);
-            }
-
-            std::vector<rectangle> res = detector(temp);
-            for (unsigned long i = 0; i < res.size(); ++i)
-                res[i] = pyr.rect_down(res[i], upsampling_amount);
-            return res;
-        }
-    }
-    else
-    {
-        throw dlib::error("Unsupported image type, must be 8bit gray or RGB image.");
-    }
-}
-
-void save_simple_object_detector(const simple_object_detector& detector, const std::string& detector_output_filename)
-{
-    std::ofstream fout(detector_output_filename.c_str(), std::ios::binary);
-    int version = 1;
-    serialize(detector, fout);
-    serialize(version, fout);
-}
-
-// ----------------------------------------------------------------------------------------
-
-inline simple_object_detector train_simple_object_detector_on_images_py (
+inline simple_object_detector_py train_simple_object_detector_on_images_py (
     const boost::python::list& pyimages,
     const boost::python::list& pyboxes,
     const simple_object_detector_training_options& options
@@ -140,7 +71,7 @@ inline simple_test_results test_simple_object_detector_with_images_py (
         const boost::python::list& pyimages,
         const boost::python::list& pyboxes,
         simple_object_detector& detector,
-        const unsigned int unsample_amount
+        const unsigned int upsampling_amount
 )
 {
     const unsigned long num_images = len(pyimages);
@@ -152,7 +83,27 @@ inline simple_test_results test_simple_object_detector_with_images_py (
     dlib::array<array2d<rgb_pixel> > images(num_images);
     images_and_nested_params_to_dlib(pyimages, pyboxes, images, boxes);
 
-    return test_simple_object_detector_with_images(images, unsample_amount, boxes, ignore, detector);
+    return test_simple_object_detector_with_images(images, upsampling_amount, boxes, ignore, detector);
+}
+
+// ----------------------------------------------------------------------------------------
+
+inline simple_test_results test_simple_object_detector_py_with_images_py (
+        const boost::python::list& pyimages,
+        const boost::python::list& pyboxes,
+        simple_object_detector_py& detector,
+        const int upsampling_amount
+)
+{
+    // Allow users to pass an upsampling amount ELSE use the one cached on the object
+    // Anything less than 0 is ignored and the cached value is used.
+    unsigned int final_upsampling_amount = 0;
+    if (upsampling_amount >= 0)
+        final_upsampling_amount = upsampling_amount;
+    else
+        final_upsampling_amount = detector.upsampling_amount;
+
+    return test_simple_object_detector_with_images_py(pyimages, pyboxes, detector.detector, final_upsampling_amount);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -246,9 +197,10 @@ ensures \n\
     - The trained object detector is returned.");
 
     def("test_simple_object_detector", test_simple_object_detector,
-            (arg("dataset_filename"), arg("detector_filename"), arg("upsample_amount")=0),
+            // Please see test_simple_object_detector for the reason upsampling_amount is -1
+            (arg("dataset_filename"), arg("detector_filename"), arg("upsampling_amount")=-1),
             "requires \n\
-                - Optionally, take the number of times to upsample the testing images. \n\
+                - Optionally, take the number of times to upsample the testing images (upsampling_amount >= 0). \n\
              ensures \n\
                 - Loads an image dataset from dataset_filename.  We assume dataset_filename is \n\
                   a file using the XML format written by save_image_dataset_metadata(). \n\
@@ -264,12 +216,31 @@ ensures \n\
         );
 
     def("test_simple_object_detector", test_simple_object_detector_with_images_py,
-            (arg("images"), arg("boxes"), arg("detector"), arg("upsample_amount")=0),
+            (arg("images"), arg("boxes"), arg("detector"), arg("upsampling_amount")=0),
             "requires \n\
                - len(images) == len(boxes) \n\
                - images should be a list of numpy matrices that represent images, either RGB or grayscale. \n\
                - boxes should be a list of lists of dlib.rectangle object. \n\
-               - Optionally, take the number of times to upsample the testing images. \n\
+               - Optionally, take the number of times to upsample the testing images (upsampling_amount >= 0). \n\
+             ensures \n\
+               - Loads a simple_object_detector from the file detector_filename.  This means \n\
+                 detector_filename should be a file produced by the train_simple_object_detector() \n\
+                 routine. \n\
+               - This function tests the detector against the dataset and returns the \n\
+                 precision, recall, and average precision of the detector.  In fact, The \n\
+                 return value of this function is identical to that of dlib's \n\
+                 test_object_detection_function() routine.  Therefore, see the documentation \n\
+                 for test_object_detection_function() for a detailed definition of these \n\
+                 metrics. "
+    );
+
+    def("test_simple_object_detector", test_simple_object_detector_py_with_images_py,
+            // Please see test_simple_object_detector_py_with_images_py for the reason upsampling_amount is -1
+            (arg("images"), arg("boxes"), arg("detector"), arg("upsampling_amount")=-1),
+            "requires \n\
+               - len(images) == len(boxes) \n\
+               - images should be a list of numpy matrices that represent images, either RGB or grayscale. \n\
+               - boxes should be a list of lists of dlib.rectangle object. \n\
              ensures \n\
                - Loads a simple_object_detector from the file detector_filename.  This means \n\
                  detector_filename should be a file produced by the train_simple_object_detector() \n\
@@ -283,7 +254,7 @@ ensures \n\
     );
     {
     typedef simple_object_detector type;
-    class_<type>("simple_object_detector", 
+    class_<type>("fhog_object_detector",
         "This object represents a sliding window histogram-of-oriented-gradients based object detector.")
         .def("__init__", make_constructor(&load_object_from_file<type>),  
 "Loads a simple_object_detector from a file that contains the output of the \n\
@@ -301,6 +272,35 @@ ensures \n\
       don't provide a value for upsample_num_times and an appropriate \n\
       default will be used.")
         .def("save", save_simple_object_detector, (arg("detector_output_filename")), "Save a simple_object_detector to the provided path.")
+        .def_pickle(serialize_pickle<type>());
+    }
+    {
+    typedef simple_object_detector_py type;
+    class_<type>("simple_object_detector",
+        "This object represents a sliding window histogram-of-oriented-gradients based object detector.")
+        .def("__init__", make_constructor(&load_object_from_file<type>),
+"Loads a simple_object_detector from a file that contains the output of the \n\
+train_simple_object_detector() routine.")
+        .def("__call__", &type::run_detector1, (arg("image"), arg("upsample_num_times")),
+"requires \n\
+    - image is a numpy ndarray containing either an 8bit grayscale or RGB \n\
+      image. \n\
+    - upsample_num_times >= 0 \n\
+ensures \n\
+    - This function runs the object detector on the input image and returns \n\
+      a list of detections.   \n\
+    - Upsamples the image upsample_num_times before running the basic \n\
+      detector.  If you don't know how many times you want to upsample then \n\
+      don't provide a value for upsample_num_times and an appropriate \n\
+      default will be used.")
+        .def("__call__", &type::run_detector2, (arg("image")),
+"requires \n\
+    - image is a numpy ndarray containing either an 8bit grayscale or RGB \n\
+      image. \n\
+ensures \n\
+    - This function runs the object detector on the input image and returns \n\
+      a list of detections.")
+        .def("save", save_simple_object_detector_py, (arg("detector_output_filename")), "Save a simple_object_detector to the provided path.")
         .def_pickle(serialize_pickle<type>());
     }
     {
