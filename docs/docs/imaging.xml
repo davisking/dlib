@@ -161,6 +161,7 @@
          <item>suppress_non_maximum_edges</item> 
          <item>threshold_image</item>
          <item>auto_threshold_image</item>
+         <item>hough_transform</item>
       </section>
 
       <section>
@@ -175,6 +176,7 @@
          <item>binary_union</item>
          <item>binary_difference</item>
          <item>binary_complement</item>
+         <item>skeleton</item>
       </section>
 
       <section>
@@ -240,7 +242,6 @@
          <item>zero_border_pixels</item> 
          <item>integral_image</item>
          <item>integral_image_generic</item>
-         <item>hough_transform</item>
 
       </section>
 
@@ -272,6 +273,20 @@
             <example>hough_transform_ex.cpp.html</example>
          </examples>
                                  
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>skeleton</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/morphological_operations_abstract.h</spec_file>
+         <description>
+              This function computes the skeletonization of an image.  That is,
+              given a binary image, we progressively thin the binary blobs
+              until only a single pixel wide skeleton of the original blobs
+              remains.
+         </description>
       </component>
 
    <!-- ************************************************************************* -->

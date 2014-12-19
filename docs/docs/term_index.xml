@@ -1288,6 +1288,7 @@
          <term file="imaging.html" name="integral_image"          include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="integral_image_generic"  include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="hough_transform"         include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="skeleton"                include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="hessian_pyramid"         include="dlib/image_keypoint.h"/>
          <term file="imaging.html" name="compute_dominant_angle"  include="dlib/image_keypoint.h"/>
          <term file="imaging.html" name="draw_surf_points"        include="dlib/image_keypoint/draw_surf_points.h"/>
