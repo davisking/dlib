@@ -6,6 +6,7 @@
 #include "../pixel.h"
 #include "thresholding.h"
 #include "morphological_operations_abstract.h"
+#include "assign_image.h"
 
 namespace dlib
 {
@@ -661,6 +662,174 @@ namespace dlib
         binary_complement(img,img);
     }
 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        template <typename image_type>
+        inline bool should_remove_pixel (
+            const image_type& img,
+            long r,
+            long c,
+            int iter
+        )
+        {
+            unsigned int p2 = img[r-1][c];
+            unsigned int p3 = img[r-1][c+1];
+            unsigned int p4 = img[r][c+1];
+            unsigned int p5 = img[r+1][c+1];
+            unsigned int p6 = img[r+1][c];
+            unsigned int p7 = img[r+1][c-1];
+            unsigned int p8 = img[r][c-1];
+            unsigned int p9 = img[r-1][c-1];
+
+            int A  = (p2 == 0 && p3 == 255) + (p3 == 0 && p4 == 255) + 
+                (p4 == 0 && p5 == 255) + (p5 == 0 && p6 == 255) + 
+                (p6 == 0 && p7 == 255) + (p7 == 0 && p8 == 255) +
+                (p8 == 0 && p9 == 255) + (p9 == 0 && p2 == 255);
+            int B  = p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9;
+            int m1 = iter == 0 ? (p2 * p4 * p6) : (p2 * p4 * p8);
+            int m2 = iter == 0 ? (p4 * p6 * p8) : (p2 * p6 * p8);
+            // Decide if we should remove the pixel img[r][c].  
+            return (A == 1 && (B >= 2*255 && B <= 6*255) && m1 == 0 && m2 == 0);
+        }
+
+        template <typename image_type>
+        inline void add_to_remove (
+            std::vector<point>& to_remove,
+            array2d<unsigned char>& marker, 
+            const rectangle& area,
+            const image_type& img,
+            long r,
+            long c,
+            int iter
+        )
+        {
+            if (marker[r][c]&&area.contains(c,r)&&should_remove_pixel(img,r,c,iter)) 
+            {
+                to_remove.push_back(point(c,r));
+                marker[r][c] = 0;
+            }
+        }
+
+        template <typename image_type>
+        inline bool is_bw_border_pixel(
+            const image_type& img,
+            long r,
+            long c
+        )
+        {
+            unsigned int p2 = img[r-1][c];
+            unsigned int p3 = img[r-1][c+1];
+            unsigned int p4 = img[r][c+1];
+            unsigned int p5 = img[r+1][c+1];
+            unsigned int p6 = img[r+1][c];
+            unsigned int p7 = img[r+1][c-1];
+            unsigned int p8 = img[r][c-1];
+            unsigned int p9 = img[r-1][c-1];
+
+            int B  = p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9;
+            // If you are on but at least one of your neighbors isn't.
+            return B<8*255 && img[r][c];
+
+        }
+
+        inline void add_if(
+            std::vector<point>& to_check2, 
+            const array2d<unsigned char>& marker,
+            long c,
+            long r
+        )
+        {
+            if (marker[r][c])
+                to_check2.push_back(point(c,r));
+        }
+
+    } // end namespace impl
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    void skeleton(
+        image_type& img_
+    )
+    {
+        /*
+            The implementation of this function is based on the paper
+            "A fast parallel algorithm for thinning digital patterns” by T.Y. Zhang and C.Y. Suen.
+            and also the excellent discussion of it at:
+            http://opencv-code.com/quick-tips/implementation-of-thinning-algorithm-in-opencv/
+        */
+
+        typedef typename image_traits<image_type>::pixel_type pixel_type;
+
+        // This function only works on grayscale images
+        COMPILE_TIME_ASSERT(pixel_traits<pixel_type>::grayscale);
+
+        using namespace impl;
+        zero_border_pixels(img_,1,1);
+        image_view<image_type> img(img_);
+
+        // We use the marker to keep track of pixels we have committed to removing but
+        // haven't yet removed from img.
+        array2d<unsigned char> marker(img.nr(), img.nc());
+        assign_image(marker, img);
+
+
+        // Begin by making a list of the pixels on the borders of binary blobs.
+        std::vector<point> to_remove, to_check, to_check2;
+        for (int r = 1; r < img.nr()-1; r++)
+        {
+            for (int c = 1; c < img.nc()-1; c++)
+            {
+                if (is_bw_border_pixel(img, r, c))
+                {
+                    to_check.push_back(point(c,r));
+                }
+            }
+        }
+
+        // Now start iteratively looking at the border pixels and removing them.
+        const rectangle area = shrink_rect(get_rect(img),1);
+        while(to_check.size() != 0)
+        {
+            for (int iter = 0; iter <= 1; ++iter)
+            {
+                // Check which pixels we should remove
+                to_remove.clear();
+                for (unsigned long i = 0; i < to_check.size(); ++i)
+                {
+                    long r = to_check[i].y();
+                    long c = to_check[i].x();
+                    add_to_remove(to_remove, marker, area, img, r, c, iter);
+                }
+                // Now remove those pixels.  Also add their neighbors into the "to check"
+                // pixel list for the next iteration.
+                for (unsigned long i = 0; i < to_remove.size(); ++i)
+                {
+                    long r = to_remove[i].y();
+                    long c = to_remove[i].x();
+                    // remove the pixel
+                    img[r][c] = 0;
+                    add_if(to_check2, marker, c-1, r-1);
+                    add_if(to_check2, marker, c,   r-1);
+                    add_if(to_check2, marker, c+1, r-1);
+                    add_if(to_check2, marker, c-1, r);
+                    add_if(to_check2, marker, c+1, r);
+                    add_if(to_check2, marker, c-1, r+1);
+                    add_if(to_check2, marker, c,   r+1);
+                    add_if(to_check2, marker, c+1, r+1);
+                }
+            }
+            to_check.clear();
+            to_check.swap(to_check2);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
 }
