@@ -699,14 +699,13 @@ namespace dlib
         inline void add_to_remove (
             std::vector<point>& to_remove,
             array2d<unsigned char>& marker, 
-            const rectangle& area,
             const image_type& img,
             long r,
             long c,
             int iter
         )
         {
-            if (marker[r][c]&&area.contains(c,r)&&should_remove_pixel(img,r,c,iter)) 
+            if (marker[r][c]&&should_remove_pixel(img,r,c,iter)) 
             {
                 to_remove.push_back(point(c,r));
                 marker[r][c] = 0;
@@ -770,6 +769,10 @@ namespace dlib
         COMPILE_TIME_ASSERT(pixel_traits<pixel_type>::grayscale);
 
         using namespace impl;
+        // Note that it's important to zero the border for 2 reasons. First, it allows
+        // thinning to being at the border of the image.  But more importantly, it causes
+        // the mask to have a border of 0 pixels as well which we use later to avoid
+        // indexing outside the image inside add_to_remove().
         zero_border_pixels(img_,1,1);
         image_view<image_type> img(img_);
 
@@ -793,7 +796,6 @@ namespace dlib
         }
 
         // Now start iteratively looking at the border pixels and removing them.
-        const rectangle area = shrink_rect(get_rect(img),1);
         while(to_check.size() != 0)
         {
             for (int iter = 0; iter <= 1; ++iter)
@@ -804,7 +806,13 @@ namespace dlib
                 {
                     long r = to_check[i].y();
                     long c = to_check[i].x();
-                    add_to_remove(to_remove, marker, area, img, r, c, iter);
+                    add_to_remove(to_remove, marker, img, r, c, iter);
+                }
+                for (unsigned long i = 0; i < to_check2.size(); ++i)
+                {
+                    long r = to_check2[i].y();
+                    long c = to_check2[i].x();
+                    add_to_remove(to_remove, marker, img, r, c, iter);
                 }
                 // Now remove those pixels.  Also add their neighbors into the "to check"
                 // pixel list for the next iteration.
