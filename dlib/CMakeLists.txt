@@ -12,7 +12,9 @@ set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
 # Suppress cmake warnings about changes in new versions.
 if(COMMAND cmake_policy) 
    cmake_policy(SET CMP0003 NEW) 
-   cmake_policy(SET CMP0054 NEW)
+   if (POLICY CMP0054)
+      cmake_policy(SET CMP0054 NEW)
+   endif()
 endif()
 
 
