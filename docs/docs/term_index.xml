@@ -676,6 +676,7 @@
          <term file="metaprogramming.html" name="DLIB_CASSERT"                      include="dlib/assert.h"/>
          <term file="metaprogramming.html" name="COMPILE_TIME_ASSERT"               include="dlib/assert.h"/>
          <term file="metaprogramming.html" name="DLIB_ASSERT_HAS_STANDARD_LAYOUT"   include="dlib/assert.h"/>
+         <term file="other.html" name="MATLAB"                       />
          <term file="other.html" name="TIME_THIS"                       include="dlib/time_this.h"/>
          <term link="other.html#timing code blocks" name="print"        include="dlib/timing.h"/>
          <term file="other.html" name="timing code blocks"              include="dlib/timing.h"/>

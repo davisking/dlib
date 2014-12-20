@@ -12,12 +12,25 @@
 
 <current>
 New Features:
+   - Upgraded fft() and ifft() to support 2D matrices.
+   - Added hough_transform
+   - Added skeleton() for finding the skeletonization of a binary image.
+   - Added distance_to_line(), clip_line_to_rectangle(), min_point(), and max_point().
+   - Added a simple API for calling C++ from MATLAB.
 
 Non-Backwards Compatible Changes:
 
 Bug fixes:
+   - Fixed a compile time error that could happen when calling fft() for
+     certain input types.
+   - Fixed a compile time error that prevented auto_threshold_image() from
+     being used.
+   - Fixed name clashes with new version of Boost. 
+   - Changed Python pickling code so it works with Python 3.
+   - Fixed CMake compile time error related to finding fftw.
 
 Other:
+   - Made extract_image_chips() much faster when extracting unscaled image chips.
 </current>
 
 <!-- **************************************************************************************  -->
