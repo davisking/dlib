@@ -103,8 +103,9 @@
       </section>
 
       <section>
-         <name>Testing</name>
+         <name>Other</name>
          <item>dlib_testing_suite</item>
+         <item>MATLAB</item>
       </section>
 
     </top>  
@@ -1004,6 +1005,21 @@
          The output of the program, that is, its return value from main() is the number of
          failed tests.  So if every test succeeds then it returns 0.
       </p>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>MATLAB</name>
+         <description>
+            dlib contains a tool that makes it easy to call C++ code from MATLAB.  It's
+            documented in the examples in the dlib/matlab folder.  In particular, the
+            <a href="dlib/matlab/example_mex_function.cpp.html">dlib/matlab/example_mex_function.cpp</a> and
+            <a href="dlib/matlab/example_mex_callback.cpp.html">dlib/matlab/example_mex_callback.cpp</a> examples.
+            You can also easily compile these files using CMake.  See the instructions in the README file
+            in the dlib/matlab folder for further details.
          </description>
                                  
       </component>
