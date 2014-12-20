@@ -20,11 +20,13 @@
 # A list of various paths you need to search on windows since people install
 # boost in a bunch of different places.
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} 
-        "C:/local/boost_*"
-        "C:/Program Files (x86)/boost/boost_*"  
-        "C:/Program Files/boost/boost_*")
+         C:/local/boost_* 
+         C:/Program\ Files\ \(x86\)/boost/boost_*   
+         C:/Program\ Files/boost/boost_* 
+         )
 set(BOOST_LIBRARYDIR ${BOOST_LIBRARYDIR} $ENV{BOOST_LIBRARYDIR} 
-        "C:/local/boost_*/lib32-msvc-*")
+         C:/local/boost_*/lib32-msvc-* 
+         )
 
 
 
