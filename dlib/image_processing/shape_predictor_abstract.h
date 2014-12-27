@@ -185,7 +185,7 @@ namespace dlib
         );
         /*!
             requires
-                - nu > 0
+                - 0 < nu <= 1
             ensures
                 - #get_nu() == nu
         !*/
