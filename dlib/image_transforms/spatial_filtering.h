@@ -1217,7 +1217,7 @@ namespace dlib
         typename in_image_type,
         typename out_image_type
         >
-    void gaussian_blur (
+    rectangle gaussian_blur (
         const in_image_type& in_img,
         out_image_type& out_img,
         double sigma = 1,
@@ -1241,7 +1241,7 @@ namespace dlib
         ptype scale = sum(filt);
         scale = scale*scale;
 
-        spatially_filter_image_separable(in_img, out_img, filt, filt, scale);
+        return spatially_filter_image_separable(in_img, out_img, filt, filt, scale);
 
     }
 

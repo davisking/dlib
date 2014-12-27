@@ -20,10 +20,13 @@
 # A list of various paths you need to search on windows since people install
 # boost in a bunch of different places.
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} 
-        "C:/local/boost_1_*"
-        "C:/Program Files (x86)/boost/boost_1_*"  
-        "C:/Program Files/boost/boost_1_*")
-set(BOOST_LIBRARYDIR "C:/local/boost_1_*/lib32-msvc-*")
+         C:/local/boost_* 
+         C:/Program\ Files\ \(x86\)/boost/boost_*   
+         C:/Program\ Files/boost/boost_* 
+         )
+set(BOOST_LIBRARYDIR ${BOOST_LIBRARYDIR} $ENV{BOOST_LIBRARYDIR} 
+         C:/local/boost_*/lib32-msvc-* 
+         )
 
 
 
@@ -32,8 +35,10 @@ set(BOOST_LIBRARYDIR "C:/local/boost_1_*/lib32-msvc-*")
 #SET(Boost_USE_STATIC_RUNTIME OFF)
 set(Boost_NO_BOOST_CMAKE ON)
 
-
-set(BOOST_LIBRARYDIR  /usr/lib/x86_64-linux-gnu/)
+if (NOT WIN32)
+    set(BOOST_LIBRARYDIR ${BOOST_LIBRARYDIR} $ENV{BOOST_LIBRARYDIR}  
+            /usr/lib/x86_64-linux-gnu/)
+endif()
 if (PYTHON3)
     FIND_PACKAGE(Boost 1.41.0 COMPONENTS python-py34 REQUIRED)
     FIND_PACKAGE(PythonLibs 3.4 REQUIRED)

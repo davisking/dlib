@@ -1,4 +1,4 @@
-# This file figured out where MATLAB is and then defines a macro, add_mex_function(name)
+# This file figures out where MATLAB is and then defines a macro, add_mex_function(name)
 # which when called instructs CMake to build a mex file from a file called name.cpp.  Note
 # that additional library dependencies can be added like this: add_mex_function(name lib1 dlib libetc).
 # That is, just add more libraries after the name and they will be build into the mex file.

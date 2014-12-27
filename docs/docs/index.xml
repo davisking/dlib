@@ -216,6 +216,7 @@
                   <li><a href="other.html#serialize">Serialization support</a></li>
                   <li>Many <a href="other.html#memory_manager">memory manager</a> objects that implement 
                   different memory pooling strategies</li>
+                  <li>A tool that lets you easily <a href="other.html#MATLAB">call C++ from MATLAB</a></li>
                </ul>
             </li>
          </ul>

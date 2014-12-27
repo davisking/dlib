@@ -1800,6 +1800,16 @@ namespace
             for (int i = 0; i < 100; ++i)
                 test_separable_filtering_center<float>(rnd);
 
+            {
+                print_spinner();
+                matrix<unsigned char> img(40,80);
+                assign_all_pixels(img, 255);
+                skeleton(img);
+
+                DLIB_TEST(sum(matrix_cast<int>(mat(img)))/255 == 40);
+                draw_line(img, point(20,19), point(59,19), 00);
+                DLIB_TEST(sum(matrix_cast<int>(mat(img))) == 0);
+            }
         }
     } a;
 

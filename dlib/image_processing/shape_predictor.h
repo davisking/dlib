@@ -315,10 +315,6 @@ namespace dlib
 
         unsigned long num_parts (
         ) const
-        /*!
-            ensures
-                - returns the number of points in the shape
-        !*/
         {
             return initial_shape.size()/2;
         }
@@ -328,13 +324,6 @@ namespace dlib
             const image_type& img,
             const rectangle& rect
         ) const
-        /*!
-            ensures
-                - runs the tree regressor on the detection rect inside img and returns a 
-                  full_object_detection DET such that:
-                    - DET.get_rect() == rect
-                    - DET.num_parts() == num_parts()
-        !*/
         {
             using namespace impl;
             matrix<float,0,1> current_shape = initial_shape;

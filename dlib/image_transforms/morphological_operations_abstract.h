@@ -285,6 +285,30 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_type
+        >
+    void skeleton(
+        image_type& img
+    );
+    /*!
+        requires
+            - image_type is an object that implement the interface defined in
+              dlib/image_processing/generic_image.h 
+            - img must contain a grayscale pixel type.
+            - all pixels in img are set to either on_pixel or off_pixel.
+              (i.e. it must be a binary image)
+        ensures
+            - This function computes the skeletonization of img and stores the result in
+              #img.  That is, given a binary image, we progressively thin the binary blobs
+              (composed of on_pixel values) until only a single pixel wide skeleton of the
+              original blobs remains.
+            - #img.nc() == img.nc()
+            - #img.nr() == img.nr()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_MORPHOLOGICAL_OPERATIONs_ABSTRACT_
