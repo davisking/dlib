@@ -84,7 +84,7 @@ testing_xml_path = os.path.join(faces_folder, "testing_with_face_landmarks.xml")
 print("Testing accuracy: {}".format(
     dlib.test_shape_predictor(testing_xml_path, "predictor.dat")))
 
-# Now let's it as you would in a normal application.  First we will load it
+# Now let's use it as you would in a normal application.  First we will load it
 # from disk. We also need to load a face detector to provide the initial
 # estimate of the facial location.
 predictor = dlib.shape_predictor("predictor.dat")
