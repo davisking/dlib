@@ -461,7 +461,7 @@ namespace dlib
             double nu
         )
         {
-            DLIB_CASSERT(0 < nu <= 1,
+            DLIB_CASSERT(0 < nu && nu <= 1,
                 "\t void shape_predictor_trainer::set_nu()"
                 << "\n\t Invalid inputs were given to this function. "
                 << "\n\t nu:  " << nu 
