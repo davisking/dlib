@@ -2,9 +2,8 @@
 # The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 # 
 # This simple example shows how to call dlib's optimal linear assignment
-#   problem solver.
-#   It is an implementation of the famous Hungarian algorithm and is quite fast,
-#   operating in O(N^3) time.
+# problem solver.  It is an implementation of the famous Hungarian algorithm
+# and is quite fast, operating in O(N^3) time.
 #
 # COMPILING THE DLIB PYTHON INTERFACE
 #   Dlib comes with a compiled python interface for python 2.7 on MS Windows. If

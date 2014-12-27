@@ -38,9 +38,7 @@ full_object_detection run_predictor (
 void save_shape_predictor(const shape_predictor& predictor, const std::string& predictor_output_filename)
 {
     std::ofstream fout(predictor_output_filename.c_str(), std::ios::binary);
-    int version = 1;
     serialize(predictor, fout);
-    serialize(version, fout);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -95,7 +93,7 @@ inline shape_predictor train_shape_predictor_on_images_py (
         throw dlib::error("The length of the detections list must match the length of the images list.");
 
     std::vector<std::vector<full_object_detection> > detections(num_images);
-    dlib::array<array2d<rgb_pixel> > images(num_images);
+    dlib::array<array2d<unsigned char> > images(num_images);
     images_and_nested_params_to_dlib(pyimages, pydetections, images, detections);
 
     return train_shape_predictor_on_images(images, detections, options);
@@ -121,9 +119,9 @@ inline double test_shape_predictor_with_images_py (
     std::vector<std::vector<double> > scales;
     if (num_scales > 0)
         scales.resize(num_scales);
-    dlib::array<array2d<rgb_pixel> > images(num_images);
+    dlib::array<array2d<unsigned char> > images(num_images);
 
-    // Now copy the data into dlib based objects so we can call the trainer.
+    // Now copy the data into dlib based objects so we can call the testing routine.
     for (unsigned long i = 0; i < num_images; ++i)
     {
         const unsigned long num_boxes = len(pydetections[i]);
@@ -193,7 +191,7 @@ void bind_shape_predictors()
                             &type::nu,
                       "The regularization parameter.  Larger values of this parameter \
                        will cause the algorithm to fit the training data better but may also \
-                       cause overfitting.")
+                       cause overfitting.  The value must be in the range (0, 1].")
         .add_property("oversampling_amount", &type::oversampling_amount,
                                              &type::oversampling_amount,
                       "The number of randomly selected initial starting points sampled for each training example")
@@ -232,7 +230,7 @@ train_shape_predictor() routine.")
     - box is the bounding box to begin the shape prediction inside. \n\
 ensures \n\
     - This function runs the shape predictor on the input image and returns \n\
-      a single full object detection.")
+      a single full_object_detection.")
         .def("save", save_shape_predictor, (arg("predictor_output_filename")), "Save a shape_predictor to the provided path.")
         .def_pickle(serialize_pickle<type>());
     }
@@ -241,36 +239,28 @@ ensures \n\
         (arg("images"), arg("object_detections"), arg("options")),
 "requires \n\
     - options.lambda > 0 \n\
-    - options.nu > 0 \n\
+    - 0 < options.nu <= 1 \n\
     - options.feature_pool_region_padding >= 0 \n\
     - len(images) == len(object_detections) \n\
     - images should be a list of numpy matrices that represent images, either RGB or grayscale. \n\
     - object_detections should be a list of lists of dlib.full_object_detection objects. \
       Each dlib.full_object_detection contains the bounding box and the lists of points that make up the object parts.\n\
 ensures \n\
-    - Uses the shape_predictor_trainer to train a \n\
-      shape_predictor based on the provided labeled images and full object detections.\n\
-    - This function will apply a reasonable set of default parameters and \n\
-      preprocessing techniques to the training procedure for shape_predictors \n\
-      objects.  So the point of this function is to provide you with a very easy \n\
-      way to train a basic shape predictor. \n\
+    - Uses dlib's shape_predictor_trainer object to train a \n\
+      shape_predictor based on the provided labeled images, full_object_detections, and options.\n\
     - The trained shape_predictor is returned");
 
     def("train_shape_predictor", train_shape_predictor,
         (arg("dataset_filename"), arg("predictor_output_filename"), arg("options")),
 "requires \n\
     - options.lambda > 0 \n\
-    - options.nu > 0 \n\
+    - 0 < options.nu <= 1 \n\
     - options.feature_pool_region_padding >= 0 \n\
 ensures \n\
-    - Uses the shape_predictor_trainer to train a \n\
+    - Uses dlib's shape_predictor_trainer to train a \n\
       shape_predictor based on the labeled images in the XML file \n\
-      dataset_filename.  This function assumes the file dataset_filename is in the \n\
+      dataset_filename and the provided options.  This function assumes the file dataset_filename is in the \n\
       XML format produced by dlib's save_image_dataset_metadata() routine. \n\
-    - This function will apply a reasonable set of default parameters and \n\
-      preprocessing techniques to the training procedure for shape_predictors \n\
-      objects.  So the point of this function is to provide you with a very easy \n\
-      way to train a basic shape predictor.   \n\
     - The trained shape predictor is serialized to the file predictor_output_filename.");
 
     def("test_shape_predictor", test_shape_predictor_py,

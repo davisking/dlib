@@ -276,32 +276,33 @@ namespace dlib
         // Load the detector off disk (We have to use the explicit serialization here
         // so that we have an open file stream)
         simple_object_detector detector;
-        int version = 0;
         std::ifstream fin(detector_filename.c_str(), std::ios::binary);
         if (!fin)
             throw error("Unable to open file " + detector_filename);
         deserialize(detector, fin);
-        deserialize(version, fin);
-        if (version != 1)
-            throw error("Unknown simple_object_detector format.");
+
 
         /*  Here we need a little hack to deal with whether we are going to be loading a
          *  simple_object_detector (possibly trained outside of Python) or a
-         *  simple_object_detector_py (definitely trained from Python). In order to do
-         *  this we peek into the filestream to see if there is more data after the
-         *  version number. If there is, it will be the upsampling amount. Therefore,
-         *  by default we set the upsampling amount to -1 so that we can catch when
-         *  no upsampling amount has been passed (numbers less than 0). If -1 is
-         *  passed, we assume no upsampling and use 0. If a number > 0 is passed,
-         *  we use that, else we use the upsampling amount cached with the detector
-         *  (if it exists).
+         *  simple_object_detector_py (definitely trained from Python). In order to do this
+         *  we peek into the filestream to see if there is more data after the object
+         *  detector. If there is, it will be the version and upsampling amount. Therefore,
+         *  by default we set the upsampling amount to -1 so that we can catch when no
+         *  upsampling amount has been passed (numbers less than 0). If -1 is passed, we
+         *  assume no upsampling and use 0. If a number > 0 is passed, we use that, else we
+         *  use the upsampling amount saved in the detector file (if it exists).
          */
         unsigned int final_upsampling_amount = 0;
-        const unsigned int cached_upsample_amount = fin.peek();
+        if (fin.peek() != EOF)
+        {
+            int version = 0;
+            deserialize(version, fin);
+            if (version != 1)
+                throw error("Unknown simple_object_detector format.");
+            deserialize(final_upsampling_amount, fin);
+        }
         if (upsample_amount >= 0)
             final_upsampling_amount = upsample_amount;
-        else if (cached_upsample_amount != std::char_traits<wchar_t>::eof())  // peek() returns EOF if no more data
-            deserialize(final_upsampling_amount, fin);
 
         return test_simple_object_detector_with_images(images, final_upsampling_amount, boxes, ignore, detector);
     }

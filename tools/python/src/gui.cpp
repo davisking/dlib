@@ -51,9 +51,7 @@ void add_overlay_rect (
     const rgb_pixel& color
 )
 {
-    std::vector<rectangle> rects;
-    rects.push_back(rect);
-    win.add_overlay(rects, color);
+    win.add_overlay(rect, color);
 }
 
 void add_overlay_parts (
@@ -62,9 +60,7 @@ void add_overlay_parts (
     const rgb_pixel& color
 )
 {
-    std::vector<full_object_detection> detections;
-    detections.push_back(detection);
-    win.add_overlay(render_face_detections(detections, color));
+    win.add_overlay(render_face_detections(detection, color));
 }
 
 boost::shared_ptr<image_window> make_image_window_from_image(object img)

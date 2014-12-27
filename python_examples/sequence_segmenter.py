@@ -83,44 +83,46 @@ def print_segment(sentence, names):
         sys.stdout.write("\n")
 
 
-# Now let's make some training data.  Each example is a sentence as well as a
-# set of ranges which indicate the locations of any names.
-names = dlib.ranges()  # make an array of dlib.range objects.
-segments = dlib.rangess()  # make an array of arrays of dlib.range objects.
-sentences = ["The other day I saw a man named Jim Smith",
-             "Davis King is the main author of the dlib Library",
-             "Bob Jones is a name and so is George Clinton",
-             "My dog is named Bob Barker",
-             "ABC is an acronym but John James Smith is a name",
-             "No names in this sentence at all"]
 
+# Now let's make some training data.  Each example is a sentence as well as a
+# set of ranges which indicate the locations of any names.   
+names = dlib.ranges()     # make an array of dlib.range objects.
+segments = dlib.rangess() # make an array of arrays of dlib.range objects.
+sentences = []
+
+sentences.append("The other day I saw a man named Jim Smith")
 # We want to detect person names.  So we note that the name is located within
 # the range [8, 10).  Note that we use half open ranges to identify segments.
-# So in  this case, the segment identifies the string "Jim Smith".
+# So in this case, the segment identifies the string "Jim Smith".
 names.append(dlib.range(8, 10))
 segments.append(names)
-# make names empty for use again below
-names.clear()
+names.clear() # make names empty for use again below
 
+sentences.append("Davis King is the main author of the dlib Library")
 names.append(dlib.range(0, 2))
 segments.append(names)
 names.clear()
 
+sentences.append("Bob Jones is a name and so is George Clinton")
 names.append(dlib.range(0, 2))
 names.append(dlib.range(8, 10))
 segments.append(names)
 names.clear()
 
+sentences.append("My dog is named Bob Barker")
 names.append(dlib.range(4, 6))
 segments.append(names)
 names.clear()
 
+sentences.append("ABC is an acronym but John James Smith is a name")
 names.append(dlib.range(5, 8))
 segments.append(names)
 names.clear()
 
+sentences.append("No names in this sentence at all")
 segments.append(names)
 names.clear()
+
 
 # Now before we can pass these training sentences to the dlib tools we need to
 # convert them into arrays of vectors as discussed above.  We can use either a

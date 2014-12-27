@@ -73,8 +73,8 @@ namespace dlib
     {
         if (options.lambda <= 0)
             throw error("Invalid lambda value given to train_shape_predictor(), lambda must be > 0.");
-        if (options.nu <= 0)
-            throw error("Invalid nu value given to train_shape_predictor(), nu must be > 0.");
+        if (!(0 < options.nu && options.nu <= 1))
+            throw error("Invalid nu value given to train_shape_predictor(). It is required that 0 < nu <= 1.");
         if (options.feature_pool_region_padding < 0)
             throw error("Invalid feature_pool_region_padding value given to train_shape_predictor(), feature_pool_region_padding must be >= 0.");
 
@@ -123,16 +123,13 @@ namespace dlib
         const shape_predictor_training_options& options
     )
     {
-        dlib::array<array2d<rgb_pixel> > images;
+        dlib::array<array2d<unsigned char> > images;
         std::vector<std::vector<full_object_detection> > objects;
         load_image_dataset(images, objects, dataset_filename);
 
         shape_predictor predictor = train_shape_predictor_on_images(images, objects, options);
 
-        std::ofstream fout(predictor_output_filename.c_str(), std::ios::binary);
-        int version = 1;
-        serialize(predictor, fout);
-        serialize(version, fout);
+        serialize(predictor_output_filename) << predictor;
 
         if (options.be_verbose)
             std::cout << "Training complete, saved predictor to file " << predictor_output_filename << std::endl;
@@ -165,7 +162,7 @@ namespace dlib
     )
     {
         // Load the images, no scales can be provided
-        dlib::array<array2d<rgb_pixel> > images;
+        dlib::array<array2d<unsigned char> > images;
         // This interface cannot take the scales parameter.
         std::vector<std::vector<double> > scales;
         std::vector<std::vector<full_object_detection> > objects;
@@ -173,14 +170,7 @@ namespace dlib
 
         // Load the shape predictor
         shape_predictor predictor;
-        int version = 0;
-        std::ifstream fin(predictor_filename.c_str(), std::ios::binary);
-        if (!fin)
-            throw error("Unable to open file " + predictor_filename);
-        deserialize(predictor, fin);
-        deserialize(version, fin);
-        if (version != 1)
-            throw error("Unknown shape_predictor format.");
+        deserialize(predictor_filename) >> predictor;
 
         return test_shape_predictor_with_images(images, objects, scales, predictor);
     }

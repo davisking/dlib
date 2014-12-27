@@ -257,8 +257,9 @@ ensures \n\
     class_<type>("fhog_object_detector",
         "This object represents a sliding window histogram-of-oriented-gradients based object detector.")
         .def("__init__", make_constructor(&load_object_from_file<type>),  
-"Loads a simple_object_detector from a file that contains the output of the \n\
-train_simple_object_detector() routine.")
+"Loads an object detector from a file that contains the output of the \n\
+train_simple_object_detector() routine or a serialized C++ object of type\n\
+object_detector<scan_fhog_pyramid<pyramid_down<6>>>.")
         .def("__call__", run_detector_with_upscale, (arg("image"), arg("upsample_num_times")=0),
 "requires \n\
     - image is a numpy ndarray containing either an 8bit grayscale or RGB \n\

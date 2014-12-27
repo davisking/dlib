@@ -36,6 +36,7 @@ if len(sys.argv) != 2:
     exit()
 faces_folder = sys.argv[1]
 
+
 # Now let's do the training.  The train_simple_object_detector() function has a
 # bunch of options, all of which come with reasonable default values.  The next
 # few lines goes over some of these options.
@@ -55,6 +56,9 @@ options.C = 5
 options.num_threads = 4
 options.be_verbose = True
 
+
+training_xml_path = os.path.join(faces_folder, "training.xml")
+testing_xml_path = os.path.join(faces_folder, "testing.xml")
 # This function does the actual training.  It will save the final detector to
 # detector.svm.  The input is an XML file that lists the images in the training
 # dataset and also contains the positions of the face boxes.  To create your
@@ -63,10 +67,9 @@ options.be_verbose = True
 # images with boxes.  To see how to use it read the tools/imglab/README.txt
 # file.  But for this example, we just use the training.xml file included with
 # dlib.
-training_xml_path = os.path.join(faces_folder, "training.xml")
-testing_xml_path = os.path.join(faces_folder, "testing.xml")
-
 dlib.train_simple_object_detector(training_xml_path, "detector.svm", options)
+
+
 
 # Now that we have a face detector we can test it.  The first statement tests
 # it on the training data.  It will print(the precision, recall, and then)
@@ -79,6 +82,10 @@ print("Training accuracy: {}".format(
 # see that the object detector works perfectly on the testing images.
 print("Testing accuracy: {}".format(
     dlib.test_simple_object_detector(testing_xml_path, "detector.svm")))
+
+
+
+
 
 # Now let's use the detector as you would in a normal application.  First we
 # will load it from disk.
@@ -106,6 +113,12 @@ for f in glob.glob(os.path.join(faces_folder, "*.jpg")):
     win.add_overlay(dets)
     raw_input("Hit enter to continue")
 
+
+
+
+
+
+
 # Finally, note that you don't have to use the XML based input to
 # train_simple_object_detector().  If you have already loaded your training
 # images and bounding boxes for the objects then you can call it as shown
@@ -126,10 +139,10 @@ boxes_img2 = ([dlib.rectangle(left=154, top=46, right=228, bottom=121),
 boxes = [boxes_img1, boxes_img2]
 
 detector2 = dlib.train_simple_object_detector(images, boxes, options)
-# We could save this detector by uncommenting the following
+# We could save this detector to disk by uncommenting the following.
 #detector2.save('detector2.svm')
 
-# Now let's load the trained detector and look at its HOG filter!
+# Now let's look at its HOG filter!
 win_det.set_image(detector2)
 raw_input("Hit enter to continue")
 
