@@ -90,7 +90,7 @@ int main(int argc, char** argv)
         shape_predictor_trainer trainer;
         // This algorithm has a bunch of parameters you can mess with.  The
         // documentation for the shape_predictor_trainer explains all of them.
-        // You should also read Kazemi paper which explains all the parameters
+        // You should also read Kazemi's paper which explains all the parameters
         // in great detail.  However, here I'm just setting three of them
         // differently than their default values.  I'm doing this because we
         // have a very small dataset.  In particular, setting the oversampling
