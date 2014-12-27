@@ -134,6 +134,14 @@
             <name>Examples: Python</name>
             <sub>
                <item>
+                  <name>Face_Landmark_Detection</name>
+                  <link>face_landmark_detection.py.html</link>
+               </item>
+               <item>
+                  <name>Train_Shape_Predictor</name>
+                  <link>train_shape_predictor.py.html</link>
+               </item>
+               <item>
                   <name>Face_Detector</name>
                   <link>face_detector.py.html</link>
                </item>

@@ -438,6 +438,9 @@
             <example>face_landmark_detection_ex.cpp.html</example>
             <example>train_shape_predictor_ex.cpp.html</example>
             <example>webcam_face_pose_ex.cpp.html</example>
+
+            <example>train_shape_predictor.py.html</example>
+            <example>face_landmark_detection.py.html</example>
          </examples>
                                  
       </component>
