@@ -216,9 +216,7 @@ if (NOT TARGET dlib)
 
       if (DLIB_LINK_WITH_LIBPNG)
          # try to find libpng 
-         set(ZLIB_FIND_QUIETLY ON)
-         set(PNG_FIND_QUIETLY ON)
-         include(FindPNG)
+         find_package(PNG QUIET)
          if (PNG_FOUND)
             include_directories(${PNG_INCLUDE_DIR})
             set (dlib_needed_libraries ${dlib_needed_libraries} ${PNG_LIBRARY})
