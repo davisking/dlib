@@ -42,6 +42,7 @@ hg commit -u "Your Name &lt;your.email@host.com&gt;"
 hg bundle dlibchanges.hg
 </code_box>
 Then <a href="mailto:davis@dlib.net">email me</a> the dlibchanges.hg file and I'll review it and get back to you.
+Alternatively, you can submit a pull request to my clone of <a href="https://github.com/davisking/dlib">dlib on github</a>.
 
          <p> If you want to make a big change or feature addition, it's probably a good idea to talk to me about it first.  
             Additionally, you should read over the coding guidelines below
