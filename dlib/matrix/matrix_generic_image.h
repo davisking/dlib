@@ -25,6 +25,17 @@ namespace dlib
         long NC,
         typename MM
         >
+    struct image_traits<const matrix<T,NR,NC,MM> >
+    {
+        typedef T pixel_type;
+    };
+
+    template <
+        typename T,
+        long NR,
+        long NC,
+        typename MM
+        >
     inline long num_rows( const matrix<T,NR,NC,MM>& img) { return img.nr(); }
 
     template <

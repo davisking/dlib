@@ -13,6 +13,11 @@ namespace dlib
     {
         typedef T pixel_type;
     };
+    template <typename T, typename mm>
+    struct image_traits<const array2d<T,mm> >
+    {
+        typedef T pixel_type;
+    };
 
     template <typename T, typename mm>
     inline long num_rows( const array2d<T,mm>& img) { return img.nr(); }
