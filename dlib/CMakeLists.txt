@@ -213,11 +213,16 @@ if (NOT TARGET dlib)
             )
       endif()
 
+      INCLUDE (CheckFunctionExists)
 
       if (DLIB_LINK_WITH_LIBPNG)
          # try to find libpng 
          find_package(PNG QUIET)
-         if (PNG_FOUND)
+         # Make sure there isn't something wrong with the version of LIBPNG
+         # installed on this system.  
+         set(CMAKE_REQUIRED_LIBRARIES ${PNG_LIBRARY})
+         CHECK_FUNCTION_EXISTS(png_create_read_struct LIBPNG_IS_GOOD)
+         if (PNG_FOUND AND LIBPNG_IS_GOOD)
             include_directories(${PNG_INCLUDE_DIR})
             set (dlib_needed_libraries ${dlib_needed_libraries} ${PNG_LIBRARY})
          else()
@@ -265,7 +270,11 @@ if (NOT TARGET dlib)
       if (DLIB_LINK_WITH_LIBJPEG)
          # try to find libjpeg 
          find_package(JPEG QUIET)
-         if (JPEG_FOUND)
+         # Make sure there isn't something wrong with the version of libjpeg 
+         # installed on this system.  
+         set(CMAKE_REQUIRED_LIBRARIES ${JPEG_LIBRARY})
+         CHECK_FUNCTION_EXISTS(jpeg_read_header LIBJPEG_IS_GOOD)
+         if (JPEG_FOUND AND LIBJPEG_IS_GOOD)
             include_directories(${JPEG_INCLUDE_DIR})
             set (dlib_needed_libraries ${dlib_needed_libraries} ${JPEG_LIBRARY})
          else()
