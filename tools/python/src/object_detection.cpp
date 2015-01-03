@@ -108,6 +108,43 @@ inline simple_test_results test_simple_object_detector_py_with_images_py (
 
 // ----------------------------------------------------------------------------------------
 
+inline void find_candidate_object_locations_py (
+    object pyimage,
+    boost::python::list& pyboxes,
+    boost::python::tuple pykvals,
+    unsigned long min_size,
+    unsigned long max_merging_iterations
+)
+{
+    // Copy the data into dlib based objects
+    array2d<rgb_pixel> image;
+    if (is_gray_python_image(pyimage))
+        assign_image(image, numpy_gray_image(pyimage));
+    else if (is_rgb_python_image(pyimage))
+        assign_image(image, numpy_rgb_image(pyimage));
+    else
+        throw dlib::error("Unsupported image type, must be 8bit gray or RGB image.");
+
+    if (boost::python::len(pykvals) != 3)
+        throw dlib::error("kvals must be a tuple with three elements for start, end, num.");
+
+    double start = extract<double>(pykvals[0]);
+    double end   = extract<double>(pykvals[1]);
+    long num     = extract<long>(pykvals[2]);
+    matrix_range_exp<double> kvals = linspace(start, end, num);
+
+    // Find candidate objects
+    std::vector<rectangle> rects;
+    find_candidate_object_locations(image, rects, kvals, min_size, max_merging_iterations);
+
+    // Collect boxes containing candidate objects
+    std::vector<rectangle>::iterator iter;
+    for (iter = rects.begin(); iter != rects.end(); ++iter)
+        pyboxes.append(*iter);
+}
+
+// ----------------------------------------------------------------------------------------
+
 void bind_object_detection()
 {
     using boost::python::arg;
@@ -162,7 +199,43 @@ obtain the fastest training speed.");
         .def_pickle(serialize_pickle<type>());
     }
 
-    def("get_frontal_face_detector", get_frontal_face_detector, 
+    def("find_candidate_object_locations", find_candidate_object_locations_py,
+            (arg("image"), arg("rects"), arg("pykvals")=boost::python::make_tuple(50, 200, 3),
+             arg("min_size")=20, arg("max_merging_iterations")=50),
+"Returns found candidate objects\n\
+requires\n\
+    - image == an image object which is a numpy ndarray\n\
+    - kvals == a tuple with three elements for start, end, num.\n\
+ensures\n\
+    - This function takes an input image and generates a set of candidate\n\
+      rectangles which are expected to bound any objects in the image.  It does\n\
+      this by running a version of the segment_image() routine on the image and\n\
+      then reports rectangles containing each of the segments as well as rectangles\n\
+      containing unions of adjacent segments.  The basic idea is described in the\n\
+      paper: \n\
+          Segmentation as Selective Search for Object Recognition by Koen E. A. van de Sande, et al.\n\
+      Note that this function deviates from what is described in the paper slightly. \n\
+      See the code for details.\n\
+    - The basic segmentation is performed kvals.size() times, each time with the k\n\
+      parameter (see segment_image() and the Felzenszwalb paper for details on k)\n\
+      set to a different value from kvals.   \n\
+    - When doing the basic segmentations prior to any box merging, we discard all\n\
+      rectangles that have an area < min_size.  Therefore, all outputs and\n\
+      subsequent merged rectangles are built out of rectangles that contain at\n\
+      least min_size pixels.  Note that setting min_size to a smaller value than\n\
+      you might otherwise be interested in using can be useful since it allows a\n\
+      larger number of possible merged boxes to be created.\n\
+    - There are max_merging_iterations rounds of neighboring blob merging.\n\
+      Therefore, this parameter has some effect on the number of output rectangles\n\
+      you get, with larger values of the parameter giving more output rectangles.\n\
+    - This function appends the output rectangles into #rects.  This means that any\n\
+      rectangles in rects before this function was called will still be in there\n\
+      after it terminates.  Note further that #rects will not contain any duplicate\n\
+      rectangles.  That is, for all valid i and j where i != j it will be true\n\
+      that:\n\
+        - #rects[i] != rects[j]");
+
+    def("get_frontal_face_detector", get_frontal_face_detector,
         "Returns the default face detector");
 
     def("train_simple_object_detector", train_simple_object_detector,
