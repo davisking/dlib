@@ -199,13 +199,17 @@ obtain the fastest training speed.");
         .def_pickle(serialize_pickle<type>());
     }
 
+    // Here, pykvals is actually the result of linspace(start, end, num) and it is different from kvals used
+    // in find_candidate_object_locations(). See dlib/image_transforms/segment_image_abstract.h for more details.
+    // TODO: Need to figure out how to allow specifying matrix_range_exp<double> kvals in Python
     def("find_candidate_object_locations", find_candidate_object_locations_py,
             (arg("image"), arg("rects"), arg("pykvals")=boost::python::make_tuple(50, 200, 3),
              arg("min_size")=20, arg("max_merging_iterations")=50),
 "Returns found candidate objects\n\
 requires\n\
     - image == an image object which is a numpy ndarray\n\
-    - kvals == a tuple with three elements for start, end, num.\n\
+    - is_vector(kvals) == true\n\
+    - kvals.size() > 0\n\
 ensures\n\
     - This function takes an input image and generates a set of candidate\n\
       rectangles which are expected to bound any objects in the image.  It does\n\
