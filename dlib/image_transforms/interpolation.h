@@ -1621,7 +1621,7 @@ namespace dlib
         }
 
         // now make an image pyramid
-        dlib::array<image_type2> levels(max_depth);
+        dlib::array<array2d<typename image_traits<image_type1>::pixel_type> > levels(max_depth);
         if (levels.size() != 0)
             pyr(img,levels[0]);
         for (unsigned long i = 1; i < levels.size(); ++i)
