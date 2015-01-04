@@ -1799,7 +1799,9 @@
               Note that this function deviates from what is described in the paper slightly. 
               See the code for details.
          </description>
-                                 
+         <examples>
+            <example>find_candidate_object_locations.py.html</example>
+         </examples>
       </component>
             
    <!-- ************************************************************************* -->

@@ -138,6 +138,10 @@
                   <link>face_landmark_detection.py.html</link>
                </item>
                <item>
+                  <name>find_candidate_object_locations</name>
+                  <link>find_candidate_object_locations.py.html</link>
+               </item>
+               <item>
                   <name>Train_Shape_Predictor</name>
                   <link>train_shape_predictor.py.html</link>
                </item>
