@@ -133,8 +133,13 @@ inline void find_candidate_object_locations_py (
     long num     = extract<long>(pykvals[2]);
     matrix_range_exp<double> kvals = linspace(start, end, num);
 
-    // Find candidate objects
     std::vector<rectangle> rects;
+    const long count = len(pyboxes);
+    // Copy any rectangles in the input pyboxes into rects so that any rectangles will be
+    // properly deduped in the resulting output.
+    for (long i = 0; i < count; ++i)
+        rects.push_back(extract<rectangle>(pyboxes[i]));
+    // Find candidate objects
     find_candidate_object_locations(image, rects, kvals, min_size, max_merging_iterations);
 
     // Collect boxes containing candidate objects
@@ -199,17 +204,17 @@ obtain the fastest training speed.");
         .def_pickle(serialize_pickle<type>());
     }
 
-    // Here, pykvals is actually the result of linspace(start, end, num) and it is different from kvals used
+    // Here, kvals is actually the result of linspace(start, end, num) and it is different from kvals used
     // in find_candidate_object_locations(). See dlib/image_transforms/segment_image_abstract.h for more details.
-    // TODO: Need to figure out how to allow specifying matrix_range_exp<double> kvals in Python
     def("find_candidate_object_locations", find_candidate_object_locations_py,
-            (arg("image"), arg("rects"), arg("pykvals")=boost::python::make_tuple(50, 200, 3),
+            (arg("image"), arg("rects"), arg("kvals")=boost::python::make_tuple(50, 200, 3),
              arg("min_size")=20, arg("max_merging_iterations")=50),
 "Returns found candidate objects\n\
 requires\n\
     - image == an image object which is a numpy ndarray\n\
-    - is_vector(kvals) == true\n\
-    - kvals.size() > 0\n\
+    - len(kvals) == 3\n\
+    - kvals should be a tuple that specifies the range of k values to use.  In\n\
+      particular, it should take the form (start, end, num) where num > 0. \n\
 ensures\n\
     - This function takes an input image and generates a set of candidate\n\
       rectangles which are expected to bound any objects in the image.  It does\n\
@@ -220,9 +225,9 @@ ensures\n\
           Segmentation as Selective Search for Object Recognition by Koen E. A. van de Sande, et al.\n\
       Note that this function deviates from what is described in the paper slightly. \n\
       See the code for details.\n\
-    - The basic segmentation is performed kvals.size() times, each time with the k\n\
-      parameter (see segment_image() and the Felzenszwalb paper for details on k)\n\
-      set to a different value from kvals.   \n\
+    - The basic segmentation is performed kvals[2] times, each time with the k parameter\n\
+      (see segment_image() and the Felzenszwalb paper for details on k) set to a different\n\
+      value from the range of numbers linearly spaced between kvals[0] to kvals[1].\n\
     - When doing the basic segmentations prior to any box merging, we discard all\n\
       rectangles that have an area < min_size.  Therefore, all outputs and\n\
       subsequent merged rectangles are built out of rectangles that contain at\n\
