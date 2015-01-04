@@ -1,5 +1,18 @@
 #!/usr/bin/python
-# This example shows how to use find_candidate_object_locations()
+#
+# This example shows how to use find_candidate_object_locations().  The
+# function takes an input image and generates a set of candidate rectangles
+# which are expected to bound any objects in the image.
+# It is based on the paper:
+#    Segmentation as Selective Search for Object Recognition by Koen E. A. van de Sande, et al.
+#
+# Typically, you would use this as part of an object detection pipeline.
+# find_candidate_object_locations() nominates boxes that might contain an
+# object and you then run some expensive classifier on each one and throw away
+# the false alarms.  Since find_candidate_object_locations() will only generate
+# a few thousand rectangles it is much faster than scanning all possible
+# rectangles inside an image.
+
 
 import dlib
 from skimage import io
@@ -11,9 +24,7 @@ img = io.imread(image_file)
 rects = []
 dlib.find_candidate_object_locations(img, rects, min_size=500)
 
-windows = []
-for d in rects:
-    windows.append([d.top(), d.left(), d.bottom(), d.right()])
-
-print len(windows)
-print (image_file, windows)
+print("number of rectangles found {}".format(len(rects))) 
+for k, d in enumerate(rects):
+    print("Detection {}: Left: {} Top: {} Right: {} Bottom: {}".format(
+        k, d.left(), d.top(), d.right(), d.bottom()))
