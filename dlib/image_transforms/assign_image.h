@@ -337,7 +337,10 @@ namespace dlib
     {
         inside = inside.intersect(get_rect(img));
         if (inside.is_empty())
+        {
+            assign_all_pixels(img, 0);
             return;
+        }
 
         for (long r = 0; r < inside.top(); ++r)
         {
