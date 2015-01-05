@@ -185,6 +185,19 @@ namespace dlib
             return loss_per_missed_association;
         }
 
+        bool forces_last_weight_to_1 (
+        ) const
+        {
+            return last_weight_1;
+        }
+
+        void force_last_weight_to_1 (
+            bool should_last_weight_be_1
+        )
+        {
+            last_weight_1 = should_last_weight_be_1;
+        }
+
         const assignment_function<feature_extractor> train (  
             const std::vector<sample_type>& samples,
             const std::vector<label_type>& labels
@@ -230,7 +243,10 @@ namespace dlib
             // Take the min here because we want to prevent the user from accidentally
             // forcing the bias term to be non-negative.
             const unsigned long num_nonneg = std::min(fe.num_features(),num_nonnegative_weights(fe));
-            solver(prob, weights, num_nonneg);
+            if (last_weight_1)
+                solver(prob, weights, num_nonneg, fe.num_features()-1);
+            else
+                solver(prob, weights, num_nonneg);
 
             const double bias = weights(weights.size()-1);
             return assignment_function<feature_extractor>(colm(weights,0,weights.size()-1), bias,fe,force_assignment);
@@ -249,6 +265,7 @@ namespace dlib
         unsigned long max_cache_size;
         double loss_per_false_association;
         double loss_per_missed_association;
+        bool last_weight_1;
 
         void set_defaults ()
         {
@@ -260,6 +277,7 @@ namespace dlib
             max_cache_size = 5;
             loss_per_false_association = 1;
             loss_per_missed_association = 1;
+            last_weight_1 = false;
         }
 
         feature_extractor fe;
