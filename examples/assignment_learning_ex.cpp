@@ -18,14 +18,15 @@
     best way to measure this goodness isn't obvious and therefore machine learning 
     methods are used.  
     
-    The remainder of this example program will show you how to learn a goodness 
-    function which is optimal, in a certain sense, for use with the Hungarian 
-    algorithm.  To do this, we will make a simple dataset of example associations 
-    and use them to train a supervised machine learning method. 
+    The remainder of this example will show you how to learn a goodness function
+    which is optimal, in a certain sense, for use with the Hungarian algorithm.  To
+    do this, we will make a simple dataset of example associations and use them to
+    train a supervised machine learning method. 
 
-    Finally, note that there is a whole example program dedicated to assignment learning
-    problems where you are trying to make an object tracker.  So if that is what you are
-    interested in then read the learning_to_track_ex.cpp example program.
+    Finally, note that there is a whole example program dedicated to assignment
+    learning problems where you are trying to make an object tracker.  So if that is
+    what you are interested in then take a look at the learning_to_track_ex.cpp
+    example program.
 */
 
 
@@ -96,9 +97,9 @@ struct feature_extractor
         Recall that our task is to learn the "goodness of assignment" function for
         use with the Hungarian algorithm.  The dlib tools assume this function
         can be written as:
-            match_score(l,r) == dot(w, PSI(l,r))
+            match_score(l,r) == dot(w, PSI(l,r)) + bias
         where l is an element of LHS, r is an element of RHS, w is a parameter vector,
-        and PSI() is a user supplied feature extractor.
+        bias is a scalar value, and PSI() is a user supplied feature extractor.
 
         This feature_extractor is where we implement PSI().  How you implement this
         is highly problem dependent.  
@@ -132,7 +133,7 @@ struct feature_extractor
               is "good").
     !*/
     {
-        // Lets just use the squared difference between each vector as our features.
+        // Let's just use the squared difference between each vector as our features.
         // However, it should be emphasized that how to compute the features here is very
         // problem dependent.  
         feats = squared(left - right);
