@@ -390,6 +390,8 @@ namespace dlib
                   find_projective_transform_basic() as a starting point for a BFGS based
                   non-linear optimizer which will optimize the correct mean squared error
                   criterion.
+
+                  A great essay on this subject is Homography Estimation by Elan Dubrofsky.
         !*/
         {
             // make sure requires clause is not broken
