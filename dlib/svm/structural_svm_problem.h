@@ -75,6 +75,12 @@ namespace dlib
                 psi = true_psi;
             else
                 prob->get_truth_joint_feature_vector(sample_idx, psi);
+
+            if (is_matrix<feature_vector_type>::value)
+            {
+                DLIB_CASSERT(psi.size() == (unsigned long)prob->get_num_dimensions(),
+                    "The dimensionality of your PSI vector doesn't match get_num_dimensions()");
+            }
         }
 
         void separation_oracle_cached (
@@ -128,6 +134,11 @@ namespace dlib
 
 
             prob->separation_oracle(sample_idx, current_solution, out_loss, out_psi);
+            if (is_matrix<feature_vector_type>::value)
+            {
+                DLIB_CASSERT(out_psi.size() == (unsigned long)prob->get_num_dimensions(),
+                    "The dimensionality of your PSI vector doesn't match get_num_dimensions()");
+            }
 
             if (!cache_enabled)
                 return;
