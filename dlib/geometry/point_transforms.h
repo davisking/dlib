@@ -253,7 +253,7 @@ namespace dlib
 
         // We use the formulas from the paper: Least-squares estimation of transformation
         // parameters between two point patterns by Umeyama.  They are equations 34 through
-        // 42.
+        // 43.
 
         dlib::vector<double,2> mean_from, mean_to;
         double sigma_from = 0, sigma_to = 0;
@@ -282,7 +282,7 @@ namespace dlib
         matrix<double,2,2> u, v, s, d;
         svd(cov, u,d,v);
         s = identity_matrix(cov);
-        if (det(cov) < 0)
+        if (det(cov) < 0 || (det(cov) == 0 && det(u)*det(v)<0))
         {
             if (d(1,1) < d(0,0))
                 s(1,1) = -1;
