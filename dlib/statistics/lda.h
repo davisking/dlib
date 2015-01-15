@@ -120,7 +120,7 @@ namespace dlib
         matrix<T,0,1> W;
         svd3(Sw, A, W, H);
         W = sqrt(W);
-        W = reciprocal(round_zeros(W,max(W)*1e-5));
+        W = reciprocal(lowerbound(W,max(W)*1e-5));
         A = trans(H*diagm(W))*Sb*H*diagm(W);
         matrix<T> v,s,u;
         svd3(A, v, s, u);

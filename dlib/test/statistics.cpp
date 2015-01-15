@@ -733,6 +733,59 @@ namespace
 
         }
 
+        void test_lda ()
+        {
+            // This test makes sure we pick the right direction in a simple 2D -> 1D LDA
+            typedef matrix<double,2,1> sample_type;
+
+            std::vector<unsigned long> labels;
+            std::vector<sample_type> samples;
+            for (int i=0; i<4; i++)
+            {
+                sample_type s;
+                s(0) = i;
+                s(1) = i+1;
+                samples.push_back(s);
+                labels.push_back(1);       
+
+                sample_type s1;
+                s1(0) = i+1;
+                s1(1) = i;
+                samples.push_back(s1);      
+                labels.push_back(2);       
+            }
+
+            matrix<double> X;  
+            X.set_size(8,2);
+            for (int i=0; i<8; i++){
+                X(i,0) = samples[i](0);
+                X(i,1) = samples[i](1);
+            }  
+
+            matrix<double,0,1> mean;   
+
+            dlib::compute_lda_transform(X,mean,labels,1);
+
+            std::vector<double> vals1, vals2;
+            for (unsigned long i = 0; i < samples.size(); ++i)
+            {
+                double val = X*samples[i]-mean;
+                if (i%2 == 0)
+                    vals1.push_back(val);
+                else
+                    vals2.push_back(val);
+                dlog << LINFO << "1D LDA output: " << val;
+            }
+
+            if (vals1[0] > vals2[0])
+                swap(vals1, vals2);
+
+            const double err = equal_error_rate(vals1, vals2).first;
+            dlog << LINFO << "LDA ERR: " << err;
+            DLIB_TEST(err == 0);
+            DLIB_TEST(equal_error_rate(vals2, vals1).first == 1);
+        }
+
         void perform_test (
         )
         {
@@ -753,6 +806,7 @@ namespace
             test_randomize_samples2();
             another_test();
             test_average_precision();
+            test_lda();
         }
     } a;
 
