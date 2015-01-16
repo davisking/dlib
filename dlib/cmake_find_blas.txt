@@ -94,6 +94,7 @@ if (UNIX)
         /usr/lib/atlas-sse3
         /usr/lib/atlas-sse2
         /usr/lib/atlas
+        /usr/lib/openblas-base
         /opt/OpenBLAS/lib
         )
 
