@@ -1429,7 +1429,7 @@ namespace dlib
     );
     /*!
         requires
-            - m.size() > 9
+            - m.size() > 0
         ensures
             - Like max_point(), this function finds the location in m with the largest
               value.  However, we additionally use some quadratic interpolation to find the
