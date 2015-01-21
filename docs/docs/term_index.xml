@@ -624,6 +624,7 @@
 
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="find_min_and_max"      include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="max_point"             include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="max_point_interpolated"             include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="min_point"             include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="index_of_max"          include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="index_of_min"          include="dlib/matrix.h"/>
