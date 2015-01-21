@@ -6,6 +6,7 @@
 #include "matrix_la_abstract.h"
 #include "matrix_utilities.h"
 #include "../sparse_vector.h"
+#include "../optimization/optimization_line_search.h"
 
 // The 4 decomposition objects described in the matrix_la_abstract.h file are
 // actually implemented in the following 4 files.  
@@ -1850,11 +1851,39 @@ convergence:
             << "\n\tm.nr():     " << m.nr() 
             << "\n\tm.nc():     " << m.nc() 
             );
-        const dlib::vector<double,2> p = max_point(m);
+        const point p = max_point(m);
 
-        // If it's on the border then just find the regular max point and return that.
+        // If this is a column vector then just do interpolation along a line.
+        if (m.nc()==1)
+        {
+            const long pos = p.y();
+            if (0 < pos && pos+1 < m.nr())
+            {
+                double v1 = dlib::impl::magnitude(m(pos-1));
+                double v2 = dlib::impl::magnitude(m(pos));
+                double v3 = dlib::impl::magnitude(m(pos+1));
+                double y = lagrange_poly_min_extrap(pos-1,pos,pos+1, -v1, -v2, -v3);
+                return vector<double,2>(0,y);
+            }
+        }
+        // If this is a row vector then just do interpolation along a line.
+        if (m.nr()==1)
+        {
+            const long pos = p.x();
+            if (0 < pos && pos+1 < m.nc())
+            {
+                double v1 = dlib::impl::magnitude(m(pos-1));
+                double v2 = dlib::impl::magnitude(m(pos));
+                double v3 = dlib::impl::magnitude(m(pos+1));
+                double x = lagrange_poly_min_extrap(pos-1,pos,pos+1, -v1, -v2, -v3);
+                return vector<double,2>(x,0);
+            }
+        }
+
+
+        // If it's on the border then just return the regular max point.
         if (shrink_rect(get_rect(m),1).contains(p) == false)
-            return max_point(subm(mat(m), centered_rect(p,3,3).intersect(get_rect(m))));
+            return p;
 
 
         matrix<double,9,1> pix;
@@ -1863,7 +1892,7 @@ convergence:
         {
             for (long c = -1; c <= +1; ++c)
             {
-                pix(i) = get_pixel_intensity(m(p.y()+r,p.y()+c));
+                pix(i) = dlib::impl::magnitude(m(p.y()+r,p.y()+c));
                 ++i;
             }
         }
@@ -1877,9 +1906,9 @@ convergence:
             12,  12,  12, -24, -24, -24,  12,  12,  12,
             -12,   0,  12, -12,   0,  12, -12,   0,  12,
             -12, -12, -12,   0,   0,   0,  12,  12,  12 };
-        matrix<double,5,9> mag(magic);
+        const matrix<double,5,9> mag(magic);
         // Now w contains the parameters of the quadratic surface
-        matrix<double,5,1> w = mag*pix/72;
+        const matrix<double,5,1> w = mag*pix/72;
 
 
         // Now newton step to the max point on the surface
@@ -1889,13 +1918,13 @@ convergence:
               w(1), 2*w(2);
         g = w(3), 
             w(4);
-        dlib::vector<double,2> delta = -inv(H)*g;
+        const dlib::vector<double,2> delta = -inv(H)*g;
 
         // if delta isn't in an ascent direction then just use the normal max point.
         if (dot(delta, g) < 0)
             return p;
         else
-            return p+clamp(delta, -1, 1);
+            return vector<double,2>(p)+clamp(delta, -1, 1);
     }
 
 // ----------------------------------------------------------------------------------------
