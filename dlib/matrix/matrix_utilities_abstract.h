@@ -1424,6 +1424,21 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    dlib::vector<double,2> max_point_interpolated (
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - m.size() > 9
+        ensures
+            - Like max_point(), this function finds the location in m with the largest
+              value.  However, we additionally use some quadratic interpolation to find the
+              location of the maximum point with sub-pixel accuracy.  Therefore, the
+              returned point is equal to max_point(m) + some small sub-pixel delta.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     point min_point (
         const matrix_exp& m
     );

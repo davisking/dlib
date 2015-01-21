@@ -1836,6 +1836,70 @@ convergence:
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename EXP 
+        >
+    dlib::vector<double,2> max_point_interpolated (
+        const matrix_exp<EXP>& m
+    )
+    {
+        DLIB_ASSERT(m.size() > 0, 
+            "\tdlib::vector<double,2> point max_point_interpolated(const matrix_exp& m)"
+            << "\n\tm can't be empty"
+            << "\n\tm.size():   " << m.size() 
+            << "\n\tm.nr():     " << m.nr() 
+            << "\n\tm.nc():     " << m.nc() 
+            );
+        const dlib::vector<double,2> p = max_point(m);
+
+        // If it's on the border then just find the regular max point and return that.
+        if (shrink_rect(get_rect(m),1).contains(p) == false)
+            return max_point(subm(mat(m), centered_rect(p,3,3).intersect(get_rect(m))));
+
+
+        matrix<double,9,1> pix;
+        long i = 0;
+        for (long r = -1; r <= +1; ++r)
+        {
+            for (long c = -1; c <= +1; ++c)
+            {
+                pix(i) = get_pixel_intensity(m(p.y()+r,p.y()+c));
+                ++i;
+            }
+        }
+
+        // So this magic finds the parameters of the quadratic surface that best fits
+        // the 3x3 region around p.  Then we find the maximizer of that surface within that
+        // small region and return that as the maximum location.
+        const double magic[] = 
+            {12, -24,  12,  12, -24,  12,  12, -24,  12,
+            9,   0,  -9,   0,   0,   0,  -9,   0,   9,
+            12,  12,  12, -24, -24, -24,  12,  12,  12,
+            -12,   0,  12, -12,   0,  12, -12,   0,  12,
+            -12, -12, -12,   0,   0,   0,  12,  12,  12 };
+        matrix<double,5,9> mag(magic);
+        // Now w contains the parameters of the quadratic surface
+        matrix<double,5,1> w = mag*pix/72;
+
+
+        // Now newton step to the max point on the surface
+        matrix<double,2,2> H;
+        matrix<double,2,1> g;
+        H = 2*w(0), w(1),
+              w(1), 2*w(2);
+        g = w(3), 
+            w(4);
+        dlib::vector<double,2> delta = -inv(H)*g;
+
+        // if delta isn't in an ascent direction then just use the normal max point.
+        if (dot(delta, g) < 0)
+            return p;
+        else
+            return p+clamp(delta, -1, 1);
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_MATRIx_LA_FUNCTS_
