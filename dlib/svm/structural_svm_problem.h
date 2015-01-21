@@ -78,7 +78,7 @@ namespace dlib
 
             if (is_matrix<feature_vector_type>::value)
             {
-                DLIB_CASSERT(psi.size() == (unsigned long)prob->get_num_dimensions(),
+                DLIB_CASSERT((long)psi.size() == prob->get_num_dimensions(),
                     "The dimensionality of your PSI vector doesn't match get_num_dimensions()");
             }
         }
@@ -136,7 +136,7 @@ namespace dlib
             prob->separation_oracle(sample_idx, current_solution, out_loss, out_psi);
             if (is_matrix<feature_vector_type>::value)
             {
-                DLIB_CASSERT(out_psi.size() == (unsigned long)prob->get_num_dimensions(),
+                DLIB_CASSERT((long)out_psi.size() == prob->get_num_dimensions(),
                     "The dimensionality of your PSI vector doesn't match get_num_dimensions()");
             }
 
