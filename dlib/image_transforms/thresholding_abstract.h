@@ -122,8 +122,10 @@ namespace dlib
             - #out_img == the hysteresis thresholded version of in_img (in_img is converted to a 
               grayscale intensity image if it is color). Pixels in in_img with grayscale 
               values >= upper_thresh have an output value of on_pixel and all others have a 
-              value of off_pixel unless they are >= lower_thresh and are adjacent to a pixel
-              with a value >= upper_thresh in which case they have a value of on_pixel.
+              value of off_pixel unless they are >= lower_thresh and are connected to a pixel
+              with a value >= upper_thresh, in which case they have a value of on_pixel.  Here
+              pixels are connected if there is a path between them composed of pixels that 
+              would receive an output of on_pixel.
             - #out_img.nc() == in_img.nc()
             - #out_img.nr() == in_img.nr()
     !*/
