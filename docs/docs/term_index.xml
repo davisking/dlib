@@ -202,6 +202,7 @@
          <term file="algorithms.html" name="disjoint_subsets"              include="dlib/disjoint_subsets.h"/>
          <term link="algorithms.html#disjoint_subsets" name="union-find"   include="dlib/disjoint_subsets.h"/>
          <term file="linear_algebra.html" name="rectangle"                 include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="drectangle"                 include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="border_enumerator"         include="dlib/geometry.h"/>
          <term file="graph_tools.html" name="edge"                         include="dlib/graph_utils.h"/>
          <term file="graph_tools.html" name="is_join_tree"                 include="dlib/graph_utils.h"/>

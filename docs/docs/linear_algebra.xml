@@ -599,6 +599,7 @@
          <name>2D/3D Geometry</name>
          <item>border_enumerator</item> 
          <item>rectangle</item> 
+         <item>drectangle</item> 
          <item>vector</item> 
          <item>point</item> 
          <item>rotate_point</item> 
@@ -1177,6 +1178,20 @@
 
    <!-- ************************************************************************* -->
 
+      <component>
+         <name>drectangle</name>
+         <file>dlib/geometry.h</file>
+         <spec_file>dlib/geometry/drectangle_abstract.h</spec_file>
+         <description>
+            This object represents a rectangular region inside a Cartesian 
+            coordinate system.  It is very similar to the <a href="#rectangle">rectangle</a>
+            except that it uses double variables instead of longs to represent the location of the rectangle.
+            Therefore, it can position rectangles with sub-pixel accuracy.
+         </description>
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
       <component>
          <name>rectangle</name>
          <file>dlib/geometry.h</file>
