@@ -1426,15 +1426,15 @@ namespace dlib
     struct chip_details
     {
         chip_details() : angle(0), rows(0), cols(0) {}
-        chip_details(const rectangle& rect_) : rect(rect_),angle(0), rows(rect_.height()), cols(rect_.width()) {}
-        chip_details(const rectangle& rect_, unsigned long size) : rect(rect_),angle(0) 
+        chip_details(const drectangle& rect_) : rect(rect_),angle(0), rows(rect_.height()), cols(rect_.width()) {}
+        chip_details(const drectangle& rect_, unsigned long size) : rect(rect_),angle(0) 
         { compute_dims_from_size(size); }
-        chip_details(const rectangle& rect_, unsigned long size, double angle_) : rect(rect_),angle(angle_) 
+        chip_details(const drectangle& rect_, unsigned long size, double angle_) : rect(rect_),angle(angle_) 
         { compute_dims_from_size(size); }
 
-        chip_details(const rectangle& rect_, const chip_dims& dims) : 
+        chip_details(const drectangle& rect_, const chip_dims& dims) : 
             rect(rect_),angle(0),rows(dims.rows), cols(dims.cols) {}
-        chip_details(const rectangle& rect_, const chip_dims& dims, double angle_) : 
+        chip_details(const drectangle& rect_, const chip_dims& dims, double angle_) : 
             rect(rect_),angle(angle_),rows(dims.rows), cols(dims.cols) {}
 
         template <typename T>
@@ -1463,13 +1463,13 @@ namespace dlib
             // Note that the translation and scale part are represented by the extraction
             // rectangle.  So here we build the appropriate rectangle.
             const double scale = length(p); 
-            rect = centered_rect(tform(point(dims.cols,dims.rows)/2.0), 
-                static_cast<unsigned long>(dims.cols*scale + 0.5), 
-                static_cast<unsigned long>(dims.rows*scale + 0.5));
+            rect = centered_drect(tform(point(dims.cols,dims.rows)/2.0), 
+                                  dims.cols*scale, 
+                                  dims.rows*scale);
         }
 
 
-        rectangle rect;
+        drectangle rect;
         double angle;
         unsigned long rows; 
         unsigned long cols;
@@ -1611,7 +1611,7 @@ namespace dlib
         for (unsigned long i = 0; i < chip_locations.size(); ++i)
         {
             long depth = 0;
-            rectangle rect = pyr.rect_down(chip_locations[i].rect);
+            drectangle rect = pyr.rect_down(chip_locations[i].rect);
             while (rect.area() > chip_locations[i].size())
             {
                 rect = pyr.rect_down(rect);
@@ -1647,7 +1647,7 @@ namespace dlib
 
                 // figure out which level in the pyramid to use to extract the chip
                 int level = -1;
-                rectangle rect = chip_locations[i].rect;
+                drectangle rect = chip_locations[i].rect;
                 while (pyr.rect_down(rect).area() > chip_locations[i].size())
                 {
                     ++level;

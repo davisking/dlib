@@ -923,7 +923,7 @@ namespace dlib
         !*/
 
         chip_details(
-            const rectangle& rect_
+            const drectangle& rect_
         );
         /*!
             ensures
@@ -935,7 +935,7 @@ namespace dlib
         !*/
 
         chip_details(
-            const rectangle& rect_, 
+            const drectangle& rect_, 
             unsigned long size_
         );
         /*!
@@ -956,7 +956,7 @@ namespace dlib
         !*/
 
         chip_details(
-            const rectangle& rect_, 
+            const drectangle& rect_, 
             unsigned long size_,
             double angle_
         );
@@ -978,7 +978,7 @@ namespace dlib
         !*/
 
         chip_details(
-            const rectangle& rect_, 
+            const drectangle& rect_, 
             const chip_dims& dims
         ); 
         /*!
@@ -991,7 +991,7 @@ namespace dlib
         !*/
 
         chip_details(
-            const rectangle& rect_, 
+            const drectangle& rect_, 
             const chip_dims& dims,
             double angle_
         ); 
@@ -1034,7 +1034,7 @@ namespace dlib
                 - returns the number of pixels in this chip.  This is just rows*cols.
         !*/
 
-        rectangle rect;
+        drectangle rect;
         double angle;
         unsigned long rows; 
         unsigned long cols;

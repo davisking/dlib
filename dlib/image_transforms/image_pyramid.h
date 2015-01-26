@@ -62,36 +62,36 @@ namespace dlib
 
     // -----------------------------
 
-        rectangle rect_up (
-            const rectangle& rect
+        drectangle rect_up (
+            const drectangle& rect
         ) const
         {
-            return rectangle(point_up(rect.tl_corner()), point_up(rect.br_corner()));
+            return drectangle(point_up(rect.tl_corner()), point_up(rect.br_corner()));
         }
 
-        rectangle rect_up (
-            const rectangle& rect,
+        drectangle rect_up (
+            const drectangle& rect,
             unsigned int levels
         ) const
         {
-            return rectangle(point_up(rect.tl_corner(),levels), point_up(rect.br_corner(),levels));
+            return drectangle(point_up(rect.tl_corner(),levels), point_up(rect.br_corner(),levels));
         }
 
     // -----------------------------
 
-        rectangle rect_down (
-            const rectangle& rect
+        drectangle rect_down (
+            const drectangle& rect
         ) const
         {
-            return rectangle(point_down(rect.tl_corner()), point_down(rect.br_corner()));
+            return drectangle(point_down(rect.tl_corner()), point_down(rect.br_corner()));
         }
 
-        rectangle rect_down (
-            const rectangle& rect,
+        drectangle rect_down (
+            const drectangle& rect,
             unsigned int levels
         ) const
         {
-            return rectangle(point_down(rect.tl_corner(),levels), point_down(rect.br_corner(),levels));
+            return drectangle(point_down(rect.tl_corner(),levels), point_down(rect.br_corner(),levels));
         }
 
     // -----------------------------
@@ -196,36 +196,36 @@ namespace dlib
 
         // -----------------------------
 
-            rectangle rect_up (
-                const rectangle& rect
+            drectangle rect_up (
+                const drectangle& rect
             ) const
             {
-                return rectangle(point_up(rect.tl_corner()), point_up(rect.br_corner()));
+                return drectangle(point_up(rect.tl_corner()), point_up(rect.br_corner()));
             }
 
-            rectangle rect_up (
-                const rectangle& rect,
+            drectangle rect_up (
+                const drectangle& rect,
                 unsigned int levels
             ) const
             {
-                return rectangle(point_up(rect.tl_corner(),levels), point_up(rect.br_corner(),levels));
+                return drectangle(point_up(rect.tl_corner(),levels), point_up(rect.br_corner(),levels));
             }
 
         // -----------------------------
 
-            rectangle rect_down (
-                const rectangle& rect
+            drectangle rect_down (
+                const drectangle& rect
             ) const
             {
-                return rectangle(point_down(rect.tl_corner()), point_down(rect.br_corner()));
+                return drectangle(point_down(rect.tl_corner()), point_down(rect.br_corner()));
             }
 
-            rectangle rect_down (
-                const rectangle& rect,
+            drectangle rect_down (
+                const drectangle& rect,
                 unsigned int levels
             ) const
             {
-                return rectangle(point_down(rect.tl_corner(),levels), point_down(rect.br_corner(),levels));
+                return drectangle(point_down(rect.tl_corner(),levels), point_down(rect.br_corner(),levels));
             }
 
         // -----------------------------
@@ -538,36 +538,36 @@ namespace dlib
 
         // -----------------------------
 
-            rectangle rect_up (
-                const rectangle& rect
+            drectangle rect_up (
+                const drectangle& rect
             ) const
             {
-                return rectangle(point_up(rect.tl_corner()), point_up(rect.br_corner()));
+                return drectangle(point_up(rect.tl_corner()), point_up(rect.br_corner()));
             }
 
-            rectangle rect_up (
-                const rectangle& rect,
+            drectangle rect_up (
+                const drectangle& rect,
                 unsigned int levels
             ) const
             {
-                return rectangle(point_up(rect.tl_corner(),levels), point_up(rect.br_corner(),levels));
+                return drectangle(point_up(rect.tl_corner(),levels), point_up(rect.br_corner(),levels));
             }
 
         // -----------------------------
 
-            rectangle rect_down (
-                const rectangle& rect
+            drectangle rect_down (
+                const drectangle& rect
             ) const
             {
-                return rectangle(point_down(rect.tl_corner()), point_down(rect.br_corner()));
+                return drectangle(point_down(rect.tl_corner()), point_down(rect.br_corner()));
             }
 
-            rectangle rect_down (
-                const rectangle& rect,
+            drectangle rect_down (
+                const drectangle& rect,
                 unsigned int levels
             ) const
             {
-                return rectangle(point_down(rect.tl_corner(),levels), point_down(rect.br_corner(),levels));
+                return drectangle(point_down(rect.tl_corner(),levels), point_down(rect.br_corner(),levels));
             }
 
         // -----------------------------
@@ -889,36 +889,36 @@ namespace dlib
 
     // -----------------------------
 
-        rectangle rect_up (
-            const rectangle& rect
+        drectangle rect_up (
+            const drectangle& rect
         ) const
         {
-            return rectangle(point_up(rect.tl_corner()), point_up(rect.br_corner()));
+            return drectangle(point_up(rect.tl_corner()), point_up(rect.br_corner()));
         }
 
-        rectangle rect_up (
-            const rectangle& rect,
+        drectangle rect_up (
+            const drectangle& rect,
             unsigned int levels
         ) const
         {
-            return rectangle(point_up(rect.tl_corner(),levels), point_up(rect.br_corner(),levels));
+            return drectangle(point_up(rect.tl_corner(),levels), point_up(rect.br_corner(),levels));
         }
 
     // -----------------------------
 
-        rectangle rect_down (
-            const rectangle& rect
+        drectangle rect_down (
+            const drectangle& rect
         ) const
         {
-            return rectangle(point_down(rect.tl_corner()), point_down(rect.br_corner()));
+            return drectangle(point_down(rect.tl_corner()), point_down(rect.br_corner()));
         }
 
-        rectangle rect_down (
-            const rectangle& rect,
+        drectangle rect_down (
+            const drectangle& rect,
             unsigned int levels
         ) const
         {
-            return rectangle(point_down(rect.tl_corner(),levels), point_down(rect.br_corner(),levels));
+            return drectangle(point_down(rect.tl_corner(),levels), point_down(rect.br_corner(),levels));
         }
 
         template <

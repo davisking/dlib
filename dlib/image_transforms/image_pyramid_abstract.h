@@ -109,21 +109,21 @@ namespace dlib
                   point_up(point_down(P)) == P
         !*/
 
-        rectangle rect_down (
-            const rectangle& rect
+        drectangle rect_down (
+            const drectangle& rect
         ) const;
         /*!
             ensures
-                - returns rectangle(point_down(rect.tl_corner()), point_down(rect.br_corner()));
+                - returns drectangle(point_down(rect.tl_corner()), point_down(rect.br_corner()));
                   (i.e. maps rect into a downsampled)
         !*/
 
-        rectangle rect_up (
-            const rectangle& rect
+        drectangle rect_up (
+            const drectangle& rect
         ) const;
         /*!
             ensures
-                - returns rectangle(point_up(rect.tl_corner()), point_up(rect.br_corner()));
+                - returns drectangle(point_up(rect.tl_corner()), point_up(rect.br_corner()));
                   (i.e. maps rect into a parent image)
         !*/
 
@@ -155,23 +155,23 @@ namespace dlib
                         point_up(p,0) == p,  etc. )
         !*/
 
-        rectangle rect_down (
-            const rectangle& rect,
+        drectangle rect_down (
+            const drectangle& rect,
             unsigned int levels
         ) const;
         /*!
             ensures
-                - returns rectangle(point_down(rect.tl_corner(),levels), point_down(rect.br_corner(),levels));
+                - returns drectangle(point_down(rect.tl_corner(),levels), point_down(rect.br_corner(),levels));
                   (i.e. Basically applies rect_down() to rect levels times and returns the result.)
         !*/
 
-        rectangle rect_up (
-            const rectangle& rect,
+        drectangle rect_up (
+            const drectangle& rect,
             unsigned int levels
         ) const;
         /*!
             ensures
-                - returns rectangle(point_up(rect.tl_corner(),levels), point_up(rect.br_corner(),levels));
+                - returns drectangle(point_up(rect.tl_corner(),levels), point_up(rect.br_corner(),levels));
                   (i.e. Basically applies rect_up() to rect levels times and returns the result.)
         !*/
 
