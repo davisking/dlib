@@ -108,7 +108,7 @@ int main(int argc, char** argv)
                 shapes.push_back(shape);
             }
 
-            // Now lets view our face poses on the screen.
+            // Now let's view our face poses on the screen.
             win.clear_overlay();
             win.set_image(img);
             win.add_overlay(render_face_detections(shapes));
