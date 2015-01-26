@@ -130,7 +130,7 @@ namespace dlib
                 string name;
                 // Check if the name buffer is empty.  Use the name it contains if it isn't.
                 if (name_buf(i,"")[0] != '\0')
-                    name = name_buf(i,"");
+                    name = cast_to_string(i) + ": " + name_buf(i,"");
                 else 
                     name = cast_to_string(i);
                 max_name_length = std::max<unsigned long>(max_name_length, name.size());
@@ -144,7 +144,7 @@ namespace dlib
                     string name;
                     // Check if the name buffer is empty.  Use the name it contains if it isn't.
                     if (name_buf(i,"")[0] != '\0')
-                        name = name_buf(i,"");
+                        name = cast_to_string(i) + ": " + name_buf(i,"");
                     else 
                         name = cast_to_string(i);
 
