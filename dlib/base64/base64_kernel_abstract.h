@@ -93,7 +93,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - reads data from in (until EOF is reached) and decodees it 
+                - reads data from in (until EOF is reached), decodes it,
                   and writes it to out. 
             throws
                 - std::ios_base::failure
