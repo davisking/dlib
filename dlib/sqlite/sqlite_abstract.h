@@ -244,6 +244,31 @@ namespace dlib
                   routines.
         !*/
 
+        template <
+            typename T
+            >
+        void get_column (
+            unsigned long idx,
+            T& item
+        ) const;
+        /*!
+            requires
+                - idx < get_num_columns()
+            ensures
+                - This function automatically selects how to extract the column data based
+                  on the type of item given. In particular:
+                    - if (T is a 32bit or smaller built in integer type) then
+                        - #item == get_column_as_int(idx)
+                    - else if (T is a 64bit built in integer type) then
+                        - #item == get_column_as_int64(idx)
+                    - else if (T is float, double, or long double) then
+                        - #item == get_column_as_double(idx)
+                    - else if (T is std::string) then
+                        - #item == get_column_as_text(idx)
+                    - else
+                        - invokes: get_column_as_object(idx, item)
+        !*/
+
         const std::vector<char> get_column_as_blob (
             unsigned long idx
         ) const;
@@ -347,6 +372,31 @@ namespace dlib
                       member functions defined below.
                 - else
                     - returns 0
+        !*/
+
+        template <
+            typename T
+            >
+        void bind (
+            unsigned long parameter_id,
+            T& item
+        ) const;
+        /*!
+            requires
+                - 1 <= parameter_id <= get_max_parameter_id()
+            ensures
+                - This function automatically selects how to bind item to a statement based
+                  on the type of item given.  In particular:
+                    - if (T is a 32bit or smaller built in integer type) then
+                        - invokes: bind_int(parameter_id, item)
+                    - else if (T is a 64bit built in integer type) then
+                        - invokes: bind_int64(parameter_id, item)
+                    - else if (T is float, double, or long double) then
+                        - invokes: bind_double(parameter_id, item)
+                    - else if (T is std::string) then
+                        - invokes: bind_text(parameter_id, item)
+                    - else
+                        - invokes: bind_object(parameter_id, item)
         !*/
 
         void bind_blob (
