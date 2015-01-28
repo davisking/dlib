@@ -65,7 +65,7 @@ namespace dlib
 #define DLIB_NO_WARN_UNUSED 
 #endif
 
-// Use the newer static_assert if it's avaiable since it produces much more readable error
+// Use the newer static_assert if it's available since it produces much more readable error
 // messages.
 #ifdef DLIB_HAS_STATIC_ASSERT
     #define COMPILE_TIME_ASSERT(expression) static_assert(expression, "Failed assertion")
