@@ -111,4 +111,8 @@ if (OpenCV_FOUND)
 endif()
 
 
+if (DLIB_LINK_WITH_SQLITE3)
+   add_example(sqlite_ex)
+endif()
+
 
