@@ -432,7 +432,7 @@ namespace dlib
 
     logger::
     logger (  
-        const char* name_
+        const std::string& name_
     ) : 
         gd(get_global_data()),
         logger_name(name_),

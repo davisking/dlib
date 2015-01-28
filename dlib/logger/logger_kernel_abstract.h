@@ -211,7 +211,7 @@ namespace dlib
     public:
 
         logger (  
-            const char* name_
+            const std::string& name_
         );
         /*!
             requires

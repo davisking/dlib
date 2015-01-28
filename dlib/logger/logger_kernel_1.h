@@ -227,7 +227,7 @@ namespace dlib
                                         const uint64, const char*> hook_mfp;
 
         logger (  
-            const char* name_
+            const std::string& name_
         );
 
         virtual ~logger (
