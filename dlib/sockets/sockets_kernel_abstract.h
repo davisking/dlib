@@ -242,7 +242,7 @@ namespace dlib
                 - num > 0 
                 - buf points to an array of at least num bytes
             ensures
-                - will block until ONE of the following occurrs:
+                - will block until ONE of the following occurs:
                     - num bytes from buf have been written to the connection 
                     - an error has occurred
                     - the outgoing channel of the connection has been shutdown locally
