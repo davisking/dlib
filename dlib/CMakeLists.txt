@@ -136,9 +136,9 @@ if (NOT TARGET dlib)
       # we want to link to the right stuff depending on our platform.  
       if (WIN32 AND NOT CYGWIN) ###############################################################################
          if (DLIB_NO_GUI_SUPPORT)
-            set (dlib_needed_libraries ws2_32)
+            set (dlib_needed_libraries ws2_32 winmm)
          else()
-            set (dlib_needed_libraries ws2_32 comctl32 gdi32 imm32)
+            set (dlib_needed_libraries ws2_32 winmm comctl32 gdi32 imm32)
          endif()
       elseif(APPLE) ############################################################################
          find_library(pthreadlib pthread)
