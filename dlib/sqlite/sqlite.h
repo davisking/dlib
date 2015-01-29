@@ -383,7 +383,7 @@ namespace dlib
         template <typename T>
         typename enable_if_c<std::numeric_limits<T>::is_integer>::type bind (
             unsigned long idx,
-            T& item
+            const T& item
         ) 
         {
             if (sizeof(T) <= 4)
@@ -392,15 +392,15 @@ namespace dlib
                 bind_int64(idx, item);
         }
 
-        void bind(unsigned long idx, std::string& item) { bind_text(idx, item); }
-        void bind(unsigned long idx, float& item      ) { bind_double(idx, item); }
-        void bind(unsigned long idx, double& item     ) { bind_double(idx, item); }
-        void bind(unsigned long idx, long double& item) { bind_double(idx, item); }
+        void bind(unsigned long idx, const std::string& item) { bind_text(idx, item); }
+        void bind(unsigned long idx, const float& item      ) { bind_double(idx, item); }
+        void bind(unsigned long idx, const double& item     ) { bind_double(idx, item); }
+        void bind(unsigned long idx, const long double& item) { bind_double(idx, item); }
 
         template <typename T>
         typename disable_if_c<std::numeric_limits<T>::is_integer>::type bind (
             unsigned long idx,
-            T& item
+            const T& item
         ) 
         {
             bind_object(idx, item);

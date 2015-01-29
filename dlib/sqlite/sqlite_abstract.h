@@ -379,7 +379,7 @@ namespace dlib
             >
         void bind (
             unsigned long parameter_id,
-            T& item
+            const T& item
         ) const;
         /*!
             requires
