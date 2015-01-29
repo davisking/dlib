@@ -22,8 +22,10 @@ namespace dlib
                 stream's output buffers.  
 
             THREAD SAFETY
-                It is not safe to touch this object from more than one thread at a time.
-                Therefore, you should mutex lock it if you need to do so.  
+                It is not safe for multiple threads to make concurrent accesses to the same
+                instance of this object (except for calls to shutdown() which are always
+                threadsafe).  Therefore, you should mutex lock an instance of this object
+                if you need to touch it from multiple threads. 
         !*/
 
     public:
@@ -147,6 +149,15 @@ namespace dlib
                     - This function has no effect on this object.
         !*/
 
+        void shutdown (
+        );
+        /*!
+            ensures
+                - Immediately closes the TCP connection and causes all I/O operations on
+                  this object to return an error.  
+                - It is safe to call this function from any thread, therefore, you can use
+                  it to signal when you want a connection to terminate from another thread.
+        !*/
     };
 
 // ---------------------------------------------------------------------------------------- 
