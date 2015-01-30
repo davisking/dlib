@@ -97,7 +97,7 @@ sudo apt-get install libx11-dev
         <h2>Compiling on Windows Using GCC</h2>
         <p>
             The commands for gcc on windows are the same as above but you may also have to link 
-            (via the -l option) to the following libraries: gdi32, comctl32, user32, ws2_32, or imm32.
+            (via the -l option) to the following libraries: gdi32, comctl32, user32, winmm, ws2_32, or imm32.
             However, it's worth pointing out that Visual Studio Express is free and a much better choice for
             windows development than gcc.
         </p>
