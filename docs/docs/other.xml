@@ -893,6 +893,9 @@
                and compile it straight into your application (download the amalgamation). 
                </p>
          </description>
+         <examples>
+            <example>sqlite_ex.cpp.html</example>
+         </examples>
                                  
       </component>
             
@@ -911,6 +914,10 @@
                 you must make sure you link your application with SQLite.  
                </p>
          </description>
+         <examples>
+            <example>sqlite_ex.cpp.html</example>
+         </examples>
+                                 
                                  
       </component>
             
@@ -924,6 +931,10 @@
                 This object is a tool for creating exception safe
                 <a href="#database">database</a> transactions.
          </description>
+         <examples>
+            <example>sqlite_ex.cpp.html</example>
+         </examples>
+                                 
                                  
       </component>
             

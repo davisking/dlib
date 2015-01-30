@@ -175,6 +175,10 @@
             <name>Examples: C++</name>
             <sub>
                <item>
+                  <name>SQLite</name>
+                  <link>sqlite_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Hough_Transform</name>
                   <link>hough_transform_ex.cpp.html</link>
                </item>
