@@ -65,7 +65,7 @@ namespace
             std::vector<char> buf;
             for (int i = 0; i < 4000; ++i)
                 buf.push_back(i);
-            DLIB_TEST(crc32(buf).get_checksum() == 492662731);
+            DLIB_TEST(crc32(buf) == 492662731);
         }
     } a;
 

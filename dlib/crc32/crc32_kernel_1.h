@@ -55,6 +55,9 @@ namespace dlib
             const std::vector<char>& item
         );
 
+        inline operator unsigned long (
+        ) const { return get_checksum(); }
+
         inline unsigned long get_checksum (
         ) const;
 

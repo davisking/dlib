@@ -101,6 +101,13 @@ namespace dlib
                 - returns the current checksum
         !*/
 
+        operator unsigned long (
+        ) const; 
+        /*!
+            ensures
+                - returns get_checksum()
+        !*/
+
         void swap (
             crc32& item
         );
