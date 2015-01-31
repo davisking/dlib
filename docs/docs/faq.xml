@@ -167,6 +167,7 @@ row_vect.set_size(5);
             <li><b>OpenCV</b> image objects can be converted into a form usable by dlib routines
             by using <a href="imaging.html#cv_image">cv_image</a>.  You can also convert from a
             dlib matrix or image to an OpenCV Mat using dlib::<a href="imaging.html#toMat">toMat</a>().</li><br/>
+
             <li><b>Google Protocol Buffers</b> can be serialized by the dlib 
             <a href="other.html#serialize">serialization</a> routines.  
             This means that, for example, you can pass protocol buffer objects through a 
@@ -180,8 +181,8 @@ row_vect.set_size(5);
             use them. However, CMake will try to link against them
             automatically if they are installed.</li><br/>
 
-            <li><b>FFTW</b> is used by the fft() and ifft() routines if you #define DLIB_USE_FFTW and
-            link to fftw3.  Otherwise dlib uses its own slower default implementation.  </li><br/>
+            <!--<li><b>FFTW</b> is used by the fft() and ifft() routines if you #define DLIB_USE_FFTW and
+            link to fftw3.  Otherwise dlib uses its own slower default implementation.  </li><br/> -->
 
             <li><b>SQLite</b> is used by the <a href="other.html#database">database</a> object.  In
             fact, it is just a wrapper around SQLite's C interface which simplifies its use (e.g. 
