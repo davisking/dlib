@@ -8,6 +8,66 @@
    <questions group="General">
 
 
+      <question text="How can I use dlib in Visual Studio?">
+         There are instructions on the <a href="compile.html">How to Compile</a> page.  
+         If you do not understand the instructions in the "<b>Compiling on Windows Using Visual Studio</b>" section
+         or are getting errors then follow the instructions in the "<b>Compiling on Any Operating System Using CMake</b>"
+         section.  In particular, <a href="http://www.cmake.org/download/">install CMake</a> and then type 
+         these exact commands from within the root of the dlib distribution:  
+<code_box>
+cd examples
+mkdir build
+cd build
+del /F /S /Q *
+cmake ..
+cmake --build . --config Release
+</code_box>
+         That should compile the dlib examples in visual studio.  The output executables will appear in the Release folder.
+         The <tt>del /F /S /Q *</tt> command is to make sure you clear out any extraneous files you might have placed in 
+         the build folder and is not necessary if build begins empty.
+      </question>
+
+      <!-- ****************************************** -->
+
+      <question text="Why is dlib slow?">
+         Dlib isn't slow.  I get this question many times a week and 95% of the time it's from someone
+         using Visual Studio who has compiled their program in Debug mode rather than the optimized
+         Release mode.  So if you are using Visual Studio then realize that Visual Studio has these two modes.  
+         The default is Debug.  The mode is selectable via a drop down:
+         <p><img src="vs_mode_1.png"/></p>
+         Debug mode disables compiler optimizations.  So the program will be very slow if you run it in Debug mode.
+         So click the drop down,
+         <p><img src="vs_mode_2.png"/></p>
+         and select Release.
+         <p><img src="vs_mode_3.png"/></p>
+         Then when you compile the program it will appear in a folder named Release rather than in a folder named Debug.  
+
+         <br/>
+         <br/>
+         Finally, you can enable either SSE4 or AVX instruction use.  These will make certain operations much faster (e.g. face detection).
+         You do this using <a href="http://www.cmake.org/download/">CMake</a>'s cmake-gui tool.  For example, if you execute
+         these commands you will get the cmake-gui screen:
+<code_box>
+cd examples
+mkdir build
+cd build
+cmake .. 
+cmake-gui .
+</code_box>
+         Which looks like this:
+         <p><img src="vs-cmake-gui.png"/></p>
+         Where you can select SSE4 or AVX instruction use.  Then you click configure and then generate. After that
+         when you build your visual studio project some things will be faster.
+         
+         Finally, note that AVX is a little bit faster than SSE4 but if your computer is fairly old it might
+         not support it.  In that case, either buy a new computer or use SSE4
+         instructions. 
+      </question>
+
+      <!-- ****************************************** -->
+
+
+
       <question text="How can I cite dlib?">
          If you use dlib in your research then please use the following citation:
          <br/>
