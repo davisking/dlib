@@ -230,7 +230,8 @@ namespace dlib
             T& item
         ) const
         {
-            if (sizeof(T) <= 4)
+            // unsigned ints won't fit into int all the time so put those into 64bit ints.
+            if (sizeof(T) < sizeof(int) || (sizeof(T)==sizeof(int) && is_signed_type<T>::value))
                 item = get_column_as_int(idx);
             else
                 item = get_column_as_int64(idx);
@@ -386,7 +387,8 @@ namespace dlib
             const T& item
         ) 
         {
-            if (sizeof(T) <= 4)
+            // unsigned ints won't fit into int all the time so put those into 64bit ints.
+            if (sizeof(T) < sizeof(int) || (sizeof(T)==sizeof(int) && is_signed_type<T>::value))
                 bind_int(idx, item);
             else
                 bind_int64(idx, item);
