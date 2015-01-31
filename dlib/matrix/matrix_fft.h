@@ -8,9 +8,13 @@
 #include "../hash.h"
 #include "../algs.h"
 
+
+// No using FFTW until it becomes thread safe!
+#if 0
 #ifdef DLIB_USE_FFTW
 #include <fftw3.h>
 #endif // DLIB_USE_FFTW
+#endif
 
 namespace dlib
 {
@@ -513,6 +517,15 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    /*
+        I'm disabling any use of the FFTW bindings because FFTW is, as of this writing, not
+        threadsafe as a library.  This means that if multiple threads were to make
+        concurrent calls to these fft routines then the program could crash.  If at some
+        point FFTW is fixed I'll turn these bindings back on.
+
+        See https://github.com/FFTW/fftw3/issues/16
+    */
+#if 0
 #ifdef DLIB_USE_FFTW
 
     template <long NR, long NC, typename MM, typename L>
@@ -597,6 +610,7 @@ namespace dlib
     inline void ifft_inplace(matrix<std::complex<double> >& data) {data = call_fftw_ifft(data);}
 
 #endif // DLIB_USE_FFTW
+#endif // end of #if 0
 
 // ----------------------------------------------------------------------------------------
 

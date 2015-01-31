@@ -40,10 +40,6 @@ namespace dlib
                 - starting with D(0,0), D contains progressively higher frequency components
                   of the input data.
                 - ifft(D) == D
-            - if DLIB_USE_FFTW is #defined then this function will use the very fast fftw
-              library when given matrix<double> objects instead of dlib's default fft
-              implementation.  Note that you must also link to the fftw3 library to use
-              this feature.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -64,10 +60,6 @@ namespace dlib
                 - D.nr() == data.nr()
                 - D.nc() == data.nc()
                 - fft(D) == data 
-            - if DLIB_USE_FFTW is #defined then this function will use the very fast fftw
-              library when given matrix<double> objects instead of dlib's default fft
-              implementation.  Note that you must also link to the fftw3 library to use
-              this feature.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -91,10 +83,6 @@ namespace dlib
             - This function is identical to fft() except that it does the FFT in-place.
               That is, after this function executes we will have:
                 - #data == fft(data)
-            - if DLIB_USE_FFTW is #defined then this function will use the very fast fftw
-              library when given double precision matrices instead of dlib's default fft
-              implementation.  Note that you must also link to the fftw3 library to use
-              this feature.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -120,10 +108,6 @@ namespace dlib
                 - #data == ifft(data)*data.size()
                 - Note that the output needs to be divided by data.size() to complete the 
                   inverse transformation.  
-            - if DLIB_USE_FFTW is #defined then this function will use the very fast fftw
-              library when given double precision matrices instead of dlib's default fft
-              implementation.  Note that you must also link to the fftw3 library to use
-              this feature.
     !*/
 
 // ----------------------------------------------------------------------------------------
