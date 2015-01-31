@@ -5,6 +5,7 @@
 
 #include "../algs.h"
 #include <string>
+#include <vector>
 
 namespace dlib
 {
@@ -41,6 +42,17 @@ namespace dlib
                   constructor and then calling add() on item)
         !*/
 
+        crc32 (        
+            const std::vector<char>& item
+        );
+        /*!
+            ensures                
+                - #*this is properly initialized
+                - calls this->add(item).
+                  (i.e. Using this constructor is the same as using the default 
+                  constructor and then calling add() on item)
+        !*/
+
         virtual ~crc32 (
         );
         /*!
@@ -66,6 +78,15 @@ namespace dlib
 
         void add (
             const std::string& item
+        );
+        /*!
+            ensures
+                - #get_checksum() == The checksum of all items added to *this previously
+                  concatenated with item.
+        !*/
+
+        void add (
+            const std::vector<char>& item
         );
         /*!
             ensures

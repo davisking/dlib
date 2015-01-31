@@ -5,6 +5,7 @@
 
 #include "../algs.h"
 #include <string>
+#include <vector>
 #include "crc32_kernel_abstract.h"
 
 namespace dlib
@@ -34,6 +35,10 @@ namespace dlib
             const std::string& item
         );
 
+        inline crc32 (
+            const std::vector<char>& item
+        );
+
         inline virtual ~crc32 (
         );
 
@@ -46,6 +51,10 @@ namespace dlib
 
         inline void add (
             const std::string& item
+        );
+
+        inline void add (
+            const std::vector<char>& item
         );
 
         inline unsigned long get_checksum (
@@ -127,6 +136,18 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     crc32::
+    crc32 (        
+        const std::vector<char>& item
+    )
+    {
+        checksum = 0xFFFFFFFF;
+        fill_crc_table();
+        add(item);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    crc32::
     ~crc32 (
     )
     {
@@ -159,6 +180,17 @@ namespace dlib
     )
     {
         for (std::string::size_type i = 0; i < item.size(); ++i)
+            checksum = (checksum>>8) ^ table[(checksum^item[i]) & 0xFF];
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void crc32::
+    add (
+        const std::vector<char>& item
+    )
+    {
+        for (unsigned long i = 0; i < item.size(); ++i)
             checksum = (checksum>>8) ^ table[(checksum^item[i]) & 0xFF];
     }
 

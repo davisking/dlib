@@ -61,6 +61,11 @@ namespace
             DLIB_TEST(c.get_checksum() == 0);
             c.add("davis");
             DLIB_TEST(c.get_checksum() == 0x0445527C);
+
+            std::vector<char> buf;
+            for (int i = 0; i < 4000; ++i)
+                buf.push_back(i);
+            DLIB_TEST(crc32(buf).get_checksum() == 492662731);
         }
     } a;
 
