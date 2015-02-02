@@ -1885,6 +1885,8 @@ convergence:
         if (shrink_rect(get_rect(m),1).contains(p) == false)
             return p;
 
+        //matrix<double> A(9,6);
+        //matrix<double,0,1> G(9);
 
         matrix<double,9,1> pix;
         long i = 0;
@@ -1893,22 +1895,37 @@ convergence:
             for (long c = -1; c <= +1; ++c)
             {
                 pix(i) = dlib::impl::magnitude(m(p.y()+r,p.y()+c));
+                /*
+                A(i,0) = c*c;
+                A(i,1) = c*r;
+                A(i,2) = r*r;
+                A(i,3) = c;
+                A(i,4) = r;
+                A(i,5) = 1;
+                G(i) = std::exp(-1*(r*r+c*c)/2.0); // Use a gaussian windowing function around p.
+                */
                 ++i;
             }
         }
+
+        // This bit of code is how we generated the magic matrix below.  
+        //A = diagm(G)*A; 
+        //std::cout << std::setprecision(16) << inv(trans(A)*A)*trans(A)*diagm(G) << std::endl; exit(1);
 
         // So this magic finds the parameters of the quadratic surface that best fits
         // the 3x3 region around p.  Then we find the maximizer of that surface within that
         // small region and return that as the maximum location.
         const double magic[] = 
-            {12, -24,  12,  12, -24,  12,  12, -24,  12,
-            9,   0,  -9,   0,   0,   0,  -9,   0,   9,
-            12,  12,  12, -24, -24, -24,  12,  12,  12,
-            -12,   0,  12, -12,   0,  12, -12,   0,  12,
-            -12, -12, -12,   0,   0,   0,  12,  12,  12 };
+            {
+            0.1059707788085427,-0.2119415576170854,0.1059707788085427,0.2880584423829146,-0.5761168847658288,0.2880584423829146,0.1059707788085427,-0.2119415576170854,0.1059707788085427,
+            0.25,0,-0.25,0,0,0,-0.25,0,0.25,
+            0.1059707788085427,0.2880584423829145,0.1059707788085427,-0.2119415576170854,-0.5761168847658289,-0.2119415576170854,0.1059707788085427,0.2880584423829145,0.1059707788085427,
+            -0.1059707788085427,0,0.1059707788085427,-0.2880584423829145,0,0.2880584423829145,-0.1059707788085427,0,0.1059707788085427,
+            -0.1059707788085427,-0.2880584423829145,-0.1059707788085427,0,0,0,0.1059707788085427,0.2880584423829145,0.1059707788085427,
+            };
         const matrix<double,5,9> mag(magic);
         // Now w contains the parameters of the quadratic surface
-        const matrix<double,5,1> w = mag*pix/72;
+        const matrix<double,5,1> w = mag*pix;
 
 
         // Now newton step to the max point on the surface
