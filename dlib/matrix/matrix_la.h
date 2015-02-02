@@ -1908,24 +1908,46 @@ convergence:
             }
         }
 
-        // This bit of code is how we generated the magic matrix below.  
+        // This bit of code is how we generated the derivative_filters matrix below.  
         //A = diagm(G)*A; 
-        //std::cout << std::setprecision(16) << inv(trans(A)*A)*trans(A)*diagm(G) << std::endl; exit(1);
+        //std::cout << std::setprecision(20) << inv(trans(A)*A)*trans(A)*diagm(G) << std::endl; exit(1);
 
-        // So this magic finds the parameters of the quadratic surface that best fits
+        const double m10 = 0.10597077880854270659;
+        const double m21 = 0.21194155761708535768;
+        const double m28 = 0.28805844238291455905;
+        const double m57 = 0.57611688476582878504;
+        // So this derivative_filters finds the parameters of the quadratic surface that best fits
         // the 3x3 region around p.  Then we find the maximizer of that surface within that
         // small region and return that as the maximum location.
-        const double magic[] = 
-            {
-            0.1059707788085427,-0.2119415576170854,0.1059707788085427,0.2880584423829146,-0.5761168847658288,0.2880584423829146,0.1059707788085427,-0.2119415576170854,0.1059707788085427,
-            0.25,0,-0.25,0,0,0,-0.25,0,0.25,
-            0.1059707788085427,0.2880584423829145,0.1059707788085427,-0.2119415576170854,-0.5761168847658289,-0.2119415576170854,0.1059707788085427,0.2880584423829145,0.1059707788085427,
-            -0.1059707788085427,0,0.1059707788085427,-0.2880584423829145,0,0.2880584423829145,-0.1059707788085427,0,0.1059707788085427,
-            -0.1059707788085427,-0.2880584423829145,-0.1059707788085427,0,0,0,0.1059707788085427,0.2880584423829145,0.1059707788085427,
+        const double derivative_filters[] = {
+                // xx
+                m10,-m21,m10,
+                m28,-m57,m28,
+                m10,-m21,m10,
+
+                // xy
+                0.25 ,0,-0.25,
+                0    ,0, 0,
+                -0.25,0,0.25,
+
+                // yy
+                m10,  m28, m10,
+                -m21,-m57,-m21,
+                m10,  m28, m10,
+
+                // x
+                -m10,0,m10,
+                -m28,0,m28,
+                -m10,0,m10,
+
+                // y
+                -m10,-m28,-m10,
+                0,   0,   0,
+                m10, m28, m10
             };
-        const matrix<double,5,9> mag(magic);
+        const matrix<double,5,9> filt(derivative_filters);
         // Now w contains the parameters of the quadratic surface
-        const matrix<double,5,1> w = mag*pix;
+        const matrix<double,5,1> w = filt*pix;
 
 
         // Now newton step to the max point on the surface
