@@ -492,6 +492,57 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const drectangle shrink_rect (
+        const drectangle& rect,
+        double num 
+    );
+    /*!
+        ensures
+            - returns drectangle(rect.left()+num, rect.top()+num, rect.right()-num, rect.bottom()-num)
+              (i.e. shrinks the given drectangle by shrinking its border by num)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const drectangle grow_rect (
+        const drectangle& rect,
+        double num 
+    );
+    /*!
+        ensures
+            - return shrink_rect(rect, -num)
+              (i.e. grows the given drectangle by expanding its border by num)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const drectangle shrink_rect (
+        const drectangle& rect,
+        double width,
+        double height
+    );
+    /*!
+        ensures
+            - returns drectangle(rect.left()+width, rect.top()+height, rect.right()-width, rect.bottom()-height)
+              (i.e. shrinks the given drectangle by shrinking its left and right borders by width
+              and its top and bottom borders by height. )
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const drectangle grow_rect (
+        const drectangle& rect,
+        double width,
+        double height
+    );
+    /*!
+        ensures
+            - return shrink_rect(rect, -width, -height)
+              (i.e. grows the given drectangle by expanding its border)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DRECTANGLe_ABSTRACT_H_

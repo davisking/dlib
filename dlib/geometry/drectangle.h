@@ -365,6 +365,40 @@ namespace dlib
         return drectangle(p.x()-width/2, p.y()-height/2, p.x()+width/2, p.y()+height/2);
     }
 
+    inline const drectangle shrink_rect (
+        const drectangle& rect,
+        double num 
+    )
+    {
+        return drectangle(rect.left()+num, rect.top()+num, rect.right()-num, rect.bottom()-num);
+    }
+
+    inline const drectangle grow_rect (
+        const drectangle& rect,
+        double num 
+    )
+    {
+        return shrink_rect(rect, -num);
+    }
+
+    inline const drectangle shrink_rect (
+        const drectangle& rect,
+        double width,
+        double height
+    )
+    {
+        return drectangle(rect.left()+width, rect.top()+height, rect.right()-width, rect.bottom()-height);
+    }
+
+    inline const drectangle grow_rect (
+        const drectangle& rect,
+        double width,
+        double height
+    )
+    {
+        return shrink_rect(rect, -width, -height);
+    }
+
 // ----------------------------------------------------------------------------------------
 
 }
