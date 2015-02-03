@@ -80,7 +80,7 @@ namespace dlib
         unsigned long get_filter_size (
         ) const { return 128/2; } // must be power of 2
 
-        long get_num_scale_levels(
+        unsigned long get_num_scale_levels(
         ) const { return 32; }  // must be power of 2
 
         unsigned long get_scale_window_size (
@@ -174,7 +174,7 @@ namespace dlib
             const double pos = max_point_interpolated(real(Gs)).y();
 
             // update the rectangle's scale
-            position *= std::pow(get_scale_pyramid_alpha(), pos-get_num_scale_levels()/2);
+            position *= std::pow(get_scale_pyramid_alpha(), pos-(double)get_num_scale_levels()/2);
 
 
 
@@ -211,13 +211,13 @@ namespace dlib
 
             // Make an image pyramid and put it into the chips array.
             const long chip_size = get_scale_window_size();
-            drectangle ppp = position*std::pow(get_scale_pyramid_alpha(), -get_num_scale_levels()/2);
+            drectangle ppp = position*std::pow(get_scale_pyramid_alpha(), -(double)get_num_scale_levels()/2);
             dlib::array<array2d<pixel_type> > chips;
             std::vector<dlib::vector<double,2> > from_points, to_points;
             from_points.push_back(point(0,0));
             from_points.push_back(point(chip_size-1,0));
             from_points.push_back(point(chip_size-1,chip_size-1));
-            for (long i = 0; i < get_num_scale_levels(); ++i)
+            for (unsigned long i = 0; i < get_num_scale_levels(); ++i)
             {
                 array2d<pixel_type> chip(chip_size,chip_size);
 
@@ -251,7 +251,7 @@ namespace dlib
             {
                 for (long c = 0; c < hogs[0][0].nc(); ++c)
                 {
-                    for (long j = 0; j < hogs[0].size(); ++j)
+                    for (unsigned long j = 0; j < hogs[0].size(); ++j)
                     {
                         Fs[i].set_size(hogs.size());
                         for (unsigned long k = 0; k < hogs.size(); ++k)
