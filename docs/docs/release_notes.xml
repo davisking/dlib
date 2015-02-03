@@ -42,6 +42,8 @@ Bug fixes:
    - Disabled all bindings to FFTW because FFTW isn't threadsafe.
 
 Other:
+   - Added an example program for dlib's SQLite API and made a few minor
+     usability improvements to the API as well.
 
 </current>
 
