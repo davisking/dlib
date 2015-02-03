@@ -143,9 +143,9 @@ makedocs ()
     BASE_LOGGER_REVNUM=`echo $LOGGER_REVNUM - 1000 | bc`
     NEXT_LOGGER_REVNUM=`echo $LOGGER_REVNUM + 1 | bc`
     echo Getting the mercurial change logs for revisions $NEXT_LOGGER_REVNUM:$REVISION
-    hg log -v ../dlib --style=xml  -r$NEXT_LOGGER_REVNUM:$REVISION > docs/log.txt || report_failure
+    hg log -v ../dlib ../examples ../tools ../python_examples --style=xml  -r$NEXT_LOGGER_REVNUM:$REVISION > docs/log.txt || report_failure
     echo Getting the mercurial change logs for revisions $BASE_LOGGER_REVNUM:$LOGGER_REVNUM
-    hg log -v ../dlib --style=xml  -r$BASE_LOGGER_REVNUM:$LOGGER_REVNUM > docs/old_log.txt || report_failure 
+    hg log -v ../dlib ../examples ../tools ../python_examples --style=xml  -r$BASE_LOGGER_REVNUM:$LOGGER_REVNUM > docs/old_log.txt || report_failure 
 
 # grab a clean copy of the repository 
     rm -rf docs/cache
