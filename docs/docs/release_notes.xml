@@ -16,6 +16,11 @@ New Features:
    - Added the option to force the last weight to 1 to structural_assignment_trainer.
    - Added max_point_interpolated()
    - Added the drectangle object
+   - New Python Tools:
+      - Patrick Snape contributed a Python binding for the face landmarking tool and 
+        the general purpose shape prediction/training tools.
+      - Vinh Khuc contributed a Python binding for find_candidate_object_locations(),
+        dlib's implementation of the selective search object location proposal method.
 
 Non-Backwards Compatible Changes:
 
