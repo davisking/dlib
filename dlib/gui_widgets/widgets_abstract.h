@@ -2917,7 +2917,7 @@ namespace dlib
         template <typename pixel_type>
         void add_overlay(
             const rectangle& r, 
-            pixel_type p
+            pixel_type p = rgb_pixel(255,0,0)
         );
         /*!
             ensures
@@ -2938,7 +2938,7 @@ namespace dlib
         template <typename pixel_type>
         void add_overlay(
             const std::vector<rectangle>& r,
-            pixel_type p
+            pixel_type p = rgb_pixel(255,0,0)
         );
         /*!
             ensures

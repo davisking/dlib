@@ -3679,6 +3679,9 @@ namespace dlib
         void add_overlay(const rectangle& r, pixel_type p) 
         { add_overlay(image_display::overlay_rect(r,p)); }
 
+        void add_overlay(const rectangle& r) 
+        { add_overlay(image_display::overlay_rect(r,rgb_pixel(255,0,0))); }
+
         template <typename pixel_type>
         void add_overlay(const rectangle& r, pixel_type p, const std::string& l) 
         { add_overlay(image_display::overlay_rect(r,p,l)); }
@@ -3693,6 +3696,9 @@ namespace dlib
 
             add_overlay(temp);
         }
+
+        void add_overlay(const std::vector<rectangle>& r) 
+        { add_overlay(r, rgb_pixel(255,0,0)); }
 
         void add_overlay(
             const full_object_detection& object,
