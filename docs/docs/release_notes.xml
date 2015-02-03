@@ -12,6 +12,38 @@
 
 <current>
 New Features:
+   - Added the correlation_tracker object
+   - Added the option to force the last weight to 1 to structural_assignment_trainer.
+   - Added max_point_interpolated()
+   - Added the drectangle object
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed a bug in extract_image_chips() and get_mapping_to_chip() that caused
+     incorrect outputs when the requested chip stretched the image unevenly
+     vertically or horizontally.
+   - Made CMake check that libpng and libjpeg actually contain the link symbols
+     they are supposed to since, on some systems, these libraries aren't
+     installed correctly and will cause linker errors if used.
+   - Fixed assign_border_pixels(img, rect) so that it correctly zeros an image
+     when an empty rectangle is supplied. Previously, it did nothing to the
+     image in this case.
+   - Fixed compute_lda_transform() so it works properly when the class
+     covariance matrices are singular even after performing PCA.
+   - Fixed a bug in find_similarity_transform(). When given just two points as
+     inputs it would sometimes produce a reflection rather than a similarity
+     transform.
+   - Disabled all bindings to FFTW because FFTW isn't threadsafe.
+
+Other:
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="18.12" date="Dec 20, 2014">
+New Features:
    - Upgraded fft() and ifft() to support 2D matrices.
    - Added hough_transform
    - Added skeleton() for finding the skeletonization of a binary image.
@@ -31,7 +63,7 @@ Bug fixes:
 
 Other:
    - Made extract_image_chips() much faster when extracting unscaled image chips.
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
