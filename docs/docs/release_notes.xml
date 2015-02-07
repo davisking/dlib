@@ -12,6 +12,19 @@
 
 <current>
 New Features:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="18.13" date="Feb 03, 2015">
+New Features:
    - Added the correlation_tracker object
    - Added the option to force the last weight to 1 to structural_assignment_trainer.
    - Added max_point_interpolated()
@@ -45,7 +58,7 @@ Other:
    - Added an example program for dlib's SQLite API and made a few minor
      usability improvements to the API as well.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
