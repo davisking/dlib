@@ -16,6 +16,80 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
+    struct sub_image_proxy
+    {
+        sub_image_proxy (
+            T& img_,
+            const rectangle& rect_
+        ) : img(img_), rect(rect_.intersect(get_rect(img_)))
+        {}
+
+        T& img;
+        const rectangle rect;
+    };
+
+    template <typename T>
+    struct image_traits<sub_image_proxy<T> >
+    {
+        typedef typename image_traits<T>::pixel_type pixel_type;
+    };
+    template <typename T>
+    struct image_traits<const sub_image_proxy<T> >
+    {
+        typedef typename image_traits<T>::pixel_type pixel_type;
+    };
+
+    template <typename T>
+    inline long num_rows( const sub_image_proxy<T>& img) { return img.rect.height(); }
+    template <typename T>
+    inline long num_columns( const sub_image_proxy<T>& img) { return img.rect.width(); }
+
+    template <typename T>
+    inline void* image_data( sub_image_proxy<T>& img) 
+    { 
+        typedef typename image_traits<T>::pixel_type pixel_type;
+        return static_cast<pixel_type*>(image_data(img.img)) + img.rect.left() + img.rect.top()*num_columns(img.img); 
+    } 
+    template <typename T>
+    inline const void* image_data( const sub_image_proxy<T>& img) 
+    {
+        typedef typename image_traits<T>::pixel_type pixel_type;
+        return static_cast<const pixel_type*>(image_data(img.img)) + img.rect.left() + img.rect.top()*num_columns(img.img); 
+    }
+
+    template <typename T>
+    inline long width_step(
+        const sub_image_proxy<T>& img
+    ) 
+    { 
+        return width_step(img.img);
+    }
+
+    template <
+        typename image_type
+        >
+    sub_image_proxy<image_type> sub_image (
+        image_type& img,
+        const rectangle& rect
+    )
+    {
+        return sub_image_proxy<image_type>(img,rect);
+    }
+
+    template <
+        typename image_type
+        >
+    const sub_image_proxy<const image_type> sub_image (
+        const image_type& img,
+        const rectangle& rect
+    )
+    {
+        return sub_image_proxy<const image_type>(img,rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class interpolate_nearest_neighbor
     {
     public:
