@@ -1,7 +1,7 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
     This is an example illustrating the use of the kkmeans object 
-    from the dlib C++ Library.
+    and spectral_cluster() routine from the dlib C++ Library.
 
     The kkmeans object is an implementation of a kernelized k-means clustering 
     algorithm.  It is implemented by using the kcentroid object to represent 
@@ -11,7 +11,8 @@
     a svm classifier finds non-linear decision surfaces.  
     
     This example will make points from 3 classes and perform kernelized k-means 
-    clustering on those points.
+    clustering on those points.  It will also do the same thing using spectral 
+    clustering.
 
     The classes are as follows:
         - points very close to the origin
@@ -140,6 +141,13 @@ int main()
     cout << "num dictionary vectors for center 0: " << test.get_kcentroid(0).dictionary_size() << endl;
     cout << "num dictionary vectors for center 1: " << test.get_kcentroid(1).dictionary_size() << endl;
     cout << "num dictionary vectors for center 2: " << test.get_kcentroid(2).dictionary_size() << endl;
+
+
+    // Finally, we can also solve the same kind of non-linear clustering problem with
+    // spectral_cluster().  The output is a vector that indicates which cluster each sample
+    // belongs to.  Just like with kkmeans, it assigns each point to the correct cluster.
+    std::vector<unsigned long> assignments = spectral_cluster(kernel_type(0.1), samples, 3);
+    cout << mat(assignments) << endl;
 
 }
 
