@@ -49,13 +49,13 @@ namespace dlib
     inline void* image_data( sub_image_proxy<T>& img) 
     { 
         typedef typename image_traits<T>::pixel_type pixel_type;
-        return static_cast<pixel_type*>(image_data(img.img)) + img.rect.left() + img.rect.top()*num_columns(img.img); 
+        return (char*)image_data(img.img) + sizeof(pixel_type)*img.rect.left() + img.rect.top()*width_step(img); 
     } 
     template <typename T>
     inline const void* image_data( const sub_image_proxy<T>& img) 
     {
         typedef typename image_traits<T>::pixel_type pixel_type;
-        return static_cast<const pixel_type*>(image_data(img.img)) + img.rect.left() + img.rect.top()*num_columns(img.img); 
+        return (const char*)image_data(img.img) + sizeof(pixel_type)*img.rect.left() + img.rect.top()*width_step(img); 
     }
 
     template <typename T>
