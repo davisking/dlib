@@ -214,6 +214,7 @@
          <item>flip_image_dataset_left_right</item> 
          <item>rotate_image_dataset</item> 
          <item>extract_image_chips</item> 
+         <item>sub_image</item> 
       </section>
 
       <section>
@@ -1626,6 +1627,19 @@
               rectangular sub-windows (i.e. chips) within an image and extracts those
               sub-windows, storing each into its own image.  It also allows the user to
               specify the scale and rotation for the chip.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>sub_image</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
+         <description>        
+            This function returns a lightweight sub-image of another image.  In particular,
+            the returned sub-image simply holds a pointer to the original image, meaning there
+            is no overhead for using or creating the sub-image.
          </description>
       </component>
 

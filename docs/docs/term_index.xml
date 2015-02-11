@@ -1265,6 +1265,8 @@
          <term file="imaging.html" name="rotate_image"            include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="resize_image"            include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="extract_image_chips"     include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="sub_image"               include="dlib/image_transforms.h"/>
+         <term file="dlib/image_transforms/interpolation_abstract.h.html" name="sub_image_proxy"     include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/interpolation_abstract.h.html" name="extract_image_chip"     include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/interpolation_abstract.h.html" name="chip_details"           include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/interpolation_abstract.h.html" name="get_face_chip_details"  include="dlib/image_transforms.h"/>
