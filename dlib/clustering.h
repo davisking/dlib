@@ -5,6 +5,7 @@
 
 #include "clustering/modularity_clustering.h"
 #include "clustering/chinese_whispers.h"
+#include "clustering/spectral_cluster.h"
 #include "svm/kkmeans.h"
 
 #endif // DLIB_CLuSTERING_
