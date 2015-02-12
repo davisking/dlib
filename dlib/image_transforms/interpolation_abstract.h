@@ -935,6 +935,18 @@ namespace dlib
         !*/
 
         chip_details(
+            const rectangle& rect_
+        );
+        /*!
+            ensures
+                - #rect == rect_
+                - #size() == rect_.area()
+                - #angle == 0
+                - #rows == rect_.height()
+                - #cols == rect_.width()
+        !*/
+
+        chip_details(
             const drectangle& rect_, 
             unsigned long size_
         );

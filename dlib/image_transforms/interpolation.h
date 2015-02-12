@@ -1500,6 +1500,7 @@ namespace dlib
     struct chip_details
     {
         chip_details() : angle(0), rows(0), cols(0) {}
+        chip_details(const rectangle& rect_) : rect(rect_),angle(0), rows(rect_.height()), cols(rect_.width()) {}
         chip_details(const drectangle& rect_) : rect(rect_),angle(0), rows(rect_.height()), cols(rect_.width()) {}
         chip_details(const drectangle& rect_, unsigned long size) : rect(rect_),angle(0) 
         { compute_dims_from_size(size); }
