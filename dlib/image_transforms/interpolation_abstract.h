@@ -935,6 +935,18 @@ namespace dlib
         !*/
 
         chip_details(
+            const rectangle& rect_
+        );
+        /*!
+            ensures
+                - #rect == rect_
+                - #size() == rect_.area()
+                - #angle == 0
+                - #rows == rect_.height()
+                - #cols == rect_.width()
+        !*/
+
+        chip_details(
             const drectangle& rect_, 
             unsigned long size_
         );
@@ -1123,6 +1135,71 @@ namespace dlib
         ensures
             - This function simply calls extract_image_chips() with a single chip location
               and stores the single output chip into #chip.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    struct sub_image_proxy
+    {
+        /*!
+            REQUIREMENTS ON image_type
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+
+            WHAT THIS OBJECT REPRESENTS
+                This is a lightweight image object for referencing a subwindow of an image.
+                It implements the generic image interface and can therefore be used with
+                any function that expects a generic image, excepting that you cannot change
+                the size of a sub_image_proxy.  
+                
+                Note that it only stores a pointer to the image given to its constructor
+                and therefore does not perform a copy.  Moreover, this means that an
+                instance of this object becomes invalid after the image it references is
+                destroyed.
+        !*/
+        sub_image_proxy (
+            T& img,
+            const rectangle& rect
+        );
+        /*!
+            ensures
+                - This object is an image that represents the part of img contained within
+                  rect.  If rect is larger than img then rect is cropped so that it does
+                  not go outside img.
+        !*/
+    };
+
+    template <
+        typename image_type
+        >
+    sub_image_proxy<image_type> sub_image (
+        image_type& img,
+        const rectangle& rect
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+        ensures
+            - returns sub_image_proxy<image_type>(img,rect)
+    !*/
+
+    template <
+        typename image_type
+        >
+    const sub_image_proxy<const image_type> sub_image (
+        const image_type& img,
+        const rectangle& rect
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+        ensures
+            - returns sub_image_proxy<const image_type>(img,rect)
     !*/
 
 // ----------------------------------------------------------------------------------------
