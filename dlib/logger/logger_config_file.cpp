@@ -145,7 +145,8 @@ namespace dlib
         if (!fin)
             throw logger_config_file_error("logger_config: unable to open config file " + file_name);
 
-        configure_loggers_from_file(config_reader(fin));
+        config_reader temp(fin);
+        configure_loggers_from_file(temp);
     }
 
 // ----------------------------------------------------------------------------------------
