@@ -34,6 +34,19 @@ namespace dlib
                 this exception is thrown if there is a problem reading the config file
     !*/
 
+    void configure_loggers_from_file (
+        const config_reader& cr 
+    );
+    /*!
+        ensures
+            - configures the loggers with the contents of cr.  This function is just like
+              the above version that reads from a file except that it reads from an in-memory
+              config_reader instead.
+        throws
+            - dlib::logger_config_file_error
+                this exception is thrown if there is a problem reading the config file
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     /*!  

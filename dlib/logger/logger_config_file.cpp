@@ -19,7 +19,6 @@ namespace dlib
 
     namespace logger_config_file_helpers 
     {
-        typedef config_reader::kernel_1a cr_type;
 
 // ----------------------------------------------------------------------------------------
 
@@ -84,7 +83,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
         
         void configure_sub_blocks (
-            const cr_type& cr,
+            const config_reader& cr,
             const std::string& name 
         )
         {
@@ -138,24 +137,29 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void configure_loggers_from_file (
-        const std::string& file_name
+        const std::string& file_name 
     )
     {
-        using namespace logger_config_file_helpers;
-        using namespace std;
-        ifstream fin(file_name.c_str());
+        std::ifstream fin(file_name.c_str());
 
         if (!fin)
             throw logger_config_file_error("logger_config: unable to open config file " + file_name);
 
+        configure_loggers_from_file(config_reader(fin));
+    }
 
-        cr_type main_cr;
-        main_cr.load_from(fin);
+// ----------------------------------------------------------------------------------------
 
+    void configure_loggers_from_file (
+        const config_reader& main_cr 
+    )
+    {
+        using namespace logger_config_file_helpers;
+        using namespace std;
 
         if (main_cr.is_block_defined("logger_config"))
         {
-            const cr_type& cr = main_cr.block("logger_config");
+            const config_reader& cr = main_cr.block("logger_config");
 
             if (cr.is_key_defined("logging_level"))
             {
