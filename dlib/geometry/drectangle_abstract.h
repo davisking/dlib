@@ -91,18 +91,27 @@ namespace dlib
         );
         /*!
             ensures
-                - left()   == rect.left()
-                - top()    == rect.top()
-                - right()  == rect.right()
-                - bottom() == rect.bottom()
+                - left()   == rect.left()-0.5
+                - top()    == rect.top()-0.5
+                - right()  == rect.right()+0.5
+                - bottom() == rect.bottom()+0.5
+                - center(*this) == center(rect)
+                - width() == rect.width()
+                - height() == rect.height()
         !*/
 
         operator rectangle (
         ) const;
         /*!
             ensures
-                - rounds the left, top, right, and bottom coordinates of *this to the
-                  nearest integers and returns the resulting rectangle.
+                - returns a rectangle R such that:
+                    - R.left()   == ceil(left())
+                    - R.top()    == ceil(top())
+                    - R.right()  == floor(right())
+                    - R.bottom() == floor(bottom())
+                - This function is designed this way so that converting a rectangle to a
+                  drectangle and then back to a rectangle again results in the original
+                  rectangle.
         !*/
 
         double left (
@@ -435,9 +444,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
     drectangle translate_rect (
         const drectangle& rect,
-        const vector<double,2>& p
+        const vector<T,2>& p
     );
     /*!
         ensures

@@ -56,18 +56,18 @@ namespace dlib
 
         drectangle (
             const rectangle& rect
-        ) : l(rect.left()), 
-            t(rect.top()),
-            r(rect.right()),
-            b(rect.bottom()) {}
+        ) : l(rect.left()-0.5), 
+            t(rect.top()-0.5),
+            r(rect.right()+0.5),
+            b(rect.bottom()+0.5) {}
 
         operator rectangle (
         ) const
         {
-            return rectangle((long)std::floor(l+0.5), 
-                             (long)std::floor(t+0.5),
-                             (long)std::floor(r+0.5),
-                             (long)std::floor(b+0.5));
+            return rectangle((long)std::ceil(l), 
+                             (long)std::ceil(t),
+                             (long)std::floor(r),
+                             (long)std::floor(b));
         }
 
         double left()   const { return l; }
@@ -334,9 +334,10 @@ namespace dlib
         return r + drectangle(p);
     }
 
+    template <typename T>
     inline drectangle translate_rect (
         const drectangle& rect,
-        const dlib::vector<double,2>& p
+        const dlib::vector<T,2>& p
     )
     {
         drectangle result;
