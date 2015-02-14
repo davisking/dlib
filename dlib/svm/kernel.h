@@ -29,6 +29,9 @@ namespace dlib
         typedef T sample_type;
         typedef typename T::mem_manager_type mem_manager_type;
 
+        // T must be capable of representing a column vector.
+        COMPILE_TIME_ASSERT(T::NC == 1 || T::NC == 0);
+
         radial_basis_kernel(const scalar_type g) : gamma(g) {}
         radial_basis_kernel() : gamma(0.1) {}
         radial_basis_kernel(
@@ -132,6 +135,9 @@ namespace dlib
         typedef typename T::type scalar_type;
         typedef T sample_type;
         typedef typename T::mem_manager_type mem_manager_type;
+
+        // T must be capable of representing a column vector.
+        COMPILE_TIME_ASSERT(T::NC == 1 || T::NC == 0);
 
         polynomial_kernel(const scalar_type g, const scalar_type c, const scalar_type d) : gamma(g), coef(c), degree(d) {}
         polynomial_kernel() : gamma(1), coef(0), degree(1) {}
@@ -244,6 +250,9 @@ namespace dlib
         typedef T sample_type;
         typedef typename T::mem_manager_type mem_manager_type;
 
+        // T must be capable of representing a column vector.
+        COMPILE_TIME_ASSERT(T::NC == 1 || T::NC == 0);
+
         sigmoid_kernel(const scalar_type g, const scalar_type c) : gamma(g), coef(c) {}
         sigmoid_kernel() : gamma(0.1), coef(-1.0) {}
         sigmoid_kernel(
@@ -348,6 +357,9 @@ namespace dlib
         typedef typename T::type scalar_type;
         typedef T sample_type;
         typedef typename T::mem_manager_type mem_manager_type;
+
+        // T must be capable of representing a column vector.
+        COMPILE_TIME_ASSERT(T::NC == 1 || T::NC == 0);
 
         scalar_type operator() (
             const sample_type& a,
