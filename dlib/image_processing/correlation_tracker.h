@@ -67,7 +67,7 @@ namespace dlib
             for (unsigned long i = 0; i < Fs.size(); ++i)
                 fft_inplace(Fs[i]);
             make_scale_target_location_image(get_num_scale_levels()/2, Gs);
-            Bs.set_size(0,0);
+            Bs.set_size(0);
             As.resize(Fs.size());
             for (unsigned long i = 0; i < Fs.size(); ++i)
             {
