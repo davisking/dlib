@@ -95,7 +95,7 @@ namespace dlib
                 - top()    == rect.top()-0.5
                 - right()  == rect.right()+0.5
                 - bottom() == rect.bottom()+0.5
-                - center(*this) == center(rect)
+                - dcenter(*this) == dcenter(rect)
                 - width() == rect.width()
                 - height() == rect.height()
         !*/

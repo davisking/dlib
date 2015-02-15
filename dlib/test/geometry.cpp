@@ -772,6 +772,29 @@ namespace
         }
     }
 
+
+// ----------------------------------------------------------------------------------------
+
+    void test_rect_to_drect()
+    {
+        print_spinner();
+        dlib::rand rnd;
+        for (int i = 0; i < 5000; ++i)
+        {
+            rectangle rect = centered_rect(rnd.get_random_32bit_number()%100,
+                rnd.get_random_32bit_number()%100,
+                rnd.get_random_32bit_number()%100,
+                rnd.get_random_32bit_number()%100);
+
+            drectangle drect = rect;
+            rectangle rect2 = drect;
+            DLIB_TEST(rect2 == rect);
+            DLIB_TEST(rect.width() == drect.width());
+            DLIB_TEST(rect.height() == drect.height());
+            DLIB_TEST(dcenter(rect) == dcenter(drect));
+        }
+    }
+
 // ----------------------------------------------------------------------------------------
 
     class geometry_tester : public tester
@@ -786,6 +809,7 @@ namespace
         void perform_test (
         )
         {
+            test_rect_to_drect();
             geometry_test();
             test_border_enumerator();
             test_find_affine_transform();

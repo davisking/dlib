@@ -95,7 +95,8 @@ namespace dlib
         double width (
         ) const 
         { 
-            if (is_empty())
+            // if either the width or height would be 0.
+            if (t >= b || l >= r)
                 return 0;
             else
                 return r - l; 
@@ -104,7 +105,8 @@ namespace dlib
         double height (
         ) const 
         { 
-            if (is_empty())
+            // if either the width or height would be 0.
+            if (t >= b || l >= r)
                 return 0;
             else
                 return b - t; 
