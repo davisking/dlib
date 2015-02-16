@@ -1101,7 +1101,7 @@ namespace dlib
             - pixel_traits<typename image_traits<image_type1>::pixel_type>::has_alpha == false
             - for all valid i: 
                 - chip_locations[i].rect.is_empty() == false
-                - chip_locations[i].size != 0
+                - chip_locations[i].size() != 0
         ensures
             - This function extracts "chips" from an image.  That is, it takes a list of
               rectangular sub-windows (i.e. chips) within an image and extracts those
