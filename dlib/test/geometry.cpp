@@ -792,6 +792,7 @@ namespace
             DLIB_TEST(rect.width() == drect.width());
             DLIB_TEST(rect.height() == drect.height());
             DLIB_TEST(dcenter(rect) == dcenter(drect));
+            DLIB_TEST(rect.is_empty() == drect.is_empty());
         }
     }
 
