@@ -56,18 +56,18 @@ namespace dlib
 
         drectangle (
             const rectangle& rect
-        ) : l(rect.left()-0.5), 
-            t(rect.top()-0.5),
-            r(rect.right()+0.5),
-            b(rect.bottom()+0.5) {}
+        ) : l(rect.left()), 
+            t(rect.top()),
+            r(rect.right()),
+            b(rect.bottom()) {}
 
         operator rectangle (
         ) const
         {
-            return rectangle((long)std::ceil(l), 
-                             (long)std::ceil(t),
-                             (long)std::floor(r),
-                             (long)std::floor(b));
+            return rectangle((long)std::floor(l+0.5), 
+                             (long)std::floor(t+0.5),
+                             (long)std::floor(r+0.5),
+                             (long)std::floor(b+0.5));
         }
 
         double left()   const { return l; }
@@ -95,21 +95,19 @@ namespace dlib
         double width (
         ) const 
         { 
-            // if either the width or height would be 0.
-            if (t >= b || l >= r)
+            if (is_empty())
                 return 0;
             else
-                return r - l; 
+                return r - l + 1; 
         }
 
         double height (
         ) const 
         { 
-            // if either the width or height would be 0.
-            if (t >= b || l >= r)
+            if (is_empty())
                 return 0;
             else
-                return b - t; 
+                return b - t + 1; 
         }
 
         double area (
@@ -188,6 +186,15 @@ namespace dlib
             *this = *this*(1.0/scale);
             return *this;
         }
+
+        drectangle& operator += (
+            const dlib::vector<double,2>& p
+        )
+        {
+            *this = *this + drectangle(p);
+            return *this;
+        }
+
 
     private:
         double l;
@@ -298,10 +305,17 @@ namespace dlib
         const double& scale 
     )
     {
-        const double width = rect.width()*scale;
-        const double height = rect.height()*scale;
-        const dlib::vector<double,2> p = center(rect);
-        return drectangle(p.x()-width/2, p.y()-height/2, p.x()+width/2, p.y()+height/2);
+        if (!rect.is_empty())
+        {
+            const double width = (rect.right()-rect.left())*scale;
+            const double height = (rect.bottom()-rect.top())*scale;
+            const dlib::vector<double,2> p = center(rect);
+            return drectangle(p.x()-width/2, p.y()-height/2, p.x()+width/2, p.y()+height/2);
+        }
+        else
+        {
+            return rect;
+        }
     }
 
     inline drectangle operator* (
@@ -361,10 +375,13 @@ namespace dlib
 
     inline drectangle centered_drect (
         const dlib::vector<double,2>& p,
-        const double& width,
-        const double& height
+        double width,
+        double height
     )
     {
+        width--;
+        height--;
+
         return drectangle(p.x()-width/2, p.y()-height/2, p.x()+width/2, p.y()+height/2);
     }
 
