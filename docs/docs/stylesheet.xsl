@@ -44,6 +44,7 @@
 
    <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz </xsl:variable>
    <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ </xsl:variable>
+   <xsl:variable name="badletters">?()&lt;&gt; /\&amp;~!@#$%^*_+=-[]{}</xsl:variable>
    
    <!-- ************************************************************************* -->
 
@@ -352,7 +353,7 @@ function BigToggle(node)
                         <ul>
                         <xsl:for-each select="question">      
                            <xsl:sort select="translate(@text,$lcletters, $ucletters)"/> 
-                           <li><a href="#{@text}"><xsl:value-of select="@text"/></a></li>
+                           <li><a href="#{translate(@text,$badletters,'')}"><xsl:value-of select="@text"/></a></li>
                         </xsl:for-each>
                         </ul>
                      </xsl:for-each>
@@ -527,7 +528,8 @@ function BigToggle(node)
       <xsl:for-each select="question">      
          <xsl:sort select="translate(@text,$lcletters, $ucletters)"/> 
 
-         <a name = "{@text}">
+         <a name = "{@text}"/>
+         <a name = "{translate(@text,$badletters,'')}">
             <div class="question">
                <a href="#top"><font size='2'><center>[top]</center></font></a>
                <h2><xsl:value-of select="@text"/></h2>
