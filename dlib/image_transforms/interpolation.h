@@ -20,13 +20,46 @@ namespace dlib
     struct sub_image_proxy
     {
         sub_image_proxy (
-            T& img_,
-            const rectangle& rect_
-        ) : img(img_), rect(rect_.intersect(get_rect(img_)))
-        {}
+            T& img,
+            rectangle rect
+        ) 
+        {
+            rect = rect.intersect(get_rect(img));
+            typedef typename image_traits<T>::pixel_type pixel_type;
 
-        T& img;
-        const rectangle rect;
+            _nr = rect.height();
+            _nc = rect.width();
+            _width_step = width_step(img);
+            _data = (char*)image_data(img) + sizeof(pixel_type)*rect.left() + rect.top()*_width_step;
+        }
+
+        void* _data;
+        long _width_step;
+        long _nr;
+        long _nc;
+    };
+
+    template <typename T>
+    struct const_sub_image_proxy
+    {
+        const_sub_image_proxy (
+            const T& img,
+            rectangle rect
+        ) 
+        {
+            rect = rect.intersect(get_rect(img));
+            typedef typename image_traits<T>::pixel_type pixel_type;
+
+            _nr = rect.height();
+            _nc = rect.width();
+            _width_step = width_step(img);
+            _data = (const char*)image_data(img) + sizeof(pixel_type)*rect.left() + rect.top()*_width_step;
+        }
+
+        const void* _data;
+        long _width_step;
+        long _nr;
+        long _nc;
     };
 
     template <typename T>
@@ -39,32 +72,53 @@ namespace dlib
     {
         typedef typename image_traits<T>::pixel_type pixel_type;
     };
+    template <typename T>
+    struct image_traits<const_sub_image_proxy<T> >
+    {
+        typedef typename image_traits<T>::pixel_type pixel_type;
+    };
+    template <typename T>
+    struct image_traits<const const_sub_image_proxy<T> >
+    {
+        typedef typename image_traits<T>::pixel_type pixel_type;
+    };
 
     template <typename T>
-    inline long num_rows( const sub_image_proxy<T>& img) { return img.rect.height(); }
+    inline long num_rows( const sub_image_proxy<T>& img) { return img._nr; }
     template <typename T>
-    inline long num_columns( const sub_image_proxy<T>& img) { return img.rect.width(); }
+    inline long num_columns( const sub_image_proxy<T>& img) { return img._nc; }
+
+    template <typename T>
+    inline long num_rows( const const_sub_image_proxy<T>& img) { return img._nr; }
+    template <typename T>
+    inline long num_columns( const const_sub_image_proxy<T>& img) { return img._nc; }
 
     template <typename T>
     inline void* image_data( sub_image_proxy<T>& img) 
     { 
-        typedef typename image_traits<T>::pixel_type pixel_type;
-        return (char*)image_data(img.img) + sizeof(pixel_type)*img.rect.left() + img.rect.top()*width_step(img); 
+        return img._data; 
     } 
     template <typename T>
     inline const void* image_data( const sub_image_proxy<T>& img) 
     {
-        typedef typename image_traits<T>::pixel_type pixel_type;
-        return (const char*)image_data(img.img) + sizeof(pixel_type)*img.rect.left() + img.rect.top()*width_step(img); 
+        return img._data; 
+    }
+
+    template <typename T>
+    inline const void* image_data( const const_sub_image_proxy<T>& img) 
+    {
+        return img._data; 
     }
 
     template <typename T>
     inline long width_step(
         const sub_image_proxy<T>& img
-    ) 
-    { 
-        return width_step(img.img);
-    }
+    ) { return img._width_step; }
+
+    template <typename T>
+    inline long width_step(
+        const const_sub_image_proxy<T>& img
+    ) { return img._width_step; }
 
     template <
         typename image_type
@@ -80,14 +134,15 @@ namespace dlib
     template <
         typename image_type
         >
-    const sub_image_proxy<const image_type> sub_image (
+    const const_sub_image_proxy<image_type> sub_image (
         const image_type& img,
         const rectangle& rect
     )
     {
-        return sub_image_proxy<const image_type>(img,rect);
+        return const_sub_image_proxy<image_type>(img,rect);
     }
 
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     class interpolate_nearest_neighbor
