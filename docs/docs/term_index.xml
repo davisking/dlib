@@ -1500,6 +1500,7 @@
          <term file="dlib/logger/logger_kernel_abstract.h.html" name="set_all_logging_output_streams"    include="dlib/logger.h"/>
          <term file="dlib/logger/logger_kernel_abstract.h.html" name="set_all_logging_output_hooks"      include="dlib/logger.h"/>
          <term file="dlib/logger/logger_kernel_abstract.h.html" name="set_all_logging_levels"            include="dlib/logger.h"/>
+         <term file="dlib/logger/logger_kernel_abstract.h.html" name="set_all_logging_headers"           include="dlib/logger.h"/>
          <term file="dlib/logger/logger_kernel_abstract.h.html" name="print_default_logger_header"       include="dlib/logger.h"/>
          <term file="dlib/logger/extra_logger_headers.h.html" name="print_datetime_logger_header"        include="dlib/logger.h"/>
 
