@@ -81,6 +81,26 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    typedef void (*print_header_type)(
+        std::ostream& out, 
+        const std::string& logger_name, 
+        const log_level& l,
+        const uint64 thread_id
+    );
+
+    void set_all_logging_headers (
+        const print_header_type& new_header
+    );
+    /*!
+        ensures
+            - for all loggers L (even loggers not yet constructed):
+                - #L.logger_header() == new_header 
+        throws
+            - std::bad_alloc
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename T
         >
@@ -360,13 +380,6 @@ namespace dlib
             throws
                 - std::bad_alloc
         !*/
-
-        typedef void (*print_header_type)(
-                std::ostream& out, 
-                const std::string& logger_name, 
-                const log_level& l,
-                const uint64 thread_id
-                );
 
         print_header_type logger_header (
         ) const;
