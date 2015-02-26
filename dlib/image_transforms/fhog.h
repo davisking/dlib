@@ -229,6 +229,24 @@ namespace dlib
             }
         }
 
+        template <typename T, typename mm1, typename mm2>
+        void init_hog_zero_everything (
+            dlib::array<array2d<T,mm1>,mm2>& hog,
+            int hog_nr,
+            int hog_nc,
+            int filter_rows_padding,
+            int filter_cols_padding
+        )
+        {
+            const int num_hog_bands = 27+4;
+            hog.resize(num_hog_bands);
+            for (int i = 0; i < num_hog_bands; ++i)
+            {
+                hog[i].set_size(hog_nr+filter_rows_padding-1, hog_nc+filter_cols_padding-1);
+                assign_all_pixels(hog[i], 0);
+            }
+        }
+
     // ------------------------------------------------------------------------------------
 
         template <typename T, typename mm>
@@ -265,6 +283,221 @@ namespace dlib
             {
                 const point p = be.element();
                 set_all_elements(hog[p.y()][p.x()], 0); 
+            }
+        }
+
+        template <typename T, typename mm>
+        void init_hog_zero_everything (
+            array2d<matrix<T,31,1>,mm>& hog,
+            int hog_nr,
+            int hog_nc,
+            int filter_rows_padding,
+            int filter_cols_padding
+        )
+        {
+            hog.set_size(hog_nr+filter_rows_padding-1, hog_nc+filter_cols_padding-1);
+
+            for (long r = 0; r < hog.nr(); ++r)
+            {
+                for (long c = 0; c < hog.nc(); ++c)
+                {
+                    set_all_elements(hog[r][c], 0); 
+                }
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename image_type, 
+            typename out_type
+            >
+        void impl_extract_fhog_features_cell_size_1(
+            const image_type& img_, 
+            out_type& hog, 
+            int filter_rows_padding,
+            int filter_cols_padding
+        ) 
+        {
+            const_image_view<image_type> img(img_);
+            // make sure requires clause is not broken
+            DLIB_ASSERT( filter_rows_padding > 0 &&
+                         filter_cols_padding > 0 ,
+                "\t void extract_fhog_features()"
+                << "\n\t Invalid inputs were given to this function. "
+                << "\n\t filter_rows_padding: " << filter_rows_padding 
+                << "\n\t filter_cols_padding: " << filter_cols_padding 
+                );
+
+            /*
+                This function is an optimized version of impl_extract_fhog_features() for
+                the case where cell_size == 1.
+            */
+
+
+            // unit vectors used to compute gradient orientation
+            matrix<double,2,1> directions[9];
+            directions[0] =  1.0000, 0.0000; 
+            directions[1] =  0.9397, 0.3420;
+            directions[2] =  0.7660, 0.6428;
+            directions[3] =  0.500,  0.8660;
+            directions[4] =  0.1736, 0.9848;
+            directions[5] = -0.1736, 0.9848;
+            directions[6] = -0.5000, 0.8660;
+            directions[7] = -0.7660, 0.6428;
+            directions[8] = -0.9397, 0.3420;
+
+
+
+            if (img.nr() <= 2 || img.nc() <= 2)
+            {
+                hog.clear();
+                return;
+            }
+
+            array2d<unsigned char> angle(img.nr(), img.nc());
+
+            array2d<float> norm(img.nr(), img.nc());
+
+            // memory for HOG features
+            const long hog_nr = img.nr()-2;
+            const long hog_nc = img.nc()-2;
+
+            const int padding_rows_offset = (filter_rows_padding-1)/2;
+            const int padding_cols_offset = (filter_cols_padding-1)/2;
+            init_hog_zero_everything(hog, hog_nr, hog_nc, filter_rows_padding, filter_cols_padding);
+
+
+            const int visible_nr = img.nr()-1;
+            const int visible_nc = img.nc()-1;
+
+            // First populate the gradient histograms
+            for (int y = 1; y < visible_nr; y++) 
+            {
+                int x;
+                for (x = 1; x < visible_nc-3; x+=4) 
+                {
+                    // v will be the length of the gradient vectors.
+                    simd4f grad_x, grad_y, v;
+                    get_gradient(y,x,img,grad_x,grad_y,v);
+
+                    float _vv[4];
+                    v.store(_vv);
+
+                    // Now snap the gradient to one of 18 orientations
+                    simd4f best_dot = 0;
+                    simd4f best_o = 0;
+                    for (int o = 0; o < 9; o++) 
+                    {
+                        simd4f dot = grad_x*directions[o](0) + grad_y*directions[o](1);
+                        simd4f_bool cmp = dot>best_dot;
+                        best_dot = select(cmp,dot,best_dot); 
+                        dot *= -1;
+                        best_o = select(cmp,o,best_o);
+
+                        cmp = dot>best_dot;
+                        best_dot = select(cmp,dot,best_dot);
+                        best_o = select(cmp,o+9,best_o);
+                    }
+
+                    int32 _best_o[4]; simd4i(best_o).store(_best_o);
+
+                    norm[y][x+0] = _vv[0];
+                    norm[y][x+1] = _vv[1];
+                    norm[y][x+2] = _vv[2];
+                    norm[y][x+3] = _vv[3];
+
+                    angle[y][x+0] = _best_o[0];
+                    angle[y][x+1] = _best_o[1];
+                    angle[y][x+2] = _best_o[2];
+                    angle[y][x+3] = _best_o[3];
+
+                }
+                // Now process the right columns that don't fit into simd registers.
+                for (; x < visible_nc; x++) 
+                {
+                    matrix<double,2,1> grad;
+                    double v;
+                    get_gradient(y,x,img,grad,v);
+
+                    // snap to one of 18 orientations
+                    double best_dot = 0;
+                    int best_o = 0;
+                    for (int o = 0; o < 9; o++) 
+                    {
+                        const double dot = dlib::dot(directions[o], grad); 
+                        if (dot > best_dot) 
+                        {
+                            best_dot = dot;
+                            best_o = o;
+                        } 
+                        else if (-dot > best_dot) 
+                        {
+                            best_dot = -dot;
+                            best_o = o+9;
+                        }
+                    }
+
+                    norm[y][x] = v;
+                    angle[y][x] = best_o;
+                }
+            }
+
+            const double eps = 0.0001;
+            // compute features
+            for (int y = 0; y < hog_nr; y++) 
+            {
+                const int yy = y+padding_rows_offset; 
+                for (int x = 0; x < hog_nc; x++) 
+                {
+                    const simd4f z1(norm[y+1][x+1],
+                                    norm[y][x+1], 
+                                    norm[y+1][x],  
+                                    norm[y][x]);
+
+                    const simd4f z2(norm[y+1][x+2],
+                                    norm[y][x+2],
+                                    norm[y+1][x+1],
+                                    norm[y][x+1]);
+
+                    const simd4f z3(norm[y+2][x+1],
+                                    norm[y+1][x+1],
+                                    norm[y+2][x],
+                                    norm[y+1][x]);
+
+                    const simd4f z4(norm[y+2][x+2],
+                                    norm[y+1][x+2],
+                                    norm[y+2][x+1],
+                                    norm[y+1][x+1]);
+
+                    const simd4f temp0 = std::sqrt(norm[y+1][x+1]);
+                    const simd4f nn = 0.2*sqrt(z1+z2+z3+z4+eps);
+                    const simd4f n = 0.1/nn;
+
+                    simd4f t = 0;
+
+                    const int xx = x+padding_cols_offset; 
+
+                    simd4f h0 = min(temp0,nn)*n;
+                    const float vv = sum(h0);
+                    set_hog(hog,angle[y+1][x+1],xx,yy,   vv);
+                    t += h0;
+
+                    t *= 2*0.2357;
+
+                    // contrast-insensitive features
+                    set_hog(hog,angle[y+1][x+1]%9+18,xx,yy, vv);
+
+
+                    float temp[4];
+                    t.store(temp);
+
+                    // texture features
+                    set_hog(hog,27,xx,yy, temp[0]);
+                    set_hog(hog,28,xx,yy, temp[1]);
+                    set_hog(hog,29,xx,yy, temp[2]);
+                    set_hog(hog,30,xx,yy, temp[3]);
+                }
             }
         }
 
@@ -330,6 +563,12 @@ namespace dlib
                 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
                 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             */
+
+            if (cell_size == 1)
+            {
+                impl_extract_fhog_features_cell_size_1(img_,hog,filter_rows_padding,filter_cols_padding);
+                return;
+            }
 
             // unit vectors used to compute gradient orientation
             matrix<double,2,1> directions[9];
