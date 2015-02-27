@@ -358,6 +358,7 @@ namespace dlib
             array2d<unsigned char> angle(img.nr(), img.nc());
 
             array2d<float> norm(img.nr(), img.nc());
+            zero_border_pixels(norm,1,1);
 
             // memory for HOG features
             const long hog_nr = img.nr()-2;
