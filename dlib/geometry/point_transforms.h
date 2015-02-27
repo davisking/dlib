@@ -192,6 +192,16 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline point_transform_affine operator* (
+        const point_transform_affine& lhs,
+        const point_transform_affine& rhs
+    )
+    {
+        return point_transform_affine(lhs.get_m()*rhs.get_m(), lhs.get_m()*rhs.get_b()+lhs.get_b());
+    }
+
+// ----------------------------------------------------------------------------------------
+
     inline point_transform_affine inv (
         const point_transform_affine& trans
     )
@@ -357,6 +367,16 @@ namespace dlib
     private:
         matrix<double,3,3> m;
     };
+
+// ----------------------------------------------------------------------------------------
+
+    inline point_transform_projective operator* (
+        const point_transform_projective& lhs,
+        const point_transform_projective& rhs
+    )
+    {
+        return point_transform_projective(lhs.get_m()*rhs.get_m());
+    }
 
 // ----------------------------------------------------------------------------------------
 

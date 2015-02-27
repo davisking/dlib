@@ -646,6 +646,10 @@ namespace
             DLIB_TEST(length(t(from[i])-to[i]) < 1e-14);
             DLIB_TEST(length(tinv(t(from[i]))-from[i]) < 1e-14);
             DLIB_TEST(length(t(tinv(from[i]))-from[i]) < 1e-14);
+
+            point_transform_affine temp = t*inv(t);
+            DLIB_TEST(length(temp.get_b()) < 1e-14);
+            DLIB_TEST(max(abs(temp.get_m() - identity_matrix<double>(2))) < 1e-14);
         }
 
         ostringstream sout;
@@ -692,6 +696,11 @@ namespace
                 to_points.push_back(tran(p) + (randm(2,1,rnd)-0.5)*error_rate);
                 DLIB_TEST(length(traninv(tran(p))-p) <= 1e-5);
                 DLIB_TEST(length(tran(traninv(p))-p) <= 1e-5);
+
+                point_transform_projective temp = tran*traninv;
+                DLIB_TEST_MSG(max(abs(temp.get_m() - identity_matrix<double>(3))) < 1e-10, temp.get_m());
+                temp = traninv*tran;
+                DLIB_TEST_MSG(max(abs(temp.get_m() - identity_matrix<double>(3))) < 1e-10, temp.get_m());
             }
 
 

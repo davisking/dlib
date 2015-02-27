@@ -74,6 +74,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    point_transform_affine operator* (
+        const point_transform_affine& lhs,
+        const point_transform_affine& rhs
+    );
+    /*!
+        ensures
+            - returns a transformation TFORM(x) that is equivalent to lhs(rhs(x)).  That
+              is, for all valid x: TFORM(x) == lhs(rhs(x)).
+    !*/
+
+    // ----------------------------------------------------------------------------------------
+
     point_transform_affine inv (
         const point_transform_affine& trans
     );
@@ -195,6 +207,18 @@ namespace dlib
     void deserialize (point_transform_projective& item, std::istream& in);
     /*!
         provides serialization support
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    point_transform_projective operator* (
+        const point_transform_projective& lhs,
+        const point_transform_projective& rhs
+    );
+    /*!
+        ensures
+            - returns a transformation TFORM(x) that is equivalent to lhs(rhs(x)).  That
+              is, for all valid x: TFORM(x) == lhs(rhs(x)).
     !*/
 
 // ----------------------------------------------------------------------------------------
