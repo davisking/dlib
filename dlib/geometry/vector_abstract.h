@@ -438,6 +438,12 @@ namespace dlib
 
     typedef vector<long,2> point;
 
+    /*!A dpoint
+        This is just a typedef of the vector object. 
+    !*/
+
+    typedef vector<double,2> dpoint;
+
 // ----------------------------------------------------------------------------------------
 
 }
