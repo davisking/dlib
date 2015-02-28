@@ -51,30 +51,17 @@ namespace dlib
                 and it must contain objects which can be accepted by image_scanner_type::load().
 
             WHAT THIS OBJECT REPRESENTS
-                This object is a tool for learning the parameter vector needed to use
-                a scan_image_pyramid or scan_image_boxes object.  
+                This object is a tool for learning the parameter vector needed to use a
+                scan_image_pyramid, scan_fhog_pyramid, scan_image_custom, or
+                scan_image_boxes object.  
 
                 It learns the parameter vector by formulating the problem as a structural 
-                SVM problem.  The general approach is similar to the method discussed in 
-                Learning to Localize Objects with Structured Output Regression by 
-                Matthew B. Blaschko and Christoph H. Lampert.  However, the method has 
-                been extended to datasets with multiple, potentially overlapping, objects 
-                per image and the measure of loss is different from what is described in 
-                the paper.  
+                SVM problem.  The exact details of the method are described in the paper 
+                Max-Margin Object Detection by Davis E. King (http://arxiv.org/abs/1502.00046).
 
-                In particular, the loss is measured as follows:
-                    let FA == the number of false alarms produced by a labeling of an image.
-                    let MT == the number of targets missed by a labeling of an image.  
-                    Then the loss for a particular labeling is the quantity:
-                        FA*get_loss_per_false_alarm() + MT*get_loss_per_missed_target()
 
-                A detection is considered a false alarm if it doesn't match with any 
-                of the ground truth rectangles or if it is a duplicate detection of a 
-                truth rectangle.  Finally, for the purposes of calculating loss, a match 
-                is determined using the following formula where rectangles A and B match 
-                if and only if:
-                    A.intersect(B).area()/(A+B).area() > get_match_eps()
         !*/
+
     public:
 
         structural_svm_object_detection_problem(
