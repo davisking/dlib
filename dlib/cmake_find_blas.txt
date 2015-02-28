@@ -145,6 +145,18 @@ if (UNIX)
       mark_as_advanced( atlas_lib cblas_lib)
    endif()
 
+   # CentOS 7 atlas
+   if (NOT blas_found)
+      find_library(tatlas_lib tatlas PATHS ${extra_paths})
+      find_library(satlas_lib satlas PATHS ${extra_paths})
+      if (tatlas_lib AND satlas_lib )
+         set(blas_libraries ${tatlas_lib} ${satlas_lib})
+         set(blas_found 1)
+         message(STATUS "Found ATLAS BLAS library")
+      endif()
+      mark_as_advanced( tatlas_lib satlas_lib)
+   endif()
+
 
    if (NOT blas_found)
       find_library(cblas_lib cblas PATHS ${extra_paths})
