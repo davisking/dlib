@@ -237,6 +237,7 @@
          <term file="algorithms.html" name="square_root"                   include="dlib/algs.h"/>
          <term file="linear_algebra.html" name="vector"                    include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="point"                     include="dlib/geometry.h"/>
+         <term file="dlib/geometry/vector_abstract.h.html" name="dpoint"   include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="rotate_point"              include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="point_rotator"             include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="point_transform"           include="dlib/geometry.h"/>
