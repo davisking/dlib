@@ -425,10 +425,10 @@ namespace dlib
         sample_type zero(centers[0]);
         set_all_elements(zero, 0);
 
-        std::vector<unsigned long, alloc> center_element_count;
+        std::vector<unsigned long> center_element_count;
 
         // tells which center a sample belongs to
-        std::vector<unsigned long, alloc> assignments(samples.size(), samples.size());
+        std::vector<unsigned long> assignments(samples.size(), samples.size());
 
 
         unsigned long iter = 0;
