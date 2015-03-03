@@ -1403,7 +1403,7 @@ namespace dlib
 
         std::vector<T> objtemp;
         std::vector<U> objtemp2;
-        typename image_array_type::image_type temp;
+        typename image_array_type::value_type temp;
         for (long i = 0; i < angles.size(); ++i)
         {
             for (unsigned long j = 0; j < images.size(); ++j)
