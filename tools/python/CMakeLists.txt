@@ -2,10 +2,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4)
 
 
-# Uncomment this to make a Python 3 compatible library instead of a Python 2
-# library.
-#set(PYTHON3 true)
-
 include(../../dlib/add_python_module)
 
 # Tell cmake to compile all these cpp files into a dlib python module.

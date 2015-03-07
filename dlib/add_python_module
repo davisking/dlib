@@ -11,11 +11,9 @@
 # python module to that folder when you run "make install".  Note that the path
 # given to install_*_to() is relative to your CMakeLists.txt file.
 #
-# Also note that if you set the cmake variable PYTHON3 equal to any non-zero
-# value then we will try and produce a Python 3 compatible library, otherwise
-# we will make a Pyhton 2 library.
 
 
+option(PYTHON3 "Build a Python3 compatible library rather than Python2." OFF)
 
 
 #SET(Boost_USE_STATIC_LIBS OFF)
