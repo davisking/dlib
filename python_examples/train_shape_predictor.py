@@ -24,6 +24,12 @@
 #   system so long as you have CMake and boost-python installed.
 #   On Ubuntu, this can be done easily by running the command:
 #       sudo apt-get install libboost-python-dev cmake
+#
+#   Also note that this example requires scikit-image which can be installed
+#   via the command:
+#       pip install -U scikit-image
+#   Or downloaded from http://scikit-image.org/download.html. 
+
 import os
 import sys
 import glob
