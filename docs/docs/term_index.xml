@@ -242,6 +242,11 @@
          <term file="linear_algebra.html" name="point_rotator"             include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="point_transform"           include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="point_transform_affine"    include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="point_transform_affine3d"  include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="rotate_around_x"           include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="rotate_around_y"           include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="rotate_around_z"           include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="translate_point"           include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="find_affine_transform"     include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="find_similarity_transform" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="point_transform_projective"    include="dlib/geometry.h"/>
