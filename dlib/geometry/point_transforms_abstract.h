@@ -410,6 +410,142 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class point_transform_affine3d
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an object that takes 3D points or vectors and 
+                applies an affine transformation to them.
+        !*/
+    public:
+
+        point_transform_affine3d (
+        );
+        /*!
+            ensures
+                - This object will perform the identity transform.  That is, given a point
+                  as input it will return the same point as output.
+        !*/
+
+        point_transform_affine3d (
+            const matrix<double,3,3>& m,
+            const dlib::vector<double,3>& b
+        );
+        /*!
+            ensures
+                - #get_m() == m
+                - #get_b() == b
+                - When (*this)(p) is invoked it will return a point P such that:
+                    - P == m*p + b
+        !*/
+
+        const dlib::vector<double,3> operator() (
+            const dlib::vector<double,3>& p
+        ) const;
+        /*!
+            ensures
+                - applies the affine transformation defined by this object's constructor
+                  to p and returns the result.
+        !*/
+
+        const matrix<double,3,3>& get_m(
+        ) const;
+        /*!
+            ensures
+                - returns the transformation matrix used by this object.
+        !*/
+
+        const dlib::vector<double,3>& get_b(
+        ) const;
+        /*!
+            ensures
+                - returns the offset vector used by this object.
+        !*/
+
+    };
+
+    void serialize   (const point_transform_affine3d& item, std::ostream& out);
+    void deserialize (point_transform_affine3d& item, std::istream& in);
+    /*!
+        provides serialization support
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    point_transform_affine3d operator* (
+        const point_transform_affine3d& lhs,
+        const point_transform_affine3d& rhs
+    );
+    /*!
+        ensures
+            - returns a transformation TFORM(x) that is equivalent to lhs(rhs(x)).  That
+              is, for all valid x: TFORM(x) == lhs(rhs(x)).
+    !*/
+
+    // ----------------------------------------------------------------------------------------
+
+    point_transform_affine3d inv (
+        const point_transform_affine3d& trans
+    );
+    /*!
+        ensures
+            - If trans is an invertible transformation then this function returns a new
+              transformation that is the inverse of trans. 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    point_transform_affine3d rotate_around_x (
+        double angle
+    );
+    /*!
+        ensures
+            - Returns a transformation that rotates a point around the x axis in a
+              counter-clockwise direction by angle radians.  That is, the rotation appears
+              counter-clockwise when the x axis points toward the observer, the coordinate
+              system is right-handed, and the angle is positive.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    point_transform_affine3d rotate_around_y (
+        double angle
+    );
+    /*!
+        ensures
+            - Returns a transformation that rotates a point around the y axis in a
+              counter-clockwise direction by angle radians.  That is, the rotation appears
+              counter-clockwise when the y axis points toward the observer, the coordinate
+              system is right-handed, and the angle is positive.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    point_transform_affine3d rotate_around_z (
+        double angle
+    );
+    /*!
+        ensures
+            - Returns a transformation that rotates a point around the z axis in a
+              counter-clockwise direction by angle radians.  That is, the rotation appears
+              counter-clockwise when the z axis points toward the observer, the coordinate
+              system is right-handed, and the angle is positive.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    point_transform_affine3d translate_point (
+        const vector<double,3>& delta
+    );
+    /*!
+        ensures
+            - returns a transformation that simply translates points by adding delta to
+              them.  That is, this function returns:
+                point_transform_affine3d(identity_matrix<double>(3),delta);
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_POINT_TrANSFORMS_ABSTRACT_Hh_

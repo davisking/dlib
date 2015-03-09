@@ -807,6 +807,34 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_affine3d()
+    {
+        const dlib::vector<double> x(1,0,0);
+        const dlib::vector<double> y(0,1,0);
+        const dlib::vector<double> z(0,0,1);
+
+        dlib::vector<double> w;
+
+        w = rotate_around_z(pi/2)(x);
+        DLIB_TEST(length(w-y) < 1e-12);
+
+        w = rotate_around_y(-pi/2)(x);
+        DLIB_TEST(length(w-z) < 1e-12);
+
+        w = rotate_around_x(pi/2)(y);
+        DLIB_TEST(length(w-z) < 1e-12);
+
+        w = translate_point(x)(y);
+        DLIB_TEST(length(w-x-y) < 1e-12);
+
+        point_transform_affine3d tform;
+        tform = rotate_around_x(pi/2)*rotate_around_z(pi/2)*translate_point(x);
+        DLIB_TEST(length(tform(dlib::vector<double>())-z) < 1e-12);
+        DLIB_TEST(length(inv(tform)(z)) < 1e-12);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class geometry_tester : public tester
     {
     public:
@@ -819,6 +847,7 @@ namespace
         void perform_test (
         )
         {
+            test_affine3d();
             test_rect_to_drect();
             geometry_test();
             test_border_enumerator();

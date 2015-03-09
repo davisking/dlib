@@ -630,6 +630,145 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class point_transform_affine3d
+    {
+    public:
+
+        point_transform_affine3d (
+        )
+        {
+            m = identity_matrix<double>(3);
+            b.x() = 0;
+            b.y() = 0;
+        }
+
+        point_transform_affine3d (
+            const matrix<double,3,3>& m_,
+            const dlib::vector<double,3>& b_
+        ) :m(m_), b(b_)
+        {
+        }
+
+        const dlib::vector<double,3> operator() (
+            const dlib::vector<double,3>& p
+        ) const
+        {
+            return m*p + b;
+        }
+
+        const matrix<double,3,3>& get_m(
+        ) const { return m; }
+
+        const dlib::vector<double,3>& get_b(
+        ) const { return b; }
+
+        inline friend void serialize (const point_transform_affine3d& item, std::ostream& out)
+        {
+            serialize(item.m, out);
+            serialize(item.b, out);
+        }
+
+        inline friend void deserialize (point_transform_affine3d& item, std::istream& in)
+        {
+            deserialize(item.m, in);
+            deserialize(item.b, in);
+        }
+
+    private:
+        matrix<double,3,3> m;
+        dlib::vector<double,3> b;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    inline point_transform_affine3d operator* (
+        const point_transform_affine3d& lhs,
+        const point_transform_affine3d& rhs
+    )
+    {
+        return point_transform_affine3d(lhs.get_m()*rhs.get_m(), lhs.get_m()*rhs.get_b()+lhs.get_b());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline point_transform_affine3d inv (
+        const point_transform_affine3d& trans
+    )
+    {
+        matrix<double,3,3> im = inv(trans.get_m());
+        return point_transform_affine3d(im, -im*trans.get_b());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline point_transform_affine3d rotate_around_x (
+        double angle
+    )
+    {
+        const double ca = std::cos(angle);
+        const double sa = std::sin(angle);
+
+        matrix<double,3,3> m;
+        m = 1,  0,  0,
+            0, ca, -sa,
+            0, sa, ca;
+
+        vector<double,3> b;
+
+        return point_transform_affine3d(m,b);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline point_transform_affine3d rotate_around_y (
+        double angle
+    )
+    {
+        const double ca = std::cos(angle);
+        const double sa = std::sin(angle);
+
+        matrix<double,3,3> m;
+        m = ca,  0, sa,
+             0,  0, 0,
+            -sa, 0, ca;
+
+        vector<double,3> b;
+
+        return point_transform_affine3d(m,b);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline point_transform_affine3d rotate_around_z (
+        double angle
+    )
+    {
+        const double ca = std::cos(angle);
+        const double sa = std::sin(angle);
+
+        matrix<double,3,3> m;
+        m = ca, -sa, 0,
+            sa, ca,  0,
+            0,   0,  0;
+
+        vector<double,3> b;
+
+        return point_transform_affine3d(m,b);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline point_transform_affine3d translate_point (
+        const vector<double,3>& delta
+    )
+    {
+        return point_transform_affine3d(identity_matrix<double>(3),delta);
+    }
+
+// ----------------------------------------------------------------------------------------
 
 }
 
