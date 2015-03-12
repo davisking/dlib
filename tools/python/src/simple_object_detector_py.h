@@ -155,20 +155,12 @@ namespace dlib
         std::vector<dlib::rectangle> run_detector1 (boost::python::object img,
                                                     const unsigned int upsampling_amount_)
         {
-            std::vector<double> detection_confidences;
-            std::vector<double> weight_indices;
-
-            return run_detector_with_upscale1(detector, img, upsampling_amount_,
-                detection_confidences, weight_indices);
+            return run_detector_with_upscale2(detector, img, upsampling_amount_);
         }
 
         std::vector<dlib::rectangle> run_detector2 (boost::python::object img)
         {
-            std::vector<double> detection_confidences;
-            std::vector<double> weight_indices;
-
-            return run_detector_with_upscale1(detector, img, upsampling_amount,
-                detection_confidences, weight_indices);
+            return run_detector_with_upscale2(detector, img, upsampling_amount);
         }
 
 
