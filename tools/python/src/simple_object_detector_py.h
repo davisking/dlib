@@ -32,7 +32,8 @@ namespace dlib
         }
     }
 
-    inline std::vector<dlib::rectangle> run_detector_with_upscale (
+
+    inline std::vector<dlib::rectangle> run_detector_with_upscale1 (
         dlib::simple_object_detector& detector,
         boost::python::object img,
         const unsigned int upsampling_amount,
@@ -111,10 +112,23 @@ namespace dlib
         }
     }
 
+    inline std::vector<dlib::rectangle> run_detector_with_upscale2 (
+        dlib::simple_object_detector& detector,
+        boost::python::object img,
+        const unsigned int upsampling_amount
+    )
+    {
+        std::vector<double> detection_confidences;
+        std::vector<double> weight_indices;
+
+        return run_detector_with_upscale1(detector, img, upsampling_amount,
+                                          detection_confidences, weight_indices);
+    }
+
     inline boost::python::tuple run_rect_detector (
-                                        dlib::simple_object_detector& detector,
-                                        boost::python::object img,
-                                        const unsigned int upsampling_amount)
+        dlib::simple_object_detector& detector,
+        boost::python::object img,
+        const unsigned int upsampling_amount)
     {
         boost::python::tuple t;
 
@@ -122,8 +136,8 @@ namespace dlib
         std::vector<double> weight_indices;
         std::vector<rectangle> rectangles;
 
-        rectangles = run_detector_with_upscale(detector, img, upsampling_amount,
-                                               detection_confidences, weight_indices);
+        rectangles = run_detector_with_upscale1(detector, img, upsampling_amount,
+                                                detection_confidences, weight_indices);
 
         return boost::python::make_tuple(rectangles,
                                          detection_confidences, weight_indices);
@@ -144,7 +158,7 @@ namespace dlib
             std::vector<double> detection_confidences;
             std::vector<double> weight_indices;
 
-            return run_detector_with_upscale(detector, img, upsampling_amount_,
+            return run_detector_with_upscale1(detector, img, upsampling_amount_,
                 detection_confidences, weight_indices);
         }
 
@@ -152,7 +166,8 @@ namespace dlib
         {
             std::vector<double> detection_confidences;
             std::vector<double> weight_indices;
-            return run_detector_with_upscale(detector, img, upsampling_amount,
+
+            return run_detector_with_upscale1(detector, img, upsampling_amount,
                 detection_confidences, weight_indices);
         }
 
