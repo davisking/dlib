@@ -354,6 +354,18 @@ ensures \n\
       detector.  If you don't know how many times you want to upsample then \n\
       don't provide a value for upsample_num_times and an appropriate \n\
       default will be used.")
+        .def("run", run_rect_detector, (arg("image"), arg("upsample_num_times")),
+"requires \n\
+    - image is a numpy ndarray containing either an 8bit grayscale or RGB \n\
+      image. \n\
+    - upsample_num_times >= 0 \n\
+ensures \n\
+    - This function runs the object detector on the input image and returns \n\
+      a tuple of (list of detections, list of scores, list of weight_indices).   \n\
+    - Upsamples the image upsample_num_times before running the basic \n\
+      detector.  If you don't know how many times you want to upsample then \n\
+      don't provide a value for upsample_num_times and an appropriate \n\
+      default will be used.")
         .def("save", save_simple_object_detector, (arg("detector_output_filename")), "Save a simple_object_detector to the provided path.")
         .def_pickle(serialize_pickle<type>());
     }
@@ -383,18 +395,6 @@ ensures \n\
 ensures \n\
     - This function runs the object detector on the input image and returns \n\
       a list of detections.")
-        .def("run", &type::run_detector3, (arg("image"), arg("upsample_num_times")),
-"requires \n\
-    - image is a numpy ndarray containing either an 8bit grayscale or RGB \n\
-      image. \n\
-    - upsample_num_times >= 0 \n\
-ensures \n\
-    - This function runs the object detector on the input image and returns \n\
-      a tuple of (list of detections, list of scores, list of weight_indices).   \n\
-    - Upsamples the image upsample_num_times before running the basic \n\
-      detector.  If you don't know how many times you want to upsample then \n\
-      don't provide a value for upsample_num_times and an appropriate \n\
-      default will be used.")
         .def("save", save_simple_object_detector_py, (arg("detector_output_filename")), "Save a simple_object_detector to the provided path.")
         .def_pickle(serialize_pickle<type>());
     }

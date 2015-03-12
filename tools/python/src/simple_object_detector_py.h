@@ -17,7 +17,7 @@ namespace dlib
         std::vector<rect_detection>& rect_detections,
         std::vector<rectangle>& rectangles,
         std::vector<double>& detection_confidences,
-        std::vector<int>& weight_indices
+        std::vector<double>& weight_indices
     )
     {
         rectangles.clear();
@@ -37,7 +37,7 @@ namespace dlib
         boost::python::object img,
         const unsigned int upsampling_amount,
         std::vector<double>& detection_confidences,
-        std::vector<int>& weight_indices
+        std::vector<double>& weight_indices
     )
     {
         pyramid_down<2> pyr;
@@ -111,6 +111,24 @@ namespace dlib
         }
     }
 
+    inline boost::python::tuple run_rect_detector (
+                                        dlib::simple_object_detector& detector,
+                                        boost::python::object img,
+                                        const unsigned int upsampling_amount)
+    {
+        boost::python::tuple t;
+
+        std::vector<double> detection_confidences;
+        std::vector<double> weight_indices;
+        std::vector<rectangle> rectangles;
+
+        rectangles = run_detector_with_upscale(detector, img, upsampling_amount,
+                                               detection_confidences, weight_indices);
+
+        return boost::python::make_tuple(rectangles,
+                                         detection_confidences, weight_indices);
+    }
+
     struct simple_object_detector_py
     {
         simple_object_detector detector;
@@ -124,7 +142,7 @@ namespace dlib
                                                     const unsigned int upsampling_amount_)
         {
             std::vector<double> detection_confidences;
-            std::vector<int> weight_indices;
+            std::vector<double> weight_indices;
 
             return run_detector_with_upscale(detector, img, upsampling_amount_,
                 detection_confidences, weight_indices);
@@ -133,27 +151,12 @@ namespace dlib
         std::vector<dlib::rectangle> run_detector2 (boost::python::object img)
         {
             std::vector<double> detection_confidences;
-            std::vector<int> weight_indices;
+            std::vector<double> weight_indices;
             return run_detector_with_upscale(detector, img, upsampling_amount,
                 detection_confidences, weight_indices);
         }
 
 
-        boost::python::tuple run_detector3 (boost::python::object img,
-                                            const unsigned int upsampling_amount_)
-        {
-            boost::python::tuple t;
-
-            std::vector<double> detection_confidences;
-            std::vector<int> weight_indices;
-            std::vector<rectangle> rectangles;
-
-            rectangles = run_detector_with_upscale(detector, img, upsampling_amount,
-                                                   detection_confidences, weight_indices);
-
-            return boost::python::make_tuple(rectangles,
-                                             detection_confidences, weight_indices);
-        }
     };
 }
 
