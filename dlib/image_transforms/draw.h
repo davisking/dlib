@@ -295,6 +295,98 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_type,
+        typename pixel_type
+        >
+    void draw_solid_circle (
+        image_type& img_,
+        const dpoint& center_point,
+        double radius,
+        const pixel_type& pixel
+    )
+    {
+        image_view<image_type> img(img_);
+        using std::sqrt;
+        const rectangle valid_area(get_rect(img));
+        const double x = center_point.x();
+        const double y = center_point.y();
+        const point cp(center_point);
+        if (radius > 1)
+        {
+            long first_x = static_cast<long>(x - radius + 0.5);
+            long last_x = static_cast<long>(x + radius + 0.5);
+            const double rs = radius*radius;
+
+            // ensure that we only loop over the part of the x dimension that this
+            // image contains.
+            if (first_x < valid_area.left())
+                first_x = valid_area.left();
+            if (last_x > valid_area.right())
+                last_x = valid_area.right();
+
+            long top, bottom;
+
+            top = static_cast<long>(sqrt(std::max(rs - (first_x-x-0.5)*(first_x-x-0.5),0.0))+0.5);
+            top += y;
+            long last = top;
+
+            // draw the left half of the circle
+            long middle = std::min(cp.x()-1,last_x);
+            for (long i = first_x; i <= middle; ++i)
+            {
+                double a = i - x + 0.5;
+                // find the top of the arc
+                top = static_cast<long>(sqrt(std::max(rs - a*a,0.0))+0.5);
+                top += y;
+                long temp = top;
+
+                while(top >= last) 
+                {
+                    bottom = y - top + y;
+                    draw_line(img_, point(i,top),point(i,bottom),pixel);
+                    --top;
+                }
+
+                last = temp;
+            }
+
+            middle = std::max(cp.x(),first_x);
+            top = static_cast<long>(sqrt(std::max(rs - (last_x-x+0.5)*(last_x-x+0.5),0.0))+0.5);
+            top += y;
+            last = top;
+            // draw the right half of the circle
+            for (long i = last_x; i >= middle; --i)
+            {
+                double a = i - x - 0.5;
+                // find the top of the arc
+                top = static_cast<long>(sqrt(std::max(rs - a*a,0.0))+0.5);
+                top += y;
+                long temp = top;
+
+                while(top >= last) 
+                {
+                    bottom = y - top + y;
+                    draw_line(img_, point(i,top),point(i,bottom),pixel);
+                    --top;
+                }
+
+                last = temp;
+            }
+        }
+        else if (valid_area.contains(cp))
+        {
+            // For circles smaller than a pixel we will just alpha blend them in proportion
+            // to how small they are.
+            rgb_alpha_pixel temp;
+            assign_pixel(temp, pixel);
+            temp.alpha = static_cast<unsigned char>(255*radius + 0.5);
+            assign_pixel(img[cp.y()][cp.x()], temp);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DRAW_IMAGe_

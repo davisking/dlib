@@ -80,6 +80,29 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type,
+        typename pixel_type
+        >
+    void draw_solid_circle (
+        image_type& img,
+        const dpoint& center_point,
+        double radius,
+        const pixel_type& pixel
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - pixel_traits<pixel_type> is defined
+        ensures
+            - Draws a fully filled in circle onto image that is centered at center_point
+              and has the given radius.  The circle will be filled by assigning the given
+              pixel value to each element of the circle.
+    !*/
+
+// ----------------------------------------------------------------------------------------
     
     template <
         typename image_type,
