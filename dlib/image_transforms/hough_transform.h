@@ -8,6 +8,7 @@
 #include "../geometry.h"
 #include "../algs.h"
 #include "assign_image.h"
+#include <limits>
 
 namespace dlib
 {
@@ -97,6 +98,144 @@ namespace dlib
             clip_line_to_rectangle(box, p1, p2);
 
             return std::make_pair(p1,p2);
+        }
+
+        template <
+            typename image_type
+            >
+        point get_best_hough_point (
+            const point& p,
+            const image_type& himg
+        )
+        {
+            DLIB_ASSERT(himg.nr() == size() && himg.nc() == size() &&
+                rectangle(0,0,size()-1,size()-1).contains(p) == true,
+                "\t point hough_transform::get_best_hough_point()"
+                << "\n\t Invalid arguments given to this function."
+                << "\n\t himg.nr(): " << himg.nr()
+                << "\n\t himg.nc(): " << himg.nc()
+                << "\n\t size():    " << size()
+                << "\n\t p:         " << p 
+                );
+
+
+            typedef typename image_traits<image_type>::pixel_type pixel_type;
+            COMPILE_TIME_ASSERT(pixel_traits<pixel_type>::grayscale == true);
+            pixel_type best_val = std::numeric_limits<pixel_type>::min();
+            point best_point;
+
+
+            const long max_n8 = (himg.nc()/8)*8;
+            const long max_n4 = (himg.nc()/4)*4;
+            const long r = p.y();
+            const long c = p.x();
+
+            const int32* ysin = &ysin_theta(r,0);
+            const int32* xcos = &xcos_theta(c,0);
+            long t = 0;
+            while(t < max_n8)
+            {
+                long rr0 = (*xcos++ + *ysin++)>>16;
+                long rr1 = (*xcos++ + *ysin++)>>16;
+                long rr2 = (*xcos++ + *ysin++)>>16;
+                long rr3 = (*xcos++ + *ysin++)>>16;
+                long rr4 = (*xcos++ + *ysin++)>>16;
+                long rr5 = (*xcos++ + *ysin++)>>16;
+                long rr6 = (*xcos++ + *ysin++)>>16;
+                long rr7 = (*xcos++ + *ysin++)>>16;
+
+                if (himg[rr0][t++] > best_val)
+                {
+                    best_val = himg[rr0][t-1];
+                    best_point.x() = t-1;
+                    best_point.y() = rr0;
+                }
+                if (himg[rr1][t++] > best_val)
+                {
+                    best_val = himg[rr1][t-1];
+                    best_point.x() = t-1;
+                    best_point.y() = rr1;
+                }
+                if (himg[rr2][t++] > best_val)
+                {
+                    best_val = himg[rr2][t-1];
+                    best_point.x() = t-1;
+                    best_point.y() = rr2;
+                }
+                if (himg[rr3][t++] > best_val)
+                {
+                    best_val = himg[rr3][t-1];
+                    best_point.x() = t-1;
+                    best_point.y() = rr3;
+                }
+                if (himg[rr4][t++] > best_val)
+                {
+                    best_val = himg[rr4][t-1];
+                    best_point.x() = t-1;
+                    best_point.y() = rr4;
+                }
+                if (himg[rr5][t++] > best_val)
+                {
+                    best_val = himg[rr5][t-1];
+                    best_point.x() = t-1;
+                    best_point.y() = rr5;
+                }
+                if (himg[rr6][t++] > best_val)
+                {
+                    best_val = himg[rr6][t-1];
+                    best_point.x() = t-1;
+                    best_point.y() = rr6;
+                }
+                if (himg[rr7][t++] > best_val)
+                {
+                    best_val = himg[rr7][t-1];
+                    best_point.x() = t-1;
+                    best_point.y() = rr7;
+                }
+            }
+            while(t < max_n4)
+            {
+                long rr0 = (*xcos++ + *ysin++)>>16;
+                long rr1 = (*xcos++ + *ysin++)>>16;
+                long rr2 = (*xcos++ + *ysin++)>>16;
+                long rr3 = (*xcos++ + *ysin++)>>16;
+                if (himg[rr0][t++] > best_val)
+                {
+                    best_val = himg[rr0][t-1];
+                    best_point.x() = t-1;
+                    best_point.y() = rr0;
+                }
+                if (himg[rr1][t++] > best_val)
+                {
+                    best_val = himg[rr1][t-1];
+                    best_point.x() = t-1;
+                    best_point.y() = rr1;
+                }
+                if (himg[rr2][t++] > best_val)
+                {
+                    best_val = himg[rr2][t-1];
+                    best_point.x() = t-1;
+                    best_point.y() = rr2;
+                }
+                if (himg[rr3][t++] > best_val)
+                {
+                    best_val = himg[rr3][t-1];
+                    best_point.x() = t-1;
+                    best_point.y() = rr3;
+                }
+            }
+            while(t < himg.nc())
+            {
+                long rr0 = (*xcos++ + *ysin++)>>16;
+                if (himg[rr0][t++] > best_val)
+                {
+                    best_val = himg[rr0][t-1];
+                    best_point.x() = t-1;
+                    best_point.y() = rr0;
+                }
+            }
+
+            return best_point;
         }
 
         template <

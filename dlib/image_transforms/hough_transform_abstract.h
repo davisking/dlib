@@ -21,6 +21,10 @@ namespace dlib
                 contribute correspondingly more to the output of the Hough transform,
                 allowing stronger edges to create correspondingly stronger line detections
                 in the final Hough transform.
+
+            THREAD SAFETY
+                It is safe for multiple threads to make concurrent accesses to this object
+                without synchronization.
         !*/
 
     public:
@@ -72,6 +76,29 @@ namespace dlib
                 - returns the line segment in the original image space corresponding
                   to Hough transform point p. 
                 - The returned points are inside rectangle(0,0,size()-1,size()-1).
+        !*/
+
+        template <
+            typename image_type
+            >
+        point get_best_hough_point (
+            const point& p,
+            const image_type& himg
+        );
+        /*!
+            requires
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+                - himg.nr() == size()
+                - himg.nc() == size()
+                - rectangle(0,0,size()-1,size()-1).contains(p) == true
+            ensures
+                - This function interprets himg as a Hough image and p as a point in the
+                  original image space.  Given this, it finds the maximum scoring line that
+                  passes though p.  That is, it checks all the Hough accumulator bins in
+                  himg corresponding to lines though p and returns the location with the
+                  largest score.  
+                - returns a point X such that get_rect(himg).contains(X) == true
         !*/
 
         template <
