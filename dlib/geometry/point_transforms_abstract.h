@@ -593,6 +593,17 @@ namespace dlib
 
     public:
 
+        camera_transform  (
+        );
+        /*!
+            ensures
+                - #get_camera_pos()           == vector<double>(1,1,1) 
+                - #get_camera_looking_at()    == vector<double>(0,0,0) 
+                - #get_camera_up_direction()  == vector<double>(0,0,1) 
+                - #get_camera_field_of_view() == 180 
+                - #get_num_pixels()           == 1 
+        !*/
+
         camera_transform (
             const vector<double>& camera_pos,
             const vector<double>& camera_looking_at,

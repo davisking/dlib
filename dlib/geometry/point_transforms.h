@@ -790,6 +790,16 @@ namespace dlib
 
     public:
 
+        camera_transform  (
+        )
+        {
+            *this = camera_transform(vector<double>(1,1,1), 
+                                     vector<double>(0,0,0),
+                                     vector<double>(0,0,1),
+                                     180,
+                                     1);
+        }
+
         camera_transform (
             const vector<double>& camera_pos_,
             const vector<double>& camera_looking_at_,
