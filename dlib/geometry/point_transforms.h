@@ -796,7 +796,7 @@ namespace dlib
             *this = camera_transform(vector<double>(1,1,1), 
                                      vector<double>(0,0,0),
                                      vector<double>(0,0,1),
-                                     180,
+                                     90,
                                      1);
         }
 
@@ -808,6 +808,13 @@ namespace dlib
             const unsigned long num_pixels_
         )
         {
+            // make sure requires clause is not broken
+            DLIB_CASSERT(0 < camera_field_of_view_ && camera_field_of_view_ < 180,
+                "\t camera_transform::camera_transform()"
+                << "\n\t Invalid inputs were given to this function."
+                << "\n\t camera_field_of_view_: " << camera_field_of_view_
+                );
+
             camera_pos = camera_pos_;
             camera_looking_at = camera_looking_at_;
             camera_up_direction = camera_up_direction_;
