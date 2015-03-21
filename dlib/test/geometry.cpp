@@ -831,6 +831,11 @@ namespace
         tform = rotate_around_x(pi/2)*rotate_around_z(pi/2)*translate_point(x);
         DLIB_TEST(length(tform(dlib::vector<double>())-z) < 1e-12);
         DLIB_TEST(length(inv(tform)(z)) < 1e-12);
+
+        point_transform_affine tform2; 
+        tform = tform*tform2;// the default tform is the identity mapping so this shouldn't do anything different 
+        DLIB_TEST(length(tform(dlib::vector<double>())-z) < 1e-12);
+        DLIB_TEST(length(inv(tform)(z)) < 1e-12);
     }
 
 // ----------------------------------------------------------------------------------------

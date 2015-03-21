@@ -482,7 +482,19 @@ namespace dlib
               is, for all valid x: TFORM(x) == lhs(rhs(x)).
     !*/
 
-    // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    point_transform_affine3d operator* (
+        const point_transform_affine3d& lhs,
+        const point_transform_affine& rhs
+    );
+    /*!
+        ensures
+            - returns a transformation TFORM(x) that is equivalent to lhs(rhs(x)).  That
+              is, for all valid x: TFORM(x) == lhs(rhs(x)).
+    !*/
+
+// ----------------------------------------------------------------------------------------
 
     point_transform_affine3d inv (
         const point_transform_affine3d& trans

@@ -686,6 +686,21 @@ namespace dlib
 
     inline point_transform_affine3d operator* (
         const point_transform_affine3d& lhs,
+        const point_transform_affine& rhs
+    )
+    {
+        matrix<double,3,3> m;
+        m = 0;
+        set_subm(m, get_rect(rhs.get_m())) = rhs.get_m();
+        vector<double,3> b = rhs.get_b();
+
+        return point_transform_affine3d(lhs.get_m()*m, lhs.get_m()*b+lhs.get_b());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline point_transform_affine3d operator* (
+        const point_transform_affine3d& lhs,
         const point_transform_affine3d& rhs
     )
     {
