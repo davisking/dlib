@@ -33,7 +33,7 @@ namespace dlib
                 - event_id == 1
 
             CONVENTION
-                - bg_color == backgroud_color()
+                - bg_color == background_color()
 
                 - widgets == this binary search tree contains every drawable that is in
                   this window.  It is a mapping of each drawable's z-order to a pointer
