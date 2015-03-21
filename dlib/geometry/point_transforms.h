@@ -785,6 +785,98 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class camera_transform
+    {
+
+    public:
+
+        camera_transform (
+            const vector<double>& camera_pos_,
+            const vector<double>& camera_looking_at_,
+            const vector<double>& camera_up_direction_,
+            const double camera_field_of_view_, 
+            const unsigned long num_pixels_
+        )
+        {
+            camera_pos = camera_pos_;
+            camera_looking_at = camera_looking_at_;
+            camera_up_direction = camera_up_direction_;
+            camera_field_of_view = camera_field_of_view_;
+            num_pixels = num_pixels_;
+
+            dlib::vector<double> X,Y,Z;
+            Z = (camera_looking_at - camera_pos).normalize();
+            Y = camera_up_direction - dot(camera_up_direction,Z)*Z; 
+            Y = Y.normalize();
+            X = Z.cross(Y);
+
+            set_rowm(proj,0) = trans(X);
+            // Minus because images have y axis going down but we want the 3d projection to appear using a normal coordinate system with y going up.
+            set_rowm(proj,1) = -trans(Y); 
+            set_rowm(proj,2) = trans(Z);
+
+            width = num_pixels/2.0;
+            dist_scale = width/std::tan(pi/180*camera_field_of_view/2);
+        }
+
+        vector<double> get_camera_pos()         const { return camera_pos; }
+        vector<double> get_camera_looking_at()  const { return camera_looking_at; }
+        vector<double> get_camera_up_direction()const { return camera_up_direction; }
+        double get_camera_field_of_view()       const { return camera_field_of_view; }
+        unsigned long get_num_pixels()                   const { return num_pixels; }
+
+        dpoint operator() (
+            const vector<double>& p
+        ) const
+        {
+            vector<double> temp = p-camera_pos;
+            temp = proj*temp;
+            const double distance = temp.z()>0 ? temp.z() : 1e-9;
+            const double scale = dist_scale/distance;
+            temp.x() = temp.x()*scale + width;
+            temp.y() = temp.y()*scale + width;
+            return temp;
+        }
+
+        inline friend void serialize (const camera_transform& item, std::ostream& out)
+        {
+            serialize(item.camera_pos, out);
+            serialize(item.camera_looking_at, out);
+            serialize(item.camera_up_direction, out);
+            serialize(item.camera_field_of_view, out); 
+            serialize(item.num_pixels, out);
+            serialize(item.proj, out);
+            serialize(item.dist_scale, out);
+            serialize(item.width, out);
+        }
+
+        inline friend void deserialize (camera_transform& item, std::istream& in)
+        {
+            deserialize(item.camera_pos, in);
+            deserialize(item.camera_looking_at, in);
+            deserialize(item.camera_up_direction, in);
+            deserialize(item.camera_field_of_view, in); 
+            deserialize(item.num_pixels, in);
+            deserialize(item.proj, in);
+            deserialize(item.dist_scale, in);
+            deserialize(item.width, in);
+        }
+
+    private:
+
+        vector<double> camera_pos;
+        vector<double> camera_looking_at;
+        vector<double> camera_up_direction;
+        double camera_field_of_view; 
+        unsigned long num_pixels;
+        matrix<double,3,3> proj;
+        double dist_scale;
+        double width;
+
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_POINT_TrANSFORMS_H_

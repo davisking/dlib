@@ -18,6 +18,10 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This is an object that takes 2D points or vectors and 
                 applies an affine transformation to them.
+
+            THREAD SAFETY
+                It is safe for multiple threads to make concurrent accesses to this object
+                without synchronization.
         !*/
     public:
 
@@ -150,6 +154,10 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This is an object that takes 2D points or vectors and 
                 applies a projective transformation to them.
+
+            THREAD SAFETY
+                It is safe for multiple threads to make concurrent accesses to this object
+                without synchronization.
         !*/
 
     public:
@@ -260,6 +268,10 @@ namespace dlib
                 This is an object that takes 2D points or vectors and 
                 rotates them around the origin by a given angle and then
                 translates them.
+
+            THREAD SAFETY
+                It is safe for multiple threads to make concurrent accesses to this object
+                without synchronization.
         !*/
     public:
 
@@ -325,6 +337,10 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This is an object that takes 2D points or vectors and 
                 rotates them around the origin by a given angle.
+
+            THREAD SAFETY
+                It is safe for multiple threads to make concurrent accesses to this object
+                without synchronization.
         !*/
     public:
 
@@ -416,6 +432,10 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This is an object that takes 3D points or vectors and 
                 applies an affine transformation to them.
+
+            THREAD SAFETY
+                It is safe for multiple threads to make concurrent accesses to this object
+                without synchronization.
         !*/
     public:
 
@@ -554,6 +574,106 @@ namespace dlib
             - returns a transformation that simply translates points by adding delta to
               them.  That is, this function returns:
                 point_transform_affine3d(identity_matrix<double>(3),delta);
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    class camera_transform
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object maps 3D points into the image plane of a camera.  Therefore,
+                you can use it to compute 2D representations of 3D data from the point of
+                view of some camera in 3D space.
+
+            THREAD SAFETY
+                It is safe for multiple threads to make concurrent accesses to this object
+                without synchronization.
+        !*/
+
+    public:
+
+        camera_transform (
+            const vector<double>& camera_pos,
+            const vector<double>& camera_looking_at,
+            const vector<double>& camera_up_direction,
+            const double camera_field_of_view, 
+            const unsigned long num_pixels
+        );
+        /*!
+            requires
+                - 0 < camera_field_of_view < 360
+            ensures
+                - #get_camera_pos() == camera_pos
+                - #get_camera_looking_at() == camera_looking_at
+                - #get_camera_up_direction() == camera_up_direction
+                - #get_camera_field_of_view() == camera_field_of_view
+                - #get_num_pixels() == num_pixels
+        !*/
+
+        dpoint operator() (
+            const vector<double>& p
+        ) const;
+        /*!
+            ensures
+                - Maps the given 3D point p into the 2D image plane defined by the camera
+                  parameters given to this object's constructor.  The 2D point in the image
+                  plane is returned.
+        !*/
+
+        vector<double> get_camera_pos(
+        ) const;
+        /*!
+            ensures
+                - returns the position, in 3D space, of the camera.  When operator() is
+                  invoked it maps 3D points into the image plane of this camera.
+        !*/
+
+        vector<double> get_camera_looking_at(
+        ) const;
+        /*!
+            ensures
+                - returns the point in 3D space the camera is pointed at.  
+        !*/
+
+        vector<double> get_camera_up_direction(
+        ) const;
+        /*!
+            ensures
+                - returns a vector that defines what direction is "up" for the camera.
+                  This means that as you travel from the bottom of the image plane to the
+                  top you will be traveling in the direction of this vector.  Note that
+                  get_camera_up_direction() doesn't need to be orthogonal to the camera's
+                  line of sight (i.e. get_camera_looking_at()-get_camera_pos()), it just
+                  needs to not be an exact multiple of the line of sight.  Any necessary
+                  orthogonalization will be taken care of internally.
+        !*/
+
+        double get_camera_field_of_view(
+        ) const;
+        /*!
+            ensures
+                - returns the field of view of the camera in degrees.
+        !*/
+
+        unsigned long get_num_pixels(
+        ) const;
+        /*!
+            ensures
+                - 3D points that fall within the field of view of the camera are mapped by
+                  operator() into the pixel coordinates of a get_num_pixels() by
+                  get_num_pixels() image.  Therefore, you can use the output of operator()
+                  to index into an image.  However, you still need to perform bounds
+                  checking as there might be 3D points outside the field of view of the
+                  camera and those will be mapped to 2D points outside the image.
+        !*/
+
+    };
+
+    void serialize   (const camera_transform& item, std::ostream& out);
+    void deserialize (camera_transform& item, std::istream& in);
+    /*!
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
