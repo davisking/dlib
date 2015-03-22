@@ -81,4 +81,4 @@ for f in glob.glob(os.path.join(faces_folder_path, "*.jpg")):
         win.add_overlay(shape)
 
     win.add_overlay(dets)
-    raw_input("Hit enter to continue")
+    dlib.hit_enter_to_continue()

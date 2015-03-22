@@ -58,4 +58,4 @@ for f in sys.argv[1:]:
     win.clear_overlay()
     win.set_image(img)
     win.add_overlay(dets)
-    raw_input("Hit enter to continue")
+    dlib.hit_enter_to_continue()
