@@ -1082,6 +1082,8 @@
          <term file="dlib/gui_widgets/widgets_abstract.h.html" name="menu_bar"                  include="dlib/gui_widgets.h"/>
          <term file="dlib/gui_widgets/widgets_abstract.h.html" name="image_display"             include="dlib/gui_widgets.h"/>
          <term file="dlib/gui_widgets/widgets_abstract.h.html" name="image_window"              include="dlib/gui_widgets.h"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="perspective_display"       include="dlib/gui_widgets.h"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="perspective_window"        include="dlib/gui_widgets.h"/>
          <term link="dlib/gui_widgets/widgets_abstract.h.html#overlay_line" name="overlay_line" include="dlib/gui_widgets.h"/>
          <term link="dlib/gui_widgets/widgets_abstract.h.html#overlay_rect" name="overlay_rect" include="dlib/gui_widgets.h"/>
 

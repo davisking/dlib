@@ -104,6 +104,14 @@
                                <link>dlib/gui_widgets/widgets_abstract.h.html#menu_bar</link>
                            </item>
                            <item>
+                               <name>perspective_window</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#perspective_window</link>
+                           </item>
+                           <item>
+                               <name>perspective_display</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#perspective_display</link>
+                           </item>
+                           <item>
                                <name>image_window</name>
                                <link>dlib/gui_widgets/widgets_abstract.h.html#image_window</link>
                            </item>
