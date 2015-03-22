@@ -1192,6 +1192,8 @@
          <term link="dlib/image_transforms/thresholding_abstract.h.html" name="off_pixel"    include="dlib/image_transforms.h"/>
     
 
+         <term file="dlib/image_transforms/colormaps_abstract.h.html" name="colormap_heat"              include="dlib/image_transforms.h"/>
+         <term file="dlib/image_transforms/colormaps_abstract.h.html" name="colormap_jet"               include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="heatmap"                    include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="jet"                        include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="randomly_color_image"       include="dlib/image_transforms.h"/>
