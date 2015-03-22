@@ -923,9 +923,16 @@ function BigToggle(node)
        </xsl:if>
    </xsl:template>   
    <xsl:template match="td">
-      <td align="center">
-         <xsl:apply-templates/>
-       </td>
+      <xsl:if test="@colspan">
+         <td align="center" colspan="{@colspan}">
+            <xsl:apply-templates/>
+         </td>
+      </xsl:if>
+      <xsl:if test="not(@colspan)">
+         <td align="center">
+            <xsl:apply-templates/>
+         </td>
+      </xsl:if>
    </xsl:template>   
    <xsl:template match="tr">
       <tr>
