@@ -28,6 +28,11 @@ import glob
 import dlib
 from skimage import io
 
+# Bind raw_input to input in Python 2
+try:
+   input = raw_input
+except NameError:
+   pass
 
 # In this example we are going to train a face detector based on the small
 # faces dataset in the examples/faces directory.  This means you need to supply
