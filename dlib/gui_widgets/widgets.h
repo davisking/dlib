@@ -3714,6 +3714,7 @@ namespace dlib
         ) : disp(*this) 
         {
             set_size(100,100);
+            show();
         }
 
         perspective_window(
