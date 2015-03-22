@@ -9,8 +9,10 @@
 
 #include <dlib/gui_widgets.h>
 #include <dlib/image_transforms.h>
+#include <cmath>
 
 using namespace dlib;
+using namespace std;
 
 // ----------------------------------------------------------------------------------------
 
