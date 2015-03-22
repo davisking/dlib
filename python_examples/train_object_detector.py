@@ -28,6 +28,11 @@ import glob
 import dlib
 from skimage import io
 
+# Bind raw_input to input in Python 2
+try:
+   input = raw_input
+except NameError:
+   pass
 
 # In this example we are going to train a face detector based on the small
 # faces dataset in the examples/faces directory.  This means you need to supply
@@ -117,7 +122,7 @@ for f in glob.glob(os.path.join(faces_folder, "*.jpg")):
     win.clear_overlay()
     win.set_image(img)
     win.add_overlay(dets)
-    raw_input("Hit enter to continue")
+    input("Hit enter to continue")
 
 
 
@@ -150,7 +155,7 @@ detector2 = dlib.train_simple_object_detector(images, boxes, options)
 
 # Now let's look at its HOG filter!
 win_det.set_image(detector2)
-raw_input("Hit enter to continue")
+input("Hit enter to continue")
 
 # Note that you don't have to use the XML based input to
 # test_simple_object_detector().  If you have already loaded your training
