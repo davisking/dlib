@@ -2061,8 +2061,8 @@ namespace dlib
                 - #height() == height_
                 - #top() == top()
                 - #left() == left()
-                - i.e. The location of the upper left corner of this button stays the
-                  same but its width and height are modified
+                - i.e. The location of the upper left corner of this widget stays the
+                  same but its width and height are modified.
         !*/
 
         long horizontal_scroll_pos (
