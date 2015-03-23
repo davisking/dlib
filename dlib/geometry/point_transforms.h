@@ -842,17 +842,26 @@ namespace dlib
         double get_camera_field_of_view()       const { return camera_field_of_view; }
         unsigned long get_num_pixels()                   const { return num_pixels; }
 
-        dpoint operator() (
-            const vector<double>& p
+        inline dpoint operator() (
+            const vector<double>& p,
+            double& scale
         ) const
         {
             vector<double> temp = p-camera_pos;
             temp = proj*temp;
             const double distance = temp.z()>0 ? temp.z() : 1e-9;
-            const double scale = dist_scale/distance;
+            scale = dist_scale/distance;
             temp.x() = temp.x()*scale + width;
             temp.y() = temp.y()*scale + width;
             return temp;
+        }
+
+        dpoint operator() (
+            const vector<double>& p
+        ) const
+        {
+            double scale;
+            return (*this)(p,scale);
         }
 
         inline friend void serialize (const camera_transform& item, std::ostream& out)

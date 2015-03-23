@@ -632,6 +632,20 @@ namespace dlib
                   plane is returned.
         !*/
 
+        dpoint operator() (
+            const vector<double>& p,
+            double& scale
+        ) const;
+        /*!
+            ensures
+                - Maps the given 3D point p into the 2D image plane defined by the camera
+                  parameters given to this object's constructor.  The 2D point in the image
+                  plane is returned.
+                - #scale == a number that tells you how large things are at the point p.
+                  Objects further from the camera appear smaller, in particular, they
+                  appear #scale times their normal size.
+        !*/
+
         vector<double> get_camera_pos(
         ) const;
         /*!
