@@ -10,7 +10,11 @@
 #include "../pixel.h"
 #include "save_jpeg.h"
 #include <stdio.h>
-#include <jpeglib.h>
+#ifdef DLIB_JPEG_STATIC
+#   include "../external/libjpeg/jpeglib.h"
+#else
+#   include <jpeglib.h>
+#endif
 #include <sstream>
 #include <setjmp.h>
 #include "image_saver.h"

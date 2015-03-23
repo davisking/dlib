@@ -283,7 +283,7 @@ if (NOT TARGET dlib)
             set (dlib_needed_libraries ${dlib_needed_libraries} ${JPEG_LIBRARY})
          else()
             # If we can't find libjpeg then statically compile it in.
-            include_directories(external/libjpeg)
+            add_definitions(-DDLIB_JPEG_STATIC)
             set(source_files ${source_files}
                   external/libjpeg/jcomapi.cpp
                   external/libjpeg/jdapimin.cpp

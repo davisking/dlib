@@ -11,7 +11,11 @@
 #include "../dir_nav.h"
 #include "jpeg_loader.h"
 #include <stdio.h>
-#include <jpeglib.h>
+#ifdef DLIB_JPEG_STATIC
+#   include "../external/libjpeg/jpeglib.h"
+#else
+#   include <jpeglib.h>
+#endif
 #include <sstream>
 #include <setjmp.h>
 
