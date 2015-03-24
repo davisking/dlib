@@ -68,7 +68,7 @@ tell CMake which one you want it to use via the -G option.
         <p>
            Again, note that you should <b><i>not</i></b> add the dlib folder itself to your compiler's include path.  
            Doing so will cause the
-           build to fail because of name collisions (such as dlib/string.h and string.h from the standard library).  
+           build to fail because of name collisions (e.g. dlib/string.h with string.h from the standard library).  
            Instead you should add the folder that contains the dlib folder to your include search path and then use 
            include statements of the form <tt>#include &lt;dlib/queue.h&gt;</tt>.  This will ensure that everything 
            builds correctly.
