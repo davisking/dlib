@@ -28,6 +28,8 @@
          <term link="dlib/numeric_constants.h.html" name="khinchin"  include="dlib/numeric_constants.h"/>
          <term link="dlib/numeric_constants.h.html" name="apery"     include="dlib/numeric_constants.h"/>
 
+         <term file="dlib/revision.h.html" name="DLIB_MAJOR_VERSION"     include="dlib/revision.h"/>
+         <term file="dlib/revision.h.html" name="DLIB_MINOR_VERSION"     include="dlib/revision.h"/>
 
 
 
