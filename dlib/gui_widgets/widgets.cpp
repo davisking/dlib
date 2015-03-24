@@ -5820,7 +5820,7 @@ namespace dlib
 
     void perspective_display::
     on_wheel_up (
-        unsigned long state
+        unsigned long //state
     )
     {
         if (rect.contains(lastx,lasty) == false || hidden || !enabled)
@@ -5841,7 +5841,7 @@ namespace dlib
 
     void perspective_display::
     on_wheel_down (
-        unsigned long state
+        unsigned long //state
     )
     {
         if (rect.contains(lastx,lasty) == false || hidden || !enabled)
@@ -5863,7 +5863,7 @@ namespace dlib
     void perspective_display::
     on_mouse_down (
         unsigned long btn,
-        unsigned long state,
+        unsigned long, //state
         long x,
         long y,
         bool is_double_click
