@@ -747,7 +747,7 @@ namespace dlib
 
         matrix<double,3,3> m;
         m = ca,  0, sa,
-             0,  0, 0,
+             0,  1, 0,
             -sa, 0, ca;
 
         vector<double,3> b;
@@ -767,7 +767,7 @@ namespace dlib
         matrix<double,3,3> m;
         m = ca, -sa, 0,
             sa, ca,  0,
-            0,   0,  0;
+            0,   0,  1;
 
         vector<double,3> b;
 
