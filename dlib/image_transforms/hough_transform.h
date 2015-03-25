@@ -105,9 +105,11 @@ namespace dlib
             >
         point get_best_hough_point (
             const point& p,
-            const image_type& himg
+            const image_type& himg_
         )
         {
+            const const_image_view<image_type> himg(himg_);
+
             DLIB_ASSERT(himg.nr() == size() && himg.nc() == size() &&
                 rectangle(0,0,size()-1,size()-1).contains(p) == true,
                 "\t point hough_transform::get_best_hough_point()"
