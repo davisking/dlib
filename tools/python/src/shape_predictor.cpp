@@ -198,8 +198,8 @@ void bind_shape_predictors()
         .add_property("feature_pool_size", &type::feature_pool_size,
                                            &type::feature_pool_size,
                       "Number of pixels used to generate features for the random trees.")
-        .add_property("lambda", &type::lambda,
-                                &type::lambda,
+        .add_property("lambda_param", &type::lambda_param,
+                                &type::lambda_param,
                       "Controls how tight the feature sampling should be. Lower values enforce closer features.")
         .add_property("num_test_splits", &type::num_test_splits,
                                          &type::num_test_splits,
@@ -238,7 +238,7 @@ ensures \n\
     def("train_shape_predictor", train_shape_predictor_on_images_py,
         (arg("images"), arg("object_detections"), arg("options")),
 "requires \n\
-    - options.lambda > 0 \n\
+    - options.lambda_param > 0 \n\
     - 0 < options.nu <= 1 \n\
     - options.feature_pool_region_padding >= 0 \n\
     - len(images) == len(object_detections) \n\
@@ -253,7 +253,7 @@ ensures \n\
     def("train_shape_predictor", train_shape_predictor,
         (arg("dataset_filename"), arg("predictor_output_filename"), arg("options")),
 "requires \n\
-    - options.lambda > 0 \n\
+    - options.lambda_param > 0 \n\
     - 0 < options.nu <= 1 \n\
     - options.feature_pool_region_padding >= 0 \n\
 ensures \n\
