@@ -1,7 +1,7 @@
 imglab is a simple graphical tool for annotating images with object bounding
-boxes.  Generally, you use it when you want to train an object detector (e.g. a
-face detector) since it allows you to easily create the needed training
-dataset.   
+boxes and optionally their part locations.  Generally, you use it when you want
+to train an object detector (e.g. a face detector) since it allows you to
+easily create the needed training dataset.   
 
 You can compile imglab with the following commands:
     cd dclib/tools/imglab
