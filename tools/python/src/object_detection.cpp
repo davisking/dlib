@@ -342,7 +342,7 @@ ensures \n\
 "Loads an object detector from a file that contains the output of the \n\
 train_simple_object_detector() routine or a serialized C++ object of type\n\
 object_detector<scan_fhog_pyramid<pyramid_down<6>>>.")
-        .def("__call__", run_detector_with_upscale, (arg("image"), arg("upsample_num_times")=0),
+        .def("__call__", run_detector_with_upscale2, (arg("image"), arg("upsample_num_times")=0),
 "requires \n\
     - image is a numpy ndarray containing either an 8bit grayscale or RGB \n\
       image. \n\
@@ -350,6 +350,18 @@ object_detector<scan_fhog_pyramid<pyramid_down<6>>>.")
 ensures \n\
     - This function runs the object detector on the input image and returns \n\
       a list of detections.   \n\
+    - Upsamples the image upsample_num_times before running the basic \n\
+      detector.  If you don't know how many times you want to upsample then \n\
+      don't provide a value for upsample_num_times and an appropriate \n\
+      default will be used.")
+        .def("run", run_rect_detector, (arg("image"), arg("upsample_num_times")),
+"requires \n\
+    - image is a numpy ndarray containing either an 8bit grayscale or RGB \n\
+      image. \n\
+    - upsample_num_times >= 0 \n\
+ensures \n\
+    - This function runs the object detector on the input image and returns \n\
+      a tuple of (list of detections, list of scores, list of weight_indices).   \n\
     - Upsamples the image upsample_num_times before running the basic \n\
       detector.  If you don't know how many times you want to upsample then \n\
       don't provide a value for upsample_num_times and an appropriate \n\
