@@ -2338,7 +2338,8 @@ namespace dlib
                 by double clicking on it and hitting delete or backspace.  Finally, you
                 can also add part labels (if they have been defined by calling add_labelable_part_name())
                 by selecting an overlay rectangle with the mouse and then right clicking
-                on the part.
+                on the part.  If you want to move any rectangle or an object part then
+                shift+right click and drag it.
                 
                 Finally, if you hold Ctrl and left click an overlay rectangle it will 
                 change its label to get_default_overlay_rect_label().

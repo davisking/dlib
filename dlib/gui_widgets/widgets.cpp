@@ -6374,6 +6374,7 @@ namespace dlib
         if (!is_printable && !hidden && enabled && rect_is_selected && 
             (key == base_window::KEY_BACKSPACE || key == base_window::KEY_DELETE))
         {
+            moving_overlay = false;
             rect_is_selected = false;
             parts_menu.disable();
             if (selected_part_name.size() == 0)
@@ -6455,6 +6456,89 @@ namespace dlib
 
         if (!overlay_editing_enabled)
             return;
+
+        if (btn == base_window::RIGHT && (state&base_window::SHIFT))
+        {
+            const bool rect_was_selected = rect_is_selected;
+            rect_is_selected = false;
+            parts_menu.disable();
+
+            long best_dist = std::numeric_limits<long>::max();
+            long best_idx = 0;
+            std::string best_part;
+
+            // check if this click landed on any of the overlay rectangles
+            for (unsigned long i = 0; i < overlay_rects.size(); ++i)
+            {
+                const rectangle orect = get_rect_on_screen(i);
+
+                const long dist = distance_to_rect_edge(orect, point(x,y));
+
+                if (dist < best_dist)
+                {
+                    best_dist = dist;
+                    best_idx = i;
+                    best_part.clear();
+                }
+
+                std::map<std::string,point>::const_iterator itr;
+                for (itr = overlay_rects[i].parts.begin(); itr != overlay_rects[i].parts.end(); ++itr)
+                {
+                    rectangle temp = centered_rect(get_rect_on_screen(centered_rect(itr->second,1,1)), part_width, part_width);
+                    point c = center(temp);
+
+                    // distance from edge of part circle
+                    const long dist = static_cast<long>(std::abs(length(c - point(x,y)) + 0.5 - temp.width()/2));
+                    if (dist < best_dist)
+                    {
+                        best_idx = i;
+                        best_dist = dist;
+                        best_part = itr->first;
+                    }
+                }
+            }
+
+
+            if (best_dist < 13)
+            {
+                moving_overlay = true;
+                moving_rect = best_idx;
+                moving_part_name = best_part;
+                // If we are moving one of the sides  of the rectangle rather than one of
+                // the parts circles then we need to figure out which side of the rectangle
+                // we are moving.
+                if (best_part.size() == 0)
+                {
+                    // which side is the click closest to?
+                    const rectangle orect = get_rect_on_screen(best_idx);
+                    const point p = nearest_point(orect,point(x,y));
+                    long dist_left   = std::abs(p.x()-orect.left());
+                    long dist_top    = std::abs(p.y()-orect.top());
+                    long dist_right  = std::abs(p.x()-orect.right());
+                    long dist_bottom = std::abs(p.y()-orect.bottom());
+                    long min_val = std::min(std::min(dist_left,dist_right),std::min(dist_top,dist_bottom));
+                    if (dist_left == min_val)
+                        moving_what = MOVING_RECT_LEFT;
+                    else if (dist_top == min_val)
+                        moving_what = MOVING_RECT_TOP;
+                    else if (dist_right == min_val)
+                        moving_what = MOVING_RECT_RIGHT;
+                    else 
+                        moving_what = MOVING_RECT_BOTTOM;
+                }
+                else
+                {
+                    moving_what = MOVING_PART;
+                }
+                // Do this to make the moving stuff snap to the mouse immediately.
+                on_mouse_move(state|btn,x,y);
+            }
+
+            if (rect_was_selected)
+                parent.invalidate_rectangle(rect);
+
+            return;
+        }
 
         if (btn == base_window::RIGHT && rect_is_selected)
         {
@@ -6687,6 +6771,10 @@ namespace dlib
             drawing_rect = false;
             parent.invalidate_rectangle(rect);
         }
+        if (moving_overlay)
+        {
+            moving_overlay = false;
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -6712,6 +6800,61 @@ namespace dlib
             {
                 drawing_rect = false;
                 parent.invalidate_rectangle(rect);
+            }
+            moving_overlay = false;
+        }
+        else if (moving_overlay)
+        {
+            if ((state&base_window::RIGHT) && (state&base_window::SHIFT) && !hidden && enabled)
+            {
+                // map point(x,y) into the image coordinate space.
+                point p = point(x,y) - total_rect().tl_corner();
+                if (zoom_in_scale != 1)
+                {
+                    if (moving_what == MOVING_PART)
+                        p = p/(double)zoom_in_scale-dpoint(0.5,0.5);
+                    else
+                        p = p/(double)zoom_in_scale;
+                }
+                else if (zoom_out_scale != 1)
+                {
+                    p = p*(double)zoom_out_scale;
+                }
+
+
+                if (moving_what == MOVING_PART)
+                {
+                    if (overlay_rects[moving_rect].parts[moving_part_name] != p)
+                    {
+                        overlay_rects[moving_rect].parts[moving_part_name] = p;
+                        parent.invalidate_rectangle(rect);
+                        if (event_handler.is_set())
+                            event_handler();
+                    }
+                }
+                else 
+                {
+                    rectangle original = overlay_rects[moving_rect].rect;
+                    if (moving_what == MOVING_RECT_LEFT)
+                        overlay_rects[moving_rect].rect.left() = std::min(p.x(), overlay_rects[moving_rect].rect.right());
+                    else if (moving_what == MOVING_RECT_RIGHT)
+                        overlay_rects[moving_rect].rect.right() = std::max(p.x()-1, overlay_rects[moving_rect].rect.left());
+                    else if (moving_what == MOVING_RECT_TOP)
+                        overlay_rects[moving_rect].rect.top() = std::min(p.y(), overlay_rects[moving_rect].rect.bottom());
+                    else 
+                        overlay_rects[moving_rect].rect.bottom() = std::max(p.y()-1, overlay_rects[moving_rect].rect.top());
+
+                    if (original != overlay_rects[moving_rect].rect)
+                    {
+                        parent.invalidate_rectangle(rect);
+                        if (event_handler.is_set())
+                            event_handler();
+                    }
+                }
+            }
+            else
+            {
+                moving_overlay = false;
             }
         }
     }

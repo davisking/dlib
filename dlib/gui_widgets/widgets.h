@@ -3231,6 +3231,16 @@ namespace dlib
                 - else
                     - parts_menu.is_enabled() == false
                     - selected_part_name.size() == 0
+
+                - if (moving_overlay) then
+                    - moving_rect == the index in overlay_rects that the move applies to.  
+                    - if (moving_what == MOVING_PART) then
+                        - moving_part_name == the name of the part in
+                          overlay_rects[moving_rect] that is being moved around with the
+                          mouse.
+                    - else
+                        - moving_what will tell us which side of the rectangle in
+                          overlay_rects[moving_rect] is being moved by the mouse.
         !*/
 
     public:
@@ -3580,6 +3590,17 @@ namespace dlib
         bool overlay_editing_enabled;
         timer<image_display> highlight_timer;
         unsigned long highlighted_rect;
+
+        bool moving_overlay;
+        unsigned long moving_rect;
+        enum  {
+            MOVING_RECT_LEFT,
+            MOVING_RECT_TOP,
+            MOVING_RECT_RIGHT,
+            MOVING_RECT_BOTTOM,
+            MOVING_PART
+        } moving_what;
+        std::string moving_part_name;
 
         // restricted functions
         image_display(image_display&);        // copy constructor
