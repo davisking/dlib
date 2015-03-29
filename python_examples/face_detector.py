@@ -51,11 +51,24 @@ for f in sys.argv[1:]:
     # faces.
     dets = detector(img, 1)
     print("Number of faces detected: {}".format(len(dets)))
-    for k, d in enumerate(dets):
+    for i, d in enumerate(dets):
         print("Detection {}: Left: {} Top: {} Right: {} Bottom: {}".format(
-            k, d.left(), d.top(), d.right(), d.bottom()))
+            i, d.left(), d.top(), d.right(), d.bottom()))
 
     win.clear_overlay()
     win.set_image(img)
     win.add_overlay(dets)
     dlib.hit_enter_to_continue()
+
+
+# Finally, if you really want to you can ask the detector to tell you the score
+# for each detection.  The score is bigger for more confident detections.
+# Also, the idx tells you which of the face sub-detectors matched.  This can be
+# used to broadly identify faces in different orientations.
+if (len(sys.argv[1:]) > 0):
+    img = io.imread(sys.argv[1])
+    dets, scores, idx = detector.run(img, 1)
+    for i, d in enumerate(dets):
+        print("Detection {}, score: {}, face_type:{}".format(
+            d, scores[i], idx[i]))
+

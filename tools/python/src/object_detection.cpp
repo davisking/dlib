@@ -354,7 +354,7 @@ ensures \n\
       detector.  If you don't know how many times you want to upsample then \n\
       don't provide a value for upsample_num_times and an appropriate \n\
       default will be used.")
-        .def("run", run_rect_detector, (arg("image"), arg("upsample_num_times")),
+        .def("run", run_rect_detector, (arg("image"), arg("upsample_num_times")=0),
 "requires \n\
     - image is a numpy ndarray containing either an 8bit grayscale or RGB \n\
       image. \n\
