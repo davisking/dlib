@@ -205,7 +205,7 @@ namespace dlib
             from_points.push_back(rect.tl_corner()); to_points.push_back(point(0,0));
             from_points.push_back(rect.tr_corner()); to_points.push_back(point(1,0));
             from_points.push_back(rect.br_corner()); to_points.push_back(point(1,1));
-            return find_similarity_transform(from_points, to_points);
+            return find_affine_transform(from_points, to_points);
         }
 
     // ------------------------------------------------------------------------------------
@@ -223,7 +223,7 @@ namespace dlib
             to_points.push_back(rect.tl_corner()); from_points.push_back(point(0,0));
             to_points.push_back(rect.tr_corner()); from_points.push_back(point(1,0));
             to_points.push_back(rect.br_corner()); from_points.push_back(point(1,1));
-            return find_similarity_transform(from_points, to_points);
+            return find_affine_transform(from_points, to_points);
         }
 
     // ------------------------------------------------------------------------------------
