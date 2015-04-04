@@ -3398,6 +3398,17 @@ namespace dlib
                   displayed.  They will be colored by pixel color p.
         !*/
 
+        template <typename pixel_type>
+        void add_overlay(
+            const vector<double>& p1,
+            const vector<double>& p2, 
+            pixel_type color
+        );
+        /*!
+            ensures
+                - Adds an overlay line going from p1 to p2 with the given color.
+        !*/
+
         template < typename T >
         void set_dot_double_clicked_handler (
             T& object,

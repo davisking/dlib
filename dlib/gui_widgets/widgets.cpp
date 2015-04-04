@@ -5811,7 +5811,10 @@ namespace dlib
 
         for (unsigned long i = 0; i < overlay_lines.size(); ++i)
         {
-            draw_line(c, tform(overlay_lines[i].p1), tform(overlay_lines[i].p2), overlay_lines[i].color, area);
+            draw_line(c, tform(overlay_lines[i].p1)+rect.tl_corner(),
+                         tform(overlay_lines[i].p2)+rect.tl_corner(), 
+                         overlay_lines[i].color, 
+                         area);
         }
 
     }

@@ -3735,6 +3735,7 @@ namespace dlib
         ) : disp(*this) 
         {
             set_size(100,100);
+            on_window_resized();
             show();
         }
 
@@ -3744,6 +3745,7 @@ namespace dlib
             disp(*this)
         {  
             set_size(100,100);
+            on_window_resized();
             add_overlay(point_cloud); 
             show(); 
         }
@@ -3755,6 +3757,7 @@ namespace dlib
             disp(*this)
         {  
             set_size(100,100);
+            on_window_resized();
             add_overlay(point_cloud); 
             set_title(title);
             show(); 
@@ -3787,6 +3790,12 @@ namespace dlib
         )
         {
             disp.clear_overlay();
+        }
+
+        template <typename pixel_type>
+        void add_overlay(const vector<double>& p1, const vector<double>& p2, pixel_type p)
+        {
+            add_overlay(std::vector<overlay_line>(1,overlay_line(p1,p2,p)));
         }
 
         void add_overlay(const std::vector<dlib::vector<double> >& d) 
@@ -3831,6 +3840,7 @@ namespace dlib
             drawable_window::on_window_resized();
             unsigned long width, height;
             get_size(width,height);
+            disp.set_pos(0,0);
             disp.set_size(width, height);
         }
         
