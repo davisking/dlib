@@ -5802,19 +5802,18 @@ namespace dlib
     {
         rectangle area = rect.intersect(c);
         fill_rect(c, area, 0);
-        for (unsigned long i = 0; i < overlay_dots.size(); ++i)
-        {
-            point p = tform(overlay_dots[i].p) + rect.tl_corner();
-            if (area.contains(p))
-                assign_pixel(c[p.y()-c.top()][p.x()-c.left()], overlay_dots[i].color);
-        }
-
         for (unsigned long i = 0; i < overlay_lines.size(); ++i)
         {
             draw_line(c, tform(overlay_lines[i].p1)+rect.tl_corner(),
                          tform(overlay_lines[i].p2)+rect.tl_corner(), 
                          overlay_lines[i].color, 
                          area);
+        }
+        for (unsigned long i = 0; i < overlay_dots.size(); ++i)
+        {
+            point p = tform(overlay_dots[i].p) + rect.tl_corner();
+            if (area.contains(p))
+                assign_pixel(c[p.y()-c.top()][p.x()-c.left()], overlay_dots[i].color);
         }
 
     }
