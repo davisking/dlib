@@ -10,6 +10,7 @@
 
 // Default timeout after 60 seconds
 #define DEFAULT_TIMEOUT 60000
+#define DEFAULT_CONNECTION_TIMEOUT 21000
 
 namespace dlib
 {
@@ -50,7 +51,7 @@ namespace dlib
 
 
         void set_timeout( unsigned int milliseconds = DEFAULT_TIMEOUT ) { timeout = milliseconds; }
-
+        void set_connectiontimeout(unsigned int milliseconds = DEFAULT_CONNECTION_TIMEOUT) { connection_timeout = milliseconds; }
 
         string_to_stringvector get_returned_headers() const { return returned_headers; }
         short                  get_http_return     () const { return http_return; }
@@ -86,6 +87,7 @@ namespace dlib
         std::string returned_body, error_field;
 
         unsigned int timeout;
+        unsigned int connection_timeout;
 
         fnOnDownload OnDownload;
         void *       user_info;
