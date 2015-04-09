@@ -42,7 +42,7 @@ namespace
 
         read_write_mutex m;
 
-        mutex mut;
+        dlib::mutex mut;
         int num_write;
         int num_read;
         int max_read;
