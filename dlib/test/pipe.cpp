@@ -22,7 +22,7 @@ namespace
     namespace pipe_kernel_test_helpers
     {
         const unsigned long proc1_count = 10000;
-        mutex m;
+        dlib::mutex m;
         signaler s(m);
         unsigned long threads_running = 0;
         bool found_error;

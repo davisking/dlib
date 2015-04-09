@@ -23,7 +23,7 @@ namespace
     class timer_test_helper
     {
     public:
-        mutex m;
+        dlib::mutex m;
         int count;
         dlib::uint64 timestamp;
         dlib::timestamper ts;
