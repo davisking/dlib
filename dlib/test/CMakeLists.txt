@@ -68,6 +68,7 @@ set (tests
    learning_to_track.cpp
    least_squares.cpp
    linear_manifold_regularizer.cpp
+   lspi.cpp
    lz77_buffer.cpp
    map.cpp
    matrix2.cpp

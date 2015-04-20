@@ -83,6 +83,7 @@ SRC += kmeans.cpp
 SRC += learning_to_track.cpp
 SRC += least_squares.cpp
 SRC += linear_manifold_regularizer.cpp
+SRC += lspi.cpp
 SRC += lz77_buffer.cpp
 SRC += map.cpp
 SRC += matrix2.cpp
