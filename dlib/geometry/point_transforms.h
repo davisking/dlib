@@ -783,6 +783,15 @@ namespace dlib
         return point_transform_affine3d(identity_matrix<double>(3),delta);
     }
 
+    inline point_transform_affine3d translate_point (
+        double x,
+        double y,
+        double z
+    )
+    {
+        return translate_point(vector<double>(x,y,z));
+    }
+
 // ----------------------------------------------------------------------------------------
 
     class camera_transform
