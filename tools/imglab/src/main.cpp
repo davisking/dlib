@@ -17,7 +17,7 @@
 #include <dlib/dir_nav.h>
 
 
-const char* VERSION = "1.0";
+const char* VERSION = "1.1";
 
 
 
@@ -337,7 +337,7 @@ int main(int argc, char** argv)
         parser.add_option("stats","List detailed statistics on the object labels in the given XML file.");
         parser.add_option("rename", "Rename all labels of <arg1> to <arg2>.",2);
         parser.add_option("parts","The display will allow image parts to be labeled.  The set of allowable parts "
-                          "defined in a space separated list contained in <arg>.",1);
+                          "is defined by <arg> which should be a space separated list of parts.",1);
         parser.add_option("rmdiff","Remove boxes marked as difficult.");
         parser.add_option("shuffle","Randomly shuffle the order of the images listed in file <arg>.");
         parser.add_option("seed", "When using --shuffle, set the random seed to the string <arg>.",1);

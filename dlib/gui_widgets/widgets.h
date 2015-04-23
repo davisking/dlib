@@ -3231,6 +3231,16 @@ namespace dlib
                 - else
                     - parts_menu.is_enabled() == false
                     - selected_part_name.size() == 0
+
+                - if (moving_overlay) then
+                    - moving_rect == the index in overlay_rects that the move applies to.  
+                    - if (moving_what == MOVING_PART) then
+                        - moving_part_name == the name of the part in
+                          overlay_rects[moving_rect] that is being moved around with the
+                          mouse.
+                    - else
+                        - moving_what will tell us which side of the rectangle in
+                          overlay_rects[moving_rect] is being moved by the mouse.
         !*/
 
     public:
@@ -3581,9 +3591,260 @@ namespace dlib
         timer<image_display> highlight_timer;
         unsigned long highlighted_rect;
 
+        bool moving_overlay;
+        unsigned long moving_rect;
+        enum  {
+            MOVING_RECT_LEFT,
+            MOVING_RECT_TOP,
+            MOVING_RECT_RIGHT,
+            MOVING_RECT_BOTTOM,
+            MOVING_PART
+        } moving_what;
+        std::string moving_part_name;
+
         // restricted functions
         image_display(image_display&);        // copy constructor
         image_display& operator=(image_display&);    // assignment operator
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class perspective_display : public drawable, noncopyable
+    {
+    public:
+
+        perspective_display(  
+            drawable_window& w
+        );
+
+        ~perspective_display(
+        );
+
+        virtual void set_size (
+            unsigned long width,
+            unsigned long height 
+        );
+
+        struct overlay_line
+        {
+            overlay_line() { assign_pixel(color, 0);}
+
+            overlay_line(const vector<double>& p1_, const vector<double>& p2_) 
+                : p1(p1_), p2(p2_) { assign_pixel(color, 255); }
+
+            template <typename pixel_type>
+            overlay_line(const vector<double>& p1_, const vector<double>& p2_, pixel_type p) 
+                : p1(p1_), p2(p2_) { assign_pixel(color, p); }
+
+            vector<double> p1;
+            vector<double> p2;
+            rgb_pixel color;
+        };
+
+        struct overlay_dot
+        {
+            overlay_dot() { assign_pixel(color, 0);}
+
+            overlay_dot(const vector<double>& p_) 
+                : p(p_) { assign_pixel(color, 255); }
+
+            template <typename pixel_type>
+            overlay_dot(const vector<double>& p_, pixel_type color_) 
+                : p(p_) { assign_pixel(color, color_); }
+
+            vector<double> p;
+            rgb_pixel color;
+        };
+
+
+        void add_overlay (
+            const std::vector<overlay_line>& overlay
+        );
+
+        void add_overlay (
+            const std::vector<overlay_dot>& overlay
+        );
+
+        void clear_overlay (
+        );
+
+        template <
+            typename T
+            >
+        void set_dot_double_clicked_handler (
+            T& object,
+            void (T::*event_handler_)(const vector<double>&)
+        )
+        {
+            auto_mutex M(m);
+            dot_clicked_event_handler = make_mfp(object,event_handler_);
+        }
+
+        void set_dot_double_clicked_handler (
+            const any_function<void(const vector<double>&)>& event_handler_
+        );
+
+    private:
+
+        void draw (
+            const canvas& c
+        ) const;
+
+        void on_wheel_up (
+            unsigned long state
+        );
+
+        void on_wheel_down (
+            unsigned long state
+        );
+
+        void on_mouse_down (
+            unsigned long btn,
+            unsigned long state,
+            long x,
+            long y,
+            bool is_double_click
+        );
+
+        void on_mouse_move (
+            unsigned long state,
+            long x,
+            long y
+        );
+
+        point last;
+        std::vector<overlay_line> overlay_lines;
+        std::vector<overlay_dot> overlay_dots;
+
+        camera_transform tform;
+        vector<double> sum_pts;
+        vector<double> max_pts;
+        any_function<void(const vector<double>&)> dot_clicked_event_handler;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class perspective_window : public drawable_window, noncopyable
+    {
+    public:
+
+        typedef perspective_display::overlay_line overlay_line;
+        typedef perspective_display::overlay_dot overlay_dot;
+
+        perspective_window(
+        ) : disp(*this) 
+        {
+            set_size(100,100);
+            on_window_resized();
+            show();
+        }
+
+        perspective_window(
+            const std::vector<dlib::vector<double> >& point_cloud
+        ) : 
+            disp(*this)
+        {  
+            set_size(100,100);
+            on_window_resized();
+            add_overlay(point_cloud); 
+            show(); 
+        }
+        
+        perspective_window(
+            const std::vector<dlib::vector<double> >& point_cloud,
+            const std::string& title
+        ) : 
+            disp(*this)
+        {  
+            set_size(100,100);
+            on_window_resized();
+            add_overlay(point_cloud); 
+            set_title(title);
+            show(); 
+        }
+        
+        ~perspective_window(
+        )
+        {
+            // You should always call close_window() in the destructor of window
+            // objects to ensure that no events will be sent to this window while 
+            // it is being destructed.  
+            close_window();
+        }
+
+        void add_overlay (
+            const std::vector<overlay_line>& overlay
+        )
+        {
+            disp.add_overlay(overlay);
+        }
+
+        void add_overlay (
+            const std::vector<overlay_dot>& overlay
+        )
+        {
+            disp.add_overlay(overlay);
+        }
+
+        void clear_overlay (
+        )
+        {
+            disp.clear_overlay();
+        }
+
+        template <typename pixel_type>
+        void add_overlay(const vector<double>& p1, const vector<double>& p2, pixel_type p)
+        {
+            add_overlay(std::vector<overlay_line>(1,overlay_line(p1,p2,p)));
+        }
+
+        void add_overlay(const std::vector<dlib::vector<double> >& d) 
+        { 
+            add_overlay(d, 255);
+        }
+
+        template <typename pixel_type>
+        void add_overlay(const std::vector<dlib::vector<double> >& d, pixel_type p) 
+        { 
+            std::vector<overlay_dot> temp;
+            temp.resize(d.size());
+            for (unsigned long i = 0; i < temp.size(); ++i)
+                temp[i] = overlay_dot(d[i], p);
+
+            add_overlay(temp);
+        }
+
+        template <
+            typename T
+            >
+        void set_dot_double_clicked_handler (
+            T& object,
+            void (T::*event_handler_)(const vector<double>&)
+        )
+        {
+            disp.set_dot_double_clicked_handler(object,event_handler_);
+        }
+
+        void set_dot_double_clicked_handler (
+            const any_function<void(const vector<double>&)>& event_handler_
+        )
+        {
+            disp.set_dot_double_clicked_handler(event_handler_);
+        }
+
+    private:
+
+        void on_window_resized(
+        )
+        {
+            drawable_window::on_window_resized();
+            unsigned long width, height;
+            get_size(width,height);
+            disp.set_pos(0,0);
+            disp.set_size(width, height);
+        }
+        
+        perspective_display disp;
     };
 
 // ----------------------------------------------------------------------------------------

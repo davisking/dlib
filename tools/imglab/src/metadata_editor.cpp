@@ -535,6 +535,7 @@ display_about(
     sout << wrap_string("Additionally, you can hold ctrl and then scroll the mouse wheel to zoom.  A normal left click "
                         "and drag allows you to navigate around the image.  Holding ctrl and "
                         "left clicking a rectangle will give it the label from the Next Label field. "
+                        "Holding shift + right click and then dragging allows you to move things around. "
                         "Finally, holding ctrl and pressing the up or down keyboard keys will propagate "
                         "rectangle labels from one image to the next and also skip empty images.",0,0) << endl;
 

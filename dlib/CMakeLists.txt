@@ -193,7 +193,8 @@ if (NOT TARGET dlib)
             else()
                message(" *****************************************************************************")
                message(" *** DLIB GUI SUPPORT DISABLED BECAUSE X11 DEVELOPMENT LIBRARIES NOT FOUND ***")
-               message(" *** Make sure libx11-dev is installed if you want GUI support             ***")
+               message(" *** Make sure libx11-dev is installed if you want GUI support.            ***")
+               message(" *** On Ubuntu run: sudo apt-get install libx11-dev                        ***")
                message(" *****************************************************************************")
                set(DLIB_NO_GUI_SUPPORT ON CACHE STRING ${DLIB_NO_GUI_SUPPORT_STR} FORCE )
             endif()
@@ -286,7 +287,7 @@ if (NOT TARGET dlib)
             set (dlib_needed_libraries ${dlib_needed_libraries} ${JPEG_LIBRARY})
          else()
             # If we can't find libjpeg then statically compile it in.
-            include_directories(external/libjpeg)
+            add_definitions(-DDLIB_JPEG_STATIC)
             set(source_files ${source_files}
                   external/libjpeg/jcomapi.cpp
                   external/libjpeg/jdapimin.cpp

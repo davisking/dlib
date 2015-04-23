@@ -156,8 +156,7 @@ namespace dlib
                 const vector<T,2>& p
             ) const
             {
-                //do return (p - vector<T,2>(2,2))/2.0;
-                return p/2.0 - vector<double,2>(1,1);
+                return p/2.0 - vector<double,2>(1.25,0.75);
             }
 
             template <typename T>
@@ -165,7 +164,7 @@ namespace dlib
                 const vector<T,2>& p
             ) const
             {
-                return p*2 + vector<T,2>(2,2);
+                return (p + vector<T,2>(1.25,0.75))*2;
             }
 
         // -----------------------------
@@ -497,8 +496,7 @@ namespace dlib
             ) const
             {
                 const double ratio = 2.0/3.0;
-                //do return (p - vector<T,2>(1,1))*ratio;
-                return p*ratio - vector<double,2>(ratio,ratio);
+                return p*ratio - vector<double,2>(1,1);
             }
 
             template <typename T>
@@ -507,7 +505,7 @@ namespace dlib
             ) const
             {
                 const double ratio = 3.0/2.0;
-                return p*ratio + vector<T,2>(1,1);
+                return p*ratio + vector<T,2>(ratio,ratio);
             }
 
         // -----------------------------

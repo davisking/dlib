@@ -15,6 +15,12 @@
 #   system so long as you have CMake and boost-python installed.
 #   On Ubuntu, this can be done easily by running the command:
 #       sudo apt-get install libboost-python-dev cmake
+#
+#   Also note that this example requires scikit-image which can be installed
+#   via the command:
+#       pip install -U scikit-image
+#   Or downloaded from http://scikit-image.org/download.html. 
+
 import os
 import sys
 import glob
@@ -111,7 +117,7 @@ for f in glob.glob(os.path.join(faces_folder, "*.jpg")):
     win.clear_overlay()
     win.set_image(img)
     win.add_overlay(dets)
-    raw_input("Hit enter to continue")
+    dlib.hit_enter_to_continue()
 
 
 
@@ -144,7 +150,7 @@ detector2 = dlib.train_simple_object_detector(images, boxes, options)
 
 # Now let's look at its HOG filter!
 win_det.set_image(detector2)
-raw_input("Hit enter to continue")
+dlib.hit_enter_to_continue()
 
 # Note that you don't have to use the XML based input to
 # test_simple_object_detector().  If you have already loaded your training

@@ -1659,13 +1659,13 @@ namespace
                 if (get_rect(out).contains(rect))
                 {
                     T val = sum(pointwise_multiply(col_filt*row_filt, subm(mat(img),rect)));
-                    DLIB_CASSERT(val == out[r][c],"err: " << val-out[r][c]);
+                    DLIB_TEST_MSG(val == out[r][c],"err: " << val-out[r][c]);
 
-                    DLIB_CASSERT(area.contains(point(c,r)),"");
+                    DLIB_TEST(area.contains(point(c,r)));
                 }
                 else
                 {
-                    DLIB_CASSERT(!area.contains(point(c,r)),"");
+                    DLIB_TEST(!area.contains(point(c,r)));
                 }
             }
         }
@@ -1731,6 +1731,89 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_extract_image_chips()
+    {
+        dlib::rand rnd;
+
+        // Make sure that cropping a white box out of a larger white image always produces an
+        // exact white box.  This should catch any bad border effects from a messed up internal
+        // cropping.
+        for (int iter = 0; iter < 1000; ++iter)
+        {
+            print_spinner();
+            const long nr = rnd.get_random_32bit_number()%100 + 1;
+            const long nc = rnd.get_random_32bit_number()%100 + 1;
+            const long size = rnd.get_random_32bit_number()%10000 + 4;
+            const double angle = rnd.get_random_double() * pi;
+
+            matrix<int> img(501,501), chip;
+            img = 255;
+            chip_details details(centered_rect(center(get_rect(img)),nr,nc), size, angle);
+            extract_image_chip(img, details, chip);
+            DLIB_TEST_MSG(max(abs(chip-255))==0,"nr: " << nr << "  nc: "<< nc << "  size: " << size << "  angle: " << angle 
+                << " error: " << max(abs(chip-255)) );
+        }
+
+
+        {
+            // Make sure that the interpolation in extract_image_chip() keeps stuff in the
+            // right places.
+
+            matrix<unsigned char> img(10,10), chip;
+            img = 0;
+            img(1,1) = 255;
+            img(8,8) = 255;
+
+            extract_image_chip(img, chip_details(get_rect(img), 9*9), chip);
+
+            DLIB_TEST(chip(1,1) == 195);
+            DLIB_TEST(chip(7,7) == 195);
+            chip(1,1) -= 195;
+            chip(7,7) -= 195;
+            DLIB_TEST(sum(matrix_cast<int>(chip)) == 0);
+        }
+
+
+
+        // Test the rotation ability of extract_image_chip().  Do this by drawing a line and
+        // then rotating it so it's horizontal.  Check that it worked correctly by hough
+        // transforming it.
+        hough_transform ht(151);
+        matrix<unsigned char> img(300,300);
+        for (int iter = 0; iter < 1000; ++iter)
+        {
+            print_spinner();
+            img = 0;
+            const int len = 9000;
+            point cent = center(get_rect(img));
+            point l = cent + point(len,0);
+            point r = cent - point(len,0);
+            const double angle = rnd.get_random_double()*pi*3;
+            l = rotate_point(cent, l, angle);
+            r = rotate_point(cent, r, angle);
+            draw_line(img, l, r, 255);
+
+
+            const long wsize = rnd.get_random_32bit_number()%350 + 150;
+
+            matrix<unsigned char> temp;
+            chip_details details(centered_rect(center(get_rect(img)), wsize,wsize),  chip_dims(ht.size(),ht.size()), angle);
+            extract_image_chip(img, details, temp);
+
+
+            matrix<long> tform;
+            ht(temp, get_rect(temp), tform);
+            std::pair<point,point> line = ht.get_line(max_point(tform));
+
+            DLIB_TEST_MSG(line.first.y() == line.second.y()," wsize: " << wsize);
+            DLIB_TEST(length(line.first-line.second) > 100);
+            DLIB_TEST(length((line.first+line.second)/2.0 - center(get_rect(temp))) <= 1);
+        }
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class image_tester : public tester
     {
     public:
@@ -1745,6 +1828,7 @@ namespace
         {
             image_test();
             run_hough_test();
+            test_extract_image_chips();
             test_integral_image<long, unsigned char>();
             test_integral_image<double, int>();
             test_integral_image<long, unsigned char>();

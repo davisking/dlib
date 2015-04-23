@@ -20,13 +20,46 @@ namespace dlib
     struct sub_image_proxy
     {
         sub_image_proxy (
-            T& img_,
-            const rectangle& rect_
-        ) : img(img_), rect(rect_.intersect(get_rect(img_)))
-        {}
+            T& img,
+            rectangle rect
+        ) 
+        {
+            rect = rect.intersect(get_rect(img));
+            typedef typename image_traits<T>::pixel_type pixel_type;
 
-        T& img;
-        const rectangle rect;
+            _nr = rect.height();
+            _nc = rect.width();
+            _width_step = width_step(img);
+            _data = (char*)image_data(img) + sizeof(pixel_type)*rect.left() + rect.top()*_width_step;
+        }
+
+        void* _data;
+        long _width_step;
+        long _nr;
+        long _nc;
+    };
+
+    template <typename T>
+    struct const_sub_image_proxy
+    {
+        const_sub_image_proxy (
+            const T& img,
+            rectangle rect
+        ) 
+        {
+            rect = rect.intersect(get_rect(img));
+            typedef typename image_traits<T>::pixel_type pixel_type;
+
+            _nr = rect.height();
+            _nc = rect.width();
+            _width_step = width_step(img);
+            _data = (const char*)image_data(img) + sizeof(pixel_type)*rect.left() + rect.top()*_width_step;
+        }
+
+        const void* _data;
+        long _width_step;
+        long _nr;
+        long _nc;
     };
 
     template <typename T>
@@ -39,32 +72,53 @@ namespace dlib
     {
         typedef typename image_traits<T>::pixel_type pixel_type;
     };
+    template <typename T>
+    struct image_traits<const_sub_image_proxy<T> >
+    {
+        typedef typename image_traits<T>::pixel_type pixel_type;
+    };
+    template <typename T>
+    struct image_traits<const const_sub_image_proxy<T> >
+    {
+        typedef typename image_traits<T>::pixel_type pixel_type;
+    };
 
     template <typename T>
-    inline long num_rows( const sub_image_proxy<T>& img) { return img.rect.height(); }
+    inline long num_rows( const sub_image_proxy<T>& img) { return img._nr; }
     template <typename T>
-    inline long num_columns( const sub_image_proxy<T>& img) { return img.rect.width(); }
+    inline long num_columns( const sub_image_proxy<T>& img) { return img._nc; }
+
+    template <typename T>
+    inline long num_rows( const const_sub_image_proxy<T>& img) { return img._nr; }
+    template <typename T>
+    inline long num_columns( const const_sub_image_proxy<T>& img) { return img._nc; }
 
     template <typename T>
     inline void* image_data( sub_image_proxy<T>& img) 
     { 
-        typedef typename image_traits<T>::pixel_type pixel_type;
-        return (char*)image_data(img.img) + sizeof(pixel_type)*img.rect.left() + img.rect.top()*width_step(img); 
+        return img._data; 
     } 
     template <typename T>
     inline const void* image_data( const sub_image_proxy<T>& img) 
     {
-        typedef typename image_traits<T>::pixel_type pixel_type;
-        return (const char*)image_data(img.img) + sizeof(pixel_type)*img.rect.left() + img.rect.top()*width_step(img); 
+        return img._data; 
+    }
+
+    template <typename T>
+    inline const void* image_data( const const_sub_image_proxy<T>& img) 
+    {
+        return img._data; 
     }
 
     template <typename T>
     inline long width_step(
         const sub_image_proxy<T>& img
-    ) 
-    { 
-        return width_step(img.img);
-    }
+    ) { return img._width_step; }
+
+    template <typename T>
+    inline long width_step(
+        const const_sub_image_proxy<T>& img
+    ) { return img._width_step; }
 
     template <
         typename image_type
@@ -80,14 +134,15 @@ namespace dlib
     template <
         typename image_type
         >
-    const sub_image_proxy<const image_type> sub_image (
+    const const_sub_image_proxy<image_type> sub_image (
         const image_type& img,
         const rectangle& rect
     )
     {
-        return sub_image_proxy<const image_type>(img,rect);
+        return const_sub_image_proxy<image_type>(img,rect);
     }
 
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     class interpolate_nearest_neighbor
@@ -1348,7 +1403,7 @@ namespace dlib
 
         std::vector<T> objtemp;
         std::vector<U> objtemp2;
-        typename image_array_type::image_type temp;
+        typename image_array_type::value_type temp;
         for (long i = 0; i < angles.size(); ++i)
         {
             for (unsigned long j = 0; j < images.size(); ++j)
@@ -1501,7 +1556,8 @@ namespace dlib
     {
         chip_details() : angle(0), rows(0), cols(0) {}
         chip_details(const rectangle& rect_) : rect(rect_),angle(0), rows(rect_.height()), cols(rect_.width()) {}
-        chip_details(const drectangle& rect_) : rect(rect_),angle(0), rows(rect_.height()), cols(rect_.width()) {}
+        chip_details(const drectangle& rect_) : rect(rect_),angle(0), 
+          rows((unsigned long)(rect_.height()+0.5)), cols((unsigned long)(rect_.width()+0.5)) {}
         chip_details(const drectangle& rect_, unsigned long size) : rect(rect_),angle(0) 
         { compute_dims_from_size(size); }
         chip_details(const drectangle& rect_, unsigned long size, double angle_) : rect(rect_),angle(angle_) 
@@ -1562,6 +1618,8 @@ namespace dlib
             const double relative_size = std::sqrt(size/(double)rect.area());
             rows = static_cast<unsigned long>(rect.height()*relative_size + 0.5);
             cols  = static_cast<unsigned long>(size/(double)rows + 0.5);
+            rows = std::max(1ul,rows);
+            cols = std::max(1ul,cols);
         }
     };
 
@@ -1683,22 +1741,36 @@ namespace dlib
         // interpolation.  So we use an image pyramid to make sure the interpolation is
         // fast but also high quality.  The first thing we do is figure out how deep the
         // image pyramid needs to be.
+        rectangle bounding_box;
         for (unsigned long i = 0; i < chip_locations.size(); ++i)
         {
             long depth = 0;
+            double grow = 2;
             drectangle rect = pyr.rect_down(chip_locations[i].rect);
             while (rect.area() > chip_locations[i].size())
             {
                 rect = pyr.rect_down(rect);
                 ++depth;
+                // We drop the image size by a factor of 2 each iteration and then assume a
+                // border of 2 pixels is needed to avoid any border effects of the crop.
+                grow = grow*2 + 2;
             }
+            drectangle rot_rect;
+            const vector<double,2> cent = center(chip_locations[i].rect);
+            rot_rect += rotate_point<double>(cent,chip_locations[i].rect.tl_corner(),chip_locations[i].angle);
+            rot_rect += rotate_point<double>(cent,chip_locations[i].rect.tr_corner(),chip_locations[i].angle);
+            rot_rect += rotate_point<double>(cent,chip_locations[i].rect.bl_corner(),chip_locations[i].angle);
+            rot_rect += rotate_point<double>(cent,chip_locations[i].rect.br_corner(),chip_locations[i].angle);
+            bounding_box += grow_rect(rot_rect, grow).intersect(get_rect(img));
             max_depth = std::max(depth,max_depth);
         }
+        //std::cout << "max_depth: " << max_depth << std::endl;
+        //std::cout << "crop amount: " << bounding_box.area()/(double)get_rect(img).area() << std::endl;
 
         // now make an image pyramid
         dlib::array<array2d<typename image_traits<image_type1>::pixel_type> > levels(max_depth);
         if (levels.size() != 0)
-            pyr(img,levels[0]);
+            pyr(sub_image(img,bounding_box),levels[0]);
         for (unsigned long i = 1; i < levels.size(); ++i)
             pyr(levels[i-1],levels[i]);
 
@@ -1722,7 +1794,7 @@ namespace dlib
 
                 // figure out which level in the pyramid to use to extract the chip
                 int level = -1;
-                drectangle rect = chip_locations[i].rect;
+                drectangle rect = translate_rect(chip_locations[i].rect, -bounding_box.tl_corner());
                 while (pyr.rect_down(rect).area() > chip_locations[i].size())
                 {
                     ++level;
@@ -1740,7 +1812,7 @@ namespace dlib
 
                 // now extract the actual chip
                 if (level == -1)
-                    transform_image(img,chips[i],interpolate_bilinear(),trns);
+                    transform_image(sub_image(img,bounding_box),chips[i],interpolate_bilinear(),trns);
                 else
                     transform_image(levels[level],chips[i],interpolate_bilinear(),trns);
             }

@@ -74,6 +74,14 @@ double _assignment_cost (
 
 // ----------------------------------------------------------------------------------------
 
+void hit_enter_to_continue()
+{
+    std::cout << "Hit enter to continue";
+    std::cin.get();
+}
+
+// ----------------------------------------------------------------------------------------
+
 void bind_other()
 {
     using boost::python::arg;
@@ -140,5 +148,8 @@ present in the output.   "
 ensures    \n\
     - saves the data to the given file in libsvm format   " 
     );
+
+    def("hit_enter_to_continue", hit_enter_to_continue, 
+        "Asks the user to hit enter to continue and pauses until they do so.");
 }
 

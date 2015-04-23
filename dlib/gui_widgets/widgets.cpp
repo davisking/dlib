@@ -5654,6 +5654,308 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
+//       perspective_display member functions
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    perspective_display::
+    perspective_display(  
+        drawable_window& w
+    ) : 
+        drawable(w,MOUSE_MOVE|MOUSE_CLICK|MOUSE_WHEEL)
+    {
+        clear_overlay();
+        enable_events(); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    perspective_display::
+    ~perspective_display(
+    )
+    {
+        disable_events();
+        parent.invalidate_rectangle(rect); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void perspective_display::
+    set_size (
+        unsigned long width,
+        unsigned long height 
+    )
+    {
+        auto_mutex lock(m);
+        rectangle old(rect);
+        rect = resize_rect(rect,width,height);
+        tform = camera_transform(tform.get_camera_pos(),
+            tform.get_camera_looking_at(),
+            tform.get_camera_up_direction(),
+            tform.get_camera_field_of_view(),
+            std::min(rect.width(),rect.height()));
+        parent.invalidate_rectangle(old+rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void perspective_display::
+    add_overlay (
+        const std::vector<overlay_line>& overlay
+    )
+    {
+        auto_mutex M(m);
+        if (overlay.size() == 0)
+            return;
+        // push this new overlay into our overlay vector
+        overlay_lines.insert(overlay_lines.end(), overlay.begin(), overlay.end());
+
+        for (unsigned long i = 0; i < overlay.size(); ++i)
+        {
+            sum_pts += overlay[i].p1;
+            sum_pts += overlay[i].p2;
+            max_pts.x() = std::max(overlay[i].p1.x(), max_pts.x());
+            max_pts.x() = std::max(overlay[i].p2.x(), max_pts.x());
+            max_pts.y() = std::max(overlay[i].p1.y(), max_pts.y());
+            max_pts.y() = std::max(overlay[i].p2.y(), max_pts.y());
+            max_pts.z() = std::max(overlay[i].p1.z(), max_pts.z());
+            max_pts.z() = std::max(overlay[i].p2.z(), max_pts.z());
+        }
+
+        tform = camera_transform(max_pts,
+            sum_pts/(overlay_lines.size()*2+overlay_dots.size()),
+            vector<double>(0,0,1),
+            tform.get_camera_field_of_view(),
+            std::min(rect.width(),rect.height()));
+
+        // make the parent window redraw us now that we changed the overlay
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void perspective_display::
+    add_overlay (
+        const std::vector<overlay_dot>& overlay
+    )
+    {
+        auto_mutex M(m);
+        if (overlay.size() == 0)
+            return;
+
+        // push this new overlay into our overlay vector
+        overlay_dots.insert(overlay_dots.end(), overlay.begin(), overlay.end());
+
+        for (unsigned long i = 0; i < overlay.size(); ++i)
+        {
+            sum_pts += overlay[i].p;
+            max_pts.x() = std::max(overlay[i].p.x(), max_pts.x());
+            max_pts.y() = std::max(overlay[i].p.y(), max_pts.y());
+            max_pts.z() = std::max(overlay[i].p.z(), max_pts.z());
+        }
+
+        tform = camera_transform(max_pts,
+            sum_pts/(overlay_lines.size()*2+overlay_dots.size()),
+            vector<double>(0,0,1),
+            tform.get_camera_field_of_view(),
+            std::min(rect.width(),rect.height()));
+
+
+        // make the parent window redraw us now that we changed the overlay
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void perspective_display::
+    clear_overlay (
+    )
+    {
+        auto_mutex lock(m);
+        overlay_dots.clear();
+        overlay_lines.clear();
+        sum_pts = vector<double>();
+        max_pts = vector<double>(-std::numeric_limits<double>::infinity(),
+            -std::numeric_limits<double>::infinity(),
+            -std::numeric_limits<double>::infinity());
+
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void perspective_display::
+    set_dot_double_clicked_handler (
+        const any_function<void(const vector<double>&)>& event_handler_
+    )
+    {
+        auto_mutex M(m);
+        dot_clicked_event_handler = event_handler_;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void perspective_display::
+    draw (
+        const canvas& c
+    ) const
+    {
+        rectangle area = rect.intersect(c);
+        fill_rect(c, area, 0);
+        for (unsigned long i = 0; i < overlay_lines.size(); ++i)
+        {
+            draw_line(c, tform(overlay_lines[i].p1)+rect.tl_corner(),
+                         tform(overlay_lines[i].p2)+rect.tl_corner(), 
+                         overlay_lines[i].color, 
+                         area);
+        }
+        for (unsigned long i = 0; i < overlay_dots.size(); ++i)
+        {
+            point p = tform(overlay_dots[i].p) + rect.tl_corner();
+            if (area.contains(p))
+                assign_pixel(c[p.y()-c.top()][p.x()-c.left()], overlay_dots[i].color);
+        }
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void perspective_display::
+    on_wheel_up (
+        unsigned long //state
+    )
+    {
+        if (rect.contains(lastx,lasty) == false || hidden || !enabled)
+            return;
+
+        const double alpha = 0.10;
+        const vector<double> delta = alpha*(tform.get_camera_pos() - tform.get_camera_looking_at());
+        tform = camera_transform(
+            tform.get_camera_pos() - delta,
+            tform.get_camera_looking_at(),
+            tform.get_camera_up_direction(),
+            tform.get_camera_field_of_view(),
+            std::min(rect.width(),rect.height()));
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void perspective_display::
+    on_wheel_down (
+        unsigned long //state
+    )
+    {
+        if (rect.contains(lastx,lasty) == false || hidden || !enabled)
+            return;
+
+        const double alpha = 0.10;
+        const vector<double> delta = alpha*(tform.get_camera_pos() - tform.get_camera_looking_at());
+        tform = camera_transform(
+            tform.get_camera_pos() + delta,
+            tform.get_camera_looking_at(),
+            tform.get_camera_up_direction(),
+            tform.get_camera_field_of_view(),
+            std::min(rect.width(),rect.height()));
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void perspective_display::
+    on_mouse_down (
+        unsigned long btn,
+        unsigned long, //state
+        long x,
+        long y,
+        bool is_double_click
+    )
+    {
+        if (btn == base_window::LEFT || btn == base_window::RIGHT)
+        {
+            last = point(x,y);
+        }
+        if (is_double_click && btn == base_window::LEFT && enabled && !hidden && overlay_dots.size() != 0)
+        {
+            double best_dist = std::numeric_limits<double>::infinity();
+            unsigned long best_idx = 0;
+            const dpoint pp(x,y);
+            for (unsigned long i = 0; i < overlay_dots.size(); ++i)
+            {
+                dpoint p = tform(overlay_dots[i].p) + rect.tl_corner();
+                double dist = length_squared(p-pp);
+                if (dist < best_dist)
+                {
+                    best_dist = dist;
+                    best_idx = i;
+                }
+            }
+            if (dot_clicked_event_handler.is_set())
+                dot_clicked_event_handler(overlay_dots[best_idx].p);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void perspective_display::
+    on_mouse_move (
+        unsigned long state,
+        long x,
+        long y
+    )
+    {
+        if (!enabled || hidden)
+            return;
+
+        if (state == base_window::LEFT)
+        {
+            const point cur(x, y);
+            dpoint delta = last-cur;
+            last = cur;
+
+            const vector<double> radius = tform.get_camera_pos()-tform.get_camera_looking_at();
+            delta *= 2*pi*length(radius)/600.0;
+            vector<double> tangent_x = tform.get_camera_up_direction().cross(radius).normalize();
+            vector<double> tangent_y = radius.cross(tangent_x).normalize();
+            vector<double> new_pos = tform.get_camera_pos() + tangent_x*delta.x() + tangent_y*-delta.y(); 
+
+            // now make it have the correct radius relative to the looking at point.
+            new_pos = (new_pos-tform.get_camera_looking_at()).normalize()*length(radius) + tform.get_camera_looking_at();
+
+            tform = camera_transform(new_pos,
+                tform.get_camera_looking_at(),
+                tangent_y,
+                tform.get_camera_field_of_view(),
+                std::min(rect.width(),rect.height()));
+            parent.invalidate_rectangle(rect);
+        }
+        else if (state == (base_window::LEFT|base_window::SHIFT) ||
+            state == base_window::RIGHT)
+        {
+            const point cur(x, y);
+            dpoint delta = last-cur;
+            last = cur;
+
+            const vector<double> radius = tform.get_camera_pos()-tform.get_camera_looking_at();
+            delta *= 2*pi*length(radius)/600.0;
+            vector<double> tangent_x = tform.get_camera_up_direction().cross(radius).normalize();
+            vector<double> tangent_y = radius.cross(tangent_x).normalize();
+
+            vector<double> offset = tangent_x*delta.x() + tangent_y*-delta.y(); 
+
+
+            tform = camera_transform(
+                tform.get_camera_pos()+offset,
+                tform.get_camera_looking_at()+offset,
+                tform.get_camera_up_direction(),
+                tform.get_camera_field_of_view(),
+                std::min(rect.width(),rect.height()));
+            parent.invalidate_rectangle(rect);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 //       image_display member functions
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -6074,6 +6376,7 @@ namespace dlib
         if (!is_printable && !hidden && enabled && rect_is_selected && 
             (key == base_window::KEY_BACKSPACE || key == base_window::KEY_DELETE))
         {
+            moving_overlay = false;
             rect_is_selected = false;
             parts_menu.disable();
             if (selected_part_name.size() == 0)
@@ -6155,6 +6458,89 @@ namespace dlib
 
         if (!overlay_editing_enabled)
             return;
+
+        if (btn == base_window::RIGHT && (state&base_window::SHIFT))
+        {
+            const bool rect_was_selected = rect_is_selected;
+            rect_is_selected = false;
+            parts_menu.disable();
+
+            long best_dist = std::numeric_limits<long>::max();
+            long best_idx = 0;
+            std::string best_part;
+
+            // check if this click landed on any of the overlay rectangles
+            for (unsigned long i = 0; i < overlay_rects.size(); ++i)
+            {
+                const rectangle orect = get_rect_on_screen(i);
+
+                const long dist = distance_to_rect_edge(orect, point(x,y));
+
+                if (dist < best_dist)
+                {
+                    best_dist = dist;
+                    best_idx = i;
+                    best_part.clear();
+                }
+
+                std::map<std::string,point>::const_iterator itr;
+                for (itr = overlay_rects[i].parts.begin(); itr != overlay_rects[i].parts.end(); ++itr)
+                {
+                    rectangle temp = centered_rect(get_rect_on_screen(centered_rect(itr->second,1,1)), part_width, part_width);
+                    point c = center(temp);
+
+                    // distance from edge of part circle
+                    const long dist = static_cast<long>(std::abs(length(c - point(x,y)) + 0.5 - temp.width()/2));
+                    if (dist < best_dist)
+                    {
+                        best_idx = i;
+                        best_dist = dist;
+                        best_part = itr->first;
+                    }
+                }
+            }
+
+
+            if (best_dist < 13)
+            {
+                moving_overlay = true;
+                moving_rect = best_idx;
+                moving_part_name = best_part;
+                // If we are moving one of the sides  of the rectangle rather than one of
+                // the parts circles then we need to figure out which side of the rectangle
+                // we are moving.
+                if (best_part.size() == 0)
+                {
+                    // which side is the click closest to?
+                    const rectangle orect = get_rect_on_screen(best_idx);
+                    const point p = nearest_point(orect,point(x,y));
+                    long dist_left   = std::abs(p.x()-orect.left());
+                    long dist_top    = std::abs(p.y()-orect.top());
+                    long dist_right  = std::abs(p.x()-orect.right());
+                    long dist_bottom = std::abs(p.y()-orect.bottom());
+                    long min_val = std::min(std::min(dist_left,dist_right),std::min(dist_top,dist_bottom));
+                    if (dist_left == min_val)
+                        moving_what = MOVING_RECT_LEFT;
+                    else if (dist_top == min_val)
+                        moving_what = MOVING_RECT_TOP;
+                    else if (dist_right == min_val)
+                        moving_what = MOVING_RECT_RIGHT;
+                    else 
+                        moving_what = MOVING_RECT_BOTTOM;
+                }
+                else
+                {
+                    moving_what = MOVING_PART;
+                }
+                // Do this to make the moving stuff snap to the mouse immediately.
+                on_mouse_move(state|btn,x,y);
+            }
+
+            if (rect_was_selected)
+                parent.invalidate_rectangle(rect);
+
+            return;
+        }
 
         if (btn == base_window::RIGHT && rect_is_selected)
         {
@@ -6387,6 +6773,10 @@ namespace dlib
             drawing_rect = false;
             parent.invalidate_rectangle(rect);
         }
+        if (moving_overlay)
+        {
+            moving_overlay = false;
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -6412,6 +6802,61 @@ namespace dlib
             {
                 drawing_rect = false;
                 parent.invalidate_rectangle(rect);
+            }
+            moving_overlay = false;
+        }
+        else if (moving_overlay)
+        {
+            if ((state&base_window::RIGHT) && (state&base_window::SHIFT) && !hidden && enabled)
+            {
+                // map point(x,y) into the image coordinate space.
+                point p = point(x,y) - total_rect().tl_corner();
+                if (zoom_in_scale != 1)
+                {
+                    if (moving_what == MOVING_PART)
+                        p = p/(double)zoom_in_scale-dpoint(0.5,0.5);
+                    else
+                        p = p/(double)zoom_in_scale;
+                }
+                else if (zoom_out_scale != 1)
+                {
+                    p = p*(double)zoom_out_scale;
+                }
+
+
+                if (moving_what == MOVING_PART)
+                {
+                    if (overlay_rects[moving_rect].parts[moving_part_name] != p)
+                    {
+                        overlay_rects[moving_rect].parts[moving_part_name] = p;
+                        parent.invalidate_rectangle(rect);
+                        if (event_handler.is_set())
+                            event_handler();
+                    }
+                }
+                else 
+                {
+                    rectangle original = overlay_rects[moving_rect].rect;
+                    if (moving_what == MOVING_RECT_LEFT)
+                        overlay_rects[moving_rect].rect.left() = std::min(p.x(), overlay_rects[moving_rect].rect.right());
+                    else if (moving_what == MOVING_RECT_RIGHT)
+                        overlay_rects[moving_rect].rect.right() = std::max(p.x()-1, overlay_rects[moving_rect].rect.left());
+                    else if (moving_what == MOVING_RECT_TOP)
+                        overlay_rects[moving_rect].rect.top() = std::min(p.y(), overlay_rects[moving_rect].rect.bottom());
+                    else 
+                        overlay_rects[moving_rect].rect.bottom() = std::max(p.y()-1, overlay_rects[moving_rect].rect.top());
+
+                    if (original != overlay_rects[moving_rect].rect)
+                    {
+                        parent.invalidate_rectangle(rect);
+                        if (event_handler.is_set())
+                            event_handler();
+                    }
+                }
+            }
+            else
+            {
+                moving_overlay = false;
             }
         }
     }

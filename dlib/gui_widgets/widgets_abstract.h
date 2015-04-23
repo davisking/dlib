@@ -2338,7 +2338,8 @@ namespace dlib
                 by double clicking on it and hitting delete or backspace.  Finally, you
                 can also add part labels (if they have been defined by calling add_labelable_part_name())
                 by selecting an overlay rectangle with the mouse and then right clicking
-                on the part.
+                on the part.  If you want to move any rectangle or an object part then
+                shift+right click and drag it.
                 
                 Finally, if you hold Ctrl and left click an overlay rectangle it will 
                 change its label to get_default_overlay_rect_label().
@@ -3156,6 +3157,287 @@ namespace dlib
         // restricted functions
         image_window(image_window&);
         image_window& operator= (image_window&);
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class perspective_display : public drawable, noncopyable
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for displaying 3D point clouds on a screen.  You can
+                navigate the display with the mouse.  Left click and drag rotates the
+                camera around the displayed data.  Scrolling the mouse wheel zooms and
+                shift+left click (or just right click) and drag pans the view around.
+        !*/
+
+    public:
+
+        perspective_display(  
+            drawable_window& w
+        );
+        /*!
+            ensures 
+                - #*this is properly initialized 
+                - #*this has been added to window w
+                - #parent_window() == w
+        !*/
+
+        ~perspective_display(
+        );
+        /*!
+            ensures
+                - all resources associated with *this have been released
+        !*/
+
+        void set_size (
+            unsigned long width,
+            unsigned long height 
+        );
+        /*! 
+            ensures
+                - #width() == width
+                - #height() == height
+                - #top() == top()
+                - #left() == left()
+                - i.e. The location of the upper left corner of this widget stays the
+                  same but its width and height are modified.
+        !*/
+
+        struct overlay_line
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object represents a line that is drawn on the screen.  Each line
+                    is represented by its two end points (p1 and p2) as well as a color.
+            !*/
+
+            overlay_line() { assign_pixel(color, 0);}
+
+            overlay_line(const vector<double>& p1_, const vector<double>& p2_) 
+                : p1(p1_), p2(p2_) { assign_pixel(color, 255); }
+
+            template <typename pixel_type>
+            overlay_line(const vector<double>& p1_, const vector<double>& p2_, pixel_type p) 
+                : p1(p1_), p2(p2_) { assign_pixel(color, p); }
+
+            vector<double> p1;
+            vector<double> p2;
+            rgb_pixel color;
+        };
+
+        struct overlay_dot
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object represents a dot that is drawn on the screen.  Each dot is
+                    represented by one point and a color.
+            !*/
+
+            overlay_dot() { assign_pixel(color, 0);}
+
+            overlay_dot(const vector<double>& p_) 
+                : p(p_) { assign_pixel(color, 255); }
+
+            template <typename pixel_type>
+            overlay_dot(const vector<double>& p_, pixel_type color_) 
+                : p(p_) { assign_pixel(color, color_); }
+
+            vector<double> p; // The location of the dot
+            rgb_pixel color;
+        };
+
+        void add_overlay (
+            const std::vector<overlay_line>& overlay
+        );
+        /*!
+            ensures
+                - Adds the given overlay lines into this object such that it will be
+                  displayed. 
+        !*/
+
+        void add_overlay (
+            const std::vector<overlay_dot>& overlay
+        );
+        /*!
+            ensures
+                - Adds the given overlay dots into this object such that it will be
+                  displayed. 
+        !*/
+
+        void clear_overlay (
+        );
+        /*!
+            ensures
+                - Removes all overlays from this object.  The display will be empty.
+        !*/
+
+        template <typename T>
+        void set_dot_double_clicked_handler (
+            T& object,
+            void (T::*event_handler)(const vector<double>&)
+        );
+        /*
+            requires
+                - event_handler is a valid pointer to a member function in T 
+            ensures
+                - The event_handler function is called on object when the user double
+                  clicks on one of the overlay dots.  The selected dot will be passed to
+                  event_handler().
+                - Any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+        */
+
+        void set_dot_double_clicked_handler (
+            const any_function<void(const vector<double>&)>& event_handler
+        );
+        /*
+            ensures
+                - The event_handler function is called when the user double clicks on one
+                  of the overlay dots.  The selected dot will be passed to event_handler().
+                - Any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+        */
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class perspective_window : public drawable_window, noncopyable
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple window that is just a container for a perspective_display.
+                It exists to make it easy to throw perspective_displays onto the screen
+                without having to put together your own drawable_window objects.
+        !*/
+    public:
+
+        typedef perspective_display::overlay_line overlay_line;
+        typedef perspective_display::overlay_dot overlay_dot;
+
+        perspective_window(
+        );
+        /*!
+            ensures
+                - The window is displayed on the screen and is 100x100 pixels in size.
+        !*/
+
+        perspective_window(
+            const std::vector<dlib::vector<double> >& point_cloud
+        );
+        /*!
+            ensures
+                - The window is displayed on the screen and is 100x100 pixels in size.
+                - This window will have point_cloud added to it via add_overlay() and the
+                  points will all be white.
+        !*/
+        
+        perspective_window(
+            const std::vector<dlib::vector<double> >& point_cloud,
+            const std::string& title
+        );
+        /*!
+            ensures
+                - The window is displayed on the screen and is 100x100 pixels in size.
+                - This window will have point_cloud added to it via add_overlay() and the
+                  points will all be white.
+                - The title of the window will be set to the given title string.
+        !*/
+        
+        ~perspective_window(
+        );
+        /*!
+            ensures
+                - any resources associated with this object have been released
+        !*/
+
+        void add_overlay (
+            const std::vector<overlay_line>& overlay
+        );
+        /*!
+            ensures
+                - Adds the given overlay lines into this object such that it will be
+                  displayed. 
+        !*/
+
+        void add_overlay (
+            const std::vector<overlay_dot>& overlay
+        );
+        /*!
+            ensures
+                - Adds the given overlay dots into this object such that it will be
+                  displayed. 
+        !*/
+
+        void clear_overlay (
+        );
+        /*!
+            ensures
+                - Removes all overlays from this object.  The display will be empty.
+        !*/
+
+        void add_overlay(
+            const std::vector<dlib::vector<double> >& d
+        ); 
+        /*!
+            ensures
+                - Adds the given dots into this object such that it will be
+                  displayed.  They will be colored white.
+        !*/
+
+        template <typename pixel_type>
+        void add_overlay(
+            const std::vector<dlib::vector<double> >& d, 
+            pixel_type p
+        );
+        /*!
+            ensures
+                - Adds the given dots into this object such that it will be
+                  displayed.  They will be colored by pixel color p.
+        !*/
+
+        template <typename pixel_type>
+        void add_overlay(
+            const vector<double>& p1,
+            const vector<double>& p2, 
+            pixel_type color
+        );
+        /*!
+            ensures
+                - Adds an overlay line going from p1 to p2 with the given color.
+        !*/
+
+        template < typename T >
+        void set_dot_double_clicked_handler (
+            T& object,
+            void (T::*event_handler)(const vector<double>&)
+        );
+        /*
+            requires
+                - event_handler is a valid pointer to a member function in T 
+            ensures
+                - The event_handler function is called on object when the user double
+                  clicks on one of the overlay dots.  The selected dot will be passed to
+                  event_handler().
+                - Any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+        */
+
+        void set_dot_double_clicked_handler (
+            const any_function<void(const vector<double>&)>& event_handler
+        );
+        /*
+            ensures
+                - The event_handler function is called when the user double clicks on one
+                  of the overlay dots.  The selected dot will be passed to event_handler().
+                - Any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+        */
+
     };
 
 // ----------------------------------------------------------------------------------------

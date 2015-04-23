@@ -31,6 +31,7 @@ ENDMACRO()
 
 
 #here we apply our macros 
+add_example(3d_point_cloud_ex)
 add_example(bayes_net_ex)
 add_example(bayes_net_from_disk_ex)
 add_example(bayes_net_gui_ex)

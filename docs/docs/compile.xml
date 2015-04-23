@@ -13,47 +13,10 @@
     <body>
         <br/><br/>
         
-
-
-        <p>
-           To use this library all you have to do is extract it somewhere, make sure the folder <i>containing</i> 
-           the dlib folder is in your include path, and finally add <a href="dlib/all/source.cpp.html">dlib/all/source.cpp</a> 
-           to your project.  It is worth noting that most of dlib is "header-only" which means that, in many cases, you
-           don't actually have to build dlib/all/source.cpp into your application.  So if you don't get linker 
-           errors when you exclude dlib/all/source.cpp from your project then you don't need it.
-        </p>
-        <p>
-            An example makefile that uses this library can be found here: 
-            <a href="dlib/test/makefile">dlib/test/makefile</a>.  It is the makefile used to build the regression 
-            test suite for this library.  There is also a 
-            <a href="http://www.cmake.org">CMake</a> makefile that builds the 
-            regression test suite at <a href="dlib/test/CMakeLists.txt.html">dlib/test/CMakeLists.txt</a> and another
-            CMake makefile that builds all the example programs at 
-            <a href="examples/CMakeLists.txt.html">examples/CMakeLists.txt</a>
-        </p>
-        <p>
-        I try to make sure everything compiles fine under Visual Studio .NET 2005 (and above) and gcc (4.1 and above).  
-        </p>
-        <p>
-           Again, note that you should <b><i>not</i></b> add the dlib folder itself to your compiler's include path.  
-           Doing so will cause the
-           build to fail because of name collisions (such as dlib/string.h and string.h from the standard library).  
-           Instead you should add the folder that contains the dlib folder to your include search path and then use 
-           include statements of the form <tt>#include &lt;dlib/queue.h&gt;</tt>.  This will ensure that everything 
-           builds correctly.
-        </p>
-
-         <p>
-            Finally, note that <a href="dlib/revision.h.html">dlib/revision.h</a> defines DLIB_MAJOR_VERSION
-            and DLIB_MINOR_VERSION which are #defines you can use to see what version of dlib you have.  
-         </p>
-
-        <center><h1>Examples</h1></center>
-
-
         <h2>Compiling on Any Operating System Using CMake</h2>
-        The simplest way to compile the example programs is to use <a href="http://www.cmake.org">CMake</a>.  
-        You can do this by typing the following on the command line.
+        The best way to compile a program that uses dlib is to use <a href="http://www.cmake.org">CMake</a>.  For
+        example, the following commands will compile the example programs on any operating
+        system:
 <code_box>
 cd examples
 mkdir build
@@ -63,20 +26,77 @@ cmake --build . --config Release
 </code_box>
 Note that you also need to have a C++ compiler installed on your system.  There are free C++ compilers
 for most operating systems.  For example, Visual Studio Express is free on Windows and GCC is free and
-works well on Mac OS X and Linux systems.  
+works well on Mac OS X and Linux systems.  If you have multiple compilers/IDEs installed then you can
+tell CMake which one you want it to use via the -G option.
 <p>
-   Finally, note that when using Visual Studio CMake will, by default, generate a 32bit executable.  
+   The <a href="examples/CMakeLists.txt.html">examples/CMakeLists.txt</a> file tells CMake how to build
+   the examples.  You can create your own projects by starting with this file and editing it however you like.
+   You can also perform additional configuration of a cmake project using the cmake-gui or ccmake tool.  For example,
+   if you are using dlib's face detector then you should turn on either SSE4 or AVX instructions since this
+   makes it run much faster (also see <a href="faq.html#Whyisdlibslow">this FAQ</a>). 
+</p>
+<p>
+   Finally, note that when using Visual Studio, CMake will by default generate a 32bit executable.  
    This means the programs you compile will only be able to use 2GB of RAM.  To avoid this, you need
    to tell CMake to generate a 64bit executable.  You do this by using a command like 
    <code_box>cmake -G "Visual Studio 10 2010 Win64" ..</code_box> instead of <code_box>cmake ..</code_box>  
-   You can see the list of valid arguments to <tt>-G</tt> by running <tt>cmake</tt> with no options.
+   You can see the list of valid arguments to <tt>-G</tt> by running <tt>cmake</tt> with no options. 
 </p>
+            
+
+<br/>
+<br/>
+<br/>
+
+
+        <h2>Compiling Without CMake</h2>
+
+        <p>
+           In most cases, to use this library all you have to do is extract it somewhere, make
+           sure the folder <i>containing</i> the dlib folder is in your include path, and
+           finally add <a href="dlib/all/source.cpp.html">dlib/all/source.cpp</a> to your
+           project.  It is worth noting that most of dlib is "header-only" which means that, in
+           many cases, you don't actually have to build dlib/all/source.cpp into your
+           application.  So if you don't get linker errors when you exclude dlib/all/source.cpp
+           from your project then you don't need it.
+        </p>
+        <p>
+            An example makefile that uses this library can be found here: <a
+            href="dlib/test/makefile">dlib/test/makefile</a>.  It is the makefile used to build
+            the regression test suite for this library.  
+        </p>
+        <p>
+           Again, note that you should <b><i>not</i></b> add the dlib folder itself to your compiler's include path.  
+           Doing so will cause the
+           build to fail because of name collisions (e.g. dlib/string.h with string.h from the standard library).  
+           Instead you should add the folder that contains the dlib folder to your include search path and then use 
+           include statements of the form <tt>#include &lt;dlib/queue.h&gt;</tt>.  This will ensure that everything 
+           builds correctly.
+        </p>
+        <p>
+           Note also that if you want to work with jpeg/png files using dlib then you will
+           need to link your program with libjpeg and/or libpng.  You also need to tell dlib 
+           about this by defining the DLIB_JPEG_SUPPORT and DLIB_PNG_SUPPORT preprocessor directives.
+           How you "link to libjpeg/libpng" varies from platform to platform.  On UNIX machines you
+           usually just add a -ljpeg or -lpng switch to your compiler (after installing the libraries).
+           On windows it's less well defined.  So dlib comes with a copy of these libraries in the dlib/external
+           folder so that you can statically compile them into your application if no system wide version 
+           is available on your machine.  If all this talk about linking is confusing to you then
+           just use CMake.  It will set this all up for you.
+        </p>
+        <p>
+           Dlib is also capable of using any optimized BLAS or LAPACK libraries that are
+           installed on your system.  Linking to these libraries will make many things run
+           faster.  To do this you define the DLIB_USE_BLAS and/or DLIB_USE_LAPACK preprocessor
+           directives and then link your program with whatever BLAS or LAPACK libraries you
+           have.  If you use CMake it will set this up automatically.
+        </p>
 
 
 
 
-        <h2>Compiling on Linux From Command Line</h2>
-        From within the examples folder, you can compile any of the examples with a single command like so:
+        <h3>Compiling on Linux From Command Line</h3>
+        From within the examples folder, you can compile nearly all of the examples with a single command like so:
 <code_box>
 g++ -O3 -I.. ../dlib/all/source.cpp -lpthread -lX11 example_program_name.cpp
 </code_box>
@@ -94,7 +114,7 @@ it by typing:
 sudo apt-get install libx11-dev
 </code_box>
 
-        <h2>Compiling on Windows Using GCC</h2>
+        <h3>Compiling on Windows Using GCC</h3>
         <p>
             The commands for gcc on windows are the same as above but you may also have to link 
             (via the -l option) to the following libraries: gdi32, comctl32, user32, winmm, ws2_32, or imm32.
@@ -102,17 +122,19 @@ sudo apt-get install libx11-dev
             windows development than gcc.
         </p>
 
-        <h2>Compiling on Windows Using Visual Studio</h2>
+        <h3>Compiling on Windows Using Visual Studio</h3>
         <p>
            All you need to do is create an empty console project. Then add dlib/all/source.cpp to it and add the
            folder containing the dlib folder to the #include search path.  Then you can compile any example program 
            by adding it to your project.  
         </p>
         <p>
-           Note that dlib will only be able to work with JPEG and PNG files if you also add all the source
-           files in the dlib/external folder into your project and also add the DLIB_PNG_SUPPORT and DLIB_JPEG_SUPPORT
-           preprocessor directives.  If you don't know how to configure Visual Studio then you should use
-           CMake as shown above since it will take care of everything for you.
+           Again, note that dlib will only be able to work with jpeg and png files if you link
+           in libjpeg and libpng.  In Visual Studio, the easiest way to do this is to add all the
+           source files in the dlib/external folder into your project and also define the
+           DLIB_PNG_SUPPORT and DLIB_JPEG_SUPPORT preprocessor directives.  If you don't know
+           how to configure Visual Studio then you should use CMake as shown above since it will
+           take care of everything automatically.
         </p>
 
 

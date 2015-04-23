@@ -171,8 +171,13 @@ typedef unsigned int JDIMENSION;
 #define LOCAL(type)		static type
 /* a function referenced thru EXTERNs: */
 #define GLOBAL(type)		type
-/* a reference to a GLOBAL function: */
-#ifdef __cplusplus
+/*  
+    Use C linking unless we are supposed to be compiling our own copy of
+    libjpeg.  Then let it use C++ linking so that we are less likely to get
+    linker name conflicts with other libraries that happen to statically include
+    libjpeg as well.
+*/
+#if defined(__cplusplus) && !defined(DLIB_JPEG_STATIC)
 #define EXTERN(type)		extern "C" type
 #else
 #define EXTERN(type)		extern type

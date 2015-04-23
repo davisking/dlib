@@ -603,9 +603,14 @@
          <item>vector</item> 
          <item>point</item> 
          <item>rotate_point</item> 
+         <item>rotate_around_x</item> 
+         <item>rotate_around_y</item> 
+         <item>rotate_around_z</item> 
          <item>point_rotator</item> 
          <item>point_transform</item> 
+         <item>camera_transform</item> 
          <item>point_transform_affine</item> 
+         <item>point_transform_affine3d</item> 
          <item>find_affine_transform</item> 
          <item>find_similarity_transform</item> 
          <item>point_transform_projective</item> 
@@ -619,6 +624,7 @@
          <item>shrink_rect</item> 
          <item>grow_rect</item> 
          <item>translate_rect</item> 
+         <item>translate_point</item> 
          <item>resize_rect</item> 
          <item>resize_rect_width</item> 
          <item>resize_rect_height</item> 
@@ -1086,9 +1092,35 @@
          <file>dlib/geometry.h</file>
          <spec_file link="true">dlib/geometry/point_transforms_abstract.h</spec_file>
          <description>        
-            This is an object that applies an affine transformation to a <a href="#vector">vector</a> or 
+            This is an object that applies a 2D affine transformation to a <a href="#vector">vector</a> or 
             <a href="#point">point</a>.  Note that you can use <a href="#find_affine_transform">find_affine_transform</a>
             to easily create affine transforms from sets of point correspondences.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>camera_transform</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/point_transforms_abstract.h</spec_file>
+         <description>        
+            This object maps 3D <a href="#vector">points</a> into the image plane of a camera.  Therefore,
+            you can use it to compute 2D representations of 3D data from the point of
+            view of some camera in 3D space.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>point_transform_affine3d</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/point_transforms_abstract.h</spec_file>
+         <description>        
+            This is an object that applies a 3D affine transformation to a <a href="#vector">vector</a>.  
          </description>
                                  
       </component>
@@ -1161,6 +1193,54 @@
             This is a method for creating 2D rotation matrices.
          </description>
                                  
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>rotate_around_x</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/point_transforms_abstract.h</spec_file>
+         <description>        
+            This is a method for creating a <a href="#point_transform_affine3d">point_transform_affine3d</a>
+            that rotates points around the x-axis.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>rotate_around_y</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/point_transforms_abstract.h</spec_file>
+         <description>        
+            This is a method for creating a <a href="#point_transform_affine3d">point_transform_affine3d</a>
+            that rotates points around the y-axis.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>rotate_around_z</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/point_transforms_abstract.h</spec_file>
+         <description>        
+            This is a method for creating a <a href="#point_transform_affine3d">point_transform_affine3d</a>
+            that rotates points around the z-axis.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>translate_point</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/point_transforms_abstract.h</spec_file>
+         <description>        
+            This is a method for creating a <a href="#point_transform_affine3d">point_transform_affine3d</a>
+            that just translates points. 
+         </description>
       </component>
 
    <!-- ************************************************************************* -->

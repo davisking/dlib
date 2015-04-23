@@ -553,7 +553,10 @@ namespace dlib
             dlib::connection * conn(0);
             try
             {
-                conn = dlib::connect(host, port);
+                if (timeout > 0)
+                    conn = dlib::connect(host, port, timeout);
+                else
+                    conn = dlib::connect(host, port);
             }
             catch (const dlib::socket_error& e)
             {

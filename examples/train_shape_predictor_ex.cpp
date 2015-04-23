@@ -82,7 +82,12 @@ int main(int argc, char** argv)
         // dataset and also contain the positions of the face boxes and
         // landmarks (called parts in the XML file).  Obviously you can use any
         // kind of input format you like so long as you store the data into
-        // images_train and faces_train.  
+        // images_train and faces_train.  But for convenience dlib comes with
+        // tools for creating and loading XML image dataset files.  Here you see
+        // how to load the data.  To create the XML files you can use the imglab
+        // tool which can be found in the tools/imglab folder.  It is a simple
+        // graphical tool for labeling objects in images.  To see how to use it
+        // read the tools/imglab/README.txt file.
         load_image_dataset(images_train, faces_train, faces_directory+"/training_with_face_landmarks.xml");
         load_image_dataset(images_test, faces_test, faces_directory+"/testing_with_face_landmarks.xml");
 

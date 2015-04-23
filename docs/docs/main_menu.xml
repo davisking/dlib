@@ -303,6 +303,10 @@
                   <link>matrix_expressions_ex.cpp.html</link>
                </item>
                <item>
+                  <name>3D_Point_Cloud</name>
+                  <link>3d_point_cloud_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Image</name>
                   <link>image_ex.cpp.html</link>
                </item>

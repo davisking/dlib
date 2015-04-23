@@ -26,7 +26,7 @@ namespace dlib
             nu = 0.1;
             oversampling_amount = 20;
             feature_pool_size = 400;
-            lambda = 0.1;
+            lambda_param = 0.1;
             num_test_splits = 20;
             feature_pool_region_padding = 0;
             random_seed = "";
@@ -39,7 +39,7 @@ namespace dlib
         double nu;
         unsigned long oversampling_amount;
         unsigned long feature_pool_size;
-        double lambda;
+        double lambda_param;
         unsigned long num_test_splits;
         double feature_pool_region_padding;
         std::string random_seed;
@@ -71,8 +71,8 @@ namespace dlib
         const shape_predictor_training_options& options
     )
     {
-        if (options.lambda <= 0)
-            throw error("Invalid lambda value given to train_shape_predictor(), lambda must be > 0.");
+        if (options.lambda_param <= 0)
+            throw error("Invalid lambda_param value given to train_shape_predictor(), lambda_param must be > 0.");
         if (!(0 < options.nu && options.nu <= 1))
             throw error("Invalid nu value given to train_shape_predictor(). It is required that 0 < nu <= 1.");
         if (options.feature_pool_region_padding < 0)
@@ -94,7 +94,7 @@ namespace dlib
         trainer.set_oversampling_amount(options.oversampling_amount);
         trainer.set_feature_pool_size(options.feature_pool_size);
         trainer.set_feature_pool_region_padding(options.feature_pool_region_padding);
-        trainer.set_lambda(options.lambda);
+        trainer.set_lambda(options.lambda_param);
         trainer.set_num_test_splits(options.num_test_splits);
 
         if (options.be_verbose)
@@ -107,7 +107,7 @@ namespace dlib
             std::cout << "Training with oversampling amount: " << options.oversampling_amount << std::endl;
             std::cout << "Training with feature pool size: " << options.feature_pool_size << std::endl;
             std::cout << "Training with feature pool region padding: " << options.feature_pool_region_padding << std::endl;
-            std::cout << "Training with lambda: " << options.lambda << std::endl;
+            std::cout << "Training with lambda_param: " << options.lambda_param << std::endl;
             std::cout << "Training with " << options.num_test_splits << " split tests."<< std::endl;
             trainer.be_verbose();
         }

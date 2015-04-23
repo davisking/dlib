@@ -28,6 +28,8 @@
          <term link="dlib/numeric_constants.h.html" name="khinchin"  include="dlib/numeric_constants.h"/>
          <term link="dlib/numeric_constants.h.html" name="apery"     include="dlib/numeric_constants.h"/>
 
+         <term file="dlib/revision.h.html" name="DLIB_MAJOR_VERSION"     include="dlib/revision.h"/>
+         <term file="dlib/revision.h.html" name="DLIB_MINOR_VERSION"     include="dlib/revision.h"/>
 
 
 
@@ -237,10 +239,17 @@
          <term file="algorithms.html" name="square_root"                   include="dlib/algs.h"/>
          <term file="linear_algebra.html" name="vector"                    include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="point"                     include="dlib/geometry.h"/>
+         <term file="dlib/geometry/vector_abstract.h.html" name="dpoint"   include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="rotate_point"              include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="point_rotator"             include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="point_transform"           include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="point_transform_affine"    include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="camera_transform"          include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="point_transform_affine3d"  include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="rotate_around_x"           include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="rotate_around_y"           include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="rotate_around_z"           include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="translate_point"           include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="find_affine_transform"     include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="find_similarity_transform" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="point_transform_projective"    include="dlib/geometry.h"/>
@@ -1008,7 +1017,11 @@
 
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_circle" include="dlib/gui_widgets.h"/>
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_pixel" include="dlib/gui_widgets.h"/>
-         <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_solid_circle" include="dlib/gui_widgets.h"/>
+         <term name="draw_solid_circle">
+            <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_solid_circle" name="for the GUI canvas object" include="dlib/gui_widgets.h"/>
+            <term link="imaging.html#draw_solid_circle" name="for image/array2d objects"    include="dlib/image_transforms.h"/>
+         </term>
+
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_solid_convex_polygon" include="dlib/gui_widgets.h"/>
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_button_down" include="dlib/gui_widgets.h"/>
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_sunken_rectangle" include="dlib/gui_widgets.h"/>
@@ -1071,6 +1084,8 @@
          <term file="dlib/gui_widgets/widgets_abstract.h.html" name="menu_bar"                  include="dlib/gui_widgets.h"/>
          <term file="dlib/gui_widgets/widgets_abstract.h.html" name="image_display"             include="dlib/gui_widgets.h"/>
          <term file="dlib/gui_widgets/widgets_abstract.h.html" name="image_window"              include="dlib/gui_widgets.h"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="perspective_display"       include="dlib/gui_widgets.h"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="perspective_window"        include="dlib/gui_widgets.h"/>
          <term link="dlib/gui_widgets/widgets_abstract.h.html#overlay_line" name="overlay_line" include="dlib/gui_widgets.h"/>
          <term link="dlib/gui_widgets/widgets_abstract.h.html#overlay_rect" name="overlay_rect" include="dlib/gui_widgets.h"/>
 
@@ -1181,6 +1196,8 @@
          <term link="dlib/image_transforms/thresholding_abstract.h.html" name="off_pixel"    include="dlib/image_transforms.h"/>
     
 
+         <term file="dlib/image_transforms/colormaps_abstract.h.html" name="colormap_heat"              include="dlib/image_transforms.h"/>
+         <term file="dlib/image_transforms/colormaps_abstract.h.html" name="colormap_jet"               include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="heatmap"                    include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="jet"                        include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="randomly_color_image"       include="dlib/image_transforms.h"/>
@@ -1500,6 +1517,7 @@
          <term file="dlib/logger/logger_kernel_abstract.h.html" name="set_all_logging_output_streams"    include="dlib/logger.h"/>
          <term file="dlib/logger/logger_kernel_abstract.h.html" name="set_all_logging_output_hooks"      include="dlib/logger.h"/>
          <term file="dlib/logger/logger_kernel_abstract.h.html" name="set_all_logging_levels"            include="dlib/logger.h"/>
+         <term file="dlib/logger/logger_kernel_abstract.h.html" name="set_all_logging_headers"           include="dlib/logger.h"/>
          <term file="dlib/logger/logger_kernel_abstract.h.html" name="print_default_logger_header"       include="dlib/logger.h"/>
          <term file="dlib/logger/extra_logger_headers.h.html" name="print_datetime_logger_header"        include="dlib/logger.h"/>
 

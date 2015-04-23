@@ -27,7 +27,13 @@ namespace dlib
         {
             DLIB_CASSERT(img.depth() == cv::DataType<typename pixel_traits<pixel_type>::basic_pixel_type>::depth &&
                          img.channels() == pixel_traits<pixel_type>::num, 
-                         "The pixel type you gave doesn't match pixel used by the open cv Mat object.");
+                         "The pixel type you gave doesn't match pixel used by the open cv Mat object."
+                         << "\n\t img.depth():    " << img.depth() 
+                         << "\n\t img.cv::DataType<typename pixel_traits<pixel_type>::basic_pixel_type>::depth: " 
+                            << cv::DataType<typename pixel_traits<pixel_type>::basic_pixel_type>::depth 
+                         << "\n\t img.channels(): " << img.channels() 
+                         << "\n\t img.pixel_traits<pixel_type>::num: " << pixel_traits<pixel_type>::num 
+                         );
             IplImage temp = img;
             init(&temp);
         }

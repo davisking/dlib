@@ -2919,13 +2919,10 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                <a href="imaging.html#scan_image_custom">scan_image_custom</a> object.  
 
             <p>
-               It learns the parameter vector by formulating the problem as a <a href="#structural_svm_problem">structural 
-               SVM problem</a>.  The general approach is similar to the method discussed in 
-               Learning to Localize Objects with Structured Output Regression by 
-               Matthew B. Blaschko and Christoph H. Lampert.  However, the method has 
-               been extended to datasets with multiple, potentially overlapping, objects 
-               per image and the measure of loss is different from what is described in 
-               the paper.  
+               It learns the parameter vector by formulating the problem as a <a
+               href="#structural_svm_problem">structural SVM problem</a>.  
+               The exact details of the method are described in the paper 
+               <a href="http://arxiv.org/abs/1502.00046">Max-Margin Object Detection</a> by Davis E. King.
             </p>
          </description>
                                  
@@ -2997,6 +2994,10 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                This object is a tool for learning to detect objects in images based on a set of labeled images.  
                The training procedure produces an <a href="imaging.html#object_detector">object_detector</a> which
                can be used to predict the locations of objects in new images. 
+               It learns the parameter vector by formulating the problem as a <a
+               href="#structural_svm_problem">structural SVM problem</a>.  
+               The exact details of the method are described in the paper 
+               <a href="http://arxiv.org/abs/1502.00046">Max-Margin Object Detection</a> by Davis E. King.
                <p>
                Note that this is just a convenience wrapper around the 
                <a href="#structural_svm_object_detection_problem">structural_svm_object_detection_problem</a>

@@ -192,6 +192,16 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline point_transform_affine operator* (
+        const point_transform_affine& lhs,
+        const point_transform_affine& rhs
+    )
+    {
+        return point_transform_affine(lhs.get_m()*rhs.get_m(), lhs.get_m()*rhs.get_b()+lhs.get_b());
+    }
+
+// ----------------------------------------------------------------------------------------
+
     inline point_transform_affine inv (
         const point_transform_affine& trans
     )
@@ -357,6 +367,16 @@ namespace dlib
     private:
         matrix<double,3,3> m;
     };
+
+// ----------------------------------------------------------------------------------------
+
+    inline point_transform_projective operator* (
+        const point_transform_projective& lhs,
+        const point_transform_projective& rhs
+    )
+    {
+        return point_transform_projective(lhs.get_m()*rhs.get_m());
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -608,6 +628,278 @@ namespace dlib
             sa, ca;
         return m;
     }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class point_transform_affine3d
+    {
+    public:
+
+        point_transform_affine3d (
+        )
+        {
+            m = identity_matrix<double>(3);
+            b.x() = 0;
+            b.y() = 0;
+        }
+
+        point_transform_affine3d (
+            const matrix<double,3,3>& m_,
+            const dlib::vector<double,3>& b_
+        ) :m(m_), b(b_)
+        {
+        }
+
+        const dlib::vector<double,3> operator() (
+            const dlib::vector<double,3>& p
+        ) const
+        {
+            return m*p + b;
+        }
+
+        const matrix<double,3,3>& get_m(
+        ) const { return m; }
+
+        const dlib::vector<double,3>& get_b(
+        ) const { return b; }
+
+        inline friend void serialize (const point_transform_affine3d& item, std::ostream& out)
+        {
+            serialize(item.m, out);
+            serialize(item.b, out);
+        }
+
+        inline friend void deserialize (point_transform_affine3d& item, std::istream& in)
+        {
+            deserialize(item.m, in);
+            deserialize(item.b, in);
+        }
+
+    private:
+        matrix<double,3,3> m;
+        dlib::vector<double,3> b;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    inline point_transform_affine3d operator* (
+        const point_transform_affine3d& lhs,
+        const point_transform_affine& rhs
+    )
+    {
+        matrix<double,3,3> m;
+        m = 0;
+        set_subm(m, get_rect(rhs.get_m())) = rhs.get_m();
+        vector<double,3> b = rhs.get_b();
+
+        return point_transform_affine3d(lhs.get_m()*m, lhs.get_m()*b+lhs.get_b());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline point_transform_affine3d operator* (
+        const point_transform_affine3d& lhs,
+        const point_transform_affine3d& rhs
+    )
+    {
+        return point_transform_affine3d(lhs.get_m()*rhs.get_m(), lhs.get_m()*rhs.get_b()+lhs.get_b());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline point_transform_affine3d inv (
+        const point_transform_affine3d& trans
+    )
+    {
+        matrix<double,3,3> im = inv(trans.get_m());
+        return point_transform_affine3d(im, -im*trans.get_b());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline point_transform_affine3d rotate_around_x (
+        double angle
+    )
+    {
+        const double ca = std::cos(angle);
+        const double sa = std::sin(angle);
+
+        matrix<double,3,3> m;
+        m = 1,  0,  0,
+            0, ca, -sa,
+            0, sa, ca;
+
+        vector<double,3> b;
+
+        return point_transform_affine3d(m,b);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline point_transform_affine3d rotate_around_y (
+        double angle
+    )
+    {
+        const double ca = std::cos(angle);
+        const double sa = std::sin(angle);
+
+        matrix<double,3,3> m;
+        m = ca,  0, sa,
+             0,  1, 0,
+            -sa, 0, ca;
+
+        vector<double,3> b;
+
+        return point_transform_affine3d(m,b);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline point_transform_affine3d rotate_around_z (
+        double angle
+    )
+    {
+        const double ca = std::cos(angle);
+        const double sa = std::sin(angle);
+
+        matrix<double,3,3> m;
+        m = ca, -sa, 0,
+            sa, ca,  0,
+            0,   0,  1;
+
+        vector<double,3> b;
+
+        return point_transform_affine3d(m,b);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline point_transform_affine3d translate_point (
+        const vector<double,3>& delta
+    )
+    {
+        return point_transform_affine3d(identity_matrix<double>(3),delta);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    class camera_transform
+    {
+
+    public:
+
+        camera_transform  (
+        )
+        {
+            *this = camera_transform(vector<double>(1,1,1), 
+                                     vector<double>(0,0,0),
+                                     vector<double>(0,0,1),
+                                     90,
+                                     1);
+        }
+
+        camera_transform (
+            const vector<double>& camera_pos_,
+            const vector<double>& camera_looking_at_,
+            const vector<double>& camera_up_direction_,
+            const double camera_field_of_view_, 
+            const unsigned long num_pixels_
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_CASSERT(0 < camera_field_of_view_ && camera_field_of_view_ < 180,
+                "\t camera_transform::camera_transform()"
+                << "\n\t Invalid inputs were given to this function."
+                << "\n\t camera_field_of_view_: " << camera_field_of_view_
+                );
+
+            camera_pos = camera_pos_;
+            camera_looking_at = camera_looking_at_;
+            camera_up_direction = camera_up_direction_;
+            camera_field_of_view = camera_field_of_view_;
+            num_pixels = num_pixels_;
+
+            dlib::vector<double> X,Y,Z;
+            Z = (camera_looking_at - camera_pos).normalize();
+            Y = camera_up_direction - dot(camera_up_direction,Z)*Z; 
+            Y = Y.normalize();
+            X = Z.cross(Y);
+
+            set_rowm(proj,0) = trans(X);
+            // Minus because images have y axis going down but we want the 3d projection to appear using a normal coordinate system with y going up.
+            set_rowm(proj,1) = -trans(Y); 
+            set_rowm(proj,2) = trans(Z);
+
+            width = num_pixels/2.0;
+            dist_scale = width/std::tan(pi/180*camera_field_of_view/2);
+        }
+
+        vector<double> get_camera_pos()         const { return camera_pos; }
+        vector<double> get_camera_looking_at()  const { return camera_looking_at; }
+        vector<double> get_camera_up_direction()const { return camera_up_direction; }
+        double get_camera_field_of_view()       const { return camera_field_of_view; }
+        unsigned long get_num_pixels()                   const { return num_pixels; }
+
+        inline dpoint operator() (
+            const vector<double>& p,
+            double& scale
+        ) const
+        {
+            vector<double> temp = p-camera_pos;
+            temp = proj*temp;
+            const double distance = temp.z()>0 ? temp.z() : 1e-9;
+            scale = dist_scale/distance;
+            temp.x() = temp.x()*scale + width;
+            temp.y() = temp.y()*scale + width;
+            return temp;
+        }
+
+        dpoint operator() (
+            const vector<double>& p
+        ) const
+        {
+            double scale;
+            return (*this)(p,scale);
+        }
+
+        inline friend void serialize (const camera_transform& item, std::ostream& out)
+        {
+            serialize(item.camera_pos, out);
+            serialize(item.camera_looking_at, out);
+            serialize(item.camera_up_direction, out);
+            serialize(item.camera_field_of_view, out); 
+            serialize(item.num_pixels, out);
+            serialize(item.proj, out);
+            serialize(item.dist_scale, out);
+            serialize(item.width, out);
+        }
+
+        inline friend void deserialize (camera_transform& item, std::istream& in)
+        {
+            deserialize(item.camera_pos, in);
+            deserialize(item.camera_looking_at, in);
+            deserialize(item.camera_up_direction, in);
+            deserialize(item.camera_field_of_view, in); 
+            deserialize(item.num_pixels, in);
+            deserialize(item.proj, in);
+            deserialize(item.dist_scale, in);
+            deserialize(item.width, in);
+        }
+
+    private:
+
+        vector<double> camera_pos;
+        vector<double> camera_looking_at;
+        vector<double> camera_up_direction;
+        double camera_field_of_view; 
+        unsigned long num_pixels;
+        matrix<double,3,3> proj;
+        double dist_scale;
+        double width;
+
+    };
 
 // ----------------------------------------------------------------------------------------
 

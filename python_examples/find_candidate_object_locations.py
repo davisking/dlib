@@ -12,6 +12,12 @@
 # the false alarms.  Since find_candidate_object_locations() will only generate
 # a few thousand rectangles it is much faster than scanning all possible
 # rectangles inside an image.
+#
+#   Also note that this example requires scikit-image which can be installed
+#   via the command:
+#       pip install -U scikit-image
+#   Or downloaded from http://scikit-image.org/download.html. 
+
 
 
 import dlib

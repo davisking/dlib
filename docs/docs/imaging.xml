@@ -224,6 +224,7 @@
          <item>jet</item>
          <item>render_face_detections</item> 
          <item>draw_line</item> 
+         <item>draw_solid_circle</item> 
          <item>draw_surf_points</item> 
          <item>draw_rectangle</item> 
          <item>tile_images</item> 
@@ -1126,6 +1127,18 @@
          <spec_file link="true">dlib/image_transforms/draw_abstract.h</spec_file>
          <description>        
             This global function draws a line on an image.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>draw_solid_circle</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/draw_abstract.h</spec_file>
+         <description>        
+            This global function draws a solid circle on an image.
          </description>
                                  
       </component>

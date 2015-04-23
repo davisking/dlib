@@ -646,6 +646,10 @@ namespace
             DLIB_TEST(length(t(from[i])-to[i]) < 1e-14);
             DLIB_TEST(length(tinv(t(from[i]))-from[i]) < 1e-14);
             DLIB_TEST(length(t(tinv(from[i]))-from[i]) < 1e-14);
+
+            point_transform_affine temp = t*inv(t);
+            DLIB_TEST(length(temp.get_b()) < 1e-14);
+            DLIB_TEST(max(abs(temp.get_m() - identity_matrix<double>(2))) < 1e-14);
         }
 
         ostringstream sout;
@@ -692,6 +696,11 @@ namespace
                 to_points.push_back(tran(p) + (randm(2,1,rnd)-0.5)*error_rate);
                 DLIB_TEST(length(traninv(tran(p))-p) <= 1e-5);
                 DLIB_TEST(length(tran(traninv(p))-p) <= 1e-5);
+
+                point_transform_projective temp = tran*traninv;
+                DLIB_TEST_MSG(max(abs(temp.get_m() - identity_matrix<double>(3))) < 1e-10, temp.get_m());
+                temp = traninv*tran;
+                DLIB_TEST_MSG(max(abs(temp.get_m() - identity_matrix<double>(3))) < 1e-10, temp.get_m());
             }
 
 
@@ -798,6 +807,49 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_affine3d()
+    {
+        const dlib::vector<double> x(1,0,0);
+        const dlib::vector<double> y(0,1,0);
+        const dlib::vector<double> z(0,0,1);
+        const dlib::vector<double> e(1,1,1);
+        const dlib::vector<double> ex(-1,1,1);
+        const dlib::vector<double> ey(1,-1,1);
+        const dlib::vector<double> ez(1,1,-1);
+
+        dlib::vector<double> w;
+
+        w = rotate_around_z(pi/2)(x);
+        DLIB_TEST(length(w-y) < 1e-12);
+        w = rotate_around_z(pi/2)(e);
+        DLIB_TEST(length(w-ex) < 1e-12);
+
+        w = rotate_around_y(-pi/2)(x);
+        DLIB_TEST(length(w-z) < 1e-12);
+        w = rotate_around_y(pi/2)(e);
+        DLIB_TEST(length(w-ez) < 1e-12);
+
+        w = rotate_around_x(pi/2)(y);
+        DLIB_TEST(length(w-z) < 1e-12);
+        w = rotate_around_x(pi/2)(e);
+        DLIB_TEST(length(w-ey) < 1e-12);
+
+        w = translate_point(x)(y);
+        DLIB_TEST(length(w-x-y) < 1e-12);
+
+        point_transform_affine3d tform;
+        tform = rotate_around_x(pi/2)*rotate_around_z(pi/2)*translate_point(x);
+        DLIB_TEST(length(tform(dlib::vector<double>())-z) < 1e-12);
+        DLIB_TEST(length(inv(tform)(z)) < 1e-12);
+
+        point_transform_affine tform2; 
+        tform = tform*tform2;// the default tform is the identity mapping so this shouldn't do anything different 
+        DLIB_TEST(length(tform(dlib::vector<double>())-z) < 1e-12);
+        DLIB_TEST(length(inv(tform)(z)) < 1e-12);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class geometry_tester : public tester
     {
     public:
@@ -810,6 +862,7 @@ namespace
         void perform_test (
         )
         {
+            test_affine3d();
             test_rect_to_drect();
             geometry_test();
             test_border_enumerator();

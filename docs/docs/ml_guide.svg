@@ -14,7 +14,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="ml_guide.svg.2014_02_20_18_33_19.0.svg">
+   sodipodi:docname="ml_guide.svg">
   <metadata
      id="metadata1192">
     <rdf:RDF>
@@ -137,9 +137,9 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:zoom="0.70710678"
-     inkscape:cx="977.00321"
-     inkscape:cy="341.56721"
+     inkscape:zoom="1"
+     inkscape:cx="784.46352"
+     inkscape:cy="377.72943"
      inkscape:window-x="65"
      inkscape:window-y="24"
      inkscape:window-maximized="1"
@@ -900,8 +900,8 @@
   </g>
   <a
      xlink:href="ml.html#structural_track_association_trainer"
-     transform="translate(-518.26903,16.004773)"
-     id="a7669">
+     id="a7669"
+     transform="translate(-518.26903,16.004773)">
     <g
        id="g6636"
        transform="matrix(0.57635848,0,0,0.57635848,323.21914,-112.48855)">
@@ -990,8 +990,8 @@
   </text>
   <a
      xlink:href="ml.html#svm_rank_trainer"
-     id="a3746"
-     transform="matrix(1.0345233,0,0,1.0345233,-38.179731,-15.968612)">
+     transform="matrix(1.0345233,0,0,1.0345233,-38.179731,-15.968612)"
+     id="a3746">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
        id="g212">
@@ -1024,8 +1024,8 @@
   </a>
   <a
      xlink:href="ml.html#structural_object_detection_trainer"
-     id="a3739"
-     transform="matrix(1.0345233,0,0,1.0345233,-43.162391,-12.620922)">
+     transform="matrix(1.0345233,0,0,1.0345233,-43.162391,-12.620922)"
+     id="a3739">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
        id="g656">
@@ -1058,8 +1058,8 @@
   </a>
   <a
      xlink:href="ml.html#structural_sequence_segmentation_trainer"
-     id="a3769"
-     transform="matrix(1.0345233,0,0,1.0345233,-55.464451,-35.829135)">
+     transform="matrix(1.0345233,0,0,1.0345233,-55.464451,-35.829135)"
+     id="a3769">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
        id="g738">
@@ -1092,8 +1092,8 @@
   </a>
   <a
      xlink:href="ml.html#structural_sequence_labeling_trainer"
-     id="a3776"
-     transform="matrix(1.0345233,0,0,1.0345233,-66.837211,-45.449317)">
+     transform="matrix(1.0345233,0,0,1.0345233,-66.837211,-45.449317)"
+     id="a3776">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
        id="g748">
@@ -1126,8 +1126,8 @@
   </a>
   <a
      xlink:href="ml.html#structural_graph_labeling_trainer"
-     id="a3762"
-     transform="matrix(1.0345233,0,0,1.0345233,-57.654191,-32.79966)">
+     transform="matrix(1.0345233,0,0,1.0345233,-57.654191,-32.79966)"
+     id="a3762">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
        id="g758">
@@ -1160,8 +1160,8 @@
   </a>
   <a
      xlink:href="ml.html#structural_assignment_trainer"
-     id="a3732"
-     transform="matrix(1.0345233,0,0,1.0345233,21.838539,28.457534)">
+     transform="matrix(1.0345233,0,0,1.0345233,21.838539,28.457534)"
+     id="a3732">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
        id="g788">
@@ -1194,8 +1194,8 @@
   </a>
   <a
      xlink:href="ml.html#structural_svm_problem"
-     id="a3753"
-     transform="matrix(1.0345233,0,0,1.0345233,-75.691381,-22.73941)">
+     transform="matrix(1.0345233,0,0,1.0345233,-75.691381,-22.73941)"
+     id="a3753">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-75.470302)"
        id="g798">
@@ -3535,8 +3535,8 @@
   </g>
   <a
      xlink:href="ml.html#svm_c_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,11.692972,-4.0092227)"
-     id="a3653">
+     id="a3653"
+     transform="matrix(1.0345233,0,0,1.0345233,11.692972,-4.0092227)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g116">
@@ -3577,8 +3577,8 @@
   </a>
   <a
      xlink:href="ml.html#svm_c_linear_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,11.571269,-12.413974)"
-     id="a3662">
+     id="a3662"
+     transform="matrix(1.0345233,0,0,1.0345233,11.571269,-12.413974)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g152">
@@ -3611,8 +3611,8 @@
   </a>
   <a
      xlink:href="ml.html#svm_one_class_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,7.4344136,5.5047033)"
-     id="a3636">
+     id="a3636"
+     transform="matrix(1.0345233,0,0,1.0345233,7.4344136,5.5047033)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g346">
@@ -3649,8 +3649,8 @@
   </a>
   <a
      xlink:href="ml.html#svm_c_linear_dcd_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,11.899438,3.6734783)"
-     id="a3644">
+     id="a3644"
+     transform="matrix(1.0345233,0,0,1.0345233,11.899438,3.6734783)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g418">
@@ -3691,8 +3691,8 @@
   </a>
   <a
      xlink:href="ml.html#svm_multiclass_linear_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,8.7733176,-27.437303)"
-     id="a3678">
+     id="a3678"
+     transform="matrix(1.0345233,0,0,1.0345233,8.7733176,-27.437303)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g444">
@@ -3725,8 +3725,8 @@
   </a>
   <a
      xlink:href="ml.html#one_vs_one_trainer"
-     transform="matrix(1.0345233,0,0,1.0345233,9.5637186,-19.946388)"
-     id="a3669">
+     id="a3669"
+     transform="matrix(1.0345233,0,0,1.0345233,9.5637186,-19.946388)">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g472">
@@ -3767,8 +3767,8 @@
   </a>
   <a
      xlink:href="ml.html#krr_trainer"
-     id="a3628"
-     transform="matrix(1.0345233,0,0,1.0345233,-7.5701194,1.6805743)">
+     transform="matrix(1.0345233,0,0,1.0345233,-7.5701194,1.6805743)"
+     id="a3628">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g18">
@@ -3805,8 +3805,8 @@
   </a>
   <a
      xlink:href="ml.html#newman_cluster"
-     id="a3685"
-     transform="matrix(1.0345233,0,0,1.0345233,1296.7302,-569.23995)">
+     transform="matrix(1.0345233,0,0,1.0345233,1296.7302,-569.23995)"
+     id="a3685">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-1369.5729,428.8738)"
        id="g514">
@@ -3842,9 +3842,9 @@
     </g>
   </a>
   <a
-     xlink:href="ml.html#kkmeans"
-     id="a3693"
-     transform="matrix(1.0345233,0,0,1.0345233,7.1212846,-24.887993)">
+     xlink:href="ml.html#spectral_cluster"
+     transform="matrix(1.0345233,0,0,1.0345233,7.1212846,-24.887993)"
+     id="a3693">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g526">
@@ -3871,7 +3871,7 @@
         <tspan
            id="tspan534"
            y="512.57001"
-           x="-218.55299">kkmeans or</tspan>
+           x="-218.55299">spectral_cluster or</tspan>
         <tspan
            id="tspan536"
            y="528.57001"
@@ -3881,8 +3881,8 @@
   </a>
   <a
      xlink:href="ml.html#vector_normalizer_frobmetric"
-     id="a38121"
-     transform="matrix(1.0345233,0,0,1.0345233,-44.863773,9.2552823)">
+     transform="matrix(1.0345233,0,0,1.0345233,-44.863773,9.2552823)"
+     id="a38121">
     <g
        transform="matrix(0.55795892,0,0,0.55795892,-138.86453,-79.441536)"
        id="g35901">
@@ -3915,8 +3915,8 @@
   </a>
   <a
      xlink:href="ml.html#linear_manifold_regularizer"
-     id="a38128"
-     transform="matrix(1.0345233,0,0,1.0345233,-44.728164,8.0874193)">
+     transform="matrix(1.0345233,0,0,1.0345233,-44.728164,8.0874193)"
+     id="a38128">
     <g
        transform="matrix(0.55795892,0,0,0.55795892,-138.86453,-79.441536)"
        id="g35911">
@@ -3949,8 +3949,8 @@
   </a>
   <a
      xlink:href="ml.html#krr_trainer"
-     id="a3708"
-     transform="matrix(1.0345233,0,0,1.0345233,109.25334,30.388373)">
+     transform="matrix(1.0345233,0,0,1.0345233,109.25334,30.388373)"
+     id="a3708">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g196">
@@ -3987,8 +3987,8 @@
   </a>
   <a
      xlink:href="ml.html#svr_trainer"
-     id="a3723"
-     transform="matrix(1.0345233,0,0,1.0345233,-145.98494,-42.08382)">
+     transform="matrix(1.0345233,0,0,1.0345233,-145.98494,-42.08382)"
+     id="a3723">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g248">
@@ -4029,8 +4029,8 @@
   </a>
   <a
      xlink:href="ml.html#svr_linear_trainer"
-     id="a3716"
-     transform="matrix(1.0345233,0,0,1.0345233,-182.16362,-48.448377)">
+     transform="matrix(1.0345233,0,0,1.0345233,-182.16362,-48.448377)"
+     id="a3716">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g266">
@@ -4063,8 +4063,8 @@
   </a>
   <a
      xlink:href="ml.html#sammon_projection"
-     id="a3621"
-     transform="matrix(1.0345233,0,0,1.0345233,-65.805214,95.211286)">
+     transform="matrix(1.0345233,0,0,1.0345233,-65.805214,95.211286)"
+     id="a3621">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g292">
@@ -4097,8 +4097,8 @@
   </a>
   <a
      xlink:href="ml.html#discriminant_pca"
-     id="a3614"
-     transform="matrix(1.0345233,0,0,1.0345233,-182.5205,62.204516)">
+     transform="matrix(1.0345233,0,0,1.0345233,-182.5205,62.204516)"
+     id="a3614">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g594">
@@ -4131,8 +4131,8 @@
   </a>
   <a
      xlink:href="ml.html#krls"
-     id="a3701"
-     transform="matrix(1.0345233,0,0,1.0345233,110.93633,24.324742)">
+     transform="matrix(1.0345233,0,0,1.0345233,110.93633,24.324742)"
+     id="a3701">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g634">
@@ -4165,8 +4165,8 @@
   </a>
   <a
      xlink:href="ml.html#cca"
-     id="a13216"
-     transform="matrix(1.0345233,0,0,1.0345233,-150.53989,74.867806)">
+     transform="matrix(1.0345233,0,0,1.0345233,-150.53989,74.867806)"
+     id="a13216">
     <g
        transform="matrix(0.55825566,0,0,0.55825566,-135.48618,-105.95031)"
        id="g934">

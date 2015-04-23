@@ -12,12 +12,21 @@
 
 <current>
 New Features:
+   - Added spectral_cluster()
+   - Added sub_image() and sub_image_proxy
+   - Added set_all_logging_headers()
 
 Non-Backwards Compatible Changes:
 
 Bug fixes:
+   - Fixed a bug that caused the correlation_tracker to erroneously trigger an assert when
+     run in debug mode.
 
 Other:
+   - Improved the usability of the new drectanle object.
+   - Optimized extract_fhog_features() for the case where cell_size==1. This makes it about
+     4x faster in that case.
+   - Made it so you can compose point transform objects via operator *.
 
 </current>
 
