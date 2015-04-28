@@ -17,6 +17,7 @@ namespace dlib
     class lspi
     {
     public:
+        typedef feature_extractor feature_extractor_type;
         typedef typename feature_extractor::state_type state_type;
         typedef typename feature_extractor::action_type action_type;
 
@@ -40,6 +41,12 @@ namespace dlib
             double value
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(0 < value && value <= 1,
+                "\t void lspi::set_discount(value)"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t value: " << value 
+                );
             discount = value;
         }
 
@@ -99,25 +106,21 @@ namespace dlib
         void set_max_iterations (
             unsigned long max_iter
         ) { max_iterations = max_iter; }
-        /*!
-            ensures
-                - #get_max_iterations() == max_iter
-        !*/
 
         unsigned long get_max_iterations (
         ) { return max_iterations; }
-        /*!
-            ensures
-                - returns the maximum number of iterations the SVM optimizer is allowed to
-                  run before it is required to stop and return a result.
-        !*/
 
         template <typename vector_type>
         policy<feature_extractor> train (
-            //const std::vector<process_sample<feature_extractor> >& samples
             const vector_type& samples
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(samples.size() > 0,
+                "\t policy lspi::train(samples)"
+                << "\n\t invalid inputs were given to this function"
+                );
+
             matrix<double,0,1> w(fe.num_features());
             w = 0;
             matrix<double,0,1> prev_w, b, f1, f2;

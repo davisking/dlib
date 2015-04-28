@@ -16,6 +16,7 @@ namespace dlib
         >
     struct process_sample
     {
+        typedef feature_extractor feature_extractor_type;
         typedef typename feature_extractor::state_type state_type;
         typedef typename feature_extractor::action_type action_type;
 
@@ -61,6 +62,7 @@ namespace dlib
     {
     public:
 
+        typedef feature_extractor feature_extractor_type;
         typedef typename feature_extractor::state_type state_type;
         typedef typename feature_extractor::action_type action_type;
 
