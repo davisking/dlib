@@ -354,7 +354,7 @@ ensures \n\
       detector.  If you don't know how many times you want to upsample then \n\
       don't provide a value for upsample_num_times and an appropriate \n\
       default will be used.")
-        .def("run", run_rect_detector, (arg("image"), arg("upsample_num_times")=0),
+        .def("run", run_rect_detector, (arg("image"), arg("upsample_num_times")=0, arg("adjust_threshold")=0.0),
 "requires \n\
     - image is a numpy ndarray containing either an 8bit grayscale or RGB \n\
       image. \n\
@@ -376,7 +376,7 @@ ensures \n\
         .def("__init__", make_constructor(&load_object_from_file<type>),
 "Loads a simple_object_detector from a file that contains the output of the \n\
 train_simple_object_detector() routine.")
-        .def("__call__", &type::run_detector1, (arg("image"), arg("upsample_num_times")),
+        .def("__call__", &type::run_detector1, (arg("image"), arg("upsample_num_times"), arg("adjust_threshold")=0.0),
 "requires \n\
     - image is a numpy ndarray containing either an 8bit grayscale or RGB \n\
       image. \n\
