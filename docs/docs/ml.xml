@@ -136,6 +136,10 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>compute_lda_transform</item> 
       </section>
       <section>
+         <name>Reinforcement Learning</name>
+         <item>lspi</item> 
+      </section>
+      <section>
          <name>Feature Selection</name>
          <item>rank_features</item> 
          <item>sort_basis_vectors</item> 
@@ -218,6 +222,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>assignment_function</item>
          <item>track_association_function</item>
          <item>graph_labeler</item>
+         <item>policy</item>
       </section>
 
       <section>
@@ -252,6 +257,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>is_ranking_problem</item>
          <item>count_ranking_inversions</item>
          <item>learn_platt_scaling</item>
+         <item>process_sample</item>
 
          
 
@@ -1633,6 +1639,51 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <examples>
             <example>learning_to_track_ex.cpp.html</example>
          </examples>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>lspi</name>
+         <file>dlib/control.h</file>
+         <spec_file link="true">dlib/control/lspi_abstract.h</spec_file>
+         <description>
+            This object is an implementation of the reinforcement learning algorithm
+            described in the following paper:
+            <blockquote>
+               Lagoudakis, Michail G., and Ronald Parr. "Least-squares policy
+               iteration." The Journal of Machine Learning Research 4 (2003):
+               1107-1149.
+            </blockquote>
+                
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>policy</name>
+         <file>dlib/control.h</file>
+         <spec_file link="true">dlib/control/approximate_linear_models_abstract.h</spec_file>
+         <description>
+                This is a policy (i.e. a control law) based on a linear function approximator.
+                You can use a tool like <a href="#lspi">lspi</a> to learn the parameters
+                of a policy.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>process_sample</name>
+         <file>dlib/control.h</file>
+         <spec_file link="true">dlib/control/approximate_linear_models_abstract.h</spec_file>
+         <description>
+                This object holds a training sample for a reinforcement learning algorithm 
+                (e.g. <a href="#lspi">lspi</a>).
+                In particular, it contains a state, action, reward, next state sample from
+                some process.
+         </description>
       </component>
       
    <!-- ************************************************************************* -->
