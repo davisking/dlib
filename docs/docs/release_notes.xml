@@ -12,6 +12,37 @@
 
 <current>
 New Features:
+   - Added a number of tools for working with 3D data:
+      - Added the perspective_window which is a tool for displaying 3D point clouds.
+      - Added camera_transform.  It performs the 3D to 2D mapping needed to visualize 3D
+        data.
+      - Added point_transform_affine3d as well as functions for creating such transforms:
+        rotate_around_x(), rotate_around_y(), rotate_around_z(), and translate_point().
+   - Added draw_solid_circle() for drawing on images.
+   - Added get_best_hough_point() to the hough_transform.
+   - Thanks to Jack Culpepper, the python API for object detection now outputs detection
+     confidences.  
+   - Added lspi, an implementation of the least-squares policy iteration algorithm.
+      
+Non-Backwards Compatible Changes:
+   - The shape_predictor and shape_predictor_trainer had a non-optimal behavior when used
+     with objects that have non-square bounding boxes. This has been fixed but will cause
+     models that were trained with the previous version of dlib to not work as accurately if
+     they used non-square boxes. So you might have to retrain your models when updating dlib.
+
+Bug fixes:
+   - Fixed a bug which prevented add_image_rotations() from compiling.
+
+Other:
+   - The imglab tool now allows the user to click and drag annotations around by holding
+     shift and right clicking.
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="18.14" date="Mar 01, 2015">
+New Features:
    - Added spectral_cluster()
    - Added sub_image() and sub_image_proxy
    - Added set_all_logging_headers()
@@ -28,7 +59,7 @@ Other:
      4x faster in that case.
    - Made it so you can compose point transform objects via operator *.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
