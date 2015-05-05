@@ -72,6 +72,16 @@ namespace dlib
         double get_epsilon (
         ) const { return trainer.get_epsilon(); }
 
+        unsigned long get_max_iterations (
+        ) const { return trainer.get_max_iterations(); }
+
+        void set_max_iterations (
+            unsigned long max_iter
+        ) 
+        {
+            trainer.set_max_iterations(max_iter);
+        }
+
         void set_max_cache_size (
             unsigned long max_size
         )
