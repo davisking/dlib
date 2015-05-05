@@ -93,7 +93,7 @@ namespace dlib
                      min(alpha) >= 0 &&
                      eps > 0 &&
                      max_iter > 0,
-                     "\t void solve_qp_using_smo()"
+                     "\t unsigned long solve_qp_using_smo()"
                      << "\n\t Invalid arguments were given to this function"
                      << "\n\t Q.nr():               " << Q.nr()
                      << "\n\t Q.nc():               " << Q.nc()
