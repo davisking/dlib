@@ -188,6 +188,7 @@ namespace dlib
             num_threads(4),
             C(1),
             eps(0.001),
+            max_iterations(10000),
             verbose(false),
             learn_nonnegative_weights(false)
         {
@@ -223,6 +224,16 @@ namespace dlib
 
         const scalar_type get_epsilon (
         ) const { return eps; }
+
+        unsigned long get_max_iterations (
+        ) const { return max_iterations; }
+
+        void set_max_iterations (
+            unsigned long max_iter
+        ) 
+        {
+            max_iterations = max_iter;
+        }
 
         void be_verbose (
         )
@@ -358,6 +369,7 @@ namespace dlib
             problem.set_max_cache_size(0);
             problem.set_c(C);
             problem.set_epsilon(eps);
+            problem.set_max_iterations(max_iterations);
 
             unsigned long num_nonnegative = 0;
             if (learn_nonnegative_weights)
@@ -403,6 +415,7 @@ namespace dlib
         unsigned long num_threads;
         scalar_type C;
         scalar_type eps;
+        unsigned long max_iterations;
         bool verbose;
         oca solver;
         bool learn_nonnegative_weights;
