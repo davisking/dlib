@@ -29,6 +29,7 @@ namespace dlib
 
             INITIAL VALUE
                 - get_epsilon() == 0.001
+                - get_max_iterations() == 10000
                 - get_max_cache_size() == 5
                 - get_c() == 1
                 - get_cache_based_epsilon() == std::numeric_limits<scalar_type>::infinity()
@@ -159,6 +160,22 @@ namespace dlib
                 - eps > 0
             ensures
                 - #get_cache_based_epsilon() == eps
+        !*/
+
+        void set_max_iterations (
+            unsigned long max_iter
+        );
+        /*!
+            ensures
+                - #get_max_iterations() == max_iter
+        !*/
+
+        unsigned long get_max_iterations (
+        ); 
+        /*!
+            ensures
+                - returns the maximum number of iterations the SVM optimizer is allowed to
+                  run before it is required to stop and return a result.
         !*/
 
         void set_max_cache_size (

@@ -239,6 +239,7 @@ namespace dlib
             CONVENTION
                 - C == get_c()
                 - eps == get_epsilon()
+                - max_iterations == get_max_iterations()
                 - if (skip_cache) then
                     - we won't use the oracle cache when we need to evaluate the separation
                       oracle. Instead, we will directly call the user supplied separation_oracle().
@@ -259,6 +260,7 @@ namespace dlib
         ) :
             saved_current_risk_gap(0),
             eps(0.001),
+            max_iterations(10000),
             verbose(false),
             skip_cache(true),
             count_below_eps(0),
@@ -307,6 +309,16 @@ namespace dlib
 
         const scalar_type get_epsilon (
         ) const { return eps; }
+
+        unsigned long get_max_iterations (
+        ) const { return max_iterations; }
+
+        void set_max_iterations (
+            unsigned long max_iter
+        ) 
+        {
+            max_iterations = max_iter;
+        }
 
         void set_max_cache_size (
             unsigned long max_size
@@ -444,6 +456,9 @@ namespace dlib
                 }
                 cout << endl;
             }
+
+            if (num_iterations >= max_iterations)
+                return true;
 
             saved_current_risk_gap = current_risk_gap;
 
@@ -611,6 +626,7 @@ namespace dlib
         mutable scalar_type saved_current_risk_gap;
         mutable matrix_type psi_true;
         scalar_type eps;
+        unsigned long max_iterations;
         mutable bool verbose;
 
 
