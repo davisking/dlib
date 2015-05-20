@@ -54,6 +54,16 @@ void add_overlay_rect (
     win.add_overlay(rect, color);
 }
 
+void add_overlay_drect (
+    image_window& win,
+    const drectangle& drect,
+    const rgb_pixel& color
+)
+{
+    rectangle rect(drect.left(), drect.top(), drect.right(), drect.bottom());
+    win.add_overlay(rect, color);
+}
+
 void add_overlay_parts (
     image_window& win,
     const full_object_detection& detection,
@@ -105,6 +115,8 @@ void bind_gui()
         .def("add_overlay", (add_overlay_funct)&type::add_overlay<rgb_pixel>, (arg("rectangles"), arg("color")=rgb_pixel(255, 0, 0)),
             "Add a list of rectangles to the image_window. They will be displayed as red boxes by default, but the color can be passed.")
         .def("add_overlay", add_overlay_rect, (arg("rectangle"), arg("color")=rgb_pixel(255, 0, 0)),
+            "Add a rectangle to the image_window.  It will be displayed as a red box by default, but the color can be passed.")
+        .def("add_overlay", add_overlay_drect, (arg("rectangle"), arg("color")=rgb_pixel(255, 0, 0)),
             "Add a rectangle to the image_window.  It will be displayed as a red box by default, but the color can be passed.")
         .def("add_overlay", add_overlay_parts, (arg("detection"), arg("color")=rgb_pixel(0, 0, 255)),
             "Add full_object_detection parts to the image window. They will be displayed as blue lines by default, but the color can be passed.")
