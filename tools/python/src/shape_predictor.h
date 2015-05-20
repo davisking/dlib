@@ -1,7 +1,7 @@
 // Copyright (C) 2014  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SHAPE_PREDICTOR_DETECTOR_H__
-#define DLIB_SHAPE_PREDICTOR_DETECTOR_H__
+#ifndef DLIB_SHAPE_PREDICTOR_H__
+#define DLIB_SHAPE_PREDICTOR_H__
 
 #include "dlib/string.h"
 #include "dlib/geometry.h"
@@ -179,5 +179,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_SHAPE_PREDICTOR_DETECTOR_H__
+#endif // DLIB_SHAPE_PREDICTOR_H__
 
