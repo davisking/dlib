@@ -17,6 +17,7 @@ void bind_image_classes();
 void bind_rectangles();
 void bind_object_detection();
 void bind_shape_predictors();
+void bind_correlation_tracker();
 
 #ifndef DLIB_NO_GUI_SUPPORT
 void bind_gui();
@@ -42,6 +43,7 @@ BOOST_PYTHON_MODULE(dlib)
     bind_rectangles();
     bind_object_detection();
     bind_shape_predictors();
+    bind_correlation_tracker();
 #ifndef DLIB_NO_GUI_SUPPORT
     bind_gui();
 #endif
