@@ -18,8 +18,10 @@ set(python_srcs
    src/sequence_segmenter.cpp
    src/svm_struct.cpp
    src/image.cpp
+   src/rectangles.cpp
    src/object_detection.cpp
    src/shape_predictor.cpp
+   src/correlation_tracker.cpp
 )
 
 # Only add the GUI module if requested
