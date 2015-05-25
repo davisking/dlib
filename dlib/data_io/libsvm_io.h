@@ -85,12 +85,14 @@ namespace dlib
                 if (sin.get() != ':')
                     throw sample_data_io_error("On line: " + cast_to_string(line_num) + ", error while reading file " + file_name);
 
-                sin >> value >> ws;
+                sin >> value;
 
                 if (sin && value != 0)
                 {
                     sample.insert(sample.end(), make_pair(key, value));
                 }
+
+                sin >> ws;
             }
 
             samples.push_back(sample);
