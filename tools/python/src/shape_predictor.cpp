@@ -51,7 +51,7 @@ unsigned long full_obj_det_num_parts (const full_object_detection& detection)
 
 point full_obj_det_part (const full_object_detection& detection, const unsigned long idx)
 {
-    if (idx < 0 || idx >= detection.num_parts())
+    if (idx >= detection.num_parts())
     {
         PyErr_SetString(PyExc_IndexError, "Index out of range");
         boost::python::throw_error_already_set();
