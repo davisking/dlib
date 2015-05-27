@@ -67,7 +67,6 @@ namespace dlib
             matrix<double,S,S> temp = diagm(Q);
             for (unsigned long c = 0; c < horizon; ++c)
             {
-                long i = horizon-c-1;
                 lambda += trans(B)*temp*B;
                 temp = trans(A)*temp*A + diagm(Q);
             }
