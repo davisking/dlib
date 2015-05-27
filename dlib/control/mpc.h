@@ -73,6 +73,21 @@ namespace dlib
 
         }
 
+        const matrix<double,S,S>& get_A (
+        ) const { return A; }
+        const matrix<double,S,I>& get_B (
+        ) const { return B; }
+        const matrix<double,S,1>& get_C (
+        ) const { return C; }
+        const matrix<double,S,1>& get_Q (
+        ) const { return Q; }
+        const matrix<double,I,1>& get_R (
+        ) const { return R; }
+        const matrix<double,I,1>& get_lower_constraints (
+        ) const { return lower; }
+        const matrix<double,I,1>& get_upper_constraints (
+        ) const { return upper; }
+
         void set_target (
             const matrix<double,S,1>& val,
             const unsigned long time
