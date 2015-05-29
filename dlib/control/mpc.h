@@ -27,6 +27,14 @@ namespace dlib
         mpc(
         ) 
         {
+            A = 0;
+            B = 0;
+            C = 0;
+            Q = 0;
+            R = 0;
+            lower = 0;
+            upper = 0;
+
             max_iterations = 0;
             eps = 0.01;
             for (unsigned long i = 0; i < horizon; ++i)
@@ -50,6 +58,48 @@ namespace dlib
             const matrix<double,I,1>& upper_
         ) : A(A_), B(B_), C(C_), Q(Q_), R(R_), lower(lower_), upper(upper_)
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(A.nr() > 0 && B.nc() > 0,
+                "\t mpc::mpc()"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t A.nr(): " <<  A.nr()
+                << "\n\t B.nc(): " <<  B.nc()
+                );
+
+            DLIB_ASSERT(A.nr() == A.nc() && 
+                        A.nr() == B.nr() && 
+                        A.nr() == C.nr() && 
+                        A.nr() == Q.nr(),
+                "\t mpc::mpc()"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t A.nr(): " <<  A.nr()
+                << "\n\t A.nc(): " <<  A.nc()
+                << "\n\t B.nr(): " <<  B.nr()
+                << "\n\t C.nr(): " <<  C.nr()
+                << "\n\t Q.nr(): " <<  Q.nr()
+                );
+            DLIB_ASSERT(
+                        B.nc() == R.nr() && 
+                        B.nc() == lower.nr() && 
+                        B.nc() == upper.nr() ,
+                "\t mpc::mpc()"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t B.nr(): " <<  B.nr()
+                << "\n\t B.nc(): " <<  B.nc()
+                << "\n\t lower.nr(): " <<  lower.nr()
+                << "\n\t upper.nr(): " <<  upper.nr()
+                );
+            DLIB_ASSERT(min(Q) >= 0 &&
+                        min(R) >  0 &&
+                        min(upper-lower) >= 0,
+                "\t mpc::mpc()"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t min(Q): " << min(Q) 
+                << "\n\t min(R): " << min(R) 
+                << "\n\t min(upper-lower): " << min(upper-lower) 
+                );
+
+
             max_iterations = 10000;
             eps = 0.01;
             for (unsigned long i = 0; i < horizon; ++i)
@@ -93,6 +143,13 @@ namespace dlib
             const unsigned long time
         )
         {
+            DLIB_ASSERT(time < horizon,
+                "\t void mpc::set_target(eps_)"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t time: " << time 
+                << "\n\t horizon: " << horizon 
+                );
+
             target[time] = val;
         }
 
@@ -107,6 +164,14 @@ namespace dlib
             const unsigned long time
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(time < horizon,
+                "\t matrix mpc::get_target(eps_)"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t time: " << time 
+                << "\n\t horizon: " << horizon 
+                );
+
             return target[time];
         }
 
@@ -126,7 +191,7 @@ namespace dlib
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(eps_ > 0,
-                "\tvoid mpc::set_epsilon(eps_)"
+                "\t void mpc::set_epsilon(eps_)"
                 << "\n\t invalid inputs were given to this function"
                 << "\n\t eps_: " << eps_ 
                 );
@@ -143,6 +208,15 @@ namespace dlib
             const matrix<double,S,1>& current_state
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(min(R) > 0 && A.nr() == current_state.size(),
+                "\t matrix mpc::operator(current_state)"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t min(R): " << min(R) 
+                << "\n\t A.nr(): " << A.nr() 
+                << "\n\t current_state.size(): " << current_state.size() 
+                );
+
             // Shift the inputs over by one time step so we can use them to warm start the
             // optimizer.
             for (unsigned long i = 1; i < horizon; ++i)
@@ -171,11 +245,6 @@ namespace dlib
             const matrix<double,S,1>& initial_state
         )
         {
-            DLIB_CASSERT(min(Q) >= 0, "");
-            DLIB_CASSERT(min(R) >  0, "");
-
-
-
             // make it so MM == trans(K)*Q*(M-target)
             M[0] = A*initial_state + C;
             for (unsigned long i = 1; i < horizon; ++i)
