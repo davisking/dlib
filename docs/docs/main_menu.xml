@@ -175,6 +175,10 @@
             <name>Examples: C++</name>
             <sub>
                <item>
+                  <name>Linear_Model_Predictive_Control</name>
+                  <link>mpc_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Video_Object_Tracking</name>
                   <link>video_tracking_ex.cpp.html</link>
                </item>

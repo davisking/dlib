@@ -777,6 +777,9 @@ Or it can alternatively solve:
                   by Markus Kogel and Rolf Findeisen
                 </blockquote>
          </description>
+         <examples>
+            <example>mpc_ex.cpp.html</example>
+         </examples>
       </component>
 
    <!-- ************************************************************************* -->
