@@ -84,6 +84,7 @@ set (tests
    md5.cpp
    member_function_pointer.cpp
    metaprogramming.cpp
+   mpc.cpp
    multithreaded_object.cpp
    numerical_integration.cpp
    object_detector.cpp

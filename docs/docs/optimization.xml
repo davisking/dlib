@@ -47,6 +47,7 @@
          <item>solve_qp3_using_smo</item> 
          <item>solve_qp4_using_smo</item> 
          <item>oca</item> 
+         <item>mpc</item> 
          <item>solve_least_squares</item> 
          <item>solve_least_squares_lm</item> 
          <item>solve_trust_region_subproblem</item> 
@@ -759,6 +760,23 @@ Or it can alternatively solve:
 
          </description>
                                  
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>mpc</name>
+         <file>dlib/control.h</file>
+         <spec_file link="true">dlib/control/mpc_abstract.h</spec_file>
+         <description>
+                This object implements a linear model predictive controller.  
+                In particular, it solves a certain quadratic program using the method
+                described in the paper:
+                <blockquote>
+                  A Fast Gradient method for embedded linear predictive control (2011)
+                  by Markus Kogel and Rolf Findeisen
+                </blockquote>
+         </description>
       </component>
 
    <!-- ************************************************************************* -->
