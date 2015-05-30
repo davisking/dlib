@@ -158,6 +158,7 @@
          <term file="optimization.html" name="solve_qp3_using_smo"            include="dlib/optimization.h"/>
          <term file="optimization.html" name="solve_qp4_using_smo"            include="dlib/optimization.h"/>
          <term file="optimization.html" name="oca"                            include="dlib/optimization.h"/>
+         <term file="optimization.html" name="mpc"                            include="dlib/control.h"/>
          <term link="optimization.html#find_min_bobyqa" name="BOBYQA"         include="dlib/optimization.h"/>
          <term file="optimization.html" name="find_max"                       include="dlib/optimization.h"/>
          <term file="optimization.html" name="find_max_single_variable"       include="dlib/optimization.h"/>
