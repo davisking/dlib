@@ -188,6 +188,15 @@ namespace dlib
                 - #get_target(time) == val
         !*/
 
+        void set_target (
+            const matrix<double,S,1>& val
+        );
+        /*!
+            ensures
+                - for all valid t:
+                    - #get_target(t) == val
+        !*/
+
         void set_last_target (
             const matrix<double,S,1>& val
         );

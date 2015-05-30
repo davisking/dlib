@@ -117,7 +117,7 @@ namespace dlib
             matrix<double,S,S> temp = diagm(Q);
             for (unsigned long c = 0; c < horizon; ++c)
             {
-                lambda += trans(B)*temp*B;
+                lambda += trace(trans(B)*temp*B);
                 temp = trans(A)*temp*A + diagm(Q);
             }
 
@@ -151,6 +151,14 @@ namespace dlib
                 );
 
             target[time] = val;
+        }
+
+        void set_target (
+            const matrix<double,S,1>& val
+        )
+        {
+            for (unsigned long i = 0; i < horizon; ++i)
+                target[i] = val;
         }
 
         void set_last_target (
