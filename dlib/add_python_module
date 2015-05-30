@@ -21,6 +21,21 @@ if (POLICY CMP0042)
     cmake_policy(SET CMP0042 NEW)
 endif()
 
+
+# Sometimes a computer will have multiple python verions installed.  So in this
+# block of code we find the one in the user's path and add its home folder into
+# cmake's search path.  That way it will use that version of python first. 
+find_program(PYTHON_EXECUTABLE python)
+# Resolve symbolic links, hopefully this will give us a path in the proper
+# python home directory.
+get_filename_component(PYTHON_EXECUTABLE ${PYTHON_EXECUTABLE} REALPATH)
+# Pick out the parent directories
+get_filename_component(PYTHON_PATH ${PYTHON_EXECUTABLE} PATH)
+get_filename_component(PYTHON_PATH ${PYTHON_PATH} PATH)
+set(CMAKE_PREFIX_PATH ${PYTHON_PATH})
+
+
+
 #SET(Boost_USE_STATIC_LIBS OFF)
 #SET(Boost_USE_MULTITHREADED ON)
 #SET(Boost_USE_STATIC_RUNTIME OFF)
