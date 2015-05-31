@@ -184,7 +184,7 @@ int main(int argc, char** argv)
         parser.add_option("v","Be verbose.");
         parser.add_option("folds","When doing cross-validation, do <arg> folds (default: 3).",1);
         parser.add_option("c","Set the SVM C parameter to <arg> (default: 1.0).",1);
-        parser.add_option("threads", "Use <arg> threads for training <arg> (default: 4).",1);
+        parser.add_option("threads", "Use <arg> threads for training (default: 4).",1);
         parser.add_option("eps", "Set training epsilon to <arg> (default: 0.01).", 1);
         parser.add_option("target-size", "Set size of the sliding window to about <arg> pixels in area (default: 80*80).", 1);
         parser.add_option("flip", "Add left/right flipped copies of the images into the training dataset.  Useful when the objects "
