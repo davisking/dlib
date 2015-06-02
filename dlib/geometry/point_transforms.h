@@ -853,13 +853,14 @@ namespace dlib
 
         inline dpoint operator() (
             const vector<double>& p,
-            double& scale
+            double& scale,
+            double& distance
         ) const
         {
             vector<double> temp = p-camera_pos;
             temp = proj*temp;
-            const double distance = temp.z()>0 ? temp.z() : 1e-9;
-            scale = dist_scale/distance;
+            distance = temp.z();
+            scale = dist_scale/(temp.z()>0 ? temp.z() : 1e-9);
             temp.x() = temp.x()*scale + width;
             temp.y() = temp.y()*scale + width;
             return temp;
@@ -869,8 +870,8 @@ namespace dlib
             const vector<double>& p
         ) const
         {
-            double scale;
-            return (*this)(p,scale);
+            double scale, distance;
+            return (*this)(p,scale,distance);
         }
 
         inline friend void serialize (const camera_transform& item, std::ostream& out)
