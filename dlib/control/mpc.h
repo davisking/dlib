@@ -118,6 +118,7 @@ namespace dlib
             for (unsigned long c = 0; c < horizon; ++c)
             {
                 lambda += trace(trans(B)*temp*B);
+                Q_diag[horizon-c-1] = diag(trans(B)*temp*B);
                 temp = trans(A)*temp*A + diagm(Q);
             }
 
@@ -264,9 +265,6 @@ namespace dlib
             for (unsigned long i = 0; i < horizon; ++i)
                 MM[i] = trans(B)*M[i];
 
-            for (unsigned long i = 0; i < horizon; ++i)
-                v[i] = controls[i];
-
 
 
             unsigned long iter = 0;
@@ -289,6 +287,8 @@ namespace dlib
                 // Check the stopping condition, which is the magnitude of the largest element
                 // of the gradient.
                 double max_df = 0;
+                unsigned long max_t = 0;
+                long max_v = 0;
                 for (unsigned long i = 0; i < horizon; ++i)
                 {
                     for (long j = 0; j < controls[i].size(); ++j)
@@ -298,7 +298,12 @@ namespace dlib
                         if (!((controls[i](j) <= lower(j) && df[i](j) > 0) || 
                               (controls[i](j) >= upper(j) && df[i](j) < 0)))
                         {
-                            max_df = std::max(max_df, std::abs(df[i](j)));
+                            if (std::abs(df[i](j)) > max_df)
+                            {
+                                max_df = std::abs(df[i](j));
+                                max_t = i;
+                                max_v = j;
+                            }
                         }
                     }
                 }
@@ -306,12 +311,37 @@ namespace dlib
                     break;
 
 
-                // take a step based on the gradient
-                for (unsigned long i = 0; i < horizon; ++i)
+
+                // We will start out by doing a little bit of coordinate descent because it
+                // allows us to optimize individual variables exactly.  Since we are warm
+                // starting each iteration with a really good solution this helps speed
+                // things up a lot.
+                const unsigned long smo_iters = 50;
+                if (iter < smo_iters)
                 {
-                    v_old[i] = v[i];
-                    v[i] = clamp(controls[i] - 1.0/lambda * df[i], lower, upper);
-                    controls[i] = clamp(v[i] + (std::sqrt(lambda)-1)/(std::sqrt(lambda)+1)*(v[i]-v_old[i]), lower, upper);
+                    if (Q_diag[max_t](max_v) == 0) continue;
+
+                    // Take the optimal step but just for one variable.
+                    controls[max_t](max_v) = -(df[max_t](max_v)-Q_diag[max_t](max_v)*controls[max_t](max_v))/Q_diag[max_t](max_v);
+                    controls[max_t](max_v) = put_in_range(lower(max_v), upper(max_v), controls[max_t](max_v));
+
+                    // If this is the last SMO iteration then don't forget to initialize v
+                    // for the gradient steps.
+                    if (iter+1 == smo_iters)
+                    {
+                        for (unsigned long i = 0; i < horizon; ++i)
+                            v[i] = controls[i];
+                    }
+                }
+                else
+                {
+                    // Take a projected gradient step.
+                    for (unsigned long i = 0; i < horizon; ++i)
+                    {
+                        v_old[i] = v[i];
+                        v[i] = clamp(controls[i] - 1.0/lambda * df[i], lower, upper);
+                        controls[i] = clamp(v[i] + (std::sqrt(lambda)-1)/(std::sqrt(lambda)+1)*(v[i]-v_old[i]), lower, upper);
+                    }
                 }
             }
         }
@@ -329,6 +359,7 @@ namespace dlib
         matrix<double,S,1> target[horizon]; 
 
         double lambda; // abound on the largest eigenvalue of the hessian matrix.
+        matrix<double,I,1> Q_diag[horizon]; 
         matrix<double,I,1> controls[horizon]; 
 
     };
