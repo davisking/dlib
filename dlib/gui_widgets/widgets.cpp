@@ -5800,7 +5800,7 @@ namespace dlib
         const canvas& c
     ) const
     {
-        if (depth.nr() < c.height() || depth.nc() < c.width())
+        if (depth.nr() < (long)c.height() || depth.nc() < (long)c.width())
             depth.set_size(c.height(), c.width());
         assign_all_pixels(depth, std::numeric_limits<float>::infinity());
 
