@@ -12,6 +12,33 @@
 
 <current>
 New Features:
+   - Added a linear model predictive control solver.  See the mpc_ex.cpp example
+     program for details.
+   - Thanks to Patrick Snape, the correlation_tracker can now be used from Python.
+      
+Non-Backwards Compatible Changes:
+   - The camera_transform's second operator() method now takes 3 arguments
+     instead of 2.  This is to allow it to output the z distance in addition to
+     scale.
+
+Bug fixes:
+   - Fixed a bug in the eigenvalue_decomposition which could occur when a
+     symmetric matrix was used along with the LAPACK bindings.
+   - Fixed a bug where the last column of data in a file wasn't loaded on some
+     OS X machines when load_libsvm_formatted_data() was called.
+
+Other:
+   - Added a hard iteration limit to a number of the SVM solvers.
+   - Adrian Rosebrock graciously setup an OS X machine for dlib testing, which
+     resulted in improved CMake python scripts on OS X machines.
+   - Improved the way overlapping points are rendered by the perspective_window.
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="18.15" date="Apr 29, 2015">
+New Features:
    - Added a number of tools for working with 3D data:
       - Added the perspective_window which is a tool for displaying 3D point clouds.
       - Added camera_transform.  It performs the 3D to 2D mapping needed to visualize 3D
@@ -37,7 +64,7 @@ Other:
    - The imglab tool now allows the user to click and drag annotations around by holding
      shift and right clicking.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 

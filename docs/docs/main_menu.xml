@@ -134,6 +134,10 @@
             <name>Examples: Python</name>
             <sub>
                <item>
+                  <name>Video_Object_Tracking</name>
+                  <link>correlation_tracker.py.html</link>
+               </item>
+               <item>
                   <name>Face_Landmark_Detection</name>
                   <link>face_landmark_detection.py.html</link>
                </item>

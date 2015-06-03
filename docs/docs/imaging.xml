@@ -2197,6 +2197,7 @@
          </description>
          <examples>
             <example>video_tracking_ex.cpp.html</example>
+            <example>correlation_tracker.py.html</example>
          </examples>
                                  
       </component>
