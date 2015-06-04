@@ -28,7 +28,7 @@ build_python_interface ()
         FILES=`ls *.py`
         for f in $FILES
         do
-            python $f > /dev/null || report_failure 
+            python $f > /dev/null < /dev/null || report_failure 
         done
     fi
 
