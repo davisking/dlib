@@ -248,7 +248,7 @@ namespace dlib
         parts.push_back(det.part(17));
         parts.push_back(det.part(21));
         parts.push_back(det.part(22));
-        parts.push_back(det.part(28));
+        parts.push_back(det.part(26));
         parts.push_back(det.part(36));
         parts.push_back(det.part(39));
         parts.push_back(det.part(42));
