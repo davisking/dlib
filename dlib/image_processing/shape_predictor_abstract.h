@@ -359,6 +359,9 @@ namespace dlib
                 - images.size() > 0
                 - for some i: objects[i].size() != 0
                   (i.e. there has to be at least one full_object_detection in the training set)
+                - for all valid p, there must exist i and j such that: 
+                  objects[i][j].part(p) != OBJECT_PART_NOT_PRESENT.
+                  (i.e. You can't define a part that is always set to OBJECT_PART_NOT_PRESENT.)
                 - for all valid i,j,k,l:
                     - objects[i][j].num_parts() == objects[k][l].num_parts()
                       (i.e. all objects must agree on the number of parts)
@@ -370,6 +373,10 @@ namespace dlib
                   shape_predictor, SP, such that:
                     SP(images[i], objects[i][j].get_rect()) == objects[i][j]
                   This learned SP object is then returned.
+                - Not all parts are required to be observed for all objects.  So if you
+                  have training instances with missing parts then set the part positions
+                  equal to OBJECT_PART_NOT_PRESENT and this algorithm will basically ignore
+                  those missing parts.
         !*/
     };
 
@@ -408,6 +415,8 @@ namespace dlib
               and compare the result with the truth part positions in objects[i][j].  We
               then return the average distance (measured in pixels) between a predicted
               part location and its true position.  
+            - Note that any parts in objects that are set to OBJECT_PART_NOT_PRESENT are
+              simply ignored.
             - if (scales.size() != 0) then
                 - Each time we compute the distance between a predicted part location and
                   its true location in objects[i][j] we divide the distance by
