@@ -220,6 +220,89 @@ namespace
         }
     }
 
+    void test_bottom_up_clustering()
+    {
+        std::vector<dpoint> pts;
+        pts.push_back(dpoint(0.0,0.0));
+        pts.push_back(dpoint(0.5,0.0));
+        pts.push_back(dpoint(0.5,0.5));
+        pts.push_back(dpoint(0.0,0.5));
+
+        pts.push_back(dpoint(3.0,3.0));
+        pts.push_back(dpoint(3.5,3.0));
+        pts.push_back(dpoint(3.5,3.5));
+        pts.push_back(dpoint(3.0,3.5));
+
+        pts.push_back(dpoint(7.0,7.0));
+        pts.push_back(dpoint(7.5,7.0));
+        pts.push_back(dpoint(7.5,7.5));
+        pts.push_back(dpoint(7.0,7.5));
+
+        matrix<double> dists(pts.size(), pts.size());
+        for (long r = 0; r < dists.nr(); ++r)
+            for (long c = 0; c < dists.nc(); ++c)
+                dists(r,c) = length(pts[r]-pts[c]);
+
+
+        matrix<unsigned long,0,1> truth(12);
+        truth = 0, 0, 0, 0,
+                1, 1, 1, 1,
+                2, 2, 2, 2;
+
+        std::vector<unsigned long> labels;
+        DLIB_TEST(bottom_up_cluster(dists, labels, 3) == 3);
+        DLIB_TEST(mat(labels) == truth);
+        DLIB_TEST(bottom_up_cluster(dists, labels, 1, 4.0) == 3);
+        DLIB_TEST(mat(labels) == truth);
+        DLIB_TEST(bottom_up_cluster(dists, labels, 1, 4.95) == 2);
+        truth = 0, 0, 0, 0,
+                0, 0, 0, 0,
+                1, 1, 1, 1;
+        DLIB_TEST(mat(labels) == truth);
+        DLIB_TEST(bottom_up_cluster(dists, labels, 1) == 1);
+        truth = 0, 0, 0, 0,
+                0, 0, 0, 0,
+                0, 0, 0, 0;
+        DLIB_TEST(mat(labels) == truth);
+
+        dists.set_size(0,0);
+        DLIB_TEST(bottom_up_cluster(dists, labels, 3) == 0);
+        DLIB_TEST(labels.size() == 0);
+        DLIB_TEST(bottom_up_cluster(dists, labels, 1) == 0);
+        DLIB_TEST(labels.size() == 0);
+
+        dists.set_size(1,1);
+        dists = 1;
+        DLIB_TEST(bottom_up_cluster(dists, labels, 3) == 1);
+        DLIB_TEST(labels.size() == 1);
+        DLIB_TEST(labels[0] == 0);
+        DLIB_TEST(bottom_up_cluster(dists, labels, 1) == 1);
+        DLIB_TEST(labels.size() == 1);
+        DLIB_TEST(labels[0] == 0);
+        DLIB_TEST(bottom_up_cluster(dists, labels, 1, 0) == 1);
+        DLIB_TEST(labels.size() == 1);
+        DLIB_TEST(labels[0] == 0);
+
+        dists.set_size(2,2);
+        dists = 1;
+        DLIB_TEST(bottom_up_cluster(dists, labels, 3) == 2);
+        DLIB_TEST(labels.size() == 2);
+        DLIB_TEST(labels[0] == 0);
+        DLIB_TEST(labels[1] == 1);
+        DLIB_TEST(bottom_up_cluster(dists, labels, 1) == 1);
+        DLIB_TEST(labels.size() == 2);
+        DLIB_TEST(labels[0] == 0);
+        DLIB_TEST(labels[1] == 0);
+        DLIB_TEST(bottom_up_cluster(dists, labels, 1, 1) == 1);
+        DLIB_TEST(labels.size() == 2);
+        DLIB_TEST(labels[0] == 0);
+        DLIB_TEST(labels[1] == 0);
+        DLIB_TEST(bottom_up_cluster(dists, labels, 1, 0.999) == 2);
+        DLIB_TEST(labels.size() == 2);
+        DLIB_TEST(labels[0] == 0);
+        DLIB_TEST(labels[1] == 1);
+    }
+
     class test_clustering : public tester
     {
     public:
@@ -232,6 +315,8 @@ namespace
         void perform_test (
         )
         {
+            test_bottom_up_clustering();
+
             dlib::rand rnd;
 
             std::vector<sample_pair> edges;
