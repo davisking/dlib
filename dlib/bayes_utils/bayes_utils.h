@@ -1137,8 +1137,8 @@ namespace dlib
                     set_node_value(bn, n, i);
                     samples(i) = node_probability(bn, n);
 
-                    for (unsigned long j = 0; j < bn.node(n).number_of_children(); ++j)
-                        samples(i) *= node_probability(bn, bn.node(n).child(j).index());
+                    for (unsigned long j = 0; j < bn.node(n).number_of_parents(); ++j)
+                        samples(i) *= node_probability(bn, bn.node(n).parent(j).index());
                 }
 
                 //normalize samples
