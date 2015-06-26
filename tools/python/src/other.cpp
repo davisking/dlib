@@ -57,6 +57,9 @@ list _max_cost_assignment (
     const matrix<double>& cost
 )
 {
+    if (cost.nr() != cost.nc())
+        throw dlib::error("The input matrix must be square.");
+
     // max_cost_assignment() only works with integer matrices, so convert from
     // double to integer.
     const double scale = (std::numeric_limits<dlib::int64>::max()/1000)/max(abs(cost));

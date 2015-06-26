@@ -428,6 +428,7 @@
          <term file="ml.html" name="newman_cluster"                                 include="dlib/clustering.h"/>
          <term file="ml.html" name="spectral_cluster"                               include="dlib/clustering.h"/>
          <term file="ml.html" name="chinese_whispers"                               include="dlib/clustering.h"/>
+         <term file="ml.html" name="bottom_up_cluster"                               include="dlib/clustering.h"/>
          <term file="ml.html" name="modularity"                                     include="dlib/clustering.h"/>
          <term file="ml.html" name="pick_initial_centers"                           include="dlib/clustering.h"/>
          <term file="ml.html" name="rank_features"                                  include="dlib/svm.h"/>
