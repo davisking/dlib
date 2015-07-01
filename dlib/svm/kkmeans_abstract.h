@@ -283,13 +283,53 @@ namespace dlib
             - centers.size() > 0
             - array_type == something with an interface compatible with std::vector
               and it must contain row or column vectors capable of being stored in 
-              sample_type objects
+              sample_type objects.
             - sample_type == a dlib::matrix capable of representing vectors
         ensures
             - performs regular old linear kmeans clustering on the samples.  The clustering
               begins with the initial set of centers given as an argument to this function.
               When it finishes #centers will contain the resulting centers.
             - no more than max_iter iterations will be performed before this function
+              terminates.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename array_type, 
+        typename sample_type,
+        typename alloc
+        >
+    void find_clusters_using_angular_kmeans (
+        const array_type& samples,
+        std::vector<sample_type, alloc>& centers,
+        unsigned long max_iter = 1000
+    );
+    /*!
+        requires
+            - samples.size() > 0
+            - samples == a bunch of row or column vectors and they all must be of the
+              same length.
+            - centers.size() > 0
+            - array_type == something with an interface compatible with std::vector
+              and it must contain row or column vectors capable of being stored in 
+              sample_type objects.
+            - sample_type == a dlib::matrix capable of representing vectors
+        ensures
+            - performs linear kmeans clustering on the samples, except instead of using
+              Euclidean distance to compare samples to the centers it uses the angle
+              between a sample and a center (with respect to the origin).  So we try to
+              cluster samples together if they have small angles with respect to each
+              other. The clustering begins with the initial set of centers given as an
+              argument to this function.  When it finishes #centers will contain the
+              resulting centers.
+            - for all valid i:
+                - length(#centers[i]) == 1
+                  (i.e. the output centers are scaled to be unit vectors since their
+                  magnitude is irrelevant.  Moreover, this makes it so you can use
+                  functions like nearest_center() with #centers to find the cluster
+                  assignments.)
+            - No more than max_iter iterations will be performed before this function
               terminates.
     !*/
 
