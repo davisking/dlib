@@ -18,13 +18,14 @@ namespace dlib
             const std::string& new_dir
         )
         {
+            reverted = false;
             _old_dir = get_current_dir();
             set_current_dir(new_dir);
         }
 
         ~locally_change_current_dir()
         {
-            set_current_dir(_old_dir);
+            revert();
         }
 
         const std::string& old_dir (
@@ -33,7 +34,18 @@ namespace dlib
             return _old_dir;
         }
 
+        void revert (
+        )
+        {
+            if (!reverted)
+            {
+                set_current_dir(_old_dir);
+                reverted = true;
+            }
+        }
+
     private:
+        bool reverted;
         std::string _old_dir;
     };
 
