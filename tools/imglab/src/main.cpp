@@ -344,6 +344,10 @@ int tile_dataset(const command_line_parser& parser)
     console_progress_indicator pbar(data.images.size());
     for (unsigned long i = 0; i < data.images.size(); ++i)
     {
+        // don't even bother loading images that don't have objects.
+        if (data.images[i].boxes.size() == 0)
+            continue;
+
         pbar.print_status(i);
         array2d<rgb_pixel> img;
         load_image(img, data.images[i].filename);
