@@ -8,6 +8,7 @@
 #include <dlib/cmd_line_parser.h>
 #include <dlib/image_transforms.h>
 #include <dlib/svm.h>
+#include <dlib/console_progress_indicator.h>
 
 #include <iostream>
 #include <fstream>
@@ -316,6 +317,71 @@ void flip_dataset(const command_line_parser& parser)
 
 // ----------------------------------------------------------------------------------------
 
+
+int tile_dataset(const command_line_parser& parser)
+{
+#if defined(DLIB_PNG_SUPPORT) && defined(DLIB_JPEG_SUPPORT)
+    if (parser.number_of_arguments() != 1)
+    {
+        cerr << "The --tile option requires you to give one XML file on the command line." << endl;
+        return EXIT_FAILURE;
+    }
+
+    string out_image = parser.option("tile").argument();
+    string ext = right_substr(out_image,".");
+    if (ext != "png" && ext != "jpg")
+    {
+        cerr << "The output image file must have either .png or .jpg extension." << endl;
+        return EXIT_FAILURE;
+    }
+
+    const unsigned long chip_size = get_option(parser, "size", 7000);
+
+    dlib::image_dataset_metadata::dataset data;
+    load_image_dataset_metadata(data, parser[0]);
+    locally_change_current_dir chdir(get_parent_directory(file(parser[0])));
+    dlib::array<array2d<rgb_pixel> > images;
+    console_progress_indicator pbar(data.images.size());
+    for (unsigned long i = 0; i < data.images.size(); ++i)
+    {
+        pbar.print_status(i);
+        array2d<rgb_pixel> img;
+        load_image(img, data.images[i].filename);
+
+        // figure out what chips we want to take from this image
+        std::vector<chip_details> dets;
+        for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
+        {
+            if (data.images[i].boxes[j].ignore)
+                continue;
+
+            rectangle rect = data.images[i].boxes[j].rect;
+            dets.push_back(chip_details(rect, chip_size));
+        }
+        // Now grab all those chips at once.
+        dlib::array<array2d<rgb_pixel> > chips;
+        extract_image_chips(img, dets, chips);
+        // and put the chips into the output.
+        for (unsigned long j = 0; j < chips.size(); ++j)
+            images.push_back(chips[j]);
+    }
+
+    chdir.revert();
+
+    if (ext == "png")
+        save_png(tile_images(images), out_image);
+    else
+        save_jpeg(tile_images(images), out_image);
+
+    return EXIT_SUCCESS;
+#else
+    throw dlib::error("imglab must be compiled with libpng and libjpeg if you want to use the --tile option.");
+#endif
+}
+
+
+// ----------------------------------------------------------------------------------------
+
 int main(int argc, char** argv)
 {
     try
@@ -333,6 +399,8 @@ int main(int argc, char** argv)
                           "Supported formats: pascal-xml, pascal-v1, idl.",1);
 
         parser.set_group_name("Viewing/Editing XML files");
+        parser.add_option("tile","Chip out all the objects and save them as one big image called <arg>.",1);
+        parser.add_option("size","When using --tile, make each object contain about <arg> pixels (default 7000).",1);
         parser.add_option("l","List all the labels in the given XML file.");
         parser.add_option("stats","List detailed statistics on the object labels in the given XML file.");
         parser.add_option("rename", "Rename all labels of <arg1> to <arg2>.",2);
@@ -354,22 +422,28 @@ int main(int argc, char** argv)
 
         parser.parse(argc, argv);
 
-        const char* singles[] = {"h","c","r","l","convert","parts","rmdiff","seed", "shuffle", "split", "add", "flip"};
+        const char* singles[] = {"h","c","r","l","convert","parts","rmdiff","seed", "shuffle", "split", "add", 
+                                 "flip", "tile", "size"};
         parser.check_one_time_options(singles);
         const char* c_sub_ops[] = {"r", "convert"};
         parser.check_sub_options("c", c_sub_ops);
         parser.check_sub_option("shuffle", "seed");
+        parser.check_sub_option("tile", "size");
         parser.check_incompatible_options("c", "l");
         parser.check_incompatible_options("c", "rmdiff");
         parser.check_incompatible_options("c", "add");
         parser.check_incompatible_options("c", "flip");
         parser.check_incompatible_options("c", "rename");
         parser.check_incompatible_options("c", "parts");
+        parser.check_incompatible_options("c", "tile");
         parser.check_incompatible_options("l", "rename");
         parser.check_incompatible_options("l", "add");
         parser.check_incompatible_options("l", "parts");
         parser.check_incompatible_options("l", "flip");
         parser.check_incompatible_options("add", "flip");
+        parser.check_incompatible_options("add", "tile");
+        parser.check_incompatible_options("flip", "tile");
+        parser.check_incompatible_options("shuffle", "tile");
         parser.check_incompatible_options("convert", "l");
         parser.check_incompatible_options("convert", "rename");
         parser.check_incompatible_options("convert", "parts");
@@ -404,6 +478,11 @@ int main(int argc, char** argv)
                  << "\nWritten by Davis King\n";
             cout << "Check for updates at http://dlib.net\n\n";
             return EXIT_SUCCESS;
+        }
+
+        if (parser.option("tile"))
+        {
+            return tile_dataset(parser);
         }
 
         if (parser.option("c"))
