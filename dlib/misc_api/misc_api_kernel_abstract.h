@@ -90,7 +90,16 @@ namespace dlib
         );
         /*!
             ensures
-                - calls set_current_dir(old_dir())
+                - if (revert() hasn't already been called) then
+                    - calls set_current_dir(old_dir())
+        !*/
+
+        void revert (
+        );
+        /*!
+            ensures
+                - if (revert() hasn't already been called) then
+                    - calls set_current_dir(old_dir())
         !*/
     };
 

@@ -44,32 +44,63 @@ namespace
 
         randomize_samples(samples);
 
-        std::vector<sample_type> centers;
-        pick_initial_centers(seed_centers.size(), centers, samples, linear_kernel<sample_type>());
-
-        find_clusters_using_kmeans(samples, centers);
-
-        DLIB_TEST(centers.size() == seed_centers.size());
-
-        std::vector<int> hits(centers.size(),0);
-        for (unsigned long i = 0; i < samples.size(); ++i)
         {
-            unsigned long best_idx = 0;
-            double best_dist = 1e100;
-            for (unsigned long j = 0; j < centers.size(); ++j)
+            std::vector<sample_type> centers;
+            pick_initial_centers(seed_centers.size(), centers, samples, linear_kernel<sample_type>());
+
+            find_clusters_using_kmeans(samples, centers);
+
+            DLIB_TEST(centers.size() == seed_centers.size());
+
+            std::vector<int> hits(centers.size(),0);
+            for (unsigned long i = 0; i < samples.size(); ++i)
             {
-                if (length(samples[i] - centers[j]) < best_dist)
+                unsigned long best_idx = 0;
+                double best_dist = 1e100;
+                for (unsigned long j = 0; j < centers.size(); ++j)
                 {
-                    best_dist = length(samples[i] - centers[j]);
-                    best_idx = j;
+                    if (length(samples[i] - centers[j]) < best_dist)
+                    {
+                        best_dist = length(samples[i] - centers[j]);
+                        best_idx = j;
+                    }
                 }
+                hits[best_idx]++;
             }
-            hits[best_idx]++;
-        }
 
-        for (unsigned long i = 0; i < hits.size(); ++i)
+            for (unsigned long i = 0; i < hits.size(); ++i)
+            {
+                DLIB_TEST(hits[i] == 250);
+            }
+        }
         {
-            DLIB_TEST(hits[i] == 250);
+            std::vector<sample_type> centers;
+            pick_initial_centers(seed_centers.size(), centers, samples, linear_kernel<sample_type>());
+
+            find_clusters_using_angular_kmeans(samples, centers);
+
+            DLIB_TEST(centers.size() == seed_centers.size());
+
+            std::vector<int> hits(centers.size(),0);
+            for (unsigned long i = 0; i < samples.size(); ++i)
+            {
+                unsigned long best_idx = 0;
+                double best_dist = 1e100;
+                for (unsigned long j = 0; j < centers.size(); ++j)
+                {
+                    if (length(samples[i] - centers[j]) < best_dist)
+                    {
+                        best_dist = length(samples[i] - centers[j]);
+                        best_idx = j;
+                    }
+                }
+                hits[best_idx]++;
+            }
+
+            for (unsigned long i = 0; i < hits.size(); ++i)
+            {
+                DLIB_TEST(hits[i] == 250);
+            }
         }
     }
 

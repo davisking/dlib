@@ -385,6 +385,15 @@ namespace dlib
         return drectangle(p.x()-width/2, p.y()-height/2, p.x()+width/2, p.y()+height/2);
     }
 
+    inline drectangle centered_drect (
+        const drectangle& rect,
+        double width,
+        double height
+    )
+    {
+        return centered_drect(dcenter(rect), width, height);
+    }
+
     inline const drectangle shrink_rect (
         const drectangle& rect,
         double num 
@@ -417,6 +426,21 @@ namespace dlib
     )
     {
         return shrink_rect(rect, -width, -height);
+    }
+
+    inline drectangle set_aspect_ratio (
+        const drectangle& rect,
+        double ratio
+    )
+    {
+        DLIB_ASSERT(ratio > 0,
+            "\t drectangle set_aspect_ratio()"
+            << "\n\t ratio: " << ratio 
+            );
+
+        const double h = std::sqrt(rect.area()/ratio);
+        const double w = h*ratio;
+        return centered_drect(rect, w, h);
     }
 
 // ----------------------------------------------------------------------------------------

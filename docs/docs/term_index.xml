@@ -424,6 +424,7 @@
          <term file="dlib/statistics/dpca_abstract.h.html" name="discriminant_pca_error"  include="dlib/statistics.h"/>
          <term file="ml.html" name="kkmeans"                                        include="dlib/clustering.h"/>
          <term file="ml.html" name="find_clusters_using_kmeans"                     include="dlib/clustering.h"/>
+         <term file="ml.html" name="find_clusters_using_angular_kmeans"             include="dlib/clustering.h"/>
          <term file="ml.html" name="nearest_center"                                 include="dlib/clustering.h"/>
          <term file="ml.html" name="newman_cluster"                                 include="dlib/clustering.h"/>
          <term file="ml.html" name="spectral_cluster"                               include="dlib/clustering.h"/>
