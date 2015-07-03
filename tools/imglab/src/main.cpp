@@ -5,6 +5,7 @@
 #include "convert_pascal_xml.h"
 #include "convert_pascal_v1.h"
 #include "convert_idl.h"
+#include "cluster.h"
 #include <dlib/cmd_line_parser.h>
 #include <dlib/image_transforms.h>
 #include <dlib/svm.h>
@@ -18,7 +19,7 @@
 #include <dlib/dir_nav.h>
 
 
-const char* VERSION = "1.1";
+const char* VERSION = "1.2";
 
 
 
@@ -335,7 +336,7 @@ int tile_dataset(const command_line_parser& parser)
         return EXIT_FAILURE;
     }
 
-    const unsigned long chip_size = get_option(parser, "size", 7000);
+    const unsigned long chip_size = get_option(parser, "size", 8000);
 
     dlib::image_dataset_metadata::dataset data;
     load_image_dataset_metadata(data, parser[0]);
@@ -402,11 +403,14 @@ int main(int argc, char** argv)
         parser.add_option("convert","Convert foreign image Annotations from <arg> format to the imglab format. "
                           "Supported formats: pascal-xml, pascal-v1, idl.",1);
 
-        parser.set_group_name("Viewing/Editing XML files");
+        parser.set_group_name("Viewing XML files");
         parser.add_option("tile","Chip out all the objects and save them as one big image called <arg>.",1);
-        parser.add_option("size","When using --tile, make each object contain about <arg> pixels (default 7000).",1);
+        parser.add_option("size","When using --tile or --cluster, make each extracted object contain "
+                                 "about <arg> pixels (default 8000).",1);
         parser.add_option("l","List all the labels in the given XML file.");
         parser.add_option("stats","List detailed statistics on the object labels in the given XML file.");
+
+        parser.set_group_name("Editing/Transforming XML files");
         parser.add_option("rename", "Rename all labels of <arg1> to <arg2>.",2);
         parser.add_option("parts","The display will allow image parts to be labeled.  The set of allowable parts "
                           "is defined by <arg> which should be a space separated list of parts.",1);
@@ -423,16 +427,19 @@ int main(int argc, char** argv)
                                  "<arg2> files are modified.",2);
         parser.add_option("flip", "Read an XML image dataset from the <arg> XML file and output a left-right flipped "
                                   "version of the dataset and an accompanying flipped XML file named flipped_<arg>.",1);
+        parser.add_option("cluster", "Cluster all the objects in an XML file into <arg> different clusters and save "
+                                     "the results as cluster_###.xml and cluster_###.jpg files.",1);
 
         parser.parse(argc, argv);
 
         const char* singles[] = {"h","c","r","l","convert","parts","rmdiff","seed", "shuffle", "split", "add", 
-                                 "flip", "tile", "size"};
+                                 "flip", "tile", "size", "cluster"};
         parser.check_one_time_options(singles);
         const char* c_sub_ops[] = {"r", "convert"};
         parser.check_sub_options("c", c_sub_ops);
         parser.check_sub_option("shuffle", "seed");
-        parser.check_sub_option("tile", "size");
+        const char* size_parent_ops[] = {"tile", "cluster"};
+        parser.check_sub_options(size_parent_ops, "size");
         parser.check_incompatible_options("c", "l");
         parser.check_incompatible_options("c", "rmdiff");
         parser.check_incompatible_options("c", "add");
@@ -440,6 +447,7 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("c", "rename");
         parser.check_incompatible_options("c", "parts");
         parser.check_incompatible_options("c", "tile");
+        parser.check_incompatible_options("c", "cluster");
         parser.check_incompatible_options("l", "rename");
         parser.check_incompatible_options("l", "add");
         parser.check_incompatible_options("l", "parts");
@@ -447,13 +455,19 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("add", "flip");
         parser.check_incompatible_options("add", "tile");
         parser.check_incompatible_options("flip", "tile");
+        parser.check_incompatible_options("cluster", "tile");
+        parser.check_incompatible_options("flip", "cluster");
+        parser.check_incompatible_options("add", "cluster");
         parser.check_incompatible_options("shuffle", "tile");
         parser.check_incompatible_options("convert", "l");
         parser.check_incompatible_options("convert", "rename");
         parser.check_incompatible_options("convert", "parts");
+        parser.check_incompatible_options("convert", "cluster");
         parser.check_incompatible_options("rmdiff", "rename");
         const char* convert_args[] = {"pascal-xml","pascal-v1","idl"};
         parser.check_option_arg_range("convert", convert_args);
+        parser.check_option_arg_range("cluster", 2, 999);
+        parser.check_option_arg_range("size", 10*10, 1000*1000);
 
         if (parser.option("h"))
         {
@@ -487,6 +501,11 @@ int main(int argc, char** argv)
         if (parser.option("tile"))
         {
             return tile_dataset(parser);
+        }
+
+        if (parser.option("cluster"))
+        {
+            return cluster_dataset(parser);
         }
 
         if (parser.option("c"))

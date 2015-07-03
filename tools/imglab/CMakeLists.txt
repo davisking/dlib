@@ -24,6 +24,7 @@ ADD_EXECUTABLE(${target_name}
    src/convert_idl.cpp
    src/common.h
    src/common.cpp
+   src/cluster.cpp
 )
 
 
