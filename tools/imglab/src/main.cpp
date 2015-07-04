@@ -523,7 +523,7 @@ int main(int argc, char** argv)
         const char* convert_args[] = {"pascal-xml","pascal-v1","idl"};
         parser.check_option_arg_range("convert", convert_args);
         parser.check_option_arg_range("cluster", 2, 999);
-        parser.check_option_arg_range("rotate", 1, 360);
+        parser.check_option_arg_range("rotate", -360, 360);
         parser.check_option_arg_range("size", 10*10, 1000*1000);
 
         if (parser.option("h"))
