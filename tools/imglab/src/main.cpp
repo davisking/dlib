@@ -314,6 +314,63 @@ void flip_dataset(const command_line_parser& parser)
 
 // ----------------------------------------------------------------------------------------
 
+void rotate_dataset(const command_line_parser& parser)
+{
+    image_dataset_metadata::dataset metadata;
+    const string datasource = parser[0];
+    load_image_dataset_metadata(metadata,datasource);
+
+    double angle = get_option(parser, "rotate", 0);
+
+    // Set the current directory to be the one that contains the
+    // metadata file. We do this because the file might contain
+    // file paths which are relative to this folder.
+    set_current_dir(get_parent_directory(file(datasource)));
+
+    const string file_prefix = "rotated_"+ cast_to_string(angle) + "_";
+    const string metadata_filename = get_parent_directory(file(datasource)).full_name() +
+        directory::get_separator() + file_prefix + file(datasource).name();
+
+
+    array2d<rgb_pixel> img, temp;
+    for (unsigned long i = 0; i < metadata.images.size(); ++i)
+    {
+        file f(metadata.images[i].filename);
+        const string filename = get_parent_directory(f).full_name() + directory::get_separator() + file_prefix + to_png_name(f.name());
+
+        load_image(img, metadata.images[i].filename);
+        const point_transform_affine tran = rotate_image(img, temp, angle*pi/180);
+        save_png(temp, filename);
+
+        for (unsigned long j = 0; j < metadata.images[i].boxes.size(); ++j)
+        {
+            const rectangle rect = metadata.images[i].boxes[j].rect;
+            rectangle newrect;
+            newrect += tran(rect.tl_corner());
+            newrect += tran(rect.tr_corner());
+            newrect += tran(rect.bl_corner());
+            newrect += tran(rect.br_corner());
+            // now make newrect have the same area as the starting rect.
+            double ratio = std::sqrt(rect.area()/(double)newrect.area());
+            newrect = centered_rect(newrect, newrect.width()*ratio, newrect.height()*ratio);
+            metadata.images[i].boxes[j].rect = newrect;
+
+            // rotate all the object parts
+            std::map<std::string,point>::iterator k;
+            for (k = metadata.images[i].boxes[j].parts.begin(); k != metadata.images[i].boxes[j].parts.end(); ++k)
+            {
+                k->second = tran(k->second); 
+            }
+        }
+
+        metadata.images[i].filename = filename;
+    }
+
+    save_image_dataset_metadata(metadata, metadata_filename);
+}
+
+// ----------------------------------------------------------------------------------------
+
 
 int tile_dataset(const command_line_parser& parser)
 {
@@ -419,13 +476,15 @@ int main(int argc, char** argv)
                                  "<arg2> files are modified.",2);
         parser.add_option("flip", "Read an XML image dataset from the <arg> XML file and output a left-right flipped "
                                   "version of the dataset and an accompanying flipped XML file named flipped_<arg>.",1);
+        parser.add_option("rotate", "Read an XML image dataset and output a copy that is rotated counter clockwise by <arg> degrees. "
+                                  "The output is saved to an XML file prefixed with rotated_<arg>.",1);
         parser.add_option("cluster", "Cluster all the objects in an XML file into <arg> different clusters and save "
                                      "the results as cluster_###.xml and cluster_###.jpg files.",1);
 
         parser.parse(argc, argv);
 
         const char* singles[] = {"h","c","r","l","convert","parts","rmdiff","seed", "shuffle", "split", "add", 
-                                 "flip", "tile", "size", "cluster"};
+                                 "flip", "rotate", "tile", "size", "cluster"};
         parser.check_one_time_options(singles);
         const char* c_sub_ops[] = {"r", "convert"};
         parser.check_sub_options("c", c_sub_ops);
@@ -436,6 +495,7 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("c", "rmdiff");
         parser.check_incompatible_options("c", "add");
         parser.check_incompatible_options("c", "flip");
+        parser.check_incompatible_options("c", "rotate");
         parser.check_incompatible_options("c", "rename");
         parser.check_incompatible_options("c", "parts");
         parser.check_incompatible_options("c", "tile");
@@ -444,11 +504,15 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("l", "add");
         parser.check_incompatible_options("l", "parts");
         parser.check_incompatible_options("l", "flip");
+        parser.check_incompatible_options("l", "rotate");
         parser.check_incompatible_options("add", "flip");
+        parser.check_incompatible_options("add", "rotate");
         parser.check_incompatible_options("add", "tile");
         parser.check_incompatible_options("flip", "tile");
+        parser.check_incompatible_options("rotate", "tile");
         parser.check_incompatible_options("cluster", "tile");
         parser.check_incompatible_options("flip", "cluster");
+        parser.check_incompatible_options("rotate", "cluster");
         parser.check_incompatible_options("add", "cluster");
         parser.check_incompatible_options("shuffle", "tile");
         parser.check_incompatible_options("convert", "l");
@@ -459,6 +523,7 @@ int main(int argc, char** argv)
         const char* convert_args[] = {"pascal-xml","pascal-v1","idl"};
         parser.check_option_arg_range("convert", convert_args);
         parser.check_option_arg_range("cluster", 2, 999);
+        parser.check_option_arg_range("rotate", 1, 360);
         parser.check_option_arg_range("size", 10*10, 1000*1000);
 
         if (parser.option("h"))
@@ -478,6 +543,12 @@ int main(int argc, char** argv)
         if (parser.option("flip"))
         {
             flip_dataset(parser);
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("rotate"))
+        {
+            rotate_dataset(parser);
             return EXIT_SUCCESS;
         }
 
