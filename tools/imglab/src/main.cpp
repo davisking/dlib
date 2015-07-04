@@ -271,7 +271,6 @@ string to_png_name (const string& filename)
 
 void flip_dataset(const command_line_parser& parser)
 {
-#ifdef DLIB_PNG_SUPPORT
     image_dataset_metadata::dataset metadata;
     const string datasource = parser.option("flip").argument();
     load_image_dataset_metadata(metadata,datasource);
@@ -311,9 +310,6 @@ void flip_dataset(const command_line_parser& parser)
     }
 
     save_image_dataset_metadata(metadata, metadata_filename);
-#else
-    throw dlib::error("imglab must be compiled with libpng if you want to use the --flip option.");
-#endif
 }
 
 // ----------------------------------------------------------------------------------------
@@ -321,7 +317,6 @@ void flip_dataset(const command_line_parser& parser)
 
 int tile_dataset(const command_line_parser& parser)
 {
-#if defined(DLIB_PNG_SUPPORT) && defined(DLIB_JPEG_SUPPORT)
     if (parser.number_of_arguments() != 1)
     {
         cerr << "The --tile option requires you to give one XML file on the command line." << endl;
@@ -379,9 +374,6 @@ int tile_dataset(const command_line_parser& parser)
         save_jpeg(tile_images(images), out_image);
 
     return EXIT_SUCCESS;
-#else
-    throw dlib::error("imglab must be compiled with libpng and libjpeg if you want to use the --tile option.");
-#endif
 }
 
 
