@@ -10,6 +10,7 @@
 #include <dlib/image_transforms.h>
 #include <dlib/svm.h>
 #include <dlib/console_progress_indicator.h>
+#include <dlib/md5.h>
 
 #include <iostream>
 #include <fstream>
@@ -468,6 +469,8 @@ int main(int argc, char** argv)
         parser.add_option("rename", "Rename all labels of <arg1> to <arg2>.",2);
         parser.add_option("parts","The display will allow image parts to be labeled.  The set of allowable parts "
                           "is defined by <arg> which should be a space separated list of parts.",1);
+        parser.add_option("rmdupes","Remove duplicate images from the dataset.  This is done by comparing "
+                                    "the md5 hash of each image file and removing duplicate images. " );
         parser.add_option("rmdiff","Set the ignored flag to true for boxes marked as difficult.");
         parser.add_option("rmtrunc","Set the ignored flag to true for boxes that are partially outside the image.");
         parser.add_option("shuffle","Randomly shuffle the order of the images listed in file <arg>.");
@@ -489,7 +492,7 @@ int main(int argc, char** argv)
 
         parser.parse(argc, argv);
 
-        const char* singles[] = {"h","c","r","l","convert","parts","rmdiff", "rmtrunc","seed", "shuffle", "split", "add", 
+        const char* singles[] = {"h","c","r","l","convert","parts","rmdiff", "rmtrunc", "rmdupes", "seed", "shuffle", "split", "add", 
                                  "flip", "rotate", "tile", "size", "cluster"};
         parser.check_one_time_options(singles);
         const char* c_sub_ops[] = {"r", "convert"};
@@ -499,6 +502,7 @@ int main(int argc, char** argv)
         parser.check_sub_options(size_parent_ops, "size");
         parser.check_incompatible_options("c", "l");
         parser.check_incompatible_options("c", "rmdiff");
+        parser.check_incompatible_options("c", "rmdupes");
         parser.check_incompatible_options("c", "rmtrunc");
         parser.check_incompatible_options("c", "add");
         parser.check_incompatible_options("c", "flip");
@@ -527,6 +531,7 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("convert", "parts");
         parser.check_incompatible_options("convert", "cluster");
         parser.check_incompatible_options("rmdiff", "rename");
+        parser.check_incompatible_options("rmdupes", "rename");
         parser.check_incompatible_options("rmtrunc", "rename");
         const char* convert_args[] = {"pascal-xml","pascal-v1","idl"};
         parser.check_option_arg_range("convert", convert_args);
@@ -616,6 +621,34 @@ int main(int argc, char** argv)
                 }
             }
             save_image_dataset_metadata(data, parser[0]);
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("rmdupes"))
+        {
+            if (parser.number_of_arguments() != 1)
+            {
+                cerr << "The --rmdupes option requires you to give one XML file on the command line." << endl;
+                return EXIT_FAILURE;
+            }
+
+            dlib::image_dataset_metadata::dataset data, data_out;
+            std::set<std::string> hashes;
+            load_image_dataset_metadata(data, parser[0]);
+            data_out = data;
+            data_out.images.clear();
+
+            for (unsigned long i = 0; i < data.images.size(); ++i)
+            {
+                ifstream fin(data.images[i].filename.c_str(), ios::binary);
+                string hash = md5(fin);
+                if (hashes.count(hash) == 0)
+                {
+                    hashes.insert(hash);
+                    data_out.images.push_back(data.images[i]);
+                }
+            }
+            save_image_dataset_metadata(data_out, parser[0]);
             return EXIT_SUCCESS;
         }
 
