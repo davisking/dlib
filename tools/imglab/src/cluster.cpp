@@ -147,7 +147,7 @@ int cluster_dataset(
 
         for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
         {
-            if (data.images[i].boxes[j].ignore)
+            if (data.images[i].boxes[j].ignore || data.images[i].boxes[j].rect.area() < 10)
                 continue;
             drectangle rect = data.images[i].boxes[j].rect;
             rect = set_aspect_ratio(rect, aspect_ratio);
@@ -187,7 +187,7 @@ int cluster_dataset(
             {
                 idata[i].second.boxes.push_back(data.images[i].boxes[j]);
 
-                if (data.images[i].boxes[j].ignore)
+                if (data.images[i].boxes[j].ignore || data.images[i].boxes[j].rect.area() < 10)
                     continue;
 
                 // If this box goes into cluster c then update the score for the whole
