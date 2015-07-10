@@ -257,16 +257,12 @@ namespace dlib
             static bool is_first_fatal_error = true;
             if (is_first_fatal_error == false)
             {
-                std::cerr << "\n\n ************************** FATAL ERROR DETECTED ************************** " << std::endl;
-                std::cerr << " ************************** FATAL ERROR DETECTED ************************** " << std::endl;
-                std::cerr << " ************************** FATAL ERROR DETECTED ************************** \n" << std::endl;
-                std::cerr << "Two fatal errors have been detected, the first was inappropriately ignored. \n"
-                          << "To prevent further fatal errors from being ignored this application will be \n"
-                          << "terminated immediately and you should go fix this buggy program.\n\n"
-                          << "The error message from this fatal error was:\n" << this->what() << "\n\n" << std::endl;
-                using namespace std;
-                assert(false);
-                abort();
+                std::cerr << " *** FATAL ERROR DETECTED ***" << std::endl
+                          << " Multiple fatal errors have been detected, and they continually are ignored." << std::endl
+                          << " This may be a buggy program that you'd like to fix, or you may really know" << std::endl
+                          << " what you are doing." << std::endl
+                          << std::endl
+                          << " The error message from this fatal error was:\n" << this->what() << "\n\n" << std::endl;
             }
             else
             {
