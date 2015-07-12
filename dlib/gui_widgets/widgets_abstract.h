@@ -533,10 +533,11 @@ namespace dlib
     {
         /*!
             INITIAL VALUE
-                text() == ""
-                width() == 10
-                height() == a height appropriate for the font used.
-                The text color will be black.
+                - text() == ""
+                - width() == 10
+                - height() == a height appropriate for the font used.  The text color will
+                  be black.
+                - has_input_focus() == false
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a simple one line text input field.  
@@ -622,7 +623,16 @@ namespace dlib
         );
         /*!
             ensures
-                - gives this text field input keyboard focus
+                - #has_input_focus() == true
+        !*/
+
+        bool has_input_focus (
+        );
+        /*!
+            ensures
+                - Returns true if this txt field has input keyboard focus.  If this
+                  is the case then it means that when the user types on the keyboard
+                  the output will appear inside the text field.
         !*/
 
         void select_all_text (

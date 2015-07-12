@@ -435,6 +435,9 @@ namespace dlib
         void give_input_focus (
         );
 
+        bool has_input_focus (
+        ) const;
+
         void select_all_text (
         );
 
