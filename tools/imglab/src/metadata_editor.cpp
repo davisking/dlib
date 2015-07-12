@@ -10,6 +10,7 @@
 #include <dlib/array2d.h>
 #include <dlib/pixel.h>
 #include <sstream>
+#include <ctime>
 
 using namespace std;
 using namespace dlib;
@@ -27,7 +28,9 @@ metadata_editor(
     image_pos(0),
     display(*this),
     overlay_label_name(*this),
-    overlay_label(*this)
+    overlay_label(*this),
+    keyboard_jump_pos(0),
+    last_keyboard_jump_pos_update(0)
 {
     file metadata_file(filename_);
     filename = metadata_file.full_name();
@@ -290,6 +293,29 @@ on_keydown (
             overlay_label.select_all_text();
         }
 
+        // If the user types a number then jump to that image.
+        if ('0' <= key && key <= '9' && metadata.images.size() != 0 && !overlay_label.has_input_focus())
+        {
+            time_t curtime = time(0);
+            // If it's been a while since the user typed numbers then forget the last jump
+            // position and start accumulating numbers over again.
+            if (curtime-last_keyboard_jump_pos_update >= 2)
+                keyboard_jump_pos = 0;
+            last_keyboard_jump_pos_update = curtime;
+
+            keyboard_jump_pos *= 10;
+            keyboard_jump_pos += key-'0';
+            if (keyboard_jump_pos >= metadata.images.size())
+                keyboard_jump_pos = metadata.images.size()-1;
+
+            image_pos = keyboard_jump_pos;
+            select_image(image_pos);
+        }
+        else
+        {
+            last_keyboard_jump_pos_update = 0;
+        }
+
         return;
     }
 
@@ -536,8 +562,9 @@ display_about(
                         "and drag allows you to navigate around the image.  Holding ctrl and "
                         "left clicking a rectangle will give it the label from the Next Label field. "
                         "Holding shift + right click and then dragging allows you to move things around. "
-                        "Finally, holding ctrl and pressing the up or down keyboard keys will propagate "
-                        "rectangle labels from one image to the next and also skip empty images.",0,0) << endl;
+                        "Holding ctrl and pressing the up or down keyboard keys will propagate "
+                        "rectangle labels from one image to the next and also skip empty images. " 
+                        "Finally, typing a number on the keyboard will jump you to a specific image.",0,0) << endl;
 
     message_box("About Image Labeler",sout.str());
 }

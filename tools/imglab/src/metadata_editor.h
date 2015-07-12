@@ -55,6 +55,9 @@ private:
     dlib::image_display display;
     dlib::label overlay_label_name;
     dlib::text_field overlay_label;
+
+    unsigned long keyboard_jump_pos;
+    time_t last_keyboard_jump_pos_update;
 };
 
 // ----------------------------------------------------------------------------------------
