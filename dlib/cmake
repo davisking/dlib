@@ -15,8 +15,8 @@ string(REGEX REPLACE "cmake$" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
 if (CMAKE_COMPILER_IS_GNUCXX)
     # By default, g++ won't warn or error if you forget to return a value in a
     # function which requires you to do so.  This option makes it give a warning
-    # for doing this. 
-    add_definitions("-Wreturn-type")
+    # for doing this.
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wreturn-type") 
 endif()
 
 # Setup some options to allow a user to enable SSE and AVX instruction use.  
