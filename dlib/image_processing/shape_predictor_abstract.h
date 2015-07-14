@@ -42,6 +42,7 @@ namespace dlib
         /*!
             ensures
                 - #num_parts() == 0
+                - #num_features() == 0
         !*/
 
         unsigned long num_parts (
@@ -51,15 +52,27 @@ namespace dlib
                 - returns the number of parts in the shapes predicted by this object.
         !*/
 
-        template <typename image_type>
+        unsigned long num_features (
+        ) const;
+        /*!
+            ensures
+                - Returns the dimensionality of the feature vector output by operator().
+                  This number is the total number of trees in this object times the number
+                  of leaves on each tree.  
+        !*/
+
+        template <typename image_type, typename T, typename U>
         full_object_detection operator()(
             const image_type& img,
-            const rectangle& rect
+            const rectangle& rect,
+            std::vector<std::pair<T,U> >& feats
         ) const;
         /*!
             requires
                 - image_type == an image object that implements the interface defined in
                   dlib/image_processing/generic_image.h 
+                - T is some unsigned integral type (e.g. unsigned int).
+                - U is any scalar type capable of storing the value 1 (e.g. float).
             ensures
                 - Runs the shape prediction algorithm on the part of the image contained in
                   the given bounding rectangle.  So it will try and fit the shape model to
@@ -73,6 +86,29 @@ namespace dlib
                     - for all valid i:
                         - DET.part(i) == the location in img for the i-th part of the shape
                           predicted by this object.
+                - #feats == a sparse vector that records which leaf each tree used to make
+                  the shape prediction.   Moreover, it is an indicator vector, Therefore,
+                  for all valid i:
+                    - #feats[i].second == 1
+                  Further, #feats is a vector from the space of num_features() dimensional
+                  vectors.  The output shape positions can be represented as the dot
+                  product between #feats and a weight vector.  Therefore, #feats encodes
+                  all the information from img that was used to predict the returned shape
+                  object.
+        !*/
+
+        template <typename image_type>
+        full_object_detection operator()(
+            const image_type& img,
+            const rectangle& rect
+        ) const;
+        /*!
+            requires
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+            ensures
+                - Calling this function is equivalent to calling (*this)(img, rect, ignored)
+                  where the 3d argument is discarded.
         !*/
 
     };
