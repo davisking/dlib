@@ -550,7 +550,7 @@
             </item>
             <item>
                <name>Download dlib</name>
-               <link>http://sourceforge.net/projects/dclib/files/latest/download</link>
+               <link>http://dlib.net/files/<current_release/>.tar.bz2</link>
             </item>
             <item>
                <name>Who uses dlib?</name>
@@ -571,12 +571,6 @@
       <br/>
       <br/>
       <br/>
-      <web>
-
-         <a href="http://sourceforge.net/projects/dclib"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=130373&amp;type=9" width="80" height="15" border="0" alt="Get dlib C++ Library at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a>
-         <br/>
-         <br/>
-      </web>
       Last Modified:<br/>
       <last_modified_date/>
       <br/>
