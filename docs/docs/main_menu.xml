@@ -550,7 +550,7 @@
             </item>
             <item>
                <name>Download dlib</name>
-               <link>http://dlib.net/files/<current_release/>.tar.bz2</link>
+               <link>http://dlib.net/files/dlib-<current_release/>.tar.bz2</link>
             </item>
             <item>
                <name>Who uses dlib?</name>
