@@ -474,7 +474,8 @@ function BigToggle(node)
                <xsl:when test="sub">
                   <xsl:choose>
                      <xsl:when test="link">
-                        <a href="{link}" style="float:right"><img src="right.gif" border="0"/></a>
+                        <xsl:variable name="linktext"><xsl:apply-templates select="link"/></xsl:variable>
+                        <a href="{$linktext}" style="float:right"><img src="right.gif" border="0"/></a>
                         <a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px" ><img src="plus.gif" border="0"/><font color="green"><u><xsl:value-of select="name"/></u></font></a>
       <xsl:apply-templates select="sub">
          <xsl:with-param name="file_name" select="$file_name" />
@@ -492,7 +493,8 @@ function BigToggle(node)
                <xsl:otherwise>
                   <xsl:choose>
                      <xsl:when test="link">
-                        <a href="{link}"><xsl:value-of select="name"/></a>
+                        <xsl:variable name="linktext"><xsl:apply-templates select="link"/></xsl:variable>
+                        <a href="{$linktext}"><xsl:value-of select="name"/></a>
                      </xsl:when>
                      <xsl:otherwise>
                         <a href="{$file_name}#{name}"><xsl:value-of select="name"/></a>
