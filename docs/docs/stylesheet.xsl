@@ -36,7 +36,6 @@
    
    <xsl:variable name="gray">#E3E3E3</xsl:variable>
    <xsl:variable name="background_color">#EDF3EE</xsl:variable>
-   <xsl:variable name="main_width">62.5em</xsl:variable>
 
    <!-- ************************************************************************* -->
    <!-- ************************************************************************* -->
@@ -286,6 +285,7 @@ function BigToggle(node)
 
    div.entire_page_header {
       width:62.5em;  
+      height:59px;
       text-align: left;
       margin-top: 0.4em;
       margin-left: auto;
@@ -297,6 +297,43 @@ function BigToggle(node)
       margin-left: auto;
       margin-right: auto;
       clear:both;
+   }
+
+   a {
+      text-decoration: none;
+      font-family: sans-serif;
+   }
+   a:hover{
+      text-decoration: underline;
+   }
+   a.menu{
+      white-space: nowrap;
+   }
+   a.sub{
+      cursor: pointer;
+      margin-left:-9px;
+      color: green;
+   }
+   #download_button {
+      font-weight: bold;
+      margin-left: auto;
+      margin-right: auto;
+      background-color: #e1ddda;
+      font-size: 14pt;
+      padding: 7px;
+      -moz-box-shadow: 2px 2px 9px #777777; 
+      -webkit-box-shadow: 2px 2px 9px #777777;
+      box-shadow: 2px 2px 9px #777777;
+      border-radius: 8px;
+      -moz-border-radius: 8px;
+      -webkit-border-radius: 8px;
+   }
+   #download_button:hover {
+      text-decoration: none;
+      -moz-box-shadow: 1px 1px 9px #77a777; 
+      -webkit-box-shadow: 1px 1px 9px #77a777;
+      box-shadow: 1px 1px 9px #77a777;
+      color: #007777;
    }
 </style>
          <xsl:if test="$is_chm != 'true'">
@@ -430,6 +467,11 @@ function BigToggle(node)
       </xsl:apply-templates>
    </xsl:template>
    
+   <xsl:template match="download_button">
+      <xsl:variable name="linktext"><xsl:apply-templates select="link"/></xsl:variable>
+      <a href="{$linktext}" id="download_button" class="menu"><xsl:value-of select="name"/></a>
+   </xsl:template>
+   
    
    <xsl:template match="menu">
       <xsl:param name="file_name" />
@@ -452,15 +494,15 @@ function BigToggle(node)
    
    <xsl:template match="item">
       <xsl:param name="file_name" />
-  <li>
+      <li>
       <xsl:choose>
          <xsl:when test="@nolink = 'true'">
             <xsl:choose>
                <xsl:when test="name">
-                  <a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"/><font color="green"><u><xsl:value-of select="name"/></u></font></a>
-      <xsl:apply-templates select="sub">
-         <xsl:with-param name="file_name" select="$file_name" />
-      </xsl:apply-templates> 
+                  <a onclick="Toggle(this)" class="sub menu"><img src="plus.gif"/><xsl:value-of select="name"/></a>
+                  <xsl:apply-templates select="sub">
+                     <xsl:with-param name="file_name" select="$file_name" />
+                  </xsl:apply-templates> 
                </xsl:when>
                <xsl:otherwise>
                   <xsl:apply-templates>
@@ -474,35 +516,37 @@ function BigToggle(node)
                <xsl:when test="sub">
                   <xsl:choose>
                      <xsl:when test="link">
-                        <a href="{link}" style="float:right"><img src="right.gif" border="0"/></a>
-                        <a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px" ><img src="plus.gif" border="0"/><font color="green"><u><xsl:value-of select="name"/></u></font></a>
-      <xsl:apply-templates select="sub">
-         <xsl:with-param name="file_name" select="$file_name" />
-      </xsl:apply-templates> 
+                        <xsl:variable name="linktext"><xsl:apply-templates select="link"/></xsl:variable>
+                        <a href="{$linktext}" style="float:right"><img src="right.gif" border="0"/></a>
+                        <a onclick="Toggle(this)" class="sub menu"><img src="plus.gif" border="0"/><xsl:value-of select="name"/></a>
+                        <xsl:apply-templates select="sub">
+                           <xsl:with-param name="file_name" select="$file_name" />
+                        </xsl:apply-templates> 
                      </xsl:when>
                      <xsl:otherwise>
                         <a href="{$file_name}#{name}" style="float:right"><img src="down.gif" border="0" /></a>
-                        <a onclick="Toggle(this)" style="cursor: pointer;"><img src="plus.gif" border="0"/><font color="green"><u><xsl:value-of select="name"/></u></font></a>
-      <xsl:apply-templates select="sub">
-         <xsl:with-param name="file_name" select="$file_name" />
-      </xsl:apply-templates>
+                        <a onclick="Toggle(this)" class="sub menu"><img src="plus.gif" border="0"/><xsl:value-of select="name"/></a>
+                        <xsl:apply-templates select="sub">
+                           <xsl:with-param name="file_name" select="$file_name" />
+                        </xsl:apply-templates>
                      </xsl:otherwise>
                   </xsl:choose>
                </xsl:when>
                <xsl:otherwise>
                   <xsl:choose>
                      <xsl:when test="link">
-                        <a href="{link}"><xsl:value-of select="name"/></a>
+                        <xsl:variable name="linktext"><xsl:apply-templates select="link"/></xsl:variable>
+                        <a href="{$linktext}" class="menu"><xsl:value-of select="name"/></a>
                      </xsl:when>
                      <xsl:otherwise>
-                        <a href="{$file_name}#{name}"><xsl:value-of select="name"/></a>
+                        <a href="{$file_name}#{name}" class="menu"><xsl:value-of select="name"/></a>
                      </xsl:otherwise>
                   </xsl:choose>
                </xsl:otherwise>
             </xsl:choose>
          </xsl:when>
          <xsl:otherwise>
-            <a href="{$file_name}#{.}"><xsl:value-of select="."/></a>
+            <a href="{$file_name}#{.}" class="menu"><xsl:value-of select="."/></a>
          </xsl:otherwise>
       </xsl:choose>
   </li>
@@ -547,7 +591,7 @@ function BigToggle(node)
       <xsl:sort select="translate(name,$lcletters, $ucletters)"/> 
          <xsl:variable name="checked" select="@checked"/>
 
-         <a name = "{name}">
+         <a name = "{name}"/>
          <div class="component"  >
       
          <a href="#top"><font size='2'><center>[top]</center></font></a>
@@ -565,12 +609,12 @@ function BigToggle(node)
                <xsl:when test="spec_file/@link = 'true'">
                   <BR/>
                   <b><a href="{spec_file}.html#{name}">
-                     <font style='font-size:1.4em'>Detailed Documentation</font></a></b> 
+                     <font style='font-size:1.6em'>Detailed Documentation</font></a></b> 
                </xsl:when>
                <xsl:otherwise>
                   <BR/>
                   <b><a href="{spec_file}.html">
-                     <font style='font-size:1.4em'>Detailed Documentation</font></a></b>
+                     <font style='font-size:1.6em'>Detailed Documentation</font></a></b>
                </xsl:otherwise>
             </xsl:choose>
          </xsl:if>
@@ -629,7 +673,6 @@ function BigToggle(node)
             messing up the space between these div blocks -->
             <center></center>
          </div>
-         </a>
       </xsl:for-each>
    </xsl:template>      
 
