@@ -33,7 +33,7 @@ namespace dlib
             }
         }
 
-        ~transaction()
+        ~transaction() throw (std::exception)
         {
             if (!committed)
                 db.exec("rollback");
