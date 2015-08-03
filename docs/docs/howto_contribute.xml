@@ -29,26 +29,13 @@
         <!--   ****************************   CODE CONTRIBUTIONS  ****************************    -->
         <h2>Contributing Code</h2>
 
-         Code contributions are also welcome.  I use <a href="http://mercurial.selenic.com/">Mercurial</a> 
-         for version control.  So the simplest
-         way to contribute code is to clone from the dlib repository, make your changes, and then email
-         them to me as a bundle file.  An example is shown below.
-
-<code_box>
-hg clone http://hg.code.sf.net/p/dclib/code dclib-code
-cd dclib-code
-[make changes to dlib source code]
-hg commit -u "Your Name &lt;your.email@host.com&gt;"
-hg bundle dlibchanges.hg
-</code_box>
-Then <a href="mailto:davis@dlib.net">email me</a> the dlibchanges.hg file and I'll review it and get back to you.
-Alternatively, you can submit a pull request to my clone of <a href="https://github.com/davisking/dlib">dlib on github</a>.
+         Code contributions are welcome and can be done by submitting a pull request 
+         to <a href="https://github.com/davisking/dlib">dlib's github page</a>.
 
          <p> If you want to make a big change or feature addition, it's probably a good idea to talk to me about it first.  
             Additionally, you should read over the coding guidelines below
             and try to follow them.  It is also probably a good idea to read the books Effective C++ and 
-            More Effective C++ by Scott Myers.  Finally, if you are not familiar with Mercurial you also 
-            might want to read the excellent <a href="http://hginit.com">introduction</a> by Joel Spolsky.  
+            More Effective C++ by Scott Myers.    
          </p>
 
         

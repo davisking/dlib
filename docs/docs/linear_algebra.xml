@@ -42,7 +42,7 @@
          <name>Dense Matrix Tools</name>
          <item>matrix</item>
          <item nolink="true">
-            <name>Basic_Math_Operators</name>
+            <name>Basic Math Operators</name>
             <sub>
                <item>
                   <name>exp</name>
@@ -167,7 +167,7 @@
             </sub>
          </item>
          <item nolink="true">
-            <name>Linear_Algebra</name>
+            <name>Linear Algebra</name>
             <sub>
                <item>
                   <name>inv</name>
@@ -290,7 +290,7 @@
             </sub>
          </item>
          <item nolink="true">
-            <name>Sub_Matrix_Expressions</name>
+            <name>Sub Matrix Expressions</name>
             <sub>
                <item>
                   <name>range</name>
@@ -400,7 +400,7 @@
             </sub>
          </item>
          <item nolink="true">
-            <name>Other_Utilities</name>
+            <name>Other Utilities</name>
             <sub>
                <item>
                   <name>fft</name>

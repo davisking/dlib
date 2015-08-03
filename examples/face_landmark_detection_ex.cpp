@@ -63,7 +63,7 @@ int main(int argc, char** argv)
             cout << "Call this program like this:" << endl;
             cout << "./face_landmark_detection_ex shape_predictor_68_face_landmarks.dat faces/*.jpg" << endl;
             cout << "\nYou can get the shape_predictor_68_face_landmarks.dat file from:\n";
-            cout << "http://sourceforge.net/projects/dclib/files/dlib/v18.10/shape_predictor_68_face_landmarks.dat.bz2" << endl;
+            cout << "http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2" << endl;
             return 0;
         }
 

@@ -1074,6 +1074,40 @@ namespace
     }
 
 
+    void test_axpy()
+    {
+        const int n = 4;
+        matrix<double> B = dlib::randm(n,n);
+
+        matrix<double> g = dlib::uniform_matrix<double>(n,1,0.0);
+
+        const double tau = 1;
+
+        matrix<double> p = g + tau*dlib::colm(B,0);
+        matrix<double> q = dlib::colm(B,0);
+        DLIB_TEST(length(p-q) < 1e-14);
+
+        p = tau*dlib::colm(B,0);
+        q = dlib::colm(B,0);
+        DLIB_TEST(length(p-q) < 1e-14);
+
+
+
+
+        g = dlib::uniform_matrix<double>(n,n,0.0);
+        p = g + tau*B;
+        DLIB_TEST(length(p-B) < 1e-14);
+
+        p = g + tau*subm(B,get_rect(B));
+        DLIB_TEST(length(p-B) < 1e-14);
+
+        g = dlib::uniform_matrix<double>(2,2,0.0);
+        p = g + tau*subm(B,1,1,2,2);
+        DLIB_TEST(length(p-subm(B,1,1,2,2)) < 1e-14);
+
+        set_subm(p,0,0,2,2) = g + tau*subm(B,1,1,2,2);
+        DLIB_TEST(length(p-subm(B,1,1,2,2)) < 1e-14);
+    }
 
 
     class matrix_tester : public tester
@@ -1088,6 +1122,7 @@ namespace
         void perform_test (
         )
         {
+            test_axpy();
             test_matrix_IO();
             matrix_test();
         }

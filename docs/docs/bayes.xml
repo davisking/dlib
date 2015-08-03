@@ -18,10 +18,10 @@
          </p>
          <p>
             The
-            library also comes with a graphical application to assist in the 
-            creation of bayesian networks.  This application is one of the example
-            programs, so to use it you have to compile it yourself or download
-            one of the binaries from the sourceforge download page.
+            library also comes with a graphical application to assist in the
+            creation of bayesian networks.  This application is one of the 
+            <a href="bayes_net_gui_ex.cpp.html">example programs</a>, so to use it
+            you have to compile it yourself. 
          </p>
 
    </body>
