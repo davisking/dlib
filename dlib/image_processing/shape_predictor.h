@@ -10,6 +10,7 @@
 #include "../geometry.h"
 #include "../pixel.h"
 #include "../console_progress_indicator.h"
+#include <utility>
 
 namespace dlib
 {
@@ -57,8 +58,11 @@ namespace dlib
             std::vector<split_feature> splits;
             std::vector<matrix<float,0,1> > leaf_values;
 
+            unsigned long num_leaves() const { return leaf_values.size(); }
+
             inline const matrix<float,0,1>& operator()(
-                const std::vector<float>& feature_pixel_values
+                const std::vector<float>& feature_pixel_values,
+                unsigned long& i
             ) const
             /*!
                 requires
@@ -69,9 +73,10 @@ namespace dlib
                       (i.e. there needs to be the right number of leaves given the number of splits in the tree)
                 ensures
                     - runs through the tree and returns the vector at the leaf we end up in.
+                    - #i == the selected leaf node index.
             !*/
             {
-                unsigned long i = 0;
+                i = 0;
                 while (i < splits.size())
                 {
                     if (feature_pixel_values[splits[i].idx1] - feature_pixel_values[splits[i].idx2] > splits[i].thresh)
@@ -79,7 +84,8 @@ namespace dlib
                     else
                         i = right_child(i);
                 }
-                return leaf_values[i - splits.size()];
+                i = i - splits.size();
+                return leaf_values[i];
             }
 
             friend void serialize (const regression_tree& item, std::ostream& out)
@@ -319,6 +325,16 @@ namespace dlib
             return initial_shape.size()/2;
         }
 
+        unsigned long num_features (
+        ) const
+        {
+            unsigned long num = 0;
+            for (unsigned long iter = 0; iter < forests.size(); ++iter)
+                for (unsigned long i = 0; i < forests[iter].size(); ++i)
+                    num += forests[iter][i].num_leaves();
+            return num;
+        }
+
         template <typename image_type>
         full_object_detection operator()(
             const image_type& img,
@@ -330,10 +346,47 @@ namespace dlib
             std::vector<float> feature_pixel_values;
             for (unsigned long iter = 0; iter < forests.size(); ++iter)
             {
-                extract_feature_pixel_values(img, rect, current_shape, initial_shape, anchor_idx[iter], deltas[iter], feature_pixel_values);
+                extract_feature_pixel_values(img, rect, current_shape, initial_shape,
+                                             anchor_idx[iter], deltas[iter], feature_pixel_values);
+                unsigned long leaf_idx;
                 // evaluate all the trees at this level of the cascade.
                 for (unsigned long i = 0; i < forests[iter].size(); ++i)
-                    current_shape += forests[iter][i](feature_pixel_values);
+                    current_shape += forests[iter][i](feature_pixel_values, leaf_idx);
+            }
+
+            // convert the current_shape into a full_object_detection
+            const point_transform_affine tform_to_img = unnormalizing_tform(rect);
+            std::vector<point> parts(current_shape.size()/2);
+            for (unsigned long i = 0; i < parts.size(); ++i)
+                parts[i] = tform_to_img(location(current_shape, i));
+            return full_object_detection(rect, parts);
+        }
+
+        template <typename image_type, typename T, typename U>
+        full_object_detection operator()(
+            const image_type& img,
+            const rectangle& rect,
+            std::vector<std::pair<T,U> >& feats
+        ) const
+        {
+            feats.clear();
+            using namespace impl;
+            matrix<float,0,1> current_shape = initial_shape;
+            std::vector<float> feature_pixel_values;
+            unsigned long feat_offset = 0;
+            for (unsigned long iter = 0; iter < forests.size(); ++iter)
+            {
+                extract_feature_pixel_values(img, rect, current_shape, initial_shape,
+                                             anchor_idx[iter], deltas[iter], feature_pixel_values);
+                // evaluate all the trees at this level of the cascade.
+                for (unsigned long i = 0; i < forests[iter].size(); ++i)
+                {
+                    unsigned long leaf_idx;
+                    current_shape += forests[iter][i](feature_pixel_values, leaf_idx);
+
+                    feats.push_back(std::make_pair(feat_offset+leaf_idx, 1));
+                    feat_offset += forests[iter][i].num_leaves();
+                }
             }
 
             // convert the current_shape into a full_object_detection
@@ -563,6 +616,7 @@ namespace dlib
             // make sure the objects agree on the number of parts and that there is at
             // least one full_object_detection. 
             unsigned long num_parts = 0;
+            std::vector<int> part_present;
             for (unsigned long i = 0; i < objects.size(); ++i)
             {
                 for (unsigned long j = 0; j < objects[i].size(); ++j)
@@ -574,6 +628,7 @@ namespace dlib
                             "\t shape_predictor shape_predictor_trainer::train()"
                             << "\n\t You can't give objects that don't have any parts to the trainer."
                         );
+                        part_present.resize(num_parts);
                     }
                     else
                     {
@@ -584,11 +639,21 @@ namespace dlib
                             << "\n\t num_parts:  " << num_parts 
                         );
                     }
+                    for (unsigned long p = 0; p < objects[i][j].num_parts(); ++p)
+                    {
+                        if (objects[i][j].part(p) != OBJECT_PART_NOT_PRESENT)
+                            part_present[p] = 1;
+                    }
                 }
             }
             DLIB_CASSERT(num_parts != 0,
                 "\t shape_predictor shape_predictor_trainer::train()"
                 << "\n\t You must give at least one full_object_detection if you want to train a shape model and it must have parts."
+            );
+            DLIB_CASSERT(sum(mat(part_present)) == (long)num_parts,
+                "\t shape_predictor shape_predictor_trainer::train()"
+                << "\n\t Each part must appear at least once in this training data.  That is, "
+                << "\n\t you can't have a part that is always set to OBJECT_PART_NOT_PRESENT."
             );
 
 
@@ -646,19 +711,33 @@ namespace dlib
 
     private:
 
-        static matrix<float,0,1> object_to_shape (
-            const full_object_detection& obj
+        static void object_to_shape (
+            const full_object_detection& obj,
+            matrix<float,0,1>& shape,
+            matrix<float,0,1>& present // a mask telling which elements of #shape are present.
         )
         {
-            matrix<float,0,1> shape(obj.num_parts()*2);
+            shape.set_size(obj.num_parts()*2);
+            present.set_size(obj.num_parts()*2);
             const point_transform_affine tform_from_img = impl::normalizing_tform(obj.get_rect());
             for (unsigned long i = 0; i < obj.num_parts(); ++i)
             {
-                vector<float,2> p = tform_from_img(obj.part(i));
-                shape(2*i)   = p.x();
-                shape(2*i+1) = p.y();
+                if (obj.part(i) != OBJECT_PART_NOT_PRESENT)
+                {
+                    vector<float,2> p = tform_from_img(obj.part(i));
+                    shape(2*i)   = p.x();
+                    shape(2*i+1) = p.y();
+                    present(2*i)   = 1;
+                    present(2*i+1) = 1;
+                }
+                else
+                {
+                    shape(2*i)   = 0;
+                    shape(2*i+1) = 0;
+                    present(2*i)   = 0;
+                    present(2*i+1) = 0;
+                }
             }
-            return shape;
         }
 
         struct training_sample 
@@ -671,7 +750,9 @@ namespace dlib
                   pixel when you look it up relative to the shape in current_shape.
 
                 - target_shape == The truth shape.  Stays constant during the whole
-                  training process.
+                  training process (except for the parts that are not present, those are
+                  always equal to the current_shape values).
+                - present == 0/1 mask saying which parts of target_shape are present.
                 - rect == the position of the object in the image_idx-th image.  All shape
                   coordinates are coded relative to this rectangle.
             !*/
@@ -679,6 +760,7 @@ namespace dlib
             unsigned long image_idx;
             rectangle rect;
             matrix<float,0,1> target_shape; 
+            matrix<float,0,1> present; 
 
             matrix<float,0,1> current_shape;  
             std::vector<float> feature_pixel_values;
@@ -688,6 +770,7 @@ namespace dlib
                 std::swap(image_idx, item.image_idx);
                 std::swap(rect, item.rect);
                 target_shape.swap(item.target_shape);
+                present.swap(item.present);
                 current_shape.swap(item.current_shape);
                 feature_pixel_values.swap(item.feature_pixel_values);
             }
@@ -727,17 +810,38 @@ namespace dlib
 
             // Now all the parts contain the ranges for the leaves so we can use them to
             // compute the average leaf values.
+            matrix<float,0,1> present_counts(samples[0].target_shape.size());
             tree.leaf_values.resize(parts.size());
             for (unsigned long i = 0; i < parts.size(); ++i)
             {
+                // Get the present counts for each dimension so we can divide each
+                // dimension by the number of observations we have on it to find the mean
+                // displacement in each leaf. 
+                present_counts = 0;
+                for (unsigned long j = parts[i].first; j < parts[i].second; ++j)
+                    present_counts += samples[j].present;
+                present_counts = dlib::reciprocal(present_counts);
+
                 if (parts[i].second != parts[i].first)
-                    tree.leaf_values[i] = sums[num_split_nodes+i]*get_nu()/(parts[i].second - parts[i].first);
+                    tree.leaf_values[i] = pointwise_multiply(present_counts,sums[num_split_nodes+i]*get_nu());
                 else
                     tree.leaf_values[i] = zeros_matrix(samples[0].target_shape);
 
                 // now adjust the current shape based on these predictions
                 for (unsigned long j = parts[i].first; j < parts[i].second; ++j)
+                {
                     samples[j].current_shape += tree.leaf_values[i];
+                    // For parts that aren't present in the training data, we just make
+                    // sure that the target shape always matches and therefore gives zero
+                    // error.  So this makes the algorithm simply ignore non-present
+                    // landmarks.
+                    for (long k = 0; k < samples[j].present.size(); ++k)
+                    {
+                        // if this part is not present
+                        if (samples[j].present(k) == 0)
+                            samples[j].target_shape(k) = samples[j].current_shape(k);
+                    }
+                }
             }
 
             return tree;
@@ -867,7 +971,7 @@ namespace dlib
         {
             samples.clear();
             matrix<float,0,1> mean_shape;
-            long count = 0;
+            matrix<float,0,1> count;
             // first fill out the target shapes
             for (unsigned long i = 0; i < objects.size(); ++i)
             {
@@ -876,15 +980,15 @@ namespace dlib
                     training_sample sample;
                     sample.image_idx = i;
                     sample.rect = objects[i][j].get_rect();
-                    sample.target_shape = object_to_shape(objects[i][j]);
+                    object_to_shape(objects[i][j], sample.target_shape, sample.present);
                     for (unsigned long itr = 0; itr < get_oversampling_amount(); ++itr)
                         samples.push_back(sample);
                     mean_shape += sample.target_shape;
-                    ++count;
+                    count += sample.present;
                 }
             }
 
-            mean_shape /= count;
+            mean_shape = pointwise_multiply(mean_shape,reciprocal(count));
 
             // now go pick random initial shapes
             for (unsigned long i = 0; i < samples.size(); ++i)
@@ -897,12 +1001,35 @@ namespace dlib
                 }
                 else
                 {
-                    // Pick a random convex combination of two of the target shapes and use
-                    // that as the initial shape for this sample.
-                    const unsigned long rand_idx = rnd.get_random_32bit_number()%samples.size();
-                    const unsigned long rand_idx2 = rnd.get_random_32bit_number()%samples.size();
-                    const double alpha = rnd.get_random_double();
-                    samples[i].current_shape = alpha*samples[rand_idx].target_shape + (1-alpha)*samples[rand_idx2].target_shape;
+                    samples[i].current_shape.set_size(0);
+
+                    matrix<float,0,1> hits(mean_shape.size());
+                    hits = 0;
+
+                    int iter = 0;
+                    // Pick a few samples at random and randomly average them together to
+                    // make the initial shape.  Note that we make sure we get at least one
+                    // observation (i.e. non-OBJECT_PART_NOT_PRESENT) on each part
+                    // location.
+                    while(min(hits) == 0 || iter < 2)
+                    {
+                        ++iter;
+                        const unsigned long rand_idx = rnd.get_random_32bit_number()%samples.size();
+                        const double alpha = rnd.get_random_double()+0.1;
+                        samples[i].current_shape += alpha*samples[rand_idx].target_shape;
+                        hits += alpha*samples[rand_idx].present;
+                    }
+                    samples[i].current_shape = pointwise_multiply(samples[i].current_shape, reciprocal(hits));
+                }
+
+            }
+            for (unsigned long i = 0; i < samples.size(); ++i)
+            {
+                for (long k = 0; k < samples[i].present.size(); ++k)
+                {
+                    // if this part is not present
+                    if (samples[i].present(k) == 0)
+                        samples[i].target_shape(k) = samples[i].current_shape(k);
                 }
             }
 
@@ -1029,8 +1156,11 @@ namespace dlib
 
                 for (unsigned long k = 0; k < det.num_parts(); ++k)
                 {
-                    double score = length(det.part(k) - objects[i][j].part(k))/scale;
-                    rs.add(score);
+                    if (objects[i][j].part(k) != OBJECT_PART_NOT_PRESENT)
+                    {
+                        double score = length(det.part(k) - objects[i][j].part(k))/scale;
+                        rs.add(score);
+                    }
                 }
             }
         }

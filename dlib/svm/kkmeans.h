@@ -288,7 +288,7 @@ namespace dlib
 
     struct dlib_pick_initial_centers_data
     {
-        dlib_pick_initial_centers_data():idx(0), dist(1e200){}
+        dlib_pick_initial_centers_data():idx(0), dist(std::numeric_limits<double>::infinity()){}
         long idx;
         double dist;
         bool operator< (const dlib_pick_initial_centers_data& d) const { return dist < d.dist; }
@@ -331,7 +331,7 @@ namespace dlib
         // pick the first sample as one of the centers
         centers.push_back(samples[0]);
 
-        const long best_idx = static_cast<long>(samples.size() - samples.size()*percentile - 1);
+        const long best_idx = static_cast<long>(std::max(0.0,samples.size() - samples.size()*percentile - 1));
 
         // pick the next center
         for (long i = 0; i < num_centers-1; ++i)
