@@ -152,7 +152,6 @@
 #include "interfaces/map_pair.h"
 #include "enable_if.h"
 #include "unicode.h"
-#include "unicode.h"
 #include "byte_orderer.h"
 #include "float_details.h"
 #include "smart_pointers/shared_ptr.h"
