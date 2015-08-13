@@ -6,7 +6,7 @@
 #include "scan_image_pyramid_abstract.h"
 #include "../matrix.h"
 #include "../geometry.h"
-#include "../image_processing.h"
+#include "scan_image.h"
 #include "../array2d.h"
 #include <vector>
 #include "full_object_detection.h"

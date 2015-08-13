@@ -6,7 +6,6 @@
 #include "scan_image_boxes_abstract.h"
 #include "../matrix.h"
 #include "../geometry.h"
-#include "../image_processing.h"
 #include "../array2d.h"
 #include <vector>
 #include "../image_processing/full_object_detection.h"

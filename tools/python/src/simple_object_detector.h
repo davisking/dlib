@@ -11,6 +11,7 @@
 #include "dlib/data_io/load_image_dataset.h"
 #include "dlib/image_processing/remove_unobtainable_rectangles.h"
 #include "serialize_object_detector.h"
+#include "dlib/svm.h"
 
 
 namespace dlib
