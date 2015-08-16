@@ -12,6 +12,45 @@
 
 <current>
 New Features:
+   - More clustering tools:
+      - Added bottom_up_cluster() and find_clusters_using_angular_kmeans()
+        routines.
+      - Added a --cluster option to the imglab tool.  This lets you cluster
+        objects into groups of similar appearance/pose.
+   - Improved the shape_predictor.  In particular, it can now be learned from
+     datasets where some landmarks are missing.  The shape_predictor also now
+     outputs a sparse feature vector that encodes which leafs are used on each
+     tree to make a prediction.
+      
+Non-Backwards Compatible Changes:
+   - extract_highdim_face_lbp_descriptors() produces slightly different output.
+
+Bug fixes:
+   - Fixed a minor bug in extract_highdim_face_lbp_descriptors() which was
+     pointed out by Yan Xu. One of the face locations was mistakenly used twice
+     while another was skipped. This change breaks backwards compatibility with
+     the previous feature extraction output but should slightly improve
+     accuracy of classifiers trained using these features.
+   - Fixed jet() and heatmap() so they work on empty images.
+   - The SQLite transaction object did not function correctly when compiled 
+     in a C++11 program.  Since its destructor can throw, an exception
+     specification needed to be added indicating that this was possible since
+     destructors are now noexcept by default in C++11.
+   - Fixed a bug pointed out by Ernesto Tapia that could cause matrix
+     expressions that involve sub matrix views (e.g. colm) to produce the wrong
+     results when the BLAS bindings were enabled.
+   - Added an if to avoid a possible division by zero inside spectral_cluster().
+   - Fixed a bug in parse_xml(). It failed to check if the given input stream
+     was valid before trying to parse it.
+
+Other:
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="18.16" date="Jun 3, 2015">
+New Features:
    - Added a linear model predictive control solver.  See the mpc_ex.cpp example
      program for details.
    - Thanks to Patrick Snape, the correlation_tracker can now be used from Python.
@@ -33,7 +72,7 @@ Other:
      resulted in improved CMake python scripts on OS X machines.
    - Improved the way overlapping points are rendered by the perspective_window.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
