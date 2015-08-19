@@ -59,7 +59,12 @@ script_dir = os.getcwd()
 cmake_path = find_executable("cmake")
 cmake_extra = []
 cmake_config = 'Release'
-options = [arg[2:].lower() for arg in sys.argv if arg.startswith('--')]
+
+options = []
+for arg in sys.argv:
+    if arg.startswith('--'):
+        sys.argv.remove(arg)
+        options.append(arg[2:].lower())
 
 opt_key = None
 # parse commandline options
