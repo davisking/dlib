@@ -203,6 +203,13 @@ def readme(fname):
     return open(os.path.join(script_dir, fname)).read()
 
 
+def read_version():
+    """Read version information
+    """
+    major = readme('../../docs/.current_release_number').strip()
+    minor = readme('../../docs/.current_minor_release_number').strip()
+    return major + '.' + minor
+
 def rmtree(name):
     """remove a directory and its subdirectories.
     """
@@ -219,7 +226,7 @@ def rmtree(name):
 def copy_file(src, dst):
     """copy a single file and log
     """
-    log.info("Copying file %s to %s." % (src, dst))
+    log.info("Copying file %s -> %s." % (src, dst))
     shutil.copy2(src, dst)
 
 
@@ -347,7 +354,7 @@ class build_ext(_build_ext):
 
 setup(
     name='dlib',
-    version='0.0.1',
+    version=read_version(),
     keywords=['dlib', 'Computer Vision', 'Machine Learning'],
     description='A toolkit for making real world machine learning and data analysis applications',
     long_description=readme('../../README.txt'),
