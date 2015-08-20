@@ -71,16 +71,17 @@ def _get_options():
 
     # parse commandline options and consume those we care about
     for opt_idx, arg in enumerate(sys.argv):
-        if not arg.startswith('--'):
-            continue
-        opt = arg[2:].lower()
         if opt_key == 'cmake':
             _cmake_path = opt
 
         if opt_key:
             sys.argv.remove(arg)
             continue
+            
+        if not arg.startswith('--'):
+            continue
 
+        opt = arg[2:].lower()
         if opt == 'cmake':
             _cmake_path = None
             opt_key = opt
