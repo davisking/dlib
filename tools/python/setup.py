@@ -35,7 +35,7 @@ from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
 from setuptools.command.develop import develop as _develop
 from distutils.command.build_ext import build_ext as _build_ext
 from distutils.command.build import build as _build
-from distutils.errors import DistutilsOptionError, DistutilsSetupError
+from distutils.errors import DistutilsSetupError
 from distutils.spawn import find_executable
 from distutils import log
 import os
@@ -58,54 +58,68 @@ if os.path.dirname(this_file):
     os.chdir(os.path.dirname(this_file))
 script_dir = os.getcwd()
 
-cmake_path = find_executable("cmake")
-cmake_extra = []
-cmake_config = 'Release'
 
-options = []
-for arg in sys.argv:
-    if arg.startswith('--'):
-        sys.argv.remove(arg)
-        options.append(arg[2:].lower())
+def _get_options():
+    """read arguments and creates options
+    """
+    _cmake_path = find_executable("cmake")
+    _cmake_extra = []
+    _cmake_config = 'Release'
 
-opt_key = None
-# parse commandline options
-for opt_idx, opt in enumerate(options):
-    if opt_key == 'cmake':
-        cmake_path = opt
-
-    if opt_key:
-        continue
-
-    if opt == 'cmake':
-        cmake_path = None
-        opt_key = opt
-        continue
-
+    _options = []
     opt_key = None
-    if opt == 'debug':
-        cmake_config = 'Debug'
-    elif opt == 'release':
-        cmake_config = 'Release'
-    elif opt == 'no-gui-support':
-        cmake_extra.append('-DDLIB_NO_GUI_SUPPORT=yes')
-    elif opt == 'enable-stack-trace':
-        cmake_extra.append('-DDLIB_ENABLE_STACK_TRACE=yes')
-    elif opt == 'enable-asserts':
-        cmake_extra.append('-DDLIB_ENABLE_ASSERTS=yes')
-    elif opt == 'no-blas':
-        cmake_extra.append('-DDLIB_USE_BLAS=no')
-    elif opt == 'no-lapack':
-        cmake_extra.append('-DDLIB_USE_LAPACK=no')
-    elif opt == 'no-libpng':
-        cmake_extra.append('-DDLIB_LINK_WITH_LIBPNG=no')
-    elif opt == 'no-libjpeg':
-        cmake_extra.append('-DDLIB_LINK_WITH_LIBJPEG=no')
-    elif opt == 'no-sqlite3':
-        cmake_extra.append('-DDLIB_LINK_WITH_SQLITE3=no')
-    elif opt not in ['debug', 'release',
+
+    # parse commandline options and consume those we care about
+    for opt_idx, arg in enumerate(sys.argv):
+        if not arg.startswith('--'):
+            continue
+        opt = arg[2:].lower()
+        if opt_key == 'cmake':
+            _cmake_path = opt
+
+        if opt_key:
+            sys.argv.remove(arg)
+            continue
+
+        if opt == 'cmake':
+            _cmake_path = None
+            opt_key = opt
+            sys.argv.remove(arg)
+            continue
+
+        opt_key = None
+        custom_arg = True
+        if opt == 'debug':
+            _cmake_config = 'Debug'
+        elif opt == 'release':
+            _cmake_config = 'Release'
+        elif opt == 'no-gui-support':
+            _cmake_extra.append('-DDLIB_NO_GUI_SUPPORT=yes')
+        elif opt == 'enable-stack-trace':
+            _cmake_extra.append('-DDLIB_ENABLE_STACK_TRACE=yes')
+        elif opt == 'enable-asserts':
+            _cmake_extra.append('-DDLIB_ENABLE_ASSERTS=yes')
+        elif opt == 'no-blas':
+            _cmake_extra.append('-DDLIB_USE_BLAS=no')
+        elif opt == 'no-lapack':
+            _cmake_extra.append('-DDLIB_USE_LAPACK=no')
+        elif opt == 'no-libpng':
+            _cmake_extra.append('-DDLIB_LINK_WITH_LIBPNG=no')
+        elif opt == 'no-libjpeg':
+            _cmake_extra.append('-DDLIB_LINK_WITH_LIBJPEG=no')
+        elif opt == 'no-sqlite3':
+            _cmake_extra.append('-DDLIB_LINK_WITH_SQLITE3=no')
+        elif opt in ['debug', 'release',
                      'repackage']:
-        raise DistutilsOptionError("Unrecognized option {opt}".format(opt=opt))
+            _options.append(opt)
+        else:
+            custom_arg = False
+        if custom_arg:
+            sys.argv.remove(arg)
+
+    return _options, _cmake_config, _cmake_path, _cmake_extra
+
+options, cmake_config, cmake_path, cmake_extra = _get_options()
 
 if cmake_path is None:
     raise DistutilsSetupError("Cannot find cmake in the path. Please specify its path with --cmake parameter.")
