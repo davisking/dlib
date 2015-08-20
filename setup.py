@@ -76,6 +76,7 @@ def _get_options():
 
         if opt_key:
             sys.argv.remove(arg)
+            opt_key = None
             continue
 
         if not arg.startswith('--'):
