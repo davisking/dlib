@@ -5,12 +5,16 @@
 
 include MANIFEST.in
 include setup.py
+include README.txt
 
 # sources
-# recursive-include sources/dlib **
-# recursive-include sources/docs **
-# recursive-include sources/python_examples **
-# recursive-include sources/tools/python **
+recursive-include dlib **
+recursive-exclude dlib/test **
+recursive-include docs **
+recursive-include python_examples *.txt *.py *.bat
+recursive-include python_examples/build **
+recursive-include tools/python **
+recursive-exclude tools/python/build **
 
 # dlib package
 recursive-include dist/dlib **

@@ -222,8 +222,8 @@ def readme(fname):
 def read_version():
     """Read version information
     """
-    major = readme('../../docs/.current_release_number').strip()
-    minor = readme('../../docs/.current_minor_release_number').strip()
+    major = readme('./docs/.current_release_number').strip()
+    minor = readme('./docs/.current_minor_release_number').strip()
     return major + '.' + minor
 
 
@@ -259,14 +259,16 @@ class build(_build):
             log.info('Removing distribution directory %s' % dist_dir)
             rmtree(dist_dir)
 
-        dist_dir_examples = os.path.join(script_dir, "dist/dlib/examples")
+        # this is where the extension examples go
+        dist_dir_examples = os.path.join(script_dir, "./dist/dlib/examples")
         try:
             os.makedirs(dist_dir_examples)
         except OSError:
             pass
 
-        log.info('Populating the distribution directory %s' % dist_dir)
-        dist_dir = os.path.join(script_dir, "dist/dlib")
+        # this is where the extension goes
+        log.info('Populating the distribution directory %s ...' % dist_dir)
+        dist_dir = os.path.join(script_dir, "./dist/dlib")
 
         # create the module init files
         with open(os.path.join(dist_dir, '__init__.py'), 'w'):
@@ -275,7 +277,7 @@ class build(_build):
             pass
 
         # this is where the extension and Python examples are located
-        out_dir = os.path.join(script_dir, "../../python_examples")
+        out_dir = os.path.join(script_dir, "./python_examples")
 
         ext_found = False
         # manually copy everything to distribution folder with package hierarchy in mind
@@ -292,7 +294,7 @@ class build(_build):
                 copy_file(srcname, dstname)
 
         if not ext_found:
-            raise DistutilsSetupError("Cannot find dlib extension module.")
+            raise DistutilsSetupError("Cannot find built dlib extension module.")
 
         return _build.run(self)
 
@@ -303,7 +305,7 @@ class build(_build):
         platform_arch = platform.architecture()[0]
         log.info("Detected Python architecture: %s" % platform_arch)
 
-        build_dir = os.path.join(script_dir, "build")
+        build_dir = os.path.join(script_dir, "./tools/python/build")
         if os.path.exists(build_dir):
             log.info('Removing build directory %s' % build_dir)
             rmtree(build_dir)
@@ -335,7 +337,7 @@ class build(_build):
         if run_process(cmake_cmd):
             raise DistutilsSetupError("cmake build failed!")
 
-        # cd where setup knows
+        # cd back where setup awaits
         os.chdir(script_dir)
 
 
@@ -374,7 +376,7 @@ setup(
     version=read_version(),
     keywords=['dlib', 'Computer Vision', 'Machine Learning'],
     description='A toolkit for making real world machine learning and data analysis applications',
-    long_description=readme('../../README.txt'),
+    long_description=readme('./README.txt'),
     author='Davis King',
     author_email='davis@dlib.net',
     url='https://github.com/davisking/dlib',
