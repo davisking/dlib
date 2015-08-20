@@ -167,7 +167,6 @@ def run_process(cmds, timeout=None):
     t.start()
 
     _time = time.time()
-    elapsed = 0
     e = None
     try:
         while t.isAlive():
@@ -271,8 +270,11 @@ class build(_build):
         dist_dir = os.path.join(script_dir, "./dist/dlib")
 
         # create the module init files
-        with open(os.path.join(dist_dir, '__init__.py'), 'w'):
-            pass
+        with open(os.path.join(dist_dir, '__init__.py'), 'w') as f:
+            # just so that we can `import dlib` and not `from dlib import dlib`
+            f.write('from .dlib import *\n')
+            # add version here
+            f.write('__version__ = {ver}\n'.format(ver=read_version()))
         with open(os.path.join(dist_dir_examples, '__init__.py'), 'w'):
             pass
 
