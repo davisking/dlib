@@ -1,4 +1,6 @@
 """setup for the dlib project
+ Copyright (C) 2015  Ehsan Azar (dashesy@linux.com)
+ License: Boost Software License   See LICENSE.txt for the full license.
 
 To build the dlib:
     python setup.py build
@@ -209,6 +211,7 @@ def read_version():
     major = readme('../../docs/.current_release_number').strip()
     minor = readme('../../docs/.current_minor_release_number').strip()
     return major + '.' + minor
+
 
 def rmtree(name):
     """remove a directory and its subdirectories.
