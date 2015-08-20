@@ -1,7 +1,7 @@
 #
 # MANIFEST.in
 #
-# Manifest template for creating the PySide source distribution.
+# Manifest template for creating the dlib source distribution.
 
 include MANIFEST.in
 include setup.py

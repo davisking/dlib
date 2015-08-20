@@ -304,7 +304,7 @@ class build(_build):
         """
         if cmake_path is None:
             raise DistutilsSetupError("Cannot find cmake in the path. Please specify its path with --cmake parameter.")
-        
+
         platform_arch = platform.architecture()[0]
         log.info("Detected Python architecture: %s" % platform_arch)
 
