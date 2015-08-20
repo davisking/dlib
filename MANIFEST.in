@@ -10,9 +10,10 @@ include README.txt
 # sources
 recursive-include dlib **
 recursive-exclude dlib/test **
+recursive-exclude dlib/build **
 recursive-include docs **
 recursive-include python_examples *.txt *.py *.bat
-recursive-include python_examples/build **
+recursive-exclude python_examples/build **
 recursive-include tools/python **
 recursive-exclude tools/python/build **
 
