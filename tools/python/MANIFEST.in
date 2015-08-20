@@ -1,0 +1,17 @@
+#
+# MANIFEST.in
+#
+# Manifest template for creating the PySide source distribution.
+
+include MANIFEST.in
+include setup.py
+
+# sources
+# recursive-include sources/dlib **
+# recursive-include sources/docs **
+# recursive-include sources/python_examples **
+# recursive-include sources/tools/python **
+
+# dlib package
+recursive-include dist/dlib **
+
