@@ -77,7 +77,7 @@ def _get_options():
         if opt_key:
             sys.argv.remove(arg)
             continue
-            
+
         if not arg.startswith('--'):
             continue
 
@@ -121,9 +121,6 @@ def _get_options():
     return _options, _cmake_config, _cmake_path, _cmake_extra
 
 options, cmake_config, cmake_path, cmake_extra = _get_options()
-
-if cmake_path is None:
-    raise DistutilsSetupError("Cannot find cmake in the path. Please specify its path with --cmake parameter.")
 
 try:
     from Queue import Queue, Empty
@@ -305,6 +302,9 @@ class build(_build):
     def build_dlib():
         """use cmake to build and install the extension
         """
+        if cmake_path is None:
+            raise DistutilsSetupError("Cannot find cmake in the path. Please specify its path with --cmake parameter.")
+        
         platform_arch = platform.architecture()[0]
         log.info("Detected Python architecture: %s" % platform_arch)
 
