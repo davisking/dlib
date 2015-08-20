@@ -72,7 +72,7 @@ def _get_options():
     # parse commandline options and consume those we care about
     for opt_idx, arg in enumerate(sys.argv):
         if opt_key == 'cmake':
-            _cmake_path = opt
+            _cmake_path = arg
 
         if opt_key:
             sys.argv.remove(arg)
