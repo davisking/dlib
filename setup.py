@@ -294,6 +294,11 @@ class build(_build):
         # this is where the extension and Python examples are located
         out_dir = os.path.join(script_dir, "./python_examples")
 
+        # these are the created artifacts we want to package
+        dll_ext = ['.so']
+        if sys.platform == "win32":
+            dll_ext = ['.pyd', '.dll']
+
         ext_found = False
         # manually copy everything to distribution folder with package hierarchy in mind
         names = os.listdir(out_dir)
@@ -301,9 +306,11 @@ class build(_build):
             srcname = os.path.join(out_dir, name)
             dstname = os.path.join(dist_dir, name)
             dstextname = os.path.join(dist_dir_examples, name)
-            if name.endswith('.py') or name.endswith('.txt'):
+
+            name, extension = os.path.splitext(name.lower())
+            if extension in ['.py', '.txt']:
                 copy_file(srcname, dstextname)
-            elif name.endswith('.dll') or name.endswith('.so') or name.endswith('.pyd'):
+            elif extension in dll_ext:
                 if name.startswith('dlib'):
                     ext_found = True
                 copy_file(srcname, dstname)
