@@ -245,17 +245,31 @@ def copy_file(src, dst):
     shutil.copy2(src, dst)
 
 
+def clean_dist():
+    """re-create the dist folder
+    """
+    dist_dir = os.path.join(script_dir, "./dist")
+    if os.path.exists(dist_dir):
+        log.info('Removing distribution directory %s' % dist_dir)
+        rmtree(dist_dir)
+
+    dist_dir = os.path.join(script_dir, "./dist/dlib")
+    try:
+        os.makedirs(dist_dir)
+    except OSError:
+        pass
+
+
+# always start with a clean slate
+clean_dist()
+
+
 # noinspection PyPep8Naming
 class build(_build):
     def run(self):
         repackage = 'repackage' in options
         if not repackage:
             self.build_dlib()
-
-        dist_dir = os.path.join(script_dir, "dist")
-        if os.path.exists(dist_dir):
-            log.info('Removing distribution directory %s' % dist_dir)
-            rmtree(dist_dir)
 
         # this is where the extension examples go
         dist_dir_examples = os.path.join(script_dir, "./dist/dlib/examples")
@@ -265,8 +279,8 @@ class build(_build):
             pass
 
         # this is where the extension goes
-        log.info('Populating the distribution directory %s ...' % dist_dir)
         dist_dir = os.path.join(script_dir, "./dist/dlib")
+        log.info('Populating the distribution directory %s ...' % dist_dir)
 
         # create the module init files
         with open(os.path.join(dist_dir, '__init__.py'), 'w') as f:
@@ -385,7 +399,7 @@ setup(
     author_email='davis@dlib.net',
     url='https://github.com/davisking/dlib',
     license='Boost Software License',
-    packages=['dlib', 'dlib.examples'],
+    packages=['dlib'],
     package_dir={'': 'dist'},
     include_package_data=True,
     cmdclass={
