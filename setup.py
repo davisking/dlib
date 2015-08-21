@@ -98,8 +98,7 @@ def _get_options():
             _cmake_config = 'Debug'
         elif opt == 'release':
             _cmake_config = 'Release'
-        elif opt in ['debug', 'release',
-                     'repackage']:
+        elif opt in ['repackage']:
             _options.append(opt)
         else:
             custom_arg = False
