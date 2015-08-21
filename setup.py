@@ -158,7 +158,7 @@ def run_process(cmds, timeout=None):
     p = Popen(cmds,
               stdout=PIPE, stderr=STDOUT,
               bufsize=1,
-              close_fds=_ON_POSIX, preexec_fn=os.setsid)
+              close_fds=_ON_POSIX, preexec_fn=os.setsid if _ON_POSIX else None)
 
     q = Queue()
     t = Thread(target=enqueue_output, args=(p.stdout, q))
