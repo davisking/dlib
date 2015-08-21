@@ -12,15 +12,10 @@ To repackage the previously built package as wheel (bypassing build):
     python setup.py bdist_wheel --repackage
 To install a develop version (egg with symbolic link):
     python setup.py develop
-To exclude/include certain features in the build:
-    --no-gui-support: sets DLIB_NO_GUI_SUPPORT
-    --enable-stack-trace: sets DLIB_ENABLE_STACK_TRACE
-    --enable-asserts: sets DLIB_ENABLE_ASSERTS
-    --no-blas: unsets DLIB_USE_BLAS
-    --no-lapack: unsets DLIB_USE_LAPACK
-    --no-libpng: unsets DLIB_LINK_WITH_LIBPNG
-    --no-libjpeg: unsets DLIB_LINK_WITH_LIBJPEG
-    --no-sqlite3: unsets DLIB_LINK_WITH_SQLITE3
+To exclude/include certain options in the cmake config use --yes and --no:
+    for example:
+    --yes DLIB_NO_GUI_SUPPORT: will set -DDLIB_NO_GUI_SUPPORT=yes
+    --no DLIB_NO_GUI_SUPPORT: will set -DDLIB_NO_GUI_SUPPORT=no
 Additional options:
     --debug: makes a debug build
     --cmake: path to specific cmake executable
@@ -73,6 +68,10 @@ def _get_options():
     for opt_idx, arg in enumerate(sys.argv):
         if opt_key == 'cmake':
             _cmake_path = arg
+        elif opt_key == 'yes':
+            _cmake_extra.append('-D{arg}=yes'.format(arg=arg.trim()))
+        elif opt_key == 'no':
+            _cmake_extra.append('-D{arg}=no'.format(arg=arg.trim()))
 
         if opt_key:
             sys.argv.remove(arg)
@@ -88,6 +87,10 @@ def _get_options():
             opt_key = opt
             sys.argv.remove(arg)
             continue
+        elif opt in ['yes', 'no']:
+            opt_key = opt
+            sys.argv.remove(arg)
+            continue
 
         opt_key = None
         custom_arg = True
@@ -95,22 +98,6 @@ def _get_options():
             _cmake_config = 'Debug'
         elif opt == 'release':
             _cmake_config = 'Release'
-        elif opt == 'no-gui-support':
-            _cmake_extra.append('-DDLIB_NO_GUI_SUPPORT=yes')
-        elif opt == 'enable-stack-trace':
-            _cmake_extra.append('-DDLIB_ENABLE_STACK_TRACE=yes')
-        elif opt == 'enable-asserts':
-            _cmake_extra.append('-DDLIB_ENABLE_ASSERTS=yes')
-        elif opt == 'no-blas':
-            _cmake_extra.append('-DDLIB_USE_BLAS=no')
-        elif opt == 'no-lapack':
-            _cmake_extra.append('-DDLIB_USE_LAPACK=no')
-        elif opt == 'no-libpng':
-            _cmake_extra.append('-DDLIB_LINK_WITH_LIBPNG=no')
-        elif opt == 'no-libjpeg':
-            _cmake_extra.append('-DDLIB_LINK_WITH_LIBJPEG=no')
-        elif opt == 'no-sqlite3':
-            _cmake_extra.append('-DDLIB_LINK_WITH_SQLITE3=no')
         elif opt in ['debug', 'release',
                      'repackage']:
             _options.append(opt)
