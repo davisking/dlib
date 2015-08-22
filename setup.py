@@ -128,6 +128,7 @@ def enqueue_output(out, queue):
 def _log_buf(buf):
     if not buf:
         return
+    buf = buf.decode("latin-1")
     buf = buf.rstrip()
     lines = buf.splitlines()
     for line in lines:
@@ -158,7 +159,7 @@ def run_process(cmds, timeout=None):
             try:
                 buf = q.get(timeout=.1)
             except Empty:
-                buf = ''
+                buf = b''
             _log_buf(buf)
             elapsed = time.time() - _time
             if timeout and elapsed > timeout:
