@@ -326,6 +326,13 @@ class build(_build):
         platform_arch = platform.architecture()[0]
         log.info("Detected Python architecture: %s" % platform_arch)
 
+        # make sure build artifacts are generated for the version of Python currently running
+        cmake_extra_arch = []
+        if platform_arch == '64bit':
+            cmake_extra_arch = ['-DCMAKE_SIZEOF_VOID_P=8']
+        elif platform_arch == '32bit':
+            cmake_extra_arch = ['-DCMAKE_SIZEOF_VOID_P=4']
+
         build_dir = os.path.join(script_dir, "./tools/python/build")
         if os.path.exists(build_dir):
             log.info('Removing build directory %s' % build_dir)
@@ -342,7 +349,7 @@ class build(_build):
         cmake_cmd = [
             cmake_path,
             "..",
-        ] + cmake_extra
+        ] + cmake_extra + cmake_extra_arch
         if run_process(cmake_cmd):
             raise DistutilsSetupError("cmake configuration failed!")
 
