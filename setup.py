@@ -19,6 +19,7 @@ To exclude/include certain options in the cmake config use --yes and --no:
 Additional options:
     --debug: makes a debug build
     --cmake: path to specific cmake executable
+    --G or -G: name of a build system generator (equivalent of passing -G "name" to cmake)
 """
 
 from __future__ import print_function
@@ -72,10 +73,18 @@ def _get_options():
             _cmake_extra.append('-D{arg}=yes'.format(arg=arg.trim()))
         elif opt_key == 'no':
             _cmake_extra.append('-D{arg}=no'.format(arg=arg.trim()))
+        elif opt_key == 'G':
+            _cmake_extra.append('-G {gen}'.format(gen=arg.trim()))
 
         if opt_key:
             sys.argv.remove(arg)
             opt_key = None
+            continue
+
+        # Keep -G to resemble cmake's
+        if arg == '-G' or arg.lower() == '--g':
+            opt_key = 'G'
+            sys.argv.remove(arg)
             continue
 
         if not arg.startswith('--'):
