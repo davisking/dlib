@@ -65,16 +65,17 @@ def _get_options():
     _options = []
     opt_key = None
 
+    argv = [arg for arg in sys.argv]  # take a copy
     # parse commandline options and consume those we care about
-    for opt_idx, arg in enumerate(sys.argv):
+    for opt_idx, arg in enumerate(argv):
         if opt_key == 'cmake':
             _cmake_path = arg
         elif opt_key == 'yes':
-            _cmake_extra.append('-D{arg}=yes'.format(arg=arg.trim()))
+            _cmake_extra.append('-D{arg}=yes'.format(arg=arg.strip()))
         elif opt_key == 'no':
-            _cmake_extra.append('-D{arg}=no'.format(arg=arg.trim()))
+            _cmake_extra.append('-D{arg}=no'.format(arg=arg.strip()))
         elif opt_key == 'G':
-            _cmake_extra.append('-G {gen}'.format(gen=arg.trim()))
+            _cmake_extra += ['-G', arg.strip()]
 
         if opt_key:
             sys.argv.remove(arg)
@@ -101,7 +102,6 @@ def _get_options():
             sys.argv.remove(arg)
             continue
 
-        opt_key = None
         custom_arg = True
         if opt == 'debug':
             _cmake_config = 'Debug'
