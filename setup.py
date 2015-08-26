@@ -33,6 +33,7 @@ from distutils.command.build_ext import build_ext as _build_ext
 from distutils.command.build import build as _build
 from distutils.errors import DistutilsSetupError
 from distutils.spawn import find_executable
+from distutils.sysconfig import get_python_inc, get_python_version
 from distutils import log
 import os
 import sys
@@ -328,10 +329,27 @@ class build(_build):
 
         # make sure build artifacts are generated for the version of Python currently running
         cmake_extra_arch = []
+        if sys.version_info >= (3, 0):
+            cmake_extra_arch += ['-DPYTHON3=yes']
+
         if platform_arch == '64bit':
-            cmake_extra_arch = ['-DCMAKE_SIZEOF_VOID_P=8']
+            cmake_extra_arch += ['-DCMAKE_SIZEOF_VOID_P=8']
         elif platform_arch == '32bit':
-            cmake_extra_arch = ['-DCMAKE_SIZEOF_VOID_P=4']
+            cmake_extra_arch += ['-DCMAKE_SIZEOF_VOID_P=4']
+
+        if platform_arch == '64bit' and sys.platform == "win32":
+            # help cmake to find Python library in 64bit Python in Windows
+            #  because cmake is 32bit and cannot find PYTHON_LIBRARY from registry.
+            inc_dir = get_python_inc()
+            cmake_extra_arch += ['-DPYTHON_INCLUDE_DIR={inc}'.format(inc=inc_dir)]
+
+            # this imitates cmake in path resolution
+            py_ver = get_python_version()
+            for ext in [py_ver.replace(".", "") + '.lib', py_ver + 'mu.lib', py_ver + 'm.lib', py_ver + 'u.lib']:
+                py_lib = os.path.abspath(os.path.join(inc_dir, '../libs/', 'python' + ext))
+                if os.path.exists(py_lib):
+                    cmake_extra_arch += ['-DPYTHON_LIBRARY={lib}'.format(lib=py_lib)]
+                    break
 
         build_dir = os.path.join(script_dir, "./tools/python/build")
         if os.path.exists(build_dir):
