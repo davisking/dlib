@@ -121,6 +121,126 @@ def _get_options():
 
 options, cmake_config, cmake_path, cmake_extra, generator_set = _get_options()
 
+
+def reg_value(rk, rname):
+    """enumerate the subkeys in a registry key
+    :param rk: root key in registry
+    :param rname: name of the value we are interested in
+    """
+    try:
+        import _winreg as winreg
+    except ImportError:
+        # noinspection PyUnresolvedReferences
+        import winreg
+
+    count = 0
+    try:
+        while True:
+            name, value, _ = winreg.EnumValue(rk, count)
+            if rname == name:
+                return value
+            count += 1
+    except OSError:
+        pass
+
+    return None
+
+
+def enum_reg_key(rk):
+    """enumerate the subkeys in a registry key
+    :param rk: root key in registry
+    """
+    try:
+        import _winreg as winreg
+    except ImportError:
+        # noinspection PyUnresolvedReferences
+        import winreg
+
+    sub_keys = []
+    count = 0
+    try:
+        while True:
+            name = winreg.EnumKey(rk, count)
+            sub_keys.append(name)
+            count += 1
+    except OSError:
+        pass
+
+    return sub_keys
+
+
+def get_msvc_win64_generator():
+    """find the default MSVC generator but Win64
+    This logic closely matches cmake's resolution for default build generator.
+    Only we select the Win64 version of it.
+    """
+    try:
+        import _winreg as winreg
+    except ImportError:
+        # noinspection PyUnresolvedReferences
+        import winreg
+
+    known_vs = {
+        "6.0": "Visual Studio 6",
+        "7.0": "Visual Studio 7",
+        "7.1": "Visual Studio 7 .NET 2003",
+        "8.0": "Visual Studio 8 2005",
+        "9.0": "Visual Studio 9 2008",
+        "10.0": "Visual Studio 10 2010",
+        "11.0": "Visual Studio 11 2012",
+        "12.0": "Visual Studio 12 2013",
+        "14.0": "Visual Studio 14 2015",
+    }
+
+    newest_vs = None
+    newest_ver = 0
+
+    platform_arch = platform.architecture()[0]
+    sam = winreg.KEY_WOW64_32KEY + winreg.KEY_READ if '64' in platform_arch else winreg.KEY_READ
+    for vs in ['VisualStudio\\', 'VCExpress\\', 'WDExpress\\']:
+        vs_key = "SOFTWARE\\Microsoft\\{vs}\\".format(vs=vs)
+        try:
+            root_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, vs_key, 0, sam)
+        except OSError:
+            continue
+        try:
+            sub_keys = enum_reg_key(root_key)
+        except OSError:
+            sub_keys = []
+        winreg.CloseKey(root_key)
+        if not sub_keys:
+            continue
+
+        # look to see if we have InstallDir
+        for sub_key in sub_keys:
+            try:
+                root_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, vs_key + sub_key, 0, sam)
+            except OSError:
+                continue
+            ins_dir = reg_value(root_key, 'InstallDir')
+            winreg.CloseKey(root_key)
+
+            if not ins_dir:
+                continue
+
+            gen_name = known_vs.get(sub_key)
+            if gen_name is None:
+                # if it looks like a version number
+                try:
+                    ver = float(sub_key)
+                except ValueError:
+                    continue
+                gen_name = 'Visual Studio %d' % int(ver)
+            else:
+                ver = float(sub_key)
+
+            if ver > newest_ver:
+                newest_vs = gen_name
+
+    if newest_vs:
+        return ['-G', newest_vs + ' Win64']
+    return []
+
 try:
     from Queue import Queue, Empty
 except ImportError:
@@ -335,6 +455,12 @@ class build(_build):
             cmake_extra_arch += ['-DPYTHON3=yes']
 
         if platform_arch == '64bit' and sys.platform == "win32":
+            # 64bit build on Windows
+
+            if not generator_set:
+                # see if we can deduce the 64bit default generator
+                cmake_extra_arch += get_msvc_win64_generator()
+
             # help cmake to find Python library in 64bit Python in Windows
             #  because cmake is 32bit and cannot find PYTHON_LIBRARY from registry.
             inc_dir = get_python_inc()
