@@ -65,6 +65,7 @@ def _get_options():
 
     _options = []
     opt_key = None
+    _generator_set = False  # if a build generator is set
 
     argv = [arg for arg in sys.argv]  # take a copy
     # parse commandline options and consume those we care about
@@ -77,6 +78,7 @@ def _get_options():
             _cmake_extra.append('-D{arg}=no'.format(arg=arg.strip()))
         elif opt_key == 'G':
             _cmake_extra += ['-G', arg.strip()]
+            _generator_set = True
 
         if opt_key:
             sys.argv.remove(arg)
@@ -115,9 +117,9 @@ def _get_options():
         if custom_arg:
             sys.argv.remove(arg)
 
-    return _options, _cmake_config, _cmake_path, _cmake_extra
+    return _options, _cmake_config, _cmake_path, _cmake_extra, _generator_set
 
-options, cmake_config, cmake_path, cmake_extra = _get_options()
+options, cmake_config, cmake_path, cmake_extra, generator_set = _get_options()
 
 try:
     from Queue import Queue, Empty
@@ -331,11 +333,6 @@ class build(_build):
         cmake_extra_arch = []
         if sys.version_info >= (3, 0):
             cmake_extra_arch += ['-DPYTHON3=yes']
-
-        if platform_arch == '64bit':
-            cmake_extra_arch += ['-DCMAKE_SIZEOF_VOID_P=8']
-        elif platform_arch == '32bit':
-            cmake_extra_arch += ['-DCMAKE_SIZEOF_VOID_P=4']
 
         if platform_arch == '64bit' and sys.platform == "win32":
             # help cmake to find Python library in 64bit Python in Windows
