@@ -145,10 +145,13 @@ if (NOT TARGET dlib)
 
          if (NOT DLIB_NO_GUI_SUPPORT)
             find_library(xlib X11)
-            # make sure X11 is in the include path
-            find_path(xlib_path Xlib.h
+            # Make sure X11 is in the include path.  Note that we look for
+            # Xlocale.h rather than Xlib.h because it avoids finding a partial
+            # copy of the X11 headers on systems with anaconda installed.
+            find_path(xlib_path Xlocale.h
                PATHS 
                /Developer/SDKs/MacOSX10.4u.sdk/usr/X11R6/include
+               /opt/local/include
                PATH_SUFFIXES X11
                )
             if (xlib AND xlib_path)
