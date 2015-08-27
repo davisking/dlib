@@ -236,6 +236,7 @@ def get_msvc_win64_generator():
 
             if ver > newest_ver:
                 newest_vs = gen_name
+                newest_ver = ver
 
     if newest_vs:
         return ['-G', newest_vs + ' Win64']
