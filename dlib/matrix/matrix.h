@@ -957,6 +957,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
+    class op_pointer_to_mat;
+    template <typename T>
+    class op_pointer_to_col_vect;
+
     template <
         typename T,
         long num_rows,
@@ -1549,6 +1554,13 @@ namespace dlib
             const matrix_exp<U>& 
         ) const { return false; }
 
+        // These two aliases() routines are defined in matrix_mat.h
+        bool aliases (
+            const matrix_exp<matrix_op<op_pointer_to_mat<T> > >& item
+        ) const;
+        bool aliases (
+            const matrix_exp<matrix_op<op_pointer_to_col_vect<T> > >& item
+        ) const;
 
         iterator begin() 
         {

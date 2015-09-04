@@ -1319,6 +1319,49 @@ namespace
             DLIB_TEST(mm(3) == 4);
         }
 
+        {
+            const long n = 5;
+            matrix<double> m1, m2, m3, truth;
+            m1 = randm(n,n);
+            m2 = randm(n,n);
+            m3 = randm(n,n);
+
+
+            truth = m1*m2;
+            m3 = mat(&m1(0,0),n,n)*mat(&m2(0,0),n,n);
+            DLIB_TEST(max(abs(truth-m3)) < 1e-13);
+            m3 = 0;
+            set_ptrm(&m3(0,0),n,n) = mat(&m1(0,0),n,n)*mat(&m2(0,0),n,n);
+            DLIB_TEST(max(abs(truth-m3)) < 1e-13);
+            set_ptrm(&m3(0,0),n,n) = m1*m2;
+            DLIB_TEST(max(abs(truth-m3)) < 1e-13);
+
+            // now make sure it deals with aliasing correctly.
+            truth = m1*m2;
+            m1 = mat(&m1(0,0),n,n)*mat(&m2(0,0),n,n);
+            DLIB_TEST(max(abs(truth-m1)) < 1e-13);
+
+            m1 = randm(n,n);
+            truth = m1*m2;
+            set_ptrm(&m1(0,0),n,n) = mat(&m1(0,0),n,n)*mat(&m2(0,0),n,n);
+            DLIB_TEST(max(abs(truth-m1)) < 1e-13);
+
+            m1 = randm(n,n);
+            truth = m1*m2;
+            set_ptrm(&m1(0,0),n,n) = m1*m2;
+            DLIB_TEST(max(abs(truth-m1)) < 1e-13);
+
+            m1 = randm(n,n);
+            truth = m1+m1*m2;
+            set_ptrm(&m1(0,0),n,n) += m1*m2;
+            DLIB_TEST(max(abs(truth-m1)) < 1e-13);
+
+            m1 = randm(n,n);
+            truth = m1-m1*m2;
+            set_ptrm(&m1(0,0),n,n) -= m1*m2;
+            DLIB_TEST(max(abs(truth-m1)) < 1e-13);
+
+        }
 
     }
 

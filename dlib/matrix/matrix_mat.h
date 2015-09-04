@@ -239,7 +239,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    struct op_pointer_to_col_vect : does_not_alias 
+    struct op_pointer_to_mat;   
+
+    template <typename T>
+    struct op_pointer_to_col_vect   
     {
         op_pointer_to_col_vect(
             const T* ptr_,
@@ -261,6 +264,31 @@ namespace dlib
 
         long nr () const { return size; }
         long nc () const { return 1; }
+
+        template <typename U> bool aliases               ( const matrix_exp<U>& ) const { return false; }
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& ) const { return false; }
+
+        template <long num_rows, long num_cols, typename mem_manager, typename layout>
+        bool aliases (
+            const matrix_exp<matrix<T,num_rows,num_cols, mem_manager,layout> >& item
+        ) const 
+        { 
+            if (item.size() == 0)
+                return false;
+            else
+                return (ptr == &item(0,0)); 
+        }
+
+        inline bool aliases (
+            const matrix_exp<matrix_op<op_pointer_to_mat<T> > >& item
+        ) const;
+
+        bool aliases (
+            const matrix_exp<matrix_op<op_pointer_to_col_vect<T> > >& item
+        ) const
+        {
+            return item.ref().op.ptr == ptr;
+        }
     }; 
 
 // ----------------------------------------------------------------------------------------
@@ -285,7 +313,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    struct op_pointer_to_mat : does_not_alias 
+    struct op_pointer_to_mat  
     {
         op_pointer_to_mat(
             const T* ptr_,
@@ -309,7 +337,66 @@ namespace dlib
 
         long nr () const { return rows; }
         long nc () const { return cols; }
+
+        template <typename U> bool aliases               ( const matrix_exp<U>& ) const { return false; }
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& ) const { return false; }
+
+        template <long num_rows, long num_cols, typename mem_manager, typename layout>
+        bool aliases (
+            const matrix_exp<matrix<T,num_rows,num_cols, mem_manager,layout> >& item
+        ) const 
+        { 
+            if (item.size() == 0)
+                return false;
+            else
+                return (ptr == &item(0,0)); 
+        }
+
+        bool aliases (
+            const matrix_exp<matrix_op<op_pointer_to_mat<T> > >& item
+        ) const
+        {
+            return item.ref().op.ptr == ptr;
+        }
+
+        bool aliases (
+            const matrix_exp<matrix_op<op_pointer_to_col_vect<T> > >& item
+        ) const
+        {
+            return item.ref().op.ptr == ptr;
+        }
     }; 
+
+    template <typename T>
+    bool op_pointer_to_col_vect<T>::
+    aliases (
+        const matrix_exp<matrix_op<op_pointer_to_mat<T> > >& item
+    ) const
+    {
+        return item.ref().op.ptr == ptr;
+    }
+
+    template <typename T, long NR, long NC, typename MM, typename L>
+    bool matrix<T,NR,NC,MM,L>::aliases (
+        const matrix_exp<matrix_op<op_pointer_to_mat<T> > >& item
+    ) const
+    {
+        if (size() != 0)
+            return item.ref().op.ptr == &data(0,0);
+        else
+            return false;
+    }
+
+    template <typename T, long NR, long NC, typename MM, typename L>
+    bool matrix<T,NR,NC,MM,L>::aliases (
+        const matrix_exp<matrix_op<op_pointer_to_col_vect<T> > >& item
+    ) const
+    {
+        if (size() != 0)
+            return item.ref().op.ptr == &data(0,0);
+        else
+            return false;
+    }
 
 // ----------------------------------------------------------------------------------------
 

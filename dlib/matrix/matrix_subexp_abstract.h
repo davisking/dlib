@@ -299,6 +299,35 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
+    assignable_matrix_expression set_ptrm (
+        T* ptr,
+        long nr,
+        long nc = 1
+    );
+    /*!
+        requires
+            - ptr == a pointer to nr*nc elements of type T
+            - nr >= 0
+            - nc >= 0
+        ensures
+            - statements of the following form:
+                - set_ptrm(ptr,nr,nc) = some_matrix;
+              result in it being the case that:
+                - mat(ptr,nr,nc) == some_matrix.
+
+            - statements of the following form:
+                - set_ptrm(ptr,nr,nc) = scalar_value;
+              result in it being the case that:
+                - mat(ptr,nr,nc) == uniform_matrix<matrix::type>(nr,nc,scalar_value).
+
+            - In addition to the normal assignment statements using the = symbol, you may
+              also use the usual += and -= versions of the assignment operator.  In these
+              cases, they have their usual effect.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     assignable_matrix_expression set_subm (
         matrix& m,
         long row,

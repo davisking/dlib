@@ -274,6 +274,32 @@ namespace
                 DLIB_TEST(counter_gemm() == 1);
             }
 
+            {
+                using namespace dlib;
+                using namespace dlib::blas_bindings;
+                array2d<double> a(100,100);
+                array2d<double> b(100,100);
+                matrix<double> aa(100,100);
+                matrix<double> bb(100,100);
+                matrix<double> c;
+                
+                counter_gemm() = 0;
+                c = mat(&a[0][0],100,100)*mat(&b[0][0],100,100);
+                DLIB_TEST(counter_gemm() == 1);
+                set_ptrm(&c(0,0),100,100) = mat(&a[0][0],100,100)*mat(&b[0][0],100,100);
+                DLIB_TEST(counter_gemm() == 2);
+                set_ptrm(&c(0,0),100,100) = aa*bb;
+                DLIB_TEST(counter_gemm() == 3);
+
+                counter_gemm() = 0;
+                c = trans(2*mat(&a[0][0],100,100)*mat(&b[0][0],100,100));
+                DLIB_TEST(counter_gemm() == 1);
+                set_ptrm(&c(0,0),100,100) = trans(2*mat(&a[0][0],100,100)*mat(&b[0][0],100,100));
+                DLIB_TEST(counter_gemm() == 2);
+                set_ptrm(&c(0,0),100,100) = trans(2*mat(a)*mat(b));
+                DLIB_TEST(counter_gemm() == 3);
+            }
+
             print_spinner();
         }
     };
