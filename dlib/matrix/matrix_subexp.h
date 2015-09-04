@@ -561,6 +561,11 @@ namespace dlib
             const matrix_exp<EXP>& exp
         ) 
         {
+            // You can only assign to a set_ptrm() expression with a source matrix that
+            // contains the same type of elements as the target (i.e. you can't mix double
+            // and float types).
+            COMPILE_TIME_ASSERT((is_same_type<T, typename EXP::type>::value == true));
+
             DLIB_ASSERT( exp.nr() == height && exp.nc() == width,
                 "\tassignable_matrix_expression set_ptrm()"
                 << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
@@ -589,6 +594,11 @@ namespace dlib
             const matrix_exp<EXP>& exp
         ) 
         {
+            // You can only assign to a set_ptrm() expression with a source matrix that
+            // contains the same type of elements as the target (i.e. you can't mix double
+            // and float types).
+            COMPILE_TIME_ASSERT((is_same_type<T, typename EXP::type>::value == true));
+
             DLIB_ASSERT( exp.nr() == height && exp.nc() == width,
                 "\tassignable_matrix_expression set_ptrm()"
                 << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
@@ -617,6 +627,11 @@ namespace dlib
             const matrix_exp<EXP>& exp
         ) 
         {
+            // You can only assign to a set_ptrm() expression with a source matrix that
+            // contains the same type of elements as the target (i.e. you can't mix double
+            // and float types).
+            COMPILE_TIME_ASSERT((is_same_type<T, typename EXP::type>::value == true));
+
             DLIB_ASSERT( exp.nr() == height && exp.nc() == width,
                 "\tassignable_matrix_expression set_ptrm()"
                 << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
