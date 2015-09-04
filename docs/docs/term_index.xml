@@ -606,6 +606,7 @@
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="set_rowm"              include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="set_colm"              include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="set_subm"              include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="set_ptrm"              include="dlib/matrix.h"/>
 
 
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="pointwise_multiply" include="dlib/matrix.h"/>

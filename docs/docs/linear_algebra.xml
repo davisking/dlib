@@ -309,6 +309,10 @@
                   <link>dlib/matrix/matrix_subexp_abstract.h.html#colm</link>
                </item>
                <item>
+                  <name>set_ptrm</name>
+                  <link>dlib/matrix/matrix_subexp_abstract.h.html#set_ptrm</link>
+               </item>
+               <item>
                   <name>set_subm</name>
                   <link>dlib/matrix/matrix_subexp_abstract.h.html#set_subm</link>
                </item>
