@@ -1595,9 +1595,15 @@ namespace dlib
             explicit literal_assign_helper(matrix* m_): m(m_), r(0), c(0),has_been_used(false) {next();}
             ~literal_assign_helper()
             {
+              try {
                 DLIB_CASSERT(!has_been_used || r == m->nr(),
                              "You have used the matrix comma based assignment incorrectly by failing to\n"
                              "supply a full set of values for every element of a matrix object.\n");
+              }
+              catch (std::exception&)
+              {
+                exit(-1);
+              }
             }
 
             const literal_assign_helper& operator, (
