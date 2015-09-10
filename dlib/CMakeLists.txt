@@ -51,6 +51,10 @@ if (NOT CMAKE_CXX_FLAGS_DEBUG MATCHES "-DENABLE_ASSERTS")
       FORCE)
 endif ()
 
+if(UNIX AND NOT CMAKE_BUILD_TYPE MATCHES DEBUG)
+    message("dlib is built in Release mode: you can install it with 'make install'")
+    set (RELEASE_MODE true)
+endif()
 
 # Don't try to call add_library(dlib) and setup dlib's stuff if it has already
 # been done by some other part of the current cmake project.  We do this
@@ -83,7 +87,13 @@ if (NOT TARGET dlib)
    option(DLIB_ISO_CPP_ONLY ${DLIB_ISO_CPP_ONLY_STR} OFF)
    option(DLIB_NO_GUI_SUPPORT ${DLIB_NO_GUI_SUPPORT_STR} OFF)
    option(DLIB_ENABLE_STACK_TRACE ${DLIB_ENABLE_STACK_TRACE_STR} OFF)
-   option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
+
+   # completely disable asserts in Release mode to prevent any risk of
+   # 'one-declaration rule' violations
+   if (NOT RELEASE_MODE)
+       option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
+   endif()
+
    option(DLIB_USE_BLAS ${DLIB_USE_BLAS_STR} ON)
    option(DLIB_USE_LAPACK ${DLIB_USE_LAPACK_STR} ON)
    option(DLIB_LINK_WITH_LIBPNG ${DLIB_LINK_WITH_LIBPNG_STR} ON)
@@ -106,7 +116,11 @@ if (NOT TARGET dlib)
          data_io/image_dataset_metadata.cpp)
 
    if (DLIB_ISO_CPP_ONLY)
-      add_library(dlib STATIC ${source_files} )
+       if (RELEASE_MODE)
+           add_library(dlib SHARED ${source_files} )
+       else()
+           add_library(dlib STATIC ${source_files} )
+       endif()
    else()
 
       set(source_files ${source_files}
@@ -400,11 +414,26 @@ if (NOT TARGET dlib)
          mark_as_advanced(fftw fftw_path)
       endif()
 
+      if (RELEASE_MODE)
+          add_library(dlib SHARED ${source_files} )
+      else()
+          add_library(dlib STATIC ${source_files} )
+      endif()
 
-      add_library(dlib STATIC ${source_files} )
       target_link_libraries(dlib ${dlib_needed_libraries} )
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
+
+   # Install the library
+   if (RELEASE_MODE)
+       install(TARGETS dlib LIBRARY DESTINATION lib)
+
+       install(DIRECTORY ${CMAKE_SOURCE_DIR}/ DESTINATION include/dlib
+               FILES_MATCHING PATTERN "*.h"
+               REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
+
+       install(FILES "LICENSE.txt" DESTINATION share/doc/dlib)
+   endif()
 
 
    #test for some things that really should be true about the compiler
