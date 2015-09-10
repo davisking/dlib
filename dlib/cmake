@@ -21,11 +21,13 @@ endif()
 
 # Setup some options to allow a user to enable SSE and AVX instruction use.  
 if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" 
+                                OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "ClangApple"
                                 OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
                                 OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-    option(USE_SSE2_INSTRUCTIONS "Compile your program with SSE2 instructions" OFF)
-    option(USE_SSE4_INSTRUCTIONS "Compile your program with SSE4 instructions" OFF)
-    option(USE_AVX_INSTRUCTIONS  "Compile your program with AVX instructions"  OFF)
+    # put options on by default for modern processors 
+    option(USE_SSE2_INSTRUCTIONS "Compile your program with SSE2 instructions" ON)
+    option(USE_SSE4_INSTRUCTIONS "Compile your program with SSE4 instructions" ON)
+    option(USE_AVX_INSTRUCTIONS  "Compile your program with AVX instructions"  ON)
     if(USE_AVX_INSTRUCTIONS)
         add_definitions(-mavx)
     elseif (USE_SSE4_INSTRUCTIONS)
@@ -34,14 +36,16 @@ if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
         add_definitions(-msse2)
     endif()
 elseif (MSVC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") # else if using Visual Studio 
-    # Use SSE2 by default when using Visual Studio.
+    # Turn on all vector instructions by default when using Visual Studio.
     option(USE_SSE2_INSTRUCTIONS "Compile your program with SSE2 instructions" ON)
+    option(USE_SSE4_INSTRUCTIONS "Compile your program with SSE4 instructions" ON)
+    option(USE_AVX_INSTRUCTIONS "Compile your program with AVX instructions" ON)
     # Visual Studio 2005 didn't support SSE4 
-    if (NOT MSVC80)
+    if (MSVC_VERSION LESS 1400)
         option(USE_SSE4_INSTRUCTIONS "Compile your program with SSE4 instructions" OFF)
     endif()
     # Visual Studio 2005 and 2008 didn't support AVX
-    if (NOT MSVC80 AND NOT MSVC90)
+    if (MSVC_VERSION LESS 1500)
         option(USE_AVX_INSTRUCTIONS  "Compile your program with AVX instructions"  OFF)
     endif() 
     include(CheckTypeSize)
