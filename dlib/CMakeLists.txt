@@ -8,6 +8,12 @@ SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 cmake_minimum_required(VERSION 2.4)
 
+project(dlib)
+
+set(CPACK_PACKAGE_VERSION_MAJOR "18")
+set(CPACK_PACKAGE_VERSION_MINOR "17")
+set(CPACK_PACKAGE_VERSION_PATCH "99")
+
 set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
 # Suppress cmake warnings about changes in new versions.
 if(COMMAND cmake_policy) 
