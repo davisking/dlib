@@ -16,15 +16,14 @@ if (CMAKE_COMPILER_IS_GNUCXX)
     # By default, g++ won't warn or error if you forget to return a value in a
     # function which requires you to do so.  This option makes it give a warning
     # for doing this.
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wreturn-type") 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wreturn-type")
 endif()
 
-# Setup some options to allow a user to enable SSE and AVX instruction use.  
-if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" 
-                                OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "ClangApple"
+# Setup some options to allow a user to enable SSE and AVX instruction use.
+if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
                                 OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
                                 OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-    # put options on by default for modern processors 
+    # put options on by default for modern processors
     option(USE_SSE2_INSTRUCTIONS "Compile your program with SSE2 instructions" ON)
     option(USE_SSE4_INSTRUCTIONS "Compile your program with SSE4 instructions" ON)
     option(USE_AVX_INSTRUCTIONS  "Compile your program with AVX instructions"  ON)
@@ -35,19 +34,19 @@ if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     elseif(USE_SSE2_INSTRUCTIONS)
         add_definitions(-msse2)
     endif()
-elseif (MSVC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") # else if using Visual Studio 
+elseif (MSVC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") # else if using Visual Studio
     # Turn on all vector instructions by default when using Visual Studio.
     option(USE_SSE2_INSTRUCTIONS "Compile your program with SSE2 instructions" ON)
     option(USE_SSE4_INSTRUCTIONS "Compile your program with SSE4 instructions" ON)
     option(USE_AVX_INSTRUCTIONS "Compile your program with AVX instructions" ON)
-    # Visual Studio 2005 didn't support SSE4 
+    # Visual Studio 2005 didn't support SSE4
     if (MSVC_VERSION LESS 1400)
         option(USE_SSE4_INSTRUCTIONS "Compile your program with SSE4 instructions" OFF)
     endif()
     # Visual Studio 2005 and 2008 didn't support AVX
     if (MSVC_VERSION LESS 1500)
         option(USE_AVX_INSTRUCTIONS  "Compile your program with AVX instructions"  OFF)
-    endif() 
+    endif()
     include(CheckTypeSize)
     check_type_size( "void*" SIZE_OF_VOID_PTR)
     if(USE_AVX_INSTRUCTIONS)
@@ -56,7 +55,7 @@ elseif (MSVC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") # else if using Visu
         # Visual studio doesn't have an /arch:SSE2 flag when building in 64 bit modes.
         # So only give it when we are doing a 32 bit build.
         if (SIZE_OF_VOID_PTR EQUAL 4)
-            add_definitions(/arch:SSE2)  
+            add_definitions(/arch:SSE2)
         endif()
         add_definitions(-DDLIB_HAVE_SSE2)
         add_definitions(-DDLIB_HAVE_SSE3)
@@ -75,7 +74,7 @@ endif()
 # Add folder containing dlib to the include search path.
 INCLUDE_DIRECTORIES(${dlib_path}/..)
 
-# This is really optional, but nice.  It will make sure the build mode 
+# This is really optional, but nice.  It will make sure the build mode
 # created by cmake is always release by default.
 include(${dlib_path}/release_build_by_default)
 
