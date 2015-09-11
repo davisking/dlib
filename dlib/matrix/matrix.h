@@ -1593,7 +1593,11 @@ namespace dlib
 
             literal_assign_helper(const literal_assign_helper& item) : m(item.m), r(item.r), c(item.c), has_been_used(false) {}
             explicit literal_assign_helper(matrix* m_): m(m_), r(0), c(0),has_been_used(false) {next();}
+#ifdef _MSC_BUILD
             ~literal_assign_helper() throw(...)
+#else
+            ~literal_assign_helper() throw(dlib::fatal_error)
+#endif
             {
                 DLIB_CASSERT(!has_been_used || r == m->nr(),
                              "You have used the matrix comma based assignment incorrectly by failing to\n"
