@@ -118,10 +118,9 @@ if (NOT TARGET dlib)
          data_io/image_dataset_metadata.cpp)
 
    if (DLIB_ISO_CPP_ONLY)
+       add_library(dlib STATIC ${source_files} )
        if (RELEASE_MODE)
-           add_library(dlib SHARED ${source_files} )
-       else()
-           add_library(dlib STATIC ${source_files} )
+           add_library(dlib-shared SHARED ${source_files} )
        endif()
    else()
 
@@ -416,25 +415,30 @@ if (NOT TARGET dlib)
          mark_as_advanced(fftw fftw_path)
       endif()
 
-      if (RELEASE_MODE)
-          add_library(dlib SHARED ${source_files} )
-      else()
-          add_library(dlib STATIC ${source_files} )
-      endif()
-
+      add_library(dlib STATIC ${source_files} )
       target_link_libraries(dlib ${dlib_needed_libraries} )
+
+      if (RELEASE_MODE)
+          add_library(dlib-shared SHARED ${source_files} )
+          target_link_libraries(dlib-shared ${dlib_needed_libraries} )
+      endif()
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
 
    # Install the library
    if (RELEASE_MODE)
-       install(TARGETS dlib LIBRARY DESTINATION lib)
+       set_target_properties(dlib-shared PROPERTIES OUTPUT_NAME dlib)
+       install(TARGETS dlib dlib-shared
+               EXPORT dlib 
+               LIBRARY DESTINATION lib
+               ARCHIVE DESTINATION lib)
 
        install(DIRECTORY ${CMAKE_SOURCE_DIR}/ DESTINATION include/dlib
                FILES_MATCHING PATTERN "*.h"
                REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
 
-       configure_file(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+
+       configure_file(${CMAKE_SOURCE_DIR}/../dlib/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
        # overwrite config.h with the configured one
        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h DESTINATION include/dlib)
 
