@@ -13,6 +13,7 @@ project(dlib)
 set(CPACK_PACKAGE_VERSION_MAJOR "18")
 set(CPACK_PACKAGE_VERSION_MINOR "17")
 set(CPACK_PACKAGE_VERSION_PATCH "99")
+set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 
 set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
 # Suppress cmake warnings about changes in new versions.
@@ -427,7 +428,9 @@ if (NOT TARGET dlib)
 
    # Install the library
    if (RELEASE_MODE)
-       set_target_properties(dlib-shared PROPERTIES OUTPUT_NAME dlib)
+       set_target_properties(dlib-shared PROPERTIES
+                                    OUTPUT_NAME dlib 
+                                    VERSION ${VERSION})
        install(TARGETS dlib dlib-shared
                EXPORT dlib 
                LIBRARY DESTINATION lib
@@ -447,6 +450,27 @@ if (NOT TARGET dlib)
 
        install(FILES "LICENSE.txt" DESTINATION share/doc/dlib)
 
+       ## Config.cmake generation and installation
+
+       set(ConfigPackageLocation lib/cmake/dlib)
+       install(EXPORT dlib
+            NAMESPACE dlib::
+            DESTINATION ${ConfigPackageLocation})
+
+       set(CONF_INSTALL_PATH "\${dlib_CMAKE_DIR}/../../../")
+       configure_file(dlibConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/dlibConfig.cmake" @ONLY)
+
+       include(CMakePackageConfigHelpers)
+       write_basic_package_version_file(
+           "${CMAKE_CURRENT_BINARY_DIR}/dlibConfigVersion.cmake"
+           VERSION ${VERSION}
+           COMPATIBILITY AnyNewerVersion
+           )
+
+       install(FILES 
+                    "${CMAKE_CURRENT_BINARY_DIR}/dlibConfig.cmake" 
+                    "${CMAKE_CURRENT_BINARY_DIR}/dlibConfigVersion.cmake" 
+               DESTINATION ${ConfigPackageLocation})
    endif()
 
 
