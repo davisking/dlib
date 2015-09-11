@@ -52,7 +52,6 @@ if (NOT CMAKE_CXX_FLAGS_DEBUG MATCHES "-DENABLE_ASSERTS")
 endif ()
 
 if(UNIX AND NOT CMAKE_BUILD_TYPE MATCHES DEBUG)
-    message("dlib is built in Release mode: you can install it with 'make install'")
     set (RELEASE_MODE true)
 endif()
 
@@ -76,30 +75,33 @@ if (NOT TARGET dlib)
    "Disable this if you don't want to use a BLAS library" )
    set (DLIB_USE_LAPACK_STR
    "Disable this if you don't want to use a LAPACK library" )
-   set (DLIB_LINK_WITH_LIBPNG_STR
+   set (DLIB_PNG_SUPPORT_STR
    "Disable this if you don't want to link against libpng" )
-   set (DLIB_LINK_WITH_LIBJPEG_STR
+   set (DLIB_JPEG_SUPPORT_STR
    "Disable this if you don't want to link against libjpeg" )
    set (DLIB_LINK_WITH_SQLITE3_STR
    "Disable this if you don't want to link against sqlite3" )
-   #set (DLIB_LINK_WITH_FFTW_STR "Disable this if you don't want to link against fftw" )
+   #set (DLIB_USE_FFTW_STR "Disable this if you don't want to link against fftw" )
 
    option(DLIB_ISO_CPP_ONLY ${DLIB_ISO_CPP_ONLY_STR} OFF)
    option(DLIB_NO_GUI_SUPPORT ${DLIB_NO_GUI_SUPPORT_STR} OFF)
    option(DLIB_ENABLE_STACK_TRACE ${DLIB_ENABLE_STACK_TRACE_STR} OFF)
 
-   # completely disable asserts in Release mode to prevent any risk of
-   # 'one-declaration rule' violations
-   if (NOT RELEASE_MODE)
-       option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
+   option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
+
+   if(DLIB_ENABLE_ASSERTS)
+       set (DLIB_DISABLE_ASSERTS false)
+       set (ENABLE_ASSERTS true) # we need the CMake variable to properly configure config.h.in
+   else()
+       set (DLIB_DISABLE_ASSERTS true)
    endif()
 
    option(DLIB_USE_BLAS ${DLIB_USE_BLAS_STR} ON)
    option(DLIB_USE_LAPACK ${DLIB_USE_LAPACK_STR} ON)
-   option(DLIB_LINK_WITH_LIBPNG ${DLIB_LINK_WITH_LIBPNG_STR} ON)
-   option(DLIB_LINK_WITH_LIBJPEG ${DLIB_LINK_WITH_LIBJPEG_STR} ON)
+   option(DLIB_PNG_SUPPORT ${DLIB_PNG_SUPPORT_STR} ON)
+   option(DLIB_JPEG_SUPPORT ${DLIB_JPEG_SUPPORT_STR} ON)
    option(DLIB_LINK_WITH_SQLITE3 ${DLIB_LINK_WITH_SQLITE3_STR} ON)
-   #option(DLIB_LINK_WITH_FFTW ${DLIB_LINK_WITH_FFTW_STR} ON)
+   #option(DLIB_USE_FFTW ${DLIB_USE_FFTW_STR} ON)
 
    set(source_files 
          base64/base64_kernel_1.cpp
@@ -238,7 +240,7 @@ if (NOT TARGET dlib)
 
       INCLUDE (CheckFunctionExists)
 
-      if (DLIB_LINK_WITH_LIBPNG)
+      if (DLIB_PNG_SUPPORT)
          # try to find libpng 
          find_package(PNG QUIET)
          # Make sure there isn't something wrong with the version of LIBPNG
@@ -292,7 +294,7 @@ if (NOT TARGET dlib)
             )
       endif()
 
-      if (DLIB_LINK_WITH_LIBJPEG)
+      if (DLIB_JPEG_SUPPORT)
          # try to find libjpeg 
          find_package(JPEG QUIET)
          # Make sure there isn't something wrong with the version of libjpeg 
@@ -401,7 +403,7 @@ if (NOT TARGET dlib)
 
 
 
-      if (DLIB_LINK_WITH_FFTW)
+      if (DLIB_USE_FFTW)
          find_library(fftw fftw3)
          # make sure fftw3.h is in the include path
          find_path(fftw_path fftw3.h)
@@ -409,7 +411,7 @@ if (NOT TARGET dlib)
             include_directories(${fftw_path})
             set(dlib_needed_libraries ${dlib_needed_libraries} ${fftw} )
          else()
-            set(DLIB_LINK_WITH_FFTW OFF CACHE STRING ${DLIB_LINK_WITH_SQLITE3_STR} FORCE )
+            set(DLIB_USE_FFTW OFF CACHE STRING ${DLIB_LINK_WITH_SQLITE3_STR} FORCE )
          endif()
          mark_as_advanced(fftw fftw_path)
       endif()
@@ -432,7 +434,12 @@ if (NOT TARGET dlib)
                FILES_MATCHING PATTERN "*.h"
                REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
 
+       configure_file(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+       # overwrite config.h with the configured one
+       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h DESTINATION include/dlib)
+
        install(FILES "LICENSE.txt" DESTINATION share/doc/dlib)
+
    endif()
 
 
@@ -441,19 +448,19 @@ if (NOT TARGET dlib)
    include(TestForANSIStreamHeaders)
 
 
-   if (DLIB_LINK_WITH_LIBPNG AND NOT DLIB_ISO_CPP_ONLY)
+   if (DLIB_PNG_SUPPORT AND NOT DLIB_ISO_CPP_ONLY)
       add_global_define(DLIB_PNG_SUPPORT)
    else()
       remove_global_define(DLIB_PNG_SUPPORT)
    endif()
 
-   if (DLIB_LINK_WITH_LIBJPEG AND NOT DLIB_ISO_CPP_ONLY)
+   if (DLIB_JPEG_SUPPORT AND NOT DLIB_ISO_CPP_ONLY)
       add_global_define(DLIB_JPEG_SUPPORT)
    else()
       remove_global_define(DLIB_JPEG_SUPPORT)
    endif()
 
-   if (DLIB_LINK_WITH_FFTW AND NOT DLIB_ISO_CPP_ONLY)
+   if (DLIB_USE_FFTW AND NOT DLIB_ISO_CPP_ONLY)
       add_global_define(DLIB_USE_FFTW)
    else()
       remove_global_define(DLIB_USE_FFTW)
