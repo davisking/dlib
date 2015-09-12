@@ -155,6 +155,17 @@ function BigToggle(node)
    }
 
 }
+
+function init_page()
+{
+   if (navigator.appVersion.indexOf("Win")!=-1)
+   {
+      var a = document.getElementById("download_button");
+      a.href = a.href.replace("tar.bz2", "zip");
+   }
+}
+window.onload = init_page;
+
 </script>
 
 <style type="text/css">
