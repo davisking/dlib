@@ -8,6 +8,9 @@ SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 cmake_minimum_required(VERSION 2.4)
 
+# default to a Release build (except if CMAKE_BUILD_TYPE is set)
+include(release_build_by_default)
+
 project(dlib)
 
 set(CPACK_PACKAGE_VERSION_MAJOR "18")
