@@ -120,7 +120,7 @@ if (NOT TARGET dlib)
 
    if (DLIB_ISO_CPP_ONLY)
        add_library(dlib STATIC ${source_files} )
-       if (RELEASE_MODE)
+       if (RELEASE_MODE AND NOT DLIB_IN_PROJECT_BUILD)
            add_library(dlib-shared SHARED ${source_files} )
        endif()
    else()
@@ -419,7 +419,7 @@ if (NOT TARGET dlib)
       add_library(dlib STATIC ${source_files} )
       target_link_libraries(dlib ${dlib_needed_libraries} )
 
-      if (RELEASE_MODE)
+      if (RELEASE_MODE AND NOT DLIB_IN_PROJECT_BUILD)
           add_library(dlib-shared SHARED ${source_files} )
           target_link_libraries(dlib-shared ${dlib_needed_libraries} )
       endif()
@@ -427,7 +427,7 @@ if (NOT TARGET dlib)
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
 
    # Install the library
-   if (RELEASE_MODE)
+   if (RELEASE_MODE AND NOT DLIB_IN_PROJECT_BUILD)
        set_target_properties(dlib-shared PROPERTIES
                                     OUTPUT_NAME dlib 
                                     VERSION ${VERSION})
