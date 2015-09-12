@@ -231,6 +231,10 @@ makedocs ()
     cp -r docs/guipics docs/chm/docs
     cp docs/*.html docs/web
     cp docs/*.html docs/chm/docs
+    cp docs/*.css docs/web
+    cp docs/*.css docs/chm/docs
+    cp docs/*.js docs/web
+    cp docs/*.js docs/chm/docs
     cp docs/*.png docs/web
     cp docs/*.ico docs/web
     cp docs/*.png docs/chm/docs

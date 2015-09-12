@@ -1,0 +1,198 @@
+body {margin:0px;}
+pre {margin:0px;}
+
+ul.tree  li { list-style: none;  margin-left:10px;} 
+ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
+ul.tree  li ul { margin-left:10px; padding:0px; }
+
+li#term { list-style: none; }
+
+div.component {
+   background-color:white; 
+   border: 2px solid rgb(102,102,102); 
+   text-align:left;
+   margin-top: 1.5em;
+   padding: 0.7em;
+}
+
+div.question {
+   background-color:white; 
+   border: 2px solid rgb(102,102,102); 
+   text-align:left;
+   margin-top: 1.5em;
+   margin-bottom: 90%;
+   padding: 0.7em;
+}
+
+div.function {
+   background-color:white; 
+   border: 2px solid rgb(102,102,255); 
+   text-align:left;
+   margin-top: 0.3em;
+   padding: 0.3em;
+}
+
+div.class {
+   background-color:white; 
+   border: 2px solid rgb(255,102,102); 
+   text-align:left;
+   margin-top: 0.3em;
+   padding: 0.3em;
+}
+
+div.extension {
+   background-color:#FDFDFD; 
+   border: 1px solid rgb(102,102,102); 
+   text-align:left;
+   margin-top: 1.0em;
+   padding: 0.7em;
+}
+
+div.logb {
+   text-align:left;
+   padding: 0.0em;
+   float: left;
+   background-color:#c0c0c0; 
+   border: double ; 
+   margin: 0.5em;
+}
+
+div.name {
+   float: left;
+}
+div.line1 {
+   float:left;
+   width:100%;
+   background-color:#dfdfdf; 
+}
+div.line2 {
+   float:left;
+   width:100%;
+}
+div.inc {
+   float: right;
+}
+
+
+.code_box
+{
+   color: black;
+   margin: 1em 0.25in;
+   padding: 0.5em;
+   background: rgb(240,240,240);
+   border-top: black dotted 1px;
+   border-left: black dotted 1px;
+   border-right: black solid 2px;
+   border-bottom: black solid 2px;
+}
+
+
+
+.bdotted {border-bottom: 1px dotted}
+.bdashed {border-bottom: 1px dashed}
+.bsolid {border-bottom: 1px solid}
+.bdouble {border-bottom: 1px double}
+.bgroove {border-bottom: 1px groove}
+.bridge {border-bottom: 1px ridge}
+.binset {border-bottom: 1px inset}
+.boutset {border-bottom: 1px outset}
+
+div.row1 {
+   background-color:#dfdfdf; 
+}
+div.row2 {
+   background-color:#f2f2f2; 
+}
+
+div.typedefs {
+   margin-left: 1.5em;
+   margin-top: 0.2em;
+   border: 1px dotted;
+   width: 52em;
+}
+
+div.tdn {
+   width: 10em;
+}
+
+.fullhr {
+   clear: both;
+}
+
+body {
+   text-align: center;
+}
+
+div.entire_page_header {
+   width:62.5em;  
+   height:59px;
+   text-align: left;
+   margin-top: 0.4em;
+   margin-left: auto;
+   margin-right: auto;
+}
+div.entire_page {
+   width:62.5em;  
+   text-align: left;
+   margin-left: auto;
+   margin-right: auto;
+   clear:both;
+}
+
+a {
+   text-decoration: none;
+   font-family: sans-serif;
+}
+a:hover{
+   text-decoration: underline;
+}
+a.menu{
+   white-space: nowrap;
+}
+a.sub{
+   cursor: pointer;
+   margin-left:-9px;
+   color: green;
+}
+#download_button {
+   font: 200 16px source-sans-pro, sans-serif;
+   text-align: center;
+   padding-left: 1.5em;
+   padding-right: 1.5em;
+   -webkit-font-smoothing: antialiased;
+   background-color: #2098f5;
+   border-color: #0a7cd4;
+   color: #fff;
+
+   padding: 0.7em 1em 0.8em;
+
+   -moz-box-shadow: 2px 2px 9px #777777; 
+   -webkit-box-shadow: 2px 2px 9px #777777;
+   box-shadow: 1px 1px 5px #777777;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+
+   transition: 320ms;
+   display: inline-block;
+}
+#download_button:hover {
+   text-decoration: none;
+   -moz-box-shadow: 1px 1px 9px #77a777; 
+   -webkit-box-shadow: 1px 1px 9px #77a777;
+   box-shadow: 1px 1px 5px #77a777;
+   color: #ffffff;
+   background-color: #0a7cd4;
+}
+
+div {
+   display:block;
+}
+
+#dlib_version {
+   color: #fff;
+   display: block;
+   font-size: 0.8em;
+   font-weight: 400;
+   margin: 0;
+}

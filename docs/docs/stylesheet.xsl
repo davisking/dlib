@@ -50,338 +50,39 @@
    <xsl:template match="/doc">
       <html>
          <head>
-         <link rel="shortcut icon" href="dlib-icon.ico"/>
-         <xsl:if test="$is_chm != 'true'">
-            <meta property="og:image" content="http://dlib.net/dlib-logo-small.png"/>
-         </xsl:if>
+            <link rel="shortcut icon" href="dlib-icon.ico"/>
+            <xsl:if test="$is_chm != 'true'">
+               <meta property="og:image" content="http://dlib.net/dlib-logo-small.png"/>
+            </xsl:if>
 
-<!-- Verify with Google -->
-<meta name="verify-v1" content="{$google_verify_id}" />
-<meta name="google-site-verification" content="{$google_verify_id2}" />
-<title>
-   <xsl:value-of select="$project_name"/>
-   <xsl:if test="title">
-   - <xsl:value-of select="title" />
-   </xsl:if>
-</title>
+            <!-- Verify with Google -->
+            <meta name="verify-v1" content="{$google_verify_id}" />
+            <meta name="google-site-verification" content="{$google_verify_id2}" />
+            <title>
+               <xsl:value-of select="$project_name"/>
+               <xsl:if test="title">
+               - <xsl:value-of select="title" />
+               </xsl:if>
+            </title>
 
+            <script type="text/javascript" src="dlib.js"></script>
+            <link rel="stylesheet" type="text/css" href="dlib.css"/>
 
+            <xsl:if test="$is_chm != 'true'">
+               <script> <!-- Google Analytics -->
+               (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+               (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+               m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+               })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-
-
-<!-- [client side code for collapsing and unfolding branches] -->
-<script language="JavaScript">
-
-// ---------------------------------------------
-// --- Name:    Easy DHTML Treeview           --
-// --- Author:  D.D. de Kerf                  --
-// --- Version: 0.2          Date: 13-6-2001  --
-// ---------------------------------------------
-function Toggle(node)
-{
-   // Unfold the branch if it isn't visible
-   var next_node = node.nextSibling;
-   if (next_node.style.display == 'none')
-   {
-      // Change the image (if there is an image)
-      if (node.childNodes.length > 0)
-      {
-         if (node.childNodes.length > 0)
-         { 
-            if (node.childNodes.item(0).nodeName == "IMG")
-            {
-               node.childNodes.item(0).src = "minus.gif";
-            }
-         }
-      }
-
-      next_node.style.display = 'block';
-   }
-   // Collapse the branch if it IS visible
-   else
-   {
-      // Change the image (if there is an image)
-      if (node.childNodes.length > 0)
-      {
-         if (node.childNodes.length > 0)
-         { 
-            if (node.childNodes.item(0).nodeName == "IMG")
-            {
-               node.childNodes.item(0).src = "plus.gif";
-            }
-         }
-      }
-
-      next_node.style.display = 'none';
-   }
-
-}
-function BigToggle(node)
-{
-   // Unfold the branch if it isn't visible
-   var next_node = node.nextSibling;
-   if (next_node.style.display == 'none')
-   {
-      // Change the image (if there is an image)
-      if (node.childNodes.length > 0)
-      {
-         if (node.childNodes.length > 0)
-         { 
-            if (node.childNodes.item(0).nodeName == "IMG")
-            {
-               node.childNodes.item(0).src = "bigminus.gif";
-            }
-         }
-      }
-
-      next_node.style.display = 'block';
-   }
-   // Collapse the branch if it IS visible
-   else
-   {
-      // Change the image (if there is an image)
-      if (node.childNodes.length > 0)
-      {
-         if (node.childNodes.length > 0)
-         { 
-            if (node.childNodes.item(0).nodeName == "IMG")
-            {
-               node.childNodes.item(0).src = "bigplus.gif";
-            }
-         }
-      }
-
-      next_node.style.display = 'none';
-   }
-
-}
-
-function init_page()
-{
-   if (navigator.appVersion.indexOf("Win")!=-1)
-   {
-      var a = document.getElementById("download_button");
-      a.href = a.href.replace("tar.bz2", "zip");
-   }
-}
-window.onload = init_page;
-
-</script>
-
-<style type="text/css">
-   body {margin:0px;}
-   pre {margin:0px;}
-
-   ul.tree  li { list-style: none;  margin-left:10px;} 
-   ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
-   ul.tree  li ul { margin-left:10px; padding:0px; }
-
-   li#term { list-style: none; }
-
-   div.component {
-      background-color:white; 
-      border: 2px solid rgb(102,102,102); 
-      text-align:left;
-      margin-top: 1.5em;
-      padding: 0.7em;
-   }
-
-   div.question {
-      background-color:white; 
-      border: 2px solid rgb(102,102,102); 
-      text-align:left;
-      margin-top: 1.5em;
-      margin-bottom: 90%;
-      padding: 0.7em;
-   }
-
-   div.function {
-      background-color:white; 
-      border: 2px solid rgb(102,102,255); 
-      text-align:left;
-      margin-top: 0.3em;
-      padding: 0.3em;
-   }
-
-   div.class {
-      background-color:white; 
-      border: 2px solid rgb(255,102,102); 
-      text-align:left;
-      margin-top: 0.3em;
-      padding: 0.3em;
-   }
-
-   div.extension {
-      background-color:#FDFDFD; 
-      border: 1px solid rgb(102,102,102); 
-      text-align:left;
-      margin-top: 1.0em;
-      padding: 0.7em;
-   }
-
-   div.logb {
-      text-align:left;
-      padding: 0.0em;
-      float: left;
-      background-color:#c0c0c0; 
-      border: double ; 
-      margin: 0.5em;
-   }
-
-   div.name {
-      float: left;
-   }
-   div.line1 {
-      float:left;
-      width:100%;
-      background-color:#dfdfdf; 
-   }
-   div.line2 {
-      float:left;
-      width:100%;
-   }
-   div.inc {
-      float: right;
-   }
-
-
-   .code_box
-   {
-      color: black;
-      margin: 1em 0.25in;
-      padding: 0.5em;
-      background: rgb(240,240,240);
-      border-top: black dotted 1px;
-      border-left: black dotted 1px;
-      border-right: black solid 2px;
-      border-bottom: black solid 2px;
-   }
-
-
-
-   .bdotted {border-bottom: 1px dotted}
-   .bdashed {border-bottom: 1px dashed}
-   .bsolid {border-bottom: 1px solid}
-   .bdouble {border-bottom: 1px double}
-   .bgroove {border-bottom: 1px groove}
-   .bridge {border-bottom: 1px ridge}
-   .binset {border-bottom: 1px inset}
-   .boutset {border-bottom: 1px outset}
-
-   div.row1 {
-      background-color:#dfdfdf; 
-   }
-   div.row2 {
-      background-color:#f2f2f2; 
-   }
-
-   div.typedefs {
-      margin-left: 1.5em;
-      margin-top: 0.2em;
-      border: 1px dotted;
-      width: 52em;
-   }
-
-   div.tdn {
-      width: 10em;
-   }
-
-   .fullhr {
-      clear: both;
-   }
-
-   body {
-      text-align: center;
-   }
-
-   div.entire_page_header {
-      width:62.5em;  
-      height:59px;
-      text-align: left;
-      margin-top: 0.4em;
-      margin-left: auto;
-      margin-right: auto;
-   }
-   div.entire_page {
-      width:62.5em;  
-      text-align: left;
-      margin-left: auto;
-      margin-right: auto;
-      clear:both;
-   }
-
-   a {
-      text-decoration: none;
-      font-family: sans-serif;
-   }
-   a:hover{
-      text-decoration: underline;
-   }
-   a.menu{
-      white-space: nowrap;
-   }
-   a.sub{
-      cursor: pointer;
-      margin-left:-9px;
-      color: green;
-   }
-   #download_button {
-        font: 200 16px source-sans-pro, sans-serif;
-        text-align: center;
-        padding-left: 1.5em;
-        padding-right: 1.5em;
-        -webkit-font-smoothing: antialiased;
-        background-color: #2098f5;
-        border-color: #0a7cd4;
-        color: #fff;
-
-        padding: 0.7em 1em 0.8em;
-
-        -moz-box-shadow: 2px 2px 9px #777777; 
-        -webkit-box-shadow: 2px 2px 9px #777777;
-        box-shadow: 1px 1px 5px #777777;
-        border-radius: 3px;
-        -moz-border-radius: 3px;
-        -webkit-border-radius: 3px;
-
-        transition: 320ms;
-        display: inline-block;
-   }
-   #download_button:hover {
-      text-decoration: none;
-      -moz-box-shadow: 1px 1px 9px #77a777; 
-      -webkit-box-shadow: 1px 1px 9px #77a777;
-      box-shadow: 1px 1px 5px #77a777;
-      color: #ffffff;
-      background-color: #0a7cd4;
-   }
-    
-    div {
-        display:block;
-    }
-    
-    #dlib_version {
-         color: #fff;
-         display: block;
-         font-size: 0.8em;
-         font-weight: 400;
-         margin: 0;
-    }
-    
-</style>
-         <xsl:if test="$is_chm != 'true'">
-            <script> <!-- Google Analytics -->
-            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-            ga('create', 'UA-51919357-1', 'dlib.net');
-            ga('send', 'pageview');
-            </script>
-         </xsl:if>
-
+               ga('create', 'UA-51919357-1', 'dlib.net');
+               ga('send', 'pageview');
+               </script>
+            </xsl:if>
          </head>
+
+
+
          <body bgcolor="{$background_color}">
             <a name="top" />
             <div class="entire_page_header">
