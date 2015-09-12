@@ -532,7 +532,7 @@
  
       <section>
          <name>Current Release</name>
-         <item nolink="true">Version: <current_release/></item> 
+         <chm><item nolink="true">Version: <current_release/></item></chm>
          <item>
             <name>Release Notes</name>
             <link>release_notes.html</link>
@@ -546,7 +546,9 @@
 
       <web>
          <download_button>
-            <name>Download dlib</name>
+            <name><div id="dlname">Download dlib</div>
+                  <div id="dlib_version">ver.<current_release/></div>
+            </name>
             <link>http://dlib.net/files/dlib-<current_release/>.tar.bz2</link>
          </download_button>
       </web>

@@ -315,26 +315,48 @@ function BigToggle(node)
       color: green;
    }
    #download_button {
-      font-weight: bold;
-      margin-left: auto;
-      margin-right: auto;
-      background-color: #e1ddda;
-      font-size: 14pt;
-      padding: 7px;
-      -moz-box-shadow: 2px 2px 9px #777777; 
-      -webkit-box-shadow: 2px 2px 9px #777777;
-      box-shadow: 2px 2px 9px #777777;
-      border-radius: 8px;
-      -moz-border-radius: 8px;
-      -webkit-border-radius: 8px;
+        font: 200 16px source-sans-pro, sans-serif;
+        text-align: center;
+        padding-left: 1.5em;
+        padding-right: 1.5em;
+        -webkit-font-smoothing: antialiased;
+        background-color: #2098f5;
+        border-color: #0a7cd4;
+        color: #fff;
+
+        padding: 0.7em 1em 0.8em;
+
+        -moz-box-shadow: 2px 2px 9px #777777; 
+        -webkit-box-shadow: 2px 2px 9px #777777;
+        box-shadow: 1px 1px 5px #777777;
+        border-radius: 3px;
+        -moz-border-radius: 3px;
+        -webkit-border-radius: 3px;
+
+        transition: 320ms;
+        display: inline-block;
    }
    #download_button:hover {
       text-decoration: none;
       -moz-box-shadow: 1px 1px 9px #77a777; 
       -webkit-box-shadow: 1px 1px 9px #77a777;
-      box-shadow: 1px 1px 9px #77a777;
-      color: #007777;
+      box-shadow: 1px 1px 5px #77a777;
+      color: #ffffff;
+      background-color: #0a7cd4;
    }
+    
+    div {
+        display:block;
+    }
+    
+    #dlib_version {
+         color: #fff;
+         display: block;
+         font-size: 0.8em;
+         font-weight: 400;
+         margin: 0;
+    }
+    
 </style>
          <xsl:if test="$is_chm != 'true'">
             <script> <!-- Google Analytics -->
@@ -469,7 +491,7 @@ function BigToggle(node)
    
    <xsl:template match="download_button">
       <xsl:variable name="linktext"><xsl:apply-templates select="link"/></xsl:variable>
-      <a href="{$linktext}" id="download_button" class="menu"><xsl:value-of select="name"/></a>
+      <a href="{$linktext}" id="download_button" class="menu"><xsl:apply-templates select="name"/></a>
    </xsl:template>
    
    
@@ -986,6 +1008,9 @@ function BigToggle(node)
       <table>
          <xsl:apply-templates/>
        </table>
+   </xsl:template>   
+   <xsl:template match="div">
+      <div id="{@id}"><xsl:apply-templates/></div>
    </xsl:template>   
    <xsl:template match="li">
       <li>
