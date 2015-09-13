@@ -63,6 +63,7 @@ body
 #main_text_body
 {
    vertical-align: top;
+   padding-top: 1px;
    padding-left: 10px;
    padding-right: 10px;
 }
