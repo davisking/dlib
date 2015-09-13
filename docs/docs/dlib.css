@@ -1,4 +1,100 @@
-body {margin:0px;}
+
+/*
+ * Overall page layout stuff.  It goes like:
+ *
+ *  ============ page_header =============
+ *  |                                    |
+ *  ============ top_content =============
+ *  |           |           |            |
+ *  | main_menu | main_text | right_menu |
+ *  |           |           |            |
+ *  ============ bottom_content ==========
+ *  |                                    |
+ *  |                  .                 |
+ *  |                  .                 |
+ *  |                  .                 |
+ *  |                                    |
+ */
+
+body 
+{
+   margin:0px;
+   background-color: #EDF3EE;
+   width:62.5em;  
+   margin-left: auto;
+   margin-right: auto;
+}
+
+#page_header {
+   height:59px;
+   text-align: left;
+   margin-top: 0.4em;
+}
+
+#top_content
+{
+   width: 100%;
+   height: 900px;
+   display: table;
+}
+#top_content > div
+{
+   display: table-cell;
+}
+#main_menu
+{
+   width: fit-content;
+   padding-bottom: 6em; /* So the menu_footer always has room. */
+}
+#main_text
+{
+   background-color: white;
+   border: 1px solid rgb(102,102,102);
+   width: 100%;
+}
+#main_text_title
+{
+   margin-top: 10px;
+   margin-bottom: 20px;
+   text-align: center;
+   font-size: 2.1em;
+   font-weight: bold;
+}
+#main_text_body
+{
+   vertical-align: top;
+   padding-left: 10px;
+   padding-right: 10px;
+}
+
+#right_menu
+{
+   width: fit-content;
+   min-width: 9em;
+}
+
+div.menu
+{
+   vertical-align: top;
+   position: relative;
+   background-color:#F5F5F5;
+   padding:7px; 
+   border: 1px solid rgb(102,102,102);
+}
+div.menu_top {
+}
+div.menu_footer {
+   position: absolute;
+   bottom: 10px;
+}
+
+
+#bottom_content
+{
+}
+
+/*  ============================================================= */
+
 pre {margin:0px;}
 
 ul.tree  li { list-style: none;  margin-left:10px;} 
@@ -6,6 +102,7 @@ ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
 ul.tree  li ul { margin-left:10px; padding:0px; }
 
 li#term { list-style: none; }
+
 
 div.component {
    background-color:white; 
@@ -119,25 +216,6 @@ div.tdn {
    clear: both;
 }
 
-body {
-   text-align: center;
-}
-
-div.entire_page_header {
-   width:62.5em;  
-   height:59px;
-   text-align: left;
-   margin-top: 0.4em;
-   margin-left: auto;
-   margin-right: auto;
-}
-div.entire_page {
-   width:62.5em;  
-   text-align: left;
-   margin-left: auto;
-   margin-right: auto;
-   clear:both;
-}
 
 a {
    text-decoration: none;
@@ -196,3 +274,4 @@ div {
    font-weight: 400;
    margin: 0;
 }
+

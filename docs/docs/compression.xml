@@ -7,7 +7,6 @@
    <!-- ************************************************************************* -->
 
    <body>
-      <br/><br/>
   <p>
      This page contains a bunch of objects that implement various parts of compression algorithms.  
      They can be put together in different ways to construct many different algorithms.  

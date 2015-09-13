@@ -7,7 +7,6 @@
    <!-- ************************************************************************* -->
 
    <body>
-         <br/><br/>
          <p>
             This page documents the core linear algebra tools included in dlib.
             In particular, the three most important objects in this part of the library are the

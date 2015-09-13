@@ -7,7 +7,6 @@
    <!-- ************************************************************************* -->
 
    <body>
-      <br/><br/>
       <p>
          This page documents tools built on top of the dlib <a href="api.html#sockets">sockets API</a>.
          Therefore, all these tools are focused on providing some kind of higher level networking

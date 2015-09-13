@@ -35,7 +35,6 @@
    <!-- ************************************************************************* -->
    
    <xsl:variable name="gray">#E3E3E3</xsl:variable>
-   <xsl:variable name="background_color">#EDF3EE</xsl:variable>
 
    <!-- ************************************************************************* -->
    <!-- ************************************************************************* -->
@@ -83,9 +82,9 @@
 
 
 
-         <body bgcolor="{$background_color}">
+         <body>
             <a name="top" />
-            <div class="entire_page_header">
+            <div id="page_header">
                <xsl:if test="$is_chm != 'true'">
                   <div style="float:right;width:450px">
                            <script>
@@ -104,20 +103,21 @@
                </xsl:if>
                <a href="http://dlib.net"><img src="dlib-logo.png"/></a>
             </div>
-            <div class="entire_page">
 
-            <table bgcolor="white" height="100%" bordercolor="{$background_color}" 
-                CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px">
-               <tr height="100%">
+
+            <div id="top_content">
+               <div id="main_menu" class="menu">
                   <xsl:apply-templates select="document($main_menu)/doc/menu"/>
+               </div>
 
-                  <!-- ************************************************************************* -->
-                  <td  VALIGN="TOP" width="100%" style="border: 1px solid rgb(102,102,102);" >
-                     <xsl:if test="title">
-                        <center><h1> <xsl:value-of select="title" /> </h1></center>
-                     </xsl:if>
+               <!-- ************************************************************************* -->
+               <div id="main_text">
+                  <xsl:if test="title">
+                     <div id="main_text_title"> <xsl:value-of select="title" /> </div>
+                  </xsl:if>
+
+                  <div id="main_text_body">
                      <xsl:apply-templates select="body"/>
-
                      <xsl:for-each select="questions">
                         <xsl:sort select="translate(@group,$lcletters, $ucletters)"/> 
                         <xsl:if test="@group"><h2><xsl:value-of select="@group"/></h2></xsl:if>
@@ -128,29 +128,32 @@
                         </xsl:for-each>
                         </ul>
                      </xsl:for-each>
+                  </div>
+               </div>
 
-                  </td>
-                  <!-- ************************************************************************* -->
-                       <xsl:choose>
-                           <xsl:when test="menu/@from_file">
-                             <xsl:apply-templates select="document(menu/@from_file)/doc/menu">
-                                 <xsl:with-param name="file_name" select="concat(substring-before(menu/@from_file,'.'),'.html')" />
-                             </xsl:apply-templates>
-                         </xsl:when>
-                           <xsl:otherwise>
-                          <xsl:apply-templates select="menu"/>
-                           </xsl:otherwise>
-                       </xsl:choose>         
+               <!-- ************************************************************************* -->
+                  <xsl:choose>
+                     <xsl:when test="menu/@from_file">
+                        <div id="right_menu" class="menu">
+                           <xsl:apply-templates select="document(menu/@from_file)/doc/menu">
+                              <xsl:with-param name="file_name" select="concat(substring-before(menu/@from_file,'.'),'.html')" />
+                           </xsl:apply-templates>
+                        </div>
+                     </xsl:when>
+                     <xsl:otherwise>
+                        <xsl:if test="menu">
+                           <div id="right_menu" class="menu">
+                              <xsl:apply-templates select="menu"/>
+                           </div>
+                        </xsl:if>
+                     </xsl:otherwise>
+                  </xsl:choose>         
+               <!-- ************************************************************************* -->
+            </div>
                   
-                  
-                  <!-- ************************************************************************* -->
-               </tr>
-               
-            </table>
-                  
+            <div id="bottom_content">
                <xsl:apply-templates select="components"/>
                <xsl:apply-templates select="questions"/>
-                  
             </div>
 
          </body>
@@ -209,21 +212,16 @@
    
    <xsl:template match="menu">
       <xsl:param name="file_name" />
-      <td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%">
-         <br/>
-         <table WIDTH="{@width}" height="100%">
-         <tr><td VALIGN="TOP">
+      <div class="menu_top">
          <xsl:apply-templates select="top">
             <xsl:with-param name="file_name" select="$file_name" />
          </xsl:apply-templates>
-         </td><td width="1"></td></tr>
-         <tr><td valign="bottom">
-            <xsl:apply-templates select="bottom">
-               <xsl:with-param name="file_name" select="$file_name" />
-            </xsl:apply-templates>
-         </td></tr>
-         </table>
-      </td>
+      </div>
+      <div class="menu_footer">
+         <xsl:apply-templates select="bottom">
+            <xsl:with-param name="file_name" select="$file_name" />
+         </xsl:apply-templates>
+      </div>
    </xsl:template>
    
    <xsl:template match="item">
