@@ -55,10 +55,6 @@ if (NOT CMAKE_CXX_FLAGS_DEBUG MATCHES "-DENABLE_ASSERTS")
       FORCE)
 endif ()
 
-if(UNIX AND NOT CMAKE_BUILD_TYPE MATCHES DEBUG)
-    set (RELEASE_MODE true)
-endif()
-
 # Don't try to call add_library(dlib) and setup dlib's stuff if it has already
 # been done by some other part of the current cmake project.  We do this
 # because it avoids getting warnings/errors about cmake policy CMP0002.  This
@@ -123,7 +119,7 @@ if (NOT TARGET dlib)
 
    if (DLIB_ISO_CPP_ONLY)
        add_library(dlib STATIC ${source_files} )
-       if (RELEASE_MODE AND NOT DLIB_IN_PROJECT_BUILD)
+       if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
            add_library(dlib-shared SHARED ${source_files} )
        endif()
    else()
@@ -422,7 +418,7 @@ if (NOT TARGET dlib)
       add_library(dlib STATIC ${source_files} )
       target_link_libraries(dlib ${dlib_needed_libraries} )
 
-      if (RELEASE_MODE AND NOT DLIB_IN_PROJECT_BUILD)
+      if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
           add_library(dlib-shared SHARED ${source_files} )
           target_link_libraries(dlib-shared ${dlib_needed_libraries} )
       endif()
@@ -430,14 +426,23 @@ if (NOT TARGET dlib)
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
 
    # Install the library
-   if (RELEASE_MODE AND NOT DLIB_IN_PROJECT_BUILD)
-       set_target_properties(dlib-shared PROPERTIES
-                                    OUTPUT_NAME dlib 
-                                    VERSION ${VERSION})
-       install(TARGETS dlib dlib-shared
-               EXPORT dlib 
-               LIBRARY DESTINATION lib
-               ARCHIVE DESTINATION lib)
+   if (NOT DLIB_IN_PROJECT_BUILD)
+       if(UNIX)
+           set_target_properties(dlib-shared PROPERTIES
+                                        OUTPUT_NAME dlib 
+                                        VERSION ${VERSION})
+           install(TARGETS dlib dlib-shared
+                   EXPORT dlib 
+                   RUNTIME DESTINATION bin # Windows (including cygwin) considers .dll to be runtime artifacts
+                   LIBRARY DESTINATION lib
+                   ARCHIVE DESTINATION lib)
+       else()
+           install(TARGETS dlib
+                   EXPORT dlib 
+                   RUNTIME DESTINATION bin # Windows considers .dll to be runtime artifacts
+                   LIBRARY DESTINATION lib
+                   ARCHIVE DESTINATION lib)
+       endif()
 
        install(DIRECTORY ${CMAKE_SOURCE_DIR}/ DESTINATION include/dlib
                FILES_MATCHING PATTERN "*.h"
