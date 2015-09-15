@@ -21,8 +21,9 @@ endif()
 
 # Setup some options to allow a user to enable SSE and AVX instruction use.
 if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-                                OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
-                                OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+                             OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang"
+                             OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
+                             OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
     # put options on by default for modern processors
     option(USE_SSE2_INSTRUCTIONS "Compile your program with SSE2 instructions" ON)
     option(USE_SSE4_INSTRUCTIONS "Compile your program with SSE4 instructions" ON)

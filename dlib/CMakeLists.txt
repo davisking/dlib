@@ -292,6 +292,7 @@ if (NOT TARGET dlib)
          else()
             # If we can't find libjpeg then statically compile it in.
             add_definitions(-DDLIB_JPEG_STATIC)
+
             set(source_files ${source_files}
                   external/libjpeg/jcomapi.cpp
                   external/libjpeg/jdapimin.cpp
@@ -398,6 +399,10 @@ if (NOT TARGET dlib)
          mark_as_advanced(fftw fftw_path)
       endif()
 
+      if ("${CMAKE_C_COMPILER_ID}" STREQUAL "AppleClang")
+          # register is deprecated on C++11 (used in libjpeg)
+          add_definitions(-Wno-deprecated-register)
+      endif()
 
       add_library(dlib STATIC ${source_files} )
       target_link_libraries(dlib ${dlib_needed_libraries} )
