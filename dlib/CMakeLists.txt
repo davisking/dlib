@@ -466,18 +466,18 @@ if (NOT TARGET dlib)
             DESTINATION ${ConfigPackageLocation})
 
        set(CONF_INSTALL_PATH "\${dlib_CMAKE_DIR}/../../../")
-       configure_file(dlibConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/dlibConfig.cmake" @ONLY)
+       configure_file(dlibConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" @ONLY)
 
        include(CMakePackageConfigHelpers)
        write_basic_package_version_file(
-           "${CMAKE_CURRENT_BINARY_DIR}/dlibConfigVersion.cmake"
+           "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake"
            VERSION ${VERSION}
            COMPATIBILITY AnyNewerVersion
            )
 
        install(FILES 
-                    "${CMAKE_CURRENT_BINARY_DIR}/dlibConfig.cmake" 
-                    "${CMAKE_CURRENT_BINARY_DIR}/dlibConfigVersion.cmake" 
+                    "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" 
+                    "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake" 
                DESTINATION ${ConfigPackageLocation})
    endif()
 
