@@ -212,7 +212,7 @@ if (UNIX)
    endif()
 
 elseif(WIN32 AND NOT MINGW)
-    message(STATUS "Searching for BLAS and LAPACK")
+    message(STATUS "Searching for Intel MKL")
 
     include(CheckTypeSize)
     check_type_size( "void*" SIZE_OF_VOID_PTR)
@@ -258,6 +258,32 @@ elseif(WIN32 AND NOT MINGW)
                     FORCE)
             endif ()
         endif()
+    else()
+      # let's try to find OpenBLAS
+      message(STATUS "Searching for OpenBLAS")
+
+      set(openblas_path "$ENV{PATH}" CACHE STRING "Path to OpenBLAS library" FORCE)
+      message(STATUS " openblas_path = ${openblas_path}")
+      find_library(openblas_lib libopenblas ${openblas_path})
+      message(STATUS " openblas_lib = ${openblas_lib}")
+      mark_as_advanced( openblas_lib)
+
+      if (openblas_lib)
+         set(blas_libraries ${openblas_lib})
+         set(blas_found 1)
+         message(STATUS " -> Found OpenBLAS BLAS library")
+         set(CMAKE_REQUIRED_LIBRARIES ${blas_libraries})
+         # If you compiled OpenBLAS with LAPACK in it then it should have the
+         # LAPACKE_sgetrf function in it.  So if we find that function in
+         # OpenBLAS then just use OpenBLAS's LAPACK. 
+         check_function_exists (LAPACKE_sgetrf OPENBLAS_HAS_LAPACK)
+         if (OPENBLAS_HAS_LAPACK)
+            message(STATUS " -> Using OpenBLAS's built in LAPACK")
+            set(lapack_libraries ${openblas_lib}) 
+            set(lapack_found 1)
+         endif()
+      endif()
+
     endif()
 
 

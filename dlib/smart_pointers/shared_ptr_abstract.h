@@ -1,12 +1,12 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_SHARED_PTr_ABSTRACT_
-#ifdef DLIB_SHARED_PTr_ABSTRACT_ 
+#ifdef DLIB_SHARED_PTr_ABSTRACT_
 
 #include "weak_ptr_abstract.h"
-#include <exception>     
+#include <exception>
 
-namespace dlib 
+namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
@@ -17,8 +17,8 @@ namespace dlib
 
     template <
         typename T
-        > 
-    class shared_ptr 
+        >
+    class shared_ptr
     {
         /*!
             INITIAL VALUE
@@ -27,12 +27,12 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object represents a reference counted smart pointer.  Each shared_ptr
                 contains a pointer to some object and when the last shared_ptr that points
-                to the object is destructed or reset() then the object is guaranteed to be 
+                to the object is destructed or reset() then the object is guaranteed to be
                 deleted.
 
-                This is an implementation of the std::tr1::shared_ptr template from the 
+                This is an implementation of the std::tr1::shared_ptr template from the
                 document ISO/IEC PDTR 19768, Proposed Draft Technical Report on C++
-                Library Extensions.  The only deviation from that document is that this 
+                Library Extensions.  The only deviation from that document is that this
                 shared_ptr is declared inside the dlib namespace rather than std::tr1.
 
             THREAD SAFETY
@@ -56,7 +56,7 @@ namespace dlib
                 - #use_count() == 0
         !*/
 
-        template<typename Y> 
+        template<typename Y>
         explicit shared_ptr(
             Y* p
         );
@@ -74,15 +74,15 @@ namespace dlib
                   if this exception is thrown then "delete p;" is called
         !*/
 
-        template<typename Y, typename D> 
+        template<typename Y, typename D>
         shared_ptr(
-            Y* p, 
+            Y* p,
             const D& d
         );
         /*!
             requires
                 - p is convertible to a T* type pointer
-                - D is copy constructable (and the copy constructor of D doesn't throw) 
+                - D is copy constructable (and the copy constructor of D doesn't throw)
                 - p can be deleted by calling "d(p);" and doing so will not throw exceptions
                 - p != 0
             ensures
@@ -94,42 +94,42 @@ namespace dlib
                   if this exception is thrown then "d(p);" is called
         !*/
 
-        shared_ptr( 
+        shared_ptr(
             const shared_ptr& r
         );
         /*!
             ensures
                 - #get() == #r.get()
                 - #use_count() == #r.use_count()
-                - If r is empty, constructs an empty shared_ptr object; otherwise, constructs 
+                - If r is empty, constructs an empty shared_ptr object; otherwise, constructs
                   a shared_ptr object that shares ownership with r.
         !*/
 
-        template<typename Y> 
+        template<typename Y>
         shared_ptr(
             const shared_ptr<Y>& r
         );
         /*!
             requires
-                - Y* is convertible to T* 
+                - Y* is convertible to T*
             ensures
                 - #get() == #r.get()
                 - #use_count() == #r.use_count()
-                - If r is empty, constructs an empty shared_ptr object; otherwise, constructs 
+                - If r is empty, constructs an empty shared_ptr object; otherwise, constructs
                   a shared_ptr object that shares ownership with r.
         !*/
 
-        template<typename Y> 
+        template<typename Y>
         explicit shared_ptr(
             const weak_ptr<Y>& r
         );
         /*!
             requires
-                - Y* is convertible to T* 
+                - Y* is convertible to T*
             ensures
                 - #get() == #r.get()
                 - #use_count() == #r.use_count()
-                - If r is empty, constructs an empty shared_ptr object; otherwise, constructs 
+                - If r is empty, constructs an empty shared_ptr object; otherwise, constructs
                   a shared_ptr object that shares ownership with r.
             throws
                 - bad_weak_ptr
@@ -138,7 +138,7 @@ namespace dlib
 
         template<typename Y>
         explicit shared_ptr(
-            std::auto_ptr<Y>& r
+            std::unique_ptr<Y>& r
         );
         /*!
             requires
@@ -159,7 +159,7 @@ namespace dlib
         /*!
             ensures
                 - if (use_count() > 1)
-                    - this object destroys itself but otherwise has no effect (i.e. 
+                    - this object destroys itself but otherwise has no effect (i.e.
                       the pointer get() is still valid and shared between the remaining
                       shared_ptr objects)
                 - else if (use_count() == 1)
@@ -178,21 +178,21 @@ namespace dlib
                 - returns #*this
         !*/
 
-        template<typename Y> 
+        template<typename Y>
         shared_ptr& operator= (
             const shared_ptr<Y>& r
         );
         /*!
             requires
-                - Y* is convertible to T* 
+                - Y* is convertible to T*
             ensures
                 - equivalent to shared_ptr(r).swap(*this).
                 - returns #*this
         !*/
 
-        template<typename Y> 
+        template<typename Y>
         shared_ptr& operator= (
-            std::auto_ptr<Y>& r
+            std::unique_ptr<Y>& r
         );
         /*!
             requires
@@ -211,7 +211,7 @@ namespace dlib
                 - equivalent to shared_ptr().swap(*this)
         !*/
 
-        template<typename Y> 
+        template<typename Y>
         void reset(
             Y* p
         );
@@ -224,15 +224,15 @@ namespace dlib
                 - equivalent to shared_ptr(p).swap(*this)
         !*/
 
-        template<typename Y, typename D> 
+        template<typename Y, typename D>
         void reset(
-            Y* p, 
+            Y* p,
             const D& d
         );
         /*!
             requires
                 - p is convertible to a T* type pointer
-                - D is copy constructable (and the copy constructor of D doesn't throw) 
+                - D is copy constructable (and the copy constructor of D doesn't throw)
                 - p can be deleted by calling "d(p);" and doing so will not throw exceptions
                 - p != 0
             ensures
@@ -240,14 +240,14 @@ namespace dlib
         !*/
 
         T* get(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the stored pointer
         !*/
 
         T& operator*(
-        ) const; 
+        ) const;
         /*!
             requires
                 - get() != 0
@@ -256,7 +256,7 @@ namespace dlib
         !*/
 
         T* operator->(
-        ) const; 
+        ) const;
         /*!
             requires
                 - get() != 0
@@ -300,7 +300,7 @@ namespace dlib
 
     template<typename T, typename U>
     bool operator== (
-        const shared_ptr<T>& a, 
+        const shared_ptr<T>& a,
         const shared_ptr<U>& b
     );
     /*!
@@ -310,7 +310,7 @@ namespace dlib
 
     template<typename T, typename U>
     bool operator!= (
-        const shared_ptr<T>& a, 
+        const shared_ptr<T>& a,
         const shared_ptr<U>& b
     ) { return a.get() != b.get(); }
     /*!
@@ -320,18 +320,18 @@ namespace dlib
 
     template<typename T, typename U>
     bool operator< (
-        const shared_ptr<T>& a, 
+        const shared_ptr<T>& a,
         const shared_ptr<U>& b
     );
     /*!
         ensures
-            - Defines an operator< on shared_ptr types appropriate for use in the associative 
-              containers.  
+            - Defines an operator< on shared_ptr types appropriate for use in the associative
+              containers.
     !*/
 
-    template<typename T> 
+    template<typename T>
     void swap(
-        shared_ptr<T>& a, 
+        shared_ptr<T>& a,
         shared_ptr<T>& b
     ) { a.swap(b); }
     /*!
@@ -346,7 +346,7 @@ namespace dlib
         - if (r.get() == 0) then
             - returns shared_ptr<T>()
         - else
-            - returns a shared_ptr<T> object that stores static_cast<T*>(r.get()) and shares 
+            - returns a shared_ptr<T> object that stores static_cast<T*>(r.get()) and shares
               ownership with r.
     !*/
 
@@ -358,7 +358,7 @@ namespace dlib
         - if (r.get() == 0) then
             - returns shared_ptr<T>()
         - else
-            - returns a shared_ptr<T> object that stores const_cast<T*>(r.get()) and shares 
+            - returns a shared_ptr<T> object that stores const_cast<T*>(r.get()) and shares
               ownership with r.
     !*/
 
@@ -369,7 +369,7 @@ namespace dlib
     /*!
         ensures
             - if (dynamic_cast<T*>(r.get()) returns a nonzero value) then
-                - returns a shared_ptr<T> object that stores a copy of 
+                - returns a shared_ptr<T> object that stores a copy of
                   dynamic_cast<T*>(r.get()) and shares ownership with r
             - else
                 - returns an empty shared_ptr<T> object.
@@ -377,13 +377,13 @@ namespace dlib
 
     template<typename E, typename T, typename Y>
     std::basic_ostream<E, T> & operator<< (
-        std::basic_ostream<E, T> & os, 
+        std::basic_ostream<E, T> & os,
         const shared_ptr<Y>& p
     );
     /*!
         ensures
             - performs os << p.get()
-            - returns os 
+            - returns os
     !*/
 
     template<typename D, typename T>
