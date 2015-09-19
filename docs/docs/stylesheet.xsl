@@ -332,39 +332,28 @@
          <BR/>
          <xsl:apply-templates select="description"/>
 
-         <xsl:if test="file">
-            <BR/>
-            <BR/><B><font style='font-size:1.4em'><tt>#include &lt;<xsl:value-of select="file"/>&gt;</tt></font></B>
-         </xsl:if>
-         <xsl:if test="spec_file">
-            <xsl:choose>
-               <xsl:when test="spec_file/@link = 'true'">
-                  <BR/>
-                  <b><a href="{spec_file}.html#{name}">
-                     <font style='font-size:1.6em'>Detailed Documentation</font></a></b> 
-               </xsl:when>
-               <xsl:otherwise>
-                  <BR/>
-                  <b><a href="{spec_file}.html">
-                     <font style='font-size:1.6em'>Detailed Documentation</font></a></b>
-               </xsl:otherwise>
-            </xsl:choose>
-         </xsl:if>
-         <xsl:if test="body_file">
-            <BR/>
-            The body for the <xsl:value-of select="name"/> component can be found 
-            here: <a href="{body_file}.html#{name}"><xsl:value-of select="body_file"/></a>
-         </xsl:if>
+         <BR/>
          <xsl:apply-templates select="examples"/>
+         <div class='include_file_more_details_wrapper'>
+            <xsl:if test="spec_file">
+               <xsl:choose>
+                  <xsl:when test="spec_file/@link = 'true'">
+                     <a class='more_details' href="{spec_file}.html#{name}">More Details...</a> 
+                  </xsl:when>
+                  <xsl:otherwise>
+                     <a class='more_details' href="{spec_file}.html">More Details...</a>
+                  </xsl:otherwise>
+               </xsl:choose>
+            </xsl:if>
+            <xsl:if test="file">
+               <div class='include_file'>#include &lt;<xsl:value-of select="file"/>&gt;</div>
+            </xsl:if>
+         </div>
 
          <xsl:apply-templates select="implementations">           
             <xsl:with-param name="checked" select="$checked" />
          </xsl:apply-templates>
                
-         <xsl:choose>
-            <xsl:when test="implementations"></xsl:when>
-            <xsl:otherwise><br/><br/></xsl:otherwise>
-         </xsl:choose>
       
          <xsl:if test="extensions">
             <br/>
@@ -380,19 +369,17 @@
                <xsl:apply-templates select="description"/>
                <BR/>
                <BR/>
+               <xsl:apply-templates select="examples"/>
                <xsl:choose>
                   <xsl:when test="spec_file/@link = 'true'">
-                     <b><a href="{spec_file}.html#{name}">
-                        <font style='font-size:1.4em'>Detailed Documentation</font></a></b>
+                     <a class='more_details_extension' href="{spec_file}.html#{name}">More Details...</a>
                   </xsl:when>
                   <xsl:otherwise>
-                     <b><a href="{spec_file}.html">
-                        <font style='font-size:1.4em'>Detailed Documentation</font></a></b>
+                     <a class='more_details_extension' href="{spec_file}.html">More Details...</a>
                   </xsl:otherwise>
                </xsl:choose>
 
 
-               <xsl:apply-templates select="examples"/>
                <xsl:apply-templates select="implementations">           
                   <xsl:with-param name="checked" select="$checked" />
                </xsl:apply-templates>
@@ -400,10 +387,6 @@
             </xsl:for-each>            
          </xsl:if>
       
-      
-            <!-- putting this empty center tag here, for whatever reason, prevents IE from
-            messing up the space between these div blocks -->
-            <center></center>
          </div>
       </xsl:for-each>
    </xsl:template>      
