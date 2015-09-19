@@ -1,7 +1,7 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_SHARED_PTr_
-#define DLIB_SHARED_PTr_ 
+#define DLIB_SHARED_PTr_
 
 #include <algorithm>
 #include <memory>
@@ -11,7 +11,7 @@
 #include "shared_ptr_abstract.h"
 
 
-namespace dlib 
+namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ namespace dlib
     {
         weak_ptr_node (
             shared_ptr_node* sn
-        ) : 
+        ) :
             ref_count(1),
             shared_node(sn)
         {
@@ -58,7 +58,7 @@ namespace dlib
     struct shared_ptr_node
     {
         shared_ptr_node(
-        ) : 
+        ) :
             ref_count(1),
             del(0),
             weak_node(0)
@@ -75,8 +75,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template<typename T> 
-    class shared_ptr 
+    template<typename T>
+    class shared_ptr
     {
         /*!
             CONVENTION
@@ -107,7 +107,7 @@ namespace dlib
             void del(const void* p) { d((T*)p); }
             D d;
 
-            void* get_deleter_void(const std::type_info& t) const 
+            void* get_deleter_void(const std::type_info& t) const
             {
                 if (typeid(D) == t)
                     return (void*)&d;
@@ -120,7 +120,7 @@ namespace dlib
         {
             void del(const void* p) { delete ((T*)p); }
 
-            void* get_deleter_void(const std::type_info&) const 
+            void* get_deleter_void(const std::type_info&) const
             {
                 return 0;
             }
@@ -131,9 +131,9 @@ namespace dlib
         typedef T element_type;
 
         shared_ptr(
-        ) : data(0), shared_node(0) {} 
+        ) : data(0), shared_node(0) {}
 
-        template<typename Y> 
+        template<typename Y>
         explicit shared_ptr(
             Y* p
         ) : data(p)
@@ -155,11 +155,11 @@ namespace dlib
             }
         }
 
-        template<typename Y, typename D> 
+        template<typename Y, typename D>
         shared_ptr(
-            Y* p, 
+            Y* p,
             const D& d
-        ) : 
+        ) :
             data(p)
         {
             DLIB_ASSERT(p != 0,
@@ -181,8 +181,8 @@ namespace dlib
             }
         }
 
-        ~shared_ptr() 
-        { 
+        ~shared_ptr()
+        {
             if ( shared_node != 0)
             {
                 if (shared_node->ref_count == 1)
@@ -198,24 +198,24 @@ namespace dlib
                     // finally delete the shared_node
                     delete shared_node;
                 }
-                else 
+                else
                 {
                     shared_node->ref_count -= 1;
                 }
             }
         }
 
-        shared_ptr( 
+        shared_ptr(
             const shared_ptr& r
-        ) 
-        { 
+        )
+        {
             data = r.data;
             shared_node = r.shared_node;
             if (shared_node)
                 shared_node->ref_count += 1;
         }
 
-        template<typename Y> 
+        template<typename Y>
         shared_ptr(
             const shared_ptr<Y>& r,
             const shared_ptr_static_cast&
@@ -233,7 +233,7 @@ namespace dlib
             }
         }
 
-        template<typename Y> 
+        template<typename Y>
         shared_ptr(
             const shared_ptr<Y>& r,
             const shared_ptr_const_cast&
@@ -251,7 +251,7 @@ namespace dlib
             }
         }
 
-        template<typename Y> 
+        template<typename Y>
         shared_ptr(
             const shared_ptr<Y>& r,
             const shared_ptr_dynamic_cast&
@@ -269,7 +269,7 @@ namespace dlib
             }
         }
 
-        template<typename Y> 
+        template<typename Y>
         shared_ptr(
             const shared_ptr<Y>& r
         )
@@ -281,12 +281,12 @@ namespace dlib
         }
 
 
-        template<typename Y> 
+        template<typename Y>
         explicit shared_ptr(
             const weak_ptr<Y>& r
         )
         {
-            if (r.expired()) 
+            if (r.expired())
                 throw bad_weak_ptr();
 
             data = r.data;
@@ -296,11 +296,11 @@ namespace dlib
 
         template<typename Y>
         explicit shared_ptr(
-            std::auto_ptr<Y>& r
+            std::unique_ptr<Y>& r
         )
         {
             DLIB_ASSERT(r.get() != 0,
-                "\tshared_ptr::shared_ptr(auto_ptr r)"
+                "\tshared_ptr::shared_ptr(unique_ptr r)"
                 << "\n\tr.get() can't be null"
                 << "\n\tthis: " << this
                 );
@@ -317,7 +317,7 @@ namespace dlib
             return *this;
         }
 
-        template<typename Y> 
+        template<typename Y>
         shared_ptr& operator= (
             const shared_ptr<Y>& r
         )
@@ -326,13 +326,13 @@ namespace dlib
             return *this;
         }
 
-        template<typename Y> 
+        template<typename Y>
         shared_ptr& operator= (
-            std::auto_ptr<Y>& r
+            std::unique_ptr<Y>& r
         )
         {
             DLIB_ASSERT(r.get() != 0,
-                "\tshared_ptr::operator=(auto_ptr r)"
+                "\tshared_ptr::operator=(unique_ptr r)"
                 << "\n\tr.get() can't be null"
                 << "\n\tthis: " << this
                 );
@@ -349,7 +349,7 @@ namespace dlib
             shared_ptr().swap(*this);
         }
 
-        template<typename Y> 
+        template<typename Y>
         void reset(Y* p)
         {
             DLIB_ASSERT(p != 0,
@@ -361,9 +361,9 @@ namespace dlib
             shared_ptr(p).swap(*this);
         }
 
-        template<typename Y, typename D> 
+        template<typename Y, typename D>
         void reset(
-            Y* p, 
+            Y* p,
             const D& d
         )
         {
@@ -377,46 +377,46 @@ namespace dlib
         }
 
         T& operator*(
-        ) const 
-        { 
+        ) const
+        {
             DLIB_ASSERT(get() != 0,
                 "\tshared_ptr::operator*()"
                 << "\n\tget() can't be null if you are going to dereference it"
                 << "\n\tthis: " << this
                 );
 
-            return *data; 
-        } 
+            return *data;
+        }
 
         T* operator->(
-        ) const 
-        { 
+        ) const
+        {
             DLIB_ASSERT(get() != 0,
                 "\tshared_ptr::operator->()"
                 << "\n\tget() can't be null"
                 << "\n\tthis: " << this
                 );
 
-            return data; 
-        } 
-        
-        T* get() const { return data; } 
+            return data;
+        }
 
-        bool unique() const 
-        {  
+        T* get() const { return data; }
+
+        bool unique() const
+        {
             return use_count() == 1;
         }
 
         long use_count() const
         {
-            if (shared_node != 0) 
+            if (shared_node != 0)
                 return shared_node->ref_count;
             else
                 return 0;
         }
 
         operator bool(
-        ) const { return get() != 0; }  
+        ) const { return get() != 0; }
 
         void swap(shared_ptr& b)
         {
@@ -455,28 +455,28 @@ namespace dlib
 
     template<typename T, typename U>
     bool operator== (
-        const shared_ptr<T>& a, 
+        const shared_ptr<T>& a,
         const shared_ptr<U>& b
     ) { return a.get() == b.get(); }
 
     template<typename T, typename U>
     bool operator!= (
-        const shared_ptr<T>& a, 
+        const shared_ptr<T>& a,
         const shared_ptr<U>& b
     ) { return a.get() != b.get(); }
 
     template<typename T, typename U>
     bool operator< (
-        const shared_ptr<T>& a, 
+        const shared_ptr<T>& a,
         const shared_ptr<U>& b
     )
     {
         return a._private_less(b);
     }
 
-    template<typename T> 
+    template<typename T>
     void swap(
-        shared_ptr<T>& a, 
+        shared_ptr<T>& a,
         shared_ptr<T>& b
     ) { a.swap(b); }
 
