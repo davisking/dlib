@@ -7,6 +7,7 @@
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 cmake_minimum_required(VERSION 2.4)
+set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
 
 # default to a Release build (except if CMAKE_BUILD_TYPE is set)
 include(release_build_by_default)
