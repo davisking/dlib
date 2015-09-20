@@ -958,9 +958,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    class op_pointer_to_mat;
+    struct op_pointer_to_mat;
     template <typename T>
-    class op_pointer_to_col_vect;
+    struct op_pointer_to_col_vect;
 
     template <
         typename T,
