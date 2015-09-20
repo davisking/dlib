@@ -8,6 +8,16 @@ SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 cmake_minimum_required(VERSION 2.4)
 
+# default to a Release build (except if CMAKE_BUILD_TYPE is set)
+include(release_build_by_default)
+
+project(dlib)
+
+set(CPACK_PACKAGE_VERSION_MAJOR "18")
+set(CPACK_PACKAGE_VERSION_MINOR "17")
+set(CPACK_PACKAGE_VERSION_PATCH "99")
+set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
+
 set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
 # Suppress cmake warnings about changes in new versions.
 if(COMMAND cmake_policy) 
@@ -45,7 +55,6 @@ if (NOT CMAKE_CXX_FLAGS_DEBUG MATCHES "-DENABLE_ASSERTS")
       FORCE)
 endif ()
 
-
 # Don't try to call add_library(dlib) and setup dlib's stuff if it has already
 # been done by some other part of the current cmake project.  We do this
 # because it avoids getting warnings/errors about cmake policy CMP0002.  This
@@ -66,24 +75,33 @@ if (NOT TARGET dlib)
    "Disable this if you don't want to use a BLAS library" )
    set (DLIB_USE_LAPACK_STR
    "Disable this if you don't want to use a LAPACK library" )
-   set (DLIB_LINK_WITH_LIBPNG_STR
+   set (DLIB_PNG_SUPPORT_STR
    "Disable this if you don't want to link against libpng" )
-   set (DLIB_LINK_WITH_LIBJPEG_STR
+   set (DLIB_JPEG_SUPPORT_STR
    "Disable this if you don't want to link against libjpeg" )
    set (DLIB_LINK_WITH_SQLITE3_STR
    "Disable this if you don't want to link against sqlite3" )
-   #set (DLIB_LINK_WITH_FFTW_STR "Disable this if you don't want to link against fftw" )
+   #set (DLIB_USE_FFTW_STR "Disable this if you don't want to link against fftw" )
 
    option(DLIB_ISO_CPP_ONLY ${DLIB_ISO_CPP_ONLY_STR} OFF)
    option(DLIB_NO_GUI_SUPPORT ${DLIB_NO_GUI_SUPPORT_STR} OFF)
    option(DLIB_ENABLE_STACK_TRACE ${DLIB_ENABLE_STACK_TRACE_STR} OFF)
+
    option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
+
+   if(DLIB_ENABLE_ASSERTS)
+       set (DLIB_DISABLE_ASSERTS false)
+       set (ENABLE_ASSERTS true) # we need the CMake variable to properly configure config.h.in
+   else()
+       set (DLIB_DISABLE_ASSERTS true)
+   endif()
+
    option(DLIB_USE_BLAS ${DLIB_USE_BLAS_STR} ON)
    option(DLIB_USE_LAPACK ${DLIB_USE_LAPACK_STR} ON)
-   option(DLIB_LINK_WITH_LIBPNG ${DLIB_LINK_WITH_LIBPNG_STR} ON)
-   option(DLIB_LINK_WITH_LIBJPEG ${DLIB_LINK_WITH_LIBJPEG_STR} ON)
+   option(DLIB_PNG_SUPPORT ${DLIB_PNG_SUPPORT_STR} ON)
+   option(DLIB_JPEG_SUPPORT ${DLIB_JPEG_SUPPORT_STR} ON)
    option(DLIB_LINK_WITH_SQLITE3 ${DLIB_LINK_WITH_SQLITE3_STR} ON)
-   #option(DLIB_LINK_WITH_FFTW ${DLIB_LINK_WITH_FFTW_STR} ON)
+   #option(DLIB_USE_FFTW ${DLIB_USE_FFTW_STR} ON)
 
    set(source_files 
          base64/base64_kernel_1.cpp
@@ -100,7 +118,10 @@ if (NOT TARGET dlib)
          data_io/image_dataset_metadata.cpp)
 
    if (DLIB_ISO_CPP_ONLY)
-      add_library(dlib STATIC ${source_files} )
+       add_library(dlib STATIC ${source_files} )
+       if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
+           add_library(dlib-shared SHARED ${source_files} )
+       endif()
    else()
 
       set(source_files ${source_files}
@@ -218,7 +239,7 @@ if (NOT TARGET dlib)
 
       INCLUDE (CheckFunctionExists)
 
-      if (DLIB_LINK_WITH_LIBPNG)
+      if (DLIB_PNG_SUPPORT)
          # try to find libpng 
          find_package(PNG QUIET)
          # Make sure there isn't something wrong with the version of LIBPNG
@@ -272,7 +293,7 @@ if (NOT TARGET dlib)
             )
       endif()
 
-      if (DLIB_LINK_WITH_LIBJPEG)
+      if (DLIB_JPEG_SUPPORT)
          # try to find libjpeg 
          find_package(JPEG QUIET)
          # Make sure there isn't something wrong with the version of libjpeg 
@@ -381,7 +402,7 @@ if (NOT TARGET dlib)
 
 
 
-      if (DLIB_LINK_WITH_FFTW)
+      if (DLIB_USE_FFTW)
          find_library(fftw fftw3)
          # make sure fftw3.h is in the include path
          find_path(fftw_path fftw3.h)
@@ -389,16 +410,76 @@ if (NOT TARGET dlib)
             include_directories(${fftw_path})
             set(dlib_needed_libraries ${dlib_needed_libraries} ${fftw} )
          else()
-            set(DLIB_LINK_WITH_FFTW OFF CACHE STRING ${DLIB_LINK_WITH_SQLITE3_STR} FORCE )
+            set(DLIB_USE_FFTW OFF CACHE STRING ${DLIB_LINK_WITH_SQLITE3_STR} FORCE )
          endif()
          mark_as_advanced(fftw fftw_path)
       endif()
 
-
       add_library(dlib STATIC ${source_files} )
       target_link_libraries(dlib ${dlib_needed_libraries} )
 
+      if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
+          add_library(dlib-shared SHARED ${source_files} )
+          target_link_libraries(dlib-shared ${dlib_needed_libraries} )
+      endif()
+
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
+
+   # Install the library
+   if (NOT DLIB_IN_PROJECT_BUILD)
+       if(UNIX)
+           set_target_properties(dlib-shared PROPERTIES
+                                        OUTPUT_NAME dlib 
+                                        VERSION ${VERSION})
+           install(TARGETS dlib dlib-shared
+                   EXPORT dlib 
+                   RUNTIME DESTINATION bin # Windows (including cygwin) considers .dll to be runtime artifacts
+                   LIBRARY DESTINATION lib
+                   ARCHIVE DESTINATION lib)
+       else()
+           install(TARGETS dlib
+                   EXPORT dlib 
+                   RUNTIME DESTINATION bin # Windows considers .dll to be runtime artifacts
+                   LIBRARY DESTINATION lib
+                   ARCHIVE DESTINATION lib)
+       endif()
+
+       install(DIRECTORY ${CMAKE_SOURCE_DIR}/ DESTINATION include/dlib
+               FILES_MATCHING PATTERN "*.h"
+               REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
+
+
+       configure_file(${CMAKE_SOURCE_DIR}/../dlib/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+       # overwrite config.h with the configured one
+       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h DESTINATION include/dlib)
+
+       configure_file(${CMAKE_SOURCE_DIR}/../dlib/revision.h.in ${CMAKE_CURRENT_BINARY_DIR}/revision.h)
+       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/revision.h DESTINATION include/dlib)
+
+       install(FILES "LICENSE.txt" DESTINATION share/doc/dlib)
+
+       ## Config.cmake generation and installation
+
+       set(ConfigPackageLocation lib/cmake/dlib)
+       install(EXPORT dlib
+            NAMESPACE dlib::
+            DESTINATION ${ConfigPackageLocation})
+
+       set(CONF_INSTALL_PATH "\${dlib_CMAKE_DIR}/../../../")
+       configure_file(dlibConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" @ONLY)
+
+       include(CMakePackageConfigHelpers)
+       write_basic_package_version_file(
+           "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake"
+           VERSION ${VERSION}
+           COMPATIBILITY AnyNewerVersion
+           )
+
+       install(FILES 
+                    "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" 
+                    "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake" 
+               DESTINATION ${ConfigPackageLocation})
+   endif()
 
 
    #test for some things that really should be true about the compiler
@@ -406,19 +487,19 @@ if (NOT TARGET dlib)
    include(TestForANSIStreamHeaders)
 
 
-   if (DLIB_LINK_WITH_LIBPNG AND NOT DLIB_ISO_CPP_ONLY)
+   if (DLIB_PNG_SUPPORT AND NOT DLIB_ISO_CPP_ONLY)
       add_global_define(DLIB_PNG_SUPPORT)
    else()
       remove_global_define(DLIB_PNG_SUPPORT)
    endif()
 
-   if (DLIB_LINK_WITH_LIBJPEG AND NOT DLIB_ISO_CPP_ONLY)
+   if (DLIB_JPEG_SUPPORT AND NOT DLIB_ISO_CPP_ONLY)
       add_global_define(DLIB_JPEG_SUPPORT)
    else()
       remove_global_define(DLIB_JPEG_SUPPORT)
    endif()
 
-   if (DLIB_LINK_WITH_FFTW AND NOT DLIB_ISO_CPP_ONLY)
+   if (DLIB_USE_FFTW AND NOT DLIB_ISO_CPP_ONLY)
       add_global_define(DLIB_USE_FFTW)
    else()
       remove_global_define(DLIB_USE_FFTW)

@@ -1,4 +1,7 @@
 # This is a CMake file meant to be included via include()
+# It will trigger a compilation of dlib *in the project* 
+# including it
+set(DLIB_IN_PROJECT_BUILD true)
 
 cmake_minimum_required(VERSION 2.6.4)
 
