@@ -14,12 +14,13 @@ endif()
 
 # Determine the path to dlib.
 string(REGEX REPLACE "cmake$" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
+include(${dlib_path}/add_global_compiler_switch.cmake)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
     # By default, g++ won't warn or error if you forget to return a value in a
     # function which requires you to do so.  This option makes it give a warning
     # for doing this.
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wreturn-type") 
+    add_global_compiler_switch(-Wreturn-type)
 endif()
 
 # Setup some options to allow a user to enable SSE and AVX instruction use.  
