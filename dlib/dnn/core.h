@@ -9,8 +9,8 @@
 #include <iterator>
 #include <memory>
 #include <type_traits>
-#include <dlib/statistics.h>
-#include <dlib/rand.h>
+#include "../statistics.h"
+#include "../rand.h"
 #include <utility>
 
 

@@ -3,8 +3,8 @@
 #ifndef DLIB_DNn_INPUT_H_
 #define DLIB_DNn_INPUT_H_
 
-#include <dlib/matrix.h>
-#include <dlib/pixel.h>
+#include "../matrix.h"
+#include "../pixel.h"
 
 
 namespace dlib

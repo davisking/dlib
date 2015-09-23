@@ -7,8 +7,7 @@
 #include "solvers_abstract.h"
 #include <memory>
 #include <type_traits>
-#include <dlib/statistics.h>
-#include <dlib/rand.h>
+#include "../rand.h"
 
 
 namespace dlib

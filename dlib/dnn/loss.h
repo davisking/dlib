@@ -4,7 +4,7 @@
 #define DLIB_DNn_LOSS_H_
 
 #include "core.h"
-#include <dlib/matrix.h>
+#include "../matrix.h"
 
 namespace dlib
 {

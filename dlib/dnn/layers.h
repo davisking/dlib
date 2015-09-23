@@ -8,8 +8,8 @@
 #include "core.h"
 #include <iostream>
 #include <string>
-#include <dlib/rand.h>
-#include <dlib/string.h>
+#include "../rand.h"
+#include "../string.h"
 
 
 namespace dlib

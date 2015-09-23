@@ -5,7 +5,7 @@
 
 #include <memory>
 #include <cstring>
-#include <dlib/matrix.h>
+#include "../matrix.h"
 
 namespace dlib
 {
