@@ -27,25 +27,7 @@ if(COMMAND cmake_policy)
    endif()
 endif()
 
-
-# make macros that can add #define directives to the entire project.  Not just 
-# to the dlib library itself.  I.e. to dlib and to any projects that depend
-# on dlib.
-macro ( add_global_define def_name )
-   if (NOT CMAKE_CXX_FLAGS MATCHES "-D${def_name}")
-      set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D${def_name}" 
-         CACHE STRING "Flags used by the compiler during all C++ builds." 
-         FORCE)
-   endif ()
-endmacro()
-macro ( remove_global_define def_name )
-   if (CMAKE_CXX_FLAGS MATCHES " -D${def_name}")
-      string (REGEX REPLACE " -D${def_name}" "" temp_var ${CMAKE_CXX_FLAGS}) 
-      set (CMAKE_CXX_FLAGS "${temp_var}" 
-         CACHE STRING "Flags used by the compiler during all C++ builds." 
-         FORCE)
-   endif ()
-endmacro()
+include(add_global_compiler_switch.cmake)
 
 
 # Make sure ENABLE_ASSERTS is defined for debug builds
