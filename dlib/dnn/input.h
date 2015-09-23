@@ -133,5 +133,5 @@ namespace dlib
 
 }
 
-#endif // #define DLIB_DNn_INPUT_H_
+#endif // DLIB_DNn_INPUT_H_
 

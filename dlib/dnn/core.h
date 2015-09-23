@@ -1401,6 +1401,6 @@ namespace dlib
 
 }
 
-#endif // #define DLIB_DNn_CORE_H_
+#endif // DLIB_DNn_CORE_H_
 
 

@@ -48,10 +48,13 @@ namespace dlib
                 f(data,parameters), that takes in a data tensor, some parameters, and
                 produces an output tensor.  You create an entire deep network by composing
                 these functions.  Importantly, you are able to use a wide range of
-                different functions to accommodate whatever task you are trying to accomplish.
+                different functions to accommodate the task you are trying to accomplish.
                 Dlib includes a number of common layer types but if you want to define your
-                own then you simply implement a class with the same interface as EXAMPLE_LAYER_.
+                own then you simply implement a class with the same interface as
+                EXAMPLE_LAYER_.
 
+                Note that there is no dlib::EXAMPLE_LAYER_ type.  It is shown here purely
+                to document the interface that a layer object must implement.
         !*/
 
     public:
@@ -234,5 +237,5 @@ namespace dlib
 
 }
 
-#endif // #define DLIB_DNn_LAYERS_H_
+#endif // DLIB_DNn_LAYERS_ABSTRACT_H_
 

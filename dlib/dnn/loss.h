@@ -170,6 +170,6 @@ namespace dlib
 
 }
 
-#endif // #define DLIB_DNn_LOSS_H_
+#endif // DLIB_DNn_LOSS_H_
 
 
