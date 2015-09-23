@@ -117,7 +117,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename SUB_NET>
-    using loss_binary_hinge = add_loss<loss_binary_hinge_, SUB_NET>;
+    using loss_binary_hinge = add_loss_layer<loss_binary_hinge_, SUB_NET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -164,7 +164,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename SUB_NET>
-    using loss_no_label = add_loss<loss_no_label_, SUB_NET>;
+    using loss_no_label = add_loss_layer<loss_no_label_, SUB_NET>;
 
 // ----------------------------------------------------------------------------------------
 

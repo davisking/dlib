@@ -138,8 +138,8 @@ namespace dlib
                     - SUB_NET implements the input interface (TODO clarify) defined in
                       input_abstract.h.
                     - SUB_NET is an add_layer object.
-                    - SUB_NET is an add_tag object.
-                    - SUB_NET is an add_skip object.
+                    - SUB_NET is an add_tag_layer object.
+                    - SUB_NET is an add_skip_layer object.
 
             WHAT THIS OBJECT REPRESENTS
                 Stacks a new layer, defined by LAYER_DETAILS, on top of SUB_NET type.
@@ -334,7 +334,7 @@ namespace dlib
         typename LOSS_DETAILS, 
         typename SUB_NET
         >
-    class add_loss
+    class add_loss_layer
     {
         /*!
             REQUIREMENTS ON LOSS_DETAILS 
@@ -346,8 +346,8 @@ namespace dlib
             REQUIREMENTS ON SUB_NET
                 - One of the following must be true:
                     - SUB_NET is an add_layer object.
-                    - SUB_NET is an add_tag object.
-                    - SUB_NET is an add_skip object.
+                    - SUB_NET is an add_tag_layer object.
+                    - SUB_NET is an add_skip_layer object.
 
             WHAT THIS OBJECT REPRESENTS
                 - Adds a loss layer, defined by LOSS_DETAILS, on top of SUB_NET.
@@ -368,22 +368,22 @@ namespace dlib
             "The loss layer and input layer must agree on the sample_expansion_factor.");
 
 
-        add_loss() = default;
-        add_loss(const add_loss&) = default;
-        add_loss(add_loss&&) = default;
-        add_loss& operator=(add_loss&&) = default;
-        add_loss& operator=(const add_loss&) = default;
+        add_loss_layer() = default;
+        add_loss_layer(const add_loss_layer&) = default;
+        add_loss_layer(add_loss_layer&&) = default;
+        add_loss_layer& operator=(add_loss_layer&&) = default;
+        add_loss_layer& operator=(const add_loss_layer&) = default;
 
         template <typename T, typename U>
-        add_loss(
-            const add_loss<T,U>& item
+        add_loss_layer(
+            const add_loss_layer<T,U>& item
         ) : 
             loss(item.loss_details()),
             sub(item.sub_net())
         {}
 
         template <typename ...T>
-        add_loss(
+        add_loss_layer(
             const LOSS_DETAILS& layer_det, 
             T&& ...args
         ) : 
@@ -393,7 +393,7 @@ namespace dlib
         }
 
         template <typename ...T>
-        add_loss(
+        add_loss_layer(
             LOSS_DETAILS&& layer_det, 
             T&& ...args
         ) : 
@@ -403,7 +403,7 @@ namespace dlib
         }
 
         template <typename ...T>
-        add_loss(
+        add_loss_layer(
             T ...args
         ) : 
             sub(std::move(args)...)
@@ -519,7 +519,7 @@ namespace dlib
 
 
     template <typename T, typename U>
-    struct is_layer_type<add_loss<T,U>> : std::true_type {};
+    struct is_layer_type<add_loss_layer<T,U>> : std::true_type {};
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -534,7 +534,7 @@ namespace dlib
     );
     /*!
         requires
-            - net_type is an object of type add_layer, add_loss, add_skip, or add_tag.
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or add_tag_layer.
         ensures
             - This function chains together i calls to n.sub_net() and returns the
               result.  So for example:
@@ -559,7 +559,7 @@ namespace dlib
     );
     /*!
         requires
-            - net_type is an object of type add_layer, add_loss, add_skip, or add_tag.
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or add_tag_layer.
         ensures
             - returns the first layer in n that is of type Match.  E.g. if net_type is
               fc<relu<fc<input<sample_type>>>> then calling layer<relu>(n) would return
@@ -576,7 +576,7 @@ namespace dlib
     );
     /*!
         requires
-            - net_type is an object of type add_layer, add_loss, add_skip, or add_tag.
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or add_tag_layer.
         ensures
             - returns layer<i>(layer<Match>(n))
     !*/
@@ -587,28 +587,28 @@ namespace dlib
         unsigned long ID, 
         typename SUB_NET
         >
-    class add_tag
+    class add_tag_layer
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object draws its inputs from sub_net() and performs the identity
                 transform.  This means it is a no-op and its presence does not change
-                the behavior of the network.  It exists solely to be used by add_skip
+                the behavior of the network.  It exists solely to be used by add_skip_layer
                 to reference a particular part of a network.
 
         !*/
     };
 
-    template <typename SUB_NET> using tag1  = add_tag< 1, SUB_NET>;
-    template <typename SUB_NET> using tag2  = add_tag< 2, SUB_NET>;
-    template <typename SUB_NET> using tag3  = add_tag< 3, SUB_NET>;
-    template <typename SUB_NET> using tag4  = add_tag< 4, SUB_NET>;
-    template <typename SUB_NET> using tag5  = add_tag< 5, SUB_NET>;
-    template <typename SUB_NET> using tag6  = add_tag< 6, SUB_NET>;
-    template <typename SUB_NET> using tag7  = add_tag< 7, SUB_NET>;
-    template <typename SUB_NET> using tag8  = add_tag< 8, SUB_NET>;
-    template <typename SUB_NET> using tag9  = add_tag< 9, SUB_NET>;
-    template <typename SUB_NET> using tag10 = add_tag<10, SUB_NET>;
+    template <typename SUB_NET> using tag1  = add_tag_layer< 1, SUB_NET>;
+    template <typename SUB_NET> using tag2  = add_tag_layer< 2, SUB_NET>;
+    template <typename SUB_NET> using tag3  = add_tag_layer< 3, SUB_NET>;
+    template <typename SUB_NET> using tag4  = add_tag_layer< 4, SUB_NET>;
+    template <typename SUB_NET> using tag5  = add_tag_layer< 5, SUB_NET>;
+    template <typename SUB_NET> using tag6  = add_tag_layer< 6, SUB_NET>;
+    template <typename SUB_NET> using tag7  = add_tag_layer< 7, SUB_NET>;
+    template <typename SUB_NET> using tag8  = add_tag_layer< 8, SUB_NET>;
+    template <typename SUB_NET> using tag9  = add_tag_layer< 9, SUB_NET>;
+    template <typename SUB_NET> using tag10 = add_tag_layer<10, SUB_NET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -616,7 +616,7 @@ namespace dlib
         template<typename> class TAG_TYPE, 
         typename SUB_NET
         >
-    class add_skip
+    class add_skip_layer
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -625,16 +625,16 @@ namespace dlib
         !*/
     };
 
-    template <typename SUB_NET> using skip1  = add_skip< tag1, SUB_NET>;
-    template <typename SUB_NET> using skip2  = add_skip< tag2, SUB_NET>;
-    template <typename SUB_NET> using skip3  = add_skip< tag3, SUB_NET>;
-    template <typename SUB_NET> using skip4  = add_skip< tag4, SUB_NET>;
-    template <typename SUB_NET> using skip5  = add_skip< tag5, SUB_NET>;
-    template <typename SUB_NET> using skip6  = add_skip< tag6, SUB_NET>;
-    template <typename SUB_NET> using skip7  = add_skip< tag7, SUB_NET>;
-    template <typename SUB_NET> using skip8  = add_skip< tag8, SUB_NET>;
-    template <typename SUB_NET> using skip9  = add_skip< tag9, SUB_NET>;
-    template <typename SUB_NET> using skip10 = add_skip<tag10, SUB_NET>;
+    template <typename SUB_NET> using skip1  = add_skip_layer< tag1, SUB_NET>;
+    template <typename SUB_NET> using skip2  = add_skip_layer< tag2, SUB_NET>;
+    template <typename SUB_NET> using skip3  = add_skip_layer< tag3, SUB_NET>;
+    template <typename SUB_NET> using skip4  = add_skip_layer< tag4, SUB_NET>;
+    template <typename SUB_NET> using skip5  = add_skip_layer< tag5, SUB_NET>;
+    template <typename SUB_NET> using skip6  = add_skip_layer< tag6, SUB_NET>;
+    template <typename SUB_NET> using skip7  = add_skip_layer< tag7, SUB_NET>;
+    template <typename SUB_NET> using skip8  = add_skip_layer< tag8, SUB_NET>;
+    template <typename SUB_NET> using skip9  = add_skip_layer< tag9, SUB_NET>;
+    template <typename SUB_NET> using skip10 = add_skip_layer<tag10, SUB_NET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -663,7 +663,7 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON net_type
-                - net_type is an add_loss object.
+                - net_type is an add_loss_layer object.
 
             REQUIREMENTS ON solver_type
                 - solver_type is an implementation of the EXAMPLE_SOLVER interface defined
