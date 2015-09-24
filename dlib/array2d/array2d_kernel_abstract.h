@@ -122,6 +122,15 @@ namespace dlib
                 - std::bad_alloc 
         !*/
 
+        array2d(
+            array2d&& item
+        );
+        /*!
+            ensures
+                - Moves the state of item into *this.
+                - #item is in a valid but unspecified state.
+        !*/
+
         array2d (
             long rows,
             long cols 
@@ -217,6 +226,16 @@ namespace dlib
             ensures
                 - swaps *this and item
         !*/ 
+
+        array2d& operator= (
+            array2d&& rhs
+        );
+        /*!
+            ensures
+                - Moves the state of item into *this.
+                - #item is in a valid but unspecified state.
+                - returns #*this
+        !*/
 
         long width_step (
         ) const;

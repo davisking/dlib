@@ -15,6 +15,7 @@
 #include "matrix_data_layout.h"
 #include "matrix_assign_fwd.h"
 #include "matrix_op.h"
+#include <utility>
 
 #ifdef _MSC_VER
 // Disable the following warnings for Visual Studio
@@ -1105,6 +1106,21 @@ namespace dlib
             data.set_size(m.nr(),m.nc());
             matrix_assign(*this, m);
         }
+
+#ifdef DLIB_HAS_RVALUE_REFERENCES
+        matrix(matrix&& item)
+        {
+            swap(item);
+        }
+
+        matrix& operator= (
+            matrix&& rhs
+        )
+        {
+            swap(rhs);
+            return *this;
+        }
+#endif
 
         template <typename U, size_t len>
         explicit matrix (
