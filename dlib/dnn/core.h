@@ -1346,6 +1346,8 @@ namespace dlib
                 - data.size() == labels.size()
         !*/
         {
+            DLIB_CASSERT(data.size() == labels.size(), "");
+
             const int batch_size = 11;
             for (int iter = 0; iter < 300; ++iter)
             {
@@ -1354,7 +1356,7 @@ namespace dlib
                     // TODO, move the contents of update() here and do the alternating tensor
                     // loading thing to hide GPU transfer latency.
                     std::cout << "loss: "<<net.update(data.begin()+i, 
-                        data.begin()+std::min(i+batch_size,i+data.size()-1), 
+                        data.begin()+std::min(i+batch_size,data.size()), 
                         labels.begin()+i,
                         solvers) << std::endl;
                 }
@@ -1382,7 +1384,7 @@ namespace dlib
                     // TODO, move the contents of update() here and do the alternating tensor
                     // loading thing to hide GPU transfer latency.
                     std::cout << "loss: "<<net.update(data.begin()+i, 
-                        data.begin()+std::min(i+batch_size,i+data.size()-1), 
+                        data.begin()+std::min(i+batch_size,data.size()), 
                         solvers) << std::endl;
                 }
             }
