@@ -26,6 +26,20 @@
 #define BOOST_DO_JOIN2( X, Y ) X##Y
 #endif
 
+// figure out if the compiler has rvalue references. 
+#if defined(__clang__) 
+#   if __has_feature(cxx_rvalue_references)
+#       define DLIB_HAS_RVALUE_REFERENCES
+#   endif
+#elif defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 2)) && defined(__GXX_EXPERIMENTAL_CXX0X__) 
+#   define DLIB_HAS_RVALUE_REFERENCES
+#elif defined(_MSC_VER) && _MSC_VER >= 1600
+#   define DLIB_HAS_RVALUE_REFERENCES
+#elif defined(__INTEL_COMPILER) && defined(BOOST_INTEL_STDCXX0X)
+#   define DLIB_HAS_RVALUE_REFERENCES
+#endif
+
+
 // figure out if the compiler has static_assert. 
 #if defined(__clang__) 
 #   if __has_feature(cxx_static_assert)
