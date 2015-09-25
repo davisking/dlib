@@ -135,7 +135,7 @@ namespace dlib
 
             REQUIREMENTS ON SUB_NET
                 - One of the following must be true:
-                    - SUB_NET implements the input interface (TODO clarify) defined in
+                    - SUB_NET implements the EXAMPLE_INPUT interface defined in
                       input_abstract.h.
                     - SUB_NET is an add_layer object.
                     - SUB_NET is an add_tag_layer object.
@@ -526,6 +526,63 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        unsigned long ID, 
+        typename SUB_NET
+        >
+    class add_tag_layer
+    {
+        /*!
+            REQUIREMENTS ON SUB_NET
+
+            WHAT THIS OBJECT REPRESENTS
+                This object draws its inputs from sub_net() and performs the identity
+                transform.  This means it is a no-op and its presence does not change
+                the behavior of the network.  It exists solely to be used by add_skip_layer
+                to reference a particular part of a network.
+
+        !*/
+    };
+
+    template <typename SUB_NET> using tag1  = add_tag_layer< 1, SUB_NET>;
+    template <typename SUB_NET> using tag2  = add_tag_layer< 2, SUB_NET>;
+    template <typename SUB_NET> using tag3  = add_tag_layer< 3, SUB_NET>;
+    template <typename SUB_NET> using tag4  = add_tag_layer< 4, SUB_NET>;
+    template <typename SUB_NET> using tag5  = add_tag_layer< 5, SUB_NET>;
+    template <typename SUB_NET> using tag6  = add_tag_layer< 6, SUB_NET>;
+    template <typename SUB_NET> using tag7  = add_tag_layer< 7, SUB_NET>;
+    template <typename SUB_NET> using tag8  = add_tag_layer< 8, SUB_NET>;
+    template <typename SUB_NET> using tag9  = add_tag_layer< 9, SUB_NET>;
+    template <typename SUB_NET> using tag10 = add_tag_layer<10, SUB_NET>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        template<typename> class TAG_TYPE, 
+        typename SUB_NET
+        >
+    class add_skip_layer
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object draws its inputs from layer<TAG_TYPE>(sub_net())
+                and performs the identity transform.
+        !*/
+    };
+
+    template <typename SUB_NET> using skip1  = add_skip_layer< tag1, SUB_NET>;
+    template <typename SUB_NET> using skip2  = add_skip_layer< tag2, SUB_NET>;
+    template <typename SUB_NET> using skip3  = add_skip_layer< tag3, SUB_NET>;
+    template <typename SUB_NET> using skip4  = add_skip_layer< tag4, SUB_NET>;
+    template <typename SUB_NET> using skip5  = add_skip_layer< tag5, SUB_NET>;
+    template <typename SUB_NET> using skip6  = add_skip_layer< tag6, SUB_NET>;
+    template <typename SUB_NET> using skip7  = add_skip_layer< tag7, SUB_NET>;
+    template <typename SUB_NET> using skip8  = add_skip_layer< tag8, SUB_NET>;
+    template <typename SUB_NET> using skip9  = add_skip_layer< tag9, SUB_NET>;
+    template <typename SUB_NET> using skip10 = add_skip_layer<tag10, SUB_NET>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         unsigned int i, 
         typename net_type
         >
@@ -580,61 +637,6 @@ namespace dlib
         ensures
             - returns layer<i>(layer<Match>(n))
     !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        unsigned long ID, 
-        typename SUB_NET
-        >
-    class add_tag_layer
-    {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This object draws its inputs from sub_net() and performs the identity
-                transform.  This means it is a no-op and its presence does not change
-                the behavior of the network.  It exists solely to be used by add_skip_layer
-                to reference a particular part of a network.
-
-        !*/
-    };
-
-    template <typename SUB_NET> using tag1  = add_tag_layer< 1, SUB_NET>;
-    template <typename SUB_NET> using tag2  = add_tag_layer< 2, SUB_NET>;
-    template <typename SUB_NET> using tag3  = add_tag_layer< 3, SUB_NET>;
-    template <typename SUB_NET> using tag4  = add_tag_layer< 4, SUB_NET>;
-    template <typename SUB_NET> using tag5  = add_tag_layer< 5, SUB_NET>;
-    template <typename SUB_NET> using tag6  = add_tag_layer< 6, SUB_NET>;
-    template <typename SUB_NET> using tag7  = add_tag_layer< 7, SUB_NET>;
-    template <typename SUB_NET> using tag8  = add_tag_layer< 8, SUB_NET>;
-    template <typename SUB_NET> using tag9  = add_tag_layer< 9, SUB_NET>;
-    template <typename SUB_NET> using tag10 = add_tag_layer<10, SUB_NET>;
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        template<typename> class TAG_TYPE, 
-        typename SUB_NET
-        >
-    class add_skip_layer
-    {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This object draws its inputs from layer<TAG_TYPE>(sub_net())
-                and performs the identity transform.
-        !*/
-    };
-
-    template <typename SUB_NET> using skip1  = add_skip_layer< tag1, SUB_NET>;
-    template <typename SUB_NET> using skip2  = add_skip_layer< tag2, SUB_NET>;
-    template <typename SUB_NET> using skip3  = add_skip_layer< tag3, SUB_NET>;
-    template <typename SUB_NET> using skip4  = add_skip_layer< tag4, SUB_NET>;
-    template <typename SUB_NET> using skip5  = add_skip_layer< tag5, SUB_NET>;
-    template <typename SUB_NET> using skip6  = add_skip_layer< tag6, SUB_NET>;
-    template <typename SUB_NET> using skip7  = add_skip_layer< tag7, SUB_NET>;
-    template <typename SUB_NET> using skip8  = add_skip_layer< tag8, SUB_NET>;
-    template <typename SUB_NET> using skip9  = add_skip_layer< tag9, SUB_NET>;
-    template <typename SUB_NET> using skip10 = add_skip_layer<tag10, SUB_NET>;
 
 // ----------------------------------------------------------------------------------------
 

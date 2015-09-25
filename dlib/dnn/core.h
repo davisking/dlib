@@ -321,6 +321,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+// This version of add_layer handles the special case where the sub network being given is
+// just an input layer object.
     template <typename LAYER_DETAILS, typename INPUT_LAYER, typename enabled>
     class add_layer
     {
