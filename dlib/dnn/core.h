@@ -384,8 +384,8 @@ namespace dlib
             LAYER_DETAILS layer_det, 
             INPUT_LAYER il
         ) : 
-            details(layer_det),
-            input_layer(il),
+            details(std::move(layer_det)),
+            input_layer(std::move(il)),
             this_layer_setup_called(false),
             gradient_input_is_stale(true)
         {}
@@ -506,8 +506,13 @@ namespace dlib
             { 
                 // It doesn't matter what values are in this tensor but client code will
                 // always assume it's the same dimension as the output so make sure that is
-                // the case.
-                grad_final_ignored.copy_size(x);
+                // the case.  Note that we do set it to a non-crazy value though to avoid
+                // it being full of NaN and slowing the processing down.
+                if (!have_same_dimensions(x, grad_final_ignored))
+                {
+                    grad_final_ignored.copy_size(x);
+                    grad_final_ignored = 0;  
+                }
                 return grad_final_ignored; 
             }
 
@@ -533,8 +538,12 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <unsigned long ID, typename SUB_NET, typename enabled=void>
+    class add_tag_layer;
+
     template <unsigned long ID, typename SUB_NET>
-    class add_tag_layer
+    class add_tag_layer<ID,SUB_NET,
+            typename std::enable_if<is_nonloss_layer_type<SUB_NET>::value>::type>
     {
     public:
         typedef SUB_NET sub_net_type;
@@ -619,8 +628,111 @@ namespace dlib
         sub_net_type sub_network;
     };
 
-    template <unsigned long ID, typename U>
-    struct is_nonloss_layer_type<add_tag_layer<ID,U>> : std::true_type {};
+// ----------------------------------------------------------------------------------------
+
+// This version of add_tag_layer handles the special case where the sub network being given
+// is just an input layer object.
+    template <unsigned long ID, typename INPUT_LAYER, typename enabled>
+    class add_tag_layer
+    {
+    public:
+        typedef INPUT_LAYER sub_net_type;
+        typedef typename sub_net_type::input_type input_type;
+        const static size_t num_layers = 1;
+        const static unsigned int sample_expansion_factor = sub_net_type::sample_expansion_factor;
+        static_assert(sample_expansion_factor >= 1,
+            "The input layer can't produce fewer output tensors than there are inputs.");
+
+        add_tag_layer() = default;
+        add_tag_layer(const add_tag_layer&) = default;
+        add_tag_layer(add_tag_layer&&) = default;
+        add_tag_layer& operator=(add_tag_layer&&) = default;
+        add_tag_layer& operator=(const add_tag_layer&) = default;
+
+        template <typename T, typename E>
+        add_tag_layer(
+            const add_tag_layer<ID,T,E>& item
+        ) : input_layer(item.sub_net())
+        {}
+
+        template <typename ...T>
+        add_tag_layer(
+            T ...args
+        ) : 
+            input_layer(std::move(args)...) 
+        {
+        }
+
+        template <typename input_iterator>
+        void to_tensor (
+            input_iterator begin,
+            input_iterator end,
+            resizable_tensor& data
+        ) const
+        {
+            input_layer.to_tensor(begin,end,data);
+        }
+
+        template <typename input_iterator>
+        const tensor& operator() (
+            input_iterator ibegin, // TODO, make naming uniform for input iterators
+            input_iterator iend
+        )
+        {
+            input_layer.to_tensor(ibegin,iend,cached_output);
+            return get_output();
+        }
+
+        const tensor& operator() (const input_type& x)
+        {
+            return (*this)(&x, &x+1);
+        }
+
+        const tensor& forward(const tensor& x)
+        {
+            cached_output = x;
+            return get_output();
+        }
+
+        const tensor& get_output() const 
+        { 
+            return cached_output; 
+        }
+
+        tensor& get_gradient_input() 
+        { 
+            if (!have_same_dimensions(cached_output, grad_final_ignored))
+            {
+                grad_final_ignored.copy_size(get_output());
+                grad_final_ignored = 0;
+            }
+            return grad_final_ignored; 
+        }
+
+        template <typename solver_type>
+        void update(const tensor& /*x*/, sstack<solver_type,num_layers>& /*solvers*/)
+        {
+            // nothing to update
+        }
+
+        const sub_net_type& sub_net() const { return input_layer; }
+        sub_net_type& sub_net() { return input_layer; }
+
+        void clean()
+        {
+            grad_final_ignored.clear();
+            cached_output.clear();
+        }
+
+    private:
+
+        sub_net_type input_layer;
+        resizable_tensor cached_output;
+        resizable_tensor grad_final_ignored;
+    };
+
+    template <unsigned long ID, typename U, typename E>
+    struct is_nonloss_layer_type<add_tag_layer<ID,U,E>> : std::true_type {};
 
 
 // ----------------------------------------------------------------------------------------

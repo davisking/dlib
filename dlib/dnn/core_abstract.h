@@ -533,6 +533,12 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON SUB_NET
+                - One of the following must be true:
+                    - SUB_NET implements the EXAMPLE_INPUT_LAYER interface defined in
+                      input_abstract.h.
+                    - SUB_NET is an add_layer object.
+                    - SUB_NET is an add_tag_layer object.
+                    - SUB_NET is an add_skip_layer object.
 
             WHAT THIS OBJECT REPRESENTS
                 This object draws its inputs from sub_net() and performs the identity
@@ -563,6 +569,12 @@ namespace dlib
     class add_skip_layer
     {
         /*!
+            REQUIREMENTS ON SUB_NET
+                - One of the following must be true:
+                    - SUB_NET is an add_layer object.
+                    - SUB_NET is an add_tag_layer object.
+                    - SUB_NET is an add_skip_layer object.
+
             WHAT THIS OBJECT REPRESENTS
                 This object draws its inputs from layer<TAG_TYPE>(sub_net())
                 and performs the identity transform.
