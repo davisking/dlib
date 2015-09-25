@@ -20,11 +20,11 @@ namespace dlib
                 of the input layer is to convert an input_type into a tensor.  Nothing more
                 and nothing less.  
                 
-                Note that there is no dlib::EXAMPLE_INPUT_LAYER type.  It is shown here purely to
-                document the interface that an input layer object must implement.  If you
-                are using some kind of image or matrix object as your input_type then you
-                can use the provided dlib::input layer type defined below.  Otherwise, you
-                need to define your own custom input layer.
+                Note that there is no dlib::EXAMPLE_INPUT_LAYER type.  It is shown here
+                purely to document the interface that an input layer object must implement.
+                If you are using some kind of image or matrix object as your input_type
+                then you can use the provided dlib::input layer type defined below.
+                Otherwise, you need to define your own custom input layer.
         !*/
     public:
 
@@ -73,6 +73,8 @@ namespace dlib
                 - Normally you would have #data.num_samples() == distance(begin,end) but
                   you can also expand the output by some integer factor so long as the loss
                   you use can deal with it correctly.
+                - The data in the ith sample in #data corresponds to
+                  *(begin+i/sample_expansion_factor).
         !*/
     };
 
