@@ -66,6 +66,7 @@ namespace dlib
                 - SUB_NET implements the SUB_NET interface defined at the top of layers_abstract.h.
                 - input_tensor was given as input to the network sub and the outputs are now
                   visible in sub.get_output(), sub.sub_net().get_output(), etc.
+                - input_tensor.num_samples() > 0
                 - input_tensor.num_samples() must be a multiple of sample_expansion_factor.
                 - input_tensor.num_samples() == sub.get_output().num_samples() == grad.num_samples()
                 - truth == an iterator pointing to the beginning of a range of
@@ -83,7 +84,8 @@ namespace dlib
             const tensor& output_tensor = sub.get_output();
             tensor& grad = sub.get_gradient_input();
 
-            // TODO, throw an exception instead of asserting, probably...
+            DLIB_CASSERT(input_tensor.num_samples() != 0,"");
+            DLIB_CASSERT(input_tensor.num_samples()%sample_expansion_factor == 0,"");
             DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples(),"");
             DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples(),"");
             DLIB_CASSERT(output_tensor.nr() == 1 && 
@@ -98,6 +100,7 @@ namespace dlib
             for (unsigned long i = 0; i < output_tensor.num_samples(); ++i)
             {
                 const float y = *truth++;
+                DLIB_CASSERT(y == +1 || y == -1, "y: " << y);
                 const float temp = 1-y*out_data[i];
                 if (temp > 0)
                 {
