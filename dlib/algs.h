@@ -43,6 +43,9 @@
 // This warning happens often in generic code that works with functions and isn't useful.
 #pragma warning(disable : 4180)
 
+// Disable "warning C4290: C++ exception specification ignored except to indicate a function is not __declspec(nothrow)"
+#pragma warning(disable : 4290)
+
 #endif
 
 #ifdef __BORLANDC__
