@@ -199,19 +199,19 @@ namespace dlib
 
         template <typename input_iterator>
         void to_tensor (
-            input_iterator begin,
-            input_iterator end,
+            input_iterator ibegin,
+            input_iterator iend,
             resizable_tensor& data
         ) const;
         /*!
             requires
-                - [begin, end) is an iterator range over input_type objects.
+                - [ibegin, iend) is an iterator range over input_type objects.
             ensures
                 - Converts the iterator range into a tensor and stores it into #data.
-                - #data.num_samples() == distance(begin,end)*sample_expansion_factor. 
+                - #data.num_samples() == distance(ibegin,iend)*sample_expansion_factor. 
                 - Invokes data.async_copy_to_device() so that the data begins transferring
                   to the device.
-                - Ultimately this function just calls sub_net().sub_net()...sub_net().to_tensor(begin,end,data).
+                - Ultimately this function just calls sub_net().sub_net()...sub_net().to_tensor(ibegin,iend,data).
         !*/
 
         template <typename input_iterator>
@@ -338,8 +338,8 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON LOSS_DETAILS 
-                - Must be a type that implements the EXAMPLE_LAYER_ interface defined in
-                  layers_abstract.h
+                - Must be a type that implements the EXAMPLE_LOSS_LAYER_ interface defined
+                  in loss_abstract.h
                 - LOSS_DETAILS::sample_expansion_factor == SUB_NET::sample_expansion_factor
                   i.e. The loss layer and input layer must agree on the sample_expansion_factor.
 

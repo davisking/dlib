@@ -207,12 +207,12 @@ namespace dlib
 
         template <typename input_iterator>
         void to_tensor (
-            input_iterator begin,
-            input_iterator end,
+            input_iterator ibegin,
+            input_iterator iend,
             resizable_tensor& data
         ) const
         {
-            sub_network.to_tensor(begin,end,data);
+            sub_network.to_tensor(ibegin,iend,data);
         }
 
         template <typename input_iterator>
@@ -392,14 +392,14 @@ namespace dlib
 
         template <typename input_iterator>
         void to_tensor (
-            input_iterator begin,
-            input_iterator end,
+            input_iterator ibegin,
+            input_iterator iend,
             resizable_tensor& data
         ) const
         {
-            input_layer.to_tensor(begin, end, data);
+            input_layer.to_tensor(ibegin, iend, data);
             // make sure the input layer's to_tensor() function is implemented properly.
-            DLIB_CASSERT(std::distance(begin,end)*sample_expansion_factor == data.num_samples(),"");
+            DLIB_CASSERT(std::distance(ibegin,iend)*sample_expansion_factor == data.num_samples(),"");
             data.async_copy_to_device();
         }
 
@@ -575,12 +575,12 @@ namespace dlib
 
         template <typename input_iterator>
         void to_tensor (
-            input_iterator begin,
-            input_iterator end,
+            input_iterator ibegin,
+            input_iterator iend,
             resizable_tensor& data
         ) const
         {
-            sub_network.to_tensor(begin,end,data);
+            sub_network.to_tensor(ibegin,iend,data);
         }
 
         template <typename input_iterator>
@@ -665,17 +665,17 @@ namespace dlib
 
         template <typename input_iterator>
         void to_tensor (
-            input_iterator begin,
-            input_iterator end,
+            input_iterator ibegin,
+            input_iterator iend,
             resizable_tensor& data
         ) const
         {
-            input_layer.to_tensor(begin,end,data);
+            input_layer.to_tensor(ibegin,iend,data);
         }
 
         template <typename input_iterator>
         const tensor& operator() (
-            input_iterator ibegin, // TODO, make naming uniform for input iterators
+            input_iterator ibegin, 
             input_iterator iend
         )
         {
@@ -1085,12 +1085,12 @@ namespace dlib
 
         template <typename input_iterator>
         void to_tensor (
-            input_iterator begin,
-            input_iterator end,
+            input_iterator ibegin,
+            input_iterator iend,
             resizable_tensor& data
         ) const
         {
-            sub_network.to_tensor(begin,end,data);
+            sub_network.to_tensor(ibegin,iend,data);
         }
 
         template <typename input_iterator>
