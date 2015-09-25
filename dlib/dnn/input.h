@@ -33,16 +33,16 @@ namespace dlib
 
         template <typename input_iterator>
         void to_tensor (
-            input_iterator begin,
-            input_iterator end,
+            input_iterator ibegin,
+            input_iterator iend,
             resizable_tensor& data
         ) const
         {
-            DLIB_CASSERT(std::distance(begin,end) > 0,"");
-            const auto nr = begin->nr();
-            const auto nc = begin->nc();
+            DLIB_CASSERT(std::distance(ibegin,iend) > 0,"");
+            const auto nr = ibegin->nr();
+            const auto nc = ibegin->nc();
             // make sure all the input matrices have the same dimensions
-            for (auto i = begin; i != end; ++i)
+            for (auto i = ibegin; i != iend; ++i)
             {
                 DLIB_CASSERT(i->nr()==nr && i->nc()==nc,
                     "\t input::to_tensor()"
@@ -56,10 +56,10 @@ namespace dlib
 
             
             // initialize data to the right size to contain the stuff in the iterator range.
-            data.set_size(std::distance(begin,end), nr, nc, pixel_traits<T>::num);
+            data.set_size(std::distance(ibegin,iend), nr, nc, pixel_traits<T>::num);
 
             auto ptr = data.host();
-            for (auto i = begin; i != end; ++i)
+            for (auto i = ibegin; i != iend; ++i)
             {
                 for (long r = 0; r < nr; ++r)
                 {
@@ -86,16 +86,16 @@ namespace dlib
 
         template <typename input_iterator>
         void to_tensor (
-            input_iterator begin,
-            input_iterator end,
+            input_iterator ibegin,
+            input_iterator iend,
             resizable_tensor& data
         ) const
         {
-            DLIB_CASSERT(std::distance(begin,end) > 0,"");
-            const auto nr = begin->nr();
-            const auto nc = begin->nc();
+            DLIB_CASSERT(std::distance(ibegin,iend) > 0,"");
+            const auto nr = ibegin->nr();
+            const auto nc = ibegin->nc();
             // make sure all the input matrices have the same dimensions
-            for (auto i = begin; i != end; ++i)
+            for (auto i = ibegin; i != iend; ++i)
             {
                 DLIB_CASSERT(i->nr()==nr && i->nc()==nc,
                     "\t input::to_tensor()"
@@ -109,10 +109,10 @@ namespace dlib
 
             
             // initialize data to the right size to contain the stuff in the iterator range.
-            data.set_size(std::distance(begin,end), nr, nc, pixel_traits<T>::num);
+            data.set_size(std::distance(ibegin,iend), nr, nc, pixel_traits<T>::num);
 
             auto ptr = data.host();
-            for (auto i = begin; i != end; ++i)
+            for (auto i = ibegin; i != iend; ++i)
             {
                 for (long r = 0; r < nr; ++r)
                 {

@@ -59,22 +59,22 @@ namespace dlib
 
         template <typename input_iterator>
         void to_tensor (
-            input_iterator begin,
-            input_iterator end,
+            input_iterator ibegin,
+            input_iterator iend,
             resizable_tensor& data
         ) const
         /*!
             requires
-                - [begin, end) is an iterator range over input_type objects.
-                - std::distance(begin,end) > 0
+                - [ibegin, iend) is an iterator range over input_type objects.
+                - std::distance(ibegin,iend) > 0
             ensures
                 - Converts the iterator range into a tensor and stores it into #data.
-                - #data.num_samples() == distance(begin,end)*sample_expansion_factor. 
-                - Normally you would have #data.num_samples() == distance(begin,end) but
+                - #data.num_samples() == distance(ibegin,iend)*sample_expansion_factor. 
+                - Normally you would have #data.num_samples() == distance(ibegin,iend) but
                   you can also expand the output by some integer factor so long as the loss
                   you use can deal with it correctly.
                 - The data in the ith sample in #data corresponds to
-                  *(begin+i/sample_expansion_factor).
+                  *(ibegin+i/sample_expansion_factor).
         !*/
     };
 
@@ -100,21 +100,21 @@ namespace dlib
 
         template <typename input_iterator>
         void to_tensor (
-            input_iterator begin,
-            input_iterator end,
+            input_iterator ibegin,
+            input_iterator iend,
             resizable_tensor& data
         ) const;
         /*!
             requires
-                - [begin, end) is an iterator range over input_type objects.
-                - std::distance(begin,end) > 0
+                - [ibegin, iend) is an iterator range over input_type objects.
+                - std::distance(ibegin,iend) > 0
                 - The input range should contain image objects that all have the same
                   dimensions.
             ensures
                 - Converts the iterator range into a tensor and stores it into #data.  In
                   particular, if the input images have R rows, C columns, and K channels
                   (where K is given by pixel_traits::num) then we will have:
-                    - #data.num_samples() == std::distance(begin,end)
+                    - #data.num_samples() == std::distance(ibegin,iend)
                     - #data.nr() == R
                     - #data.nc() == C
                     - #data.k() == K
