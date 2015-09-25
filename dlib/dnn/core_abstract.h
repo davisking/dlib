@@ -135,7 +135,7 @@ namespace dlib
 
             REQUIREMENTS ON SUB_NET
                 - One of the following must be true:
-                    - SUB_NET implements the EXAMPLE_INPUT interface defined in
+                    - SUB_NET implements the EXAMPLE_INPUT_LAYER interface defined in
                       input_abstract.h.
                     - SUB_NET is an add_layer object.
                     - SUB_NET is an add_tag_layer object.

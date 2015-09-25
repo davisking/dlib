@@ -12,7 +12,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class EXAMPLE_INPUT
+    class EXAMPLE_INPUT_LAYER
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -20,7 +20,7 @@ namespace dlib
                 of the input layer is to convert an input_type into a tensor.  Nothing more
                 and nothing less.  
                 
-                Note that there is no dlib::EXAMPLE_INPUT type.  It is shown here purely to
+                Note that there is no dlib::EXAMPLE_INPUT_LAYER type.  It is shown here purely to
                 document the interface that an input layer object must implement.  If you
                 are using some kind of image or matrix object as your input_type then you
                 can use the provided dlib::input layer type defined below.  Otherwise, you
@@ -28,7 +28,7 @@ namespace dlib
         !*/
     public:
 
-        EXAMPLE_INPUT(
+        EXAMPLE_INPUT_LAYER(
         );
         /*!
             ensures
@@ -37,7 +37,7 @@ namespace dlib
                   constructable. 
         !*/
 
-        EXAMPLE_INPUT(
+        EXAMPLE_INPUT_LAYER(
             const some_other_input_layer_type& item
         );
         /*!
