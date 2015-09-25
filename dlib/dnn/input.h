@@ -3,7 +3,9 @@
 #ifndef DLIB_DNn_INPUT_H_
 #define DLIB_DNn_INPUT_H_
 
+#include "input_abstract.h"
 #include "../matrix.h"
+#include "../array2d.h"
 #include "../pixel.h"
 
 
@@ -13,13 +15,21 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    class input 
+    class input
+    {
+        const static bool always_false = sizeof(T)!=sizeof(T); 
+        static_assert(always_false, "Unsupported type given to input<>.  input<> only supports "
+            "dlib::matrix and dlib::array2d objects."); 
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, long NR, long NC, typename MM, typename L>
+    class input<matrix<T,NR,NC,MM,L>> 
     {
     public:
-
-        // sample_expansion_factor must be > 0
+        typedef matrix<T,NR,NC,MM,L> input_type;
         const static unsigned int sample_expansion_factor = 1;
-        typedef T input_type;
 
         template <typename input_iterator>
         void to_tensor (
@@ -27,37 +37,51 @@ namespace dlib
             input_iterator end,
             resizable_tensor& data
         ) const
-        /*!
-            requires
-                - [begin, end) is an iterator range over input_type objects.
-            ensures
-                - Converts the iterator range into a tensor and stores it into #data.
-                - Normally you would have #data.num_samples() == distance(begin,end) but
-                  you can also expand the output by some integer factor so long as the loss
-                  you use can deal with it correctly.
-                - #data.num_samples() == distance(begin,end)*sample_expansion_factor. 
-        !*/
         {
-            // initialize data to the right size to contain the stuff in the iterator range.
-
-            for (input_iterator i = begin; i != end; ++i)
+            DLIB_CASSERT(std::distance(begin,end) > 0,"");
+            const auto nr = begin->nr();
+            const auto nc = begin->nc();
+            // make sure all the input matrices have the same dimensions
+            for (auto i = begin; i != end; ++i)
             {
-                matrix<rgb_pixel> temp = *i;
-                // now copy *i into the right part of data.
+                DLIB_CASSERT(i->nr()==nr && i->nc()==nc,
+                    "\t input::to_tensor()"
+                    << "\n\t All matrices given to to_tensor() must have the same dimensions."
+                    << "\n\t nr: " << nr
+                    << "\n\t nc: " << nc
+                    << "\n\t i->nr(): " << i->nr()
+                    << "\n\t i->nc(): " << i->nc()
+                );
             }
+
+            
+            // initialize data to the right size to contain the stuff in the iterator range.
+            data.set_size(std::distance(begin,end), nr, nc, pixel_traits<T>::num);
+
+            auto ptr = data.host();
+            for (auto i = begin; i != end; ++i)
+            {
+                for (long r = 0; r < nr; ++r)
+                {
+                    for (long c = 0; c < nc; ++c)
+                    {
+                        auto temp = pixel_to_vector<float>((*i)(r,c));
+                        for (long j = 0; j < temp.size(); ++j)
+                            *ptr++ = temp(j);
+                    }
+                }
+            }
+
         }
     };
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T,long NR, typename MM, typename L>
-    class input<matrix<T,NR,1,MM,L>> 
+    template <typename T, typename MM>
+    class input<array2d<T,MM>> 
     {
     public:
-
-        // TODO, maybe we should only allow T to be float?  Seems kinda pointless to allow
-        // double. Don't forget to remove the matrix_cast if we enforce just float.
-        typedef matrix<T,NR,1,MM,L> input_type;
+        typedef array2d<T,MM> input_type;
         const static unsigned int sample_expansion_factor = 1;
 
         template <typename input_iterator>
@@ -66,66 +90,41 @@ namespace dlib
             input_iterator end,
             resizable_tensor& data
         ) const
-        /*!
-            requires
-                - [begin, end) is an iterator range over input_type objects.
-            ensures
-                - converts the iterator range into a tensor and stores it into #data.
-                - Normally you would have #data.num_samples() == distance(begin,end) but
-                  you can also expand the output by some integer factor so long as the loss
-                  you use can deal with it correctly.
-                - #data.num_samples() == distance(begin,end)*sample_expansion_factor. 
-        !*/
         {
-            // initialize data to the right size to contain the stuff in the iterator range.
-            data.set_size(std::distance(begin,end), 1, 1, begin->size());
-
-            unsigned long idx = 0;
-            for (input_iterator i = begin; i != end; ++i)
+            DLIB_CASSERT(std::distance(begin,end) > 0,"");
+            const auto nr = begin->nr();
+            const auto nc = begin->nc();
+            // make sure all the input matrices have the same dimensions
+            for (auto i = begin; i != end; ++i)
             {
-                data.set_sample(idx++, matrix_cast<float>(*i));
+                DLIB_CASSERT(i->nr()==nr && i->nc()==nc,
+                    "\t input::to_tensor()"
+                    << "\n\t All array2d objects given to to_tensor() must have the same dimensions."
+                    << "\n\t nr: " << nr
+                    << "\n\t nc: " << nc
+                    << "\n\t i->nr(): " << i->nr()
+                    << "\n\t i->nc(): " << i->nc()
+                );
             }
-        }
-    };
 
-// ----------------------------------------------------------------------------------------
-
-    template <typename T>
-    class input2
-    {
-    public:
-
-        input2(){}
-
-        input2(const input<T>&) {}
-
-        typedef T input_type;
-        const static unsigned int sample_expansion_factor = 1;
-
-        template <typename input_iterator>
-        void to_tensor (
-            input_iterator begin,
-            input_iterator end,
-            resizable_tensor& data
-        ) const
-        /*!
-            requires
-                - [begin, end) is an iterator range over T objects.
-            ensures
-                - converts the iterator range into a tensor and stores it into #data.
-                - Normally you would have #data.num_samples() == distance(begin,end) but
-                  you can also expand the output by some integer factor so long as the loss
-                  you use can deal with it correctly.
-                - #data.num_samples() == distance(begin,end)*K where K is an integer >= 1. 
-        !*/
-        {
+            
             // initialize data to the right size to contain the stuff in the iterator range.
+            data.set_size(std::distance(begin,end), nr, nc, pixel_traits<T>::num);
 
-            for (input_iterator i = begin; i != end; ++i)
+            auto ptr = data.host();
+            for (auto i = begin; i != end; ++i)
             {
-                matrix<rgb_pixel> temp = *i;
-                // now copy *i into the right part of data.
+                for (long r = 0; r < nr; ++r)
+                {
+                    for (long c = 0; c < nc; ++c)
+                    {
+                        auto temp = pixel_to_vector<float>((*i)[r][c]);
+                        for (long j = 0; j < temp.size(); ++j)
+                            *ptr++ = temp(j);
+                    }
+                }
             }
+
         }
     };
 

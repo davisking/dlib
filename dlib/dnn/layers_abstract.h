@@ -68,6 +68,22 @@ namespace dlib
                   constructable. 
         !*/
 
+        EXAMPLE_LAYER_(
+            const some_other_layer_type& item
+        );
+        /*!
+            ensures
+                - Constructs this object from item.  This form of constructor is optional
+                  but it allows you to provide a conversion from one layer type to another.
+                  For example, the following code is valid only if my_layer2 can be
+                  constructed from my_layer1:
+                    relu<fc<my_layer1<fc<input<matrix<float>>>>>> my_dnn1;
+                    relu<fc<my_layer2<fc<input<matrix<float>>>>>> my_dnn2(my_dnn1);
+                  This kind of pattern is useful if you want to use one type of layer
+                  during training but a different type of layer during testing since it
+                  allows you to easily convert between related deep neural network types.  
+        !*/
+
         template <typename SUB_NET>
         void setup (
             const SUB_NET& sub
