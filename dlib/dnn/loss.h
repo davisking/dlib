@@ -3,6 +3,7 @@
 #ifndef DLIB_DNn_LOSS_H_
 #define DLIB_DNn_LOSS_H_
 
+#include "loss_abstract.h"
 #include "core.h"
 #include "../matrix.h"
 
@@ -10,18 +11,14 @@ namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
 
     class loss_binary_hinge_ 
     {
     public:
 
         const static unsigned int sample_expansion_factor = 1;
-        typedef double label_type;
+        typedef float label_type;
 
-        // Implementing to_label() is optional.  If you don't do it then it just means the
-        // automatic operator() mapping from tensors to outputs is missing from the net object.
         template <
             typename SUB_TYPE,
             typename label_iterator
@@ -30,14 +27,6 @@ namespace dlib
             const SUB_TYPE& sub,
             label_iterator iter
         ) const
-        /*!
-            requires
-                - SUB_NET implements the SUB_NET interface defined at the top of layers_abstract.h.
-                - sub.get_output().num_samples() must be a multiple of sample_expansion_factor.
-                - iter == an iterator pointing to the beginning of a range of
-                  sub.get_output().num_samples()/sample_expansion_factor elements.  In
-                  particular, they must be label_type elements.
-        !*/
         {
             const tensor& output_tensor = sub.get_output();
             DLIB_CASSERT(output_tensor.nr() == 1 && 
@@ -53,33 +42,14 @@ namespace dlib
         }
 
         template <
-            typename label_iterator,
+            typename const_label_iterator,
             typename SUB_NET
             >
         double compute_loss (
             const tensor& input_tensor,
-            label_iterator truth, // TODO, this parameter is optional.
+            const_label_iterator truth, 
             SUB_NET& sub
         ) const
-        /*!
-            requires
-                - SUB_NET implements the SUB_NET interface defined at the top of layers_abstract.h.
-                - input_tensor was given as input to the network sub and the outputs are now
-                  visible in sub.get_output(), sub.sub_net().get_output(), etc.
-                - input_tensor.num_samples() > 0
-                - input_tensor.num_samples() must be a multiple of sample_expansion_factor.
-                - input_tensor.num_samples() == sub.get_output().num_samples() == grad.num_samples()
-                - truth == an iterator pointing to the beginning of a range of
-                  input_tensor.num_samples()/sample_expansion_factor elements.  In particular,
-                  they must be label_type elements.
-                - sub.get_gradient_input() has the same dimensions as sub.get_output().
-                - for all valid i:
-                    - *(truth+i/sample_expansion_factor) is the label of the ith sample in
-                      sub.get_output().
-            ensures
-                - #sub.get_gradient_input() == the gradient of the loss with respect to
-                  sub.get_output().
-        !*/
         {
             const tensor& output_tensor = sub.get_output();
             tensor& grad = sub.get_gradient_input();
@@ -105,19 +75,13 @@ namespace dlib
                 if (temp > 0)
                 {
                     loss += scale*temp;
-                    g[i] = -scale*y;
-                }
-                else
-                {
-                    g[i] = 0;
+                    g[i] += -scale*y;
                 }
             }
             return loss;
         }
 
     };
-
-// ----------------------------------------------------------------------------------------
 
     template <typename SUB_NET>
     using loss_binary_hinge = add_loss_layer<loss_binary_hinge_, SUB_NET>;
@@ -128,10 +92,7 @@ namespace dlib
     {
     public:
 
-        //typedef int label_type;
-
         const static unsigned int sample_expansion_factor = 1;
-
 
         template <
             typename SUB_NET
@@ -140,31 +101,11 @@ namespace dlib
             const tensor& input_tensor,
             SUB_NET& sub
         ) const
-        /*!
-            requires
-                - SUB_NET implements the SUB_NET interface defined at the top of layers_abstract.h.
-                - input_tensor was given as input to the network sub and the outputs are now
-                  visible in sub.get_output(), sub.sub_net().get_output(), etc.
-                - input_tensor.num_samples() must be a multiple of sample_expansion_factor.
-                - input_tensor.num_samples() == sub.get_output().num_samples() == grad.num_samples()
-                - truth == an iterator pointing to the beginning of a range of
-                  input_tensor.num_samples()/sample_expansion_factor elements.  In particular,
-                  they must be label_type elements.
-                - sub.get_gradient_input() has the same dimensions as sub.get_output().
-                - for all valid i:
-                    - *(truth+i/sample_expansion_factor) is the label of the ith sample in
-                      sub.get_output().
-            ensures
-                - #sub.get_gradient_input() == the gradient of the loss with respect to
-                  sub.get_output().
-        !*/
         {
             return 0;
         }
 
     };
-
-// ----------------------------------------------------------------------------------------
 
     template <typename SUB_NET>
     using loss_no_label = add_loss_layer<loss_no_label_, SUB_NET>;
@@ -174,5 +115,4 @@ namespace dlib
 }
 
 #endif // DLIB_DNn_LOSS_H_
-
 
