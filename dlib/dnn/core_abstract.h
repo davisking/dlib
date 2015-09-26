@@ -52,72 +52,72 @@ namespace dlib
                 entirely allocated on the stack.
         !*/
 
-        public:
-            typedef T value_type;
-            const static size_t num_elements = N;
+    public:
+        typedef T value_type;
+        const static size_t num_elements = N;
 
-            sstack(
-            );
-            /*!
-                ensures
-                    - #size() == N
-                    - All elements of this stack are default constructed.
-            !*/
+        sstack(
+        );
+        /*!
+            ensures
+                - #size() == N
+                - All elements of this stack are default constructed.
+        !*/
 
-            sstack(
-                const T& item
-            );
-            /*!
-                ensures
-                    - #size() == N
-                    - Initializes all N elements in this stack with the given item.
-                      E.g. top()==item, pop().top()==item, pop().pop().top()==item, etc.
-            !*/
+        sstack(
+            const T& item
+        );
+        /*!
+            ensures
+                - #size() == N
+                - Initializes all N elements in this stack with the given item.  E.g.
+                  top()==item, pop().top()==item, pop().pop().top()==item, etc.
+        !*/
 
-            const T& top(
-            ) const;
-            /*!
-                ensures
-                    - returns the top element of the stack.
-            !*/
+        const T& top(
+        ) const;
+        /*!
+            ensures
+                - returns the top element of the stack.
+        !*/
 
-            T& top(
-            );
-            /*!
-                ensures
-                    - returns the top element of the stack.  
-            !*/
+        T& top(
+        );
+        /*!
+            ensures
+                - returns the top element of the stack.  
+        !*/
 
 
-            size_t size(
-            ) const;
-            /*!
-                ensures
-                    - returns the number of elements in this stack.  In particular, the
-                      number returned is always N.
-            !*/
+        size_t size(
+        ) const;
+        /*!
+            ensures
+                - returns the number of elements in this stack.  In particular, the number
+                  returned is always N.
+        !*/
 
-            const sstack<T,N-1>& pop(
-            ) const;
-            /*!
-                requires
-                    - size() > 1
-                ensures
-                    - returns a reference to the sub-stack S such that:
-                        - S.size() == size()-1.
-                        - S.top() is the next element in the stack.
-            !*/
+        const sstack<T,N-1>& pop(
+        ) const;
+        /*!
+            requires
+                - size() > 1
+            ensures
+                - returns a reference to the sub-stack S such that:
+                    - S.size() == size()-1.
+                    - S.top() is the next element in the stack.
+        !*/
 
-            sstack<T,N-1>& pop(
-            ); 
-            /*!
-                requires
-                    - size() > 1
-                ensures
-                    - returns a reference to the sub-stack S such that:
-                        - S.size() == size()-1.
-                        - S.top() is the next element in the stack.
-            !*/
+        sstack<T,N-1>& pop(
+        ); 
+        /*!
+            requires
+                - size() > 1
+            ensures
+                - returns a reference to the sub-stack S such that:
+                    - S.size() == size()-1.
+                    - S.top() is the next element in the stack.
+        !*/
     };
 
 // ----------------------------------------------------------------------------------------
