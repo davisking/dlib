@@ -54,7 +54,7 @@ namespace dlib
         !*/
 
         // sample_expansion_factor must be > 0
-        const static unsigned int sample_expansion_factor = 1;
+        const static unsigned int sample_expansion_factor;
         typedef whatever_type_to_tensor_expects input_type;
 
         template <typename input_iterator>
