@@ -62,7 +62,7 @@ namespace dlib
             input_iterator ibegin,
             input_iterator iend,
             resizable_tensor& data
-        ) const
+        ) const;
         /*!
             requires
                 - [ibegin, iend) is an iterator range over input_type objects.
