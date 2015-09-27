@@ -409,7 +409,7 @@ class build(_build):
             # just so that we can `import dlib` and not `from dlib import dlib`
             f.write('from .dlib import *\n')
             # add version here
-            f.write('__version__ = {ver}\n'.format(ver=read_version()))
+            f.write('__version__ = "{ver}"\n'.format(ver=read_version()))
         with open(os.path.join(dist_dir_examples, '__init__.py'), 'w'):
             pass
 
