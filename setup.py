@@ -43,6 +43,7 @@ from subprocess import Popen, PIPE, STDOUT
 import signal
 from threading import Thread
 import time
+import re
 
 
 # change directory to this module path
@@ -340,9 +341,10 @@ def readme(fname):
 def read_version():
     """Read version information
     """
-    major = readme('./docs/.current_release_number').strip()
-    minor = readme('./docs/.current_minor_release_number').strip()
-    return major + '.' + minor
+    major = re.findall("set\(CPACK_PACKAGE_VERSION_MAJOR.*\"(.*)\"", open('dlib/CMakeLists.txt').read())[0]
+    minor = re.findall("set\(CPACK_PACKAGE_VERSION_MINOR.*\"(.*)\"", open('dlib/CMakeLists.txt').read())[0]
+    patch = re.findall("set\(CPACK_PACKAGE_VERSION_PATCH.*\"(.*)\"", open('dlib/CMakeLists.txt').read())[0]
+    return major + '.' + minor + '.' + patch 
 
 
 def rmtree(name):
@@ -546,7 +548,7 @@ setup(
     version=read_version(),
     keywords=['dlib', 'Computer Vision', 'Machine Learning'],
     description='A toolkit for making real world machine learning and data analysis applications',
-    long_description=readme('./README.txt'),
+    long_description=readme('dlib/README.txt'),
     author='Davis King',
     author_email='davis@dlib.net',
     url='https://github.com/davisking/dlib',

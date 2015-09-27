@@ -1,0 +1,30 @@
+#/bin/sh
+#
+# This script defines some helper functions used by other scripts in the docs
+# folder.
+
+get_short_revision_number()
+{    
+    RESULT=`hg log -r $1 | grep changeset | awk '{print $2}' | sed -e 's/:.*//'`  
+}
+
+get_last_modified_date()
+{
+    RESULT=`hg log $1 -l1 --template '{date|date}\n' | awk '{ print $2" "$3", " $5}'`
+}
+
+get_dlib_version()
+{
+    cat ../dlib/CMakeLists.txt | awk '/set\(CPACK_PACKAGE_VERSION_'$1'/{ match($2,"\"(.*)\"",a); print a[1]}'
+}
+
+
+# call like: set_dlib_version MAJOR 42
+set_dlib_version()
+{
+    sed -i -e 's/\(set(CPACK_PACKAGE_VERSION_'$1' *"\).*\(".*\)/\1'$2'\2/' ../dlib/CMakeLists.txt
+}
+
+MAJOR_NUM=`get_dlib_version MAJOR`
+MINOR_NUM=`get_dlib_version MINOR`
+PATCH_NUM=`get_dlib_version PATCH`
