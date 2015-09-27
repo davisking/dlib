@@ -124,6 +124,9 @@ endif()
 string(REGEX REPLACE "add_python_module$" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
 include(${dlib_path}/cmake)
 
+set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+INCLUDE(InstallRequiredSystemLibraries)
+
 # We put the extra _ on the end of the name just so it's possible to
 # have a module name of dlib and not get a conflict with the target named
 # dlib in ../dlib/cmake.  We use the target OUPUT_NAME property to ensure the
@@ -163,13 +166,13 @@ macro(add_python_module module_name module_sources )
 
        # On windows we will usually need to have the boost-python .dll files in the same folder or
        # you will get an error about how they can't be found.  So copy the boost .dll files along with
-       # your module to the install folder to avoid this.
+       # your module to the install folder to avoid this.  Also copy any visual studio runtime dlls as well.
        if (WIN32)
            list(GET Boost_LIBRARIES 1 boostlibs1)
            list(GET Boost_LIBRARIES 3 boostlibs2)
            string(REGEX REPLACE ".lib$" ".dll" boostdlls1 ${boostlibs1})
            string(REGEX REPLACE ".lib$" ".dll" boostdlls2 ${boostlibs2})
-           INSTALL(FILES ${boostdlls1} ${boostdlls2} 
+           INSTALL(FILES ${boostdlls1} ${boostdlls2} ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
                 DESTINATION "${base_path}/${path}"
                 )
        endif()
