@@ -234,6 +234,7 @@ elseif(WIN32 AND NOT MINGW)
         find_library(mkl_intel  mkl_intel_c ${mkl_search_path})
     endif()
 
+   INCLUDE (CheckFunctionExists)
 
     # Search for the needed libraries from the MKL.  
     find_library(mkl_core mkl_core ${mkl_search_path})
@@ -249,7 +250,18 @@ elseif(WIN32 AND NOT MINGW)
         set(lapack_found 1)
         message(STATUS "Found Intel MKL BLAS/LAPACK library")
 
-        if (MSVC)
+        # Make sure the version of the Intel MKL we found is compatible with
+        # the compiler we are using.  One way to do this check is to see if we can
+        # link to it right now.
+        set(CMAKE_REQUIRED_LIBRARIES ${blas_libraries})
+        CHECK_FUNCTION_EXISTS(cblas_ddot HAVE_CBLAS)
+        if (NOT HAVE_CBLAS)
+            message(STATUS "BLAS library does not have cblas symbols, so dlib will not use BLAS or LAPACK")
+            set(blas_found 0)
+            set(lapack_found 0)
+        endif()
+
+        if (MSVC AND blas_found)
             # need to set /bigobj when statically linking with the MKL on
             # visual studio or it doesn't work right.
             if (NOT CMAKE_CXX_FLAGS MATCHES "/bigobj")
