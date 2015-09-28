@@ -136,7 +136,9 @@ namespace dlib
             ensures
                 - performs any necessary initial memory allocations and/or sets parameters
                   to their initial values prior to learning.  Therefore, calling setup
-                  destroys any previously learned parameters.
+                  destroys any previously learned parameters.  Also, typically setup()
+                  would look at the dimensions of the outputs of sub and configure the
+                  number of parameters in *this accordingly.
         !*/
 
         template <typename SUBNET>
