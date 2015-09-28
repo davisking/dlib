@@ -23,20 +23,20 @@ namespace dlib
         con_()
         {}
 
-        template <typename SUB_NET>
-        void setup (const SUB_NET& sub)
+        template <typename SUBNET>
+        void setup (const SUBNET& sub)
         {
             // TODO
         }
 
-        template <typename SUB_NET>
-        void forward(const SUB_NET& sub, resizable_tensor& output)
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
         {
             // TODO
         } 
 
-        template <typename SUB_NET>
-        void backward(const tensor& gradient_input, SUB_NET& sub, tensor& params_grad)
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
         {
             // TODO
         }
@@ -49,8 +49,8 @@ namespace dlib
         resizable_tensor params;
     };
 
-    template <typename SUB_NET>
-    using con = add_layer<con_, SUB_NET>;
+    template <typename SUBNET>
+    using con = add_layer<con_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -71,8 +71,8 @@ namespace dlib
         unsigned long get_num_outputs (
         ) const { return num_outputs; }
 
-        template <typename SUB_NET>
-        void setup (const SUB_NET& sub)
+        template <typename SUBNET>
+        void setup (const SUBNET& sub)
         {
             num_inputs = sub.get_output().nr()*sub.get_output().nc()*sub.get_output().k();
             params.set_size(num_inputs, num_outputs);
@@ -82,16 +82,16 @@ namespace dlib
             randomize_parameters(params, num_inputs+num_outputs, rnd);
         }
 
-        template <typename SUB_NET>
-        void forward(const SUB_NET& sub, resizable_tensor& output)
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
         {
             output.set_size(sub.get_output().num_samples(), num_outputs);
 
             output = mat(sub.get_output())*mat(params);
         } 
 
-        template <typename SUB_NET>
-        void backward(const tensor& gradient_input, SUB_NET& sub, tensor& params_grad)
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
         {
             // d1*W*p1 + d2*W*p2
             // total gradient = [d1*W; d2*W; d3*W; ...] == D*W
@@ -116,8 +116,8 @@ namespace dlib
     };
 
 
-    template <typename SUB_NET>
-    using fc = add_layer<fc_, SUB_NET>;
+    template <typename SUBNET>
+    using fc = add_layer<fc_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -128,20 +128,20 @@ namespace dlib
         {
         }
 
-        template <typename SUB_NET>
-        void setup (const SUB_NET& sub)
+        template <typename SUBNET>
+        void setup (const SUBNET& sub)
         {
         }
 
-        template <typename SUB_NET>
-        void forward(const SUB_NET& sub, resizable_tensor& output)
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
         {
             output.copy_size(sub.get_output());
             output = lowerbound(mat(sub.get_output()), 0);
         } 
 
-        template <typename SUB_NET>
-        void backward(const tensor& gradient_input, SUB_NET& sub, tensor& params_grad)
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
         {
             const float* grad = gradient_input.host();
             const float* in = sub.get_output().host();
@@ -163,8 +163,8 @@ namespace dlib
     };
 
 
-    template <typename SUB_NET>
-    using relu = add_layer<relu_, SUB_NET>;
+    template <typename SUBNET>
+    using relu = add_layer<relu_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -176,8 +176,8 @@ namespace dlib
         }
 
 
-        template <typename SUB_NET>
-        void setup (const SUB_NET& sub)
+        template <typename SUBNET>
+        void setup (const SUBNET& sub)
         {
             num_inputs = sub.get_output().nr()*sub.get_output().nc()*sub.get_output().k();
             params.set_size(1, num_inputs);
@@ -189,8 +189,8 @@ namespace dlib
             randomize_parameters(params, num_inputs+num_outputs, rnd);
         }
 
-        template <typename SUB_NET>
-        void forward(const SUB_NET& sub, resizable_tensor& output)
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
         {
             DLIB_CASSERT( sub.get_output().nr()*sub.get_output().nc()*sub.get_output().k() == params.size(), "");
             DLIB_CASSERT( sub.get_output().nr()*sub.get_output().nc()*sub.get_output().k() == num_inputs, "");
@@ -208,8 +208,8 @@ namespace dlib
             }
         } 
 
-        template <typename SUB_NET>
-        void backward(const tensor& gradient_input, SUB_NET& sub, tensor& params_grad)
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
         {
             params_grad += sum_rows(pointwise_multiply(mat(sub.get_output()),mat(gradient_input)));
 
@@ -230,8 +230,8 @@ namespace dlib
         dlib::rand rnd;
     };
 
-    template <typename SUB_NET>
-    using multiply = add_layer<multiply_, SUB_NET>;
+    template <typename SUBNET>
+    using multiply = add_layer<multiply_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

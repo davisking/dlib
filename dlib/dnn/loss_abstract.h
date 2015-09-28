@@ -54,7 +54,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - SUB_NET implements the SUB_NET interface defined at the top of
+                - SUBNET implements the SUBNET interface defined at the top of
                   layers_abstract.h.
                 - sub.get_output().num_samples()%sample_expansion_factor == 0
                 - All outputs in each layer of sub have the same number of samples.  That
@@ -73,16 +73,16 @@ namespace dlib
 
         template <
             typename const_label_iterator,
-            typename SUB_NET
+            typename SUBNET
             >
         double compute_loss (
             const tensor& input_tensor,
             const_label_iterator truth, 
-            SUB_NET& sub
+            SUBNET& sub
         ) const;
         /*!
             requires
-                - SUB_NET implements the SUB_NET interface defined at the top of
+                - SUBNET implements the SUBNET interface defined at the top of
                   layers_abstract.h.
                 - input_tensor was given as input to the network sub and the outputs are
                   now visible in layer<i>(sub).get_output(), for all valid i.
@@ -114,8 +114,8 @@ namespace dlib
     // layers can be easily composed.  Moreover, the convention is that the layer class
     // ends with an _ while the add_loss_layer template has the same name but without the
     // trailing _.
-    template <typename SUB_NET>
-    using EXAMPLE_LOSS_LAYER = add_loss_layer<EXAMPLE_LOSS_LAYER_, SUB_NET>;
+    template <typename SUBNET>
+    using EXAMPLE_LOSS_LAYER = add_loss_layer<EXAMPLE_LOSS_LAYER_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -151,12 +151,12 @@ namespace dlib
 
         template <
             typename const_label_iterator,
-            typename SUB_NET
+            typename SUBNET
             >
         double compute_loss (
             const tensor& input_tensor,
             const_label_iterator truth, 
-            SUB_NET& sub
+            SUBNET& sub
         ) const;
         /*!
             This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
@@ -169,8 +169,8 @@ namespace dlib
 
     };
 
-    template <typename SUB_NET>
-    using loss_binary_hinge = add_loss_layer<loss_binary_hinge_, SUB_NET>;
+    template <typename SUBNET>
+    using loss_binary_hinge = add_loss_layer<loss_binary_hinge_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

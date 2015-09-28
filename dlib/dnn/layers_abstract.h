@@ -12,7 +12,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class SUB_NET 
+    class SUBNET 
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -35,8 +35,8 @@ namespace dlib
 
     public:
         // You aren't allowed to copy subnetworks from inside a layer.
-        SUB_NET(const SUB_NET&) = delete;
-        SUB_NET& operator=(const SUB_NET&) = delete;
+        SUBNET(const SUBNET&) = delete;
+        SUBNET& operator=(const SUBNET&) = delete;
 
         const tensor& get_output(
         ) const;
@@ -61,21 +61,21 @@ namespace dlib
                   get_gradient_input().
         !*/
 
-        const NEXT_SUB_NET& sub_net(
+        const NEXT_SUBNET& subnet(
         ) const;
         /*!
             ensures
                 - returns the subnetwork of *this network.  With respect to the diagram
-                  above, if *this was layer1 then sub_net() would return the network that
+                  above, if *this was layer1 then subnet() would return the network that
                   begins with layer2.
         !*/
 
-        NEXT_SUB_NET& sub_net(
+        NEXT_SUBNET& subnet(
         );
         /*!
             ensures
                 - returns the subnetwork of *this network.  With respect to the diagram
-                  above, if *this was layer1 then sub_net() would return the network that
+                  above, if *this was layer1 then subnet() would return the network that
                   begins with layer2.
         !*/
     };
@@ -126,45 +126,45 @@ namespace dlib
                   allows you to easily convert between related deep neural network types.  
         !*/
 
-        template <typename SUB_NET>
+        template <typename SUBNET>
         void setup (
-            const SUB_NET& sub
+            const SUBNET& sub
         );
         /*!
             requires
-                - SUB_NET implements the SUB_NET interface defined at the top of this file.
+                - SUBNET implements the SUBNET interface defined at the top of this file.
             ensures
                 - performs any necessary initial memory allocations and/or sets parameters
                   to their initial values prior to learning.  Therefore, calling setup
                   destroys any previously learned parameters.
         !*/
 
-        template <typename SUB_NET>
+        template <typename SUBNET>
         void forward(
-            const SUB_NET& sub, 
+            const SUBNET& sub, 
             resizable_tensor& output
         );
         /*!
             requires
-                - SUB_NET implements the SUB_NET interface defined at the top of this file.
+                - SUBNET implements the SUBNET interface defined at the top of this file.
                 - setup() has been called.
             ensures
                 - Runs the output of the subnetwork through this layer and stores the
                   output into #output.  In particular, forward() can use any of the outputs
-                  in sub (e.g. sub.get_output(), sub.sub_net().get_output(), etc.) to
+                  in sub (e.g. sub.get_output(), sub.subnet().get_output(), etc.) to
                   compute whatever it wants.
                 - #output.num_samples() == sub.get_output().num_samples()
         !*/
 
-        template <typename SUB_NET>
+        template <typename SUBNET>
         void backward(
             const tensor& gradient_input, 
-            SUB_NET& sub, 
+            SUBNET& sub, 
             tensor& params_grad
         );
         /*!
             requires
-                - SUB_NET implements the SUB_NET interface defined at the top of this file.
+                - SUBNET implements the SUBNET interface defined at the top of this file.
                 - setup() has been called.
                 - gradient_input has the same dimensions as the output of forward(sub,output).
                 - have_same_dimensions(sub.get_gradient_input(), sub.get_output()) == true
@@ -183,7 +183,7 @@ namespace dlib
                     - for all valid I:
                         - DATA_GRADIENT_I == gradient of f(sub,get_layer_params()) with
                           respect to layer<I>(sub).get_output() (recall that forward() can
-                          draw inputs from the immediate sub layer, sub.sub_net(), or
+                          draw inputs from the immediate sub layer, sub.subnet(), or
                           any earlier layer.  So you must consider the gradients with
                           respect to all inputs drawn from sub)
                   Finally, backward() adds these gradients into the output by performing:
@@ -211,8 +211,8 @@ namespace dlib
     // For each layer you define, always define an add_layer template so that layers can be
     // easily composed.  Moreover, the convention is that the layer class ends with an _
     // while the add_layer template has the same name but without the trailing _.
-    template <typename SUB_NET>
-    using EXAMPLE_LAYER = add_layer<EXAMPLE_LAYER_, SUB_NET>;
+    template <typename SUBNET>
+    using EXAMPLE_LAYER = add_layer<EXAMPLE_LAYER_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -254,9 +254,9 @@ namespace dlib
                     - The rest of the dimensions of T will be 1.
         !*/
 
-        template <typename SUB_NET> void setup (const SUB_NET& sub);
-        template <typename SUB_NET> void forward(const SUB_NET& sub, resizable_tensor& output);
-        template <typename SUB_NET> void backward(const tensor& gradient_input, SUB_NET& sub, tensor& params_grad);
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -265,8 +265,8 @@ namespace dlib
     };
 
 
-    template <typename SUB_NET>
-    using fc = add_layer<fc_, SUB_NET>;
+    template <typename SUBNET>
+    using fc = add_layer<fc_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -277,9 +277,9 @@ namespace dlib
         relu_(
         );
 
-        template <typename SUB_NET> void setup (const SUB_NET& sub);
-        template <typename SUB_NET> void forward(const SUB_NET& sub, resizable_tensor& output);
-        template <typename SUB_NET> void backward(const tensor& gradient_input, SUB_NET& sub, tensor& params_grad);
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -288,8 +288,8 @@ namespace dlib
     };
 
 
-    template <typename SUB_NET>
-    using relu = add_layer<relu_, SUB_NET>;
+    template <typename SUBNET>
+    using relu = add_layer<relu_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

@@ -43,12 +43,12 @@ namespace dlib
 
         template <
             typename const_label_iterator,
-            typename SUB_NET
+            typename SUBNET
             >
         double compute_loss (
             const tensor& input_tensor,
             const_label_iterator truth, 
-            SUB_NET& sub
+            SUBNET& sub
         ) const
         {
             const tensor& output_tensor = sub.get_output();
@@ -83,8 +83,8 @@ namespace dlib
 
     };
 
-    template <typename SUB_NET>
-    using loss_binary_hinge = add_loss_layer<loss_binary_hinge_, SUB_NET>;
+    template <typename SUBNET>
+    using loss_binary_hinge = add_loss_layer<loss_binary_hinge_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -95,11 +95,11 @@ namespace dlib
         const static unsigned int sample_expansion_factor = 1;
 
         template <
-            typename SUB_NET
+            typename SUBNET
             >
         double compute_loss (
             const tensor& input_tensor,
-            SUB_NET& sub
+            SUBNET& sub
         ) const
         {
             return 0;
@@ -107,8 +107,8 @@ namespace dlib
 
     };
 
-    template <typename SUB_NET>
-    using loss_no_label = add_loss_layer<loss_no_label_, SUB_NET>;
+    template <typename SUBNET>
+    using loss_no_label = add_loss_layer<loss_no_label_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

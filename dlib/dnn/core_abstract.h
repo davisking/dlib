@@ -124,7 +124,7 @@ namespace dlib
 
     template <
         typename LAYER_DETAILS, 
-        typename SUB_NET
+        typename SUBNET
         >
     class add_layer
     {
@@ -133,26 +133,26 @@ namespace dlib
                 - Must be a type that implements the EXAMPLE_LAYER_ interface defined in
                   layers_abstract.h
 
-            REQUIREMENTS ON SUB_NET
+            REQUIREMENTS ON SUBNET
                 - One of the following must be true:
-                    - SUB_NET implements the EXAMPLE_INPUT_LAYER interface defined in
+                    - SUBNET implements the EXAMPLE_INPUT_LAYER interface defined in
                       input_abstract.h.
-                    - SUB_NET is an add_layer object.
-                    - SUB_NET is an add_tag_layer object.
-                    - SUB_NET is an add_skip_layer object.
+                    - SUBNET is an add_layer object.
+                    - SUBNET is an add_tag_layer object.
+                    - SUBNET is an add_skip_layer object.
 
             WHAT THIS OBJECT REPRESENTS
-                Stacks a new layer, defined by LAYER_DETAILS, on top of SUB_NET type.
+                Stacks a new layer, defined by LAYER_DETAILS, on top of SUBNET type.
         !*/
 
     public:
         typedef LAYER_DETAILS layer_details_type;
-        typedef SUB_NET sub_net_type;
-        typedef typename sub_net_type::input_type input_type;
-        const static unsigned int sample_expansion_factor = sub_net_type::sample_expansion_factor;
-        // If SUB_NET is an input layer then num_layers == 1, otherwise it has the
+        typedef SUBNET subnet_type;
+        typedef typename subnet_type::input_type input_type;
+        const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
+        // If SUBNET is an input layer then num_layers == 1, otherwise it has the
         // definition shown here:
-        const static size_t num_layers = sub_net_type::num_layers + 1;
+        const static size_t num_layers = subnet_type::num_layers + 1;
 
         add_layer(
         );
@@ -172,7 +172,7 @@ namespace dlib
         /*!
             ensures
                 - #layer_details() == layer_details_type(item.layer_details())
-                - #sub_net()       == sub_net_type(item.sub_net())
+                - #subnet()       == subnet_type(item.subnet())
         !*/
 
         template <typename ...T>
@@ -183,7 +183,7 @@ namespace dlib
         /*!
             ensures
                 - #layer_details() == layer_details_type(layer_det)
-                - #sub_net() == sub_net_type(args)
+                - #subnet() == subnet_type(args)
         !*/
 
         template <typename ...T>
@@ -194,7 +194,7 @@ namespace dlib
         /*!
             ensures
                 - #layer_details() == layer_details_type(layer_det)
-                - #sub_net() == sub_net_type(args)
+                - #subnet() == subnet_type(args)
         !*/
 
         template <typename input_iterator>
@@ -211,7 +211,7 @@ namespace dlib
                 - #data.num_samples() == distance(ibegin,iend)*sample_expansion_factor. 
                 - Invokes data.async_copy_to_device() so that the data begins transferring
                   to the device.
-                - Ultimately this function just calls sub_net().sub_net()...sub_net().to_tensor(ibegin,iend,data).
+                - Ultimately this function just calls subnet().subnet()...subnet().to_tensor(ibegin,iend,data).
         !*/
 
         template <typename input_iterator>
@@ -247,17 +247,17 @@ namespace dlib
             ensures
                 - Runs x through the network and returns the results.  In particular, this
                   function performs the equivalent of:
-                    sub_net().forward(x);
+                    subnet().forward(x);
                     if (this is the first time forward() has been called) then
-                        layer_details().setup(sub_net());
-                    layer_details().forward(sub_net(), get_output());
+                        layer_details().setup(subnet());
+                    layer_details().forward(subnet(), get_output());
                 - The return value from this function is also available in #get_output().
                 - have_same_dimensions(#get_gradient_input(), #get_output()) == true
                 - All elements of #get_gradient_input() are set to 0. 
         !*/
         {
-            sub_network.forward(x);
-            const dimpl::sub_net_wrapper<sub_net_type> wsub(sub_network);
+            subnetwork.forward(x);
+            const dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
             if (!this_layer_setup_called)
             {
                 details.setup(wsub);
@@ -303,18 +303,18 @@ namespace dlib
                   to some loss.
         !*/
         {
-            dimpl::sub_net_wrapper<sub_net_type> wsub(sub_network);
+            dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
             params_grad.copy_size(details.get_layer_params());
             params_grad = 0;
             details.backward(get_gradient_input(), wsub, static_cast<tensor&>(params_grad));
             // Don't try to adjust the parameters if this layer doesn't have any.
             if (params_grad.size() != 0)
                 solvers.top()(details, static_cast<const tensor&>(params_grad));
-            sub_network.update(x, solvers.pop());
+            subnetwork.update(x, solvers.pop());
         }
 
-        const sub_net_type& sub_net() const { return sub_network; }
-        sub_net_type& sub_net() { return sub_network; }
+        const subnet_type& subnet() const { return subnetwork; }
+        subnet_type& subnet() { return subnetwork; }
 
         const layer_details_type& layer_details() const { return details; } 
         layer_details_type& layer_details() { return details; } 
@@ -332,7 +332,7 @@ namespace dlib
 
     template <
         typename LOSS_DETAILS, 
-        typename SUB_NET
+        typename SUBNET
         >
     class add_loss_layer
     {
@@ -340,26 +340,26 @@ namespace dlib
             REQUIREMENTS ON LOSS_DETAILS 
                 - Must be a type that implements the EXAMPLE_LOSS_LAYER_ interface defined
                   in loss_abstract.h
-                - LOSS_DETAILS::sample_expansion_factor == SUB_NET::sample_expansion_factor
+                - LOSS_DETAILS::sample_expansion_factor == SUBNET::sample_expansion_factor
                   i.e. The loss layer and input layer must agree on the sample_expansion_factor.
 
-            REQUIREMENTS ON SUB_NET
+            REQUIREMENTS ON SUBNET
                 - One of the following must be true:
-                    - SUB_NET is an add_layer object.
-                    - SUB_NET is an add_tag_layer object.
-                    - SUB_NET is an add_skip_layer object.
+                    - SUBNET is an add_layer object.
+                    - SUBNET is an add_tag_layer object.
+                    - SUBNET is an add_skip_layer object.
 
             WHAT THIS OBJECT REPRESENTS
-                - Adds a loss layer, defined by LOSS_DETAILS, on top of SUB_NET.
+                - Adds a loss layer, defined by LOSS_DETAILS, on top of SUBNET.
         !*/
 
     public:
         typedef LOSS_DETAILS loss_details_type;
-        typedef SUB_NET sub_net_type;
-        typedef typename sub_net_type::input_type input_type;
+        typedef SUBNET subnet_type;
+        typedef typename subnet_type::input_type input_type;
         // Note that the loss layer doesn't count as an additional layer. 
-        const static size_t num_layers = sub_net_type::num_layers;
-        const static unsigned int sample_expansion_factor = sub_net_type::sample_expansion_factor;
+        const static size_t num_layers = subnet_type::num_layers;
+        const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         // If LOSS_DETAILS is an unsupervised loss then label_type==no_label_type.
         // Otherwise it is defined as follows:
         typedef typename LOSS_DETAILS::label_type label_type;
@@ -379,7 +379,7 @@ namespace dlib
             const add_loss_layer<T,U>& item
         ) : 
             loss(item.loss_details()),
-            sub(item.sub_net())
+            sub(item.subnet())
         {}
 
         template <typename ...T>
@@ -450,7 +450,7 @@ namespace dlib
         {
             sub.to_tensor(ibegin,iend,temp_tensor);
             sub.forward(temp_tensor);
-            dimpl::sub_net_wrapper<sub_net_type> wsub(sub);
+            dimpl::subnet_wrapper<subnet_type> wsub(sub);
             return loss.compute_loss(temp_tensor, lbegin, wsub);
         }
 
@@ -470,7 +470,7 @@ namespace dlib
         {
             sub.to_tensor(ibegin,iend,temp_tensor);
             sub.forward(temp_tensor);
-            dimpl::sub_net_wrapper<sub_net_type> wsub(sub);
+            dimpl::subnet_wrapper<subnet_type> wsub(sub);
             double l = loss.compute_loss(temp_tensor, lbegin, wsub);
             sub.update(temp_tensor, solvers);
             return l;
@@ -483,8 +483,8 @@ namespace dlib
             sstack<solver_type,num_layers>& solvers
         );
 
-        const sub_net_type& sub_net() const { return sub; }
-        sub_net_type& sub_net() { return sub; }
+        const subnet_type& subnet() const { return sub; }
+        subnet_type& subnet() { return sub; }
         const loss_details_type& loss_details() const { return loss; }
         loss_details_type& loss_details() { return loss; }
 
@@ -509,7 +509,7 @@ namespace dlib
     private:
 
         loss_details_type loss;
-        sub_net_type sub;
+        subnet_type sub;
 
         // These two objects don't logically contribute to the state of this object.  They
         // are here to prevent them from being reallocated over and over.
@@ -527,21 +527,21 @@ namespace dlib
 
     template <
         unsigned long ID, 
-        typename SUB_NET
+        typename SUBNET
         >
     class add_tag_layer
     {
         /*!
-            REQUIREMENTS ON SUB_NET
+            REQUIREMENTS ON SUBNET
                 - One of the following must be true:
-                    - SUB_NET implements the EXAMPLE_INPUT_LAYER interface defined in
+                    - SUBNET implements the EXAMPLE_INPUT_LAYER interface defined in
                       input_abstract.h.
-                    - SUB_NET is an add_layer object.
-                    - SUB_NET is an add_tag_layer object.
-                    - SUB_NET is an add_skip_layer object.
+                    - SUBNET is an add_layer object.
+                    - SUBNET is an add_tag_layer object.
+                    - SUBNET is an add_skip_layer object.
 
             WHAT THIS OBJECT REPRESENTS
-                This object draws its inputs from sub_net() and performs the identity
+                This object draws its inputs from subnet() and performs the identity
                 transform.  This means it is a no-op and its presence does not change
                 the behavior of the network.  It exists solely to be used by add_skip_layer
                 to reference a particular part of a network.
@@ -549,48 +549,48 @@ namespace dlib
         !*/
     };
 
-    template <typename SUB_NET> using tag1  = add_tag_layer< 1, SUB_NET>;
-    template <typename SUB_NET> using tag2  = add_tag_layer< 2, SUB_NET>;
-    template <typename SUB_NET> using tag3  = add_tag_layer< 3, SUB_NET>;
-    template <typename SUB_NET> using tag4  = add_tag_layer< 4, SUB_NET>;
-    template <typename SUB_NET> using tag5  = add_tag_layer< 5, SUB_NET>;
-    template <typename SUB_NET> using tag6  = add_tag_layer< 6, SUB_NET>;
-    template <typename SUB_NET> using tag7  = add_tag_layer< 7, SUB_NET>;
-    template <typename SUB_NET> using tag8  = add_tag_layer< 8, SUB_NET>;
-    template <typename SUB_NET> using tag9  = add_tag_layer< 9, SUB_NET>;
-    template <typename SUB_NET> using tag10 = add_tag_layer<10, SUB_NET>;
+    template <typename SUBNET> using tag1  = add_tag_layer< 1, SUBNET>;
+    template <typename SUBNET> using tag2  = add_tag_layer< 2, SUBNET>;
+    template <typename SUBNET> using tag3  = add_tag_layer< 3, SUBNET>;
+    template <typename SUBNET> using tag4  = add_tag_layer< 4, SUBNET>;
+    template <typename SUBNET> using tag5  = add_tag_layer< 5, SUBNET>;
+    template <typename SUBNET> using tag6  = add_tag_layer< 6, SUBNET>;
+    template <typename SUBNET> using tag7  = add_tag_layer< 7, SUBNET>;
+    template <typename SUBNET> using tag8  = add_tag_layer< 8, SUBNET>;
+    template <typename SUBNET> using tag9  = add_tag_layer< 9, SUBNET>;
+    template <typename SUBNET> using tag10 = add_tag_layer<10, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
     template <
         template<typename> class TAG_TYPE, 
-        typename SUB_NET
+        typename SUBNET
         >
     class add_skip_layer
     {
         /*!
-            REQUIREMENTS ON SUB_NET
+            REQUIREMENTS ON SUBNET
                 - One of the following must be true:
-                    - SUB_NET is an add_layer object.
-                    - SUB_NET is an add_tag_layer object.
-                    - SUB_NET is an add_skip_layer object.
+                    - SUBNET is an add_layer object.
+                    - SUBNET is an add_tag_layer object.
+                    - SUBNET is an add_skip_layer object.
 
             WHAT THIS OBJECT REPRESENTS
-                This object draws its inputs from layer<TAG_TYPE>(sub_net())
+                This object draws its inputs from layer<TAG_TYPE>(subnet())
                 and performs the identity transform.
         !*/
     };
 
-    template <typename SUB_NET> using skip1  = add_skip_layer< tag1, SUB_NET>;
-    template <typename SUB_NET> using skip2  = add_skip_layer< tag2, SUB_NET>;
-    template <typename SUB_NET> using skip3  = add_skip_layer< tag3, SUB_NET>;
-    template <typename SUB_NET> using skip4  = add_skip_layer< tag4, SUB_NET>;
-    template <typename SUB_NET> using skip5  = add_skip_layer< tag5, SUB_NET>;
-    template <typename SUB_NET> using skip6  = add_skip_layer< tag6, SUB_NET>;
-    template <typename SUB_NET> using skip7  = add_skip_layer< tag7, SUB_NET>;
-    template <typename SUB_NET> using skip8  = add_skip_layer< tag8, SUB_NET>;
-    template <typename SUB_NET> using skip9  = add_skip_layer< tag9, SUB_NET>;
-    template <typename SUB_NET> using skip10 = add_skip_layer<tag10, SUB_NET>;
+    template <typename SUBNET> using skip1  = add_skip_layer< tag1, SUBNET>;
+    template <typename SUBNET> using skip2  = add_skip_layer< tag2, SUBNET>;
+    template <typename SUBNET> using skip3  = add_skip_layer< tag3, SUBNET>;
+    template <typename SUBNET> using skip4  = add_skip_layer< tag4, SUBNET>;
+    template <typename SUBNET> using skip5  = add_skip_layer< tag5, SUBNET>;
+    template <typename SUBNET> using skip6  = add_skip_layer< tag6, SUBNET>;
+    template <typename SUBNET> using skip7  = add_skip_layer< tag7, SUBNET>;
+    template <typename SUBNET> using skip8  = add_skip_layer< tag8, SUBNET>;
+    template <typename SUBNET> using skip9  = add_skip_layer< tag9, SUBNET>;
+    template <typename SUBNET> using skip10 = add_skip_layer<tag10, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -605,16 +605,16 @@ namespace dlib
         requires
             - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or add_tag_layer.
         ensures
-            - This function chains together i calls to n.sub_net() and returns the
+            - This function chains together i calls to n.subnet() and returns the
               result.  So for example:
                 - if (i == 0)
                     - returns n
                 - else if (i == 1)
-                    - returns n.sub_net()
+                    - returns n.subnet()
                 - else if (i == 2)
-                    - returns n.sub_net().sub_net()
+                    - returns n.subnet().subnet()
                 - else if (i == 3)
-                    - returns n.sub_net().sub_net().sub_net()
+                    - returns n.subnet().subnet().subnet()
                 - else
                     - etc.
     !*/

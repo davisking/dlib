@@ -94,68 +94,68 @@ namespace dlib
     namespace dimpl
     {
         template <typename T, typename enabled=void>
-        class sub_net_wrapper
+        class subnet_wrapper
         {
             /*!
                 WHAT THIS OBJECT REPRESENTS
                     This is a tool that makes an add_layer or add_loss_layer object
-                    expose only the part of its interface defined by the SUB_NET
+                    expose only the part of its interface defined by the SUBNET
                     type in layers_abstract.h.  This way, when we pass sub network
                     objects to the layer callbacks those callbacks won't be able to 
                     interact with the sub networks in a way other than specified 
-                    by the SUB_NET interface spec.
+                    by the SUBNET interface spec.
             !*/
 
         public:
-            sub_net_wrapper(const sub_net_wrapper&) = delete;
-            sub_net_wrapper& operator=(const sub_net_wrapper&) = delete;
+            subnet_wrapper(const subnet_wrapper&) = delete;
+            subnet_wrapper& operator=(const subnet_wrapper&) = delete;
 
-            sub_net_wrapper(T& l_) {}
+            subnet_wrapper(T& l_) {}
             // Nothing here because in this case T is one of the input layer types 
             // that doesn't have anything in it.
         };
 
         template <typename T>
-        class sub_net_wrapper<T,typename std::enable_if<is_nonloss_layer_type<T>::value>::type>
+        class subnet_wrapper<T,typename std::enable_if<is_nonloss_layer_type<T>::value>::type>
         {
 
         public:
-            sub_net_wrapper(const sub_net_wrapper&) = delete;
-            sub_net_wrapper& operator=(const sub_net_wrapper&) = delete;
+            subnet_wrapper(const subnet_wrapper&) = delete;
+            subnet_wrapper& operator=(const subnet_wrapper&) = delete;
 
             typedef T wrapped_type;
             const static size_t num_layers = T::num_layers;
 
-            sub_net_wrapper(T& l_) : l(l_),sub(l.sub_net()) {}
+            subnet_wrapper(T& l_) : l(l_),sub(l.subnet()) {}
 
             const tensor& get_output() const { return l.get_output(); }
             tensor& get_gradient_input() { return l.get_gradient_input(); }
 
-            const sub_net_wrapper<typename T::sub_net_type>& sub_net() const { sub; }
-            sub_net_wrapper<typename T::sub_net_type>& sub_net() { sub; }
+            const subnet_wrapper<typename T::subnet_type>& subnet() const { sub; }
+            subnet_wrapper<typename T::subnet_type>& subnet() { sub; }
 
         private:
             T& l;
-            sub_net_wrapper<typename T::sub_net_type> sub;
+            subnet_wrapper<typename T::subnet_type> sub;
         };
     }
 
-    template <typename LAYER_DETAILS, typename SUB_NET, typename enabled = void>
+    template <typename LAYER_DETAILS, typename SUBNET, typename enabled = void>
     class add_layer;
 
     template <typename T, typename U>
     struct is_nonloss_layer_type<add_layer<T,U>> : std::true_type {};
 
-    template <typename LAYER_DETAILS, typename SUB_NET>
-    class add_layer<LAYER_DETAILS,SUB_NET, 
-            typename std::enable_if<is_nonloss_layer_type<SUB_NET>::value>::type>
+    template <typename LAYER_DETAILS, typename SUBNET>
+    class add_layer<LAYER_DETAILS,SUBNET, 
+            typename std::enable_if<is_nonloss_layer_type<SUBNET>::value>::type>
     {
     public:
         typedef LAYER_DETAILS layer_details_type;
-        typedef SUB_NET sub_net_type;
-        typedef typename sub_net_type::input_type input_type;
-        const static size_t num_layers = sub_net_type::num_layers + 1;
-        const static unsigned int sample_expansion_factor = sub_net_type::sample_expansion_factor;
+        typedef SUBNET subnet_type;
+        typedef typename subnet_type::input_type input_type;
+        const static size_t num_layers = subnet_type::num_layers + 1;
+        const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
 
         add_layer(
         ):
@@ -178,7 +178,7 @@ namespace dlib
         add_layer(
             const add_layer<T,U,E>& item
         ) :
-            sub_network(item.sub_net()),
+            subnetwork(item.subnet()),
             details(item.layer_details()), 
             this_layer_setup_called(item.this_layer_setup_called),
             gradient_input_is_stale(item.gradient_input_is_stale),
@@ -193,7 +193,7 @@ namespace dlib
             T&& ...args
         ) : 
             details(layer_det), 
-            sub_network(std::forward<T>(args)...),
+            subnetwork(std::forward<T>(args)...),
             this_layer_setup_called(false),
             gradient_input_is_stale(true)
         {
@@ -205,7 +205,7 @@ namespace dlib
             T&& ...args
         ) : 
             details(std::move(layer_det)), 
-            sub_network(std::forward<T>(args)...),
+            subnetwork(std::forward<T>(args)...),
             this_layer_setup_called(false),
             gradient_input_is_stale(true)
         {
@@ -218,7 +218,7 @@ namespace dlib
             resizable_tensor& data
         ) const
         {
-            sub_network.to_tensor(ibegin,iend,data);
+            subnetwork.to_tensor(ibegin,iend,data);
         }
 
         template <typename input_iterator>
@@ -247,8 +247,8 @@ namespace dlib
 
         const tensor& forward(const tensor& x)
         {
-            sub_network.forward(x);
-            const dimpl::sub_net_wrapper<sub_net_type> wsub(sub_network);
+            subnetwork.forward(x);
+            const dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
             if (!this_layer_setup_called)
             {
                 details.setup(wsub);
@@ -281,18 +281,18 @@ namespace dlib
                   to some loss.
         !*/
         {
-            dimpl::sub_net_wrapper<sub_net_type> wsub(sub_network);
+            dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
             params_grad.copy_size(details.get_layer_params());
             params_grad = 0;
             details.backward(get_gradient_input(), wsub, static_cast<tensor&>(params_grad));
             // Don't try to adjust the parameters if this layer doesn't have any.
             if (params_grad.size() != 0)
                 solvers.top()(details, static_cast<const tensor&>(params_grad));
-            sub_network.update(x, solvers.pop());
+            subnetwork.update(x, solvers.pop());
         }
 
-        const sub_net_type& sub_net() const { return sub_network; }
-        sub_net_type& sub_net() { return sub_network; }
+        const subnet_type& subnet() const { return subnetwork; }
+        subnet_type& subnet() { return subnetwork; }
 
         const layer_details_type& layer_details() const { return details; } 
         layer_details_type& layer_details() { return details; } 
@@ -304,13 +304,13 @@ namespace dlib
             params_grad.clear();
             temp_tensor.clear();
             gradient_input_is_stale = true;
-            sub_network.clean();
+            subnetwork.clean();
         }
 
     private:
 
 
-        sub_net_type sub_network;
+        subnet_type subnetwork;
         LAYER_DETAILS details;
         bool this_layer_setup_called;
         bool gradient_input_is_stale;
@@ -334,7 +334,7 @@ namespace dlib
     {
     public:
         typedef LAYER_DETAILS layer_details_type;
-        typedef INPUT_LAYER sub_net_type;
+        typedef INPUT_LAYER subnet_type;
         typedef typename INPUT_LAYER::input_type input_type;
         const static unsigned int sample_expansion_factor = INPUT_LAYER::sample_expansion_factor;
         const static size_t num_layers = 1;
@@ -361,7 +361,7 @@ namespace dlib
         add_layer(
             const add_layer<T,U,E>& item
         ):
-            input_layer(item.sub_net()),
+            input_layer(item.subnet()),
             details(item.layer_details()),
             this_layer_setup_called(item.this_layer_setup_called),
             gradient_input_is_stale(item.gradient_input_is_stale),
@@ -441,7 +441,7 @@ namespace dlib
         !*/
         {
             DLIB_CASSERT(x.num_samples()%sample_expansion_factor == 0,"");
-            sub_net_wrapper wsub(x, grad_final_ignored);
+            subnet_wrapper wsub(x, grad_final_ignored);
             if (!this_layer_setup_called)
             {
                 details.setup(wsub);
@@ -474,7 +474,7 @@ namespace dlib
                 - x.num_samples() == get_gradient_input().num_samples()
         !*/
         {
-            sub_net_wrapper wsub(x, grad_final_ignored);
+            subnet_wrapper wsub(x, grad_final_ignored);
             params_grad.copy_size(details.get_layer_params());
             params_grad = 0;
             details.backward(get_gradient_input(), wsub, static_cast<tensor&>(params_grad));
@@ -483,8 +483,8 @@ namespace dlib
                 solvers.top()(details, static_cast<const tensor&>(params_grad));
         }
 
-        const sub_net_type& sub_net() const { return input_layer; } 
-        sub_net_type& sub_net() { return input_layer; } 
+        const subnet_type& subnet() const { return input_layer; } 
+        subnet_type& subnet() { return input_layer; } 
 
         const layer_details_type& layer_details() const { return details; } 
         layer_details_type& layer_details() { return details; } 
@@ -501,14 +501,14 @@ namespace dlib
 
     private:
 
-        class sub_net_wrapper
+        class subnet_wrapper
         {
         public:
-            sub_net_wrapper(const tensor& x_, resizable_tensor& grad_final_ignored_) :
+            subnet_wrapper(const tensor& x_, resizable_tensor& grad_final_ignored_) :
                 x(x_), grad_final_ignored(grad_final_ignored_) {}
 
-            sub_net_wrapper(const sub_net_wrapper&) = delete;
-            sub_net_wrapper& operator=(const sub_net_wrapper&) = delete;
+            subnet_wrapper(const subnet_wrapper&) = delete;
+            subnet_wrapper& operator=(const subnet_wrapper&) = delete;
 
             const tensor& get_output() const { return x; }
             tensor& get_gradient_input() 
@@ -530,7 +530,7 @@ namespace dlib
             resizable_tensor& grad_final_ignored;
         };
 
-        sub_net_type input_layer;
+        subnet_type input_layer;
         LAYER_DETAILS details;
         bool this_layer_setup_called;
         bool gradient_input_is_stale;
@@ -547,18 +547,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <unsigned long ID, typename SUB_NET, typename enabled=void>
+    template <unsigned long ID, typename SUBNET, typename enabled=void>
     class add_tag_layer;
 
-    template <unsigned long ID, typename SUB_NET>
-    class add_tag_layer<ID,SUB_NET,
-            typename std::enable_if<is_nonloss_layer_type<SUB_NET>::value>::type>
+    template <unsigned long ID, typename SUBNET>
+    class add_tag_layer<ID,SUBNET,
+            typename std::enable_if<is_nonloss_layer_type<SUBNET>::value>::type>
     {
     public:
-        typedef SUB_NET sub_net_type;
-        typedef typename sub_net_type::input_type input_type;
-        const static size_t num_layers = sub_net_type::num_layers + 1;
-        const static unsigned int sample_expansion_factor = sub_net_type::sample_expansion_factor;
+        typedef SUBNET subnet_type;
+        typedef typename subnet_type::input_type input_type;
+        const static size_t num_layers = subnet_type::num_layers + 1;
+        const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         static_assert(sample_expansion_factor >= 1,
             "The input layer can't produce fewer output tensors than there are inputs.");
 
@@ -571,14 +571,14 @@ namespace dlib
         template <typename T>
         add_tag_layer(
             const add_tag_layer<ID,T>& item
-        ) : sub_network(item.sub_net())
+        ) : subnetwork(item.subnet())
         {}
 
         template <typename ...T>
         add_tag_layer(
             T ...args
         ) : 
-            sub_network(std::move(args)...) 
+            subnetwork(std::move(args)...) 
         {
         }
 
@@ -589,7 +589,7 @@ namespace dlib
             resizable_tensor& data
         ) const
         {
-            sub_network.to_tensor(ibegin,iend,data);
+            subnetwork.to_tensor(ibegin,iend,data);
         }
 
         template <typename input_iterator>
@@ -598,43 +598,43 @@ namespace dlib
             input_iterator iend
         )
         {
-            return sub_network(ibegin,iend);
+            return subnetwork(ibegin,iend);
         }
 
         const tensor& operator() (const input_type& x)
         {
-            return sub_network(x);
+            return subnetwork(x);
         }
 
         const tensor& forward(const tensor& x)
         {
-            return sub_network.forward(x);
+            return subnetwork.forward(x);
         }
 
-        const tensor& get_output() const { return sub_network.get_output(); }
+        const tensor& get_output() const { return subnetwork.get_output(); }
 
         tensor& get_gradient_input() 
         { 
-            return sub_network.get_gradient_input();
+            return subnetwork.get_gradient_input();
         }
 
         template <typename solver_type>
         void update(const tensor& x, sstack<solver_type,num_layers>& solvers)
         {
-            sub_network.update(x,solvers.pop());
+            subnetwork.update(x,solvers.pop());
         }
 
-        const sub_net_type& sub_net() const { return sub_network; }
-        sub_net_type& sub_net() { return sub_network; }
+        const subnet_type& subnet() const { return subnetwork; }
+        subnet_type& subnet() { return subnetwork; }
 
         void clean()
         {
-            sub_network.clean();
+            subnetwork.clean();
         }
 
     private:
 
-        sub_net_type sub_network;
+        subnet_type subnetwork;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -645,10 +645,10 @@ namespace dlib
     class add_tag_layer
     {
     public:
-        typedef INPUT_LAYER sub_net_type;
-        typedef typename sub_net_type::input_type input_type;
+        typedef INPUT_LAYER subnet_type;
+        typedef typename subnet_type::input_type input_type;
         const static size_t num_layers = 1;
-        const static unsigned int sample_expansion_factor = sub_net_type::sample_expansion_factor;
+        const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         static_assert(sample_expansion_factor >= 1,
             "The input layer can't produce fewer output tensors than there are inputs.");
 
@@ -661,7 +661,7 @@ namespace dlib
         template <typename T, typename E>
         add_tag_layer(
             const add_tag_layer<ID,T,E>& item
-        ) : input_layer(item.sub_net())
+        ) : input_layer(item.subnet())
         {}
 
         template <typename ...T>
@@ -724,8 +724,8 @@ namespace dlib
             // nothing to update
         }
 
-        const sub_net_type& sub_net() const { return input_layer; }
-        sub_net_type& sub_net() { return input_layer; }
+        const subnet_type& subnet() const { return input_layer; }
+        subnet_type& subnet() { return input_layer; }
 
         void clean()
         {
@@ -735,7 +735,7 @@ namespace dlib
 
     private:
 
-        sub_net_type input_layer;
+        subnet_type input_layer;
         resizable_tensor cached_output;
         resizable_tensor grad_final_ignored;
     };
@@ -748,7 +748,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    template <typename LOSS_DETAILS, typename SUB_NET>
+    template <typename LOSS_DETAILS, typename SUBNET>
     class add_loss_layer;
 
     class no_label_type
@@ -762,12 +762,12 @@ namespace dlib
         // add_loss_layer objects can make it (again, just to simplify add_loss_layer's
         // implementation).
         no_label_type()=default;
-        template <typename LOSS_DETAILS, typename SUB_NET> friend class add_loss_layer;
+        template <typename LOSS_DETAILS, typename SUBNET> friend class add_loss_layer;
     };
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename LOSS_DETAILS, typename SUB_NET>
+    template <typename LOSS_DETAILS, typename SUBNET>
     class add_loss_layer
     {
         template <typename T, typename enabled=void>
@@ -783,14 +783,14 @@ namespace dlib
 
     public:
         typedef LOSS_DETAILS loss_details_type;
-        typedef SUB_NET sub_net_type;
-        typedef typename sub_net_type::input_type input_type;
+        typedef SUBNET subnet_type;
+        typedef typename subnet_type::input_type input_type;
         // Note that the loss layer doesn't count as an additional layer.
-        const static size_t num_layers = sub_net_type::num_layers;
-        const static unsigned int sample_expansion_factor = sub_net_type::sample_expansion_factor;
+        const static size_t num_layers = subnet_type::num_layers;
+        const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         typedef typename get_loss_layer_label_type<LOSS_DETAILS>::type label_type;
 
-        static_assert(is_nonloss_layer_type<SUB_NET>::value, "SUB_NET must be of type add_layer, add_skip_layer, or add_tag_layer."); 
+        static_assert(is_nonloss_layer_type<SUBNET>::value, "SUBNET must be of type add_layer, add_skip_layer, or add_tag_layer."); 
         static_assert(sample_expansion_factor == LOSS_DETAILS::sample_expansion_factor,
             "The loss layer and input layer must agree on the sample_expansion_factor.");
 
@@ -806,7 +806,7 @@ namespace dlib
             const add_loss_layer<T,U>& item
         ) : 
             loss(item.loss_details()),
-            sub(item.sub_net())
+            sub(item.subnet())
         {}
 
         template <typename ...T>
@@ -877,7 +877,7 @@ namespace dlib
         {
             sub.to_tensor(ibegin,iend,temp_tensor);
             sub.forward(temp_tensor);
-            dimpl::sub_net_wrapper<sub_net_type> wsub(sub);
+            dimpl::subnet_wrapper<subnet_type> wsub(sub);
             return loss.compute_loss(temp_tensor, lbegin, wsub);
         }
 
@@ -889,7 +889,7 @@ namespace dlib
         {
             sub.to_tensor(ibegin,iend,temp_tensor);
             sub.forward(temp_tensor);
-            dimpl::sub_net_wrapper<sub_net_type> wsub(sub);
+            dimpl::subnet_wrapper<subnet_type> wsub(sub);
             return loss.compute_loss(temp_tensor, wsub);
         }
 
@@ -903,7 +903,7 @@ namespace dlib
         {
             sub.to_tensor(ibegin,iend,temp_tensor);
             sub.forward(temp_tensor);
-            dimpl::sub_net_wrapper<sub_net_type> wsub(sub);
+            dimpl::subnet_wrapper<subnet_type> wsub(sub);
             double l = loss.compute_loss(temp_tensor, lbegin, wsub);
             sub.update(temp_tensor, solvers);
             return l;
@@ -918,14 +918,14 @@ namespace dlib
         {
             sub.to_tensor(ibegin,iend,temp_tensor);
             sub.forward(temp_tensor);
-            dimpl::sub_net_wrapper<sub_net_type> wsub(sub);
+            dimpl::subnet_wrapper<subnet_type> wsub(sub);
             double l = loss.compute_loss(temp_tensor, wsub);
             sub.update(temp_tensor, solvers);
             return l;
         }
 
-        const sub_net_type& sub_net() const { return sub; }
-        sub_net_type& sub_net() { return sub; }
+        const subnet_type& subnet() const { return sub; }
+        subnet_type& subnet() { return sub; }
         const loss_details_type& loss_details() const { return loss; }
         loss_details_type& loss_details() { return loss; }
 
@@ -950,7 +950,7 @@ namespace dlib
     private:
 
         loss_details_type loss;
-        sub_net_type sub;
+        subnet_type sub;
 
         // These two objects don't logically contribute to the state of this object.  They
         // are here to prevent them from being reallocated over and over.
@@ -972,11 +972,11 @@ namespace dlib
         struct layer_helper
         {
             static T& makeT();
-            using next_type = typename std::remove_reference<decltype(makeT().sub_net())>::type;
+            using next_type = typename std::remove_reference<decltype(makeT().subnet())>::type;
             using type = typename layer_helper<i-1,next_type>::type;
             static type& layer(T& n)
             {
-                return layer_helper<i-1,next_type>::layer(n.sub_net());
+                return layer_helper<i-1,next_type>::layer(n.subnet());
             }
         };
         template <typename T>
@@ -993,17 +993,17 @@ namespace dlib
         struct layer_helper_match
         {
             static T& makeT();
-            using next_type = typename std::remove_reference<decltype(makeT().sub_net())>::type;
+            using next_type = typename std::remove_reference<decltype(makeT().subnet())>::type;
             using type = typename layer_helper_match<Match,next_type,i>::type;
             static type& layer(T& n)
             {
-                return layer_helper_match<Match,next_type,i>::layer(n.sub_net());
+                return layer_helper_match<Match,next_type,i>::layer(n.subnet());
             }
         };
         // This overload catches add_layer and add_loss_layer templates.
         template <template<typename> class Match, typename T, unsigned int i>
         struct layer_helper_match<Match,T,i,
-            typename std::enable_if<std::is_same<const T,const  Match<typename T::sub_net_type>>::value>::type>
+            typename std::enable_if<std::is_same<const T,const  Match<typename T::subnet_type>>::value>::type>
         {
             using type = typename layer_helper<i,T>::type;
             static type& layer(T& n)
@@ -1022,11 +1022,11 @@ namespace dlib
                 return layer_helper<i,T>::layer(n);
             }
         };
-        // This overload catches sub_net_wrapper templates.
+        // This overload catches subnet_wrapper templates.
         template <template<typename> class Match, typename T, unsigned int i>
         struct layer_helper_match<Match,T,i,
             typename std::enable_if<std::is_same<const typename T::wrapped_type, 
-                                                 const Match<typename T::wrapped_type::sub_net_type>>::value>::type>
+                                                 const Match<typename T::wrapped_type::subnet_type>>::value>::type>
         {
             using type = typename layer_helper<i,T>::type;
             static type& layer(T& n)
@@ -1056,19 +1056,19 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <template<typename> class TAG_TYPE, typename SUB_NET>
+    template <template<typename> class TAG_TYPE, typename SUBNET>
     class add_skip_layer
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object draws its inputs from layer<TAG_TYPE>(SUB_NET())
+                This object draws its inputs from layer<TAG_TYPE>(SUBNET())
                 and performs the identity transform.
         !*/
     public:
-        typedef SUB_NET sub_net_type;
-        typedef typename sub_net_type::input_type input_type;
-        const static size_t num_layers = sub_net_type::num_layers + 1;
-        const static unsigned int sample_expansion_factor = sub_net_type::sample_expansion_factor;
+        typedef SUBNET subnet_type;
+        typedef typename subnet_type::input_type input_type;
+        const static size_t num_layers = subnet_type::num_layers + 1;
+        const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         static_assert(sample_expansion_factor >= 1,
             "The input layer can't produce fewer output tensors than there are inputs.");
 
@@ -1081,14 +1081,14 @@ namespace dlib
         template <typename T>
         add_skip_layer(
             const add_skip_layer<TAG_TYPE,T>& item
-        ) : sub_network(item.sub_net())
+        ) : subnetwork(item.subnet())
         {}
 
         template <typename ...T>
         add_skip_layer(
             T ...args
         ) : 
-            sub_network(std::move(args)...) 
+            subnetwork(std::move(args)...) 
         {
         }
 
@@ -1099,7 +1099,7 @@ namespace dlib
             resizable_tensor& data
         ) const
         {
-            sub_network.to_tensor(ibegin,iend,data);
+            subnetwork.to_tensor(ibegin,iend,data);
         }
 
         template <typename input_iterator>
@@ -1108,81 +1108,81 @@ namespace dlib
             input_iterator iend
         )
         {
-            sub_network(ibegin,iend);
-            return layer<TAG_TYPE>(sub_network).get_output();
+            subnetwork(ibegin,iend);
+            return layer<TAG_TYPE>(subnetwork).get_output();
         }
 
         const tensor& operator() (const input_type& x)
         {
-            sub_network(x);
-            return layer<TAG_TYPE>(sub_network).get_output();
+            subnetwork(x);
+            return layer<TAG_TYPE>(subnetwork).get_output();
         }
 
         const tensor& forward(const tensor& x)
         {
-            sub_network.forward(x);
-            return layer<TAG_TYPE>(sub_network).get_output();
+            subnetwork.forward(x);
+            return layer<TAG_TYPE>(subnetwork).get_output();
         }
 
         const tensor& get_output() const 
         { 
-            return layer<TAG_TYPE>(sub_network).get_output();
+            return layer<TAG_TYPE>(subnetwork).get_output();
         }
 
         tensor& get_gradient_input() 
         { 
-            return layer<TAG_TYPE>(sub_network).get_gradient_input();
+            return layer<TAG_TYPE>(subnetwork).get_gradient_input();
         }
 
         template <typename solver_type>
         void update(const tensor& x, sstack<solver_type,num_layers>& solvers)
         {
-            sub_network.update(x,solvers.pop());
+            subnetwork.update(x,solvers.pop());
         }
 
-        const sub_net_type& sub_net() const 
+        const subnet_type& subnet() const 
         { 
-            return sub_network; 
+            return subnetwork; 
         }
 
-        sub_net_type& sub_net() 
+        subnet_type& subnet() 
         { 
-            return sub_network; 
+            return subnetwork; 
         }
 
         void clean()
         {
-            sub_network.clean();
+            subnetwork.clean();
         }
 
     private:
 
-        sub_net_type sub_network;
+        subnet_type subnetwork;
     };
     template <template<typename> class T, typename U>
     struct is_nonloss_layer_type<add_skip_layer<T,U>> : std::true_type {};
 
-    template <typename SUB_NET> using tag1  = add_tag_layer< 1, SUB_NET>;
-    template <typename SUB_NET> using tag2  = add_tag_layer< 2, SUB_NET>;
-    template <typename SUB_NET> using tag3  = add_tag_layer< 3, SUB_NET>;
-    template <typename SUB_NET> using tag4  = add_tag_layer< 4, SUB_NET>;
-    template <typename SUB_NET> using tag5  = add_tag_layer< 5, SUB_NET>;
-    template <typename SUB_NET> using tag6  = add_tag_layer< 6, SUB_NET>;
-    template <typename SUB_NET> using tag7  = add_tag_layer< 7, SUB_NET>;
-    template <typename SUB_NET> using tag8  = add_tag_layer< 8, SUB_NET>;
-    template <typename SUB_NET> using tag9  = add_tag_layer< 9, SUB_NET>;
-    template <typename SUB_NET> using tag10 = add_tag_layer<10, SUB_NET>;
+    template <typename SUBNET> using tag1  = add_tag_layer< 1, SUBNET>;
+    template <typename SUBNET> using tag2  = add_tag_layer< 2, SUBNET>;
+    template <typename SUBNET> using tag3  = add_tag_layer< 3, SUBNET>;
+    template <typename SUBNET> using tag4  = add_tag_layer< 4, SUBNET>;
+    template <typename SUBNET> using tag5  = add_tag_layer< 5, SUBNET>;
+    template <typename SUBNET> using tag6  = add_tag_layer< 6, SUBNET>;
+    template <typename SUBNET> using tag7  = add_tag_layer< 7, SUBNET>;
+    template <typename SUBNET> using tag8  = add_tag_layer< 8, SUBNET>;
+    template <typename SUBNET> using tag9  = add_tag_layer< 9, SUBNET>;
+    template <typename SUBNET> using tag10 = add_tag_layer<10, SUBNET>;
 
-    template <typename SUB_NET> using skip1  = add_skip_layer< tag1, SUB_NET>;
-    template <typename SUB_NET> using skip2  = add_skip_layer< tag2, SUB_NET>;
-    template <typename SUB_NET> using skip3  = add_skip_layer< tag3, SUB_NET>;
-    template <typename SUB_NET> using skip4  = add_skip_layer< tag4, SUB_NET>;
-    template <typename SUB_NET> using skip5  = add_skip_layer< tag5, SUB_NET>;
-    template <typename SUB_NET> using skip6  = add_skip_layer< tag6, SUB_NET>;
-    template <typename SUB_NET> using skip7  = add_skip_layer< tag7, SUB_NET>;
-    template <typename SUB_NET> using skip8  = add_skip_layer< tag8, SUB_NET>;
-    template <typename SUB_NET> using skip9  = add_skip_layer< tag9, SUB_NET>;
-    template <typename SUB_NET> using skip10 = add_skip_layer<tag10, SUB_NET>;
+    template <typename SUBNET> using skip1  = add_skip_layer< tag1, SUBNET>;
+    template <typename SUBNET> using skip2  = add_skip_layer< tag2, SUBNET>;
+    template <typename SUBNET> using skip3  = add_skip_layer< tag3, SUBNET>;
+    template <typename SUBNET> using skip4  = add_skip_layer< tag4, SUBNET>;
+    template <typename SUBNET> using skip5  = add_skip_layer< tag5, SUBNET>;
+    template <typename SUBNET> using skip6  = add_skip_layer< tag6, SUBNET>;
+    template <typename SUBNET> using skip7  = add_skip_layer< tag7, SUBNET>;
+    template <typename SUBNET> using skip8  = add_skip_layer< tag8, SUBNET>;
+    template <typename SUBNET> using skip9  = add_skip_layer< tag9, SUBNET>;
+    template <typename SUBNET> using skip10 = add_skip_layer<tag10, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -1199,10 +1199,10 @@ namespace dlib
                 data[i] = rnd.get_random_gaussian()*sigma;
         }
 
-        class test_layer_sub_net 
+        class test_layer_subnet 
         {
         public:
-            test_layer_sub_net (
+            test_layer_subnet (
                 dlib::rand& rnd_
             ) : rnd(rnd_) 
             {
@@ -1225,10 +1225,10 @@ namespace dlib
 
 
             const tensor& get_output() const { return output; }
-            const test_layer_sub_net& sub_net() const { init_sub(); return *sub; }
+            const test_layer_subnet& subnet() const { init_sub(); return *sub; }
 
             tensor& get_gradient_input() { return gradient_input; }
-            test_layer_sub_net& sub_net() { init_sub(); return *sub; }
+            test_layer_subnet& subnet() { init_sub(); return *sub; }
 
 
 
@@ -1245,7 +1245,7 @@ namespace dlib
                 if (i < output.size())
                     return output.host()[i];
                 else
-                    return sub_net().get_output_element(i-output.size());
+                    return subnet().get_output_element(i-output.size());
             }
 
             float get_gradient_input_element(unsigned long i) const
@@ -1253,21 +1253,21 @@ namespace dlib
                 if (i < gradient_input.size())
                     return gradient_input.host()[i];
                 else
-                    return sub_net().get_gradient_input_element(i-gradient_input.size());
+                    return subnet().get_gradient_input_element(i-gradient_input.size());
             }
 
 
         private:
             // We lazily initialize sub-layers as needed when someone tries to call
-            // sub_net()
+            // subnet()
             void init_sub() const
             {
                 if (!sub)
-                    sub.reset(new test_layer_sub_net(rnd));
+                    sub.reset(new test_layer_subnet(rnd));
             }
 
             dlib::rand& rnd;
-            mutable std::unique_ptr<test_layer_sub_net> sub;
+            mutable std::unique_ptr<test_layer_subnet> sub;
             resizable_tensor output;
             resizable_tensor gradient_input;
         };
@@ -1295,12 +1295,12 @@ namespace dlib
         using namespace timpl;
         // Do some setup
         dlib::rand rnd;
-        test_layer_sub_net sub(rnd);
+        test_layer_subnet sub(rnd);
         resizable_tensor output, out2, out3;
-        // Run setup() and forward() as well to make sure any calls to sub_net() have
+        // Run setup() and forward() as well to make sure any calls to subnet() have
         // happened before we start assuming we know how many data elements there are
-        // (since we do a lazy layer creation thing based on calls to sub_net() inside
-        // test_layer_sub_net).
+        // (since we do a lazy layer creation thing based on calls to subnet() inside
+        // test_layer_subnet).
         l.setup(sub);
         l.forward(sub, output);
 
