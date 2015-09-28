@@ -51,25 +51,25 @@ namespace dlib
     template <typename T, size_t N>
     class sstack
     {
-        public:
-            static_assert(N > 0, "You can't create an empty sstack.");
-            typedef T value_type;
-            const static size_t num_elements = N;
+    public:
+        static_assert(N > 0, "You can't create an empty sstack.");
+        typedef T value_type;
+        const static size_t num_elements = N;
 
-            sstack() {}
-            sstack(const T& item_) : item(item_), data(item_) {}
+        sstack() {}
+        sstack(const T& item_) : item(item_), data(item_) {}
 
-            const T& top() const { return item; }
-            T& top() { return item; }
+        const T& top() const { return item; }
+        T& top() { return item; }
 
-            size_t size() const { return N; }
+        size_t size() const { return N; }
 
-            const sstack<T,N-1>& pop() const { return data; }
-            sstack<T,N-1>& pop() { return data; }
+        const sstack<T,N-1>& pop() const { return data; }
+        sstack<T,N-1>& pop() { return data; }
 
-        private:
-            T item;
-            sstack<T,N-1> data;
+    private:
+        T item;
+        sstack<T,N-1> data;
     };
 
     template <typename T>

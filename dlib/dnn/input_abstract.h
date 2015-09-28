@@ -44,10 +44,10 @@ namespace dlib
             ensures
                 - Constructs this object from item.  This form of constructor is optional
                   but it allows you to provide a conversion from one input layer type to
-                  another.  For example, the following code is valid only if my_input2 can
-                  be constructed from my_input1:
-                    relu<fc<relu<fc<my_input1>>>> my_dnn1;
-                    relu<fc<relu<fc<my_input2>>>> my_dnn2(my_dnn1);
+                  another.  For example, the following code is valid only if my_input_layer2 can
+                  be constructed from my_input_layer1:
+                    relu<fc<relu<fc<my_input_layer1>>>> my_dnn1;
+                    relu<fc<relu<fc<my_input_layer2>>>> my_dnn2(my_dnn1);
                   This kind of pattern is useful if you want to use one type of input layer
                   during training but a different type of layer during testing since it
                   allows you to easily convert between related deep neural network types.  

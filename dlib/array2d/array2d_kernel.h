@@ -161,7 +161,7 @@ namespace dlib
         }
 
 #ifdef DLIB_HAS_RVALUE_REFERENCES
-        array2d(array2d&& item)
+        array2d(array2d&& item) : array2d()
         {
             swap(item);
         }
