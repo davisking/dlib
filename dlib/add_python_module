@@ -55,10 +55,14 @@ if (NOT WIN32)
             /usr/lib/x86_64-linux-gnu/)
 endif()
 if (PYTHON3)
-    # on Some systems the boost python3 module is called python-py34 so check for that one.
+    # On some systems the boost python3 module is called python-py34 so check
+    # for that one.  Then if you don't find that then look for a few other
+    # names before findly trying just "python".
     FIND_PACKAGE(Boost 1.41.0  COMPONENTS python-py34 )
     if (NOT Boost_FOUND)
-        # But if you don't find it then try looking for a module called python.
+        FIND_PACKAGE(Boost 1.41.0 COMPONENTS python3)
+    endif()
+    if (NOT Boost_FOUND)
         FIND_PACKAGE(Boost 1.41.0 COMPONENTS python)
     endif()
     FIND_PACKAGE(PythonLibs 3.4 REQUIRED)
@@ -117,6 +121,8 @@ else()
    INCLUDE_DIRECTORIES("${PYTHON_INCLUDE_DIRS}" )
 endif()
 
+message(STATUS "USING BOOST_LIBS: ${Boost_LIBRARIES}")
+message(STATUS "USING PYTHON_LIBS: ${PYTHON_LIBRARIES}")
 
 if (CMAKE_COMPILER_IS_GNUCXX)
     # Just setting CMAKE_POSITION_INDEPENDENT_CODE should be enough to set
