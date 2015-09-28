@@ -23,7 +23,7 @@ namespace dlib
                 needs.  You do this by creating a class that defines an interface matching
                 the one described by this EXAMPLE_LOSS_LAYER_ class.  Note that there is no
                 dlib::EXAMPLE_LOSS_LAYER_ type.  It is shown here purely to document the
-                interface that a loss layer object must implement.
+                interface that a loss layer must implement.
 
                 A loss layer can optionally provide a to_label() method that converts the
                 output of a network into a user defined type.  If to_label() is not
@@ -56,7 +56,7 @@ namespace dlib
             requires
                 - SUBNET implements the SUBNET interface defined at the top of
                   layers_abstract.h.
-                - sub.get_output().num_samples()%sample_expansion_factor == 0
+                - sub.get_output().num_samples()%sample_expansion_factor == 0.
                 - All outputs in each layer of sub have the same number of samples.  That
                   is, for all valid i: 
                     - sub.get_output().num_samples() == layer<i>(sub).get_output().num_samples()
@@ -67,7 +67,7 @@ namespace dlib
                 - Converts the output of the provided network to label_type objects and
                   stores the results into the range indicated by iter.  In particular, for
                   all valid i and j, it will be the case that:
-                    *(truth+i/sample_expansion_factor) is the output corresponding to the
+                    *(iter+i/sample_expansion_factor) is the output corresponding to the
                     ith sample in layer<j>(sub).get_output().
         !*/
 
@@ -90,7 +90,8 @@ namespace dlib
                 - input_tensor.num_samples()%sample_expansion_factor == 0.
                 - for all valid i:
                     - layer<i>(sub).get_output().num_samples() == input_tensor.num_samples().
-                    - layer<i>(sub).get_gradient_input() has the same dimensions as layer<i>(sub).get_output().
+                    - layer<i>(sub).get_gradient_input() has the same dimensions as
+                      layer<i>(sub).get_output().
                 - truth == an iterator pointing to the beginning of a range of
                   input_tensor.num_samples()/sample_expansion_factor elements.  In
                   particular, they must be label_type elements.
@@ -98,7 +99,7 @@ namespace dlib
                     - *(truth+i/sample_expansion_factor) is the label of the ith sample in
                       layer<j>(sub).get_output().
             ensures
-                - This function computes the loss function that describes how well the output
+                - This function computes a loss function that describes how well the output
                   of sub matches the expected labels given by truth.  Let's write the loss
                   function as L(input_tensor, truth, sub).  
                 - Then compute_loss() computes the gradient of L() with respect to the
@@ -125,8 +126,10 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                You use this loss to perform binary classification with the hinge loss.
-                Therefore, the possible outputs/labels when using this loss are +1 and -1.
+                This object implements the loss layer interface defined above by
+                EXAMPLE_LOSS_LAYER_.  In particular, you use this loss to perform binary
+                classification with the hinge loss.  Therefore, the possible outputs/labels
+                when using this loss are +1 and -1.
         !*/
     public:
 

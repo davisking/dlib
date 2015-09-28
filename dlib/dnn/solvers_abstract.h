@@ -25,7 +25,7 @@ namespace dlib
                 apply it to its update rule.
 
                 Note that there is no dlib::EXAMPLE_SOLVER type.  It is shown here purely
-                to document the interface that a solver object must implement.
+                to document the interface a solver object must implement.
         !*/
 
     public:
@@ -40,9 +40,10 @@ namespace dlib
         );
         /*!
             requires
-                - LAYER_DETAILS implements the EXAMPLE_LAYER_ interface defined in layers_abstract.h.
+                - LAYER_DETAILS implements the EXAMPLE_LAYER_ interface defined in
+                  layers_abstract.h.
                 - l.get_layer_params().size() != 0
-                - l.get_layer_params() and params_grad have the same dimensions.
+                - have_same_dimensions(l.get_layer_params(), params_grad) == true.
                 - When this function is invoked on a particular solver instance, it is
                   always supplied with the same LAYER_DETAILS object.
             ensures

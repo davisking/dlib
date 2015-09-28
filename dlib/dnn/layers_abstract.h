@@ -274,6 +274,15 @@ namespace dlib
 
     class relu_
     {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
+                In particular, it defines a rectified linear layer.  Therefore, it passes
+                its inputs though the function f(x)=max(x,0) where f() is applied pointwise
+                across the input tensor.
+                
+        !*/
+
     public:
 
         relu_(
