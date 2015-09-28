@@ -226,10 +226,6 @@ namespace dlib
             input_iterator ibegin,
             input_iterator iend
         )
-        /*!
-            ensures
-                - runs [ibegin,iend) through the network and returns the results 
-        !*/
         {
             to_tensor(ibegin,iend,temp_tensor);
             return forward(temp_tensor);
@@ -237,10 +233,6 @@ namespace dlib
 
 
         const tensor& operator() (const input_type& x)
-        /*!
-            ensures
-                - runs a single x through the network and returns the output.
-        !*/
         {
             return (*this)(&x, &x+1);
         }
@@ -273,13 +265,6 @@ namespace dlib
 
         template <typename solver_type>
         void update(const tensor& x, sstack<solver_type,num_layers>& solvers)
-        /*!
-            requires
-                - forward(x) was called to forward propagate x though the network.
-                - x.num_samples() == get_gradient_input().num_samples()
-                - get_gradient_input() == the gradient of the network with respect
-                  to some loss.
-        !*/
         {
             dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
             params_grad.copy_size(details.get_layer_params());
@@ -415,10 +400,6 @@ namespace dlib
             input_iterator ibegin,
             input_iterator iend
         )
-        /*!
-            ensures
-                - runs [ibegin,iend) through the network and returns the results 
-        !*/
         {
             to_tensor(ibegin,iend,temp_tensor);
             return forward(temp_tensor);
@@ -426,19 +407,11 @@ namespace dlib
 
 
         const tensor& operator() (const input_type& x)
-        /*!
-            ensures
-                - runs a single x through the network and returns the output.
-        !*/
         {
             return (*this)(&x, &x+1);
         }
 
         const tensor& forward (const tensor& x)
-        /*!
-            requires
-                - x.num_samples() is a multiple of sample_expansion_factor.
-        !*/
         {
             DLIB_CASSERT(x.num_samples()%sample_expansion_factor == 0,"");
             subnet_wrapper wsub(x, grad_final_ignored);
@@ -467,12 +440,6 @@ namespace dlib
 
         template <typename solver_type>
         void update(const tensor& x, sstack<solver_type,num_layers>& solvers)
-        /*!
-            requires
-                - x.num_samples() is a multiple of sample_expansion_factor.
-                - forward(x) was called to forward propagate x though the network.
-                - x.num_samples() == get_gradient_input().num_samples()
-        !*/
         {
             subnet_wrapper wsub(x, grad_final_ignored);
             params_grad.copy_size(details.get_layer_params());
@@ -843,13 +810,6 @@ namespace dlib
             input_iterator iend,
             output_iterator obegin
         )
-        /*!
-            requires
-                - obegin == iterator pointing to the start of a range of distance(ibegin,iend)
-                  elements.
-            ensures
-                - runs [ibegin,iend) through the network and writes the output to the range at obegin.
-        !*/
         {
             sub.to_tensor(ibegin,iend,temp_tensor);
             sub.forward(temp_tensor);
@@ -858,10 +818,6 @@ namespace dlib
 
 
         const label_type& operator() (const input_type& x)
-        /*!
-            ensures
-                - runs a single x through the network and returns the output.
-        !*/
         {
             (*this)(&x, &x+1, &temp_label);
             return temp_label;
@@ -931,17 +887,6 @@ namespace dlib
 
         void clean (
         )
-        /*!
-            ensures
-                - Causes the network to forget about everything but its parameters.  
-                  That is, for each layer we will have:
-                    - get_output().num_samples() == 0
-                    - get_gradient_input().num_samples() == 0
-                  However, running new input data though this network will still have the
-                  same output it would have had regardless of any calls to clean().
-                  Finally, the purpose of clean() is to compact the network object prior to
-                  saving it to disk so that it takes up less space and the IO is quicker.
-        !*/
         {
             temp_tensor.clear();
             sub.clear();
@@ -1059,11 +1004,6 @@ namespace dlib
     template <template<typename> class TAG_TYPE, typename SUBNET>
     class add_skip_layer
     {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This object draws its inputs from layer<TAG_TYPE>(SUBNET())
-                and performs the identity transform.
-        !*/
     public:
         typedef SUBNET subnet_type;
         typedef typename subnet_type::input_type input_type;
@@ -1464,10 +1404,6 @@ namespace dlib
             const std::vector<input_type>& data,
             const std::vector<label_type>& labels 
         ) 
-        /*!
-            requires
-                - data.size() == labels.size()
-        !*/
         {
             DLIB_CASSERT(data.size() == labels.size(), "");
 
@@ -1490,10 +1426,6 @@ namespace dlib
         const net_type& train (
             const std::vector<input_type>& data
         ) 
-        /*!
-            ensures
-                - trains an auto-encoder
-        !*/
         {
             const bool has_unsupervised_loss = std::is_same<no_label_type, label_type>::value; 
             static_assert(has_unsupervised_loss, 
