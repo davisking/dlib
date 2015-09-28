@@ -56,12 +56,8 @@ if (NOT WIN32)
 endif()
 if (PYTHON3)
     # On some systems the boost python3 module is called python-py34 so check
-    # for that one.  Then if you don't find that then look for a few other
-    # names before findly trying just "python".
+    # for that one first.  
     FIND_PACKAGE(Boost 1.41.0  COMPONENTS python-py34 )
-    if (NOT Boost_FOUND)
-        FIND_PACKAGE(Boost 1.41.0 COMPONENTS python3)
-    endif()
     if (NOT Boost_FOUND)
         FIND_PACKAGE(Boost 1.41.0 COMPONENTS python)
     endif()
@@ -89,7 +85,7 @@ if (NOT Boost_FOUND)
         message(STATUS "    b2 install")
         message(STATUS " And then add the output bin folder to your PATH.  Usually this is the C:\\boost-build-engine\\bin")
         message(STATUS " folder. Finally, go to the boost root and run a command like this:")
-        message(STATUS "    b2 --with-python address-model=64 toolset=msvc --build-type=complete")
+        message(STATUS "    b2 -a --with-python address-model=64 toolset=msvc runtime-link=static")
         message(STATUS " When it completes, set BOOST_LIBRARYDIR equal to wherever b2 put the compiled libraries.")
         message(STATUS " Note that you will need to set the address-model based on if you want a 32 or 64bit python library.")
         message(STATUS "")
