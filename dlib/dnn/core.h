@@ -107,6 +107,9 @@ namespace dlib
             !*/
 
         public:
+            sub_net_wrapper(const sub_net_wrapper&) = delete;
+            sub_net_wrapper& operator=(const sub_net_wrapper&) = delete;
+
             sub_net_wrapper(T& l_) {}
             // Nothing here because in this case T is one of the input layer types 
             // that doesn't have anything in it.
@@ -117,6 +120,9 @@ namespace dlib
         {
 
         public:
+            sub_net_wrapper(const sub_net_wrapper&) = delete;
+            sub_net_wrapper& operator=(const sub_net_wrapper&) = delete;
+
             typedef T wrapped_type;
             const static size_t num_layers = T::num_layers;
 
@@ -500,6 +506,9 @@ namespace dlib
         public:
             sub_net_wrapper(const tensor& x_, resizable_tensor& grad_final_ignored_) :
                 x(x_), grad_final_ignored(grad_final_ignored_) {}
+
+            sub_net_wrapper(const sub_net_wrapper&) = delete;
+            sub_net_wrapper& operator=(const sub_net_wrapper&) = delete;
 
             const tensor& get_output() const { return x; }
             tensor& get_gradient_input() 

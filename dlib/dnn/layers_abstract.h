@@ -16,26 +16,68 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
+                This object represents a deep neural network.  In particular, it is
+                the simplified interface through which layer objects interact with their
+                subnetworks.  A layer's two important tasks are to (1) take outputs from its
+                subnetwork and forward propagate them though itself and (2) to backwards
+                propagate an error gradient through itself and onto its subnetwork.
+                The idea of a subnetwork is illustrated in the following diagram:
 
-                By "Sub net" we mean the part of the network closer to the input.  Whenever
-                you get a SUB_NET it will always have computed its outputs and they will be
-                available in get_output().
+                  +---------------------------------------------------------+
+                  | loss <-- layer1 <-- layer2 <-- ... <-- layern <-- input |
+                  +---------------------------------------------------------+
+                                      ^                            ^
+                                      \__ subnetwork for layer1 __/
 
+                Therefore, by "subnetwork" we mean the part of the network closer to the
+                input.  
         !*/
 
     public:
+        // You aren't allowed to copy subnetworks from inside a layer.
+        SUB_NET(const SUB_NET&) = delete;
+        SUB_NET& operator=(const SUB_NET&) = delete;
 
         const tensor& get_output(
         ) const;
+        /*!
+            ensures
+                - returns the output of this subnetwork.  This is the data that the next
+                  layer in the network will take as input.
+                - have_same_dimensions(#get_gradient_input(), get_output()) == true
+        !*/
 
         tensor& get_gradient_input(
         );
+        /*!
+            ensures
+                - returns the error gradient for this subnetwork.  That is, this is the
+                  error gradient that this network will use to update itself.  Therefore,
+                  when performing back propagation, layers that sit on top of this
+                  subnetwork write their back propagated error gradients into
+                  get_gradient_input().  Or to put it another way, during back propagation,
+                  layers take the contents of their get_gradient_input() and back propagate
+                  it through themselves and store the results into their subnetwork's
+                  get_gradient_input().
+        !*/
 
         const NEXT_SUB_NET& sub_net(
         ) const;
+        /*!
+            ensures
+                - returns the subnetwork of *this network.  With respect to the diagram
+                  above, if *this was layer1 then sub_net() would return the network that
+                  begins with layer2.
+        !*/
 
         NEXT_SUB_NET& sub_net(
         );
+        /*!
+            ensures
+                - returns the subnetwork of *this network.  With respect to the diagram
+                  above, if *this was layer1 then sub_net() would return the network that
+                  begins with layer2.
+        !*/
     };
 
 // ----------------------------------------------------------------------------------------
@@ -64,8 +106,8 @@ namespace dlib
         /*!
             ensures
                 - Default constructs this object.  This function is not required to do
-                  anything in particular but it is required that layer objects be default
-                  constructable. 
+                  anything in particular but it must exist, that is, it is required that
+                  layer objects be default constructable. 
         !*/
 
         EXAMPLE_LAYER_(
@@ -107,7 +149,7 @@ namespace dlib
                 - SUB_NET implements the SUB_NET interface defined at the top of this file.
                 - setup() has been called.
             ensures
-                - Runs the output of the sub-network through this layer and stores the
+                - Runs the output of the subnetwork through this layer and stores the
                   output into #output.  In particular, forward() can use any of the outputs
                   in sub (e.g. sub.get_output(), sub.sub_net().get_output(), etc.) to
                   compute whatever it wants.

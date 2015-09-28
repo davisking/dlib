@@ -23,8 +23,8 @@ namespace dlib
                 Note that there is no dlib::EXAMPLE_INPUT_LAYER type.  It is shown here
                 purely to document the interface that an input layer object must implement.
                 If you are using some kind of image or matrix object as your input_type
-                then you can use the provided dlib::input layer type defined below.
-                Otherwise, you need to define your own custom input layer.
+                then you can use the provided dlib::input layer defined below.  Otherwise,
+                you need to define your own custom input layer.
         !*/
     public:
 
@@ -33,8 +33,8 @@ namespace dlib
         /*!
             ensures
                 - Default constructs this object.  This function is not required to do
-                  anything in particular but it is required that layer objects be default
-                  constructable. 
+                  anything in particular but it must exist, that is, it is required that
+                  layer objects be default constructable. 
         !*/
 
         EXAMPLE_INPUT_LAYER(
@@ -70,10 +70,10 @@ namespace dlib
             ensures
                 - Converts the iterator range into a tensor and stores it into #data.
                 - #data.num_samples() == distance(ibegin,iend)*sample_expansion_factor. 
-                - Normally you would have #data.num_samples() == distance(ibegin,iend) but
+                  Normally you would have #data.num_samples() == distance(ibegin,iend) but
                   you can also expand the output by some integer factor so long as the loss
                   you use can deal with it correctly.
-                - The data in the ith sample in #data corresponds to
+                - The data in the ith sample of #data corresponds to the input_type object
                   *(ibegin+i/sample_expansion_factor).
         !*/
     };
