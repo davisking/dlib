@@ -269,65 +269,21 @@ def _log_buf(buf):
         log.info(line)
 
 
-def run_process(cmds, timeout=None):
-    """run a process asynchronously
+def run_process(cmds):
+    """run a process 
     :param cmds: list of commands to invoke on a shell e.g. ['make', 'install']
-    :param timeout: timeout in seconds (optional)
     """
 
-    # open process as its own session, and with no stdout buffering
+    # Run the process
     p = Popen(cmds,
               stdout=PIPE, stderr=STDOUT,
               bufsize=1,
               close_fds=_ON_POSIX, preexec_fn=os.setsid if _ON_POSIX else None)
+    # And send it's output to the console. 
+    for line in p.stdout:
+        _log_buf(line)
+    p.wait()
 
-    q = Queue()
-    t = Thread(target=enqueue_output, args=(p.stdout, q))
-    t.daemon = True  # thread dies with the program
-    t.start()
-
-    _time = time.time()
-    e = None
-    try:
-        while t.isAlive():
-            try:
-                buf = q.get(timeout=.1)
-            except Empty:
-                buf = b''
-            _log_buf(buf)
-            elapsed = time.time() - _time
-            if timeout and elapsed > timeout:
-                break
-    except (KeyboardInterrupt, SystemExit) as e:
-        # if user interrupted
-        pass
-
-    # noinspection PyBroadException
-    try:
-        os.kill(p.pid, signal.SIGINT)
-    except (KeyboardInterrupt, SystemExit) as e:
-        pass
-    except:
-        pass
-
-    # noinspection PyBroadException
-    try:
-        if e:
-            os.kill(p.pid, signal.SIGKILL)
-        else:
-            p.wait()
-    except (KeyboardInterrupt, SystemExit) as e:
-        # noinspection PyBroadException
-        try:
-            os.kill(p.pid, signal.SIGKILL)
-        except:
-            pass
-    except:
-        pass
-
-    t.join(timeout=0.1)
-    if e:
-        raise e
 
     return p.returncode
 
