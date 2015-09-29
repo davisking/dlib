@@ -49,7 +49,7 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This is a basic stack of T objects.  It holds N of the objects and is
-                entirely allocated on the stack.
+                entirely allocated on the stack rather than on the heap.
         !*/
 
     public:
@@ -142,7 +142,10 @@ namespace dlib
                     - SUBNET is an add_skip_layer object.
 
             WHAT THIS OBJECT REPRESENTS
-                Stacks a new layer, defined by LAYER_DETAILS, on top of SUBNET type.
+                This object represents a deep neural network.  In particular, it is a tool
+                for adding another layer on top of the neural network of type SUBNET, which
+                is specified as a template argument.  The specific layer added is defined
+                by the LAYER_DETAILS details template argument.
         !*/
 
     public:
@@ -156,45 +159,53 @@ namespace dlib
 
         add_layer(
         );
+        /*!
+            ensures
+                - default constructs all the layers in this network.
+        !*/
 
         add_layer(const add_layer&) = default;
         add_layer(add_layer&&) = default;
         add_layer& operator=(add_layer&&) = default;
         add_layer& operator=(const add_layer&) = default;
+        /*!
+            ensures
+                - this object is copyable and movable.
+        !*/
 
-
-        // Allow copying networks from one to another as long as their corresponding 
-        // layers can be constructed from each other.
         template <typename T, typename U>
         add_layer(
             const add_layer<T,U>& item
         );
         /*!
             ensures
+                - This constructor allows you to copy neural network objects from one to
+                  another as long as their corresponding layers can be constructed from
+                  each other.
                 - #layer_details() == layer_details_type(item.layer_details())
-                - #subnet()       == subnet_type(item.subnet())
+                - #subnet()        == subnet_type(item.subnet())
         !*/
 
         template <typename ...T>
         add_layer(
-            const LAYER_DETAILS& layer_det, 
+            const layer_details_type& layer_det, 
             T&& ...args
         );
         /*!
             ensures
                 - #layer_details() == layer_details_type(layer_det)
-                - #subnet() == subnet_type(args)
+                - #subnet()        == subnet_type(args)
         !*/
 
         template <typename ...T>
         add_layer(
-            LAYER_DETAILS&& layer_det, 
+            layer_details_type&& layer_det, 
             T&& ...args
         );
         /*!
             ensures
                 - #layer_details() == layer_details_type(layer_det)
-                - #subnet() == subnet_type(args)
+                - #subnet()        == subnet_type(args)
         !*/
 
         template <typename input_iterator>
@@ -206,12 +217,50 @@ namespace dlib
         /*!
             requires
                 - [ibegin, iend) is an iterator range over input_type objects.
+                - std::distance(ibegin,iend) > 0
             ensures
                 - Converts the iterator range into a tensor and stores it into #data.
                 - #data.num_samples() == distance(ibegin,iend)*sample_expansion_factor. 
+                - The data in the ith sample of #data corresponds to the input_type object
+                  *(ibegin+i/sample_expansion_factor).
                 - Invokes data.async_copy_to_device() so that the data begins transferring
-                  to the device.
-                - Ultimately this function just calls subnet().subnet()...subnet().to_tensor(ibegin,iend,data).
+                  to the GPU device, if present.
+                - This function is implemented by calling the to_tensor() routine defined
+                  at the input layer of this network.  
+        !*/
+
+        const subnet_type& subnet(
+        ) const; 
+        /*!
+            ensures
+                - returns the immediate subnetwork of *this network.  
+        !*/
+
+        subnet_type& subnet(
+        );
+        /*!
+            ensures
+                - returns the immediate subnetwork of *this network.  
+        !*/
+
+        const layer_details_type& layer_details(
+        ) const; 
+        /*!
+            ensures
+                - returns the layer_details_type instance that defines the behavior of the
+                  layer at the top of this network.  I.e. returns the layer details that
+                  defines the behavior of the layer nearest to the network output rather
+                  than the input layer.
+        !*/
+
+        layer_details_type& layer_details(
+        );
+        /*!
+            ensures
+                - returns the layer_details_type instance that defines the behavior of the
+                  layer at the top of this network.  I.e. returns the layer details that
+                  defines the behavior of the layer nearest to the network output rather
+                  than the input layer.
         !*/
 
         template <typename input_iterator>
@@ -220,14 +269,19 @@ namespace dlib
             input_iterator iend
         );
         /*!
+            requires
+                - [ibegin, iend) is an iterator range over input_type objects.
+                - std::distance(ibegin,iend) > 0
             ensures
                 - runs [ibegin,iend) through the network and returns the results.
                   In particular, this function performs:
                     to_tensor(ibegin,iend,temp_tensor);
                     return forward(temp_tensor);
                 - The return value from this function is also available in #get_output().
-                - have_same_dimensions(#get_gradient_input(), #get_output()) == true
+                - have_same_dimensions(#get_gradient_input(), #get_output()) == true.
                 - All elements of #get_gradient_input() are set to 0. 
+                  i.e. calling this function clears out #get_gradient_input() and ensures
+                  it has the same dimensions as the most recent output.
         !*/
 
 
@@ -254,19 +308,9 @@ namespace dlib
                 - The return value from this function is also available in #get_output().
                 - have_same_dimensions(#get_gradient_input(), #get_output()) == true
                 - All elements of #get_gradient_input() are set to 0. 
+                  i.e. calling this function clears out #get_gradient_input() and ensures
+                  it has the same dimensions as the most recent output.
         !*/
-        {
-            subnetwork.forward(x);
-            const dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
-            if (!this_layer_setup_called)
-            {
-                details.setup(wsub);
-                this_layer_setup_called = true;
-            }
-            details.forward(wsub, cached_output);
-            gradient_input_is_stale = true;
-            return get_output();
-        }
 
         const tensor& get_output(
         ) const;
@@ -281,46 +325,51 @@ namespace dlib
         );
         /*!
             ensures
-                - 
+                - returns the error gradient for this network.  That is, this is the error
+                  gradient that this network will use to update itself when update() is
+                  called.  Therefore, when performing back propagation, layers that sit on
+                  top of this network layer write their back propagated error gradients
+                  into get_gradient_input().  Or to put it another way, during back
+                  propagation, layers take the contents of their get_gradient_input() and
+                  back propagate it through themselves and store the results into their
+                  subnetwork's get_gradient_input().
+
+                  This means you should consider get_gradient_input() as an input to the
+                  update() method.  
         !*/
-        { 
-            if (gradient_input_is_stale)
-            {
-                gradient_input_is_stale = false;
-                x_grad.copy_size(get_output());
-                x_grad = 0;
-            }
-            return x_grad; 
-        }
 
         template <typename solver_type>
-        void update(const tensor& x, sstack<solver_type,num_layers>& solvers)
+        void update(
+            const tensor& x, 
+            sstack<solver_type,num_layers>& solvers
+        );
         /*!
             requires
                 - forward(x) was called to forward propagate x though the network.
-                - x.num_samples() == get_gradient_input().num_samples()
-                - get_gradient_input() == the gradient of the network with respect
-                  to some loss.
+                - x.num_samples() == get_output().num_samples()
+                - get_gradient_input() has been set equal to the gradient of this network's
+                  output with respect to some loss function.
+                - This instance of solvers has only ever been used with this network.  That
+                  is, if you want to call update() on some other neural network object then
+                  you must not reuse the same solvers object.
+            ensures
+                - Back propagates the error gradient, get_gradient_input(), through this
+                  network and uses the provided solvers to update the network parameters.
         !*/
-        {
-            dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
-            params_grad.copy_size(details.get_layer_params());
-            params_grad = 0;
-            details.backward(get_gradient_input(), wsub, static_cast<tensor&>(params_grad));
-            // Don't try to adjust the parameters if this layer doesn't have any.
-            if (params_grad.size() != 0)
-                solvers.top()(details, static_cast<const tensor&>(params_grad));
-            subnetwork.update(x, solvers.pop());
-        }
-
-        const subnet_type& subnet() const { return subnetwork; }
-        subnet_type& subnet() { return subnetwork; }
-
-        const layer_details_type& layer_details() const { return details; } 
-        layer_details_type& layer_details() { return details; } 
 
         void clean(
         );
+        /*!
+            ensures
+                - Causes the network to forget about everything but its parameters.  
+                  That is, for each layer we will have:
+                    - get_output().num_samples() == 0
+                    - get_gradient_input().num_samples() == 0
+                  However, running new input data though this network will still have the
+                  same output it would have had regardless of any calls to clean().
+                  The purpose of clean() is to compact the network object prior to saving
+                  it to disk so that it takes up less space and the IO is quicker.
+        !*/
 
     };
 
@@ -350,115 +399,175 @@ namespace dlib
                     - SUBNET is an add_skip_layer object.
 
             WHAT THIS OBJECT REPRESENTS
-                - Adds a loss layer, defined by LOSS_DETAILS, on top of SUBNET.
+                This object represents a deep neural network.  In particular, it is a tool
+                for adding a loss layer on top of the neural network of type SUBNET, which
+                is specified as a template argument.  The specific layer added is defined
+                by the LOSS_DETAILS details template argument.  Importantly, a loss layer
+                is the last layer in a deep neural network.  So once it is added you can't
+                add any other layers of any type.
         !*/
 
     public:
         typedef LOSS_DETAILS loss_details_type;
         typedef SUBNET subnet_type;
         typedef typename subnet_type::input_type input_type;
-        // Note that the loss layer doesn't count as an additional layer. 
+        // Note that the loss layer doesn't count as an additional layer since it doesn't
+        // have any learnable parameters.  
         const static size_t num_layers = subnet_type::num_layers;
         const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         // If LOSS_DETAILS is an unsupervised loss then label_type==no_label_type.
         // Otherwise it is defined as follows:
         typedef typename LOSS_DETAILS::label_type label_type;
 
-        static_assert(sample_expansion_factor == LOSS_DETAILS::sample_expansion_factor,
-            "The loss layer and input layer must agree on the sample_expansion_factor.");
 
 
         add_loss_layer() = default;
+        /*!
+            ensures
+                - default constructs all the layers in this network.
+        !*/
+
         add_loss_layer(const add_loss_layer&) = default;
         add_loss_layer(add_loss_layer&&) = default;
         add_loss_layer& operator=(add_loss_layer&&) = default;
         add_loss_layer& operator=(const add_loss_layer&) = default;
+        /*!
+            ensures
+                - this object is copyable and movable.
+        !*/
 
         template <typename T, typename U>
         add_loss_layer(
             const add_loss_layer<T,U>& item
-        ) : 
-            loss(item.loss_details()),
-            sub(item.subnet())
-        {}
+        );
+        /*!
+            ensures
+                - This constructor allows you to copy neural network objects from one to
+                  another as long as their corresponding layers can be constructed from
+                  each other.
+                - #loss_details() == loss_details_type(item.loss_details())
+                - #subnet()       == subnet_type(item.subnet())
+        !*/
 
         template <typename ...T>
         add_loss_layer(
             const LOSS_DETAILS& layer_det, 
             T&& ...args
-        ) : 
-            loss(layer_det), 
-            sub(std::forward<T>(args)...)
-        {
-        }
+        ); 
+        /*!
+            ensures
+                - #loss_details() == loss_details_type(layer_det)
+                - #subnet()       == subnet_type(args)
+        !*/
 
         template <typename ...T>
         add_loss_layer(
             LOSS_DETAILS&& layer_det, 
             T&& ...args
-        ) : 
-            loss(std::move(layer_det)), 
-            sub(std::forward<T>(args)...)
-        {
-        }
+        );
+        /*!
+            ensures
+                - #loss_details() == loss_details_type(layer_det)
+                - #subnet()       == subnet_type(args)
+        !*/
 
         template <typename ...T>
         add_loss_layer(
             T ...args
-        ) : 
-            sub(std::move(args)...)
-        {
-        }
+        ); 
+        /*!
+            ensures
+                - #loss_details() == loss_details_type()
+                - #subnet()       == subnet_type(args)
+        !*/
 
-        template <typename input_iterator, typename output_iterator>
+        const subnet_type& subnet(
+        ) const; 
+        /*!
+            ensures
+                - returns the immediate subnetwork of *this network.  
+        !*/
+
+        subnet_type& subnet(
+        ); 
+        /*!
+            ensures
+                - returns the immediate subnetwork of *this network.  
+        !*/
+
+        const loss_details_type& loss_details(
+        ) const; 
+        /*!
+            ensures
+                - returns the loss_details_type instance that defines the behavior of the
+                  loss layer used by this network.
+        !*/
+
+        loss_details_type& loss_details(
+        ); 
+        /*!
+            ensures
+                - returns the loss_details_type instance that defines the behavior of the
+                  loss layer used by this network.
+        !*/
+
+        template <typename input_iterator, typename label_iterator>
         void operator() (
             input_iterator ibegin,
             input_iterator iend,
-            output_iterator obegin
-        )
+            label_iterator obegin
+        );
         /*!
             requires
-                - obegin == iterator pointing to the start of a range of distance(ibegin,iend)
-                  elements.
+                - [ibegin, iend) is an iterator range over input_type objects.
+                - std::distance(ibegin,iend) > 0
+                - obegin == iterator pointing to the start of a range of
+                  std::distance(ibegin,iend) label_type elements.
             ensures
-                - runs [ibegin,iend) through the network and writes the output to the range at obegin.
+                - runs [ibegin,iend) through the network and writes the output to the range
+                  at obegin.
         !*/
-        {
-            sub.to_tensor(ibegin,iend,temp_tensor);
-            sub.forward(temp_tensor);
-            loss.to_label(sub, obegin);
-        }
 
-
-        const label_type& operator() (const input_type& x)
+        const label_type& operator() (
+            const input_type& x
+        );
         /*!
             ensures
-                - runs a single x through the network and returns the output.
+                - runs a single object, x, through the network and returns the output.
         !*/
-        {
-            (*this)(&x, &x+1, &temp_label);
-            return temp_label;
-        }
-
 
         template <typename input_iterator, typename label_iterator>
         double compute_loss (
             input_iterator ibegin,
             input_iterator iend,
             label_iterator lbegin 
-        )
-        {
-            sub.to_tensor(ibegin,iend,temp_tensor);
-            sub.forward(temp_tensor);
-            dimpl::subnet_wrapper<subnet_type> wsub(sub);
-            return loss.compute_loss(temp_tensor, lbegin, wsub);
-        }
+        );
+        /*!
+            requires
+                - [ibegin, iend) is an iterator range over input_type objects.
+                - std::distance(ibegin,iend) > 0
+                - lbegin == iterator pointing to the start of a range of
+                  std::distance(ibegin,iend) label_type elements.
+            ensures
+                - runs [ibegin,iend) through the network, compares the output to the
+                  expected output pointed to by lbegin, and returns the resulting loss. 
+                - This function does not update the network parameters.
+        !*/
 
         template <typename input_iterator>
         double compute_loss (
             input_iterator ibegin,
             input_iterator iend,
         );
+        /*!
+            requires
+                - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
+                - [ibegin, iend) is an iterator range over input_type objects.
+                - std::distance(ibegin,iend) > 0
+            ensures
+                - runs [ibegin,iend) through the network and returns the resulting loss. 
+                - This function does not update the network parameters.
+        !*/
 
         template <typename input_iterator, typename label_iterator, typename solver_type>
         double update (
@@ -466,15 +575,24 @@ namespace dlib
             input_iterator iend,
             label_iterator lbegin,
             sstack<solver_type,num_layers>& solvers
-        )
-        {
-            sub.to_tensor(ibegin,iend,temp_tensor);
-            sub.forward(temp_tensor);
-            dimpl::subnet_wrapper<subnet_type> wsub(sub);
-            double l = loss.compute_loss(temp_tensor, lbegin, wsub);
-            sub.update(temp_tensor, solvers);
-            return l;
-        }
+        );
+        /*!
+            requires
+                - [ibegin, iend) is an iterator range over input_type objects.
+                - std::distance(ibegin,iend) > 0
+                - lbegin == iterator pointing to the start of a range of
+                  std::distance(ibegin,iend) label_type elements.
+                - This instance of solvers has only ever been used with this network.  That
+                  is, if you want to call update() on some other neural network object then
+                  you must not reuse the same solvers object.
+            ensures
+                - runs [ibegin,iend) through the network, compares the output to the
+                  expected output pointed to by lbegin, and updates the network parameters
+                  via backpropagation.
+                - The provided solvers are used to update the parameters in each layer of
+                  the network.
+                - returns compute_loss(ibegin,iend,lbegin)
+        !*/
 
         template <typename input_iterator, typename solver_type>
         double update (
@@ -482,44 +600,30 @@ namespace dlib
             input_iterator iend,
             sstack<solver_type,num_layers>& solvers
         );
-
-        const subnet_type& subnet() const { return sub; }
-        subnet_type& subnet() { return sub; }
-        const loss_details_type& loss_details() const { return loss; }
-        loss_details_type& loss_details() { return loss; }
+        /*!
+            requires
+                - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
+                - [ibegin, iend) is an iterator range over input_type objects.
+                - std::distance(ibegin,iend) > 0
+                - This instance of solvers has only ever been used with this network.  That
+                  is, if you want to call update() on some other neural network object then
+                  you must not reuse the same solvers object.
+            ensures
+                - runs [ibegin,iend) through the network and updates the network parameters
+                  by back-propagating the loss gradient through the network.
+                - The provided solvers are used to update the parameters in each layer of
+                  the network.
+                - returns compute_loss(ibegin,iend)
+        !*/
 
         void clean (
-        )
+        );
         /*!
             ensures
                 - Causes the network to forget about everything but its parameters.  
-                  That is, for each layer we will have:
-                    - get_output().num_samples() == 0
-                    - get_gradient_input().num_samples() == 0
-                  However, running new input data though this network will still have the
-                  same output it would have had regardless of any calls to clean().
-                  Finally, the purpose of clean() is to compact the network object prior to
-                  saving it to disk so that it takes up less space and the IO is quicker.
+                - invokes subnet().clean()
         !*/
-        {
-            temp_tensor.clear();
-            sub.clear();
-        }
-
-    private:
-
-        loss_details_type loss;
-        subnet_type sub;
-
-        // These two objects don't logically contribute to the state of this object.  They
-        // are here to prevent them from being reallocated over and over.
-        label_type temp_label;
-        resizable_tensor temp_tensor;
     };
-
-
-    template <typename T, typename U>
-    struct is_layer_type<add_loss_layer<T,U>> : std::true_type {};
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -541,11 +645,13 @@ namespace dlib
                     - SUBNET is an add_skip_layer object.
 
             WHAT THIS OBJECT REPRESENTS
-                This object draws its inputs from subnet() and performs the identity
-                transform.  This means it is a no-op and its presence does not change
-                the behavior of the network.  It exists solely to be used by add_skip_layer
-                to reference a particular part of a network.
+                This object adds a new layer to a deep neural network.  However, this layer
+                simply performs the identity transform.  This means it is a no-op and its
+                presence does not change the behavior of the network.  It exists solely to
+                be used by add_skip_layer to reference a particular part of a network.
 
+                Also, this object provides an interface identical to the one defined by the
+                add_layer object.
         !*/
     };
 
@@ -576,8 +682,11 @@ namespace dlib
                     - SUBNET is an add_skip_layer object.
 
             WHAT THIS OBJECT REPRESENTS
-                This object draws its inputs from layer<TAG_TYPE>(subnet())
-                and performs the identity transform.
+                This object adds a new layer to a deep neural network which draws its
+                inputs from layer<TAG_TYPE>(subnet()) and performs the identity transform.
+
+                Also, this object provides an interface identical to the one defined by the
+                add_layer object.
         !*/
     };
 
@@ -659,10 +768,10 @@ namespace dlib
         layer_details_type l
     );
     /*!
-        requires
-            - l implements the EXAMPLE_LAYER_ interface defined in layers_abstract.h
         ensures
-            - tests l for compliance against the EXAMPLE_LAYER_ interface spec.
+            - Checks if l correctly implements the EXAMPLE_LAYER_ interface defined in
+              layers_abstract.h.  Importantly, it computes numerical approximations to the
+              gradients and compares them to the outputs of the layer.  
     !*/
 
 // ----------------------------------------------------------------------------------------
