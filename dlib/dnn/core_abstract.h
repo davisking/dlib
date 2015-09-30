@@ -278,12 +278,13 @@ namespace dlib
                     to_tensor(ibegin,iend,temp_tensor);
                     return forward(temp_tensor);
                 - The return value from this function is also available in #get_output().
+                  i.e. this function returns #get_output().
+                - #get_output().num_samples() == std::distance(ibegin,iend)*sample_expansion_factor.
                 - have_same_dimensions(#get_gradient_input(), #get_output()) == true.
                 - All elements of #get_gradient_input() are set to 0. 
                   i.e. calling this function clears out #get_gradient_input() and ensures
                   it has the same dimensions as the most recent output.
         !*/
-
 
         const tensor& operator() (
             const input_type& x
@@ -298,6 +299,9 @@ namespace dlib
             const tensor& x
         );
         /*!
+            requires
+                - x.num_samples()%sample_expansion_factor == 0
+                - x.num_samples() > 0
             ensures
                 - Runs x through the network and returns the results.  In particular, this
                   function performs the equivalent of:
@@ -306,6 +310,8 @@ namespace dlib
                         layer_details().setup(subnet());
                     layer_details().forward(subnet(), get_output());
                 - The return value from this function is also available in #get_output().
+                  i.e. this function returns #get_output().
+                - #get_output().num_samples() == x.num_samples().
                 - have_same_dimensions(#get_gradient_input(), #get_output()) == true
                 - All elements of #get_gradient_input() are set to 0. 
                   i.e. calling this function clears out #get_gradient_input() and ensures
@@ -511,6 +517,46 @@ namespace dlib
                   loss layer used by this network.
         !*/
 
+        template <typename input_iterator>
+        void to_tensor (
+            input_iterator ibegin,
+            input_iterator iend,
+            resizable_tensor& data
+        ) const;
+        /*!
+            requires
+                - [ibegin, iend) is an iterator range over input_type objects.
+                - std::distance(ibegin,iend) > 0
+            ensures
+                - Converts the iterator range into a tensor and stores it into #data.
+                - #data.num_samples() == distance(ibegin,iend)*sample_expansion_factor. 
+                - The data in the ith sample of #data corresponds to the input_type object
+                  *(ibegin+i/sample_expansion_factor).
+                - Invokes data.async_copy_to_device() so that the data begins transferring
+                  to the GPU device, if present.
+                - This function is implemented by calling the to_tensor() routine defined
+                  at the input layer of this network.  
+        !*/
+
+    // -------------
+
+        template <typename output_iterator>
+        void operator() (
+            const tensor& x, 
+            output_iterator obegin
+        );
+        /*!
+            requires
+                - x.num_samples()%sample_expansion_factor == 0
+                - x.num_samples() > 0
+                - obegin == iterator pointing to the start of a range of
+                  x.num_samples()/sample_expansion_factor label_type elements.
+            ensures
+                - runs x through the network and writes the output to the range at obegin.
+                - loss_details().to_label() is used to write the network output into
+                  obegin.
+        !*/
+
         template <typename input_iterator, typename label_iterator>
         void operator() (
             input_iterator ibegin,
@@ -526,7 +572,11 @@ namespace dlib
             ensures
                 - runs [ibegin,iend) through the network and writes the output to the range
                   at obegin.
+                - loss_details().to_label() is used to write the network output into
+                  obegin.
         !*/
+
+    // -------------
 
         const label_type& operator() (
             const input_type& x
@@ -534,6 +584,29 @@ namespace dlib
         /*!
             ensures
                 - runs a single object, x, through the network and returns the output.
+                - loss_details().to_label() is used to convert the network output into a
+                  label_type.
+        !*/
+
+    // -------------
+
+        template <typename label_iterator>
+        double compute_loss (
+            const tensor& x,
+            label_iterator lbegin 
+        );
+        /*!
+            requires
+                - x.num_samples()%sample_expansion_factor == 0
+                - x.num_samples() > 0
+                - lbegin == iterator pointing to the start of a range of
+                  x.num_samples()/sample_expansion_factor label_type elements.
+            ensures
+                - runs x through the network, compares the output to the expected output
+                  pointed to by lbegin, and returns the resulting loss. 
+                - for all valid k:
+                    - the expected label of the kth sample in x is *(lbegin+k/sample_expansion_factor).
+                - This function does not update the network parameters.
         !*/
 
         template <typename input_iterator, typename label_iterator>
@@ -551,6 +624,23 @@ namespace dlib
             ensures
                 - runs [ibegin,iend) through the network, compares the output to the
                   expected output pointed to by lbegin, and returns the resulting loss. 
+                - for all valid k:
+                    - the expected label of *(ibegin+k) is *(lbegin+k).
+                - This function does not update the network parameters.
+        !*/
+
+    // -------------
+
+        double compute_loss (
+            const tensor& x
+        );
+        /*!
+            requires
+                - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
+                - x.num_samples()%sample_expansion_factor == 0
+                - x.num_samples() > 0
+            ensures
+                - runs x through the network and returns the resulting loss. 
                 - This function does not update the network parameters.
         !*/
 
@@ -567,6 +657,34 @@ namespace dlib
             ensures
                 - runs [ibegin,iend) through the network and returns the resulting loss. 
                 - This function does not update the network parameters.
+        !*/
+
+    // -------------
+
+        template <typename label_iterator, typename solver_type>
+        double update (
+            const tensor& x,
+            label_iterator lbegin,
+            sstack<solver_type,num_layers>& solvers
+        );
+        /*!
+            requires
+                - x.num_samples()%sample_expansion_factor == 0
+                - x.num_samples() > 0
+                - lbegin == iterator pointing to the start of a range of
+                  x.num_samples()/sample_expansion_factor label_type elements.
+                - This instance of solvers has only ever been used with this network.  That
+                  is, if you want to call update() on some other neural network object then
+                  you must not reuse the same solvers object.
+            ensures
+                - runs x through the network, compares the output to the expected output
+                  pointed to by lbegin, and updates the network parameters via
+                  backpropagation.
+                - for all valid k:
+                    - the expected label of the kth sample in x is *(lbegin+k/sample_expansion_factor).
+                - The provided solvers are used to update the parameters in each layer of
+                  the network.
+                - returns compute_loss(x,lbegin)
         !*/
 
         template <typename input_iterator, typename label_iterator, typename solver_type>
@@ -589,9 +707,34 @@ namespace dlib
                 - runs [ibegin,iend) through the network, compares the output to the
                   expected output pointed to by lbegin, and updates the network parameters
                   via backpropagation.
+                - for all valid k:
+                    - the expected label of *(ibegin+k) is *(lbegin+k).
                 - The provided solvers are used to update the parameters in each layer of
                   the network.
                 - returns compute_loss(ibegin,iend,lbegin)
+        !*/
+
+    // -------------
+
+        template <typename solver_type>
+        double update (
+            const tensor& x,
+            sstack<solver_type,num_layers>& solvers
+        );
+        /*!
+            requires
+                - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
+                - x.num_samples()%sample_expansion_factor == 0
+                - x.num_samples() > 0
+                - This instance of solvers has only ever been used with this network.  That
+                  is, if you want to call update() on some other neural network object then
+                  you must not reuse the same solvers object.
+            ensures
+                - runs x through the network and updates the network parameters by
+                  back-propagating the loss gradient through the network.
+                - The provided solvers are used to update the parameters in each layer of
+                  the network.
+                - returns compute_loss(x)
         !*/
 
         template <typename input_iterator, typename solver_type>
@@ -615,6 +758,8 @@ namespace dlib
                   the network.
                 - returns compute_loss(ibegin,iend)
         !*/
+
+    // -------------
 
         void clean (
         );

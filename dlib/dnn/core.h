@@ -100,9 +100,9 @@ namespace dlib
                 WHAT THIS OBJECT REPRESENTS
                     This is a tool that makes an add_layer or add_loss_layer object
                     expose only the part of its interface defined by the SUBNET
-                    type in layers_abstract.h.  This way, when we pass sub network
+                    type in layers_abstract.h.  This way, when we pass subnetwork
                     objects to the layer callbacks those callbacks won't be able to 
-                    interact with the sub networks in a way other than specified 
+                    interact with the subnetworks in a way other than specified 
                     by the SUBNET interface spec.
             !*/
 
@@ -312,7 +312,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-// This version of add_layer handles the special case where the sub network being given is
+// This version of add_layer handles the special case where the subnetwork being given is
 // just an input layer object.
     template <typename LAYER_DETAILS, typename INPUT_LAYER, typename enabled>
     class add_layer
@@ -606,7 +606,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-// This version of add_tag_layer handles the special case where the sub network being given
+// This version of add_tag_layer handles the special case where the subnetwork being given
 // is just an input layer object.
     template <unsigned long ID, typename INPUT_LAYER, typename enabled>
     class add_tag_layer
@@ -802,6 +802,28 @@ namespace dlib
         ) : 
             sub(std::move(args)...)
         {
+            // TODO, rename sub to subnetwork
+        }
+
+        template <typename input_iterator>
+        void to_tensor (
+            input_iterator ibegin,
+            input_iterator iend,
+            resizable_tensor& data
+        ) const
+        {
+            sub.to_tensor(ibegin,iend,data);
+        }
+
+        template <typename output_iterator>
+        void operator() (
+            const tensor& x, 
+            output_iterator obegin
+        )
+        {
+            sub.forward(x);
+            const dimpl::subnet_wrapper<subnet_type> wsub(sub);
+            loss.to_label(wsub, obegin);
         }
 
         template <typename input_iterator, typename output_iterator>
@@ -811,11 +833,9 @@ namespace dlib
             output_iterator obegin
         )
         {
-            sub.to_tensor(ibegin,iend,temp_tensor);
-            sub.forward(temp_tensor);
-            loss.to_label(sub, obegin);
+            to_tensor(ibegin,iend,temp_tensor);
+            (*this)(temp_tensor, obegin);
         }
-
 
         const label_type& operator() (const input_type& x)
         {
@@ -823,6 +843,16 @@ namespace dlib
             return temp_label;
         }
 
+        template <typename label_iterator>
+        double compute_loss (
+            const tensor& x,
+            label_iterator lbegin 
+        )
+        {
+            sub.forward(x);
+            dimpl::subnet_wrapper<subnet_type> wsub(sub);
+            return loss.compute_loss(x, lbegin, wsub);
+        }
 
         template <typename input_iterator, typename label_iterator>
         double compute_loss (
@@ -831,10 +861,17 @@ namespace dlib
             label_iterator lbegin 
         )
         {
-            sub.to_tensor(ibegin,iend,temp_tensor);
-            sub.forward(temp_tensor);
+            to_tensor(ibegin,iend,temp_tensor);
+            return compute_loss(temp_tensor, lbegin);
+        }
+
+        double compute_loss (
+            const tensor& x
+        )
+        {
+            sub.forward(x);
             dimpl::subnet_wrapper<subnet_type> wsub(sub);
-            return loss.compute_loss(temp_tensor, lbegin, wsub);
+            return loss.compute_loss(x, wsub);
         }
 
         template <typename input_iterator>
@@ -843,10 +880,22 @@ namespace dlib
             input_iterator iend
         )
         {
-            sub.to_tensor(ibegin,iend,temp_tensor);
-            sub.forward(temp_tensor);
+            to_tensor(ibegin,iend,temp_tensor);
+            return compute_loss(temp_tensor);
+        }
+
+        template <typename label_iterator, typename solver_type>
+        double update (
+            const tensor& x,
+            label_iterator lbegin,
+            sstack<solver_type,num_layers>& solvers
+        )
+        {
+            sub.forward(x);
             dimpl::subnet_wrapper<subnet_type> wsub(sub);
-            return loss.compute_loss(temp_tensor, wsub);
+            double l = loss.compute_loss(x, lbegin, wsub);
+            sub.update(x, solvers);
+            return l;
         }
 
         template <typename input_iterator, typename label_iterator, typename solver_type>
@@ -857,11 +906,20 @@ namespace dlib
             sstack<solver_type,num_layers>& solvers
         )
         {
-            sub.to_tensor(ibegin,iend,temp_tensor);
-            sub.forward(temp_tensor);
+            to_tensor(ibegin,iend,temp_tensor);
+            return update(temp_tensor, lbegin, solvers);
+        }
+
+        template <typename solver_type>
+        double update (
+            const tensor& x,
+            sstack<solver_type,num_layers>& solvers
+        )
+        {
+            sub.forward(x);
             dimpl::subnet_wrapper<subnet_type> wsub(sub);
-            double l = loss.compute_loss(temp_tensor, lbegin, wsub);
-            sub.update(temp_tensor, solvers);
+            double l = loss.compute_loss(x, wsub);
+            sub.update(x, solvers);
             return l;
         }
 
@@ -872,12 +930,8 @@ namespace dlib
             sstack<solver_type,num_layers>& solvers
         )
         {
-            sub.to_tensor(ibegin,iend,temp_tensor);
-            sub.forward(temp_tensor);
-            dimpl::subnet_wrapper<subnet_type> wsub(sub);
-            double l = loss.compute_loss(temp_tensor, wsub);
-            sub.update(temp_tensor, solvers);
-            return l;
+            to_tensor(ibegin,iend,temp_tensor);
+            return update(temp_tensor, solvers);
         }
 
         const subnet_type& subnet() const { return sub; }
