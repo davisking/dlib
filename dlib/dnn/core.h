@@ -126,17 +126,17 @@ namespace dlib
             typedef T wrapped_type;
             const static size_t num_layers = T::num_layers;
 
-            subnet_wrapper(T& l_) : l(l_),sub(l.subnet()) {}
+            subnet_wrapper(T& l_) : l(l_),subnetwork(l.subnet()) {}
 
             const tensor& get_output() const { return l.get_output(); }
             tensor& get_gradient_input() { return l.get_gradient_input(); }
 
-            const subnet_wrapper<typename T::subnet_type>& subnet() const { sub; }
-            subnet_wrapper<typename T::subnet_type>& subnet() { sub; }
+            const subnet_wrapper<typename T::subnet_type>& subnet() const { subnetwork; }
+            subnet_wrapper<typename T::subnet_type>& subnet() { subnetwork; }
 
         private:
             T& l;
-            subnet_wrapper<typename T::subnet_type> sub;
+            subnet_wrapper<typename T::subnet_type> subnetwork;
         };
     }
 
@@ -773,7 +773,7 @@ namespace dlib
             const add_loss_layer<T,U>& item
         ) : 
             loss(item.loss_details()),
-            sub(item.subnet())
+            subnetwork(item.subnet())
         {}
 
         template <typename ...T>
@@ -782,7 +782,7 @@ namespace dlib
             T&& ...args
         ) : 
             loss(layer_det), 
-            sub(std::forward<T>(args)...)
+            subnetwork(std::forward<T>(args)...)
         {
         }
 
@@ -792,7 +792,7 @@ namespace dlib
             T&& ...args
         ) : 
             loss(std::move(layer_det)), 
-            sub(std::forward<T>(args)...)
+            subnetwork(std::forward<T>(args)...)
         {
         }
 
@@ -800,9 +800,8 @@ namespace dlib
         add_loss_layer(
             T ...args
         ) : 
-            sub(std::move(args)...)
+            subnetwork(std::move(args)...)
         {
-            // TODO, rename sub to subnetwork
         }
 
         template <typename input_iterator>
@@ -812,7 +811,7 @@ namespace dlib
             resizable_tensor& data
         ) const
         {
-            sub.to_tensor(ibegin,iend,data);
+            subnetwork.to_tensor(ibegin,iend,data);
         }
 
         template <typename output_iterator>
@@ -821,8 +820,8 @@ namespace dlib
             output_iterator obegin
         )
         {
-            sub.forward(x);
-            const dimpl::subnet_wrapper<subnet_type> wsub(sub);
+            subnetwork.forward(x);
+            const dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
             loss.to_label(wsub, obegin);
         }
 
@@ -849,8 +848,8 @@ namespace dlib
             label_iterator lbegin 
         )
         {
-            sub.forward(x);
-            dimpl::subnet_wrapper<subnet_type> wsub(sub);
+            subnetwork.forward(x);
+            dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
             return loss.compute_loss(x, lbegin, wsub);
         }
 
@@ -869,8 +868,8 @@ namespace dlib
             const tensor& x
         )
         {
-            sub.forward(x);
-            dimpl::subnet_wrapper<subnet_type> wsub(sub);
+            subnetwork.forward(x);
+            dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
             return loss.compute_loss(x, wsub);
         }
 
@@ -891,10 +890,10 @@ namespace dlib
             sstack<solver_type,num_layers>& solvers
         )
         {
-            sub.forward(x);
-            dimpl::subnet_wrapper<subnet_type> wsub(sub);
+            subnetwork.forward(x);
+            dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
             double l = loss.compute_loss(x, lbegin, wsub);
-            sub.update(x, solvers);
+            subnetwork.update(x, solvers);
             return l;
         }
 
@@ -916,10 +915,10 @@ namespace dlib
             sstack<solver_type,num_layers>& solvers
         )
         {
-            sub.forward(x);
-            dimpl::subnet_wrapper<subnet_type> wsub(sub);
+            subnetwork.forward(x);
+            dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
             double l = loss.compute_loss(x, wsub);
-            sub.update(x, solvers);
+            subnetwork.update(x, solvers);
             return l;
         }
 
@@ -934,8 +933,8 @@ namespace dlib
             return update(temp_tensor, solvers);
         }
 
-        const subnet_type& subnet() const { return sub; }
-        subnet_type& subnet() { return sub; }
+        const subnet_type& subnet() const { return subnetwork; }
+        subnet_type& subnet() { return subnetwork; }
         const loss_details_type& loss_details() const { return loss; }
         loss_details_type& loss_details() { return loss; }
 
@@ -943,13 +942,13 @@ namespace dlib
         )
         {
             temp_tensor.clear();
-            sub.clear();
+            subnetwork.clear();
         }
 
     private:
 
         loss_details_type loss;
-        subnet_type sub;
+        subnet_type subnetwork;
 
         // These two objects don't logically contribute to the state of this object.  They
         // are here to prevent them from being reallocated over and over.
@@ -1219,17 +1218,17 @@ namespace dlib
 
 
             const tensor& get_output() const { return output; }
-            const test_layer_subnet& subnet() const { init_sub(); return *sub; }
+            const test_layer_subnet& subnet() const { init_sub(); return *subnetwork; }
 
             tensor& get_gradient_input() { return gradient_input; }
-            test_layer_subnet& subnet() { init_sub(); return *sub; }
+            test_layer_subnet& subnet() { init_sub(); return *subnetwork; }
 
 
 
             unsigned long count_outputs() const
             {
-                if (sub)
-                    return sub->count_outputs() + output.size();
+                if (subnetwork)
+                    return subnetwork->count_outputs() + output.size();
                 else
                     return output.size();
             }
@@ -1256,12 +1255,12 @@ namespace dlib
             // subnet()
             void init_sub() const
             {
-                if (!sub)
-                    sub.reset(new test_layer_subnet(rnd));
+                if (!subnetwork)
+                    subnetwork.reset(new test_layer_subnet(rnd));
             }
 
             dlib::rand& rnd;
-            mutable std::unique_ptr<test_layer_subnet> sub;
+            mutable std::unique_ptr<test_layer_subnet> subnetwork;
             resizable_tensor output;
             resizable_tensor gradient_input;
         };
@@ -1289,14 +1288,14 @@ namespace dlib
         using namespace timpl;
         // Do some setup
         dlib::rand rnd;
-        test_layer_subnet sub(rnd);
+        test_layer_subnet subnetwork(rnd);
         resizable_tensor output, out2, out3;
         // Run setup() and forward() as well to make sure any calls to subnet() have
         // happened before we start assuming we know how many data elements there are
         // (since we do a lazy layer creation thing based on calls to subnet() inside
         // test_layer_subnet).
-        l.setup(sub);
-        l.forward(sub, output);
+        l.setup(subnetwork);
+        l.forward(subnetwork, output);
 
         resizable_tensor input_grad;
         input_grad.copy_size(output);
@@ -1307,14 +1306,14 @@ namespace dlib
         // parameter and data values is:
         std::cout << "f(data,params): " << dot(output, input_grad) << std::endl;
 
-        // We are going to save a copy of the sub.get_gradient_input() data before we do
+        // We are going to save a copy of the subnetwork.get_gradient_input() data before we do
         // backpropagation since the backward() function is supposed to *add* to the
         // gradients rather than overwrite them.  We will use this saved data to check if
         // that is the case.
-        const unsigned long num_data_inputs = sub.count_outputs();
+        const unsigned long num_data_inputs = subnetwork.count_outputs();
         std::vector<float> initial_gradient_input(num_data_inputs);
         for (unsigned long i = 0; i < num_data_inputs; ++i)
-            initial_gradient_input[i] = sub.get_gradient_input_element(i);
+            initial_gradient_input[i] = subnetwork.get_gradient_input_element(i);
 
 
         // Now tell the layer to compute all the gradients.  In the rest of this function
@@ -1325,7 +1324,7 @@ namespace dlib
         random_noise.copy_size(l.get_layer_params());
         randomize_parameters(random_noise, 5, rnd);
         params_grad = random_noise;
-        l.backward(input_grad, sub, params_grad);
+        l.backward(input_grad, subnetwork, params_grad);
 
         running_stats<double> rs_param, rs_data;
 
@@ -1340,9 +1339,9 @@ namespace dlib
                 eps = base_eps;
             const float oldval = l1.get_layer_params().host()[i];
             l1.get_layer_params().host()[i] = oldval+eps;
-            l1.forward(sub, out2);
+            l1.forward(subnetwork, out2);
             l1.get_layer_params().host()[i] = oldval-eps;
-            l1.forward(sub, out3);
+            l1.forward(subnetwork, out3);
 
             // Compute a reference derivative via a central differences approximation and
             // compare it to the one output by the layer and make sure they match.
@@ -1364,19 +1363,19 @@ namespace dlib
         // now validate the data gradients
         for (unsigned long i = 0; i < num_data_inputs; ++i)
         {
-            const float oldval = sub.get_output_element(i);
+            const float oldval = subnetwork.get_output_element(i);
             float eps = oldval*base_eps;
             if (eps == 0)
                 eps = base_eps;
-            sub.get_output_element(i) = oldval+eps;
-            l.forward(sub, out2);
-            sub.get_output_element(i) = oldval-eps;
-            l.forward(sub, out3);
+            subnetwork.get_output_element(i) = oldval+eps;
+            l.forward(subnetwork, out2);
+            subnetwork.get_output_element(i) = oldval-eps;
+            l.forward(subnetwork, out3);
 
             // Compute a reference derivative via a central differences approximation and
             // compare it to the one output by the layer and make sure they match.
             double reference_derivative = (dot(out2,input_grad)-dot(out3, input_grad))/(2*eps);
-            double output_derivative = sub.get_gradient_input_element(i)-initial_gradient_input[i];
+            double output_derivative = subnetwork.get_gradient_input_element(i)-initial_gradient_input[i];
             double relative_error = (reference_derivative - output_derivative)/(reference_derivative + 1e-100);
             if (std::abs(relative_error) > 0.01)
             {
