@@ -2,6 +2,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4)
 
 
+set(USE_SSE4_INSTRUCTIONS ON CACHE BOOL "Use SSE4 instructions")
 include(../../dlib/add_python_module)
 
 # Tell cmake to compile all these cpp files into a dlib python module.

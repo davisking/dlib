@@ -256,7 +256,6 @@ _ON_POSIX = 'posix' in sys.builtin_module_names
 def enqueue_output(out, queue):
     for line in iter(out.readline, b''):
         queue.put(line)
-    out.close()
 
 
 def _log_buf(buf):
@@ -298,6 +297,11 @@ def run_process(cmds, timeout=None):
             elapsed = time.time() - _time
             if timeout and elapsed > timeout:
                 break
+        # Make sure we print all the output from the process.
+        if p.stdout:
+            for line in p.stdout:
+                _log_buf(line)
+            p.wait()
     except (KeyboardInterrupt, SystemExit) as e:
         # if user interrupted
         pass
