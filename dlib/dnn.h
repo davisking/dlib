@@ -9,6 +9,7 @@
 #include "dnn/loss.h"
 #include "dnn/core.h"
 #include "dnn/solvers.h"
+#include "dnn/trainer.h"
 
 #endif // DLIB_DNn_
 
