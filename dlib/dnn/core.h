@@ -140,6 +140,8 @@ namespace dlib
         };
     }
 
+// ----------------------------------------------------------------------------------------
+
     template <typename LAYER_DETAILS, typename SUBNET, typename enabled = void>
     class add_layer;
 
