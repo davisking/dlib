@@ -975,6 +975,20 @@ namespace dlib
         sstack<solver_type,net_type::num_layers>& get_solvers (
         ); 
 
+        unsigned long get_mini_batch_size (
+        ) const; 
+
+        void set_mini_batch_size (
+            unsigned long batch_size 
+        );
+
+        unsigned long get_num_epochs (
+        ) const; 
+
+        void set_num_epochs (
+            unsigned long num
+        ) const;
+
         const net_type& train (
             const std::vector<input_type>& data,
             const std::vector<label_type>& labels 
