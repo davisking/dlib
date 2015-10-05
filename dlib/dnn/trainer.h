@@ -109,12 +109,14 @@ namespace dlib
                 // and data transfer between the host and the device.
                 if (j < data.size())
                 {
-                    net.to_tensor(data.begin()+j, data.begin()+std::min(j+mini_batch_size,data.size()), t1);
+                    net.to_tensor(data.begin()+j, 
+                                  data.begin()+std::min(j+mini_batch_size,data.size()), t1);
                     j += mini_batch_size;
                 }
                 if (j < data.size())
                 {
-                    net.to_tensor(data.begin()+j, data.begin()+std::min(j+mini_batch_size,data.size()), t2);
+                    net.to_tensor(data.begin()+j, 
+                                  data.begin()+std::min(j+mini_batch_size,data.size()), t2);
                     j += mini_batch_size;
                 }
 
@@ -125,7 +127,8 @@ namespace dlib
                     i += mini_batch_size;
                     if (j < data.size())
                     {
-                        net.to_tensor(data.begin()+j, data.begin()+std::min(j+mini_batch_size,data.size()), t1);
+                        net.to_tensor(data.begin()+j, 
+                                      data.begin()+std::min(j+mini_batch_size,data.size()), t1);
                         j += mini_batch_size;
                     }
 
@@ -135,7 +138,8 @@ namespace dlib
                         i += mini_batch_size;
                         if (j < data.size())
                         {
-                            net.to_tensor(data.begin()+j, data.begin()+std::min(j+mini_batch_size,data.size()), t2);
+                            net.to_tensor(data.begin()+j, 
+                                          data.begin()+std::min(j+mini_batch_size,data.size()), t2);
                             j += mini_batch_size;
                         }
                     }
@@ -165,12 +169,14 @@ namespace dlib
                 // and data transfer between the host and the device.
                 if (j < data.size())
                 {
-                    net.to_tensor(data.begin()+j, data.begin()+std::min(j+mini_batch_size,data.size()), t1);
+                    net.to_tensor(data.begin()+j, 
+                                  data.begin()+std::min(j+mini_batch_size,data.size()), t1);
                     j += mini_batch_size;
                 }
                 if (j < data.size())
                 {
-                    net.to_tensor(data.begin()+j, data.begin()+std::min(j+mini_batch_size,data.size()), t2);
+                    net.to_tensor(data.begin()+j, 
+                                  data.begin()+std::min(j+mini_batch_size,data.size()), t2);
                     j += mini_batch_size;
                 }
 
@@ -181,7 +187,8 @@ namespace dlib
                     i += mini_batch_size;
                     if (j < data.size())
                     {
-                        net.to_tensor(data.begin()+j, data.begin()+std::min(j+mini_batch_size,data.size()), t1);
+                        net.to_tensor(data.begin()+j, 
+                                      data.begin()+std::min(j+mini_batch_size,data.size()), t1);
                         j += mini_batch_size;
                     }
 
@@ -191,7 +198,8 @@ namespace dlib
                         i += mini_batch_size;
                         if (j < data.size())
                         {
-                            net.to_tensor(data.begin()+j, data.begin()+std::min(j+mini_batch_size,data.size()), t2);
+                            net.to_tensor(data.begin()+j, 
+                                          data.begin()+std::min(j+mini_batch_size,data.size()), t2);
                             j += mini_batch_size;
                         }
                     }
