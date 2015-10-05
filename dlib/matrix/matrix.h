@@ -1605,7 +1605,18 @@ namespace dlib
 
             literal_assign_helper(const literal_assign_helper& item) : m(item.m), r(item.r), c(item.c), has_been_used(false) {}
             explicit literal_assign_helper(matrix* m_): m(m_), r(0), c(0),has_been_used(false) {next();}
-            ~literal_assign_helper() throw (std::exception)
+            ~literal_assign_helper()
+// If C++11 or later.
+// Reference: http://www.stroustrup.com/C++11FAQ.html#11
+#if __cplusplus > 199711L
+				// In C++11 destructors are noexcept by default unless declared otherwise.
+				// Reference: http://en.cppreference.com/w/cpp/language/noexcept_spec
+				noexcept(false)
+// C++98 or earlier. Note that partly conforming compilers will take this path too. E.g., MSVC14 and earlier.
+#else
+				// Use the now deprecated throw specifier
+				throw(std::exception)
+#endif
             {
                 DLIB_CASSERT(!has_been_used || r == m->nr(),
                              "You have used the matrix comma based assignment incorrectly by failing to\n"
