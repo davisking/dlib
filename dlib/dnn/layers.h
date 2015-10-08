@@ -77,15 +77,13 @@ namespace dlib
             num_inputs = sub.get_output().nr()*sub.get_output().nc()*sub.get_output().k();
             params.set_size(num_inputs, num_outputs);
 
-            std::cout << "fc_::setup() " << params.size() << std::endl;
-
             randomize_parameters(params, num_inputs+num_outputs, rnd);
         }
 
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
         {
-            output.set_size(sub.get_output().num_samples(), num_outputs);
+            output.set_size(sub.get_output().num_samples(), 1,1,num_outputs);
 
             output = mat(sub.get_output())*mat(params);
         } 
@@ -93,10 +91,6 @@ namespace dlib
         template <typename SUBNET>
         void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
         {
-            // d1*W*p1 + d2*W*p2
-            // total gradient = [d1*W; d2*W; d3*W; ...] == D*W
-
-
             // compute the gradient of the parameters.  
             params_grad += trans(mat(sub.get_output()))*mat(gradient_input);
 

@@ -252,7 +252,7 @@ namespace dlib
                 - This layer outputs column vectors that contain get_num_outputs()
                   elements. That is, the output tensor T from forward() will be such that:
                     - T.num_samples() == however many samples were given to forward().
-                    - T.nr() == get_num_outputs()
+                    - T.k() == get_num_outputs()
                     - The rest of the dimensions of T will be 1.
         !*/
 
