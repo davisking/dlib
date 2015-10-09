@@ -37,6 +37,14 @@ namespace dlib
                   layer objects be default constructable. 
         !*/
 
+        EXAMPLE_INPUT_LAYER (
+            const EXAMPLE_INPUT_LAYER& item
+        );
+        /*!
+            ensures
+                - EXAMPLE_INPUT_LAYER objects are copy constructable
+        !*/
+
         EXAMPLE_INPUT_LAYER(
             const some_other_input_layer_type& item
         );

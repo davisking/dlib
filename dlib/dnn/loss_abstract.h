@@ -42,6 +42,13 @@ namespace dlib
         const static unsigned int sample_expansion_factor;
         typedef whatever_type_you_use_for_labels label_type;
 
+        EXAMPLE_LOSS_LAYER_ (
+            const EXAMPLE_LOSS_LAYER_& item
+        );
+        /*!
+            ensures
+                - EXAMPLE_LOSS_LAYER_ objects are copy constructable
+        !*/
 
         // Implementing to_label() is optional.
         template <

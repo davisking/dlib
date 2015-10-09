@@ -110,6 +110,14 @@ namespace dlib
                   layer objects be default constructable. 
         !*/
 
+        EXAMPLE_LAYER_ (
+            const EXAMPLE_LAYER_& item
+        );
+        /*!
+            ensures
+                - EXAMPLE_LAYER_ objects are copy constructable
+        !*/
+
         EXAMPLE_LAYER_(
             const some_other_layer_type& item
         );
