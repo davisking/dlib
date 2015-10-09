@@ -9,6 +9,9 @@
 
 namespace dlib
 {
+    class tensor;
+    class resizable_tensor;
+
     namespace cuda 
     {
 
@@ -24,8 +27,12 @@ namespace dlib
         class cudnn_context
         {
         public:
+            // not copyable 
             cudnn_context(const cudnn_context&) = delete;
             cudnn_context& operator=(const cudnn_context&) = delete;
+            // but is movable
+            cudnn_context(cudnn_context&&) = default;
+            cudnn_context& operator=(cudnn_context&&) = default;
 
             cudnn_context()
             {
@@ -38,6 +45,10 @@ namespace dlib
                 // TODO
                 // cudnnDestroy()
             }
+
+            const void* get_handle (
+            ) const { return handle; }
+
         private:
 
             void* handle;
@@ -53,8 +64,12 @@ namespace dlib
             !*/
 
         public:
+            // not copyable
             tensor_descriptor(const tensor_descriptor&) = delete;
             tensor_descriptor& operator=(const tensor_descriptor&) = delete;
+            // but is movable
+            tensor_descriptor(tensor_descriptor&&) = default;
+            tensor_descriptor& operator=(tensor_descriptor&&) = default;
 
             tensor_descriptor()
             {
@@ -68,6 +83,23 @@ namespace dlib
             {
                 // cudnnDestroyTensorDescriptor()
             }
+
+            void set_size(
+                int n, 
+                int nr, 
+                int nc, 
+                int k
+            );
+
+            void get_size (
+                int& n, 
+                int& nr, 
+                int& nc, 
+                int& k
+            ) const;
+
+            const void* get_handle (
+            ) const { return handle; }
 
         private:
 

@@ -6,6 +6,7 @@
 #include <memory>
 #include <cstring>
 #include "../matrix.h"
+#include "cudnn.h"
 
 namespace dlib
 {
@@ -246,6 +247,11 @@ namespace dlib
         }
 
 
+#ifdef DLIB_USE_CUDA
+        const cuda::tensor_descriptor& get_cudnn_tensor_descriptor (
+        ) const { return cudnn_descriptor; }
+#endif
+
 
 
     protected:
@@ -258,6 +264,10 @@ namespace dlib
             m_k  = item.m_k;
             data.set_size(item.data.size());
             std::memcpy(data.host(), item.data.host(), data.size()*sizeof(float));
+#ifdef DLIB_USE_CUDA
+            cudnn_descriptor.set_size(m_n,m_nr,m_nc,m_k);
+
+#endif
             return *this;
         }
 
@@ -277,6 +287,9 @@ namespace dlib
         long m_nc;
         long m_k;
         gpu_data data;
+#ifdef DLIB_USE_CUDA
+        cuda::tensor_descriptor cudnn_descriptor;
+#endif 
     };
 
     tensor::~tensor()
@@ -431,6 +444,10 @@ namespace dlib
             m_nc = nc_;
             m_k = k_;
             data.set_size(m_n*m_nr*m_nc*m_k);
+#ifdef DLIB_USE_CUDA
+            cudnn_descriptor.set_size(m_n,m_nr,m_nc,m_k);
+
+#endif
         }
     };
 

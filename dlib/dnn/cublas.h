@@ -24,8 +24,12 @@ namespace dlib
         class cublas_context
         {
         public:
+            // not copyable
             cublas_context(const cublas_context&) = delete;
             cublas_context& operator=(const cublas_context&) = delete;
+            // but is movable
+            cublas_context(const cublas_context&&) = default;
+            cublas_context& operator=(const cublas_context&&) = default;
 
             cublas_context()
             {
@@ -36,6 +40,10 @@ namespace dlib
             {
                 // TODO
             }
+
+            const void* get_handle (
+            ) const { return handle; }
+
         private:
 
             void* handle;

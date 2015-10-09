@@ -108,8 +108,12 @@ namespace dlib
             !*/
         public:
 
+            // not copyable
             dropout(const dropout&) = delete;
             dropout& operator=(const dropout&) = delete;
+            // but is movable
+            dropout(const dropout&&) = default;
+            dropout& operator=(const dropout&&) = default;
 
             dropout(float drop_rate = 0.5);
             dropout(float drop_rate, int seed);
