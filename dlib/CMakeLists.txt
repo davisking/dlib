@@ -58,6 +58,8 @@ if (NOT TARGET dlib)
    "Disable this if you don't want to use a BLAS library" )
    set (DLIB_USE_LAPACK_STR
    "Disable this if you don't want to use a LAPACK library" )
+   set (DLIB_USE_CUDA_STR
+   "Disable this if you don't want to use NVIDIA CUDA" )
    set (DLIB_PNG_SUPPORT_STR
    "Disable this if you don't want to link against libpng" )
    set (DLIB_JPEG_SUPPORT_STR
@@ -81,6 +83,7 @@ if (NOT TARGET dlib)
 
    option(DLIB_USE_BLAS ${DLIB_USE_BLAS_STR} ON)
    option(DLIB_USE_LAPACK ${DLIB_USE_LAPACK_STR} ON)
+   option(DLIB_USE_CUDA ${DLIB_USE_CUDA_STR} ON)
    option(DLIB_PNG_SUPPORT ${DLIB_PNG_SUPPORT_STR} ON)
    option(DLIB_JPEG_SUPPORT ${DLIB_JPEG_SUPPORT_STR} ON)
    option(DLIB_LINK_WITH_SQLITE3 ${DLIB_LINK_WITH_SQLITE3_STR} ON)
@@ -368,6 +371,44 @@ if (NOT TARGET dlib)
       endif()
 
 
+      if (DLIB_USE_CUDA)
+         find_package(CUDA)
+
+         if (CUDA_FOUND)
+
+            if (CUDA_VERSION_STRING LESS "7.0")
+               message(FATAL_ERROR "dlib requires CUDA version 7.0 or higher")
+            endif()
+
+            message(STATUS "Looking for cuDNN install...")
+            # Look for cudnn, we will look in the same place as other CUDA
+            # libraries and also a few other places as well.
+            find_path(cudnn_include cudnn.h
+               HINTS ${CUDA_INCLUDE_DIRS}
+               PATHS /usr/local/include
+               )
+            get_filename_component(cudnn_hint_path ${CUDA_CUBLAS_LIBRARIES} PATH)
+            find_library(cudnn cudnn
+               HINTS ${cudnn_hint_path}
+               PATHS /usr/local/lib64 
+                     /usr/local/cuda/lib64
+                     /usr/local/cuda/lib
+                     /usr/local/lib
+               )
+            mark_as_advanced(cudnn cudnn_include)
+         endif()
+
+         if (CUDA_FOUND AND cudnn AND cudnn_include)
+            message(STATUS "Found cuDNN: " ${cudnn})
+            set(source_files ${source_files} dnn/cuda.cu )
+            set(dlib_needed_libraries ${dlib_needed_libraries} ${CUDA_CUBLAS_LIBRARIES} ${cudnn})
+            include_directories(${cudnn_include})
+         else()
+            set(DLIB_USE_CUDA OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
+            message(STATUS "cuDNN NOT FOUND.  DLIB WILL NOT USE CUDA")
+         endif()
+      endif()
+      
 
       if (DLIB_LINK_WITH_SQLITE3)
          find_library(sqlite sqlite3)
@@ -398,12 +439,22 @@ if (NOT TARGET dlib)
          mark_as_advanced(fftw fftw_path)
       endif()
 
-      add_library(dlib STATIC ${source_files} )
-      target_link_libraries(dlib ${dlib_needed_libraries} )
 
+
+      # Tell CMake to build dlib via add_library()/cuda_add_library()
+      if (DLIB_USE_CUDA)
+         cuda_add_library(dlib STATIC ${source_files} )
+      else()
+         add_library(dlib STATIC ${source_files} )
+      endif()
+      target_link_libraries(dlib ${dlib_needed_libraries} )
       if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
-          add_library(dlib-shared SHARED ${source_files} )
-          target_link_libraries(dlib-shared ${dlib_needed_libraries} )
+         if (DLIB_USE_CUDA)
+            cuda_add_library(dlib-shared SHARED ${source_files} )
+         else()
+            add_library(dlib-shared SHARED ${source_files} )
+         endif()
+         target_link_libraries(dlib-shared ${dlib_needed_libraries} )
       endif()
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
@@ -486,6 +537,12 @@ if (NOT TARGET dlib)
       add_global_define(DLIB_USE_FFTW)
    else()
       remove_global_define(DLIB_USE_FFTW)
+   endif()
+
+   if (DLIB_USE_CUDA AND NOT DLIB_ISO_CPP_ONLY)
+      add_global_define(DLIB_USE_CUDA)
+   else()
+      remove_global_define(DLIB_USE_CUDA)
    endif()
 
 

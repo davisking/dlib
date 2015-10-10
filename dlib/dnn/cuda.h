@@ -7,6 +7,9 @@
 
 #include "tensor.h"
 
+// TODO, remove this cruft
+void hello_cuda();
+
 namespace dlib
 {
     namespace cuda 
