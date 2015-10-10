@@ -34,6 +34,7 @@ if (UNIX)
             )
 
         find_library(mkl_intel mkl_intel_lp64 ${mkl_search_path})
+        mark_as_advanced(mkl_intel)
     else()
         set( mkl_search_path
             /opt/intel/mkl/*/lib/32
@@ -42,6 +43,7 @@ if (UNIX)
             )
 
         find_library(mkl_intel mkl_intel ${mkl_search_path})
+        mark_as_advanced(mkl_intel)
     endif()
 
    include(CheckLibraryExists)
