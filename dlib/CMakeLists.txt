@@ -5,12 +5,12 @@
 
 
 cmake_minimum_required(VERSION 2.8.4)
+project(dlib)
 
 # default to a Release build (except if CMAKE_BUILD_TYPE is set)
 include(release_build_by_default)
 include(use_cpp_11.cmake)
 
-project(dlib)
 
 set(CPACK_PACKAGE_VERSION_MAJOR "18")
 set(CPACK_PACKAGE_VERSION_MINOR "17")
