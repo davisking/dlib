@@ -19,7 +19,7 @@ include(${dlib_path}/add_global_compiler_switch.cmake)
 # verions of CMake are not so convenient.
 if (CMAKE_VERSION VERSION_LESS "3.1")
    if(CMAKE_COMPILER_IS_GNUCXX)
-      execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+      execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
       if (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7)
          message(STATUS "C++11 activated.")
          add_global_compiler_switch("-std=gnu++11")
