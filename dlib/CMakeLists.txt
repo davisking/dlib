@@ -35,6 +35,13 @@ if (NOT CMAKE_CXX_FLAGS_DEBUG MATCHES "-DENABLE_ASSERTS")
       CACHE STRING "Flags used by the compiler during C++ debug builds." 
       FORCE)
 endif ()
+macro (toggle_preprocessor_switch option_name)
+   if (${option_name})
+      add_global_define(${option_name})
+   else()
+      remove_global_define(${option_name})
+   endif()
+endmacro()
 
 # Don't try to call add_library(dlib) and setup dlib's stuff if it has already
 # been done by some other part of the current cmake project.  We do this
@@ -67,25 +74,51 @@ if (NOT TARGET dlib)
    #set (DLIB_USE_FFTW_STR "Disable this if you don't want to link against fftw" )
 
    option(DLIB_ISO_CPP_ONLY ${DLIB_ISO_CPP_ONLY_STR} OFF)
+   toggle_preprocessor_switch(DLIB_ISO_CPP_ONLY)
    option(DLIB_NO_GUI_SUPPORT ${DLIB_NO_GUI_SUPPORT_STR} OFF)
+   toggle_preprocessor_switch(DLIB_NO_GUI_SUPPORT)
    option(DLIB_ENABLE_STACK_TRACE ${DLIB_ENABLE_STACK_TRACE_STR} OFF)
+   toggle_preprocessor_switch(DLIB_ENABLE_STACK_TRACE)
 
    option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
-
+   toggle_preprocessor_switch(DLIB_ENABLE_ASSERTS)
    if(DLIB_ENABLE_ASSERTS)
-       set (DLIB_DISABLE_ASSERTS false)
-       set (ENABLE_ASSERTS true) # we need the CMake variable to properly configure config.h.in
+      # Set these variables so they are set in the config.h.in file when dlib
+      # is installed.
+      set (DLIB_DISABLE_ASSERTS false)
+      set (ENABLE_ASSERTS true) 
    else()
-       set (DLIB_DISABLE_ASSERTS true)
+      # Set these variables so they are set in the config.h.in file when dlib
+      # is installed.
+      set (DLIB_DISABLE_ASSERTS true)
+      set (ENABLE_ASSERTS false) 
    endif()
 
-   option(DLIB_USE_BLAS ${DLIB_USE_BLAS_STR} ON)
-   option(DLIB_USE_LAPACK ${DLIB_USE_LAPACK_STR} ON)
-   option(DLIB_USE_CUDA ${DLIB_USE_CUDA_STR} ON)
-   option(DLIB_PNG_SUPPORT ${DLIB_PNG_SUPPORT_STR} ON)
-   option(DLIB_JPEG_SUPPORT ${DLIB_JPEG_SUPPORT_STR} ON)
-   option(DLIB_LINK_WITH_SQLITE3 ${DLIB_LINK_WITH_SQLITE3_STR} ON)
-   #option(DLIB_USE_FFTW ${DLIB_USE_FFTW_STR} ON)
+   if (DLIB_ISO_CPP_ONLY)
+      option(DLIB_JPEG_SUPPORT ${DLIB_JPEG_SUPPORT_STR} OFF)
+      option(DLIB_LINK_WITH_SQLITE3 ${DLIB_LINK_WITH_SQLITE3_STR} OFF)
+      option(DLIB_USE_BLAS ${DLIB_USE_BLAS_STR} OFF)
+      option(DLIB_USE_LAPACK ${DLIB_USE_LAPACK_STR} OFF)
+      option(DLIB_USE_CUDA ${DLIB_USE_CUDA_STR} OFF)
+      option(DLIB_PNG_SUPPORT ${DLIB_PNG_SUPPORT_STR} OFF)
+      #option(DLIB_USE_FFTW ${DLIB_USE_FFTW_STR} OFF)
+   else()
+      option(DLIB_JPEG_SUPPORT ${DLIB_JPEG_SUPPORT_STR} ON)
+      option(DLIB_LINK_WITH_SQLITE3 ${DLIB_LINK_WITH_SQLITE3_STR} ON)
+      option(DLIB_USE_BLAS ${DLIB_USE_BLAS_STR} ON)
+      option(DLIB_USE_LAPACK ${DLIB_USE_LAPACK_STR} ON)
+      option(DLIB_USE_CUDA ${DLIB_USE_CUDA_STR} ON)
+      option(DLIB_PNG_SUPPORT ${DLIB_PNG_SUPPORT_STR} ON)
+      #option(DLIB_USE_FFTW ${DLIB_USE_FFTW_STR} ON)
+   endif()
+   toggle_preprocessor_switch(DLIB_JPEG_SUPPORT)
+   toggle_preprocessor_switch(DLIB_LINK_WITH_SQLITE3)
+   toggle_preprocessor_switch(DLIB_USE_BLAS)
+   toggle_preprocessor_switch(DLIB_USE_LAPACK)
+   toggle_preprocessor_switch(DLIB_USE_CUDA)
+   toggle_preprocessor_switch(DLIB_PNG_SUPPORT) 
+   #toggle_preprocessor_switch(DLIB_USE_FFTW)
+
 
    set(source_files 
          base64/base64_kernel_1.cpp
@@ -170,6 +203,7 @@ if (NOT TARGET dlib)
                message(" *** You can download XQuartz from: http://xquartz.macosforge.org/landing/ ***")
                message(" *****************************************************************************")
                set(DLIB_NO_GUI_SUPPORT ON CACHE STRING ${DLIB_NO_GUI_SUPPORT_STR} FORCE )
+               add_global_define(DLIB_NO_GUI_SUPPORT)
             endif()
          endif()
 
@@ -202,6 +236,7 @@ if (NOT TARGET dlib)
                message(" *** On Ubuntu run: sudo apt-get install libx11-dev                        ***")
                message(" *****************************************************************************")
                set(DLIB_NO_GUI_SUPPORT ON CACHE STRING ${DLIB_NO_GUI_SUPPORT_STR} FORCE )
+               add_global_define(DLIB_NO_GUI_SUPPORT)
             endif()
          endif()
 
@@ -356,6 +391,7 @@ if (NOT TARGET dlib)
                set (dlib_needed_libraries ${dlib_needed_libraries} ${blas_libraries})
             else()
                set(DLIB_USE_BLAS OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
+               toggle_preprocessor_switch(DLIB_USE_BLAS)
             endif()
          endif()
 
@@ -364,6 +400,7 @@ if (NOT TARGET dlib)
                set (dlib_needed_libraries ${dlib_needed_libraries} ${lapack_libraries})
             else()
                set(DLIB_USE_LAPACK OFF CACHE STRING ${DLIB_USE_LAPACK_STR} FORCE )
+               toggle_preprocessor_switch(DLIB_USE_LAPACK)
             endif()
          endif()
       endif()
@@ -377,6 +414,9 @@ if (NOT TARGET dlib)
             if (CUDA_VERSION_STRING LESS "7.0")
                message(FATAL_ERROR "dlib requires CUDA version 7.0 or higher")
             endif()
+
+            set(CUDA_HOST_COMPILATION_CPP ON)
+            list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-std=c++11")
 
             message(STATUS "Looking for cuDNN install...")
             # Look for cudnn, we will look in the same place as other CUDA
@@ -403,6 +443,7 @@ if (NOT TARGET dlib)
             include_directories(${cudnn_include})
          else()
             set(DLIB_USE_CUDA OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
+            toggle_preprocessor_switch(DLIB_USE_CUDA)
             if (NOT cudnn OR NOT cudnn_include)
                message(STATUS "cuDNN NOT FOUND.  DLIB WILL NOT USE CUDA.")
             endif()
@@ -437,7 +478,8 @@ if (NOT TARGET dlib)
             include_directories(${fftw_path})
             set(dlib_needed_libraries ${dlib_needed_libraries} ${fftw} )
          else()
-            set(DLIB_USE_FFTW OFF CACHE STRING ${DLIB_LINK_WITH_SQLITE3_STR} FORCE )
+            set(DLIB_USE_FFTW OFF CACHE STRING ${DLIB_USE_FFTW_STR} FORCE )
+            toggle_preprocessor_switch(DLIB_USE_FFTW)
          endif()
          mark_as_advanced(fftw fftw_path)
       endif()
@@ -517,76 +559,5 @@ if (NOT TARGET dlib)
                     "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake" 
                DESTINATION ${ConfigPackageLocation})
    endif()
-
-
-   #test for some things that really should be true about the compiler
-   include(TestForSTDNamespace)
-   include(TestForANSIStreamHeaders)
-
-
-   if (DLIB_PNG_SUPPORT AND NOT DLIB_ISO_CPP_ONLY)
-      add_global_define(DLIB_PNG_SUPPORT)
-   else()
-      remove_global_define(DLIB_PNG_SUPPORT)
-   endif()
-
-   if (DLIB_JPEG_SUPPORT AND NOT DLIB_ISO_CPP_ONLY)
-      add_global_define(DLIB_JPEG_SUPPORT)
-   else()
-      remove_global_define(DLIB_JPEG_SUPPORT)
-   endif()
-
-   if (DLIB_USE_FFTW AND NOT DLIB_ISO_CPP_ONLY)
-      add_global_define(DLIB_USE_FFTW)
-   else()
-      remove_global_define(DLIB_USE_FFTW)
-   endif()
-
-   if (DLIB_USE_CUDA AND NOT DLIB_ISO_CPP_ONLY)
-      add_global_define(DLIB_USE_CUDA)
-   else()
-      remove_global_define(DLIB_USE_CUDA)
-   endif()
-
-
-   if (DLIB_USE_BLAS AND blas_found)
-      add_global_define(DLIB_USE_BLAS)
-   else()
-      remove_global_define(DLIB_USE_BLAS)
-   endif()
-
-   if (DLIB_USE_LAPACK AND lapack_found)
-      add_global_define(DLIB_USE_LAPACK)
-   else()
-      remove_global_define(DLIB_USE_LAPACK)
-   endif()
-
-
-   if (DLIB_ISO_CPP_ONLY)
-      add_global_define(DLIB_ISO_CPP_ONLY)
-   else()
-      remove_global_define(DLIB_ISO_CPP_ONLY)
-   endif()
-
-
-   if (DLIB_NO_GUI_SUPPORT)
-      add_global_define(DLIB_NO_GUI_SUPPORT)
-   else()
-      remove_global_define(DLIB_NO_GUI_SUPPORT)
-   endif()
-
-   if (DLIB_ENABLE_STACK_TRACE)
-      add_global_define(DLIB_ENABLE_STACK_TRACE)
-   else()
-      remove_global_define(DLIB_ENABLE_STACK_TRACE)
-   endif()
-
-
-   if (DLIB_ENABLE_ASSERTS)
-      add_global_define(ENABLE_ASSERTS)
-   else()
-      remove_global_define(ENABLE_ASSERTS)
-   endif()
-
 
 endif()
