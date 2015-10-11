@@ -407,13 +407,10 @@ if (NOT TARGET dlib)
 
 
       if (DLIB_USE_CUDA)
-         find_package(CUDA)
+         find_package(CUDA 7.0)
+
 
          if (CUDA_FOUND)
-
-            if (CUDA_VERSION_STRING LESS "7.0")
-               message(FATAL_ERROR "dlib requires CUDA version 7.0 or higher")
-            endif()
 
             set(CUDA_HOST_COMPILATION_CPP ON)
             list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-std=c++11")
@@ -506,6 +503,7 @@ if (NOT TARGET dlib)
 
    # Install the library
    if (NOT DLIB_IN_PROJECT_BUILD)
+       cmake_minimum_required(VERSION 2.8.8)
        if(UNIX)
            set_target_properties(dlib-shared PROPERTIES
                                         OUTPUT_NAME dlib 
