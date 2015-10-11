@@ -25,5 +25,11 @@ void hello_cuda()
 
     helloFromGPU<<<1, 10>>>();
     CHECK(cudaDeviceReset());
+
+#ifndef DLIB_USE_CUDA
+#error why is this not defined?
+#endif
+
+    auto x = 4;
 }
 
