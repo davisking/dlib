@@ -14,6 +14,7 @@ endif()
 # Determine the path to dlib.
 string(REGEX REPLACE "cmake$" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
 include(${dlib_path}/add_global_compiler_switch.cmake)
+include(${dlib_path}/use_cpp_11.cmake)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
     # By default, g++ won't warn or error if you forget to return a value in a
