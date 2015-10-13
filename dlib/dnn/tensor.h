@@ -183,6 +183,7 @@ namespace dlib
             auto d = data.host();
             for (size_t i = 0; i < data.size(); ++i)
                 d[i] = val;
+            return *this;
         }
 
         template <typename EXP>
