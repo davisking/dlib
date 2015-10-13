@@ -66,12 +66,16 @@ namespace dlib
 
         void async_copy_to_device() 
         {
+#ifdef DLIB_USE_CUDA
             // TODO
+#endif
         }
 
         void async_copy_to_host() 
         {
+#ifdef DLIB_USE_CUDA
             // TODO
+#endif
         }
 
         const float* host() const 
@@ -89,12 +93,18 @@ namespace dlib
 
         const float* device() const 
         { 
+#ifndef DLIB_USE_CUDA
+            DLIB_CASSERT(false, "CUDA NOT ENABLED");
+#endif
             copy_to_device();
             return data_device.get(); 
         }
 
         float* device() 
         {
+#ifndef DLIB_USE_CUDA
+            DLIB_CASSERT(false, "CUDA NOT ENABLED");
+#endif
             copy_to_device();
             host_current = false;
             return data_device.get(); 
@@ -108,7 +118,9 @@ namespace dlib
         {
             if (!device_current)
             {
+#ifdef DLIB_USE_CUDA
                 // TODO, cudamemcpy()
+#endif
                 device_current = true;
             }
         }
@@ -117,7 +129,9 @@ namespace dlib
         {
             if (!host_current)
             {
+#ifdef DLIB_USE_CUDA
                 // TODO, cudamemcpy()
+#endif
                 host_current = true;
             }
         }

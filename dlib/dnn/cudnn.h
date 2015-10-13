@@ -5,7 +5,6 @@
 
 #ifdef DLIB_USE_CUDA
 
-#include "tensor.h"
 
 namespace dlib
 {
@@ -128,9 +127,9 @@ namespace dlib
                    calls cudnnAddTensor_v3()
 
                    This function adds the scaled values of one bias tensor to another
-                   tensor. Each dimension of the bias tensor must match the coresponding
+                   tensor. Each dimension of the bias tensor must match the corresponding
                    dimension of the srcDest tensor or must be equal to 1. In the latter
-                   case, the same value from the bias tensor for thoses dimensions will be
+                   case, the same value from the bias tensor for those dimensions will be
                    used to blend into the srcDest tensor.
         !*/
 
