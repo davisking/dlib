@@ -918,8 +918,8 @@ namespace dlib
               gradients and compares them to the outputs of the layer.  
             - Note that this function is only capable of checking layers that take
               arbitrary subnetworks as input.  So if you have designed a layer that expects
-              only a certain restricted type of subnetwork then you might get an error when
-              you call this function.
+              only a certain restricted type of subnetwork then you might get a compile or
+              runtime error when you call this function.
     !*/
 
 // ----------------------------------------------------------------------------------------
