@@ -65,7 +65,8 @@ namespace dlib
         !*/
 
         inline bool print_status (
-            double cur
+            double cur,
+            bool always_print = false
         );
         /*!
             ensures
@@ -74,10 +75,13 @@ namespace dlib
                   remaining until cur becomes equal to target().
                 - prints a status message to the screen which indicates how much
                   more time is left until cur is equal to target()
-                - This function throttles the printing so that at most 1 message is printed
-                  each second.  Note that it won't print anything to the screen until about
-                  one second has elapsed.  This means that the first call to print_status()
-                  never prints to the screen.
+                - if (always_print) then
+                    - This function prints to the screen each time it is called.
+                - else
+                    - This function throttles the printing so that at most 1 message is
+                      printed each second.  Note that it won't print anything to the screen
+                      until about one second has elapsed.  This means that the first call
+                      to print_status() never prints to the screen.
                 - This function returns true if it prints to the screen and false
                   otherwise. 
         !*/
@@ -115,7 +119,8 @@ namespace dlib
 
     bool console_progress_indicator::
     print_status (
-        double cur
+        double cur,
+        bool always_print
     )
     {
         const time_t cur_time = std::time(0);
@@ -132,7 +137,7 @@ namespace dlib
             return false;
         }
 
-        if (cur_time != last_time)
+        if (cur_time != last_time || always_print)
         {
             last_time = cur_time;
             double delta_t = static_cast<double>(cur_time - start_time);
@@ -152,17 +157,17 @@ namespace dlib
             if (seconds < 60)
             {
                 ss = std::cout.precision(0); 
-                std::cout << "Time remaining: " << seconds << " seconds.                        \r" << std::flush;
+                std::cout << "Time remaining: " << seconds << " seconds.                 \r" << std::flush;
             }
             else if (seconds < 60*60)
             {
                 ss = std::cout.precision(2); 
-                std::cout << "Time remaining: " << seconds/60 << " minutes.                        \r" << std::flush;
+                std::cout << "Time remaining: " << seconds/60 << " minutes.                 \r" << std::flush;
             }
             else 
             {
                 ss = std::cout.precision(2); 
-                std::cout << "Time remaining: " << seconds/60/60 << " hours.                        \r" << std::flush;
+                std::cout << "Time remaining: " << seconds/60/60 << " hours.                 \r" << std::flush;
             }
 
             // restore previous output flags and precision settings
