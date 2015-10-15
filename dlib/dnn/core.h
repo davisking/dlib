@@ -1056,7 +1056,7 @@ namespace dlib
         )
         {
             temp_tensor.clear();
-            subnetwork.clear();
+            subnetwork.clean();
         }
 
         friend void serialize(const add_loss_layer& item, std::ostream& out)
