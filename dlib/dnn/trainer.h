@@ -325,8 +325,6 @@ namespace dlib
         sstack<solver_type,net_type::num_layers> solvers;
     };
 
-    // TODO, make dnn_trainer serializable. 
-
 // ----------------------------------------------------------------------------------------
 
 }
