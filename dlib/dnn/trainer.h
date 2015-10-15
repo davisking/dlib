@@ -9,6 +9,7 @@
 #include "../statistics.h"
 #include "../console_progress_indicator.h"
 #include <chrono>
+#include "../serialize.h"
 
 namespace dlib
 {
@@ -281,7 +282,33 @@ namespace dlib
             return net;
         }
 
+        friend void serialize(const dnn_trainer& item, std::ostream& out)
+        {
+            int version = 1;
+            serialize(version, out);
+            serialize(item.num_epochs, out);
+            serialize(item.mini_batch_size, out);
+            serialize(item.verbose, out);
+            serialize(item.net, out);
+            serialize(item.solvers, out);
+        }
+
+        friend void deserialize(dnn_trainer& item, std::istream& in)
+        {
+            int version = 0;
+            deserialize(version, in);
+            if (version != 1)
+                throw serialization_error("Unexpected version found while deserializing dlib::dnn_trainer.");
+            deserialize(item.num_epochs, in);
+            deserialize(item.mini_batch_size, in);
+            deserialize(item.verbose, in);
+            deserialize(item.net, in);
+            deserialize(item.solvers, in);
+        }
+
     private:
+
+        const static long string_pad = 10;
 
         void init()
         {
@@ -293,7 +320,6 @@ namespace dlib
         unsigned long num_epochs;
         unsigned long mini_batch_size;
         bool verbose;
-        const static long string_pad = 10;
 
         net_type net;
         sstack<solver_type,net_type::num_layers> solvers;

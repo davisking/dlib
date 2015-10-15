@@ -218,6 +218,12 @@ namespace dlib
 
     };
 
+    void serialize(const EXAMPLE_LAYER_& item, std::ostream& out);
+    void deserialize(EXAMPLE_LAYER_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
     // For each layer you define, always define an add_layer template so that layers can be
     // easily composed.  Moreover, the convention is that the layer class ends with an _
     // while the add_layer template has the same name but without the trailing _.
@@ -274,6 +280,11 @@ namespace dlib
         !*/
     };
 
+    void serialize(const fc_& item, std::ostream& out);
+    void deserialize(fc_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
 
     template <typename SUBNET>
     using fc = add_layer<fc_, SUBNET>;
@@ -306,6 +317,11 @@ namespace dlib
         !*/
     };
 
+    void serialize(const relu_& item, std::ostream& out);
+    void deserialize(relu_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
 
     template <typename SUBNET>
     using relu = add_layer<relu_, SUBNET>;

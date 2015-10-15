@@ -73,6 +73,20 @@ namespace dlib
             }
 
         }
+
+        friend void serialize(const input& item, std::ostream& out)
+        {
+            serialize("input<matrix>", out);
+        }
+
+        friend void deserialize(input& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "input<matrix>")
+                throw serialization_error("Unexpected version found while deserializing dlib::input.");
+        }
+
     };
 
 // ----------------------------------------------------------------------------------------
@@ -126,6 +140,20 @@ namespace dlib
             }
 
         }
+
+        friend void serialize(const input& item, std::ostream& out)
+        {
+            serialize("input<array2d>", out);
+        }
+
+        friend void deserialize(input& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "input<array2d>")
+                throw serialization_error("Unexpected version found while deserializing dlib::input.");
+        }
+
     };
 
 // ----------------------------------------------------------------------------------------

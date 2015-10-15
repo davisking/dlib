@@ -86,6 +86,12 @@ namespace dlib
         !*/
     };
 
+    void serialize(const EXAMPLE_INPUT_LAYER& item, std::ostream& out);
+    void deserialize(EXAMPLE_INPUT_LAYER& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -131,6 +137,14 @@ namespace dlib
                   with 4 rows, 5 columns, and k()==3 (since rgb_pixels have 3 channels).
         !*/
     };
+
+    template <typename T>
+    void serialize(const input<T>& item, std::ostream& out);
+    template <typename T>
+    void deserialize(input<T>& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
 
 // ----------------------------------------------------------------------------------------
 

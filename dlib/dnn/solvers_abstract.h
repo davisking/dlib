@@ -52,6 +52,12 @@ namespace dlib
         !*/
     };
 
+    void serialize(const EXAMPLE_SOLVER& item, std::ostream& out);
+    void deserialize(EXAMPLE_SOLVER& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -91,6 +97,12 @@ namespace dlib
         float get_weight_decay () const;
         float get_momentum () const; 
     };
+
+    void serialize(const sgd& item, std::ostream& out);
+    void deserialize(sgd& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
 
 // ----------------------------------------------------------------------------------------
 

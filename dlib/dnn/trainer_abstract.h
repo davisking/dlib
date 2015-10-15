@@ -222,6 +222,14 @@ namespace dlib
 
     };
 
+    template <typename T, typename U>
+    void serialize(const dnn_trainer<T,U>& item, std::ostream& out);
+    template <typename T, typename U>
+    void deserialize(dnn_trainer<T,U>& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
 }

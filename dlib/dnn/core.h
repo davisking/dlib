@@ -67,6 +67,18 @@ namespace dlib
         const sstack<T,N-1>& pop() const { return data; }
         sstack<T,N-1>& pop() { return data; }
 
+        friend void serialize(const sstack& item, std::ostream& out)
+        {
+            serialize(item.top(), out);
+            serialize(item.pop(), out);
+        }
+
+        friend void deserialize(sstack& item, std::istream& in)
+        {
+            deserialize(item.top(), in);
+            deserialize(item.pop(), in);
+        }
+
     private:
         T item;
         sstack<T,N-1> data;
@@ -83,6 +95,17 @@ namespace dlib
         T& top() { return item; }
 
         size_t size() const { return 1; }
+
+        friend void serialize(const sstack& item, std::ostream& out)
+        {
+            serialize(item.top(), out);
+        }
+
+        friend void deserialize(sstack& item, std::istream& in)
+        {
+            deserialize(item.top(), in);
+        }
+
     private:
         T item;
     };
@@ -294,6 +317,32 @@ namespace dlib
             subnetwork.clean();
         }
 
+        friend void serialize(const add_layer& item, std::ostream& out)
+        {
+            int version = 1;
+            serialize(version, out);
+            serialize(item.subnetwork, out);
+            serialize(item.details, out);
+            serialize(item.this_layer_setup_called, out);
+            serialize(item.gradient_input_is_stale, out);
+            serialize(item.x_grad, out);
+            serialize(item.cached_output, out);
+        }
+
+        friend void deserialize(add_layer& item, std::istream& in)
+        {
+            int version = 0;
+            deserialize(version, in);
+            if (version != 1)
+                throw serialization_error("Unexpected version found while deserializing dlib::add_layer.");
+            deserialize(item.subnetwork, in);
+            deserialize(item.details, in);
+            deserialize(item.this_layer_setup_called, in);
+            deserialize(item.gradient_input_is_stale, in);
+            deserialize(item.x_grad, in);
+            deserialize(item.cached_output, in);
+        }
+
     private:
 
 
@@ -468,6 +517,32 @@ namespace dlib
             gradient_input_is_stale = true;
         }
 
+        friend void serialize(const add_layer& item, std::ostream& out)
+        {
+            int version = 1;
+            serialize(version, out);
+            serialize(item.input_layer, out);
+            serialize(item.details, out);
+            serialize(item.this_layer_setup_called, out);
+            serialize(item.gradient_input_is_stale, out);
+            serialize(item.x_grad, out);
+            serialize(item.cached_output, out);
+        }
+
+        friend void deserialize(add_layer& item, std::istream& in)
+        {
+            int version = 0;
+            deserialize(version, in);
+            if (version != 1)
+                throw serialization_error("Unexpected version found while deserializing dlib::add_layer.");
+            deserialize(item.input_layer, in);
+            deserialize(item.details, in);
+            deserialize(item.this_layer_setup_called, in);
+            deserialize(item.gradient_input_is_stale, in);
+            deserialize(item.x_grad, in);
+            deserialize(item.cached_output, in);
+        }
+
     private:
 
         class subnet_wrapper
@@ -601,6 +676,22 @@ namespace dlib
             subnetwork.clean();
         }
 
+        friend void serialize(const add_tag_layer& item, std::ostream& out)
+        {
+            int version = 1;
+            serialize(version, out);
+            serialize(item.subnetwork, out);
+        }
+
+        friend void deserialize(add_tag_layer& item, std::istream& in)
+        {
+            int version = 0;
+            deserialize(version, in);
+            if (version != 1)
+                throw serialization_error("Unexpected version found while deserializing dlib::add_tag_layer.");
+            deserialize(item.subnetwork, in);
+        }
+
     private:
 
         subnet_type subnetwork;
@@ -702,6 +793,26 @@ namespace dlib
             cached_output.clear();
         }
 
+        friend void serialize(const add_tag_layer& item, std::ostream& out)
+        {
+            int version = 1;
+            serialize(version, out);
+            serialize(item.input_layer, out);
+            serialize(item.cached_output, out);
+            serialize(item.grad_final_ignored, out);
+        }
+
+        friend void deserialize(add_tag_layer& item, std::istream& in)
+        {
+            int version = 0;
+            deserialize(version, in);
+            if (version != 1)
+                throw serialization_error("Unexpected version found while deserializing dlib::add_tag_layer.");
+            deserialize(item.input_layer, in);
+            deserialize(item.cached_output, in);
+            deserialize(item.grad_final_ignored, in);
+        }
+
     private:
 
         subnet_type input_layer;
@@ -759,7 +870,8 @@ namespace dlib
         const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         typedef typename get_loss_layer_label_type<LOSS_DETAILS>::type label_type;
 
-        static_assert(is_nonloss_layer_type<SUBNET>::value, "SUBNET must be of type add_layer, add_skip_layer, or add_tag_layer."); 
+        static_assert(is_nonloss_layer_type<SUBNET>::value, 
+            "SUBNET must be of type add_layer, add_skip_layer, or add_tag_layer."); 
         static_assert(sample_expansion_factor == LOSS_DETAILS::sample_expansion_factor,
             "The loss layer and input layer must agree on the sample_expansion_factor.");
 
@@ -945,6 +1057,24 @@ namespace dlib
         {
             temp_tensor.clear();
             subnetwork.clear();
+        }
+
+        friend void serialize(const add_loss_layer& item, std::ostream& out)
+        {
+            int version = 1;
+            serialize(version, out);
+            serialize(item.loss, out);
+            serialize(item.subnetwork, out);
+        }
+
+        friend void deserialize(add_loss_layer& item, std::istream& in)
+        {
+            int version = 0;
+            deserialize(version, in);
+            if (version != 1)
+                throw serialization_error("Unexpected version found while deserializing dlib::add_loss_layer.");
+            deserialize(item.loss, in);
+            deserialize(item.subnetwork, in);
         }
 
     private:
@@ -1148,6 +1278,22 @@ namespace dlib
         void clean()
         {
             subnetwork.clean();
+        }
+
+        friend void serialize(const add_skip_layer& item, std::ostream& out)
+        {
+            int version = 1;
+            serialize(version, out);
+            serialize(item.subnetwork, out);
+        }
+
+        friend void deserialize(add_skip_layer& item, std::istream& in)
+        {
+            int version = 0;
+            deserialize(version, in);
+            if (version != 1)
+                throw serialization_error("Unexpected version found while deserializing dlib::add_skip_layer.");
+            deserialize(item.subnetwork, in);
         }
 
     private:

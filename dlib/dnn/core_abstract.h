@@ -119,6 +119,12 @@ namespace dlib
         !*/
     };
 
+    void serialize(const sstack& item, std::ostream& out);
+    void deserialize(sstack& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -377,6 +383,14 @@ namespace dlib
         !*/
 
     };
+
+    template <typename T, typename U>, 
+    void serialize(const add_layer<T,U>& item, std::ostream& out);
+    template <typename T, typename U>, 
+    void deserialize(add_layer<T,U>& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -769,6 +783,14 @@ namespace dlib
         !*/
     };
 
+    template <typename T, typename U>, 
+    void serialize(const add_loss_layer<T,U>& item, std::ostream& out);
+    template <typename T, typename U>, 
+    void deserialize(add_loss_layer<T,U>& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -798,6 +820,14 @@ namespace dlib
                 add_layer object.
         !*/
     };
+
+    template <unsigned long ID, typename U>, 
+    void serialize(const add_tag_layer<ID,U>& item, std::ostream& out);
+    template <unsigned long ID, typename U>, 
+    void deserialize(add_tag_layer<ID,U>& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
 
     template <typename SUBNET> using tag1  = add_tag_layer< 1, SUBNET>;
     template <typename SUBNET> using tag2  = add_tag_layer< 2, SUBNET>;
@@ -833,6 +863,14 @@ namespace dlib
                 add_layer object.
         !*/
     };
+
+    template <template<typename> class T, typename U>
+    void serialize(const add_skip_layer<T,U>& item, std::ostream& out);
+    template <template<typename> class T, typename U>
+    void deserialize(add_skip_layer<T,U>& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
 
     template <typename SUBNET> using skip1  = add_skip_layer< tag1, SUBNET>;
     template <typename SUBNET> using skip2  = add_skip_layer< tag2, SUBNET>;

@@ -118,6 +118,12 @@ namespace dlib
         !*/
     };
 
+    void serialize(const EXAMPLE_LOSS_LAYER_& item, std::ostream& out);
+    void deserialize(EXAMPLE_LOSS_LAYER_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
     // For each loss layer you define, always define an add_loss_layer template so that
     // layers can be easily composed.  Moreover, the convention is that the layer class
     // ends with an _ while the add_loss_layer template has the same name but without the
@@ -178,6 +184,12 @@ namespace dlib
         !*/
 
     };
+
+    void serialize(const loss_binary_hinge_& item, std::ostream& out);
+    void deserialize(loss_binary_hinge_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
 
     template <typename SUBNET>
     using loss_binary_hinge = add_loss_layer<loss_binary_hinge_, SUBNET>;

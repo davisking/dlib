@@ -59,13 +59,12 @@ namespace dlib
     public:
         fc_() : num_outputs(1)
         {
-            rnd.set_seed("fc_" + cast_to_string(num_outputs));
         }
 
-        explicit fc_(unsigned long num_outputs_)
+        explicit fc_(
+            unsigned long num_outputs_
+        ) : num_outputs(num_outputs_)
         {
-            num_outputs = num_outputs_;
-            rnd.set_seed("fc_" + cast_to_string(num_outputs));
         }
 
         unsigned long get_num_outputs (
@@ -77,6 +76,7 @@ namespace dlib
             num_inputs = sub.get_output().nr()*sub.get_output().nc()*sub.get_output().k();
             params.set_size(num_inputs, num_outputs);
 
+            dlib::rand rnd("fc_"+cast_to_string(num_outputs));
             randomize_parameters(params, num_inputs+num_outputs, rnd);
         }
 
@@ -101,12 +101,30 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
+        friend void serialize(const fc_& item, std::ostream& out)
+        {
+            serialize("fc_", out);
+            serialize(item.num_outputs, out);
+            serialize(item.num_inputs, out);
+            serialize(item.params, out);
+        }
+
+        friend void deserialize(fc_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "fc_")
+                throw serialization_error("Unexpected version found while deserializing dlib::fc_.");
+            deserialize(item.num_outputs, in);
+            deserialize(item.num_inputs, in);
+            deserialize(item.params, in);
+        }
+
     private:
 
         unsigned long num_outputs;
         unsigned long num_inputs;
         resizable_tensor params;
-        dlib::rand rnd;
     };
 
 
@@ -151,6 +169,20 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
+        friend void serialize(const relu_& item, std::ostream& out)
+        {
+            serialize("relu_", out);
+        }
+
+        friend void deserialize(relu_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "relu_")
+                throw serialization_error("Unexpected version found while deserializing dlib::relu_.");
+        }
+
+
     private:
 
         resizable_tensor params;
@@ -159,73 +191,6 @@ namespace dlib
 
     template <typename SUBNET>
     using relu = add_layer<relu_, SUBNET>;
-
-// ----------------------------------------------------------------------------------------
-
-    class multiply_
-    {
-    public:
-        multiply_() 
-        {
-        }
-
-
-        template <typename SUBNET>
-        void setup (const SUBNET& sub)
-        {
-            num_inputs = sub.get_output().nr()*sub.get_output().nc()*sub.get_output().k();
-            params.set_size(1, num_inputs);
-
-            std::cout << "multiply_::setup() " << params.size() << std::endl;
-
-            const int num_outputs = num_inputs;
-
-            randomize_parameters(params, num_inputs+num_outputs, rnd);
-        }
-
-        template <typename SUBNET>
-        void forward(const SUBNET& sub, resizable_tensor& output)
-        {
-            DLIB_CASSERT( sub.get_output().nr()*sub.get_output().nc()*sub.get_output().k() == params.size(), "");
-            DLIB_CASSERT( sub.get_output().nr()*sub.get_output().nc()*sub.get_output().k() == num_inputs, "");
-
-            output.copy_size(sub.get_output());
-            auto indata = sub.get_output().host();
-            auto outdata = output.host();
-            auto paramdata = params.host();
-            for (int i = 0; i < sub.get_output().num_samples(); ++i)
-            {
-                for (int j = 0; j < num_inputs; ++j)
-                {
-                    *outdata++ = *indata++ * paramdata[j];
-                }
-            }
-        } 
-
-        template <typename SUBNET>
-        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
-        {
-            params_grad += sum_rows(pointwise_multiply(mat(sub.get_output()),mat(gradient_input)));
-
-            for (long i = 0; i < gradient_input.num_samples(); ++i)
-            {
-                sub.get_gradient_input().add_to_sample(i, 
-                    pointwise_multiply(rowm(mat(gradient_input),i), mat(params)));
-            }
-        }
-
-        const tensor& get_layer_params() const { return params; }
-        tensor& get_layer_params() { return params; }
-
-    private:
-
-        int num_inputs;
-        resizable_tensor params;
-        dlib::rand rnd;
-    };
-
-    template <typename SUBNET>
-    using multiply = add_layer<multiply_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

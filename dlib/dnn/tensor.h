@@ -112,6 +112,7 @@ namespace dlib
 
         size_t size() const { return data_size; }
 
+
     private:
 
         void copy_to_device() const
@@ -143,6 +144,30 @@ namespace dlib
         std::unique_ptr<float[]> data_host;
         std::unique_ptr<float[]> data_device;
     };
+
+    inline void serialize(const gpu_data& item, std::ostream& out)
+    {
+        int version = 1;
+        serialize(item.size(), out);
+        auto data = item.host();
+        for (size_t i = 0; i < item.size(); ++i)
+            serialize(data[i], out);
+    }
+
+    inline void deserialize(gpu_data& item, std::istream& in)
+    {
+        int version;
+        deserialize(version, in);
+        if (version != 1)
+            throw serialization_error("Unexpected version found while deserializing dlib::gpu_data.");
+        size_t s;
+        deserialize(s, in);
+        item.set_size(s);
+        auto data = item.host();
+        for (size_t i = 0; i < item.size(); ++i)
+            deserialize(data[i], in);
+    }
+
 
 // ----------------------------------------------------------------------------------------
 
@@ -465,6 +490,37 @@ namespace dlib
 #endif
         }
     };
+
+    inline void serialize(const tensor& item, std::ostream& out)
+    {
+        int version = 1;
+        serialize(version, out);
+        serialize(item.num_samples(), out);
+        serialize(item.nr(), out);
+        serialize(item.nc(), out);
+        serialize(item.k(), out);
+        auto data = item.host();
+        for (size_t i = 0; i < item.size(); ++i)
+            serialize(data[i], out);
+    }
+
+    inline void deserialize(resizable_tensor& item, std::istream& in)
+    {
+        int version;
+        deserialize(version, in);
+        if (version != 1)
+            throw serialization_error("Unexpected version found while deserializing dlib::resizable_tensor.");
+
+        long num_samples=0, nr=0, nc=0, k=0;
+        deserialize(num_samples, in);
+        deserialize(nr, in);
+        deserialize(nc, in);
+        deserialize(k, in);
+        item.set_size(num_samples, nr, nc, k);
+        auto data = item.host();
+        for (size_t i = 0; i < item.size(); ++i)
+            deserialize(data[i], in);
+    }
 
 // ----------------------------------------------------------------------------------------
 

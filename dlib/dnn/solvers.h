@@ -48,6 +48,27 @@ namespace dlib
             l.get_layer_params() += v;
         }
 
+        friend void serialize(const sgd& item, std::ostream& out)
+        {
+            serialize("sgd", out);
+            serialize(item.v, out);
+            serialize(item.weight_decay, out);
+            serialize(item.learning_rate, out);
+            serialize(item.momentum, out);
+        }
+
+        friend void deserialize(sgd& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "sgd")
+                throw serialization_error("Unexpected version found while deserializing dlib::sgd.");
+            deserialize(item.v, in);
+            deserialize(item.weight_decay, in);
+            deserialize(item.learning_rate, in);
+            deserialize(item.momentum, in);
+        }
+
     private:
         matrix<float> v;
         float weight_decay;

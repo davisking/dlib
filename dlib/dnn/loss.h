@@ -81,6 +81,19 @@ namespace dlib
             return loss;
         }
 
+        friend void serialize(const loss_binary_hinge_& item, std::ostream& out)
+        {
+            serialize("loss_binary_hinge_", out);
+        }
+
+        friend void deserialize(loss_binary_hinge_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "loss_binary_hinge_")
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_binary_hinge_.");
+        }
+
     };
 
     template <typename SUBNET>
@@ -103,6 +116,19 @@ namespace dlib
         ) const
         {
             return 0;
+        }
+
+        friend void serialize(const loss_no_label_& item, std::ostream& out)
+        {
+            serialize("loss_no_label_", out);
+        }
+
+        friend void deserialize(loss_no_label_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "loss_no_label_")
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_no_label_.");
         }
 
     };
