@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-//#include "cuda_dlib.h"
+#include "cuda_dlib.h"
 
 #define CHECK(call)                                                            \
 {                                                                              \

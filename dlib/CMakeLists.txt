@@ -412,7 +412,10 @@ if (NOT TARGET dlib)
          if (CUDA_FOUND)
 
             set(CUDA_HOST_COMPILATION_CPP ON)
-            list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-std=c++11")
+            # Note that we add __STRICT_ANSI__ to avoid freaking out nvcc with gcc specific
+            # magic in the standard C++ header files (since nvcc uses gcc headers on
+            # linux).
+            list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-std=c++11;-D__STRICT_ANSI__")
 
             message(STATUS "Looking for cuDNN install...")
             # Look for cudnn, we will look in the same place as other CUDA
