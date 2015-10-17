@@ -5,6 +5,7 @@
 
 #ifdef DLIB_USE_CUDA
 
+#include "../error.h"
 
 namespace dlib
 {
@@ -33,17 +34,8 @@ namespace dlib
             cudnn_context(cudnn_context&&) = default;
             cudnn_context& operator=(cudnn_context&&) = default;
 
-            cudnn_context()
-            {
-                // TODO
-                // cudnnCreate()
-            }
-
-            ~cudnn_context()
-            {
-                // TODO
-                // cudnnDestroy()
-            }
+            cudnn_context();
+            ~cudnn_context();
 
             const void* get_handle (
             ) const { return handle; }
@@ -70,18 +62,8 @@ namespace dlib
             tensor_descriptor(tensor_descriptor&&) = default;
             tensor_descriptor& operator=(tensor_descriptor&&) = default;
 
-            tensor_descriptor()
-            {
-                //  cudnnCreateTensorDescriptor()
-
-                // Also call cudnnSetTensor4dDescriptor() somewhere.  Probably in a set()
-                // method.
-            }
-
-            ~tensor_descriptor()
-            {
-                // cudnnDestroyTensorDescriptor()
-            }
+            tensor_descriptor();
+            ~tensor_descriptor();
 
             void set_size(
                 int n, 

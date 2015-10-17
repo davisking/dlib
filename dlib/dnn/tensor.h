@@ -6,7 +6,7 @@
 #include <memory>
 #include <cstring>
 #include "../matrix.h"
-#include "cudnn.h"
+#include "cudnn_api.h"
 
 namespace dlib
 {
@@ -338,7 +338,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    const matrix_op<op_pointer_to_mat<float> > mat (
+    inline const matrix_op<op_pointer_to_mat<float> > mat (
         const tensor& t,
         long nr,
         long nc
@@ -360,7 +360,7 @@ namespace dlib
         return matrix_op<op>(op(t.host(),nr,nc));
     }
 
-    const matrix_op<op_pointer_to_mat<float> > mat (
+    inline const matrix_op<op_pointer_to_mat<float> > mat (
         const tensor& t
     )
     {
@@ -486,7 +486,6 @@ namespace dlib
             data.set_size(m_n*m_nr*m_nc*m_k);
 #ifdef DLIB_USE_CUDA
             cudnn_descriptor.set_size(m_n,m_nr,m_nc,m_k);
-
 #endif
         }
     };
