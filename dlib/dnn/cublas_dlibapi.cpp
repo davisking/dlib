@@ -5,7 +5,7 @@
 
 #ifdef DLIB_USE_CUDA
 
-#include "cublas_api.h"
+#include "cublas_dlibapi.h"
 
 #include <cublas_v2.h>
 

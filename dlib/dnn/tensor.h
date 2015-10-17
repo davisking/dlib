@@ -6,7 +6,7 @@
 #include <memory>
 #include <cstring>
 #include "../matrix.h"
-#include "cudnn_api.h"
+#include "cudnn_dlibapi.h"
 
 namespace dlib
 {

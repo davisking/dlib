@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+//#include "cuda_dlib.h"
+
 #define CHECK(call)                                                            \
 {                                                                              \
     const cudaError_t error = call;                                            \

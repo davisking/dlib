@@ -5,7 +5,7 @@
 
 #ifdef DLIB_USE_CUDA
 
-#include "cudnn_api.h"
+#include "cudnn_dlibapi.h"
 #include "tensor.h"
 #include <cudnn.h>
 

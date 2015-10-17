@@ -435,9 +435,9 @@ if (NOT TARGET dlib)
          if (CUDA_FOUND AND cudnn AND cudnn_include AND COMPILER_CAN_DO_CPP_11)
             message(STATUS "Found cuDNN: " ${cudnn})
             set(source_files ${source_files} 
-               dnn/cuda.cu 
-               dnn/cudnn_api.cpp
-               dnn/cublas_api.cpp
+               dnn/cuda_dlib.cu 
+               dnn/cudnn_dlibapi.cpp
+               dnn/cublas_dlibapi.cpp
                )
             set(dlib_needed_libraries ${dlib_needed_libraries} ${CUDA_CUBLAS_LIBRARIES} ${cudnn})
             include_directories(${cudnn_include})
