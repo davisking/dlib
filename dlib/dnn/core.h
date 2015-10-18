@@ -1511,7 +1511,7 @@ namespace dlib
 
         // ==================================================================
         // first validate the way the parameter gradients are computed
-        for (long i = 0; i < params_grad.size(); ++i)
+        for (unsigned long i = 0; i < params_grad.size(); ++i)
         {
             layer_details_type l1(l);
 

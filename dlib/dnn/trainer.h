@@ -123,7 +123,7 @@ namespace dlib
             {
                 running_stats<double> rs;
 
-                unsigned long j = 0;
+                size_t j = 0;
 
                 // Load two tensors worth of data at once so we can overlap the computation
                 // and data transfer between the host and the device.
@@ -140,7 +140,7 @@ namespace dlib
                     j += mini_batch_size;
                 }
 
-                unsigned long i = 0;
+                size_t i = 0;
                 using namespace std::chrono;
                 auto last_time = system_clock::now();
                 while (i < data.size())
@@ -211,7 +211,7 @@ namespace dlib
             for (unsigned long epoch_iteration = 0; epoch_iteration < num_epochs; ++epoch_iteration)
             {
                 running_stats<double> rs;
-                unsigned long j = 0;
+                size_t j = 0;
 
                 // Load two tensors worth of data at once so we can overlap the computation
                 // and data transfer between the host and the device.
@@ -228,7 +228,7 @@ namespace dlib
                     j += mini_batch_size;
                 }
 
-                unsigned long i = 0;
+                size_t i = 0;
                 using namespace std::chrono;
                 auto last_time = system_clock::now();
                 while (i < data.size())
@@ -318,7 +318,7 @@ namespace dlib
         }
 
         unsigned long num_epochs;
-        unsigned long mini_batch_size;
+        size_t mini_batch_size;
         bool verbose;
 
         net_type net;

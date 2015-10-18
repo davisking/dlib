@@ -35,7 +35,7 @@ namespace dlib
             DLIB_CASSERT(output_tensor.num_samples()%sample_expansion_factor == 0,"");
 
             const float* out_data = output_tensor.host();
-            for (unsigned long i = 0; i < output_tensor.num_samples(); ++i)
+            for (long i = 0; i < output_tensor.num_samples(); ++i)
             {
                 *iter++ = out_data[i];
             }
@@ -67,7 +67,7 @@ namespace dlib
             double loss = 0;
             const float* out_data = output_tensor.host();
             float* g = grad.host();
-            for (unsigned long i = 0; i < output_tensor.num_samples(); ++i)
+            for (long i = 0; i < output_tensor.num_samples(); ++i)
             {
                 const float y = *truth++;
                 DLIB_CASSERT(y == +1 || y == -1, "y: " << y);
