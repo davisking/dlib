@@ -190,9 +190,9 @@ namespace dlib
         }
 
         add_layer(const add_layer&) = default;
-        add_layer(add_layer&&) = default;
-        add_layer& operator=(add_layer&&) = default;
         add_layer& operator=(const add_layer&) = default;
+        add_layer(add_layer&& item) : add_layer() { swap(item); }
+        add_layer& operator=(add_layer&& item) { swap(item); return *this; }
 
         template <typename T, typename U, typename E>
         friend class add_layer;
@@ -345,6 +345,16 @@ namespace dlib
 
     private:
 
+        void swap(add_layer& item)
+        {
+            std::swap(subnetwork,item.subnetwork);
+            std::swap(details, item.details);
+            std::swap(this_layer_setup_called, item.this_layer_setup_called);
+            std::swap(gradient_input_is_stale, item.gradient_input_is_stale);
+            std::swap(x_grad, item.x_grad);
+            std::swap(cached_output, item.cached_output);
+        }
+
 
         subnet_type subnetwork;
         LAYER_DETAILS details;
@@ -384,9 +394,9 @@ namespace dlib
         {}
 
         add_layer(const add_layer&) = default;
-        add_layer(add_layer&&) = default;
-        add_layer& operator=(add_layer&&) = default;
+        add_layer(add_layer&& item) : add_layer() { swap(item); }
         add_layer& operator=(const add_layer&) = default;
+        add_layer& operator=(add_layer&& item) { swap(item); return *this; }
 
         template <typename T, typename U, typename E>
         friend class add_layer;
@@ -574,6 +584,16 @@ namespace dlib
             resizable_tensor& grad_final_ignored;
         };
 
+        void swap(add_layer& item)
+        {
+            std::swap(input_layer, item.input_layer);
+            std::swap(details, item.details);
+            std::swap(this_layer_setup_called, item.this_layer_setup_called);
+            std::swap(gradient_input_is_stale, item.gradient_input_is_stale);
+            std::swap(x_grad, item.x_grad); 
+            std::swap(cached_output, item.cached_output); 
+        }
+
         subnet_type input_layer;
         LAYER_DETAILS details;
         bool this_layer_setup_called;
@@ -714,9 +734,9 @@ namespace dlib
 
         add_tag_layer() = default;
         add_tag_layer(const add_tag_layer&) = default;
-        add_tag_layer(add_tag_layer&&) = default;
-        add_tag_layer& operator=(add_tag_layer&&) = default;
         add_tag_layer& operator=(const add_tag_layer&) = default;
+        add_tag_layer(add_tag_layer&& item) : add_tag_layer() { swap(item); }
+        add_tag_layer& operator=(add_tag_layer&& item) { swap(item); return *this; }
 
         template <typename T, typename E>
         add_tag_layer(
@@ -815,6 +835,13 @@ namespace dlib
 
     private:
 
+        void swap(add_tag_layer& item)
+        {
+            std::swap(input_layer, item.input_layer);
+            std::swap(cached_output, item.cached_output);
+            std::swap(grad_final_ignored, item.grad_final_ignored);
+        }
+
         subnet_type input_layer;
         resizable_tensor cached_output;
         resizable_tensor grad_final_ignored;
@@ -876,11 +903,11 @@ namespace dlib
             "The loss layer and input layer must agree on the sample_expansion_factor.");
 
 
-        add_loss_layer() = default;
+        add_loss_layer() {};
         add_loss_layer(const add_loss_layer&) = default;
-        add_loss_layer(add_loss_layer&&) = default;
-        add_loss_layer& operator=(add_loss_layer&&) = default;
         add_loss_layer& operator=(const add_loss_layer&) = default;
+        add_loss_layer(add_loss_layer&& item) : add_loss_layer() { swap(item); }
+        add_loss_layer& operator=(add_loss_layer&& item) { swap(item); return *this; }
 
         template <typename T, typename U>
         add_loss_layer(
@@ -1078,6 +1105,12 @@ namespace dlib
         }
 
     private:
+
+        void swap(add_loss_layer& item)
+        {
+            std::swap(loss, item.loss);
+            std::swap(subnetwork, item.subnetwork);
+        }
 
         loss_details_type loss;
         subnet_type subnetwork;
