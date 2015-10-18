@@ -218,7 +218,7 @@ namespace dlib
     ) const
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( is_in_domain(d),
+        DLIB_CASSERT( this->is_in_domain(d),
             "\tconst range& hash_map::operator[]"
             << "\n\td must be in the domain of the hash_map"
             << "\n\tthis: " << this

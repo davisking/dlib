@@ -36,8 +36,8 @@ set_dlib_version PATCH 0
 RELEASE=${MAJOR_NUM}.${MINOR_NUM} 
 # Commit changes to the version numbers so that the makedocs script will use them.
 echo Create Mercurial tags and commit release
-hg tag v$RELEASE || report_failure
 hg commit -m "Created release v$RELEASE" || report_failure
+hg tag v$RELEASE || report_failure
 
 ./makedocs makerel || exit 1
 
