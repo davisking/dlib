@@ -115,11 +115,16 @@ namespace dlib
             dropout(const dropout&) = delete;
             dropout& operator=(const dropout&) = delete;
             // but is movable
-            dropout(dropout&&) = default;
-            dropout& operator=(dropout&&) = default;
+            dropout(dropout&& item) : dropout() { swap(item); }
+            dropout& operator=(dropout&& item) { swap(item); return *this; }
 
             dropout(float drop_rate = 0.5);
             dropout(float drop_rate, int seed);
+            
+            void swap(dropout& item) 
+            {
+                // TODO
+            }
 
             void operator() (
                 resizable_tensor& dest,
