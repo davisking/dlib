@@ -25,8 +25,19 @@ namespace dlib
             cudnn_context(const cudnn_context&) = delete;
             cudnn_context& operator=(const cudnn_context&) = delete;
             // but is movable
-            cudnn_context(cudnn_context&&) = default;
-            cudnn_context& operator=(cudnn_context&&) = default;
+            cudnn_context(cudnn_context&& item) 
+            {
+                handle = item.handle;
+                item.handle = nullptr;
+            }
+            cudnn_context& operator=(cudnn_context&& item)
+            {
+                if (this == &item) 
+                    return *this;
+                handle = item.handle;
+                item.handle = nullptr;
+                return *this;
+            }
 
             cudnn_context();
             ~cudnn_context();
@@ -53,8 +64,19 @@ namespace dlib
             tensor_descriptor(const tensor_descriptor&) = delete;
             tensor_descriptor& operator=(const tensor_descriptor&) = delete;
             // but is movable
-            tensor_descriptor(tensor_descriptor&&) = default;
-            tensor_descriptor& operator=(tensor_descriptor&&) = default;
+            tensor_descriptor(tensor_descriptor&& item)
+            {
+                handle = item.handle;
+                item.handle = nullptr;
+            }
+            tensor_descriptor& operator=(tensor_descriptor&& item) 
+            {
+                if (this == &item) 
+                    return *this;
+                handle = item.handle;
+                item.handle = nullptr;
+                return *this;
+            }
 
             tensor_descriptor();
             ~tensor_descriptor();

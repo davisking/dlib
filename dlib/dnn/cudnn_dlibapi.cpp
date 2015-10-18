@@ -15,133 +15,6 @@
 namespace dlib
 {
 
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-//                              gpu_data member functions 
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-
-// TODO, add error handling
-    void gpu_data::
-    wait_for_transfer_to_finish() const
-    {
-        if (have_active_transfer)
-        {
-            std::cout << "wait for cudaStreamSynchronize()" << std::endl;
-            CHECK_CUDA(cudaStreamSynchronize((cudaStream_t)cuda_stream.get()));
-            have_active_transfer = false;
-            // Check for errors.  These calls to cudaGetLastError() are what help us find
-            // out if our kernel launches have been failing.
-            CHECK_CUDA(cudaGetLastError());
-        }
-    }
-
-    void gpu_data::
-    copy_to_device() const
-    {
-        wait_for_transfer_to_finish();
-        if (!device_current)
-        {
-            std::cout << "cudaMemcpy to device" << std::endl;
-            CHECK_CUDA(cudaMemcpy(data_device.get(), data_host.get(), data_size*sizeof(float), cudaMemcpyHostToDevice));
-            device_current = true;
-            // Check for errors.  These calls to cudaGetLastError() are what help us find
-            // out if our kernel launches have been failing.
-            CHECK_CUDA(cudaGetLastError());
-        }
-    }
-
-    void gpu_data::
-    copy_to_host() const
-    {
-        wait_for_transfer_to_finish();
-        if (!host_current)
-        {
-            std::cout << "cudaMemcpy to host" << std::endl;
-            CHECK_CUDA(cudaMemcpy(data_host.get(), data_device.get(), data_size*sizeof(float), cudaMemcpyDeviceToHost));
-            host_current = true;
-            // Check for errors.  These calls to cudaGetLastError() are what help us find
-            // out if our kernel launches have been failing.
-            CHECK_CUDA(cudaGetLastError());
-        }
-    }
-
-    void gpu_data::
-    async_copy_to_device() 
-    {
-        if (!device_current)
-        {
-            std::cout << "cudaMemcpyAsync to device" << std::endl;
-            CHECK_CUDA(cudaMemcpyAsync(data_device.get(), data_host.get(), data_size*sizeof(float), cudaMemcpyHostToDevice, (cudaStream_t)cuda_stream.get()));
-            have_active_transfer = true;
-            device_current = true;
-        }
-    }
-
-    void gpu_data::
-    set_size(
-        size_t new_size
-    )
-    {
-        wait_for_transfer_to_finish();
-        if (new_size == 0)
-        {
-            data_size = 0;
-            host_current = true;
-            device_current = true;
-            data_host.reset();
-            data_device.reset();
-        }
-        else if (new_size != data_size)
-        {
-            data_size = new_size;
-            host_current = true;
-            device_current = true;
-
-            try
-            {
-                void* data;
-                CHECK_CUDA(cudaMallocHost(&data, new_size*sizeof(float)));
-                // Note that we don't throw exceptions since the free calls are invariably
-                // called in destructors.  They also shouldn't fail anyway unless someone
-                // is resetting the GPU card in the middle of their program.
-                data_host.reset((float*)data, [](float* ptr){
-                    auto err = cudaFreeHost(ptr);
-                    if(err!=cudaSuccess)
-                        std::cerr << "cudaFreeHost() failed. Reason: " << cudaGetErrorString(err) << std::endl;
-                });
-
-                CHECK_CUDA(cudaMalloc(&data, new_size*sizeof(float)));
-                data_device.reset((float*)data, [](float* ptr){
-                    auto err = cudaFree(ptr);
-                    if(err!=cudaSuccess)
-                        std::cerr << "cudaFree() failed. Reason: " << cudaGetErrorString(err) << std::endl;
-                });
-
-                if (!cuda_stream)
-                {
-                    cudaStream_t cstream;
-                    CHECK_CUDA(cudaStreamCreateWithFlags(&cstream, cudaStreamNonBlocking));
-                    cuda_stream.reset(cstream, [](void* ptr){
-                        auto err = cudaStreamDestroy((cudaStream_t)ptr);
-                        if(err!=cudaSuccess)
-                            std::cerr << "cudaStreamDestroy() failed. Reason: " << cudaGetErrorString(err) << std::endl;
-                    });
-                }
-
-            }
-            catch(...)
-            {
-                set_size(0);
-                throw;
-            }
-        }
-    }
-
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-
     namespace cuda 
     {
 
@@ -155,6 +28,8 @@ namespace dlib
                     throw cudnn_error("CUDA Runtime API initialization failed.");
                 case CUDNN_STATUS_ALLOC_FAILED: 
                     throw cudnn_error("CUDA Resources could not be allocated.");
+                case CUDNN_STATUS_BAD_PARAM:
+                    throw cudnn_error("CUDNN_STATUS_BAD_PARAM");
                 default:
                     throw cudnn_error("A call to cuDNN failed.");
             }
@@ -180,20 +55,16 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        tensor_descriptor::tensor_descriptor() : handle(nullptr)
+        tensor_descriptor::
+        tensor_descriptor(
+        ) : handle(nullptr)
         {
-            cudnnTensorDescriptor_t h;
-            check(cudnnCreateTensorDescriptor(&h));
-            handle = h;
         }
 
-        tensor_descriptor::~tensor_descriptor()
+        tensor_descriptor::
+        ~tensor_descriptor()
         {
-            if (handle)
-            {
-                cudnnDestroyTensorDescriptor((cudnnTensorDescriptor_t)handle);
-                handle = nullptr;
-            }
+            set_size(0,0,0,0);
         }
 
         void tensor_descriptor::
@@ -204,13 +75,28 @@ namespace dlib
             int k
         )
         {
-            check(cudnnSetTensor4dDescriptor((cudnnTensorDescriptor_t)handle,
-                                       CUDNN_TENSOR_NHWC,
-                                       CUDNN_DATA_FLOAT,
-                                       n,
-                                       k,
-                                       nr,
-                                       nc));
+            if (n == 0 || nr == 0 || nc == 0 || k == 0)
+            {
+                if (handle)
+                {
+                    cudnnDestroyTensorDescriptor((cudnnTensorDescriptor_t)handle);
+                    handle = nullptr;
+                }
+            }
+            else
+            {
+                cudnnTensorDescriptor_t h;
+                check(cudnnCreateTensorDescriptor(&h));
+                handle = h;
+
+                check(cudnnSetTensor4dDescriptor((cudnnTensorDescriptor_t)handle,
+                        CUDNN_TENSOR_NHWC,
+                        CUDNN_DATA_FLOAT,
+                        n,
+                        k,
+                        nr,
+                        nc));
+            }
         }
 
         void tensor_descriptor::
@@ -221,18 +107,28 @@ namespace dlib
             int& k
         ) const
         {
-            int nStride, cStride, hStride, wStride;
-            cudnnDataType_t datatype;
-            check(cudnnGetTensor4dDescriptor((cudnnTensorDescriptor_t)handle,
-                                       &datatype,
-                                       &n,
-                                       &k,
-                                       &nr,
-                                       &nc,
-                                       &nStride,
-                                       &cStride,
-                                       &hStride,
-                                       &wStride));
+            if (handle)
+            {
+                int nStride, cStride, hStride, wStride;
+                cudnnDataType_t datatype;
+                check(cudnnGetTensor4dDescriptor((cudnnTensorDescriptor_t)handle,
+                        &datatype,
+                        &n,
+                        &k,
+                        &nr,
+                        &nc,
+                        &nStride,
+                        &cStride,
+                        &hStride,
+                        &wStride));
+            }
+            else
+            {
+                n = 0;
+                nr = 0;
+                nc = 0;
+                k = 0;
+            }
         }
 
     // ------------------------------------------------------------------------------------

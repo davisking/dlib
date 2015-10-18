@@ -441,6 +441,7 @@ if (NOT TARGET dlib)
                dnn/cuda_dlib.cu 
                dnn/cudnn_dlibapi.cpp
                dnn/cublas_dlibapi.cpp
+               dnn/gpu_data.cpp
                )
             set(dlib_needed_libraries ${dlib_needed_libraries} ${CUDA_CUBLAS_LIBRARIES} ${cudnn})
             include_directories(${cudnn_include})

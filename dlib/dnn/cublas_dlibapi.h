@@ -29,8 +29,19 @@ namespace dlib
             cublas_context(const cublas_context&) = delete;
             cublas_context& operator=(const cublas_context&) = delete;
             // but is movable
-            cublas_context(cublas_context&&) = default;
-            cublas_context& operator=(cublas_context&&) = default;
+            cublas_context(cublas_context&& item) 
+            {
+                handle = item.handle;
+                item.handle = nullptr;
+            }
+            cublas_context& operator=(cublas_context&& item) 
+            {
+                if (this == &item) 
+                    return *this;
+                handle = item.handle;
+                item.handle = nullptr;
+                return *this;
+            }
 
             cublas_context();
             ~cublas_context();
