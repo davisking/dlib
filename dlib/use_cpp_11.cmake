@@ -39,6 +39,7 @@ else()
    if (";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_rvalue_references;" AND
        ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_variadic_templates;" AND
        ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_lambdas;" AND
+       ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_defaulted_move_initializers;" AND
        ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_auto_type;")
       set(COMPILER_CAN_DO_CPP_11 1)
       # Set which standard to use unless someone has already set it to something
