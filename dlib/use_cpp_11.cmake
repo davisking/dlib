@@ -5,9 +5,16 @@
 cmake_minimum_required(VERSION 2.8.4)
 
 # Don't rerun this script if its already been executed.
-if (COMPILER_CAN_DO_CPP_11)
+if (DEFINED COMPILER_CAN_DO_CPP_11)
    return()
 endif()
+
+if (POLICY CMP0054)
+    cmake_policy(SET CMP0054 NEW)
+endif()
+
+# Set to false unless we find out otherwise in the code below.
+set(COMPILER_CAN_DO_CPP_11 0)
 
 # Determine the path to dlib.
 string(REGEX REPLACE "use_cpp_11.cmake$" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
@@ -32,6 +39,17 @@ if (CMAKE_VERSION VERSION_LESS "3.1")
          message(STATUS "C++11 activated.")
          add_global_compiler_switch("-std=c++11")
          set(COMPILER_CAN_DO_CPP_11 1)
+      endif()
+   else()
+      # Since we don't know what compiler this is ust try to build a c++11 project and see if it compiles.
+      message(STATUS "Building a C++11 test project to see if your compiler supports C++11")
+      try_compile(test_for_cpp11_worked ${PROJECT_BINARY_DIR}/cpp11_test_build 
+         ${dlib_path}/dnn/test_for_cpp11 cpp11_test)
+      if (test_for_cpp11_worked)
+         message(STATUS "C++11 activated.")
+         set(COMPILER_CAN_DO_CPP_11 1)
+      else()
+         message(STATUS "*** Your compiler failed to build a C++11 project, so dlib won't use C++11 features.***")
       endif()
    endif()
 else()
