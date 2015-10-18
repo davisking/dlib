@@ -1,37 +1,33 @@
+// Copyright (C) 2015  Davis E. King (davis@dlib.net)
+// License: Boost Software License   See LICENSE.txt for the full license.
 
-#include <stdlib.h>
-#include <stdio.h>
-
+#include "cuda_utils.h"
 #include "cuda_dlib.h"
 
-#define CHECK(call)                                                            \
-{                                                                              \
-    const cudaError_t error = call;                                            \
-    if (error != cudaSuccess)                                                  \
-    {                                                                          \
-        fprintf(stderr, "Error: %s:%d, ", __FILE__, __LINE__);                 \
-        fprintf(stderr, "code: %d, reason: %s\n", error,                       \
-                cudaGetErrorString(error));                                    \
-        exit(1);                                                               \
-    }                                                                          \
-}
+namespace dlib 
+{ 
+    namespace cuda 
+    {
 
-__global__ void helloFromGPU()
-{
-    printf("Hello World from GPU!\n");
-}
+    // ------------------------------------------------------------------------------------
 
-void hello_cuda()
-{
-    printf("Hello World from CPU!\n");
+        __global__ void cuda_add_arrays(const float* a, const float* b, float* out, size_t n)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                out[i] += a[i]+b[i];
+            }
+        }
 
-    helloFromGPU<<<1, 10>>>();
-    CHECK(cudaDeviceReset());
+        void add_arrays(const gpu_data& a, const gpu_data& b, gpu_data& out)
+        {
+            DLIB_CASSERT(a.size() == b.size(),"");
+            out.set_size(a.size());
+            cuda_add_arrays<<<512,512>>>(a.device(), b.device(), out.device(), a.size());
+        }
 
-#ifndef DLIB_USE_CUDA
-#error why is this not defined?
-#endif
+    // ------------------------------------------------------------------------------------
 
-    auto x = 4;
+    }
 }
 

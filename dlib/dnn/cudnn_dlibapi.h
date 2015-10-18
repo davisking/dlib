@@ -5,7 +5,7 @@
 
 #ifdef DLIB_USE_CUDA
 
-#include "../error.h"
+#include "cuda_errors.h"
 
 namespace dlib
 {
@@ -17,12 +17,6 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
-        struct cudnn_error : public error
-        {
-            cudnn_error(const std::string& message): error(message) {}
-        };
-
-    // ------------------------------------------------------------------------------------
 
         class cudnn_context
         {

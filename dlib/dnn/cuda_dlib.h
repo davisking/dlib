@@ -7,13 +7,13 @@
 
 #include "tensor.h"
 
-// TODO, remove this cruft
-void hello_cuda();
-
 namespace dlib
 {
     namespace cuda 
     {
+
+        // TODO, remove this 
+        void add_arrays(const gpu_data& a, const gpu_data& b, gpu_data& out);
 
     // -----------------------------------------------------------------------------------
 
