@@ -46,8 +46,8 @@ namespace dlib
         gpu_data& operator=(const gpu_data&) = delete;
 
         // but is movable
-        gpu_data(gpu_data&&) = default;
-        gpu_data& operator=(gpu_data&&) = default;
+        gpu_data(gpu_data&& item) : gpu_data() { swap(item); }
+        gpu_data& operator=(gpu_data&& item) { swap(item); return *this; }
 
 
 #ifdef DLIB_USE_CUDA
@@ -112,6 +112,16 @@ namespace dlib
 
         size_t size() const { return data_size; }
 
+        void swap (gpu_data& item)
+        {
+            std::swap(data_size, item.data_size);
+            std::swap(host_current, item.host_current);
+            std::swap(device_current, item.device_current);
+            std::swap(have_active_transfer, item.have_active_transfer);
+            std::swap(data_host, item.data_host);
+            std::swap(data_device, item.data_device);
+            std::swap(cuda_stream, item.cuda_stream);
+        }
 
     private:
 
