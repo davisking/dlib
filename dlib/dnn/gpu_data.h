@@ -21,7 +21,7 @@ namespace dlib
                 - if (data_device) then 
                     - data_device == a pointer to size() floats in device memory.
 
-                - if (there might be an active transfer between host and device) then
+                - if (there might be an active async transfer from host to device) then
                     - have_active_transfer == true
 
                 - We use the host_current and device_current bools to keep track of which

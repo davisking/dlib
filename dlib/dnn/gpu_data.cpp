@@ -49,9 +49,9 @@ namespace dlib
     void gpu_data::
     copy_to_host() const
     {
-        wait_for_transfer_to_finish();
         if (!host_current)
         {
+            wait_for_transfer_to_finish();
             std::cout << "cudaMemcpy to host" << std::endl;
             CHECK_CUDA(cudaMemcpy(data_host.get(), data_device.get(), data_size*sizeof(float), cudaMemcpyDeviceToHost));
             host_current = true;
@@ -78,9 +78,9 @@ namespace dlib
         size_t new_size
     )
     {
-        wait_for_transfer_to_finish();
         if (new_size == 0)
         {
+            wait_for_transfer_to_finish();
             data_size = 0;
             host_current = true;
             device_current = true;
@@ -89,6 +89,7 @@ namespace dlib
         }
         else if (new_size != data_size)
         {
+            wait_for_transfer_to_finish();
             data_size = new_size;
             host_current = true;
             device_current = true;
