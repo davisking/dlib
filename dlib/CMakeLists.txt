@@ -432,6 +432,9 @@ if (NOT TARGET dlib)
                      /usr/local/cuda/lib
                      /usr/local/lib
                )
+            if (cudnn)
+               message(STATUS "Found cuDNN: " ${cudnn})
+            endif()
             mark_as_advanced(cudnn cudnn_include)
 
             if (cudnn)
@@ -447,7 +450,6 @@ if (NOT TARGET dlib)
 
 
          if (CUDA_FOUND AND cudnn AND cudnn_include AND COMPILER_CAN_DO_CPP_11 AND cuda_test_compile_worked)
-            message(STATUS "Found cuDNN: " ${cudnn})
             set(source_files ${source_files} 
                dnn/cuda_dlib.cu 
                dnn/cudnn_dlibapi.cpp
