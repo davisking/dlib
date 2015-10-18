@@ -433,9 +433,20 @@ if (NOT TARGET dlib)
                      /usr/local/lib
                )
             mark_as_advanced(cudnn cudnn_include)
+
+            if (cudnn)
+               # make sure cuda is really working by doing a test compile
+               message(STATUS "Building a CUDA test project to see if your compiler is compatible with CUDA...")
+               try_compile(cuda_test_compile_worked ${PROJECT_BINARY_DIR}/cuda_test_build 
+                           ${PROJECT_SOURCE_DIR}/dnn/test_for_cuda cuda_test)
+               if (NOT cuda_test_compile_worked)
+                  message(STATUS "*** CUDA was found but your compiler failed to compile a simple CUDA program so dlib isn't going to use CUDA.***")
+               endif()
+            endif()
          endif()
 
-         if (CUDA_FOUND AND cudnn AND cudnn_include AND COMPILER_CAN_DO_CPP_11)
+
+         if (CUDA_FOUND AND cudnn AND cudnn_include AND COMPILER_CAN_DO_CPP_11 AND cuda_test_compile_worked)
             message(STATUS "Found cuDNN: " ${cudnn})
             set(source_files ${source_files} 
                dnn/cuda_dlib.cu 
@@ -449,10 +460,10 @@ if (NOT TARGET dlib)
             set(DLIB_USE_CUDA OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
             toggle_preprocessor_switch(DLIB_USE_CUDA)
             if (NOT cudnn OR NOT cudnn_include)
-               message(STATUS "cuDNN NOT FOUND.  DLIB WILL NOT USE CUDA.")
+               message(STATUS "***cuDNN NOT FOUND.  DLIB WILL NOT USE CUDA.***")
             endif()
             if (NOT COMPILER_CAN_DO_CPP_11)
-               message(STATUS "Dlib CUDA support requires C++11 but your compiler doesn't support it.")
+               message(STATUS "***Dlib CUDA support requires C++11 but your compiler doesn't support it.***")
             endif()
          endif()
       endif()
