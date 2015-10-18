@@ -25,19 +25,8 @@ namespace dlib
             cudnn_context(const cudnn_context&) = delete;
             cudnn_context& operator=(const cudnn_context&) = delete;
             // but is movable
-            cudnn_context(cudnn_context&& item) 
-            {
-                handle = item.handle;
-                item.handle = nullptr;
-            }
-            cudnn_context& operator=(cudnn_context&& item)
-            {
-                if (this == &item) 
-                    return *this;
-                handle = item.handle;
-                item.handle = nullptr;
-                return *this;
-            }
+            cudnn_context(cudnn_context&& item) : cudnn_context() { swap(item); }
+            cudnn_context& operator=(cudnn_context&& item) { swap(item); return *this; }
 
             cudnn_context();
             ~cudnn_context();
@@ -46,6 +35,7 @@ namespace dlib
             ) const { return handle; }
 
         private:
+            void swap(cudnn_context& item) { std::swap(handle, item.handle); }
 
             void* handle;
         };
@@ -64,19 +54,8 @@ namespace dlib
             tensor_descriptor(const tensor_descriptor&) = delete;
             tensor_descriptor& operator=(const tensor_descriptor&) = delete;
             // but is movable
-            tensor_descriptor(tensor_descriptor&& item)
-            {
-                handle = item.handle;
-                item.handle = nullptr;
-            }
-            tensor_descriptor& operator=(tensor_descriptor&& item) 
-            {
-                if (this == &item) 
-                    return *this;
-                handle = item.handle;
-                item.handle = nullptr;
-                return *this;
-            }
+            tensor_descriptor(tensor_descriptor&& item) : tensor_descriptor() { swap(item); }
+            tensor_descriptor& operator=(tensor_descriptor&& item) { swap(item); return *this; }
 
             tensor_descriptor();
             ~tensor_descriptor();
@@ -99,6 +78,8 @@ namespace dlib
             ) const { return handle; }
 
         private:
+
+            void swap(tensor_descriptor& item) { std::swap(handle, item.handle); }
 
             void* handle;
         };

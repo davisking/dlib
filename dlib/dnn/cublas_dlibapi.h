@@ -29,19 +29,8 @@ namespace dlib
             cublas_context(const cublas_context&) = delete;
             cublas_context& operator=(const cublas_context&) = delete;
             // but is movable
-            cublas_context(cublas_context&& item) 
-            {
-                handle = item.handle;
-                item.handle = nullptr;
-            }
-            cublas_context& operator=(cublas_context&& item) 
-            {
-                if (this == &item) 
-                    return *this;
-                handle = item.handle;
-                item.handle = nullptr;
-                return *this;
-            }
+            cublas_context(cublas_context&& item) : cublas_context() { swap(item); }
+            cublas_context& operator=(cublas_context&& item) { swap(item); return *this; }
 
             cublas_context();
             ~cublas_context();
@@ -50,6 +39,7 @@ namespace dlib
             ) const { return handle; }
 
         private:
+            void swap(cublas_context& item) { std::swap(handle, item.handle); }
 
             void* handle;
         };
