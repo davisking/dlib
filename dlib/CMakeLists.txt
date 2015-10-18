@@ -136,7 +136,7 @@ if (NOT TARGET dlib)
    if (DLIB_ISO_CPP_ONLY)
        add_library(dlib STATIC ${source_files} )
        if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
-           add_library(dlib-shared SHARED ${source_files} )
+           add_library(dlib_shared SHARED ${source_files} )
        endif()
    else()
 
@@ -512,11 +512,11 @@ if (NOT TARGET dlib)
       target_link_libraries(dlib ${dlib_needed_libraries} )
       if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
          if (DLIB_USE_CUDA)
-            cuda_add_library(dlib-shared SHARED ${source_files} )
+            cuda_add_library(dlib_shared SHARED ${source_files} )
          else()
-            add_library(dlib-shared SHARED ${source_files} )
+            add_library(dlib_shared SHARED ${source_files} )
          endif()
-         target_link_libraries(dlib-shared ${dlib_needed_libraries} )
+         target_link_libraries(dlib_shared ${dlib_needed_libraries} )
       endif()
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
@@ -525,10 +525,10 @@ if (NOT TARGET dlib)
    if (NOT DLIB_IN_PROJECT_BUILD)
        cmake_minimum_required(VERSION 2.8.8)
        if(UNIX)
-           set_target_properties(dlib-shared PROPERTIES
+           set_target_properties(dlib_shared PROPERTIES
                                         OUTPUT_NAME dlib 
                                         VERSION ${VERSION})
-           install(TARGETS dlib dlib-shared
+           install(TARGETS dlib dlib_shared
                    EXPORT dlib 
                    RUNTIME DESTINATION bin # Windows (including cygwin) considers .dll to be runtime artifacts
                    LIBRARY DESTINATION lib
