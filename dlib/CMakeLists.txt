@@ -409,7 +409,7 @@ if (NOT TARGET dlib)
          find_package(CUDA 7.0)
 
 
-         if (CUDA_FOUND)
+         if (CUDA_FOUND AND COMPILER_CAN_DO_CPP_11)
 
             set(CUDA_HOST_COMPILATION_CPP ON)
             # Note that we add __STRICT_ANSI__ to avoid freaking out nvcc with gcc specific
