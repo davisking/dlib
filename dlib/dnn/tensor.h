@@ -153,8 +153,20 @@ namespace dlib
             *this = item;
         }
 
-        tensor(tensor&& item) = default;
-        tensor& operator=(tensor&& item) = default;
+        tensor(tensor&& item) : tensor() { swap(item); }
+        tensor& operator=(tensor&& item) { swap(item); return *this; }
+
+        void swap(tensor& item)
+        {
+            std::swap(m_n,    item.m_n);
+            std::swap(m_nr,   item.m_nr);
+            std::swap(m_nc,   item.m_nc);
+            std::swap(m_k,    item.m_k);
+            std::swap(data, item.data);
+#ifdef DLIB_USE_CUDA
+            std::swap(cudnn_descriptor, item.cudnn_descriptor);
+#endif
+        }
 
 
         long m_n;
