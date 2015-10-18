@@ -876,7 +876,7 @@ namespace dlib
             "The loss layer and input layer must agree on the sample_expansion_factor.");
 
 
-        add_loss_layer() = default;
+        add_loss_layer() {};
         add_loss_layer(const add_loss_layer&) = default;
         add_loss_layer(add_loss_layer&&) = default;
         add_loss_layer& operator=(add_loss_layer&&) = default;
@@ -1478,7 +1478,7 @@ namespace dlib
 
         // ==================================================================
         // first validate the way the parameter gradients are computed
-        for (long i = 0; i < params_grad.size(); ++i)
+        for (unsigned long i = 0; i < params_grad.size(); ++i)
         {
             layer_details_type l1(l);
 
