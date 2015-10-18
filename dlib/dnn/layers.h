@@ -57,13 +57,13 @@ namespace dlib
     class fc_
     {
     public:
-        fc_() : num_outputs(1)
+        fc_() : num_outputs(1), num_inputs(0)
         {
         }
 
         explicit fc_(
             unsigned long num_outputs_
-        ) : num_outputs(num_outputs_)
+        ) : num_outputs(num_outputs_), num_inputs(0)
         {
         }
 
