@@ -17,31 +17,6 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
-
-        class cudnn_context
-        {
-        public:
-            // not copyable 
-            cudnn_context(const cudnn_context&) = delete;
-            cudnn_context& operator=(const cudnn_context&) = delete;
-            // but is movable
-            cudnn_context(cudnn_context&& item) : cudnn_context() { swap(item); }
-            cudnn_context& operator=(cudnn_context&& item) { swap(item); return *this; }
-
-            cudnn_context();
-            ~cudnn_context();
-
-            const void* get_handle (
-            ) const { return handle; }
-
-        private:
-            void swap(cudnn_context& item) { std::swap(handle, item.handle); }
-
-            void* handle;
-        };
-
-    // ------------------------------------------------------------------------------------
-
         class tensor_descriptor
         {
             /*!
@@ -91,7 +66,6 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         void add(
-            cudnn_context& context, 
             float beta,
             tensor& dest,
             float alpha,
@@ -117,7 +91,6 @@ namespace dlib
         !*/
 
         void set_tensor (
-            cudnn_context& context,
             tensor& t,
             float value
         );
@@ -128,7 +101,6 @@ namespace dlib
         !*/
 
         void scale_tensor (
-            cudnn_context& context,
             tensor& t,
             float value
         );
@@ -155,7 +127,6 @@ namespace dlib
             );
 
             void setup(
-                cudnn_context& context,
                 const tensor& data,
                 const tensor& filters,
                 int stride_y,
@@ -236,7 +207,6 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         void soft_max (
-            cudnn_context& context,
             resizable_tensor& dest,
             const tensor& src
         );
@@ -245,13 +215,12 @@ namespace dlib
         !*/
 
         void soft_max_gradient (
-            cudnn_context& context,
             tensor& grad,
             const tensor& src,
             const tensor& gradient_input
         );
         /*!
-            - let OUT be the output of soft_max(context,OUT,src)
+            - let OUT be the output of soft_max(OUT,src)
             - let f(src) == dot(gradient_input,OUT)
             - Then this function computes the gradient of f() with respect to src
               and adds it to grad.
@@ -271,7 +240,6 @@ namespace dlib
 
             // cudnnCreatePoolingDescriptor(), cudnnSetPooling2dDescriptor()
             max_pool (
-                cudnn_context& context,
                 int window_height,
                 int window_width,
                 int stride_y,
@@ -310,7 +278,6 @@ namespace dlib
 
         // cudnnActivationForward(), CUDNN_ACTIVATION_SIGMOID
         void sigmoid (
-            cudnn_context& context,
             resizable_tensor& dest,
             const tensor& src
         );
@@ -323,7 +290,6 @@ namespace dlib
 
         // cudnnActivationBackward()
         void sigmoid_gradient (
-            cudnn_context& context,
             tensor& grad,
             const tensor& src,
             const tensor& gradient_input
@@ -333,7 +299,7 @@ namespace dlib
                 - have_same_dimensions(src,gradient_input) == true 
                 - have_same_dimensions(src,grad) == true 
             ensures
-                - let OUT be the output of sigmoid(context,OUT,src)
+                - let OUT be the output of sigmoid(OUT,src)
                 - let f(src) == dot(gradient_input,OUT)
                 - Then this function computes the gradient of f() with respect to src and
                   adds it to grad.
@@ -343,7 +309,6 @@ namespace dlib
 
         // cudnnActivationForward(), CUDNN_ACTIVATION_RELU
         void relu (
-            cudnn_context& context,
             resizable_tensor& dest,
             const tensor& src
         );
@@ -356,7 +321,6 @@ namespace dlib
 
         // cudnnActivationBackward()
         void relu_gradient (
-            cudnn_context& context,
             tensor& grad,
             const tensor& src,
             const tensor& gradient_input
@@ -366,7 +330,7 @@ namespace dlib
                 - have_same_dimensions(src,gradient_input) == true 
                 - have_same_dimensions(src,grad) == true 
             ensures
-                - let OUT be the output of relu(context,OUT,src)
+                - let OUT be the output of relu(OUT,src)
                 - let f(src) == dot(gradient_input,OUT)
                 - Then this function computes the gradient of f() with respect to src and
                   adds it to grad.
@@ -376,7 +340,6 @@ namespace dlib
 
         // cudnnActivationForward(), CUDNN_ACTIVATION_TANH
         void tanh (
-            cudnn_context& context,
             resizable_tensor& dest,
             const tensor& src
         );
@@ -389,7 +352,6 @@ namespace dlib
 
         // cudnnActivationBackward()
         void tanh_gradient (
-            cudnn_context& context,
             tensor& grad,
             const tensor& src,
             const tensor& gradient_input
@@ -399,7 +361,7 @@ namespace dlib
                 - have_same_dimensions(src,gradient_input) == true 
                 - have_same_dimensions(src,grad) == true 
             ensures
-                - let OUT be the output of tanh(context,OUT,src)
+                - let OUT be the output of tanh(OUT,src)
                 - let f(src) == dot(gradient_input,OUT)
                 - Then this function computes the gradient of f() with respect to src and
                   adds it to grad.

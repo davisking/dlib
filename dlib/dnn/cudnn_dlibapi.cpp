@@ -37,22 +37,35 @@ namespace dlib
         }
 
     // ------------------------------------------------------------------------------------
-    // ------------------------------------------------------------------------------------
 
-        cudnn_context::cudnn_context() : handle(nullptr)
+        class cudnn_context
         {
-            cudnnHandle_t h;
-            check(cudnnCreate(&h));
-            handle = h;
-        }
+        public:
+            // not copyable 
+            cudnn_context(const cudnn_context&) = delete;
+            cudnn_context& operator=(const cudnn_context&) = delete;
 
-        cudnn_context::~cudnn_context()
-        {
-            if (handle)
+            cudnn_context()
             {
-                cudnnDestroy((cudnnHandle_t)handle);
-                handle = nullptr;
+                check(cudnnCreate(&handle));
             }
+
+            ~cudnn_context()
+            {
+                cudnnDestroy(handle);
+            }
+
+            cudnnHandle_t get_handle (
+            ) const { return handle; }
+
+        private:
+            cudnnHandle_t handle;
+        };
+
+        static cudnnHandle_t context()
+        {
+            thread_local cudnn_context c;
+            return c.get_handle();
         }
 
     // ------------------------------------------------------------------------------------
@@ -136,7 +149,6 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         void add(
-            cudnn_context& context, 
             float beta,
             tensor& dest,
             float alpha,
@@ -146,7 +158,6 @@ namespace dlib
         }
 
         void set_tensor (
-            cudnn_context& context,
             tensor& t,
             float value
         )
@@ -154,7 +165,6 @@ namespace dlib
         }
 
         void scale_tensor (
-            cudnn_context& context,
             tensor& t,
             float value
         )
@@ -194,7 +204,6 @@ namespace dlib
 
         void conv::
         setup(
-            cudnn_context& context,
             const tensor& data,
             const tensor& filters,
             int stride_y,
@@ -272,7 +281,6 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         void soft_max (
-            cudnn_context& context,
             resizable_tensor& dest,
             const tensor& src
         )
@@ -280,7 +288,6 @@ namespace dlib
         }
 
         void soft_max_gradient (
-            cudnn_context& context,
             tensor& grad,
             const tensor& src,
             const tensor& gradient_input
@@ -292,7 +299,6 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         max_pool::max_pool (
-            cudnn_context& context,
             int window_height,
             int window_width,
             int stride_y,
@@ -326,7 +332,6 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         void sigmoid (
-            cudnn_context& context,
             resizable_tensor& dest,
             const tensor& src
         )
@@ -334,7 +339,6 @@ namespace dlib
         }
 
         void sigmoid_gradient (
-            cudnn_context& context,
             tensor& grad,
             const tensor& src,
             const tensor& gradient_input
@@ -345,7 +349,6 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         void relu (
-            cudnn_context& context,
             resizable_tensor& dest,
             const tensor& src
         )
@@ -353,7 +356,6 @@ namespace dlib
         }
 
         void relu_gradient (
-            cudnn_context& context,
             tensor& grad,
             const tensor& src,
             const tensor& gradient_input
@@ -364,7 +366,6 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         void tanh (
-            cudnn_context& context,
             resizable_tensor& dest,
             const tensor& src
         )
@@ -372,7 +373,6 @@ namespace dlib
         }
 
         void tanh_gradient (
-            cudnn_context& context,
             tensor& grad,
             const tensor& src,
             const tensor& gradient_input
