@@ -26,8 +26,8 @@ namespace dlib
 
                 - We use the host_current and device_current bools to keep track of which
                   copy of the data (or both) are most current.  e.g. if the CPU has
-                  modified the tensor and it hasn't been copied to the device yet then
-                  host_current==true and device_current == false.
+                  modified the data and it hasn't been copied to the device yet then
+                  host_current==true and device_current==false.
 
 
             THREAD SAFETY
