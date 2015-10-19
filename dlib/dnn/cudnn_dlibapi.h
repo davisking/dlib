@@ -65,6 +65,10 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        // add a call that maps to cudnnConvolutionBackwardBias()
+
+    // ------------------------------------------------------------------------------------
+
         void add(
             float beta,
             tensor& dest,
@@ -83,11 +87,11 @@ namespace dlib
 
                    calls cudnnAddTensor_v3()
 
-                   This function adds the scaled values of one bias tensor to another
-                   tensor. Each dimension of the bias tensor must match the corresponding
-                   dimension of the srcDest tensor or must be equal to 1. In the latter
-                   case, the same value from the bias tensor for those dimensions will be
-                   used to blend into the srcDest tensor.
+                   This function adds the scaled values of one src tensor to another
+                   tensor. Each dimension of the src tensor must match the corresponding
+                   dimension of the dest tensor or must be equal to 1. In the latter case,
+                   the same value from the src tensor, for those dimensions, will be used
+                   to blend into the dest tensor.
         !*/
 
         void set_tensor (
