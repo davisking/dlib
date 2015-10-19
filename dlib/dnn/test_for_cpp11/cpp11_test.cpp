@@ -15,6 +15,7 @@ public:
 
     void dostuff()
     {
+        thread_local stuff1 = 999;
         auto x = 4;
 
         decltype(x) asdf = 9;
