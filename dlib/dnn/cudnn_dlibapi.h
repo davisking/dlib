@@ -132,6 +132,10 @@ namespace dlib
                 int stride_y,
                 int stride_x
             );
+            /*!
+                requires
+                    - filters.k() == data.k()
+            !*/
 
             ~conv (
             );
@@ -196,12 +200,18 @@ namespace dlib
         private:
             void* filter_handle;
             void* conv_handle;
+            int stride_y;
+            int stride_x;
 
             // dimensions of the output tensor from operator()
             int out_num_samples;
             int out_nr;
             int out_nc;
             int out_k;
+
+            int forward_algo;
+            size_t forward_workspace_size_in_bytes;
+            void* forward_workspace;
         };
 
     // ------------------------------------------------------------------------------------
