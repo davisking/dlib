@@ -66,6 +66,10 @@ namespace dlib
                 int nc, 
                 int k
             );
+            /*!
+                ensures
+                    - if any of the arguments are 0 then they are all set to 0 in the tensor.
+            !*/
 
             void get_size (
                 int& n, 
@@ -145,12 +149,20 @@ namespace dlib
             conv(const conv&) = delete;
             conv& operator=(const conv&) = delete;
 
-            conv(
+            conv();
+
+            void clear(
+            );
+
+            void setup(
                 cudnn_context& context,
                 const tensor& data,
                 const tensor& filters,
                 int stride_y,
                 int stride_x
+            );
+
+            ~conv (
             );
 
             void operator() (
@@ -210,6 +222,15 @@ namespace dlib
                       and adds this gradient to filters_gradient.
             !*/
 
+        private:
+            void* filter_handle;
+            void* conv_handle;
+
+            // dimensions of the output tensor from operator()
+            int out_num_samples;
+            int out_nr;
+            int out_nc;
+            int out_k;
         };
 
     // ------------------------------------------------------------------------------------

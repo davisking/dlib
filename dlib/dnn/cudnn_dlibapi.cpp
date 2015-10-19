@@ -9,6 +9,7 @@
 #include "tensor.h"
 #include <cudnn.h>
 #include <iostream>
+#include <string>
 #include "cuda_utils.h"
 
 
@@ -31,10 +32,11 @@ namespace dlib
                 case CUDNN_STATUS_BAD_PARAM:
                     throw cudnn_error("CUDNN_STATUS_BAD_PARAM");
                 default:
-                    throw cudnn_error("A call to cuDNN failed.");
+                    throw cudnn_error("A call to cuDNN failed: " + std::string(cudnnGetErrorString(s)));
             }
         }
 
+    // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
 
         cudnn_context::cudnn_context() : handle(nullptr)
@@ -162,14 +164,83 @@ namespace dlib
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
 
-        conv::conv(
+        conv::
+        conv(
+        ) : 
+            filter_handle(nullptr),
+            conv_handle(nullptr),
+            out_num_samples(0),
+            out_k(0),
+            out_nr(0),
+            out_nc(0)
+        {
+        }
+
+        void conv::
+        clear (
+        )
+        {
+            if (filter_handle) 
+                cudnnDestroyFilterDescriptor((cudnnFilterDescriptor_t)filter_handle);
+            if (conv_handle) 
+                cudnnDestroyConvolutionDescriptor((cudnnConvolutionDescriptor_t)conv_handle);
+            filter_handle = nullptr;
+            conv_handle = nullptr;
+            out_num_samples = 0;
+            out_k = 0;
+            out_nr = 0;
+            out_nc = 0;
+        }
+
+        void conv::
+        setup(
             cudnn_context& context,
             const tensor& data,
             const tensor& filters,
             int stride_y,
             int stride_x
+        ) 
+        {
+            clear();
+            try
+            {
+                check(cudnnCreateFilterDescriptor((cudnnFilterDescriptor_t*)&filter_handle));
+                check(cudnnSetFilter4dDescriptor((cudnnFilterDescriptor_t)filter_handle, 
+                                                 CUDNN_DATA_FLOAT, 
+                                                 filters.num_samples(),
+                                                 filters.k(),
+                                                 filters.nr(),
+                                                 filters.nc()));
+
+                check(cudnnCreateConvolutionDescriptor((cudnnConvolutionDescriptor_t*)&conv_handle));
+                check(cudnnSetConvolution2dDescriptor((cudnnConvolutionDescriptor_t)conv_handle,
+                        filters.nr()/2, // vertical padding
+                        filters.nc()/2, // horizontal padding
+                        stride_y,
+                        stride_x,
+                        1, 1, // must be 1,1
+                        CUDNN_CONVOLUTION)); // could also be CUDNN_CROSS_CORRELATION
+
+                check(cudnnGetConvolution2dForwardOutputDim(
+                        (const cudnnConvolutionDescriptor_t)conv_handle,
+                        (const cudnnTensorDescriptor_t)data.get_cudnn_tensor_descriptor().get_handle(),
+                        (const cudnnFilterDescriptor_t)filter_handle,
+                        &out_num_samples,
+                        &out_k,
+                        &out_nr,
+                        &out_nc));
+            }
+            catch(...)
+            {
+                clear();
+            }
+        }
+
+        conv::
+        ~conv (
         )
         {
+            clear();
         }
 
         void conv::operator() (
