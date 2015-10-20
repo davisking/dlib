@@ -34,16 +34,10 @@ namespace dlib
     void gpu_data::
     copy_to_device() const
     {
+        // We want transfers to the device to always be concurrent with any device
+        // computation.  So we use our non-default stream to do the transfer.
+        async_copy_to_device();
         wait_for_transfer_to_finish();
-        if (!device_current)
-        {
-            std::cout << "cudaMemcpy to device" << std::endl;
-            CHECK_CUDA(cudaMemcpy(data_device.get(), data_host.get(), data_size*sizeof(float), cudaMemcpyHostToDevice));
-            device_current = true;
-            // Check for errors.  These calls to cudaGetLastError() are what help us find
-            // out if our kernel launches have been failing.
-            CHECK_CUDA(cudaGetLastError());
-        }
     }
 
     void gpu_data::

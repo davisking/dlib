@@ -3,6 +3,7 @@
 #ifndef DLIB_GPU_DaTA_H_
 #define DLIB_GPU_DaTA_H_
 
+#include "gpu_data_abstract.h"
 #include <memory>
 #include "cuda_errors.h"
 #include "../serialize.h"
@@ -29,10 +30,6 @@ namespace dlib
                   modified the data and it hasn't been copied to the device yet then
                   host_current==true and device_current==false.
 
-
-            THREAD SAFETY
-                This object is not thread-safe.  Don't touch it from multiple threads as the
-                same time.
         !*/
     public:
 
