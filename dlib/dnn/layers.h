@@ -83,7 +83,7 @@ namespace dlib
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
         {
-            output.set_size(sub.get_output().num_samples(), 1,1,num_outputs);
+            output.set_size(sub.get_output().num_samples(), num_outputs);
 
             output = mat(sub.get_output())*mat(params);
         } 

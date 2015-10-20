@@ -22,30 +22,22 @@ namespace dlib
 
         tensor (
         ) : 
-            m_n(0), m_nr(0), m_nc(0), m_k(0)
+            m_n(0), m_k(0), m_nr(0), m_nc(0)
         {
         }
 
         inline virtual ~tensor() = 0;
 
         long num_samples() const { return m_n; }
+        long k() const { return m_k; }
         long nr() const { return m_nr; }
         long nc() const { return m_nc; }
-        long k() const { return m_k; }
         size_t size() const { return data.size(); }
 
         void async_copy_to_device() 
         {
             data.async_copy_to_device();
         }
-        /*!
-            ensures
-                - begin asynchronously copying this tensor to the GPU.
-
-                NOTE that the "get device pointer" routine in this class
-                will have to do some kind of synchronization that ensures
-                the copy is finished.
-        !*/
 
         const float* host() const { return data.host(); }
         float*       host()       { return data.host(); }
@@ -135,13 +127,13 @@ namespace dlib
         tensor& operator= (const tensor& item) 
         {
             m_n  = item.m_n;
+            m_k  = item.m_k;
             m_nr = item.m_nr;
             m_nc = item.m_nc;
-            m_k  = item.m_k;
             data.set_size(item.data.size());
             std::memcpy(data.host(), item.data.host(), data.size()*sizeof(float));
 #ifdef DLIB_USE_CUDA
-            cudnn_descriptor.set_size(m_n,m_nr,m_nc,m_k);
+            cudnn_descriptor.set_size(m_n,m_k,m_nr,m_nc);
 #endif
             return *this;
         }
@@ -159,9 +151,9 @@ namespace dlib
         void swap(tensor& item)
         {
             std::swap(m_n,    item.m_n);
+            std::swap(m_k,    item.m_k);
             std::swap(m_nr,   item.m_nr);
             std::swap(m_nc,   item.m_nc);
-            std::swap(m_k,    item.m_k);
             std::swap(data, item.data);
 #ifdef DLIB_USE_CUDA
             std::swap(cudnn_descriptor, item.cudnn_descriptor);
@@ -170,9 +162,9 @@ namespace dlib
 
 
         long m_n;
+        long m_k;
         long m_nr;
         long m_nc;
-        long m_k;
         gpu_data data;
 #ifdef DLIB_USE_CUDA
         cuda::tensor_descriptor cudnn_descriptor;
@@ -227,9 +219,9 @@ namespace dlib
     )
     {
         return a.num_samples() == b.num_samples() &&
+               a.k()  == b.k() &&
                a.nr() == b.nr() &&
-               a.nc() == b.nc() &&
-               a.k()  == b.k();
+               a.nc() == b.nc();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -242,10 +234,10 @@ namespace dlib
         {}
 
         explicit resizable_tensor(
-            long n_, long nr_ = 1, long nc_ = 1, long k_ = 1
+            long n_, long k_ = 1, long nr_ = 1, long nc_ = 1
         ) 
         {
-            set_size(n_,nr_,nc_,k_);
+            set_size(n_,k_,nr_,nc_);
         }
 
         resizable_tensor(const resizable_tensor&) = default;
@@ -265,7 +257,7 @@ namespace dlib
                 - resizes *this so that: have_same_dimensions(#*this, item)==true
         !*/
         {
-            set_size(item.num_samples(), item.nr(), item.nc(), item.k());
+            set_size(item.num_samples(), item.k(), item.nr(), item.nc());
         }
 
         resizable_tensor& operator= (float val)
@@ -323,16 +315,16 @@ namespace dlib
         }
 
         void set_size(
-            long n_, long nr_ = 1, long nc_ = 1, long k_ = 1
+            long n_, long k_ = 1, long nr_ = 1, long nc_ = 1
         )
         {
             m_n = n_;
+            m_k = k_;
             m_nr = nr_;
             m_nc = nc_;
-            m_k = k_;
-            data.set_size(m_n*m_nr*m_nc*m_k);
+            data.set_size(m_n*m_k*m_nr*m_nc);
 #ifdef DLIB_USE_CUDA
-            cudnn_descriptor.set_size(m_n,m_nr,m_nc,m_k);
+            cudnn_descriptor.set_size(m_n,m_k,m_nr,m_nc);
 #endif
         }
     };
@@ -342,9 +334,9 @@ namespace dlib
         int version = 1;
         serialize(version, out);
         serialize(item.num_samples(), out);
+        serialize(item.k(), out);
         serialize(item.nr(), out);
         serialize(item.nc(), out);
-        serialize(item.k(), out);
         auto data = item.host();
         for (size_t i = 0; i < item.size(); ++i)
             serialize(data[i], out);
@@ -357,12 +349,12 @@ namespace dlib
         if (version != 1)
             throw serialization_error("Unexpected version found while deserializing dlib::resizable_tensor.");
 
-        long num_samples=0, nr=0, nc=0, k=0;
+        long num_samples=0, k=0, nr=0, nc=0;
         deserialize(num_samples, in);
+        deserialize(k, in);
         deserialize(nr, in);
         deserialize(nc, in);
-        deserialize(k, in);
-        item.set_size(num_samples, nr, nc, k);
+        item.set_size(num_samples, k, nr, nc);
         auto data = item.host();
         for (size_t i = 0; i < item.size(); ++i)
             deserialize(data[i], in);

@@ -56,8 +56,9 @@ namespace dlib
 
             
             // initialize data to the right size to contain the stuff in the iterator range.
-            data.set_size(std::distance(ibegin,iend), nr, nc, pixel_traits<T>::num);
+            data.set_size(std::distance(ibegin,iend), pixel_traits<T>::num, nr, nc);
 
+            const size_t offset = nr*nc;
             auto ptr = data.host();
             for (auto i = ibegin; i != iend; ++i)
             {
@@ -66,10 +67,15 @@ namespace dlib
                     for (long c = 0; c < nc; ++c)
                     {
                         auto temp = pixel_to_vector<float>((*i)(r,c));
+                        auto p = ptr++;
                         for (long j = 0; j < temp.size(); ++j)
-                            *ptr++ = temp(j);
+                        {
+                            *p = temp(j);
+                            p += offset;
+                        }
                     }
                 }
+                ptr += offset*(data.k()-1);
             }
 
         }
@@ -123,8 +129,9 @@ namespace dlib
 
             
             // initialize data to the right size to contain the stuff in the iterator range.
-            data.set_size(std::distance(ibegin,iend), nr, nc, pixel_traits<T>::num);
+            data.set_size(std::distance(ibegin,iend), pixel_traits<T>::num, nr, nc);
 
+            const size_t offset = nr*nc;
             auto ptr = data.host();
             for (auto i = ibegin; i != iend; ++i)
             {
@@ -133,10 +140,15 @@ namespace dlib
                     for (long c = 0; c < nc; ++c)
                     {
                         auto temp = pixel_to_vector<float>((*i)[r][c]);
+                        auto p = ptr++;
                         for (long j = 0; j < temp.size(); ++j)
-                            *ptr++ = temp(j);
+                        {
+                            *p = temp(j);
+                            p += offset;
+                        }
                     }
                 }
+                ptr += offset*(data.k()-1);
             }
 
         }

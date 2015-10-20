@@ -37,9 +37,9 @@ namespace dlib
 
             void set_size(
                 int n, 
+                int k,
                 int nr, 
-                int nc, 
-                int k
+                int nc 
             );
             /*!
                 ensures
@@ -48,9 +48,9 @@ namespace dlib
 
             void get_size (
                 int& n, 
-                int& nr, 
-                int& nc, 
-                int& k
+                int& k,
+                int& nr,
+                int& nc 
             ) const;
 
             const void* get_handle (
@@ -209,9 +209,9 @@ namespace dlib
 
             // dimensions of the output tensor from operator()
             int out_num_samples;
+            int out_k;
             int out_nr;
             int out_nc;
-            int out_k;
 
             int forward_algo;
             size_t forward_workspace_size_in_bytes;

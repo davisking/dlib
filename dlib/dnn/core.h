@@ -1362,7 +1362,7 @@ namespace dlib
 
     namespace timpl
     {
-        void fill_with_gassuan_random_numbers (
+        inline void fill_with_gassuan_random_numbers (
             tensor& t,
             dlib::rand& rnd,
             double sigma = 1
@@ -1383,12 +1383,12 @@ namespace dlib
                 // Output and gradient_input have to have the same dimensions in each
                 // layer.
                 const long num_samples = rnd.get_random_32bit_number()%4+3;
+                const long k  = rnd.get_random_32bit_number()%4+2;
                 const long nr = rnd.get_random_32bit_number()%4+2;
                 const long nc = rnd.get_random_32bit_number()%4+2;
-                const long k  = rnd.get_random_32bit_number()%4+2;
 
-                output.set_size(num_samples, nr, nc, k);
-                gradient_input.set_size(num_samples, nr, nc, k);
+                output.set_size(num_samples, k, nr, nc);
+                gradient_input.set_size(num_samples, k, nr, nc);
 
                 // Use a non-zero initial gradient to make sure the layers add to it
                 // rather than assign and blow away the initial value.
@@ -1447,7 +1447,8 @@ namespace dlib
         };
 
 
-        void print_tensor(
+        // TODO, remove?
+        inline void print_tensor(
             const tensor& a
         )
         {

@@ -85,9 +85,9 @@ namespace dlib
         void tensor_descriptor::
         set_size(
             int n, 
+            int k,
             int nr, 
-            int nc, 
-            int k
+            int nc 
         )
         {
             if (n == 0 || nr == 0 || nc == 0 || k == 0)
@@ -105,7 +105,7 @@ namespace dlib
                 handle = h;
 
                 check(cudnnSetTensor4dDescriptor((cudnnTensorDescriptor_t)handle,
-                        CUDNN_TENSOR_NHWC,
+                        CUDNN_TENSOR_NCHW,
                         CUDNN_DATA_FLOAT,
                         n,
                         k,
@@ -117,9 +117,9 @@ namespace dlib
         void tensor_descriptor::
         get_size (
             int& n, 
-            int& nr, 
-            int& nc, 
-            int& k
+            int& k,
+            int& nr,
+            int& nc
         ) const
         {
             if (handle)
@@ -140,9 +140,9 @@ namespace dlib
             else
             {
                 n = 0;
+                k = 0;
                 nr = 0;
                 nc = 0;
-                k = 0;
             }
         }
 
@@ -254,7 +254,7 @@ namespace dlib
                         &out_nc));
 
                 tensor_descriptor dest_desc;
-                dest_desc.set_size(out_num_samples,out_nr,out_nc,out_k);
+                dest_desc.set_size(out_num_samples,out_k,out_nr,out_nc);
 
                 cudnnConvolutionFwdAlgo_t forward_best_algo;
                 check(cudnnGetConvolutionForwardAlgorithm(
@@ -299,7 +299,7 @@ namespace dlib
             const tensor& filters
         )
         {
-            output.set_size(out_num_samples, out_nr, out_nc, out_k);
+            output.set_size(out_num_samples, out_k, out_nr, out_nc);
 
 
             // TODO, remove
