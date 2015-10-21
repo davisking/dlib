@@ -34,7 +34,7 @@ namespace dlib
         long nc() const { return m_nc; }
         size_t size() const { return data.size(); }
 
-        void async_copy_to_device() 
+        void async_copy_to_device() const
         {
             data.async_copy_to_device();
         }
