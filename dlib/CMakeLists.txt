@@ -437,7 +437,7 @@ if (NOT TARGET dlib)
             endif()
             mark_as_advanced(cudnn cudnn_include)
 
-            if (cudnn)
+            if (cudnn AND NOT DEFINED cuda_test_compile_worked)
                # make sure cuda is really working by doing a test compile
                message(STATUS "Building a CUDA test project to see if your compiler is compatible with CUDA...")
                try_compile(cuda_test_compile_worked ${PROJECT_BINARY_DIR}/cuda_test_build 
