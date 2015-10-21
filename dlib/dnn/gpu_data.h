@@ -48,11 +48,11 @@ namespace dlib
 
 
 #ifdef DLIB_USE_CUDA
-        void async_copy_to_device(); 
+        void async_copy_to_device() const; 
         void set_size(size_t new_size);
 #else
         // Note that calls to host() or device() will block until any async transfers are complete.
-        void async_copy_to_device(){}
+        void async_copy_to_device() const{}
 
         void set_size(size_t new_size)
         {

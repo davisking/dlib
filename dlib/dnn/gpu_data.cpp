@@ -56,7 +56,7 @@ namespace dlib
     }
 
     void gpu_data::
-    async_copy_to_device() 
+    async_copy_to_device() const
     {
         if (!device_current)
         {
