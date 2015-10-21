@@ -3,10 +3,7 @@
 #undef DLIB_DNn_TENSOR_ABSTRACT_H_
 #ifdef DLIB_DNn_TENSOR_ABSTRACT_H_
 
-#include <cstring>
 #include "../matrix.h"
-#include "cudnn_dlibapi.h"
-#include "gpu_data.h"
 
 namespace dlib
 {
