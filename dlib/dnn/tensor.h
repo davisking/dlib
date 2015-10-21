@@ -367,6 +367,7 @@ namespace dlib
         const tensor& b
     )
     {
+        // TODO, do on GPU?
         DLIB_CASSERT(a.size() == b.size(), "");
         const float* da = a.host();
         const float* db = b.host();

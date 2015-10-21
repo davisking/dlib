@@ -16,23 +16,23 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object is a block of size() floats, all stored contiguously in memory.
-                In particular, it keeps two copies of the floats, one on the host CPU side
+                Importantly, it keeps two copies of the floats, one on the host CPU side
                 and another on the GPU device side. It automatically performs the necessary
                 host/device transfers to keep these two copies of the data in sync.
 
-                All transfers to the device happen asynchronously so that CUDA kernel
-                computations can overlap with data transfers.  However, any transfers from
-                the device to the host happen synchronously in the default CUDA stream.
-                Therefore, you should perform all your CUDA kernel launches on the default
-                stream so that transfers back to the host do not happen before the
-                computations have completed.
+                All transfers to the device happen asynchronously with respect to the
+                default CUDA stream so that CUDA kernel computations can overlap with data
+                transfers.  However, any transfers from the device to the host happen
+                synchronously in the default CUDA stream.  Therefore, you should perform
+                all your CUDA kernel launches on the default stream so that transfers back
+                to the host do not happen before the relevant computations have completed.
 
                 If DLIB_USE_CUDA is not #defined then this object will not use CUDA at all.
                 Instead, it will simply store one host side memory block of floats.  
 
             THREAD SAFETY
-                This object is not thread-safe.  Don't touch it from multiple threads at
-                the same time.
+                Instances of this object are not thread-safe.  So don't touch one from
+                multiple threads at the same time.
         !*/
     public:
 
