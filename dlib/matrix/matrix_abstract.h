@@ -733,13 +733,13 @@ namespace dlib
               from being parsed into a matrix then #in.fail() == true.
     !*/
 
-    some_undefined_iomnaip_type csv;
     /*!A csv
         This object is used to define an io manipulator for matrix expressions.  In
         particular, you can write statements like:
             cout << csv << yourmatrix;
         and have it print the matrix with commas separating each element.
     !*/
+    some_undefined_iomnaip_type csv;
 
 // ----------------------------------------------------------------------------------------
 
