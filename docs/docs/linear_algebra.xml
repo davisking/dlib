@@ -406,6 +406,10 @@
             <name>Other Utilities</name>
             <sub>
                <item>
+                  <name>csv</name>
+                  <link>dlib/matrix/matrix_abstract.h.html#csv</link>
+               </item>
+               <item>
                   <name>fft</name>
                   <link>dlib/matrix/matrix_fft_abstract.h.html#fft</link>
                </item>
