@@ -43,6 +43,8 @@ namespace dlib
                 - #size() == 0
                 - #host() == nullptr 
                 - #device() == nullptr 
+                - #host_ready() == true
+                - #device_ready() == true
         !*/
 
         // This object is not copyable, however, it is movable.
@@ -57,7 +59,7 @@ namespace dlib
         /*!
             ensures
                 - This function does not block.
-                - if (the host version of the data is newer than the device's copy) then
+                - if (!device_ready()) then
                     - Begins asynchronously copying host data to the device.
                     - A call to device() that happens before the transfer completes will
                       block until the transfer is complete.  That is, it is safe to call
@@ -72,15 +74,36 @@ namespace dlib
                 - #size() == new_size
         !*/
 
+        bool host_ready (
+        ) const;
+        /*!
+            ensures
+                - returns true if and only if the host's copy of the data is current.  The
+                  host's data is current if there aren't any modifications to the data
+                  which were made on the device side that have yet to be copied to the
+                  host.
+        !*/
+
+        bool device_ready (
+        ) const; 
+        /*!
+            ensures
+                - returns true if and only if the device's copy of the data is current.
+                  The device's data is current if there aren't any modifications to the
+                  data which were made on the host side that have yet to be copied to the
+                  device.
+        !*/
+
         const float* host(
         ) const;
         /*!
             ensures
                 - returns a pointer to the host memory block of size() contiguous float
                   values or nullptr if size()==0.
-                - if (the host's copy of the data is out of date) then
+                - if (!host_ready()) then
                     - copies the data from the device to the host, while this is happening
                       the call to host() blocks. 
+                - #host_ready() == true 
         !*/
 
         float* host(
@@ -89,10 +112,12 @@ namespace dlib
             ensures
                 - returns a pointer to the host memory block of size() contiguous float
                   values or nullptr if size()==0.
-                - if (the host's copy of the data is out of date) then
+                - if (!host_ready()) then
                     - copies the data from the device to the host, while this is happening
                       the call to host() blocks. 
-                - Marks the device side data as out of date so that the next call to
+                - #host_ready() == true 
+                - #device_ready() == false
+                  I.e. Marks the device side data as out of date so that the next call to
                   device() will perform a host to device transfer.  If you want to begin
                   the transfer immediately then you can call async_copy_to_device() after
                   calling host().
@@ -106,9 +131,10 @@ namespace dlib
             ensures
                 - returns a pointer to the device memory block of size() contiguous float
                   values or nullptr if size()==0.
-                - if (the device's copy of the data is out of date) then
+                - if (!device_ready()) then
                     - copies the data from the host to the device, while this is happening
                       the call to device() blocks. 
+                - #device_ready() == true
         !*/
 
         float* device(
@@ -119,11 +145,11 @@ namespace dlib
             ensures
                 - returns a pointer to the device memory block of size() contiguous float
                   values or nullptr if size()==0.
-                - if (the device's copy of the data is out of date) then
+                - if (!device_ready()) then
                     - copies the data from the host to the device, while this is happening
                       the call to device() blocks. 
-                - Marks the host side data as out of date so that the next call to
-                  host() will perform a device to host transfer.
+                - #host_ready() == false
+                - #device_ready() == true
         !*/
 
         size_t size(

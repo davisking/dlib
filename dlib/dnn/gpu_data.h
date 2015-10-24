@@ -107,6 +107,12 @@ namespace dlib
             return data_device.get(); 
         }
 
+        bool host_ready (
+        ) const { return host_current; }
+
+        bool device_ready (
+        ) const { return device_current && !have_active_transfer; }
+
         size_t size() const { return data_size; }
 
         void swap (gpu_data& item)
