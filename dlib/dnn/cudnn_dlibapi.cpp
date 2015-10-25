@@ -502,24 +502,6 @@ namespace dlib
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
 
-        void soft_max (
-            resizable_tensor& dest,
-            const tensor& src
-        )
-        {
-        }
-
-        void soft_max_gradient (
-            tensor& grad,
-            const tensor& src,
-            const tensor& gradient_input
-        )
-        {
-        }
-
-    // ------------------------------------------------------------------------------------
-    // ------------------------------------------------------------------------------------
-
         max_pool::max_pool (
             int window_height,
             int window_width,
@@ -548,6 +530,60 @@ namespace dlib
             tensor& grad 
         )
         {
+        }
+
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+
+        void softmax (
+            resizable_tensor& dest,
+            const tensor& src
+        )
+        {
+            dest.copy_size(src);
+            if (src.size() == 0)
+                return;
+
+            const float alpha = 1;
+            const float beta = 0;
+
+            check(cudnnSoftmaxForward(context(),
+                                      CUDNN_SOFTMAX_ACCURATE,
+                                      CUDNN_SOFTMAX_MODE_CHANNEL,
+                                      &alpha,
+                                      descriptor(src),
+                                      src.device(),
+                                      &beta,
+                                      descriptor(dest),
+                                      dest.device()));
+        }
+
+
+        void softmax_gradient (
+            tensor& grad,
+            const tensor& softmaxed_data,
+            const tensor& gradient_input
+        )
+        {
+            DLIB_CASSERT(
+                  have_same_dimensions(softmaxed_data,gradient_input) == true &&
+                  have_same_dimensions(softmaxed_data,grad) == true , "");
+            if (softmaxed_data.size() == 0)
+                return;
+
+            const float alpha = 1;
+            const float beta = 1;
+            check(cudnnSoftmaxBackward(context(),
+                                      CUDNN_SOFTMAX_ACCURATE,
+                                      CUDNN_SOFTMAX_MODE_CHANNEL,
+                                      &alpha,
+                                      descriptor(softmaxed_data),
+                                      softmaxed_data.device(),
+                                      descriptor(gradient_input),
+                                      gradient_input.device(),
+                                      &beta,
+                                      descriptor(grad),
+                                      grad.device()));
         }
 
     // ------------------------------------------------------------------------------------

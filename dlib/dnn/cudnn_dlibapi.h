@@ -151,6 +151,8 @@ namespace dlib
             /*!
                 requires
                     - filters.k() == data.k()
+                    - stride_y > 0
+                    - stride_x > 0
             !*/
 
             ~conv (
@@ -239,28 +241,6 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        void soft_max (
-            resizable_tensor& dest,
-            const tensor& src
-        );
-        /*!
-            probably uses CUDNN_SOFTMAX_MODE_CHANNEL 
-        !*/
-
-        void soft_max_gradient (
-            tensor& grad,
-            const tensor& src,
-            const tensor& gradient_input
-        );
-        /*!
-            - let OUT be the output of soft_max(OUT,src)
-            - let f(src) == dot(gradient_input,OUT)
-            - Then this function computes the gradient of f() with respect to src
-              and adds it to grad.
-        !*/
-
-    // ------------------------------------------------------------------------------------
-
         class max_pool
         {
             /*!
@@ -309,6 +289,41 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        void softmax (
+            resizable_tensor& dest,
+            const tensor& src
+        );
+        /*!
+            ensures
+                - have_same_dimensions(#dest, src) == true
+                - Note that the softmax function is a vector valued function: 
+                    s(x) == exp(x)/sum(exp(x)) 
+                - Computes the softmax function on src and writes the results to dest.  The
+                  softmax is computed per spatial location across the different channels at
+                  each location.  That is, softmax() outputs a new tensor, #dest, where
+                  each of the spatial locations in dest (i.e. image idx, row idx, and
+                  column idx) contains the output of s() evaluated over the channel values
+                  at each location.
+        !*/
+
+        void softmax_gradient (
+            tensor& grad,
+            const tensor& softmaxed_data,
+            const tensor& gradient_input
+        );
+        /*!
+            requires
+                - have_same_dimensions(softmaxed_data,gradient_input) == true 
+                - have_same_dimensions(softmaxed_data,grad) == true 
+            ensures
+                - We interpret softmaxed_data as the output of softmax(softmaxed_data,SRC)
+                  for some SRC tensor.  Then let f(SRC) == dot(gradient_input,softmaxed_data)
+                  Then this function computes the gradient of f() with respect to SRC and
+                  adds it to grad.
+        !*/
+
+    // ------------------------------------------------------------------------------------
+
         void sigmoid (
             resizable_tensor& dest,
             const tensor& src
@@ -334,7 +349,7 @@ namespace dlib
                 - dest contains the result of calling sigmoid(dest,src)
             ensures
                 - Recalling that dest is the output of sigmoid(dest,src),
-                  let f(src) == dot(gradient_input,dist)
+                  let f(src) == dot(gradient_input,dest)
                 - Then this function computes the gradient of f() with respect to src and
                   adds it to grad.
         !*/
@@ -366,7 +381,7 @@ namespace dlib
                 - dest contains the result of calling relu(dest,src)
             ensures
                 - Recalling that dest is the output of relu(dest,src),
-                  let f(src) == dot(gradient_input,dist)
+                  let f(src) == dot(gradient_input,dest)
                 - Then this function computes the gradient of f() with respect to src and
                   adds it to grad.
         !*/
@@ -398,7 +413,7 @@ namespace dlib
                 - dest contains the result of calling tanh(dest,src)
             ensures
                 - Recalling that dest is the output of tanh(dest,src),
-                  let f(src) == dot(gradient_input,dist)
+                  let f(src) == dot(gradient_input,dest)
                 - Then this function computes the gradient of f() with respect to src and
                   adds it to grad.
         !*/
