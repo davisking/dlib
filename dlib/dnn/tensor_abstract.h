@@ -295,6 +295,26 @@ namespace dlib
             - returns mat(t, t.num_samples(), t.size()/t.num_samples())
     !*/
 
+    const matrix_exp image_plane (
+        const tensor& t,
+        long sample = 0,
+        long k = 0
+    );
+    /*!
+        requires
+            - t.size() != 0
+            - 0 <= sample < t.num_samples()
+            - 0 <= k < t.k()
+        ensures
+            - returns the k-th image plane from the sample-th image in t.  That is,
+              returns a matrix M such that:
+                - M contains float valued elements.
+                - M.nr() == t.nr()
+                - M.nc() == t.nc()
+                - for all valid r and c:
+                    - M(r,c) == t.host()[((sample*t.k() + k)*t.nr() + r)*t.nc() + c]
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     bool have_same_dimensions (

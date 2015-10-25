@@ -241,6 +241,31 @@ namespace dlib
         return mat(t, t.num_samples(), t.size()/t.num_samples());
     }
 
+    inline const matrix_op<op_pointer_to_mat<float> > image_plane (
+        const tensor& t,
+        long sample = 0,
+        long k = 0
+    )
+    {
+        DLIB_ASSERT(0 <= sample && sample < t.num_samples() &&
+                    0 <= k && k < t.k() &&
+                    t.size() != 0, 
+                    "\tconst matrix_exp image_plane(tensor,sample,k)"
+                    << "\n\t Invalid arguments were given to this function."
+                    << "\n\t sample: " << sample
+                    << "\n\t k:      " << k 
+                    << "\n\t t.num_samples(): " << t.num_samples() 
+                    << "\n\t t.k():           " << t.k() 
+                    << "\n\t t.size():        " << t.size() 
+        );
+
+
+        typedef op_pointer_to_mat<float> op;
+        return matrix_op<op>(op(t.host() + ((sample*t.k() + k)*t.nr())*t.nc(), 
+                                t.nr(), 
+                                t.nc()));
+    }
+
 // ----------------------------------------------------------------------------------------
 
     inline bool have_same_dimensions (
