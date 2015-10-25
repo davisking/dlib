@@ -107,6 +107,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp subm (
+        const matrix_exp& m,
+        const rectangle& rect
+    );
+    /*!
+        requires
+            - get_rect(m).contains(rect) == true
+              (i.e. rect is a region inside the matrix m)
+        ensures
+            - returns a matrix R such that:
+                - R.nr() == rect.height()  
+                - R.nc() == rect.width()
+                - for all valid r and c:
+                  R(r, c) == m(r+rect.top(), c+rect.left())
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp subm_clipped (
         const matrix_exp& m,
         long row,
@@ -127,24 +145,6 @@ namespace dlib
                     - R.nc() == box_clipped.width()
                     - for all valid r and c:
                       R(r, c) == m(r+box_clipped.top(),c+box_clipped.left())
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    const matrix_exp subm (
-        const matrix_exp& m,
-        const rectangle& rect
-    );
-    /*!
-        requires
-            - get_rect(m).contains(rect) == true
-              (i.e. rect is a region inside the matrix m)
-        ensures
-            - returns a matrix R such that:
-                - R.nr() == rect.height()  
-                - R.nc() == rect.width()
-                - for all valid r and c:
-                  R(r, c) == m(r+rect.top(), c+rect.left())
     !*/
 
 // ----------------------------------------------------------------------------------------
