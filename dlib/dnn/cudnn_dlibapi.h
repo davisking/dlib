@@ -109,8 +109,25 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        // TODO
-        // add a call that maps to cudnnConvolutionBackwardBias()
+        void add_conv_bias_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        );
+        /*!
+            requires
+                - grad.num_samples() == 1
+                - grad.k()  >= 1
+                - grad.nr() == 1
+                - grad.nc() == 1
+                - gradient_input.k() == grad.k()
+                - gradient_input.size() > 0
+            ensures
+                - let BIAS be a tensor with all dimensions equal to 1 except for k which is >= 1.
+                - let OUT be the output of add(1,OUT,1,BIAS)
+                - let f(gradient_input,BIAS) == dot(gradient_input,OUT)
+                - Then this function computes the gradient of f() with respect to BIAS and
+                  adds it to grad.
+        !*/
 
     // ------------------------------------------------------------------------------------
 

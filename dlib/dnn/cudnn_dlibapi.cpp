@@ -207,6 +207,30 @@ namespace dlib
                                    &value));
         }
 
+        void add_conv_bias_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        )
+        {
+            DLIB_CASSERT(
+                  grad.num_samples() == 1 &&
+                  grad.k()  >= 1 &&
+                  grad.nr() == 1 &&
+                  grad.nc() == 1 &&
+                  gradient_input.k() == grad.k() &&
+                  gradient_input.size() > 0,"");
+
+            const float alpha = 1;
+            const float beta = 1;
+            check(cudnnConvolutionBackwardBias(context(),
+                                               &alpha,
+                                               descriptor(gradient_input),
+                                               gradient_input.device(),
+                                               &beta,
+                                               descriptor(grad),
+                                               grad.device()));
+        }
+
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
 
