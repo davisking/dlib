@@ -602,6 +602,7 @@
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="colm"                  include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="colm_exp"              include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="subm"                  include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="subm_clipped"          include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="range"                 include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="set_rowm"              include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="set_colm"              include="dlib/matrix.h"/>

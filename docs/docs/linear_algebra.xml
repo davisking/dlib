@@ -300,6 +300,10 @@
                   <link>dlib/matrix/matrix_subexp_abstract.h.html#subm</link>
                </item>
                <item>
+                  <name>subm_clipped</name>
+                  <link>dlib/matrix/matrix_subexp_abstract.h.html#subm_clipped</link>
+               </item>
+               <item>
                   <name>rowm</name>
                   <link>dlib/matrix/matrix_subexp_abstract.h.html#rowm</link>
                </item>
