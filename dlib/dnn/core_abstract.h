@@ -6,6 +6,7 @@
 #include "tensor_abstract.h"
 #include <memory>
 #include <type_traits>
+#include <tuple>
 #include "../rand.h"
 
 
@@ -29,6 +30,19 @@ namespace dlib
               num_inputs_and_outputs.  That is, you should set num_inputs_and_outputs to
               the sum of the dimensionalities of the vectors going into and out of the
               layer that uses params as its parameters.
+    !*/
+
+    template <
+        typename Head, 
+        typename... Tail
+        >
+    std::tuple<Tail...> tuple_tail(
+        const std::tuple<Head, Tail...>& item 
+    );
+    /*!
+        ensures
+            - returns a tuple that contains everything in item except for get<0>(item).
+              So it basically returns make_tuple(get<1>(item),get<2>(item),get<3>(item), and so on).
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -189,6 +203,17 @@ namespace dlib
                   each other.
                 - #layer_details() == layer_details_type(item.layer_details())
                 - #subnet()        == subnet_type(item.subnet())
+        !*/
+
+        template <typename ...T, typename ...U>
+        add_layer(
+            const std::tuple<layer_details_type,U...>& layer_det, 
+            T&& ...args
+        );
+        /*!
+            ensures
+                - #layer_details() == layer_details_type(get<0>(layer_det))
+                - #subnet()        == subnet_type(tuple_tail(layer_det),args)
         !*/
 
         template <typename ...T>

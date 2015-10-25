@@ -12,6 +12,7 @@
 #include "../rand.h"
 #include "../algs.h"
 #include <utility>
+#include <tuple>
 
 
 namespace dlib
@@ -24,6 +25,50 @@ namespace dlib
     template <typename T> struct is_nonloss_layer_type : std::false_type {};
     // Tell us if T is an instance of add_loss_layer.
     template <typename T> struct is_loss_layer_type : std::false_type {};
+
+    namespace impl
+    {
+        template <size_t... n>
+        struct ct_integers_list {
+            template <size_t m>
+            struct push_back
+            {
+                typedef ct_integers_list<n..., m> type;
+            };
+        };
+
+        template <size_t max>
+        struct ct_make_integer_range
+        {
+            // recursively call push_back on ct_integers_list to build a range from 0 to max
+            // inclusive.
+            typedef typename ct_make_integer_range<max-1>::type::template push_back<max>::type type;
+        };
+
+        template <>
+        struct ct_make_integer_range<0>
+        {
+            typedef ct_integers_list<> type;
+        };
+
+        template <size_t... indices, typename Tuple>
+        auto tuple_subset(
+            const Tuple& item, 
+            ct_integers_list<indices...>
+        ) -> decltype(std::make_tuple(std::get<indices>(item)...))
+        {
+            return std::make_tuple(std::get<indices>(item)...);
+        }
+
+    }
+
+    template <typename Head, typename... Tail>
+    std::tuple<Tail...> tuple_tail(
+        const std::tuple<Head, Tail...>& item
+    )
+    {
+        return impl::tuple_subset(item, typename impl::ct_make_integer_range<sizeof...(Tail)>::type());
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -236,6 +281,32 @@ namespace dlib
         {
         }
 
+        template <typename ...T, typename ...U>
+        add_layer(
+            const std::tuple<LAYER_DETAILS,U...>& layer_det, 
+            T&& ...args
+        ) : 
+            details(std::get<0>(layer_det)), 
+            subnetwork(tuple_tail(layer_det),std::forward<T>(args)...),
+            this_layer_setup_called(false),
+            gradient_input_is_stale(true)
+        {
+        }
+
+        template <typename ...T, typename ...U>
+        add_layer(
+            std::tuple<>,
+            const std::tuple<LAYER_DETAILS,U...>& layer_det, 
+            T&& ...args
+        ) : add_layer(layer_det,args...) { }
+
+        template <typename ...T>
+        add_layer(
+            std::tuple<>, 
+            LAYER_DETAILS&& layer_det, 
+            T&& ...args
+        ) : add_layer(layer_det, args...) { }
+
         template <typename input_iterator>
         void to_tensor (
             input_iterator ibegin,
@@ -441,6 +512,31 @@ namespace dlib
             this_layer_setup_called(false),
             gradient_input_is_stale(true)
         {}
+
+        add_layer(
+            std::tuple<>,
+            const LAYER_DETAILS& layer_det
+        ) : add_layer(layer_det) {}
+
+        add_layer(
+            std::tuple<>,
+            LAYER_DETAILS&& layer_det
+        ) : add_layer(layer_det) {}
+
+        add_layer(
+            std::tuple<>,
+            LAYER_DETAILS layer_det, 
+            INPUT_LAYER il
+        ) : add_layer(layer_det,il) {}
+
+        add_layer(
+            const std::tuple<LAYER_DETAILS>& layer_det
+        ) : add_layer(std::get<0>(layer_det)) {}
+
+        add_layer(
+            const std::tuple<LAYER_DETAILS>& layer_det,
+            INPUT_LAYER il
+        ) : add_layer(std::get<0>(layer_det),il) {}
 
         template <typename input_iterator>
         void to_tensor (
