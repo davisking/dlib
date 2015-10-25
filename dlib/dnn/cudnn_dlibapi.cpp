@@ -558,14 +558,50 @@ namespace dlib
             const tensor& src
         )
         {
+            dest.copy_size(src);
+            if (src.size() == 0)
+                return;
+
+            const float alpha = 1;
+            const float beta = 0;
+            check(cudnnActivationForward(context(),
+                                         CUDNN_ACTIVATION_SIGMOID,
+                                         &alpha,
+                                         descriptor(src),
+                                         src.device(),
+                                         &beta,
+                                         descriptor(dest),
+                                         dest.device()));
         }
 
         void sigmoid_gradient (
             tensor& grad,
+            const tensor& dest,
             const tensor& src,
             const tensor& gradient_input
         )
         {
+            DLIB_CASSERT(
+                  have_same_dimensions(src,gradient_input) == true &&
+                  have_same_dimensions(src,grad) == true &&
+                  have_same_dimensions(src,dest) == true , "");
+            if (src.size() == 0)
+                return;
+
+            const float alpha = 1;
+            const float beta = 1;
+            check(cudnnActivationBackward(context(),
+                                          CUDNN_ACTIVATION_SIGMOID,
+                                          &alpha,
+                                          descriptor(dest),
+                                          dest.device(),
+                                          descriptor(gradient_input),
+                                          gradient_input.device(),
+                                          descriptor(src),
+                                          src.device(),
+                                          &beta,
+                                          descriptor(grad),
+                                          grad.device()));
         }
 
     // ------------------------------------------------------------------------------------
@@ -575,14 +611,50 @@ namespace dlib
             const tensor& src
         )
         {
+            dest.copy_size(src);
+            if (src.size() == 0)
+                return;
+
+            const float alpha = 1;
+            const float beta = 0;
+            check(cudnnActivationForward(context(),
+                                         CUDNN_ACTIVATION_RELU,
+                                         &alpha,
+                                         descriptor(src),
+                                         src.device(),
+                                         &beta,
+                                         descriptor(dest),
+                                         dest.device()));
         }
 
         void relu_gradient (
             tensor& grad,
+            const tensor& dest,
             const tensor& src,
             const tensor& gradient_input
         )
         {
+            DLIB_CASSERT(
+                  have_same_dimensions(src,gradient_input) == true &&
+                  have_same_dimensions(src,grad) == true &&
+                  have_same_dimensions(src,dest) == true , "");
+            if (src.size() == 0)
+                return;
+
+            const float alpha = 1;
+            const float beta = 1;
+            check(cudnnActivationBackward(context(),
+                                          CUDNN_ACTIVATION_RELU,
+                                          &alpha,
+                                          descriptor(dest),
+                                          dest.device(),
+                                          descriptor(gradient_input),
+                                          gradient_input.device(),
+                                          descriptor(src),
+                                          src.device(),
+                                          &beta,
+                                          descriptor(grad),
+                                          grad.device()));
         }
 
     // ------------------------------------------------------------------------------------
@@ -592,14 +664,50 @@ namespace dlib
             const tensor& src
         )
         {
+            dest.copy_size(src);
+            if (src.size() == 0)
+                return;
+
+            const float alpha = 1;
+            const float beta = 0;
+            check(cudnnActivationForward(context(),
+                                         CUDNN_ACTIVATION_TANH,
+                                         &alpha,
+                                         descriptor(src),
+                                         src.device(),
+                                         &beta,
+                                         descriptor(dest),
+                                         dest.device()));
         }
 
         void tanh_gradient (
             tensor& grad,
+            const tensor& dest,
             const tensor& src,
             const tensor& gradient_input
         )
         {
+            DLIB_CASSERT(
+                  have_same_dimensions(src,gradient_input) == true &&
+                  have_same_dimensions(src,grad) == true &&
+                  have_same_dimensions(src,dest) == true , "");
+            if (src.size() == 0)
+                return;
+
+            const float alpha = 1;
+            const float beta = 1;
+            check(cudnnActivationBackward(context(),
+                                          CUDNN_ACTIVATION_TANH,
+                                          &alpha,
+                                          descriptor(dest),
+                                          dest.device(),
+                                          descriptor(gradient_input),
+                                          gradient_input.device(),
+                                          descriptor(src),
+                                          src.device(),
+                                          &beta,
+                                          descriptor(grad),
+                                          grad.device()));
         }
 
     // ------------------------------------------------------------------------------------

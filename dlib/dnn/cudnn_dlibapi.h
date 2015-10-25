@@ -309,7 +309,6 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        // cudnnActivationForward(), CUDNN_ACTIVATION_SIGMOID
         void sigmoid (
             resizable_tensor& dest,
             const tensor& src
@@ -321,9 +320,9 @@ namespace dlib
                     - #dest.host()[i] == 1/(1+std::exp(-src.host()[i])) 
         !*/
 
-        // cudnnActivationBackward()
         void sigmoid_gradient (
             tensor& grad,
+            const tensor& dest,
             const tensor& src,
             const tensor& gradient_input
         );
@@ -331,16 +330,17 @@ namespace dlib
             requires
                 - have_same_dimensions(src,gradient_input) == true 
                 - have_same_dimensions(src,grad) == true 
+                - have_same_dimensions(src,dest) == true 
+                - dest contains the result of calling sigmoid(dest,src)
             ensures
-                - let OUT be the output of sigmoid(OUT,src)
-                - let f(src) == dot(gradient_input,OUT)
+                - Recalling that dest is the output of sigmoid(dest,src),
+                  let f(src) == dot(gradient_input,dist)
                 - Then this function computes the gradient of f() with respect to src and
                   adds it to grad.
         !*/
 
     // ------------------------------------------------------------------------------------
 
-        // cudnnActivationForward(), CUDNN_ACTIVATION_RELU
         void relu (
             resizable_tensor& dest,
             const tensor& src
@@ -352,9 +352,9 @@ namespace dlib
                     - #dest.host()[i] == std::max(0,src.host()[i]) 
         !*/
 
-        // cudnnActivationBackward()
         void relu_gradient (
             tensor& grad,
+            const tensor& dest,
             const tensor& src,
             const tensor& gradient_input
         );
@@ -362,16 +362,17 @@ namespace dlib
             requires
                 - have_same_dimensions(src,gradient_input) == true 
                 - have_same_dimensions(src,grad) == true 
+                - have_same_dimensions(src,dest) == true 
+                - dest contains the result of calling relu(dest,src)
             ensures
-                - let OUT be the output of relu(OUT,src)
-                - let f(src) == dot(gradient_input,OUT)
+                - Recalling that dest is the output of relu(dest,src),
+                  let f(src) == dot(gradient_input,dist)
                 - Then this function computes the gradient of f() with respect to src and
                   adds it to grad.
         !*/
 
     // ------------------------------------------------------------------------------------
 
-        // cudnnActivationForward(), CUDNN_ACTIVATION_TANH
         void tanh (
             resizable_tensor& dest,
             const tensor& src
@@ -383,9 +384,9 @@ namespace dlib
                     - #dest.host()[i] == std::tanh(src.host()[i]) 
         !*/
 
-        // cudnnActivationBackward()
         void tanh_gradient (
             tensor& grad,
+            const tensor& dest,
             const tensor& src,
             const tensor& gradient_input
         );
@@ -393,9 +394,11 @@ namespace dlib
             requires
                 - have_same_dimensions(src,gradient_input) == true 
                 - have_same_dimensions(src,grad) == true 
+                - have_same_dimensions(src,dest) == true 
+                - dest contains the result of calling tanh(dest,src)
             ensures
-                - let OUT be the output of tanh(OUT,src)
-                - let f(src) == dot(gradient_input,OUT)
+                - Recalling that dest is the output of tanh(dest,src),
+                  let f(src) == dot(gradient_input,dist)
                 - Then this function computes the gradient of f() with respect to src and
                   adds it to grad.
         !*/
