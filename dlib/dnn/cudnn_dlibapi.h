@@ -65,10 +65,6 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        // add a call that maps to cudnnConvolutionBackwardBias()
-
-    // ------------------------------------------------------------------------------------
-
         void add(
             float beta,
             tensor& dest,
@@ -113,6 +109,11 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        // TODO
+        // add a call that maps to cudnnConvolutionBackwardBias()
+
+    // ------------------------------------------------------------------------------------
+
         class conv
         {
         public:
@@ -145,8 +146,8 @@ namespace dlib
             );
             /*!
                 requires
-                    - the dimensions of data and filters are the same as the ones given 
-                      to the constructor.
+                    - The dimensions of data and filters are the same as the ones given 
+                      to the last call to setup().
                 ensures
                     - convolves filters over data.  
                     - filters contains filters.num_samples() filters. 
@@ -156,7 +157,6 @@ namespace dlib
                     - #output.nc() == 1+(data.nc()-1)/stride_x
             !*/
 
-            // get gradient of data: 4.49. cudnnConvolutionBackwardData_v3
             void get_gradient_for_data (
                 const tensor& gradient_input, 
                 const tensor& filters,
@@ -164,10 +164,10 @@ namespace dlib
             );
             /*!
                 requires
-                    - filters has the same dimensions as the filters object give to the
-                      constructor.
+                    - filters has the same dimensions as the filters object give to the 
+                      last call to setup().
                     - data_gradient has the same dimensions as the data object give to the
-                      constructor.
+                      last call to setup().
                     - gradient_input has the same dimensions as the output of operator().
                 ensures
                     - let OUT be the output of (*this)(OUT,data,filters).
@@ -176,7 +176,6 @@ namespace dlib
                       and adds this gradient to data_gradient.
             !*/
 
-            // get gradient of filters: 4.44. cudnnConvolutionBackwardFilter_v3
             void get_gradient_for_filters (
                 const tensor& gradient_input, 
                 const tensor& data,
@@ -185,8 +184,9 @@ namespace dlib
             /*!
                 requires
                     - filters_gradient has the same dimensions as the filters object give
-                      to the constructor.
-                    - data has the same dimensions as the data object give to the constructor.
+                      to the last call to setup().
+                    - data has the same dimensions as the data object give to the last call
+                      to setup().
                     - gradient_input has the same dimensions as the output of operator().
                 ensures
                     - let OUT be the output of (*this)(OUT,data,filters).
@@ -210,6 +210,14 @@ namespace dlib
             int forward_algo;
             size_t forward_workspace_size_in_bytes;
             void* forward_workspace;
+
+            int backward_data_algo;
+            size_t backward_data_workspace_size_in_bytes;
+            void* backward_data_workspace;
+
+            int backward_filters_algo;
+            size_t backward_filters_workspace_size_in_bytes;
+            void* backward_filters_workspace;
         };
 
     // ------------------------------------------------------------------------------------

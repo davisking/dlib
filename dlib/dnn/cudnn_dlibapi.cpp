@@ -166,6 +166,12 @@ namespace dlib
             const tensor& src
         )
         {
+            DLIB_CASSERT(
+                  (dest.num_samples()==src.num_samples() || src.num_samples()==1) &&
+                  (dest.nr()==src.nr() || src.nr()==1) &&
+                  (dest.nc()==src.nc() || src.nc()==1) &&
+                  (dest.k()==src.k()   || src.k()==1), "");
+
             check(cudnnAddTensor_v3(context(),
                                     &alpha,
                                     descriptor(src),
@@ -215,7 +221,13 @@ namespace dlib
             out_nc(0),
             forward_algo(0),
             forward_workspace_size_in_bytes(0),
-            forward_workspace(nullptr)
+            forward_workspace(nullptr),
+            backward_data_algo(0),
+            backward_data_workspace_size_in_bytes(0),
+            backward_data_workspace(nullptr),
+            backward_filters_algo(0),
+            backward_filters_workspace_size_in_bytes(0),
+            backward_filters_workspace(nullptr)
         {
         }
 
@@ -237,9 +249,20 @@ namespace dlib
             if (forward_workspace)
                 cudaFree(forward_workspace);
             forward_workspace = nullptr;
-
             forward_algo = 0;
             forward_workspace_size_in_bytes = 0;
+
+            if (backward_data_workspace)
+                cudaFree(backward_data_workspace);
+            backward_data_workspace = nullptr;
+            backward_data_algo = 0;
+            backward_data_workspace_size_in_bytes = 0;
+
+            if (backward_filters_workspace)
+                cudaFree(backward_filters_workspace);
+            backward_filters_workspace = nullptr;
+            backward_filters_algo = 0;
+            backward_filters_workspace_size_in_bytes = 0;
         }
 
         void conv::
@@ -286,6 +309,8 @@ namespace dlib
                 tensor_descriptor dest_desc;
                 dest_desc.set_size(out_num_samples,out_k,out_nr,out_nc);
 
+                // Pick which forward algorithm we will use and allocate the necessary
+                // workspace buffer.
                 cudnnConvolutionFwdAlgo_t forward_best_algo;
                 check(cudnnGetConvolutionForwardAlgorithm(
                         context(), 
@@ -297,8 +322,6 @@ namespace dlib
                         std::numeric_limits<size_t>::max(),
                         &forward_best_algo));
                 forward_algo = forward_best_algo;
-
-
                 check(cudnnGetConvolutionForwardWorkspaceSize( 
                         context(),
                         descriptor(data),
@@ -307,8 +330,55 @@ namespace dlib
                         descriptor(dest_desc),
                         forward_best_algo,
                         &forward_workspace_size_in_bytes));
-
                 CHECK_CUDA(cudaMalloc(&forward_workspace, forward_workspace_size_in_bytes));
+
+
+                // Pick which backward data algorithm we will use and allocate the
+                // necessary workspace buffer.
+                cudnnConvolutionBwdDataAlgo_t backward_data_best_algo;
+                check(cudnnGetConvolutionBackwardDataAlgorithm(
+                        context(),
+                        (const cudnnFilterDescriptor_t)filter_handle,
+                        descriptor(dest_desc),
+                        (const cudnnConvolutionDescriptor_t)conv_handle,
+                        descriptor(data),
+                        CUDNN_CONVOLUTION_BWD_DATA_PREFER_FASTEST,
+                        std::numeric_limits<size_t>::max(),
+                        &backward_data_best_algo));
+                backward_data_algo = backward_data_best_algo;
+                check(cudnnGetConvolutionBackwardDataWorkspaceSize( 
+                        context(),
+                        (const cudnnFilterDescriptor_t)filter_handle,
+                        descriptor(dest_desc),
+                        (const cudnnConvolutionDescriptor_t)conv_handle,
+                        descriptor(data),
+                        backward_data_best_algo,
+                        &backward_data_workspace_size_in_bytes));
+                CHECK_CUDA(cudaMalloc(&backward_data_workspace, backward_data_workspace_size_in_bytes));
+
+
+                // Pick which backward filters algorithm we will use and allocate the
+                // necessary workspace buffer.
+                cudnnConvolutionBwdFilterAlgo_t backward_filters_best_algo;
+                check(cudnnGetConvolutionBackwardFilterAlgorithm(
+                        context(),
+                        descriptor(data),
+                        descriptor(dest_desc),
+                        (const cudnnConvolutionDescriptor_t)conv_handle,
+                        (const cudnnFilterDescriptor_t)filter_handle,
+                        CUDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST,
+                        std::numeric_limits<size_t>::max(),
+                        &backward_filters_best_algo));
+                backward_filters_algo = backward_filters_best_algo;
+                check(cudnnGetConvolutionBackwardFilterWorkspaceSize( 
+                        context(),
+                        descriptor(data),
+                        descriptor(dest_desc),
+                        (const cudnnConvolutionDescriptor_t)conv_handle,
+                        (const cudnnFilterDescriptor_t)filter_handle,
+                        backward_filters_best_algo,
+                        &backward_filters_workspace_size_in_bytes));
+                CHECK_CUDA(cudaMalloc(&backward_filters_workspace, backward_filters_workspace_size_in_bytes));
             }
             catch(...)
             {
@@ -362,6 +432,23 @@ namespace dlib
             tensor& data_gradient
         )
         {
+            const float alpha = 1;
+            const float beta = 1;
+
+
+            check(cudnnConvolutionBackwardData_v3(context(),
+                                                  &alpha,
+                                                  (const cudnnFilterDescriptor_t)filter_handle,
+                                                  filters.device(),
+                                                  descriptor(gradient_input),
+                                                  gradient_input.device(),
+                                                  (const cudnnConvolutionDescriptor_t)conv_handle,
+                                                  (cudnnConvolutionBwdDataAlgo_t)backward_data_algo,
+                                                  backward_data_workspace,
+                                                  backward_data_workspace_size_in_bytes,
+                                                  &beta,
+                                                  descriptor(data_gradient),
+                                                  data_gradient.device()));
         }
 
         void conv::
@@ -371,6 +458,21 @@ namespace dlib
             tensor& filters_gradient
         )
         {
+            const float alpha = 1;
+            const float beta = 1;
+            check(cudnnConvolutionBackwardFilter_v3(context(),
+                                                    &alpha,
+                                                    descriptor(data),
+                                                    data.device(),
+                                                    descriptor(gradient_input),
+                                                    gradient_input.device(),
+                                                    (const cudnnConvolutionDescriptor_t)conv_handle,
+                                                    (cudnnConvolutionBwdFilterAlgo_t)backward_filters_algo,
+                                                    backward_filters_workspace,
+                                                    backward_filters_workspace_size_in_bytes,
+                                                    &beta,
+                                                    (const cudnnFilterDescriptor_t)filter_handle,
+                                                    filters_gradient.device()));
         }
 
     // ------------------------------------------------------------------------------------
