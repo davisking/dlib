@@ -503,17 +503,48 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         max_pool::max_pool (
-            int window_height,
-            int window_width,
-            int stride_y,
-            int stride_x
-        )
+        ) : handle(nullptr),stride_y(0),stride_x(0)
         {
         }
 
         max_pool::~max_pool(
         )
         {
+            clear();
+        }
+
+        void max_pool::
+        clear(
+        )
+        {
+            if (handle)
+                cudnnDestroyPoolingDescriptor((cudnnPoolingDescriptor_t)handle);
+            handle = nullptr;
+            stride_y = 0;
+            stride_x = 0;
+        }
+
+        void max_pool::
+        setup(
+            int window_height,
+            int window_width,
+            int stride_y_,
+            int stride_x_
+        )
+        {
+            stride_x = stride_x_;
+            stride_y = stride_y_;
+            cudnnPoolingDescriptor_t poolingDesc;
+            check(cudnnCreatePoolingDescriptor(&poolingDesc));
+            handle = poolingDesc;
+
+            check(cudnnSetPooling2dDescriptor(poolingDesc,
+                                              CUDNN_POOLING_MAX,
+                                              window_height,
+                                              window_width,
+                                              0,0, // no padding
+                                              stride_y,
+                                              stride_x));
         }
 
         void max_pool::
@@ -522,14 +553,61 @@ namespace dlib
             const tensor& src
         )
         {
+            const float alpha = 1;
+            const float beta = 0;
+            int outN;
+            int outC;
+            int outH;
+            int outW;
+            check(cudnnGetPooling2dForwardOutputDim((const cudnnPoolingDescriptor_t)handle,
+                                                    descriptor(src),
+                                                    &outN,
+                                                    &outC,
+                                                    &outH,
+                                                    &outW));
+
+
+            dest.set_size(outN,outC,outH,outW);
+
+            DLIB_CASSERT(dest.num_samples() == src.num_samples(),"");
+            DLIB_CASSERT(dest.k() == src.k(),"");
+            DLIB_CASSERT(dest.nr() == src.nr()/stride_y,"");
+            DLIB_CASSERT(dest.nc() == src.nc()/stride_x,"");
+
+            check(cudnnPoolingForward(context(),
+                                     (const cudnnPoolingDescriptor_t)handle,
+                                     &alpha,
+                                     descriptor(src),
+                                     src.device(),
+                                     &beta,
+                                     descriptor(dest),
+                                     dest.device()));
         }
 
         void max_pool::get_gradient(
             const tensor& gradient_input, 
+            const tensor& dest,
             const tensor& src,
             tensor& grad 
         )
         {
+            DLIB_CASSERT(have_same_dimensions(gradient_input,dest),"");
+            DLIB_CASSERT(have_same_dimensions(src,grad),"");
+
+            const float alpha = 1;
+            const float beta = 0;
+            check(cudnnPoolingBackward(context(),
+                                       (const cudnnPoolingDescriptor_t)handle,
+                                       &alpha,
+                                       descriptor(dest),
+                                       dest.device(),
+                                       descriptor(gradient_input),
+                                       gradient_input.device(),
+                                       descriptor(src),
+                                       src.device(),
+                                       &beta,
+                                       descriptor(grad),
+                                       grad.device()));
         }
 
     // ------------------------------------------------------------------------------------

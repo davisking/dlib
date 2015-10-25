@@ -244,45 +244,68 @@ namespace dlib
         class max_pool
         {
             /*!
-                CUDNN_POOLING_MAX
             !*/
         public:
 
             max_pool(const max_pool&) = delete;
             max_pool& operator=(const max_pool&) = delete;
 
-            // cudnnCreatePoolingDescriptor(), cudnnSetPooling2dDescriptor()
             max_pool (
+            );
+
+            ~max_pool(
+            );
+
+            void clear(
+            );
+
+            void setup(
                 int window_height,
                 int window_width,
                 int stride_y,
                 int stride_x
             );
 
-            // cudnnDestroyPoolingDescriptor ()
-            ~max_pool(
-            );
-
-            // cudnnGetPooling2dForwardOutputDim(), cudnnPoolingForward()
             void operator() (
                 resizable_tensor& dest,
                 const tensor& src
             );
             /*!
+                ensures
+                    - #dest.num_samples() == src.num_samples()
+                    - #dest.k() == src.k()
+                    - #dest.nr() == src.nr()/stride_y
+                    - #dest.nc() == src.nc()/stride_x
+                    - for all valid s, k, r, and c:
+                        - image_plane(#dest,s,k)(r,c) == max(subm_clipped(image_plane(src,s,k),
+                                                                          r*stride_y,
+                                                                          c*stride_x,
+                                                                          window_height,
+                                                                          window_width))
             !*/
 
-            // cudnnPoolingBackward()
             void get_gradient(
                 const tensor& gradient_input, 
+                const tensor& dest,
                 const tensor& src,
                 tensor& grad 
             );
             /*!
-                - let OUT be the output of (*this)(OUT,src)
-                - let f(src) == dot(gradient_input,OUT)
-                - Then this function computes the gradient of f() with respect to src and
-                  adds it to grad.
+                requires
+                    - have_same_dimensions(gradient_input,dest) == true
+                    - have_same_dimensions(src,grad) == true
+                    - dest contains the result of calling (*this)(dest,src)
+                ensures
+                    - Recalling that dest is the output of (*this)(dest,src),
+                      let f(src) == dot(gradient_input,dest)
+                    - Then this function computes the gradient of f() with respect to src
+                      and adds it to grad.
             !*/
+
+        private:
+            void* handle;
+            int stride_y;
+            int stride_x;
         };
 
         // TODO, make the order of parameters of all these functions consistent.
