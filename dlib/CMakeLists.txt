@@ -81,17 +81,18 @@ if (NOT TARGET dlib)
    toggle_preprocessor_switch(DLIB_ENABLE_STACK_TRACE)
 
    option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
-   toggle_preprocessor_switch(DLIB_ENABLE_ASSERTS)
    if(DLIB_ENABLE_ASSERTS)
       # Set these variables so they are set in the config.h.in file when dlib
       # is installed.
       set (DLIB_DISABLE_ASSERTS false)
       set (ENABLE_ASSERTS true) 
+      add_global_define(ENABLE_ASSERTS)
    else()
       # Set these variables so they are set in the config.h.in file when dlib
       # is installed.
       set (DLIB_DISABLE_ASSERTS true)
       set (ENABLE_ASSERTS false) 
+      remove_global_define(ENABLE_ASSERTS)
    endif()
 
    if (DLIB_ISO_CPP_ONLY)
