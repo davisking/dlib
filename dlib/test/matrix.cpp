@@ -433,6 +433,8 @@ namespace
                 {
                     DLIB_TEST(subm(a,1,2,2,3)(r,c) == (r+1)*a.nc() + c+2);
                     DLIB_TEST(subm(a,1,2,2,3) == subm(a,rect));
+                    DLIB_TEST(subm_clipped(a,1,2,2,3) == subm(a,rect));
+                    DLIB_TEST(subm_clipped(a,1,2,2,3) == subm_clipped(a,rect));
                 }
             }
 

@@ -126,6 +126,25 @@ namespace dlib
     template <
         typename EXP
         >
+    const matrix_op<op_subm<EXP> > subm_clipped (
+        const matrix_exp<EXP>& m,
+        long r, 
+        long c,
+        long nr,
+        long nc
+    )
+    {
+        rectangle box(c,r,c+nc-1,r+nr-1);
+        box = box.intersect(get_rect(m));
+        typedef op_subm<EXP> op;
+        return matrix_op<op>(op(m.ref(),box.top(),box.left(),box.height(),box.width()));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP
+        >
     const matrix_op<op_subm<EXP> > subm (
         const matrix_exp<EXP>& m,
         const rectangle& rect
@@ -141,6 +160,22 @@ namespace dlib
             << "\n\trect.right():  " << rect.right()
             << "\n\trect.bottom(): " << rect.bottom()
             );
+
+        typedef op_subm<EXP> op;
+        return matrix_op<op>(op(m.ref(),rect.top(),rect.left(),rect.height(),rect.width()));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP
+        >
+    const matrix_op<op_subm<EXP> > subm_clipped (
+        const matrix_exp<EXP>& m,
+        rectangle rect
+    )
+    {
+        rect = rect.intersect(get_rect(m));
 
         typedef op_subm<EXP> op;
         return matrix_op<op>(op(m.ref(),rect.top(),rect.left(),rect.height(),rect.width()));

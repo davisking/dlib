@@ -107,6 +107,30 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp subm_clipped (
+        const matrix_exp& m,
+        long row,
+        long col,
+        long nr,
+        long nc
+    );
+    /*!
+        ensures
+            - This function is just like subm() except that it will automatically clip the
+              indicated sub matrix window so that it does not extend outside m.
+              In particular:
+                - Let box = rectangle(col,row,col+nc-1,row+nr-1)
+                  (i.e. the box that contains the indicated sub matrix)
+                - Let box_clipped = box.intersect(get_rect(m))
+                - Then this function returns a matrix R such that:
+                    - R.nr() == box_clipped.height()
+                    - R.nc() == box_clipped.width()
+                    - for all valid r and c:
+                      R(r, c) == m(r+box_clipped.top(),c+box_clipped.left())
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp subm (
         const matrix_exp& m,
         const rectangle& rect
@@ -121,6 +145,22 @@ namespace dlib
                 - R.nc() == rect.width()
                 - for all valid r and c:
                   R(r, c) == m(r+rect.top(), c+rect.left())
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp subm_clipped (
+        const matrix_exp& m,
+        const rectangle& rect
+    );
+    /*!
+        ensures
+            - Let box_clipped == rect.intersect(get_rect(m))
+            - returns a matrix R such that:
+                - R.nr() == box_clipped.height()  
+                - R.nc() == box_clipped.width()
+                - for all valid r and c:
+                  R(r, c) == m(r+box_clipped.top(), c+box_clipped.left())
     !*/
 
 // ----------------------------------------------------------------------------------------
