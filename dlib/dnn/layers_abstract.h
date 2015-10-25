@@ -168,6 +168,7 @@ namespace dlib
 
         template <typename SUBNET>
         void backward(
+            const tensor& computed_output,
             const tensor& gradient_input, 
             SUBNET& sub, 
             tensor& params_grad
@@ -176,7 +177,8 @@ namespace dlib
             requires
                 - SUBNET implements the SUBNET interface defined at the top of this file.
                 - setup() has been called.
-                - gradient_input has the same dimensions as the output of forward(sub,output).
+                - computed_output is the tensor resulting from calling forward(sub,computed_output).
+                - have_same_dimensions(gradient_input, computed_output)
                 - have_same_dimensions(sub.get_gradient_input(), sub.get_output()) == true
                 - have_same_dimensions(params_grad, get_layer_params()) == true
             ensures
@@ -185,8 +187,9 @@ namespace dlib
                   These gradients are stored into #sub and #params_grad, respectively. To be
                   precise, the gradients are taken of a function f(sub,get_layer_params())
                   which is defined thusly:   
-                    - let OUT be the output of forward(sub,OUT).
-                    - let f(sub,get_layer_params()) == dot(OUT, gradient_input)
+                    - Recalling that computed_output is a function of sub and get_layer_params() 
+                      since it is the result of calling forward(sub,computed_output):
+                      let f(sub,get_layer_params()) == dot(computed_output, gradient_input)
                   Then we define the following gradient vectors: 
                     - PARAMETER_GRADIENT == gradient of f(sub,get_layer_params()) with
                       respect to get_layer_params(). 
@@ -272,7 +275,7 @@ namespace dlib
 
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
-        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        template <typename SUBNET> void backward(const tensor& computed_output, const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -309,7 +312,7 @@ namespace dlib
 
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
-        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        template <typename SUBNET> void backward(const tensor& computed_output, const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!

@@ -365,7 +365,7 @@ namespace dlib
             dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
             params_grad.copy_size(details.get_layer_params());
             params_grad = 0;
-            details.backward(get_gradient_input(), wsub, static_cast<tensor&>(params_grad));
+            details.backward(get_output(), get_gradient_input(), wsub, static_cast<tensor&>(params_grad));
             // Don't try to adjust the parameters if this layer doesn't have any.
             if (params_grad.size() != 0)
                 solvers.top()(details, static_cast<const tensor&>(params_grad));
@@ -601,7 +601,7 @@ namespace dlib
             subnet_wrapper wsub(x, grad_final_ignored);
             params_grad.copy_size(details.get_layer_params());
             params_grad = 0;
-            details.backward(get_gradient_input(), wsub, static_cast<tensor&>(params_grad));
+            details.backward(get_output(), get_gradient_input(), wsub, static_cast<tensor&>(params_grad));
             // Don't try to adjust the parameters if this layer doesn't have any.
             if (params_grad.size() != 0)
                 solvers.top()(details, static_cast<const tensor&>(params_grad));
@@ -1602,7 +1602,7 @@ namespace dlib
         random_noise.copy_size(l.get_layer_params());
         randomize_parameters(random_noise, 5, rnd);
         params_grad = random_noise;
-        l.backward(input_grad, subnetwork, params_grad);
+        l.backward(output, input_grad, subnetwork, params_grad);
 
         running_stats<double> rs_param, rs_data;
 
