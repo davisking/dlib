@@ -83,15 +83,12 @@ namespace dlib
                 - dest.k()==src.k()   || src.k()==1
             ensures
                 - performs: dest = beta*dest + alpha*src
-                   TODO, clarify:
-
-                   calls cudnnAddTensor_v3()
-
-                   This function adds the scaled values of one src tensor to another
-                   tensor. Each dimension of the src tensor must match the corresponding
-                   dimension of the dest tensor or must be equal to 1. In the latter case,
-                   the same value from the src tensor, for those dimensions, will be used
-                   to blend into the dest tensor.
+                  However, how the addition happens depends on the dimensions of src.  In
+                  particular, this function adds the scaled values of one src tensor to
+                  dest. Each dimension of the src tensor must match the corresponding
+                  dimension of the dest tensor or must be equal to 1. In the latter case,
+                  the same value from the src tensor, for those dimensions, will be used to
+                  add into the dest tensor.
         !*/
 
         void set_tensor (
@@ -101,7 +98,6 @@ namespace dlib
         /*!
             ensures
                 - sets all elements in t equal to value.
-                  Uses cudnnSetTensor().
         !*/
 
         void scale_tensor (
@@ -113,8 +109,6 @@ namespace dlib
                 - scales all elements of t by the given value.  I.e. for all elements E in
                   t, this function performs:
                     - E = E*value
-
-                uses cudnnScaleTensor()
         !*/
 
     // ------------------------------------------------------------------------------------

@@ -161,6 +161,24 @@ namespace dlib
                 - returns *this
         !*/
 
+        tensor& operator*= (
+            float val
+        );
+        /*!
+            ensures
+                - pointwise multiplies all elements of *this tensor with val.
+                - returns *this
+        !*/
+        
+        tensor& operator/= (
+            float val
+        );
+        /*!
+            ensures
+                - pointwise divides all elements of *this tensor with val.
+                - returns *this
+        !*/
+
         template <typename EXP>
         tensor& operator= (
             const matrix_exp<EXP>& item

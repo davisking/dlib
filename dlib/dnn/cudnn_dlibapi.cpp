@@ -38,6 +38,17 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        static const cudnnTensorDescriptor_t descriptor(const tensor& t) 
+        {
+            return (const cudnnTensorDescriptor_t)t.get_cudnn_tensor_descriptor().get_handle();
+        }
+        static const cudnnTensorDescriptor_t descriptor(const tensor_descriptor& t) 
+        {
+            return (const cudnnTensorDescriptor_t)t.get_handle();
+        }
+
+    // ------------------------------------------------------------------------------------
+
         class cudnn_context
         {
         public:
@@ -155,6 +166,13 @@ namespace dlib
             const tensor& src
         )
         {
+            check(cudnnAddTensor_v3(context(),
+                                    &alpha,
+                                    descriptor(src),
+                                    src.device(),
+                                    &beta,
+                                    descriptor(dest),
+                                    dest.device()));
         }
 
         void set_tensor (
@@ -162,6 +180,12 @@ namespace dlib
             float value
         )
         {
+            if (t.size() == 0)
+                return;
+            check(cudnnSetTensor(context(),
+                                 descriptor(t),
+                                 t.device(),
+                                 &value));
         }
 
         void scale_tensor (
@@ -169,6 +193,12 @@ namespace dlib
             float value
         )
         {
+            if (t.size() == 0)
+                return;
+            check(cudnnScaleTensor(context(),
+                                   descriptor(t),
+                                   t.device(),
+                                   &value));
         }
 
     // ------------------------------------------------------------------------------------
@@ -246,7 +276,7 @@ namespace dlib
 
                 check(cudnnGetConvolution2dForwardOutputDim(
                         (const cudnnConvolutionDescriptor_t)conv_handle,
-                        (const cudnnTensorDescriptor_t)data.get_cudnn_tensor_descriptor().get_handle(),
+                        descriptor(data),
                         (const cudnnFilterDescriptor_t)filter_handle,
                         &out_num_samples,
                         &out_k,
@@ -259,10 +289,10 @@ namespace dlib
                 cudnnConvolutionFwdAlgo_t forward_best_algo;
                 check(cudnnGetConvolutionForwardAlgorithm(
                         context(), 
-                        (const cudnnTensorDescriptor_t)data.get_cudnn_tensor_descriptor().get_handle(),
+                        descriptor(data),
                         (const cudnnFilterDescriptor_t)filter_handle,
                         (const cudnnConvolutionDescriptor_t)conv_handle,
-                        (const cudnnTensorDescriptor_t)dest_desc.get_handle(),
+                        descriptor(dest_desc),
                         CUDNN_CONVOLUTION_FWD_PREFER_FASTEST, // or CUDNN_CONVOLUTION_FWD_NO_WORKSPACE,
                         std::numeric_limits<size_t>::max(),
                         &forward_best_algo));
@@ -271,10 +301,10 @@ namespace dlib
 
                 check(cudnnGetConvolutionForwardWorkspaceSize( 
                         context(),
-                        (const cudnnTensorDescriptor_t)data.get_cudnn_tensor_descriptor().get_handle(),
+                        descriptor(data),
                         (const cudnnFilterDescriptor_t)filter_handle,
                         (const cudnnConvolutionDescriptor_t)conv_handle,
-                        (const cudnnTensorDescriptor_t)dest_desc.get_handle(),
+                        descriptor(dest_desc),
                         forward_best_algo,
                         &forward_workspace_size_in_bytes));
 
@@ -313,7 +343,7 @@ namespace dlib
             check(cudnnConvolutionForward(
                     context(),
                     &alpha,
-                    (const cudnnTensorDescriptor_t)data.get_cudnn_tensor_descriptor().get_handle(),
+                    descriptor(data),
                     data.device(),
                     (const cudnnFilterDescriptor_t)filter_handle,
                     filters.device(),
@@ -322,7 +352,7 @@ namespace dlib
                     forward_workspace,
                     forward_workspace_size_in_bytes,
                     &beta,
-                    (const cudnnTensorDescriptor_t)output.get_cudnn_tensor_descriptor().get_handle(),
+                    descriptor(output),
                     output.device()));
         }
 

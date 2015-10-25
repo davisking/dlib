@@ -3,6 +3,7 @@
 #ifndef DLIB_DNn_TENSOR_H_
 #define DLIB_DNn_TENSOR_H_
 
+#include "tensor_abstract.h"
 #include <cstring>
 #include "../matrix.h"
 #include "cudnn_dlibapi.h"
@@ -46,10 +47,39 @@ namespace dlib
 
         tensor& operator= (float val)
         {
-            // TODO, do on the device if that's where the memory is living right now.
+#ifdef DLIB_USE_CUDA
+            // If you are using CUDA then presumably you will be mostly using tensor's on
+            // the GPU.  So unless you seem to be actively working with the host side's
+            // data then we do this initialization on the device side since this avoids a
+            // host to device transfer that would likely immediately follow.
+            if (data.device_ready())
+            {
+                cuda::set_tensor(*this, val);
+                return *this;
+            }
+#endif
             auto d = data.host();
             for (size_t i = 0; i < data.size(); ++i)
                 d[i] = val;
+            return *this;
+        }
+
+        tensor& operator*= (float val)
+        {
+#ifdef DLIB_USE_CUDA
+            cuda::scale_tensor(*this, val);
+            return *this;
+#else
+            auto d = data.host();
+            for (size_t i = 0; i < data.size(); ++i)
+                d[i] *= val;
+            return *this;
+#endif
+        }
+        
+        tensor& operator/= (float val)
+        {
+            *this *= 1.0/val;
             return *this;
         }
 
