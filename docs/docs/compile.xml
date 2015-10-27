@@ -12,7 +12,7 @@
 
     <body>
         
-        <h2>Compiling on Any Operating System Using CMake</h2>
+        <h2>Compiling C++ Example Programs on Any Operating System Using CMake</h2>
         The best way to compile a program that uses dlib is to use <a href="http://www.cmake.org">CMake</a>.  For
         example, the following commands will compile the example programs on any operating
         system:
@@ -44,11 +44,23 @@ tell CMake which one you want it to use via the -G option.
             
 
 <br/>
-<br/>
+        <h2>Compiling Dlib's Python Interface</h2>
+        <p>
+           Go to the base folder of the dlib repository and run <tt>python setup.py install</tt>.  That
+           should compile and install the dlib python API on your system. 
+        </p>
+        <p>
+           Alternatively, if you want to add more python bindings to dlib's
+           python interface then you probably want to avoid the setup.py file
+           and work directly using CMake.  In particular, dlib's python API is
+           built by the CMake project in the tools/python folder.  You build
+           this project using the usual CMake commands and when compiled it
+           outputs the dlib shared library that defines the python API for dlib.
+        </p>
 <br/>
 
 
-        <h2>Compiling Without CMake</h2>
+        <h2>Compiling C++ Examples Without CMake</h2>
 
         <p>
            In most cases, to use this library all you have to do is extract it somewhere, make
@@ -137,13 +149,15 @@ sudo apt-get install libx11-dev
         </p>
 
 
-        <center><h1>Preprocessor Directives</h1></center>
+         <br/>
+        <center><h1>Miscellaneous Preprocessor Directives</h1></center>
 
          <p>
-            There are a few preprocessor directives you can supply during the build process
-            to cause the library to build in various optional ways.  By default, the
-            library will always do something reasonable, but they are listed here in the
-            event that you need to use them.
+            In addition to the preprocessor directives mentioned above, there
+            are a few more you can supply during the build process to cause the
+            library to build in various optional ways.  By default, the library
+            will always do something reasonable, but they are listed here in
+            the event that you need to use them.
          </p>
 
 

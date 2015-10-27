@@ -3,7 +3,7 @@
 #ifndef DLIB_FLOAT_DEtAILS_Hh_
 #define DLIB_FLOAT_DEtAILS_Hh_
 
-#include <math.h>
+#include <cmath>
 #include "algs.h"
 #include <limits> 
 
@@ -100,24 +100,6 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-
-
-
-        double      _frexp(double      v, int* e) const { return frexp(v,e); }
-        float       _frexp(float       v, int* e) const { return frexpf(v,e); }
-
-        double      _ldexp(double      v, int e) const { return ldexp(v,e); }
-        float       _ldexp(float       v, int e) const { return ldexpf(v,e); }
-
-#ifdef __CYGWIN__
-        // frexpl and ldexpl aren't available on cygwin so just use the double version.
-        long double _frexp(long double v, int* e) const { return _frexp((double)v,e); }
-        long double _ldexp(long double v, int e) const { return _ldexp((double)v,e); }
-#else
-        long double _frexp(long double v, int* e) const { return frexpl(v,e); }
-        long double _ldexp(long double v, int e) const { return ldexpl(v,e); }
-#endif
-
         template <typename T>
         void convert_from_T (
             const T& val
@@ -138,7 +120,7 @@ namespace dlib
             else if (val < std::numeric_limits<T>::infinity())
             {
                 int exp;
-                mantissa = static_cast<int64>(_frexp(val, &exp)*(((uint64)1)<<digits));
+                mantissa = static_cast<int64>(std::frexp(val, &exp)*(((uint64)1)<<digits));
                 exponent = exp - digits;
 
                 // Compact the representation a bit by shifting off any low order bytes 
@@ -162,7 +144,7 @@ namespace dlib
         ) const
         {
             if (exponent < is_inf)
-                return _ldexp((T)mantissa, exponent);
+                return std::ldexp((T)mantissa, exponent);
             else if (exponent == is_inf)
                 return std::numeric_limits<T>::infinity();
             else if (exponent == is_ninf)
