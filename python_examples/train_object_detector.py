@@ -27,7 +27,7 @@
 #
 #   Also note that this example requires scikit-image which can be installed
 #   via the command:
-#       pip install -U scikit-image
+#       pip install scikit-image
 #   Or downloaded from http://scikit-image.org/download.html. 
 
 import os
