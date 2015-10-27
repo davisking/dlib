@@ -12,12 +12,24 @@
 
 <current>
 New Features:
+   - Added the set_ptrm() routine for assigning dlib::matrix objects to arbitrary
+     memory blocks.
       
 Non-Backwards Compatible Changes:
 
 Bug fixes:
+   - Fixed a bug that caused cmake to not provide the correct preprocessor
+     definitions until cmake was run twice. This was causing some projects to
+     not build properly.
 
 Other:
+   - Improvements to build system:
+      - Ehsan Azarnasab contributed a setup.py so the dlib Python API can be
+        installed via the usual 'python setup.py install' command. 
+      - Séverin Lemaignan upgraded dlib's CMake scripts so they include an 
+        install target.  Now dlib can be installed system wide by executing 
+        'cmake PATH_TO_DLIB; make install'.  This also includes installing the
+        appropriate CMake scripts for CMake's find_package(dlib) to work.
 
 </current>
 
