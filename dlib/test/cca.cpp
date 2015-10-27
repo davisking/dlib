@@ -18,6 +18,7 @@ namespace
     dlib::rand rnd;
 // ----------------------------------------------------------------------------------------
 
+    /*
     std::vector<std::map<unsigned long, double> > make_really_big_test_matrix (
     )
     {
@@ -29,6 +30,7 @@ namespace
         }
         return temp;
     }
+    */
 
     template <typename T>
     std::vector<std::map<unsigned long, T> > mat_to_sparse (
@@ -60,6 +62,7 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    /*
     void check_correlation (
         matrix<double> L,
         matrix<double> R,
@@ -82,6 +85,7 @@ namespace
             cout << "error: "<< A(i) - correlations(i);
         }
     }
+    */
 
 // ----------------------------------------------------------------------------------------
 
