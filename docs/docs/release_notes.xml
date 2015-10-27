@@ -12,6 +12,19 @@
 
 <current>
 New Features:
+      
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="18.17" date="Aug 15, 2015">
+New Features:
    - More clustering tools:
       - Added bottom_up_cluster() and find_clusters_using_angular_kmeans()
         routines.
@@ -45,7 +58,7 @@ Bug fixes:
 
 Other:
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
