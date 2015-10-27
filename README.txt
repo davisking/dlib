@@ -12,7 +12,7 @@ COMPILING DLIB C++ EXAMPLE PROGRAMS
        mkdir build; cd build; cmake .. ; cmake --build .
    That will build all the examples.  If you have a CPU that supports AVX
    instructions then turn them on like this:
-       mkdir build; cd build; cmake .. -DUSE_AVX_INSTRUCTIONS=1 ; cmake --build .
+       mkdir build; cd build; cmake .. -DUSE_AVX_INSTRUCTIONS=1; cmake --build .
    Doing so will make some things run faster.
 
 COMPILING DLIB Python API
