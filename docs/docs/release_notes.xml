@@ -29,7 +29,7 @@ Other:
       - Séverin Lemaignan upgraded dlib's CMake scripts so they include an 
         install target.  Now dlib can be installed system wide by executing 
         'cmake PATH_TO_DLIB; make install'.  This also includes installing the
-        appropriate CMake scripts for CMake's find_package(dlib) to work.
+        appropriate scripts for CMake's find_package(dlib) to work.
 
 </current>
 
