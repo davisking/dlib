@@ -2,6 +2,10 @@
  Copyright (C) 2015  Ehsan Azar (dashesy@linux.com)
  License: Boost Software License   See LICENSE.txt for the full license.
 
+This file basically just uses CMake to compile the dlib python bindings project
+located in the tools/python folder and then puts the outputs into standard
+python packages.
+
 To build the dlib:
     python setup.py build
 To build and install:
