@@ -31,13 +31,16 @@
             software components, each accompanied by extensive documentation and thorough debugging modes. 
          </p>
 
+      
         <p>
-           Since development began in 2002, dlib has grown to include a wide
-           variety of tools.  In particular, it now contains software components 
-           for dealing with networking, threads, graphical interfaces, complex
-           data structures, linear algebra, statistical machine learning, image
-           processing, data mining, XML and text parsing, numerical
-           optimization, Bayesian networks, and numerous other tasks.  In
+           <a href='mailto:davis@dlib.net'>Davis King</a> has been the primary
+           author of dlib since development began in 2002.  In that time
+           dlib has grown to include a wide variety of tools.  In particular,
+           it now contains software components for dealing with networking,
+           threads, graphical interfaces, complex data structures, linear
+           algebra, statistical machine learning, image processing, data
+           mining, XML and text parsing, numerical optimization, Bayesian
+           networks, and numerous other tasks.  In
            recent years, much of the development has been focused on creating 
            a broad set of statistical machine learning tools.  However, dlib
            remains a general purpose library and <a href="howto_contribute.html">welcomes contributions</a> of high
@@ -45,7 +48,7 @@
         </p>
 
         <p>
-         Part of the development philosophy of dlib is a dedication to
+         Core to the development philosophy of dlib is a dedication to
          portability and ease of use.  Therefore, all code in dlib is designed
          to be as portable as possible and similarly to not require a user to
          configure or install anything.  To help achieve this, all platform
