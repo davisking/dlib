@@ -91,19 +91,19 @@
                <name>Home</name>
                <link>http://dlib.net</link>
             </item>
-            <item>
-               <name>Dlib Blog</name>
-               <link>http://blog.dlib.net</link>
-            </item>
-            <item>
-               <name>Forums</name>
-               <link>https://sourceforge.net/p/dclib/discussion</link>
-            </item>
-            <item>
-               <name>Who uses dlib?</name>
-               <link>http://sourceforge.net/p/dclib/wiki/Known_users/</link>
-            </item>
          </web>
+         <item>
+            <name>Dlib Blog</name>
+            <link>http://blog.dlib.net</link>
+         </item>
+         <item>
+            <name>Forums</name>
+            <link>https://sourceforge.net/p/dclib/discussion</link>
+         </item>
+         <item>
+            <name>Who uses dlib?</name>
+            <link>http://sourceforge.net/p/dclib/wiki/Known_users/</link>
+         </item>
 
          <item>
             <name>Introduction</name>

@@ -9,17 +9,17 @@
 
       <p>
 
-      Dlib is a general purpose cross-platform C++ library designed using contract programming
-      and modern C++ techniques.  
+      Dlib is a modern C++ toolkit containing machine learning algorithms and tools
+      for creating complex software in C++ to solve real world problems.
 
       It is open source software and licensed
       under the <a href="license.html">Boost Software License</a>.
 
       The <a href="intro.html">introduction</a> contains everything you need to know to get
-      started using the library.  However, if you have any questions, comments, or complaints feel free to 
-      <a href='mailto:davis@dlib.net'>email me</a><web> or post in the 
-      sourceforge <a href='http://sourceforge.net/p/dclib/discussion'>Forums</a></web>.
-      
+      started using the library.  However, if after consulting the documentation, you have any questions, comments,
+      or complaints feel free to post in the  
+      <a href='http://sourceforge.net/p/dclib/discussion'>forums</a>.
+
       
       </p>
 
@@ -63,6 +63,96 @@
                      abstraction layers or is pure ISO standard C++.  </li>
                </ul>
             </li>
+            <li><b>Machine Learning Algorithms</b>
+               <ul>
+                  <li>Conventional SMO based Support Vector Machines for <a href="ml.html#svm_nu_trainer">classification</a> 
+                                                                    and  <a href="ml.html#svr_trainer">regression</a>  </li>
+                  <li>Reduced-rank methods for large-scale <a href="ml.html#svm_c_ekm_trainer">classification</a>
+                     and <a href="ml.html#krr_trainer">regression</a></li>
+                  <li>Relevance vector machines for <a href="ml.html#rvm_trainer">classification</a> 
+                      and <a href="ml.html#rvm_regression_trainer">regression</a> </li>
+                  <li>General purpose <a href="ml.html#one_vs_one_trainer">multiclass classification</a> tools</li>
+                  <li>A <a href="ml.html#svm_multiclass_linear_trainer">Multiclass SVM</a></li>
+                  <li>A tool for solving the optimization problem associated with 
+                     <a href="ml.html#structural_svm_problem">structural support vector machines</a>. </li> 
+                  <li>Structural SVM tools for <a href="ml.html#structural_sequence_labeling_trainer">sequence labeling</a> </li>  
+                  <li>Structural SVM tools for solving <a href="ml.html#structural_assignment_trainer">assignment problems</a> </li>  
+                  <li>Structural SVM tools for <a href="ml.html#structural_object_detection_trainer">object detection</a> in images </li>  
+                  <li>Structural SVM tools for <a href="ml.html#structural_graph_labeling_trainer">labeling nodes</a> in graphs </li>  
+                  <li>A large-scale <a href="ml.html#svm_rank_trainer">SVM-Rank</a> implementation</li>
+                  <li>An online <a href="ml.html#krls">kernel RLS regression</a> algorithm</li>
+                  <li>An online <a href="ml.html#svm_pegasos">SVM classification</a> algorithm</li>
+                  <li><a href="ml.html#vector_normalizer_frobmetric">Semidefinite Metric Learning</a></li>
+                  <li>An online kernelized <a href="ml.html#kcentroid">centroid estimator</a>/novelty detector and
+                     offline support vector <a href="ml.html#svm_one_class_trainer">one-class classification</a></li>
+                  <li>Clustering algorithms: <a href="ml.html#find_clusters_using_kmeans">linear</a> 
+                        or <a href="ml.html#kkmeans">kernel k-means</a>, 
+                        <a href="ml.html#chinese_whispers">Chinese Whispers</a>, and 
+                        <a href="ml.html#newman_cluster">Newman clustering</a>.  </li>
+                  <li><a href="ml.html#rbf_network_trainer">Radial Basis Function Networks</a></li>
+                  <li><a href="ml.html#mlp">Multi layer perceptrons</a> </li>  
+               </ul>
+            </li>
+
+            <li><b>Numerical Algorithms</b>
+               <ul>
+                  <li>A fast <a href="linear_algebra.html#matrix">matrix</a> object implemented using the expression 
+                     templates technique and capable of using BLAS and LAPACK libraries when available.</li>
+                  <li>Numerous linear algebra and mathematical operations are defined for the matrix object such as the 
+                     <a href="dlib/matrix/matrix_la_abstract.h.html#svd">singular value decomposition</a>, 
+                     <a href="dlib/matrix/matrix_utilities_abstract.h.html#trans">transpose</a>, 
+                     <a href="dlib/matrix/matrix_math_functions_abstract.h.html#sin">trig functions</a>, etc.</li>
+                  <li>General purpose unconstrained non-linear optimization algorithms using the  
+                      <a href="optimization.html#cg_search_strategy">conjugate gradient</a>, 
+                      <a href="optimization.html#bfgs_search_strategy">BFGS</a>, and
+                      <a href="optimization.html#lbfgs_search_strategy">L-BFGS</a>
+                      techniques</li>
+                  <li> <a href="optimization.html#solve_least_squares_lm">Levenberg-Marquardt</a> for solving non-linear
+                      least squares problems </li>
+                  <li>Box-constrained derivative-free optimization via the 
+                      <a href="optimization.html#find_min_bobyqa">BOBYQA</a> algorithm</li> 
+                  <li>An implementation of the <a href="optimization.html#oca">Optimized Cutting Plane Algorithm</a></li> 
+                  <li><preserve_space><a href="optimization.html#solve_qp_using_smo">Several</a> 
+                                      <a href="optimization.html#solve_qp2_using_smo">quadratic</a> 
+                                      <a href="optimization.html#solve_qp3_using_smo">program</a>
+                                      <a href="optimization.html#solve_qp4_using_smo">solvers</a></preserve_space> </li> 
+                  <li>Combinatorial optimization tools for solving 
+                     <a href="optimization.html#max_cost_assignment">optimal assignment</a> and
+                     <a href="optimization.html#min_cut">min cut/max flow</a> problems as well as
+                     the <a href="optimization.html#find_max_parse_cky">CKY algorithm</a> for finding the most probable parse tree</li>
+                  <li>A <a href="algorithms.html#bigint">big integer</a> object</li>
+                  <li>A <a href="algorithms.html#rand">random number</a> object</li>
+               </ul>
+            </li>
+
+            <li><b>Graphical Model Inference Algorithms</b>
+               <ul>
+                  <li><a href="bayes.html#bayesian_network_join_tree">Join tree</a> algorithm for exact inference in 
+                  a Bayesian network.</li> 
+                  <li><a href="bayes.html#bayesian_network_gibbs_sampler">Gibbs sampler</a> markov chain monte 
+                  carlo algorithm for approximate inference in a Bayesian network.</li>
+                  <li>Routines for performing MAP inference in 
+                     <a href="optimization.html#find_max_factor_graph_viterbi">chain-structured</a>,
+                     <a href="optimization.html#find_max_factor_graph_potts">Potts</a>, or 
+                     <a href="optimization.html#find_max_factor_graph_nmplp">general</a> factor graphs.</li>
+               </ul>
+            </li>
+
+            <li><b>Image Processing</b>
+               <ul>
+                  <li>Routines for <a href="imaging.html#load_image">reading</a> and 
+                  <a href="imaging.html#save_bmp">writing</a> common image formats.  </li>
+                  <li>Automatic color space conversion between various pixel types</li>  
+                  <li>Common image operations such as edge finding and morphological operations</li>
+                  <li>Implementations of the <a href="imaging.html#get_surf_points">SURF</a>,
+                   <a href="imaging.html#hog_image">HOG</a>, and <a href="imaging.html#extract_fhog_features">FHOG</a> 
+                   feature extraction algorithms.</li>
+                  <li>Tools for <a href="imaging.html#object_detector">detecting objects</a> in images including
+                  <a href="imaging.html#get_frontal_face_detector">frontal face detection</a> and
+                   <a href="imaging.html#shape_predictor">object pose estimation</a>.</li>
+               </ul>
+            </li>
+
             <li><b>Threading</b>
                <ul>
                   <li>The library provides a portable and simple <a href="api.html#threads">threading API</a></li>
@@ -97,96 +187,6 @@
                </ul>
             </li>
 
-
-            <li><b>Numerical Algorithms</b>
-               <ul>
-                  <li>A fast <a href="linear_algebra.html#matrix">matrix</a> object implemented using the expression 
-                     templates technique and capable of using BLAS and LAPACK libraries when available.</li>
-                  <li>Numerous linear algebra and mathematical operations are defined for the matrix object such as the 
-                     <a href="dlib/matrix/matrix_la_abstract.h.html#svd">singular value decomposition</a>, 
-                     <a href="dlib/matrix/matrix_utilities_abstract.h.html#trans">transpose</a>, 
-                     <a href="dlib/matrix/matrix_math_functions_abstract.h.html#sin">trig functions</a>, etc.</li>
-                  <li>General purpose unconstrained non-linear optimization algorithms using the  
-                      <a href="optimization.html#cg_search_strategy">conjugate gradient</a>, 
-                      <a href="optimization.html#bfgs_search_strategy">BFGS</a>, and
-                      <a href="optimization.html#lbfgs_search_strategy">L-BFGS</a>
-                      techniques</li>
-                  <li> <a href="optimization.html#solve_least_squares_lm">Levenberg-Marquardt</a> for solving non-linear
-                      least squares problems </li>
-                  <li>Box-constrained derivative-free optimization via the 
-                      <a href="optimization.html#find_min_bobyqa">BOBYQA</a> algorithm</li> 
-                  <li>An implementation of the <a href="optimization.html#oca">Optimized Cutting Plane Algorithm</a></li> 
-                  <li><preserve_space><a href="optimization.html#solve_qp_using_smo">Several</a> 
-                                      <a href="optimization.html#solve_qp2_using_smo">quadratic</a> 
-                                      <a href="optimization.html#solve_qp3_using_smo">program</a>
-                                      <a href="optimization.html#solve_qp4_using_smo">solvers</a></preserve_space> </li> 
-                  <li>Combinatorial optimization tools for solving 
-                     <a href="optimization.html#max_cost_assignment">optimal assignment</a> and
-                     <a href="optimization.html#min_cut">min cut/max flow</a> problems as well as
-                     the <a href="optimization.html#find_max_parse_cky">CKY algorithm</a> for finding the most probable parse tree</li>
-                  <li>A <a href="algorithms.html#bigint">big integer</a> object</li>
-                  <li>A <a href="algorithms.html#rand">random number</a> object</li>
-               </ul>
-            </li>
-
-            <li><b>Machine Learning Algorithms</b>
-               <ul>
-                  <li>Conventional SMO based Support Vector Machines for <a href="ml.html#svm_nu_trainer">classification</a> 
-                                                                    and  <a href="ml.html#svr_trainer">regression</a>  </li>
-                  <li>Reduced-rank methods for large-scale <a href="ml.html#svm_c_ekm_trainer">classification</a>
-                     and <a href="ml.html#krr_trainer">regression</a></li>
-                  <li>Relevance vector machines for <a href="ml.html#rvm_trainer">classification</a> 
-                      and <a href="ml.html#rvm_regression_trainer">regression</a> </li>
-                  <li>General purpose <a href="ml.html#one_vs_one_trainer">multiclass classification</a> tools</li>
-                  <li>A <a href="ml.html#svm_multiclass_linear_trainer">Multiclass SVM</a></li>
-                  <li>A tool for solving the optimization problem associated with 
-                     <a href="ml.html#structural_svm_problem">structural support vector machines</a>. </li> 
-                  <li>Structural SVM tools for <a href="ml.html#structural_sequence_labeling_trainer">sequence labeling</a> </li>  
-                  <li>Structural SVM tools for solving <a href="ml.html#structural_assignment_trainer">assignment problems</a> </li>  
-                  <li>Structural SVM tools for <a href="ml.html#structural_object_detection_trainer">object detection</a> in images </li>  
-                  <li>Structural SVM tools for <a href="ml.html#structural_graph_labeling_trainer">labeling nodes</a> in graphs </li>  
-                  <li>A large-scale <a href="ml.html#svm_rank_trainer">SVM-Rank</a> implementation</li>
-                  <li>An online <a href="ml.html#krls">kernel RLS regression</a> algorithm</li>
-                  <li>An online <a href="ml.html#svm_pegasos">SVM classification</a> algorithm</li>
-                  <li><a href="ml.html#vector_normalizer_frobmetric">Semidefinite Metric Learning</a></li>
-                  <li>An online kernelized <a href="ml.html#kcentroid">centroid estimator</a>/novelty detector and
-                     offline support vector <a href="ml.html#svm_one_class_trainer">one-class classification</a></li>
-                  <li>Clustering algorithms: <a href="ml.html#find_clusters_using_kmeans">linear</a> 
-                        or <a href="ml.html#kkmeans">kernel k-means</a>, 
-                        <a href="ml.html#chinese_whispers">Chinese Whispers</a>, and 
-                        <a href="ml.html#newman_cluster">Newman clustering</a>.  </li>
-                  <li><a href="ml.html#rbf_network_trainer">Radial Basis Function Networks</a></li>
-                  <li><a href="ml.html#mlp">Multi layer perceptrons</a> </li>  
-               </ul>
-            </li>
-
-            <li><b>Graphical Model Inference Algorithms</b>
-               <ul>
-                  <li><a href="bayes.html#bayesian_network_join_tree">Join tree</a> algorithm for exact inference in 
-                  a Bayesian network.</li> 
-                  <li><a href="bayes.html#bayesian_network_gibbs_sampler">Gibbs sampler</a> markov chain monte 
-                  carlo algorithm for approximate inference in a Bayesian network.</li>
-                  <li>Routines for performing MAP inference in 
-                     <a href="optimization.html#find_max_factor_graph_viterbi">chain-structured</a>,
-                     <a href="optimization.html#find_max_factor_graph_potts">Potts</a>, or 
-                     <a href="optimization.html#find_max_factor_graph_nmplp">general</a> factor graphs.</li>
-               </ul>
-            </li>
-
-            <li><b>Image Processing</b>
-               <ul>
-                  <li>Routines for <a href="imaging.html#load_image">reading</a> and 
-                  <a href="imaging.html#save_bmp">writing</a> common image formats.  </li>
-                  <li>Automatic color space conversion between various pixel types</li>  
-                  <li>Common image operations such as edge finding and morphological operations</li>
-                  <li>Implementations of the <a href="imaging.html#get_surf_points">SURF</a>,
-                   <a href="imaging.html#hog_image">HOG</a>, and <a href="imaging.html#extract_fhog_features">FHOG</a> 
-                   feature extraction algorithms.</li>
-                  <li>Tools for <a href="imaging.html#object_detector">detecting objects</a> in images including
-                  <a href="imaging.html#get_frontal_face_detector">frontal face detection</a> and
-                   <a href="imaging.html#shape_predictor">object pose estimation</a>.</li>
-               </ul>
-            </li>
 
             <li><b>Data Compression and Integrity Algorithms</b>
                <ul>

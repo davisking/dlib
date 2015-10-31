@@ -1,15 +1,27 @@
 
+                              dlib C++ library
 
-See http://dlib.net for the main project documentation.
+Dlib is a modern C++ toolkit containing machine learning algorithms and tools
+for creating complex software in C++ to solve real world problems.  See
+http://dlib.net for the main project documentation and API reference.
 
 
 
-COMPILING DLIB EXAMPLE PROGRAMS
+COMPILING DLIB C++ EXAMPLE PROGRAMS
    Go into the examples folder and type:
-   mkdir build; cd build; cmake .. ; cmake --build .
+       mkdir build; cd build; cmake .. ; cmake --build .
+   That will build all the examples.  If you have a CPU that supports AVX
+   instructions then turn them on like this:
+       mkdir build; cd build; cmake .. -DUSE_AVX_INSTRUCTIONS=1; cmake --build .
+   Doing so will make some things run faster.
 
-   That will build all the examples.  There is nothing to install when using
-   dlib.  It's just a folder of source files.  
+COMPILING DLIB Python API
+   Before you can run the Python example programs you must compile dlib. Type:
+       python setup.py install
+   or type
+       python setup.py install --yes USE_AVX_INSTRUCTIONS
+   if you have a CPU that supports AVX instructions, since this makes some
+   things run faster.  
 
 RUNNING THE UNIT TEST SUITE
    Type the following to compile and run the dlib unit test suite:
@@ -24,9 +36,12 @@ RUNNING THE UNIT TEST SUITE
    subfolder called Release.  If that's the case then you have to go to that
    folder before running the test.
 
-DOCUMENTATION
-   The source control repository doesn't contain finished documentation.  The
-   stuff in the docs folder is just a bunch of scripts and xml files used to
-   generate the documentation.  There is a readme in docs/README.txt which
-   discusses how to do this.  However, unless you are trying to modify the
-   documentation, you should just download a copy from http://dlib.net.  
+This library is licensed under the Boost Software License, which can be found
+in dlib/LICENSE.txt.  The long and short of the license is that you can use
+dlib however you like, even in closed source commercial software.
+
+Dlib Sponsors:
+  This code development was funded by the Office of the Director of National
+  Intelligence (ODNI), Intelligence Advanced Research Projects Activity (IARPA),
+  via IARPA R&D Contract No. 2014-14071600010
+

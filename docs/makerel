@@ -52,9 +52,9 @@ mkdir $RELDIR
 cd $RELDIR || report_failure
 cp -r ../../docs/cache/* . || report_failure
 
-echo Version: $RELEASE >> dlib/README.txt
-echo "Date:    `date`" >> dlib/README.txt
-echo Mercurial Revision ID: $CHANGESET_ID >> dlib/README.txt
+echo Version: $RELEASE >> README.txt
+echo "Date:    `date`" >> README.txt
+echo Mercurial Revision ID: $CHANGESET_ID >> README.txt
 
 
 

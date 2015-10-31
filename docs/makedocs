@@ -142,7 +142,6 @@ makedocs ()
     hg archive docs/cache || report_failure
     # Don't need the docs folder in the cache, moreover, deleting it here avoids letting the makerel script include it in the dlib tar balls.
     rm -rf docs/cache/docs
-    rm docs/cache/README.txt
 
     echo "#ifndef DLIB_REVISION_H"           > docs/cache/dlib/revision.h
     echo "// Version: " $RELEASE            >> docs/cache/dlib/revision.h
