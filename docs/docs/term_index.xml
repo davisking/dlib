@@ -294,6 +294,7 @@
          <term file="ml.html" name="save_image_dataset_metadata"                 include="dlib/data_io.h"/>
          <term file="ml.html" name="load_libsvm_formatted_data"                  include="dlib/data_io.h"/>
          <term file="ml.html" name="save_libsvm_formatted_data"                  include="dlib/data_io.h"/>
+         <term file="ml.html" name="load_mnist_dataset"                          include="dlib/data_io.h"/>
          <term file="linear_algebra.html" name="sparse_to_dense"                 include="dlib/sparse_vector.h"/>
          <term file="ml.html" name="fix_nonzero_indexing"                        include="dlib/data_io.h"/>
          <term link="ml.html#mlp" name="multi-layer perceptron"                  include="dlib/mlp.h"/>
