@@ -132,7 +132,8 @@ if (NOT TARGET dlib)
          md5/md5_kernel_1.cpp
          tokenizer/tokenizer_kernel_1.cpp
          unicode/unicode.cpp
-         data_io/image_dataset_metadata.cpp)
+         data_io/image_dataset_metadata.cpp
+         data_io/mnist.cpp)
 
    if (DLIB_ISO_CPP_ONLY)
        add_library(dlib STATIC ${source_files} )
