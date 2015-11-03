@@ -163,7 +163,6 @@ namespace dlib
                   output into #output.  In particular, forward() can use any of the outputs
                   in sub (e.g. sub.get_output(), sub.subnet().get_output(), etc.) to
                   compute whatever it wants.
-                - #output.num_samples() == sub.get_output().num_samples()
         !*/
 
         template <typename SUBNET>

@@ -1059,7 +1059,7 @@ namespace dlib
         {
             subnetwork.forward(x);
             const dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
-            loss.to_label(wsub, obegin);
+            loss.to_label(x, wsub, obegin);
         }
 
         template <typename input_iterator, typename output_iterator>

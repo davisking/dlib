@@ -24,6 +24,7 @@ namespace dlib
             typename label_iterator
             >
         void to_label (
+            const tensor& input_tensor,
             const SUB_TYPE& sub,
             label_iterator iter
         ) const
@@ -32,7 +33,7 @@ namespace dlib
             DLIB_CASSERT(output_tensor.nr() == 1 && 
                          output_tensor.nc() == 1 && 
                          output_tensor.k() == 1,"");
-            DLIB_CASSERT(output_tensor.num_samples()%sample_expansion_factor == 0,"");
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples(),"");
 
             const float* out_data = output_tensor.host();
             for (long i = 0; i < output_tensor.num_samples(); ++i)

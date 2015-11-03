@@ -309,7 +309,6 @@ namespace dlib
                     return forward(temp_tensor);
                 - The return value from this function is also available in #get_output().
                   i.e. this function returns #get_output().
-                - #get_output().num_samples() == std::distance(ibegin,iend)*sample_expansion_factor.
                 - have_same_dimensions(#get_gradient_input(), #get_output()) == true.
                 - All elements of #get_gradient_input() are set to 0. 
                   i.e. calling this function clears out #get_gradient_input() and ensures
@@ -341,7 +340,6 @@ namespace dlib
                     layer_details().forward(subnet(), get_output());
                 - The return value from this function is also available in #get_output().
                   i.e. this function returns #get_output().
-                - #get_output().num_samples() == x.num_samples().
                 - have_same_dimensions(#get_gradient_input(), #get_output()) == true
                 - All elements of #get_gradient_input() are set to 0. 
                   i.e. calling this function clears out #get_gradient_input() and ensures
@@ -382,7 +380,6 @@ namespace dlib
         /*!
             requires
                 - forward(x) was called to forward propagate x though the network.
-                - x.num_samples() == get_output().num_samples()
                 - get_gradient_input() has been set equal to the gradient of this network's
                   output with respect to some loss function.
                 - This instance of solvers has only ever been used with this network.  That

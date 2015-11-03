@@ -56,6 +56,7 @@ namespace dlib
             typename label_iterator
             >
         void to_label (
+            const tensor& input_tensor,
             const SUB_TYPE& sub,
             label_iterator iter
         ) const;
@@ -63,19 +64,19 @@ namespace dlib
             requires
                 - SUBNET implements the SUBNET interface defined at the top of
                   layers_abstract.h.
-                - sub.get_output().num_samples()%sample_expansion_factor == 0.
-                - All outputs in each layer of sub have the same number of samples.  That
-                  is, for all valid i: 
-                    - sub.get_output().num_samples() == layer<i>(sub).get_output().num_samples()
+                - input_tensor was given as input to the network sub and the outputs are
+                  now visible in layer<i>(sub).get_output(), for all valid i.
+                - input_tensor.num_samples() > 0
+                - input_tensor.num_samples()%sample_expansion_factor == 0.
                 - iter == an iterator pointing to the beginning of a range of
-                  sub.get_output().num_samples()/sample_expansion_factor elements.
-                  Moreover, they must be label_type elements.
+                  input_tensor.num_samples()/sample_expansion_factor elements.  Moreover,
+                  they must be label_type elements.
             ensures
                 - Converts the output of the provided network to label_type objects and
                   stores the results into the range indicated by iter.  In particular, for
-                  all valid i and j, it will be the case that:
-                    *(iter+i/sample_expansion_factor) is the output corresponding to the
-                    ith sample in layer<j>(sub).get_output().
+                  all valid i, it will be the case that:
+                    *(iter+i/sample_expansion_factor) is the element corresponding to the
+                    output of sub for the ith sample in input_tensor.
         !*/
 
         template <
@@ -96,15 +97,14 @@ namespace dlib
                 - input_tensor.num_samples() > 0
                 - input_tensor.num_samples()%sample_expansion_factor == 0.
                 - for all valid i:
-                    - layer<i>(sub).get_output().num_samples() == input_tensor.num_samples().
                     - layer<i>(sub).get_gradient_input() has the same dimensions as
                       layer<i>(sub).get_output().
                 - truth == an iterator pointing to the beginning of a range of
-                  input_tensor.num_samples()/sample_expansion_factor elements.  In
-                  particular, they must be label_type elements.
-                - for all valid i and j:
+                  input_tensor.num_samples()/sample_expansion_factor elements.  Moreover,
+                  they must be label_type elements.
+                - for all valid i:
                     - *(truth+i/sample_expansion_factor) is the label of the ith sample in
-                      layer<j>(sub).get_output().
+                      input_tensor.
             ensures
                 - This function computes a loss function that describes how well the output
                   of sub matches the expected labels given by truth.  Let's write the loss
@@ -154,6 +154,7 @@ namespace dlib
             typename label_iterator
             >
         void to_label (
+            const tensor& input_tensor,
             const SUB_TYPE& sub,
             label_iterator iter
         ) const;
