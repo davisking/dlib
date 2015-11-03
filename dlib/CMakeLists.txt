@@ -432,7 +432,7 @@ if (NOT TARGET dlib)
                REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
 
 
-             configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+       configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
        # overwrite config.h with the configured one
        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h DESTINATION include/dlib)
 
