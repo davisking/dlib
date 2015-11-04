@@ -965,10 +965,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct layer_test_results
+    {
+        std::string log;
+        bool was_good;
+
+        operator bool() const { return was_good; }
+    };
+
+    inline std::ostream& operator<< (std::ostream& out, const layer_test_results& item)
+    {
+        out << item.log;
+        return out;
+    }
+
     template <
         typename layer_details_type
         >
-    void test_layer (
+    layer_test_results test_layer (
         layer_details_type l
     );
     /*!
@@ -976,6 +990,10 @@ namespace dlib
             - Checks if l correctly implements the EXAMPLE_LAYER_ interface defined in
               layers_abstract.h.  Importantly, it computes numerical approximations to the
               gradients and compares them to the outputs of the layer.  
+            - The results of the testing are returned.  In particular, if the returned object
+              is RESULT then we will have:
+                - RESULT.was_good == false if and only if the layer failed the testing.
+                - RESULT.log == a string describing why the testing failed if was_good==false.
             - Note that this function is only capable of checking layers that take
               arbitrary subnetworks as input.  So if you have designed a layer that expects
               only a certain restricted type of subnetwork then you might get a compile or
