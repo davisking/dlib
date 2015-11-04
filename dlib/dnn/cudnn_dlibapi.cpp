@@ -38,11 +38,11 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        static const cudnnTensorDescriptor_t descriptor(const tensor& t) 
+        static cudnnTensorDescriptor_t descriptor(const tensor& t) 
         {
             return (const cudnnTensorDescriptor_t)t.get_cudnn_tensor_descriptor().get_handle();
         }
-        static const cudnnTensorDescriptor_t descriptor(const tensor_descriptor& t) 
+        static cudnnTensorDescriptor_t descriptor(const tensor_descriptor& t) 
         {
             return (const cudnnTensorDescriptor_t)t.get_handle();
         }

@@ -219,7 +219,7 @@ namespace dlib
                     << "\n\t nr: " << nr
                     << "\n\t nc: " << nc
         );
-        DLIB_ASSERT(nr*nc == t.size() , 
+        DLIB_ASSERT(nr*nc == (long)t.size() , 
                     "\tconst matrix_exp mat(tensor, nr, nc)"
                     << "\n\t The sizes don't match up."
                     << "\n\t nr*nc:    " << nr*nc
