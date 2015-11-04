@@ -183,18 +183,26 @@ namespace
             DLIB_TEST(is_running() == false);
         }
 
-        ~test4_c2() throw (std::exception)
+        ~test4_c2() 
         {
-            DLIB_TEST(number_of_threads_registered() == 2);
-            DLIB_TEST(number_of_threads_alive() == 2);
-            DLIB_TEST_MSG(is_running() == false,"is_running(): " << is_running());
-            stop();
-            DLIB_TEST(number_of_threads_registered() == 2);
-            DLIB_TEST(is_running() == false);
-            wait();
-            DLIB_TEST(number_of_threads_registered() == 2);
-            DLIB_TEST(number_of_threads_alive() == 0);
-            DLIB_TEST(is_running() == false);
+            try
+            {
+                DLIB_TEST(number_of_threads_registered() == 2);
+                DLIB_TEST(number_of_threads_alive() == 2);
+                DLIB_TEST_MSG(is_running() == false,"is_running(): " << is_running());
+                stop();
+                DLIB_TEST(number_of_threads_registered() == 2);
+                DLIB_TEST(is_running() == false);
+                wait();
+                DLIB_TEST(number_of_threads_registered() == 2);
+                DLIB_TEST(number_of_threads_alive() == 0);
+                DLIB_TEST(is_running() == false);
+            }
+            catch(std::exception& e)
+            {
+                std::cerr << e.what() << std::endl;
+                exit(1);
+            }
         }
 
     private:
