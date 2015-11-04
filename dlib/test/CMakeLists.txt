@@ -35,6 +35,7 @@ set (tests
    config_reader.cpp
    crc32.cpp
    create_iris_datafile.cpp
+   cublas.cpp
    data_io.cpp
    directed_graph.cpp
    discriminant_pca.cpp
