@@ -110,8 +110,8 @@ namespace dlib
                               mat(lhs).nc() == mat(rhs).nr(),"")
             }
 
-            const int m = mat(dest).nr();
-            const int n = mat(dest).nc();
+            const int m = mat(dest).nc();
+            const int n = mat(dest).nr();
             const int k = trans_rhs ? mat(rhs).nc() : mat(rhs).nr();
             check(cublasSgemm(context(),
                               transb,
