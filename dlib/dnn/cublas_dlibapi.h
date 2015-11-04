@@ -22,32 +22,7 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
-        class cublas_context
-        {
-        public:
-            // not copyable
-            cublas_context(const cublas_context&) = delete;
-            cublas_context& operator=(const cublas_context&) = delete;
-            // but is movable
-            cublas_context(cublas_context&& item) : cublas_context() { swap(item); }
-            cublas_context& operator=(cublas_context&& item) { swap(item); return *this; }
-
-            cublas_context();
-            ~cublas_context();
-
-            const void* get_handle (
-            ) const { return handle; }
-
-        private:
-            void swap(cublas_context& item) { std::swap(handle, item.handle); }
-
-            void* handle;
-        };
-
-    // -----------------------------------------------------------------------------------
-
         void gemm (
-            cublas_context& context,
             float beta,
             tensor& dest,
             float alpha,
@@ -56,6 +31,19 @@ namespace dlib
             const tensor& rhs,
             bool trans_rhs
         );
+        /*!
+            requires
+                - The dimensions of lhs and rhs must be compatible for matrix
+                  multiplication.  In particular:
+                    - Let L == trans_lhs ? trans(mat(lhs)) : mat(lhs)
+                    - Let R == trans_rhs ? trans(mat(rhs)) : mat(rhs)
+                    - Let D == mat(dest)
+                    - D.nr() == L.nr() && D.nc() == R.nc()
+                      (i.e. dest must be preallocated and have the correct output dimensions)
+                    - L.nc() == R.nr()
+            ensures
+                - performs: dest = alpha*L*R + beta*mat(dest)
+        !*/
 
     // ------------------------------------------------------------------------------------
 
