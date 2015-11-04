@@ -7,6 +7,7 @@
 #include "tensor.h"
 #include <iterator>
 #include <memory>
+#include <sstream>
 #include <type_traits>
 #include "../statistics.h"
 #include "../rand.h"
@@ -1542,23 +1543,29 @@ namespace dlib
             resizable_tensor gradient_input;
         };
 
+    }
 
-        // TODO, remove?
-        inline void print_tensor(
-            const tensor& a
-        )
-        {
-            auto data = a.host();
-            for (size_t i = 0; i < a.size(); ++i)
-                std::cout << data[i] << " ";
-            std::cout << std::endl;
-        }
+    struct layer_test_results
+    {
+        layer_test_results() : was_good(true) {}
+        explicit layer_test_results(const std::string& l) : log(l),was_good(false) {}
+
+        std::string log;
+        bool was_good;
+
+        operator bool() const { return was_good; }
+    };
+
+    inline std::ostream& operator<< (std::ostream& out, const layer_test_results& item)
+    {
+        out << item.log;
+        return out;
     }
 
     template <
         typename layer_details_type
         >
-    void test_layer (
+    layer_test_results test_layer (
         layer_details_type l
     )
     {
@@ -1577,12 +1584,13 @@ namespace dlib
 
         resizable_tensor input_grad;
         input_grad.copy_size(output);
-        std::cout << "output.num_samples(): "<< output.num_samples() << std::endl;
         fill_with_gassuan_random_numbers(input_grad, rnd);
+
+        std::ostringstream sout;
 
         // The f() we are computing gradients of is this thing.  It's value at the current
         // parameter and data values is:
-        std::cout << "f(data,params): " << dot(output, input_grad) << std::endl;
+        //sout << "f(data,params): " << dot(output, input_grad) << std::endl;
 
         // We are going to save a copy of the subnetwork.get_gradient_input() data before we do
         // backpropagation since the backward() function is supposed to *add* to the
@@ -1604,7 +1612,6 @@ namespace dlib
         params_grad = random_noise;
         l.backward(output, input_grad, subnetwork, params_grad);
 
-        running_stats<double> rs_param, rs_data;
 
         // ==================================================================
         // first validate the way the parameter gradients are computed
@@ -1629,12 +1636,12 @@ namespace dlib
             if (std::abs(relative_error) > 0.01)
             {
                 using namespace std;
-                cout << "PARAM ERROR: "<< relative_error << endl;
-                cout << "   reference_derivative:   " << reference_derivative << endl;
-                cout << "   output_derivative: " << output_derivative << endl;
+                sout << "Gradient error in parameter #" << i <<".  Relative error: "<< relative_error << endl;
+                sout << "expected derivative:   " << reference_derivative << endl;
+                sout << "output derivative: " << output_derivative << endl;
+                return layer_test_results(sout.str()); 
             }
 
-            rs_param.add(std::abs(relative_error));
         }
 
         // ==================================================================
@@ -1658,26 +1665,14 @@ namespace dlib
             if (std::abs(relative_error) > 0.01)
             {
                 using namespace std;
-                cout << "DATA ERROR: "<< relative_error << endl;
-                cout << "   reference_derivative:   " << reference_derivative << endl;
-                cout << "   output_derivative: " << output_derivative << endl;
+                sout << "Gradient error in data variable #" << i <<".  Relative error: "<< relative_error << endl;
+                sout << "expected derivative:   " << reference_derivative << endl;
+                sout << "output derivative: " << output_derivative << endl;
+                return layer_test_results(sout.str()); 
             }
-            rs_data.add(std::abs(relative_error));
         }
 
-        using namespace std;
-        if (rs_param.current_n() > 1)
-        {
-            cout << "rs_param.mean():   " << rs_param.mean() << endl;
-            cout << "rs_param.stddev(): " << rs_param.stddev() << endl;
-            cout << "rs_param.max():    " << rs_param.max() << endl;
-        }
-        if (rs_data.current_n() > 1)
-        {
-            cout << "rs_data.mean():    " << rs_data.mean() << endl;
-            cout << "rs_data.stddev():  " << rs_data.stddev() << endl;
-            cout << "rs_data.max():     " << rs_data.max() << endl;
-        }
+        return layer_test_results();
     }
 
 // ----------------------------------------------------------------------------------------
