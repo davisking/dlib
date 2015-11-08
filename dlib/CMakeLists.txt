@@ -135,6 +135,12 @@ if (NOT TARGET dlib)
          data_io/image_dataset_metadata.cpp
          data_io/mnist.cpp)
 
+   if (COMPILER_CAN_DO_CPP_11)
+      set(source_files ${source_files}
+         dnn/cpu_dlib.cpp
+         )
+   endif()
+
    if (DLIB_ISO_CPP_ONLY)
        add_library(dlib STATIC ${source_files} )
        if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
