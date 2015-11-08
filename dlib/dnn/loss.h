@@ -82,12 +82,12 @@ namespace dlib
             return loss;
         }
 
-        friend void serialize(const loss_binary_hinge_& item, std::ostream& out)
+        friend void serialize(const loss_binary_hinge_& , std::ostream& out)
         {
             serialize("loss_binary_hinge_", out);
         }
 
-        friend void deserialize(loss_binary_hinge_& item, std::istream& in)
+        friend void deserialize(loss_binary_hinge_& , std::istream& in)
         {
             std::string version;
             deserialize(version, in);
@@ -119,12 +119,12 @@ namespace dlib
             return 0;
         }
 
-        friend void serialize(const loss_no_label_& item, std::ostream& out)
+        friend void serialize(const loss_no_label_& , std::ostream& out)
         {
             serialize("loss_no_label_", out);
         }
 
-        friend void deserialize(loss_no_label_& item, std::istream& in)
+        friend void deserialize(loss_no_label_& , std::istream& in)
         {
             std::string version;
             deserialize(version, in);

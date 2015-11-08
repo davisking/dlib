@@ -169,12 +169,12 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const relu_& item, std::ostream& out)
+        friend void serialize(const relu_& , std::ostream& out)
         {
             serialize("relu_", out);
         }
 
-        friend void deserialize(relu_& item, std::istream& in)
+        friend void deserialize(relu_& , std::istream& in)
         {
             std::string version;
             deserialize(version, in);
