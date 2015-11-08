@@ -456,9 +456,14 @@ if (NOT TARGET dlib)
                dnn/cuda_dlib.cu 
                dnn/cudnn_dlibapi.cpp
                dnn/cublas_dlibapi.cpp
+               dnn/curand_dlibapi.cpp
                dnn/gpu_data.cpp
                )
-            set(dlib_needed_libraries ${dlib_needed_libraries} ${CUDA_CUBLAS_LIBRARIES} ${cudnn})
+            set(dlib_needed_libraries ${dlib_needed_libraries} 
+                                      ${CUDA_CUBLAS_LIBRARIES} 
+                                      ${cudnn}
+                                      ${CUDA_curand_LIBRARY}
+                                      )
             include_directories(${cudnn_include})
          else()
             set(DLIB_USE_CUDA OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
