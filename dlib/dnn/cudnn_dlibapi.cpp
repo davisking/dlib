@@ -234,8 +234,8 @@ namespace dlib
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
 
-        conv::
-        conv(
+        tensor_conv::
+        tensor_conv(
         ) : 
             filter_handle(nullptr),
             conv_handle(nullptr),
@@ -255,7 +255,7 @@ namespace dlib
         {
         }
 
-        void conv::
+        void tensor_conv::
         clear (
         )
         {
@@ -289,7 +289,7 @@ namespace dlib
             backward_filters_workspace_size_in_bytes = 0;
         }
 
-        void conv::
+        void tensor_conv::
         setup(
             const tensor& data,
             const tensor& filters,
@@ -410,14 +410,14 @@ namespace dlib
             }
         }
 
-        conv::
-        ~conv (
+        tensor_conv::
+        ~tensor_conv (
         )
         {
             clear();
         }
 
-        void conv::operator() (
+        void tensor_conv::operator() (
             resizable_tensor& output,
             const tensor& data,
             const tensor& filters
@@ -450,7 +450,7 @@ namespace dlib
                     output.device()));
         }
 
-        void conv::get_gradient_for_data (
+        void tensor_conv::get_gradient_for_data (
             const tensor& gradient_input, 
             const tensor& filters,
             tensor& data_gradient
@@ -475,7 +475,7 @@ namespace dlib
                                                   data_gradient.device()));
         }
 
-        void conv::
+        void tensor_conv::
         get_gradient_for_filters (
             const tensor& gradient_input, 
             const tensor& data,

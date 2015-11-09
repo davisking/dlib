@@ -131,13 +131,13 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        class conv
+        class tensor_conv
         {
         public:
-            conv(const conv&) = delete;
-            conv& operator=(const conv&) = delete;
+            tensor_conv(const tensor_conv&) = delete;
+            tensor_conv& operator=(const tensor_conv&) = delete;
 
-            conv();
+            tensor_conv();
 
             void clear(
             );
@@ -155,7 +155,7 @@ namespace dlib
                     - stride_x > 0
             !*/
 
-            ~conv (
+            ~tensor_conv (
             );
 
             void operator() (
