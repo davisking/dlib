@@ -35,6 +35,13 @@ namespace dlib
         long nc() const { return m_nc; }
         size_t size() const { return data.size(); }
 
+        typedef float* iterator;
+        typedef const float* const_iterator;
+        iterator       begin()       { return host(); }
+        const_iterator begin() const { return host(); }
+        iterator       end()         { return host()+size(); }
+        const_iterator end() const   { return host()+size(); }
+
         void async_copy_to_device() const
         {
             data.async_copy_to_device();

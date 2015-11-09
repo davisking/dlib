@@ -98,6 +98,17 @@ namespace dlib
                       async_copy_to_device() and then immediately call device().
         !*/
 
+        typedef float* iterator;
+        typedef const float* const_iterator;
+        iterator       begin()       { return host(); }
+        const_iterator begin() const { return host(); }
+        iterator       end()         { return host()+size(); }
+        const_iterator end() const   { return host()+size(); }
+        /*!
+            ensures
+                - makes a tensor iterable just like the STL containers.   
+        !*/
+
         const float* host(
         ) const;
         /*!
