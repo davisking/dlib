@@ -12,8 +12,20 @@ namespace dlib
     namespace cuda 
     {
 
-        // TODO, remove this 
-        void add_arrays(const gpu_data& a, const gpu_data& b, gpu_data& out);
+    // -----------------------------------------------------------------------------------
+
+        void multiply (
+            tensor& dest,
+            const tensor& src
+        );
+        /*!
+            requires
+                - have_same_dimensions(dest,src) == true
+            ensures
+                - #dest == dest*src 
+                  That is, for all valid i:
+                    #dest.host()[i] == dest.host()[i]*src.host()[i]
+        !*/
 
     // -----------------------------------------------------------------------------------
 
@@ -39,15 +51,22 @@ namespace dlib
         );
         /*!
             requires
-                - A.num_samples() == 1
-                - B.num_samples() == 1
+                - if (A.num_samples() == 1) then
+                    - B.num_samples() == 1
+                - else
+                    - A.num_samples() == src.num_samples()
+                    - B.num_samples() == src.num_samples()
                 - A.nr() == B.nr() == src.nr()
                 - A.nc() == B.nc() == src.nc()
                 - A.k()  == B.k()  == src.k()
             ensures
                 - have_same_dimensions(#dest,src) == true
-                - #dest == A*src + B
-                  (done for each sample in src)
+                - if (A.num_samples() == 1) then
+                    - #dest == A*src + B
+                      (done for each sample in src)
+                - else
+                    - for all valid i:
+                        - #dest.host()[i] == A.host()[i]*src.host()[i] + B.host()[i]  
         !*/
 
     // -----------------------------------------------------------------------------------
@@ -108,9 +127,9 @@ namespace dlib
             ensures
                 - Let f(src,gamma,beta) == dot(gradient_input, dest output of
                   batch_normalize(dest,means,vars,src,gamma,beta))
-                - Adds the gradient of f() with respect to src to #src
-                - Adds the gradient of f() with respect to gamma to #gamma
-                - Adds the gradient of f() with respect to beta to #beta
+                - Adds the gradient of f() with respect to src to #src_grad.
+                - Adds the gradient of f() with respect to gamma to #gamma_grad.
+                - Adds the gradient of f() with respect to beta to #beta_grad.
         !*/
 
         void batch_normalize_conv (
@@ -147,59 +166,41 @@ namespace dlib
             tensor& gamma_grad, 
             tensor& beta_grad 
         );
+        /*!
+            requires
+                - vars and means should be the output of a call to
+                  batch_normalize_conv(dest,means,vars,src,gamma,beta)
+                - have_same_dimensions(gradient_input, src) == true
+                - have_same_dimensions(src, src_grad) == true
+                - src.num_samples() > 1
+                - gamma.num_samples()==gamma.nr()==gamma.nc() == 1
+                - have_same_dimensions(gamma, gamma_grad) == true
+                - have_same_dimensions(gamma, beta_grad) == true
+                - gamma.k()  == src.k()
+                - have_same_dimensions(means, gamma) == true
+                - have_same_dimensions(vars, gamma) == true
+            ensures
+                - Let f(src,gamma,beta) == dot(gradient_input, dest output of
+                  batch_normalize_conv(dest,means,vars,src,gamma,beta))
+                - Adds the gradient of f() with respect to src to #src_grad.
+                - Adds the gradient of f() with respect to gamma to #gamma_grad.
+                - Adds the gradient of f() with respect to beta to #beta_grad.
+        !*/
 
     // -----------------------------------------------------------------------------------
 
-        class dropout
-        {
-            /*!
-            !*/
-        public:
+        void threshold (
+            tensor& data,
+            float thresh
+        );
+        /*!
+            ensures
+                - Sets all elements of data to 1 or 0 depending on if they are above or
+                  below the given threshold.  Specifically, for all valid i:
+                    - #data.host()[i] == data.host()[i]>thresh ? 1 : 0
+        !*/
 
-            // not copyable
-            dropout(const dropout&) = delete;
-            dropout& operator=(const dropout&) = delete;
-            // but is movable
-            dropout(dropout&& item) : dropout() { swap(item); }
-            dropout& operator=(dropout&& item) { swap(item); return *this; }
-
-            dropout(float drop_rate = 0.5);
-            dropout(float drop_rate, int seed);
-            
-            void swap(dropout& item) 
-            {
-                // TODO
-            }
-
-            void operator() (
-                resizable_tensor& dest,
-                resizable_tensor& random_mask,
-                const tensor& src
-            );
-            /*!
-                ensures
-                    - have_same_dimensions(src, #dest) == true
-                    - have_same_dimensions(src, #random_mask) == true
-            !*/
-
-            void get_gradient(
-                const tensor& gradient_input, 
-                const tensor& random_mask,
-                tensor& grad 
-            );
-            /*!
-                requires
-                    - have_same_dimensions(gradient_input, random_mask) == true
-                    - have_same_dimensions(gradient_input, grad) == true
-                ensures
-                    - let OUT and MASK be the output of (*this)(OUT,MASK,src)
-                    - let f(src) == dot(gradient_input,OUT)
-                    - Then this function computes the gradient of f() with respect to src
-                      and adds it to grad.
-            !*/
-        };
-
-    // -----------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
 
     } 
 }

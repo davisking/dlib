@@ -14,6 +14,19 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
+        void multiply (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            const auto d = dest.host();
+            const auto s = src.host();
+            for (size_t i = 0; i < src.size(); ++i)
+                d[i] *= s[i];
+        }
+
+    // -----------------------------------------------------------------------------------
+
         void affine_transform(
             resizable_tensor& dest,
             const tensor& src,
@@ -21,7 +34,11 @@ namespace dlib
             const float B
         )
         {
-            // TODO
+            dest.copy_size(src);
+            const auto d = dest.host();
+            const auto s = src.host();
+            for (size_t i = 0; i < src.size(); ++i)
+                d[i] = A*s[i] + B;
         }
 
     // -----------------------------------------------------------------------------------
@@ -33,7 +50,36 @@ namespace dlib
             const tensor& B
         )
         {
-            // TODO
+            DLIB_CASSERT(
+                  ((A.num_samples()==1 && B.num_samples()==1) ||
+                  (A.num_samples()==src.num_samples() && B.num_samples()==src.num_samples())) &&
+                  A.nr()==B.nr() && B.nr()==src.nr() &&
+                  A.nc()==B.nc() && B.nc()==src.nc() &&
+                  A.k() ==B.k()  && B.k()==src.k(),"");
+
+            dest.copy_size(src);
+            auto d = dest.host();
+            auto s = src.host();
+            const auto a = A.host();
+            const auto b = B.host();
+            if (A.num_samples() == 1)
+            {
+                const long num = src.size()/src.num_samples();
+                for (size_t i = 0; i < src.num_samples(); ++i)
+                {
+                    for (long j = 0; j < num; ++j)
+                    {
+                        *d = a[j]*(*s) + b[j];
+                        d++;
+                        s++;
+                    }
+                }
+            }
+            else
+            {
+                for (size_t i = 0; i < src.size(); ++i)
+                    d[i] = a[i]*s[i] + b[i];
+            }
         }
 
     // -----------------------------------------------------------------------------------
@@ -397,40 +443,18 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
-        dropout::
-        dropout(
-            float drop_rate 
+        void threshold (
+            tensor& data,
+            float thresh
         )
         {
-        }
-
-        dropout::
-        dropout(
-            float drop_rate, 
-            int seed
-        )
-        {
-        }
-
-        void dropout::
-        operator() (
-            resizable_tensor& dest,
-            resizable_tensor& random_mask,
-            const tensor& src
-        )
-        {
-        }
-
-        void dropout::
-        get_gradient(
-            const tensor& gradient_input, 
-            const tensor& random_mask,
-            tensor& grad 
-        )
-        {
+            const auto d = data.host();
+            for (size_t i = 0; i < data.size(); ++i)
+                d[i] = d[i]>thresh ? 1:0;
         }
 
     // -----------------------------------------------------------------------------------
+
 
     } 
 }

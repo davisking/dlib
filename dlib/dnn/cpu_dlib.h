@@ -14,6 +14,13 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
+        void multiply (
+            tensor& dest,
+            const tensor& src
+        );
+
+    // -----------------------------------------------------------------------------------
+
         void affine_transform(
             resizable_tensor& dest,
             const tensor& src,
@@ -74,37 +81,10 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
-        class dropout
-        {
-        public:
-
-            // not copyable
-            dropout(const dropout&) = delete;
-            dropout& operator=(const dropout&) = delete;
-            // but is movable
-            dropout(dropout&& item) : dropout() { swap(item); }
-            dropout& operator=(dropout&& item) { swap(item); return *this; }
-
-            dropout(float drop_rate = 0.5);
-            dropout(float drop_rate, int seed);
-            
-            void swap(dropout& item) 
-            {
-                // TODO
-            }
-
-            void operator() (
-                resizable_tensor& dest,
-                resizable_tensor& random_mask,
-                const tensor& src
-            );
-
-            void get_gradient(
-                const tensor& gradient_input, 
-                const tensor& random_mask,
-                tensor& grad 
-            );
-        };
+        void threshold (
+            tensor& data,
+            float thresh
+        );
 
     // -----------------------------------------------------------------------------------
 
