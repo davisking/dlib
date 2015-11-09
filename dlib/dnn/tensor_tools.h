@@ -4,8 +4,12 @@
 #define DLIB_TeNSOR_TOOLS_H_
 
 #include "tensor.h"
+#include "cudnn_dlibapi.h"
+#include "cublas_dlibapi.h"
+#include "curand_dlibapi.h"
+#include "../rand.h"
 
-namespace dlib
+namespace dlib { namespace tt
 {
 
 // ----------------------------------------------------------------------------------------
@@ -37,7 +41,51 @@ namespace dlib
 
     class tensor_rand
     {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a tool for filling a tensor with random numbers.  
+
+                Note that the sequence of random numbers output by this object is different
+                when dlib is compiled with DLIB_USE_CUDA.  So you should not write code
+                that depends on any specific sequence of numbers coming out of a
+                tensor_rand.
+
+        !*/
+
     public:
+        // not copyable
+        tensor_rand(const tensor_rand&) = delete;
+        tensor_rand& operator=(const tensor_rand&) = delete;
+
+        tensor_rand() : tensor_rand(0) {}
+        tensor_rand(unsigned long long seed);
+
+        void fill_gaussian (
+            tensor& data,
+            float mean,
+            float stddev
+        );
+        /*!
+            requires
+                - data.size()%2 == 0
+            ensures
+                - Fills data with random numbers drawn from a Gaussian distribution
+                  with the given mean and standard deviation.
+        !*/
+
+        void fill_uniform (
+            tensor& data
+        );
+        /*!
+            ensures
+                - Fills data with uniform random numbers in the range (0.0, 1.0].
+        !*/
+
+#ifdef DLIB_USE_CUDA
+        cuda::curand_generator rnd;
+#else
+        dlib::rand rnd;
+#endif
     };
 
 // ----------------------------------------------------------------------------------------
@@ -278,13 +326,13 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class conv
+    class tensor_conv
     {
     public:
-        conv(const conv&) = delete;
-        conv& operator=(const conv&) = delete;
+        tensor_conv(const tensor_conv&) = delete;
+        tensor_conv& operator=(const tensor_conv&) = delete;
 
-        conv();
+        tensor_conv();
 
         void clear(
         );
@@ -301,9 +349,6 @@ namespace dlib
                     - stride_y > 0
                     - stride_x > 0
         !*/
-
-        ~conv (
-        );
 
         void operator() (
             resizable_tensor& output,
@@ -362,6 +407,11 @@ namespace dlib
         !*/
 
     private:
+#ifdef DLIB_USE_CUDA
+        cuda::tensor_conv impl;
+#else
+        // TODO
+#endif
 
     };
 
@@ -377,9 +427,6 @@ namespace dlib
         max_pool& operator=(const max_pool&) = delete;
 
         max_pool (
-        );
-
-        ~max_pool(
         );
 
         void clear(
@@ -429,6 +476,11 @@ namespace dlib
         !*/
 
         private:
+#ifdef DLIB_USE_CUDA
+        cuda::max_pool impl;
+#else
+        // TODO
+#endif
     };
 
 // ----------------------------------------------------------------------------------------
@@ -564,8 +616,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    } 
-}
+}}
+
+#ifdef NO_MAKEFILE
+#include "tensor_tools.cpp"
+#endif
 
 #endif // DLIB_TeNSOR_TOOLS_H_
 

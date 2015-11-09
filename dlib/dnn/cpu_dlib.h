@@ -91,6 +91,9 @@ namespace dlib
     } 
 }
 
+#ifdef NO_MAKEFILE
+#include "cpu_dlib.cpp"
+#endif
 
 #endif // DLIB_DNN_CPU_H_
 

@@ -138,6 +138,7 @@ if (NOT TARGET dlib)
    if (COMPILER_CAN_DO_CPP_11)
       set(source_files ${source_files}
          dnn/cpu_dlib.cpp
+         dnn/tensor_tools.cpp
          )
    endif()
 

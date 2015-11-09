@@ -11,6 +11,7 @@
 #include "dnn/solvers.h"
 #include "dnn/trainer.h"
 #include "dnn/cpu_dlib.h"
+#include "dnn/tensor_tools.h"
 
 #endif // DLIB_DNn_
 
