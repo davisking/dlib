@@ -5,6 +5,7 @@
 
 #include "tensor_tools.h"
 #include "cpu_dlib.h"
+#include "cuda_dlib.h"
 
 namespace dlib { namespace tt
 {
@@ -55,7 +56,7 @@ namespace dlib { namespace tt
     {
         DLIB_CASSERT(data.size()%2 == 0,"");
 #ifdef DLIB_USE_CUDA
-        rnd.fill_gaussian(data);
+        rnd.fill_gaussian(data, mean, stddev);
 #else
         for (auto& x : data) 
             x = rnd.get_random_gaussian()*stddev + mean;
