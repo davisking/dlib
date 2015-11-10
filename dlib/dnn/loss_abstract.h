@@ -75,8 +75,8 @@ namespace dlib
                 - Converts the output of the provided network to label_type objects and
                   stores the results into the range indicated by iter.  In particular, for
                   all valid i, it will be the case that:
-                    *(iter+i/sample_expansion_factor) is the element corresponding to the
-                    output of sub for the ith sample in input_tensor.
+                    *(iter+i/sample_expansion_factor) is populated based on the output of
+                    sub and corresponds to the ith sample in input_tensor.
         !*/
 
         template <
