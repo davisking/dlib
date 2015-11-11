@@ -365,7 +365,6 @@ namespace dlib
         {
             dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
             params_grad.copy_size(details.get_layer_params());
-            params_grad = 0;
             details.backward(get_output(), get_gradient_input(), wsub, static_cast<tensor&>(params_grad));
             // Don't try to adjust the parameters if this layer doesn't have any.
             if (params_grad.size() != 0)
@@ -601,7 +600,6 @@ namespace dlib
         {
             subnet_wrapper wsub(x, grad_final_ignored);
             params_grad.copy_size(details.get_layer_params());
-            params_grad = 0;
             details.backward(get_output(), get_gradient_input(), wsub, static_cast<tensor&>(params_grad));
             // Don't try to adjust the parameters if this layer doesn't have any.
             if (params_grad.size() != 0)
@@ -1605,11 +1603,11 @@ namespace dlib
         // Now tell the layer to compute all the gradients.  In the rest of this function
         // we will just be checking that these gradients were computed correctly by
         // comparing them to a central differences approximation.
-        resizable_tensor params_grad, random_noise;
+        resizable_tensor params_grad;
         params_grad.copy_size(l.get_layer_params());
-        random_noise.copy_size(l.get_layer_params());
-        randomize_parameters(random_noise, 5, rnd);
-        params_grad = random_noise;
+        // Set the params grad to something crazy so that it's very obvious if it doesn't
+        // get fully assigned.
+        params_grad = std::numeric_limits<float>::infinity();
         l.backward(output, input_grad, subnetwork, params_grad);
 
 
@@ -1631,7 +1629,7 @@ namespace dlib
             // Compute a reference derivative via a central differences approximation and
             // compare it to the one output by the layer and make sure they match.
             double reference_derivative = (dot(out2,input_grad)-dot(out3, input_grad))/(2*eps);
-            double output_derivative = params_grad.host()[i]-random_noise.host()[i];
+            double output_derivative = params_grad.host()[i];
             double relative_error = (reference_derivative - output_derivative)/(reference_derivative + 1e-100);
             if (std::abs(relative_error) > 0.01)
             {

@@ -221,7 +221,7 @@ namespace dlib
                   gradient_input.size() > 0,"");
 
             const float alpha = 1;
-            const float beta = 1;
+            const float beta = 0;
             check(cudnnConvolutionBackwardBias(context(),
                                                &alpha,
                                                descriptor(gradient_input),
@@ -483,7 +483,7 @@ namespace dlib
         )
         {
             const float alpha = 1;
-            const float beta = 1;
+            const float beta = 0;
             check(cudnnConvolutionBackwardFilter_v3(context(),
                                                     &alpha,
                                                     descriptor(data),

@@ -92,7 +92,7 @@ namespace dlib
         void backward(const tensor& , const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
         {
             // compute the gradient of the parameters.  
-            params_grad += trans(mat(sub.get_output()))*mat(gradient_input);
+            params_grad = trans(mat(sub.get_output()))*mat(gradient_input);
 
             // compute the gradient for the data
             sub.get_gradient_input() += mat(gradient_input)*trans(mat(params));
@@ -161,7 +161,9 @@ namespace dlib
             for (unsigned long i = 0; i < sub.get_output().size(); ++i)
             {
                 if (in[i] > 0)
-                    out[i] += grad[i];
+                    out[i] = grad[i];
+                else
+                    out[i] = 0;
             }
 
         }

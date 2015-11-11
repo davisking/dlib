@@ -201,8 +201,8 @@ namespace dlib
                           draw inputs from the immediate sub layer, sub.subnet(), or
                           any earlier layer.  So you must consider the gradients with
                           respect to all inputs drawn from sub)
-                  Finally, backward() adds these gradients into the output by performing:
-                    - params_grad += PARAMETER_GRADIENT
+                  Finally, backward() outputs these gradients by performing:
+                    - params_grad = PARAMETER_GRADIENT 
                     - for all valid I:
                         - layer<I>(sub).get_gradient_input() += DATA_GRADIENT_I
         !*/

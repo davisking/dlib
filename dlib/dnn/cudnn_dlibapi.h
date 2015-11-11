@@ -128,7 +128,7 @@ namespace dlib
                 - let OUT be the output of add(1,OUT,1,BIAS)
                 - let f(gradient_input,BIAS) == dot(gradient_input,OUT)
                 - Then this function computes the gradient of f() with respect to BIAS and
-                  adds it to grad.
+                  assigns it to grad.
         !*/
 
     // ------------------------------------------------------------------------------------
@@ -219,7 +219,7 @@ namespace dlib
                     - let OUT be the output of (*this)(OUT,data,filters).
                     - let f(data,filters) == dot(OUT, gradient_input)
                     - This function finds the gradient of f() with respect to filters 
-                      and adds this gradient to filters_gradient.
+                      and assigns this gradient to filters_gradient.
             !*/
 
         private:
