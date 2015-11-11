@@ -77,6 +77,7 @@ namespace dlib
                 - dest.nr()==src.nr() || src.nr()==1
                 - dest.nc()==src.nc() || src.nc()==1
                 - dest.k()==src.k()   || src.k()==1
+                - is_same_object(src,dest) == false
             ensures
                 - performs: dest = beta*dest + alpha*src
                   However, how the addition happens depends on the dimensions of src.  In
@@ -121,6 +122,7 @@ namespace dlib
                 - grad.nc() == 1
                 - gradient_input.k() == grad.k()
                 - gradient_input.size() > 0
+                - is_same_object(grad,gradient_input) == false
             ensures
                 - let BIAS be a tensor with all dimensions equal to 1 except for k which is >= 1.
                 - let OUT be the output of add(1,OUT,1,BIAS)
@@ -167,6 +169,8 @@ namespace dlib
                 requires
                     - The dimensions of data and filters are the same as the ones given 
                       to the last call to setup().
+                    - is_same_object(output,data) == false
+                    - is_same_object(output,filters) == false
                 ensures
                     - convolves filters over data.  
                     - filters contains filters.num_samples() filters. 
@@ -188,6 +192,8 @@ namespace dlib
                     - data_gradient has the same dimensions as the data object give to the
                       last call to setup().
                     - gradient_input has the same dimensions as the output of operator().
+                    - is_same_object(data_gradient,filters) == false
+                    - is_same_object(data_gradient,gradient_input) == false
                 ensures
                     - let OUT be the output of (*this)(OUT,data,filters).
                     - let f(data,filters) == dot(OUT, gradient_input)
@@ -207,6 +213,8 @@ namespace dlib
                     - data has the same dimensions as the data object give to the last call
                       to setup().
                     - gradient_input has the same dimensions as the output of operator().
+                    - is_same_object(filters_gradient,data) == false
+                    - is_same_object(filters_gradient,gradient_input) == false
                 ensures
                     - let OUT be the output of (*this)(OUT,data,filters).
                     - let f(data,filters) == dot(OUT, gradient_input)
@@ -271,6 +279,8 @@ namespace dlib
                 const tensor& src
             );
             /*!
+                requires
+                    - is_same_object(dest,src) == false
                 ensures
                     - #dest.num_samples() == src.num_samples()
                     - #dest.k() == src.k()
@@ -295,6 +305,9 @@ namespace dlib
                     - have_same_dimensions(gradient_input,dest) == true
                     - have_same_dimensions(src,grad) == true
                     - dest contains the result of calling (*this)(dest,src)
+                    - is_same_object(grad,gradient_input) == false
+                    - is_same_object(grad,dest) == false
+                    - is_same_object(grad,src) == false
                 ensures
                     - Recalling that dest is the output of (*this)(dest,src),
                       let f(src) == dot(gradient_input,dest)
@@ -327,6 +340,8 @@ namespace dlib
                   each of the spatial locations in dest (i.e. image idx, row idx, and
                   column idx) contains the output of s() evaluated over the channel values
                   at each location.
+                - This function supports in-place operation, i.e. having
+                  is_same_object(dest, src)==true
         !*/
 
         void softmax_gradient (
@@ -338,11 +353,14 @@ namespace dlib
             requires
                 - have_same_dimensions(softmaxed_data,gradient_input) == true 
                 - have_same_dimensions(softmaxed_data,grad) == true 
+                - is_same_object(grad, softmaxed_data)==false
             ensures
                 - We interpret softmaxed_data as the output of softmax(softmaxed_data,SRC)
                   for some SRC tensor.  Then let f(SRC) == dot(gradient_input,softmaxed_data)
                   Then this function computes the gradient of f() with respect to SRC and
                   adds it to grad.
+                - This function supports in-place operation, i.e. having
+                  is_same_object(grad, gradient_input)==true
         !*/
 
     // ------------------------------------------------------------------------------------
@@ -356,6 +374,8 @@ namespace dlib
                 - have_same_dimensions(#dest, src) == true
                 - for all valid i:
                     - #dest.host()[i] == 1/(1+std::exp(-src.host()[i])) 
+                - This function supports in-place operation, i.e. having
+                  is_same_object(dest, src)==true
         !*/
 
         void sigmoid_gradient (
@@ -370,11 +390,15 @@ namespace dlib
                 - have_same_dimensions(src,grad) == true 
                 - have_same_dimensions(src,dest) == true 
                 - dest contains the result of calling sigmoid(dest,src)
+                - is_same_object(grad,src) == false
+                - is_same_object(grad,dest) == false
             ensures
                 - Recalling that dest is the output of sigmoid(dest,src),
                   let f(src) == dot(gradient_input,dest)
                 - Then this function computes the gradient of f() with respect to src and
                   adds it to grad.
+                - This function supports in-place operation, i.e. having
+                  is_same_object(grad, gradient_input)==true
         !*/
 
     // ------------------------------------------------------------------------------------
@@ -388,6 +412,8 @@ namespace dlib
                 - have_same_dimensions(#dest, src) == true
                 - for all valid i:
                     - #dest.host()[i] == std::max(0,src.host()[i]) 
+                - This function supports in-place operation, i.e. having
+                  is_same_object(dest, src)==true
         !*/
 
         void relu_gradient (
@@ -402,11 +428,15 @@ namespace dlib
                 - have_same_dimensions(src,grad) == true 
                 - have_same_dimensions(src,dest) == true 
                 - dest contains the result of calling relu(dest,src)
+                - is_same_object(grad,src) == false
+                - is_same_object(grad,dest) == false
             ensures
                 - Recalling that dest is the output of relu(dest,src),
                   let f(src) == dot(gradient_input,dest)
                 - Then this function computes the gradient of f() with respect to src and
                   adds it to grad.
+                - This function supports in-place operation, i.e. having
+                  is_same_object(grad, gradient_input)==true
         !*/
 
     // ------------------------------------------------------------------------------------
@@ -420,6 +450,8 @@ namespace dlib
                 - have_same_dimensions(#dest, src) == true
                 - for all valid i:
                     - #dest.host()[i] == std::tanh(src.host()[i]) 
+                - This function supports in-place operation, i.e. having
+                  is_same_object(dest, src)==true
         !*/
 
         void tanh_gradient (
@@ -434,11 +466,15 @@ namespace dlib
                 - have_same_dimensions(src,grad) == true 
                 - have_same_dimensions(src,dest) == true 
                 - dest contains the result of calling tanh(dest,src)
+                - is_same_object(grad,src) == false
+                - is_same_object(grad,dest) == false
             ensures
                 - Recalling that dest is the output of tanh(dest,src),
                   let f(src) == dot(gradient_input,dest)
                 - Then this function computes the gradient of f() with respect to src and
                   adds it to grad.
+                - This function supports in-place operation, i.e. having
+                  is_same_object(grad, gradient_input)==true
         !*/
 
     // ------------------------------------------------------------------------------------
