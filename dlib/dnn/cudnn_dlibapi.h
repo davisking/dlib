@@ -321,8 +321,6 @@ namespace dlib
             int stride_x;
         };
 
-        // TODO, make the order of parameters of all these functions consistent.
-
     // ------------------------------------------------------------------------------------
 
         void softmax (
