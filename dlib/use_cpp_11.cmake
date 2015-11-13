@@ -60,6 +60,7 @@ else()
        ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_defaulted_move_initializers;" AND
        ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_delegating_constructors;" AND
        ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_thread_local;" AND
+       ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_constexpr;" AND
        ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_auto_type;")
 
       set(COMPILER_CAN_DO_CPP_11 1)
