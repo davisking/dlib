@@ -41,6 +41,7 @@ namespace dlib
             /*!
                 requires
                     - data.size()%2 == 0
+                    - stddev >= 0
                 ensures
                     - Fills data with random numbers drawn from a Gaussian distribution
                       with the given mean and standard deviation.

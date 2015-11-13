@@ -281,6 +281,8 @@ namespace dlib
             /*!
                 requires
                     - is_same_object(dest,src) == false
+                    - src.nr() >= stride_y
+                    - src.nc() >= stride_x
                 ensures
                     - #dest.num_samples() == src.num_samples()
                     - #dest.k() == src.k()
