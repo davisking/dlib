@@ -346,19 +346,18 @@ namespace dlib
 
         void softmax_gradient (
             tensor& grad,
-            const tensor& softmaxed_data,
+            const tensor& dest,
             const tensor& gradient_input
         );
         /*!
             requires
-                - have_same_dimensions(softmaxed_data,gradient_input) == true 
-                - have_same_dimensions(softmaxed_data,grad) == true 
-                - is_same_object(grad, softmaxed_data)==false
+                - have_same_dimensions(dest,gradient_input) == true 
+                - have_same_dimensions(dest,grad) == true 
+                - is_same_object(grad, dest)==false
             ensures
-                - We interpret softmaxed_data as the output of softmax(softmaxed_data,SRC)
-                  for some SRC tensor.  Then let f(SRC) == dot(gradient_input,softmaxed_data)
-                  Then this function computes the gradient of f() with respect to SRC and
-                  adds it to grad.
+                - We interpret dest as the output of softmax(dest,SRC) for some SRC tensor.
+                  Then let f(SRC) == dot(gradient_input,dest) Then this function computes
+                  the gradient of f() with respect to SRC and assigns it to grad.
                 - This function supports in-place operation, i.e. having
                   is_same_object(grad, gradient_input)==true
         !*/
@@ -381,22 +380,18 @@ namespace dlib
         void sigmoid_gradient (
             tensor& grad,
             const tensor& dest,
-            const tensor& src,
             const tensor& gradient_input
         );
         /*!
             requires
-                - have_same_dimensions(src,gradient_input) == true 
-                - have_same_dimensions(src,grad) == true 
-                - have_same_dimensions(src,dest) == true 
-                - dest contains the result of calling sigmoid(dest,src)
-                - is_same_object(grad,src) == false
+                - have_same_dimensions(dest,gradient_input) == true 
+                - have_same_dimensions(dest,grad) == true 
                 - is_same_object(grad,dest) == false
             ensures
-                - Recalling that dest is the output of sigmoid(dest,src),
-                  let f(src) == dot(gradient_input,dest)
-                - Then this function computes the gradient of f() with respect to src and
-                  adds it to grad.
+                - Recalling that dest is the output of sigmoid(dest,SRC) for some SRC tensor,
+                  let f(SRC) == dot(gradient_input,dest)
+                - Then this function computes the gradient of f() with respect to SRC and
+                  assigns it to grad.
                 - This function supports in-place operation, i.e. having
                   is_same_object(grad, gradient_input)==true
         !*/
@@ -419,22 +414,18 @@ namespace dlib
         void relu_gradient (
             tensor& grad,
             const tensor& dest,
-            const tensor& src,
             const tensor& gradient_input
         );
         /*!
             requires
-                - have_same_dimensions(src,gradient_input) == true 
-                - have_same_dimensions(src,grad) == true 
-                - have_same_dimensions(src,dest) == true 
-                - dest contains the result of calling relu(dest,src)
-                - is_same_object(grad,src) == false
+                - have_same_dimensions(dest,gradient_input) == true 
+                - have_same_dimensions(dest,grad) == true 
                 - is_same_object(grad,dest) == false
             ensures
-                - Recalling that dest is the output of relu(dest,src),
-                  let f(src) == dot(gradient_input,dest)
-                - Then this function computes the gradient of f() with respect to src and
-                  adds it to grad.
+                - Recalling that dest is the output of relu(dest,SRC) for some SRC tensor,
+                  let f(SRC) == dot(gradient_input,dest)
+                - Then this function computes the gradient of f() with respect to SRC and
+                  assigns it to grad.
                 - This function supports in-place operation, i.e. having
                   is_same_object(grad, gradient_input)==true
         !*/
@@ -457,22 +448,18 @@ namespace dlib
         void tanh_gradient (
             tensor& grad,
             const tensor& dest,
-            const tensor& src,
             const tensor& gradient_input
         );
         /*!
             requires
-                - have_same_dimensions(src,gradient_input) == true 
-                - have_same_dimensions(src,grad) == true 
-                - have_same_dimensions(src,dest) == true 
-                - dest contains the result of calling tanh(dest,src)
-                - is_same_object(grad,src) == false
+                - have_same_dimensions(dest,gradient_input) == true 
+                - have_same_dimensions(dest,grad) == true 
                 - is_same_object(grad,dest) == false
             ensures
-                - Recalling that dest is the output of tanh(dest,src),
-                  let f(src) == dot(gradient_input,dest)
-                - Then this function computes the gradient of f() with respect to src and
-                  adds it to grad.
+                - Recalling that dest is the output of tanh(dest,SRC) for some SRC tensor,
+                  let f(SRC) == dot(gradient_input,dest)
+                - Then this function computes the gradient of f() with respect to SRC and
+                  assigns it to grad.
                 - This function supports in-place operation, i.e. having
                   is_same_object(grad, gradient_input)==true
         !*/

@@ -639,24 +639,24 @@ namespace dlib
 
         void softmax_gradient (
             tensor& grad,
-            const tensor& softmaxed_data,
+            const tensor& dest,
             const tensor& gradient_input
         )
         {
             DLIB_CASSERT(
-                  have_same_dimensions(softmaxed_data,gradient_input) == true &&
-                  have_same_dimensions(softmaxed_data,grad) == true , "");
-            if (softmaxed_data.size() == 0)
+                  have_same_dimensions(dest,gradient_input) == true &&
+                  have_same_dimensions(dest,grad) == true , "");
+            if (dest.size() == 0)
                 return;
 
             const float alpha = 1;
-            const float beta = 1;
+            const float beta = 0;
             check(cudnnSoftmaxBackward(context(),
                                       CUDNN_SOFTMAX_ACCURATE,
                                       CUDNN_SOFTMAX_MODE_CHANNEL,
                                       &alpha,
-                                      descriptor(softmaxed_data),
-                                      softmaxed_data.device(),
+                                      descriptor(dest),
+                                      dest.device(),
                                       descriptor(gradient_input),
                                       gradient_input.device(),
                                       &beta,
@@ -691,19 +691,17 @@ namespace dlib
         void sigmoid_gradient (
             tensor& grad,
             const tensor& dest,
-            const tensor& src,
             const tensor& gradient_input
         )
         {
             DLIB_CASSERT(
-                  have_same_dimensions(src,gradient_input) == true &&
-                  have_same_dimensions(src,grad) == true &&
-                  have_same_dimensions(src,dest) == true , "");
-            if (src.size() == 0)
+                  have_same_dimensions(dest,gradient_input) == true &&
+                  have_same_dimensions(dest,grad) == true , "");
+            if (dest.size() == 0)
                 return;
 
             const float alpha = 1;
-            const float beta = 1;
+            const float beta = 0;
             check(cudnnActivationBackward(context(),
                                           CUDNN_ACTIVATION_SIGMOID,
                                           &alpha,
@@ -711,8 +709,8 @@ namespace dlib
                                           dest.device(),
                                           descriptor(gradient_input),
                                           gradient_input.device(),
-                                          descriptor(src),
-                                          src.device(),
+                                          descriptor(dest),
+                                          dest.device(),
                                           &beta,
                                           descriptor(grad),
                                           grad.device()));
@@ -744,19 +742,17 @@ namespace dlib
         void relu_gradient (
             tensor& grad,
             const tensor& dest,
-            const tensor& src,
             const tensor& gradient_input
         )
         {
             DLIB_CASSERT(
-                  have_same_dimensions(src,gradient_input) == true &&
-                  have_same_dimensions(src,grad) == true &&
-                  have_same_dimensions(src,dest) == true , "");
-            if (src.size() == 0)
+                  have_same_dimensions(dest,gradient_input) == true &&
+                  have_same_dimensions(dest,grad) == true , "");
+            if (dest.size() == 0)
                 return;
 
             const float alpha = 1;
-            const float beta = 1;
+            const float beta = 0;
             check(cudnnActivationBackward(context(),
                                           CUDNN_ACTIVATION_RELU,
                                           &alpha,
@@ -764,8 +760,8 @@ namespace dlib
                                           dest.device(),
                                           descriptor(gradient_input),
                                           gradient_input.device(),
-                                          descriptor(src),
-                                          src.device(),
+                                          descriptor(dest),
+                                          dest.device(),
                                           &beta,
                                           descriptor(grad),
                                           grad.device()));
@@ -797,19 +793,17 @@ namespace dlib
         void tanh_gradient (
             tensor& grad,
             const tensor& dest,
-            const tensor& src,
             const tensor& gradient_input
         )
         {
             DLIB_CASSERT(
-                  have_same_dimensions(src,gradient_input) == true &&
-                  have_same_dimensions(src,grad) == true &&
-                  have_same_dimensions(src,dest) == true , "");
-            if (src.size() == 0)
+                  have_same_dimensions(dest,gradient_input) == true &&
+                  have_same_dimensions(dest,grad) == true, "");
+            if (dest.size() == 0)
                 return;
 
             const float alpha = 1;
-            const float beta = 1;
+            const float beta = 0;
             check(cudnnActivationBackward(context(),
                                           CUDNN_ACTIVATION_TANH,
                                           &alpha,
@@ -817,8 +811,8 @@ namespace dlib
                                           dest.device(),
                                           descriptor(gradient_input),
                                           gradient_input.device(),
-                                          descriptor(src),
-                                          src.device(),
+                                          descriptor(dest),
+                                          dest.device(),
                                           &beta,
                                           descriptor(grad),
                                           grad.device()));

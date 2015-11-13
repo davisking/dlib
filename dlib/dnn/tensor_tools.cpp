@@ -86,7 +86,7 @@ namespace dlib { namespace tt
     {
         DLIB_CASSERT(have_same_dimensions(dest,src) == true,"");
 #ifdef DLIB_USE_CUDA
-        cuda::multiply(dest, src);
+        //cuda::multiply(dest, src);
 #else
         cpu::multiply(dest, src);
 #endif
@@ -103,7 +103,7 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::affine_transform(dest,src,A,B);
+        //cuda::affine_transform(dest,src,A,B);
 #else
         cpu::affine_transform(dest,src,A,B);
 #endif
@@ -119,7 +119,7 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::affine_transform(dest,src,A,B);
+        //cuda::affine_transform(dest,src,A,B);
 #else
         cpu::affine_transform(dest,src,A,B);
 #endif
@@ -137,7 +137,7 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::batch_normalize(dest,means,vars,src,gamma,beta);
+        //cuda::batch_normalize(dest,means,vars,src,gamma,beta);
 #else
         cpu::batch_normalize(dest,means,vars,src,gamma,beta);
 #endif
@@ -157,8 +157,10 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
+        /*
         cuda::batch_normalize_gradient(gradient_input,means,vars,src,gamma,
                                        src_grad,gamma_grad,beta_grad);
+        */
 #else
         cpu::batch_normalize_gradient(gradient_input,means,vars,src,gamma,
                                        src_grad,gamma_grad,beta_grad);
@@ -177,7 +179,7 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::batch_normalize_conv(dest,means,vars,src,gamma,beta);
+        //cuda::batch_normalize_conv(dest,means,vars,src,gamma,beta);
 #else
         cpu::batch_normalize_conv(dest,means,vars,src,gamma,beta);
 #endif
@@ -197,8 +199,10 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
+        /*
         cuda::batch_normalize_conv_gradient(gradient_input,means,vars,src,gamma,
                                        src_grad,gamma_grad,beta_grad);
+        */
 #else
         cpu::batch_normalize_conv_gradient(gradient_input,means,vars,src,gamma,
                                        src_grad,gamma_grad,beta_grad);
@@ -213,7 +217,7 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::threshold(data,thresh);
+        //cuda::threshold(data,thresh);
 #else
         cpu::threshold(data,thresh);
 #endif
@@ -417,12 +421,12 @@ namespace dlib { namespace tt
 
     void softmax_gradient (
         tensor& grad,
-        const tensor& softmaxed_data,
+        const tensor& dest,
         const tensor& gradient_input
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::softmax_gradient(grad, softmaxed_data, gradient_input);
+        cuda::softmax_gradient(grad, dest, gradient_input);
 #else
         // TODO
         DLIB_CASSERT(false,"");
@@ -447,12 +451,11 @@ namespace dlib { namespace tt
     void sigmoid_gradient (
         tensor& grad,
         const tensor& dest,
-        const tensor& src,
         const tensor& gradient_input
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::sigmoid_gradient(grad, dest, src, gradient_input);
+        cuda::sigmoid_gradient(grad, dest, gradient_input);
 #else
         // TODO
         DLIB_CASSERT(false,"");
@@ -477,12 +480,11 @@ namespace dlib { namespace tt
     void relu_gradient (
         tensor& grad,
         const tensor& dest,
-        const tensor& src,
         const tensor& gradient_input
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::relu_gradient(grad, dest, src, gradient_input);
+        cuda::relu_gradient(grad, dest, gradient_input);
 #else
         // TODO
         DLIB_CASSERT(false,"");
@@ -507,12 +509,11 @@ namespace dlib { namespace tt
     void tanh_gradient (
         tensor& grad,
         const tensor& dest,
-        const tensor& src,
         const tensor& gradient_input
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::tanh_gradient(grad, dest, src, gradient_input);
+        cuda::tanh_gradient(grad, dest, gradient_input);
 #else
         // TODO
         DLIB_CASSERT(false,"");
