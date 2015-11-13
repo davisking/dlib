@@ -36,7 +36,7 @@ namespace dlib
         } 
 
         template <typename SUBNET>
-        void backward(const tensor& computed_output, const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
         {
             // TODO
         }
@@ -89,7 +89,7 @@ namespace dlib
         } 
 
         template <typename SUBNET>
-        void backward(const tensor& , const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
         {
             // compute the gradient of the parameters.  
             params_grad = trans(mat(sub.get_output()))*mat(gradient_input);
@@ -145,20 +145,22 @@ namespace dlib
         {
         }
 
-        template <typename SUBNET>
-        void forward(const SUBNET& sub, resizable_tensor& output)
+        void forward_inplace(const tensor& input, tensor& output)
         {
-            output.copy_size(sub.get_output());
-            output = lowerbound(mat(sub.get_output()), 0);
+            output = lowerbound(mat(input), 0);
         } 
 
-        template <typename SUBNET>
-        void backward(const tensor&, const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
+        void backward_inplace(
+            const tensor& computed_output,
+            const tensor& gradient_input, 
+            tensor& data_grad, 
+            tensor& params_grad
+        )
         {
             const float* grad = gradient_input.host();
-            const float* in = sub.get_output().host();
-            float* out = sub.get_gradient_input().host();
-            for (unsigned long i = 0; i < sub.get_output().size(); ++i)
+            const float* in = computed_output.host();
+            float* out = data_grad.host();
+            for (unsigned long i = 0; i < computed_output.size(); ++i)
             {
                 if (in[i] > 0)
                     out[i] = grad[i];

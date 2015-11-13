@@ -61,7 +61,171 @@ namespace dlib
             return std::make_tuple(std::get<indices>(item)...);
         }
 
-    }
+        template <typename T> struct alwaysbool { typedef bool type; };
+
+        resizable_tensor& rt();
+
+        // The significance of a layer's backward method requiring forward's outputs is
+        // that such as layer can't have an in-place layer stacked on top of it because
+        // in-place layers overwrite the output of the layer they sit on top of.
+        template <typename layer_type, typename SUBNET>
+        constexpr auto backward_requires_forward_output(
+            layer_type& layer,
+            SUBNET& sub
+        ) -> typename alwaysbool<decltype(layer.backward(rt(),rt(),sub,rt()))>::type
+        {
+            return true;
+        }
+
+        template <typename layer_type, typename SUBNET>
+        constexpr auto backward_requires_forward_output(
+            layer_type& layer,
+            SUBNET& sub
+        ) -> typename alwaysbool<decltype(layer.backward(rt(),sub,rt()))>::type
+        {
+            return false;
+        }
+
+        template <typename layer_type, typename SUBNET>
+        constexpr auto backward_requires_forward_output(
+            layer_type& layer,
+            SUBNET& sub
+        ) -> typename alwaysbool<decltype(layer.backward_inplace(rt(),rt(),sub.get_gradient_input(),rt()))>::type
+        {
+            return true;
+        }
+
+        template <typename layer_type, typename SUBNET>
+        constexpr auto has_inplace_backward(
+            layer_type& layer,
+            SUBNET& sub
+        ) -> typename alwaysbool<decltype(layer.backward(rt(),rt(),sub,rt()))>::type
+        {
+            return false;
+        }
+
+        template <typename layer_type, typename SUBNET>
+        constexpr auto has_inplace_backward(
+            layer_type& layer,
+            SUBNET& sub
+        ) -> typename alwaysbool<decltype(layer.backward(rt(),sub,rt()))>::type
+        {
+            return false;
+        }
+
+        template <typename layer_type, typename SUBNET>
+        constexpr auto has_inplace_backward(
+            layer_type& layer,
+            SUBNET& sub
+        ) -> typename alwaysbool<decltype(layer.backward_inplace(rt(),rt(),sub.get_gradient_input(),rt()))>::type
+        {
+            return true;
+        }
+
+        template <typename layer_type, typename SUBNET>
+        constexpr auto is_inplace_layer(
+            layer_type& layer,
+            const SUBNET& sub 
+        ) -> typename alwaysbool<decltype(layer.forward(sub,rt()))>::type
+        {
+            return false;
+        }
+
+        template <typename layer_type, typename SUBNET>
+        constexpr auto is_inplace_layer(
+            layer_type& layer,
+            const SUBNET& sub
+        ) -> typename alwaysbool<decltype(layer.forward_inplace(sub.get_output(),rt()))>::type
+        {
+            return true;
+        }
+
+        template <typename layer_type, typename SUBNET>
+        auto call_layer_backward(
+            layer_type& layer,
+            const tensor& computed_output, 
+            const tensor& gradient_input, 
+            SUBNET& sub, 
+            tensor& params_grad
+        ) -> decltype(layer.backward(computed_output,gradient_input,sub,params_grad))
+        {
+            layer.backward(computed_output,gradient_input,sub,params_grad);
+        }
+
+        template <typename layer_type, typename SUBNET>
+        auto call_layer_backward(
+            layer_type& layer,
+            const tensor& , 
+            const tensor& gradient_input, 
+            SUBNET& sub, 
+            tensor& params_grad
+        ) -> decltype(layer.backward(gradient_input,sub,params_grad))
+        {
+            layer.backward(gradient_input,sub,params_grad);
+        }
+
+        template <typename layer_type, typename SUBNET>
+        auto call_layer_backward(
+            layer_type& layer,
+            const tensor& computed_output, 
+            const tensor& gradient_input, 
+            SUBNET& sub, 
+            tensor& params_grad
+        ) -> decltype(layer.backward_inplace(computed_output,gradient_input,sub.get_gradient_input(),params_grad))
+        {
+            layer.backward_inplace(computed_output,gradient_input,sub.get_gradient_input(),params_grad);
+        }
+
+
+        template <typename layer_type, typename SUBNET>
+        auto call_layer_forward(
+            layer_type& layer,
+            const SUBNET& sub, 
+            tensor& data_output
+        ) -> decltype(layer.forward(sub,rt()))
+        {
+            // This overload of call_layer_forward() is here because this template
+            // naturally gets instantiated but only on code paths that never get executed.
+            // So rather than writing a bunch of hard to read template magic around call
+            // sites we just have this overload that doesn't do anything (and an assert to
+            // make sure that's the case).
+            DLIB_CASSERT(false, "This should never happen");
+        }
+
+        template <typename layer_type, typename SUBNET>
+        auto call_layer_forward(
+            layer_type& layer,
+            const SUBNET& sub, 
+            resizable_tensor& data_output
+        ) -> decltype(layer.forward(sub,data_output))
+        {
+            layer.forward(sub,data_output);
+        }
+
+        template <typename layer_type, typename SUBNET>
+        auto call_layer_forward(
+            layer_type& layer,
+            const SUBNET& sub, 
+            tensor& data_output
+        ) -> decltype(layer.forward_inplace(sub.get_output(),data_output))
+        {
+            layer.forward_inplace(sub.get_output(),data_output);
+        }
+
+        template <typename layer_type, typename SUBNET>
+        auto call_layer_forward(
+            layer_type& layer,
+            const SUBNET& sub, 
+            resizable_tensor& data_output
+        ) -> decltype(layer.forward_inplace(sub.get_output(),data_output))
+        {
+            if (!have_same_dimensions(data_output, sub.get_output()))
+                data_output.copy_size(sub.get_output());
+            layer.forward_inplace(sub.get_output(),data_output);
+        }
+
+
+    } // end namespace impl
 
     template <typename Head, typename... Tail>
     std::tuple<Tail...> tuple_tail(
@@ -162,7 +326,7 @@ namespace dlib
 
     namespace dimpl
     {
-        template <typename T, typename enabled=void>
+        template <typename T, bool is_first = true, typename enabled=void>
         class subnet_wrapper
         {
             /*!
@@ -173,6 +337,13 @@ namespace dlib
                     objects to the layer callbacks those callbacks won't be able to 
                     interact with the subnetworks in a way other than specified 
                     by the SUBNET interface spec.
+
+                    We also allow the top layer of a subnet_wrapper stack to call the
+                    private_get_output() and private_get_gradient_input() functions.  This
+                    way, layers that have had their output/gradient overwritten by in-place
+                    layers can only be accessed from the in-place layers that sit directly
+                    on top of them since those in-place layers are the only layers that
+                    know how to interact with them properly.
             !*/
 
         public:
@@ -185,7 +356,31 @@ namespace dlib
         };
 
         template <typename T>
-        class subnet_wrapper<T,typename std::enable_if<is_nonloss_layer_type<T>::value>::type>
+        class subnet_wrapper<T,true, typename std::enable_if<is_nonloss_layer_type<T>::value>::type>
+        {
+
+        public:
+            subnet_wrapper(const subnet_wrapper&) = delete;
+            subnet_wrapper& operator=(const subnet_wrapper&) = delete;
+
+            typedef T wrapped_type;
+            const static size_t num_layers = T::num_layers;
+
+            subnet_wrapper(T& l_) : l(l_),subnetwork(l.subnet()) {}
+
+            const tensor& get_output() const { return l.private_get_output(); }
+            tensor& get_gradient_input() { return l.private_get_gradient_input(); }
+
+            const subnet_wrapper<typename T::subnet_type>& subnet() const { subnetwork; }
+            subnet_wrapper<typename T::subnet_type>& subnet() { subnetwork; }
+
+        private:
+            T& l;
+            subnet_wrapper<typename T::subnet_type,false> subnetwork;
+        };
+
+        template <typename T>
+        class subnet_wrapper<T,false, typename std::enable_if<is_nonloss_layer_type<T>::value>::type>
         {
 
         public:
@@ -231,8 +426,11 @@ namespace dlib
         add_layer(
         ):
             this_layer_setup_called(false),
-            gradient_input_is_stale(true)
+            gradient_input_is_stale(true),
+            get_output_and_gradient_input_disabled(false)
         {
+            if (this_layer_operates_inplace())
+                subnetwork.disable_output_and_gradient_getters();
         }
 
         add_layer(const add_layer&) = default;
@@ -242,6 +440,8 @@ namespace dlib
 
         template <typename T, typename U, typename E>
         friend class add_layer;
+        template <typename T, bool is_first, typename E>
+        friend class dimpl::subnet_wrapper;
 
         // Allow copying networks from one to another as long as their corresponding 
         // layers can be constructed from each other.
@@ -253,9 +453,12 @@ namespace dlib
             details(item.layer_details()), 
             this_layer_setup_called(item.this_layer_setup_called),
             gradient_input_is_stale(item.gradient_input_is_stale),
+            get_output_and_gradient_input_disabled(item.get_output_and_gradient_input_disabled),
             x_grad(item.x_grad),
             cached_output(item.cached_output)
         {
+            if (this_layer_operates_inplace())
+                subnetwork.disable_output_and_gradient_getters();
         }
 
         template <typename ...T>
@@ -266,8 +469,11 @@ namespace dlib
             details(layer_det), 
             subnetwork(std::forward<T>(args)...),
             this_layer_setup_called(false),
-            gradient_input_is_stale(true)
+            gradient_input_is_stale(true),
+            get_output_and_gradient_input_disabled(false)
         {
+            if (this_layer_operates_inplace())
+                subnetwork.disable_output_and_gradient_getters();
         }
 
         template <typename ...T>
@@ -278,8 +484,11 @@ namespace dlib
             details(std::move(layer_det)), 
             subnetwork(std::forward<T>(args)...),
             this_layer_setup_called(false),
-            gradient_input_is_stale(true)
+            gradient_input_is_stale(true),
+            get_output_and_gradient_input_disabled(false)
         {
+            if (this_layer_operates_inplace())
+                subnetwork.disable_output_and_gradient_getters();
         }
 
         template <typename ...T, typename ...U>
@@ -290,8 +499,11 @@ namespace dlib
             details(std::get<0>(layer_det)), 
             subnetwork(tuple_tail(layer_det),std::forward<T>(args)...),
             this_layer_setup_called(false),
-            gradient_input_is_stale(true)
+            gradient_input_is_stale(true),
+            get_output_and_gradient_input_disabled(false)
         {
+            if (this_layer_operates_inplace())
+                subnetwork.disable_output_and_gradient_getters();
         }
 
         template <typename ...T, typename ...U>
@@ -343,21 +555,54 @@ namespace dlib
                 details.setup(wsub);
                 this_layer_setup_called = true;
             }
-            details.forward(wsub, cached_output);
+            if (this_layer_operates_inplace())
+                impl::call_layer_forward(details, wsub, private_get_output());
+            else
+                impl::call_layer_forward(details, wsub, cached_output);
+
             gradient_input_is_stale = true;
-            return get_output();
+            return private_get_output();
         }
 
-        const tensor& get_output() const { return cached_output; }
+    private:
+        tensor& private_get_output() const
+        { 
+            if (const_cast<add_layer&>(*this).this_layer_operates_inplace())
+                return subnetwork.private_get_output();
+            else
+                return const_cast<resizable_tensor&>(cached_output); 
+        }
+        tensor& private_get_gradient_input() 
+        { 
+            if (this_layer_operates_inplace())
+            {
+                return subnetwork.private_get_gradient_input();
+            }
+            else
+            {
+                if (gradient_input_is_stale)
+                {
+                    gradient_input_is_stale = false;
+                    x_grad.copy_size(private_get_output());
+                    x_grad = 0;
+                }
+                return x_grad; 
+            }
+        }
+        void disable_output_and_gradient_getters (
+        ) { get_output_and_gradient_input_disabled = true; }
+    public:
+        const tensor& get_output() const 
+        { 
+            if (get_output_and_gradient_input_disabled)
+                throw dlib::error("Accessing this layer's get_output() is disabled because an in-place layer has been stacked on top of it.");
+            return private_get_output(); 
+        }
         tensor& get_gradient_input() 
         { 
-            if (gradient_input_is_stale)
-            {
-                gradient_input_is_stale = false;
-                x_grad.copy_size(get_output());
-                x_grad = 0;
-            }
-            return x_grad; 
+            if (get_output_and_gradient_input_disabled)
+                throw dlib::error("Accessing this layer's get_gradient_input() is disabled because an in-place layer has been stacked on top of it.");
+            return private_get_gradient_input();
         }
 
         template <typename solver_type>
@@ -365,11 +610,13 @@ namespace dlib
         {
             dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
             params_grad.copy_size(details.get_layer_params());
-            details.backward(get_output(), get_gradient_input(), wsub, static_cast<tensor&>(params_grad));
+            impl::call_layer_backward(details, private_get_output(),
+                private_get_gradient_input(), wsub, static_cast<tensor&>(params_grad));
             // Don't try to adjust the parameters if this layer doesn't have any.
             if (params_grad.size() != 0)
                 solvers.top()(details, static_cast<const tensor&>(params_grad));
             subnetwork.update(x, solvers.pop());
+            gradient_input_is_stale = true;
         }
 
         const subnet_type& subnet() const { return subnetwork; }
@@ -396,6 +643,7 @@ namespace dlib
             serialize(item.details, out);
             serialize(item.this_layer_setup_called, out);
             serialize(item.gradient_input_is_stale, out);
+            serialize(item.get_output_and_gradient_input_disabled, out);
             serialize(item.x_grad, out);
             serialize(item.cached_output, out);
         }
@@ -410,11 +658,26 @@ namespace dlib
             deserialize(item.details, in);
             deserialize(item.this_layer_setup_called, in);
             deserialize(item.gradient_input_is_stale, in);
+            deserialize(item.get_output_and_gradient_input_disabled, in);
             deserialize(item.x_grad, in);
             deserialize(item.cached_output, in);
         }
 
     private:
+
+        bool this_layer_operates_inplace(
+        ) 
+        {
+            // This layer can run in-place if it's an in-place capable layer and also if
+            // the layer it's on top of doesn't need it's own output tensor (since in-place
+            // layers overwrite that tensor)
+            return impl::is_inplace_layer(details, subnetwork) && !subnetwork.this_layer_requires_forward_output();
+        }
+        bool this_layer_requires_forward_output(
+        ) 
+        {
+            return impl::backward_requires_forward_output(details, subnetwork);
+        }
 
         void swap(add_layer& item)
         {
@@ -422,6 +685,7 @@ namespace dlib
             std::swap(details, item.details);
             std::swap(this_layer_setup_called, item.this_layer_setup_called);
             std::swap(gradient_input_is_stale, item.gradient_input_is_stale);
+            std::swap(get_output_and_gradient_input_disabled, item.get_output_and_gradient_input_disabled);
             std::swap(x_grad, item.x_grad);
             std::swap(cached_output, item.cached_output);
         }
@@ -431,6 +695,10 @@ namespace dlib
         LAYER_DETAILS details;
         bool this_layer_setup_called;
         bool gradient_input_is_stale;
+        bool get_output_and_gradient_input_disabled;
+        // Note that if this_layer_operates_inplace()==true then x_grad and cached_output
+        // are not used at all.  Instead, this layer uses these variables from the lower
+        // layer.
         resizable_tensor x_grad;
         resizable_tensor cached_output; 
 
@@ -461,7 +729,8 @@ namespace dlib
         add_layer(
         ): 
             this_layer_setup_called(false),
-            gradient_input_is_stale(true) 
+            gradient_input_is_stale(true),
+            get_output_and_gradient_input_disabled(false)
         {}
 
         add_layer(const add_layer&) = default;
@@ -471,6 +740,8 @@ namespace dlib
 
         template <typename T, typename U, typename E>
         friend class add_layer;
+        template <typename T, bool is_first, typename E>
+        friend class dimpl::subnet_wrapper;
 
         // Allow copying networks from one to another as long as their corresponding 
         // layers can be constructed from each other.
@@ -482,6 +753,7 @@ namespace dlib
             details(item.layer_details()),
             this_layer_setup_called(item.this_layer_setup_called),
             gradient_input_is_stale(item.gradient_input_is_stale),
+            get_output_and_gradient_input_disabled(false),
             x_grad(item.x_grad),
             cached_output(item.cached_output)
         {
@@ -492,7 +764,8 @@ namespace dlib
         ) : 
             details(layer_det), 
             this_layer_setup_called(false),
-            gradient_input_is_stale(true) 
+            gradient_input_is_stale(true),
+            get_output_and_gradient_input_disabled(false)
         {}
 
         add_layer(
@@ -500,7 +773,8 @@ namespace dlib
         ) : 
             details(std::move(layer_det)), 
             this_layer_setup_called(false),
-            gradient_input_is_stale(true) 
+            gradient_input_is_stale(true),
+            get_output_and_gradient_input_disabled(false)
         {}
 
         add_layer(
@@ -510,7 +784,8 @@ namespace dlib
             details(std::move(layer_det)),
             input_layer(std::move(il)),
             this_layer_setup_called(false),
-            gradient_input_is_stale(true)
+            gradient_input_is_stale(true),
+            get_output_and_gradient_input_disabled(false)
         {}
 
         add_layer(
@@ -577,33 +852,50 @@ namespace dlib
                 details.setup(wsub);
                 this_layer_setup_called = true;
             }
-            details.forward(wsub, cached_output);
+            impl::call_layer_forward(details, wsub, cached_output);
             gradient_input_is_stale = true;
-            return get_output();
+            return private_get_output();
         }
 
-        const tensor& get_output() const { return cached_output; }
-        tensor& get_gradient_input() 
+    private:
+        tensor& private_get_output() const { return const_cast<resizable_tensor&>(cached_output); }
+        tensor& private_get_gradient_input() 
         { 
             if (gradient_input_is_stale)
             {
                 gradient_input_is_stale = false;
-                x_grad.copy_size(get_output());
+                x_grad.copy_size(private_get_output());
                 x_grad = 0;
             }
             return x_grad; 
         }
-
+        void disable_output_and_gradient_getters (
+        ) { get_output_and_gradient_input_disabled = true; }
+    public:
+        const tensor& get_output() const 
+        { 
+            if (get_output_and_gradient_input_disabled)
+                throw dlib::error("Accessing this layer's get_output() is disabled because an in-place layer has been stacked on top of it.");
+            return private_get_output(); 
+        }
+        tensor& get_gradient_input() 
+        { 
+            if (get_output_and_gradient_input_disabled)
+                throw dlib::error("Accessing this layer's get_gradient_input() is disabled because an in-place layer has been stacked on top of it.");
+            return private_get_gradient_input();
+        }
 
         template <typename solver_type>
         void update(const tensor& x, sstack<solver_type,num_layers>& solvers)
         {
             subnet_wrapper wsub(x, grad_final_ignored);
             params_grad.copy_size(details.get_layer_params());
-            details.backward(get_output(), get_gradient_input(), wsub, static_cast<tensor&>(params_grad));
+            impl::call_layer_backward(details, private_get_output(),
+                private_get_gradient_input(), wsub, static_cast<tensor&>(params_grad));
             // Don't try to adjust the parameters if this layer doesn't have any.
             if (params_grad.size() != 0)
                 solvers.top()(details, static_cast<const tensor&>(params_grad));
+            gradient_input_is_stale = true;
         }
 
         const subnet_type& subnet() const { return input_layer; } 
@@ -630,6 +922,7 @@ namespace dlib
             serialize(item.details, out);
             serialize(item.this_layer_setup_called, out);
             serialize(item.gradient_input_is_stale, out);
+            serialize(item.get_output_and_gradient_input_disabled, out);
             serialize(item.x_grad, out);
             serialize(item.cached_output, out);
         }
@@ -644,11 +937,19 @@ namespace dlib
             deserialize(item.details, in);
             deserialize(item.this_layer_setup_called, in);
             deserialize(item.gradient_input_is_stale, in);
+            deserialize(item.get_output_and_gradient_input_disabled, in);
             deserialize(item.x_grad, in);
             deserialize(item.cached_output, in);
         }
 
     private:
+
+        bool this_layer_requires_forward_output(
+        ) 
+        {
+            subnet_wrapper wsub(grad_final_ignored, grad_final_ignored);
+            return impl::backward_requires_forward_output(details, wsub);
+        }
 
         class subnet_wrapper
         {
@@ -685,6 +986,7 @@ namespace dlib
             std::swap(details, item.details);
             std::swap(this_layer_setup_called, item.this_layer_setup_called);
             std::swap(gradient_input_is_stale, item.gradient_input_is_stale);
+            std::swap(get_output_and_gradient_input_disabled, item.get_output_and_gradient_input_disabled);
             std::swap(x_grad, item.x_grad); 
             std::swap(cached_output, item.cached_output); 
         }
@@ -693,6 +995,7 @@ namespace dlib
         LAYER_DETAILS details;
         bool this_layer_setup_called;
         bool gradient_input_is_stale;
+        bool get_output_and_gradient_input_disabled;
         resizable_tensor x_grad; 
         resizable_tensor cached_output; 
 
@@ -1493,10 +1796,13 @@ namespace dlib
             }
 
 
+            tensor& get_mutable_output() { return output; }
             const tensor& get_output() const { return output; }
+            const tensor& private_get_output() const { return get_output(); }
             const test_layer_subnet& subnet() const { init_sub(); return *subnetwork; }
 
             tensor& get_gradient_input() { return gradient_input; }
+            tensor& private_get_gradient_input() { return get_gradient_input(); }
             test_layer_subnet& subnet() { init_sub(); return *subnetwork; }
 
 
@@ -1578,7 +1884,7 @@ namespace dlib
         // (since we do a lazy layer creation thing based on calls to subnet() inside
         // test_layer_subnet).
         l.setup(subnetwork);
-        l.forward(subnetwork, output);
+        impl::call_layer_forward(l, subnetwork, output);
 
         resizable_tensor input_grad;
         input_grad.copy_size(output);
@@ -1605,11 +1911,71 @@ namespace dlib
         // comparing them to a central differences approximation.
         resizable_tensor params_grad;
         params_grad.copy_size(l.get_layer_params());
-        // Set the params grad to something crazy so that it's very obvious if it doesn't
-        // get fully assigned.
+        // But first, set the params grad to something crazy so that it's very obvious if
+        // it doesn't get fully assigned.
         params_grad = std::numeric_limits<float>::infinity();
-        l.backward(output, input_grad, subnetwork, params_grad);
+        impl::call_layer_backward(l, output, input_grad, subnetwork, params_grad);
 
+        static_assert(impl::is_inplace_layer(l, subnetwork) == impl::has_inplace_backward(l, subnetwork),
+            "Layer not defined correctly.  forward and backward methods must either both be in-place or both out-of-place. ");
+
+        // Make sure the outputs of forward() and backward() are the same when they are run
+        // in in-place mode.
+        if (impl::is_inplace_layer(l, subnetwork))
+        {
+            test_layer_subnet subnetwork2(rnd);
+            layer_details_type ll(l);
+            ll.setup(subnetwork2);
+            resizable_tensor ip_out;
+            impl::call_layer_forward(ll, subnetwork2, ip_out);
+            impl::call_layer_forward(ll, subnetwork2, subnetwork2.get_mutable_output());
+            const auto forward_error = max(abs(mat(ip_out) - mat(subnetwork2.get_output())));
+            if (forward_error > 0.00001)
+            {
+                using namespace std;
+                sout << "This layer is supposed to support in-place computations but the output of forward_inplace()\n";
+                sout << "changes when invoked in-place vs. out-of-place. The error was: " << forward_error << endl;
+                return layer_test_results(sout.str()); 
+            }
+
+            resizable_tensor params_grad;
+            params_grad.copy_size(ll.get_layer_params());
+            params_grad = std::numeric_limits<float>::infinity();
+
+            resizable_tensor input_grad;
+            input_grad.copy_size(ip_out);
+            fill_with_gassuan_random_numbers(input_grad, rnd);
+            resizable_tensor params_grad1, params_grad2, data_grad1, data_grad2;
+            params_grad1 = params_grad;
+            params_grad2 = params_grad;
+            // Now call backward() and make sure it works as well.
+            subnetwork2.get_gradient_input() = 9999;
+            impl::call_layer_backward(ll, ip_out, input_grad, subnetwork2, params_grad1);
+            data_grad1 = subnetwork2.get_gradient_input();
+
+            subnetwork2.get_gradient_input() = mat(input_grad);
+            impl::call_layer_backward(ll, ip_out, subnetwork2.get_gradient_input(), subnetwork2, params_grad2);
+            data_grad2 = subnetwork2.get_gradient_input();
+            if (params_grad.size() != 0)
+            {
+                const auto backward_param_error = max(abs(mat(params_grad1) - mat(params_grad2)));
+                if (backward_param_error > 0.00001)
+                {
+                    using namespace std;
+                    sout << "This layer is supposed to support in-place computations but the output of backward_inplace()\n";
+                    sout << "changes when invoked in-place vs. out-of-place. The error was: " << backward_param_error << endl;
+                    return layer_test_results(sout.str()); 
+                }
+            }
+            const auto backward_data_error = max(abs(mat(data_grad1) - mat(data_grad2)));
+            if (backward_data_error > 0.00001)
+            {
+                using namespace std;
+                sout << "This layer is supposed to support in-place computations but the output of backward_inplace()\n";
+                sout << "changes when invoked in-place vs. out-of-place. The error was: " << backward_data_error << endl;
+                return layer_test_results(sout.str()); 
+            }
+        }
 
         // ==================================================================
         // first validate the way the parameter gradients are computed
@@ -1622,9 +1988,10 @@ namespace dlib
                 eps = base_eps;
             const float oldval = l1.get_layer_params().host()[i];
             l1.get_layer_params().host()[i] = oldval+eps;
-            l1.forward(subnetwork, out2);
+            impl::call_layer_forward(l1, subnetwork, out2);
             l1.get_layer_params().host()[i] = oldval-eps;
-            l1.forward(subnetwork, out3);
+            impl::call_layer_forward(l1, subnetwork, out3);
+            l1.get_layer_params().host()[i] = oldval;
 
             // Compute a reference derivative via a central differences approximation and
             // compare it to the one output by the layer and make sure they match.
@@ -1635,8 +2002,8 @@ namespace dlib
             {
                 using namespace std;
                 sout << "Gradient error in parameter #" << i <<".  Relative error: "<< relative_error << endl;
-                sout << "expected derivative:   " << reference_derivative << endl;
-                sout << "output derivative: " << output_derivative << endl;
+                sout << "expected derivative: " << reference_derivative << endl;
+                sout << "output derivative:   " << output_derivative << endl;
                 return layer_test_results(sout.str()); 
             }
 
@@ -1651,21 +2018,24 @@ namespace dlib
             if (eps == 0)
                 eps = base_eps;
             subnetwork.get_output_element(i) = oldval+eps;
-            l.forward(subnetwork, out2);
+            impl::call_layer_forward(l, subnetwork, out2);
             subnetwork.get_output_element(i) = oldval-eps;
-            l.forward(subnetwork, out3);
+            impl::call_layer_forward(l, subnetwork, out3);
+            subnetwork.get_output_element(i) = oldval;
 
             // Compute a reference derivative via a central differences approximation and
             // compare it to the one output by the layer and make sure they match.
             double reference_derivative = (dot(out2,input_grad)-dot(out3, input_grad))/(2*eps);
-            double output_derivative = subnetwork.get_gradient_input_element(i)-initial_gradient_input[i];
+            double output_derivative = subnetwork.get_gradient_input_element(i);
+            if (!impl::is_inplace_layer(l,subnetwork))
+                output_derivative -= initial_gradient_input[i];
             double relative_error = (reference_derivative - output_derivative)/(reference_derivative + 1e-100);
             if (std::abs(relative_error) > 0.01)
             {
                 using namespace std;
                 sout << "Gradient error in data variable #" << i <<".  Relative error: "<< relative_error << endl;
-                sout << "expected derivative:   " << reference_derivative << endl;
-                sout << "output derivative: " << output_derivative << endl;
+                sout << "expected derivative: " << reference_derivative << endl;
+                sout << "output derivative:   " << output_derivative << endl;
                 return layer_test_results(sout.str()); 
             }
         }

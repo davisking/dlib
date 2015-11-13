@@ -91,12 +91,28 @@ namespace dlib
                 produces an output tensor.  You create an entire deep network by composing
                 these functions.  Importantly, you are able to use a wide range of
                 different functions to accommodate the task you are trying to accomplish.
-                Dlib includes a number of common layer types but if you want to define your
-                own then you simply implement a class with the same interface as
-                EXAMPLE_LAYER_.
+                Therefore, dlib includes a number of common layer types but if you want to
+                define your own then you simply implement a class with the same interface
+                as EXAMPLE_LAYER_.
 
                 Note that there is no dlib::EXAMPLE_LAYER_ type.  It is shown here purely
                 to document the interface that a layer object must implement.
+
+                The central work of defining a layer is implementing the forward and backward
+                methods.  When you do this you have three options:
+                    - Implement the forward() and backward() methods according to the
+                      specification shown below.  Do not implement forward_inplace() and
+                      backward_inplace().
+                    - Implement the forward() and backward() methods according to the
+                      specification shown below, except exclude the computed_output
+                      parameter from backward().  Doing this will allow dlib to make some
+                      layers execute in-place and therefore run a little faster and use
+                      less memory. Do not implement forward_inplace() and
+                      backward_inplace().
+                    - Implement the forward_inplace() and backward_inplace() methods
+                      according to the specification shown below.  Do not implement
+                      forward() and backward().  These in-place methods allow some types of
+                      layers to be implemented more efficiently.
         !*/
 
     public:
@@ -152,7 +168,7 @@ namespace dlib
         template <typename SUBNET>
         void forward(
             const SUBNET& sub, 
-            resizable_tensor& output
+            resizable_tensor& data_output
         );
         /*!
             requires
@@ -160,14 +176,14 @@ namespace dlib
                 - setup() has been called.
             ensures
                 - Runs the output of the subnetwork through this layer and stores the
-                  output into #output.  In particular, forward() can use any of the outputs
-                  in sub (e.g. sub.get_output(), sub.subnet().get_output(), etc.) to
-                  compute whatever it wants.
+                  results into #data_output.  In particular, forward() can use any of the
+                  outputs in sub (e.g. sub.get_output(), sub.subnet().get_output(), etc.)
+                  to compute whatever it wants.
         !*/
 
         template <typename SUBNET>
         void backward(
-            const tensor& computed_output,
+            const tensor& computed_output, // this parameter is optional
             const tensor& gradient_input, 
             SUBNET& sub, 
             tensor& params_grad
@@ -189,7 +205,7 @@ namespace dlib
                   These gradients are stored into #sub and #params_grad, respectively. To be
                   precise, the gradients are taken of a function f(sub,get_layer_params())
                   which is defined thusly:   
-                    - Recalling that computed_output is a function of sub and get_layer_params() 
+                    - Recalling that computed_output is a function of both sub and get_layer_params(), 
                       since it is the result of calling forward(sub,computed_output):
                       let f(sub,get_layer_params()) == dot(computed_output, gradient_input)
                   Then we define the following gradient vectors: 
@@ -205,6 +221,59 @@ namespace dlib
                     - params_grad = PARAMETER_GRADIENT 
                     - for all valid I:
                         - layer<I>(sub).get_gradient_input() += DATA_GRADIENT_I
+        !*/
+
+        void forward_inplace(
+            const tensor& data_input, 
+            tensor& data_output
+        );
+        /*!
+            requires
+                - have_same_dimensions(data_input,data_output) == true
+                - setup() has been called.
+            ensures
+                - Runs the data_input tensor though this layer and stores the output into
+                  #data_output.
+                - This function supports in-place operation, i.e. having
+                  is_same_object(data_input, data_output)==true
+        !*/
+
+        void backward_inplace(
+            const tensor& computed_output,
+            const tensor& gradient_input,
+            tensor& data_grad,
+            tensor& params_grad
+        );
+        /*!
+            requires
+                - setup() has been called.
+                - computed_output is the tensor resulting from the most recent call to
+                  forward_inplace().  This means that backward_inplace() is allowed to
+                  cache intermediate results computed during forward_inplace() and use them
+                  for the backward computation.
+                - have_same_dimensions(gradient_input, data_grad) == true
+                - have_same_dimensions(gradient_input, computed_output) == true
+                - have_same_dimensions(params_grad, get_layer_params()) == true
+            ensures
+                - This function supports in-place operation, i.e. having
+                  is_same_object(gradient_input, data_grad)==true
+                - This function outputs the gradients of this layer with respect to the
+                  input data from a sublayer and also with respect to this layer's parameters.
+                  These gradients are stored into #data_grad and #params_grad, respectively. To be
+                  precise, the gradients are taken of a function f(data_input,get_layer_params())
+                  which is defined thusly:   
+                    - Recalling that computed_output is a function of both the input to
+                      forward_inplace() and get_layer_params(), since it is the result of
+                      calling forward_inplace(data_input,computed_output):
+                      let f(data_input,get_layer_params()) == dot(computed_output, gradient_input)
+                  Then we define the following gradient vectors: 
+                    - PARAMETER_GRADIENT == gradient of f(data_input,get_layer_params()) with
+                      respect to get_layer_params(). 
+                    - DATA_GRADIENT == gradient of f(data_input,get_layer_params()) with respect
+                      to data_input. 
+                  Finally, backward_inplace() outputs these gradients by performing:
+                    - params_grad = PARAMETER_GRADIENT 
+                    - data_grad = DATA_GRADIENT
         !*/
 
         const tensor& get_layer_params(
@@ -277,7 +346,7 @@ namespace dlib
 
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
-        template <typename SUBNET> void backward(const tensor& computed_output, const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -313,8 +382,8 @@ namespace dlib
         );
 
         template <typename SUBNET> void setup (const SUBNET& sub);
-        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
-        template <typename SUBNET> void backward(const tensor& computed_output, const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        void forward_inplace(const tensor& input, tensor& output);
+        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!

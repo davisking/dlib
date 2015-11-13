@@ -389,6 +389,7 @@ namespace dlib
             ensures
                 - Back propagates the error gradient, get_gradient_input(), through this
                   network and uses the provided solvers to update the network parameters.
+                - All elements of #get_gradient_input() are set to 0. 
         !*/
 
         void clean(
