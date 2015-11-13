@@ -22,7 +22,6 @@ namespace dlib
     {
         if (have_active_transfer)
         {
-            std::cout << "wait for cudaStreamSynchronize()" << std::endl;
             CHECK_CUDA(cudaStreamSynchronize((cudaStream_t)cuda_stream.get()));
             have_active_transfer = false;
             // Check for errors.  These calls to cudaGetLastError() are what help us find
@@ -46,7 +45,6 @@ namespace dlib
         if (!host_current)
         {
             wait_for_transfer_to_finish();
-            std::cout << "cudaMemcpy to host" << std::endl;
             CHECK_CUDA(cudaMemcpy(data_host.get(), data_device.get(), data_size*sizeof(float), cudaMemcpyDeviceToHost));
             host_current = true;
             // Check for errors.  These calls to cudaGetLastError() are what help us find
@@ -60,7 +58,6 @@ namespace dlib
     {
         if (!device_current)
         {
-            std::cout << "cudaMemcpyAsync to device" << std::endl;
             CHECK_CUDA(cudaMemcpyAsync(data_device.get(), data_host.get(), data_size*sizeof(float), cudaMemcpyHostToDevice, (cudaStream_t)cuda_stream.get()));
             have_active_transfer = true;
             device_current = true;
