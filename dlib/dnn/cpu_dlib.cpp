@@ -87,7 +87,7 @@ namespace dlib
         void batch_normalize (
             resizable_tensor& dest,
             resizable_tensor& means,
-            resizable_tensor& vars,
+            resizable_tensor& invstds,
             const tensor& src,
             const tensor& gamma, 
             const tensor& beta 
@@ -115,12 +115,12 @@ namespace dlib
 
             dest.copy_size(src);
             means.set_size(1, src.k(), src.nr(), src.nc());
-            vars.set_size(1, src.k(), src.nr(), src.nc());
+            invstds.set_size(1, src.k(), src.nr(), src.nc());
 
-            // first compute means and vars
+            // first compute means and invstds
             means = 0;
-            vars = 0;
-            const auto p_vars = vars.host();
+            invstds = 0;
+            const auto p_invstds = invstds.host();
             const auto p_means = means.host();
             auto p_src = src.host();
             const long num = src.k()*src.nr()*src.nc();
@@ -131,23 +131,23 @@ namespace dlib
                 {
                     float val = p_src[n*num+i];
                     p_means[i] += val;
-                    p_vars[i] += val*val;
+                    p_invstds[i] += val*val;
                 }
             }
             means /= src.num_samples();
-            vars /= src.num_samples();
+            invstds /= src.num_samples();
             // copy data back to host
-            vars.host(); means.host();
+            invstds.host(); means.host();
 
+            const float eps = 0.00001;
             p_src = src.host();
             // compute variances 
             for (long i = 0; i < num; ++i)
             {
-                p_vars[i] = p_vars[i] - p_means[i]*p_means[i];
+                auto actual_var = p_invstds[i] - p_means[i]*p_means[i];
+                p_invstds[i] = 1.0/std::sqrt(actual_var+eps);
             }
 
-            // TODO, must match eps in batch_normalize_gradient() so make this a shared variable.
-            const float eps = 0.00001;
             p_src = src.host();
             auto p_dest = dest.host();
             const auto p_gamma = gamma.host();   
@@ -156,7 +156,7 @@ namespace dlib
             {
                 for (long i = 0; i < num; ++i)
                 {
-                    *p_dest = (*p_src - p_means[i])/std::sqrt(p_vars[i] + eps);
+                    *p_dest = (*p_src - p_means[i])*p_invstds[i];
                     *p_dest = (*p_dest)*p_gamma[i] + p_beta[i];
                     ++p_src;
                     ++p_dest;
@@ -167,7 +167,7 @@ namespace dlib
         void batch_normalize_gradient (
             const tensor& gradient_input,
             const tensor& means,
-            const tensor& vars,
+            const tensor& invstds,
             const tensor& src,
             const tensor& gamma,
             tensor& src_grad,
@@ -175,11 +175,10 @@ namespace dlib
             tensor& beta_grad 
         )
         {
-            const float eps = 0.00001;
 
             const long num = src.k()*src.nr()*src.nc();
             DLIB_CASSERT(num == means.size(),"");
-            DLIB_CASSERT(num == vars.size(),"");
+            DLIB_CASSERT(num == invstds.size(),"");
             DLIB_CASSERT(num == gamma.size(),"");
             DLIB_CASSERT(num == gamma_grad.size(),"");
             DLIB_CASSERT(num == beta_grad.size(),"");
@@ -190,11 +189,11 @@ namespace dlib
             const auto p_gamma = gamma.host();   
             const auto p_gamma_grad = gamma_grad.host();   
             const auto p_beta_grad = beta_grad.host();   
-            const auto p_vars = vars.host();
+            const auto p_invstds = invstds.host();
             const auto p_means = means.host();
 
             resizable_tensor dvars, dmeans;
-            dvars.copy_size(vars);
+            dvars.copy_size(invstds);
             dmeans.copy_size(means);
             dvars = 0;
             dmeans = 0;
@@ -205,13 +204,13 @@ namespace dlib
             {
                 for (long i = 0; i < num; ++i)
                 {
-                    const float x_hat = (*p_src - p_means[i])/std::sqrt(p_vars[i] + eps);
+                    const float x_hat = (*p_src - p_means[i])*p_invstds[i];
                     p_beta_grad[i] += *p_grad;
                     p_gamma_grad[i] += (*p_grad)*x_hat;
 
                     const float dx = *p_grad * p_gamma[i];
 
-                    p_dvars[i] += dx*(*p_src - p_means[i])* -0.5*std::pow(p_vars[i]+eps, -3.0f/2);
+                    p_dvars[i] += dx*(*p_src - p_means[i])* -0.5*std::pow(p_invstds[i], 3.0f);
 
                     ++p_grad;
                     ++p_src;
@@ -226,7 +225,7 @@ namespace dlib
                 {
                     const float dx = *p_grad * p_gamma[i];
 
-                    p_dmeans[i] += dx*-1/std::sqrt(p_vars[i] + eps) + p_dvars[i] * -2*(*p_src - p_means[i])/src.num_samples();
+                    p_dmeans[i] += dx*-p_invstds[i] + p_dvars[i] * -2*(*p_src - p_means[i])/src.num_samples();
 
                     ++p_grad;
                     ++p_src;
@@ -241,7 +240,7 @@ namespace dlib
                 {
                     const float dx = *p_grad * p_gamma[i];
 
-                    *p_src_grad += dx/std::sqrt(p_vars[i] + eps) + 
+                    *p_src_grad += dx*p_invstds[i] + 
                         p_dvars[i] *2*(*p_src - p_means[i])/src.num_samples() + 
                         p_dmeans[i]/src.num_samples();
 
@@ -258,7 +257,7 @@ namespace dlib
         void batch_normalize_conv (
             resizable_tensor& dest,
             resizable_tensor& means,
-            resizable_tensor& vars,
+            resizable_tensor& invstds,
             const tensor& src,
             const tensor& gamma, 
             const tensor& beta 
@@ -288,12 +287,12 @@ namespace dlib
 
             dest.copy_size(src);
             means.set_size(1, src.k());
-            vars.set_size(1, src.k());
+            invstds.set_size(1, src.k());
 
-            // first compute means and vars
+            // first compute means and invstds
             means = 0;
-            vars = 0;
-            const auto p_vars = vars.host();
+            invstds = 0;
+            const auto p_invstds = invstds.host();
             const auto p_means = means.host();
             const auto p_gamma = gamma.host();   
             const auto p_beta = beta.host();   
@@ -307,25 +306,25 @@ namespace dlib
                     for (long i = 0; i < num; ++i)
                     {
                         p_means[k] += *p_src;
-                        p_vars[k] += (*p_src)*(*p_src);
+                        p_invstds[k] += (*p_src)*(*p_src);
                         ++p_src;
                     }
                 }
             }
             means /= src.num_samples()*num;
-            vars /= src.num_samples()*num;
+            invstds /= src.num_samples()*num;
             // copy data back to host
-            vars.host(); means.host();
+            invstds.host(); means.host();
 
+            const float eps = 0.00001;
             p_src = src.host();
             // compute variances 
             for (long k = 0; k < src.k(); ++k)
             {
-                p_vars[k] = p_vars[k] - p_means[k]*p_means[k];
+                auto actual_var = p_invstds[k] - p_means[k]*p_means[k];
+                p_invstds[k] = 1.0/std::sqrt(actual_var + eps);
             }
 
-            // TODO, must match eps in batch_normalize_gradient() so make this a shared variable.
-            const float eps = 0.00001;
             p_src = src.host();
             auto p_dest = dest.host();
             for (long n = 0; n < src.num_samples(); ++n)
@@ -334,7 +333,7 @@ namespace dlib
                 {
                     for (long i = 0; i < num; ++i)
                     {
-                        *p_dest = (*p_src - p_means[k])/std::sqrt(p_vars[k] + eps);
+                        *p_dest = (*p_src - p_means[k])*p_invstds[k];
                         *p_dest = (*p_dest)*p_gamma[k] + p_beta[k];
                         ++p_src;
                         ++p_dest;
@@ -346,7 +345,7 @@ namespace dlib
         void batch_normalize_conv_gradient (
             const tensor& gradient_input,
             const tensor& means,
-            const tensor& vars,
+            const tensor& invstds,
             const tensor& src,
             const tensor& gamma,
             tensor& src_grad,
@@ -354,11 +353,10 @@ namespace dlib
             tensor& beta_grad 
         )
         {
-            const float eps = 0.00001;
 
             const long num = src.nr()*src.nc();
             DLIB_CASSERT(src.k() == means.size(),"");
-            DLIB_CASSERT(src.k() == vars.size(),"");
+            DLIB_CASSERT(src.k() == invstds.size(),"");
             DLIB_CASSERT(src.k() == gamma.size(),"");
             DLIB_CASSERT(src.k() == gamma_grad.size(),"");
             DLIB_CASSERT(src.k() == beta_grad.size(),"");
@@ -369,11 +367,11 @@ namespace dlib
             const auto p_gamma = gamma.host();   
             const auto p_gamma_grad = gamma_grad.host();   
             const auto p_beta_grad = beta_grad.host();   
-            const auto p_vars = vars.host();
+            const auto p_invstds = invstds.host();
             const auto p_means = means.host();
 
             resizable_tensor dvars, dmeans;
-            dvars.copy_size(vars);
+            dvars.copy_size(invstds);
             dmeans.copy_size(means);
             dvars = 0;
             dmeans = 0;
@@ -386,13 +384,13 @@ namespace dlib
                 {
                     for (long i = 0; i < num; ++i)
                     {
-                        const float x_hat = (*p_src - p_means[k])/std::sqrt(p_vars[k] + eps);
+                        const float x_hat = (*p_src - p_means[k])*p_invstds[k];
                         p_beta_grad[k] += *p_grad;
                         p_gamma_grad[k] += (*p_grad)*x_hat;
 
                         const float dx = *p_grad * p_gamma[k];
 
-                        p_dvars[k] += dx*(*p_src - p_means[k])* -0.5*std::pow(p_vars[k]+eps, -3.0f/2);
+                        p_dvars[k] += dx*(*p_src - p_means[k])* -0.5*std::pow(p_invstds[k], 3.0f);
 
                         ++p_grad;
                         ++p_src;
@@ -410,7 +408,7 @@ namespace dlib
                     {
                         const float dx = *p_grad * p_gamma[k];
 
-                        p_dmeans[k] += dx*-1/std::sqrt(p_vars[k] + eps) + p_dvars[k] * -2*(*p_src - p_means[k])/src.num_samples()/num;
+                        p_dmeans[k] += -dx*p_invstds[k] + p_dvars[k] * -2*(*p_src - p_means[k])/src.num_samples()/num;
 
                         ++p_grad;
                         ++p_src;
@@ -428,7 +426,7 @@ namespace dlib
                     {
                         const float dx = *p_grad * p_gamma[k];
 
-                        *p_src_grad += dx/std::sqrt(p_vars[k] + eps) + 
+                        *p_src_grad += dx*p_invstds[k] + 
                             p_dvars[k] *2*(*p_src - p_means[k])/src.num_samples()/num + 
                             p_dmeans[k]/src.num_samples()/num;
 

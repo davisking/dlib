@@ -150,7 +150,7 @@ namespace dlib { namespace tt
     void batch_normalize (
         resizable_tensor& dest,
         resizable_tensor& means,
-        resizable_tensor& vars,
+        resizable_tensor& invstds,
         const tensor& src,
         const tensor& gamma, 
         const tensor& beta 
@@ -166,13 +166,13 @@ namespace dlib { namespace tt
         ensures
             - have_same_dimensions(#dest, src) == true
             - #means.num_samples() == 1
-            - #vars.num_samples() == 1
-            - means.nr() == vars.nr() == src.nr()
-            - means.nc() == vars.nc() == src.nc()
-            - means.k()  == vars.k()  == src.k()
+            - #invstds.num_samples() == 1
+            - means.nr() == invstds.nr() == src.nr()
+            - means.nc() == invstds.nc() == src.nc()
+            - means.k()  == invstds.k()  == src.k()
             - #src == the batch normalized version of src.
             - #means == the mean values of the contents of src.
-            - #vars == the variance values of the contents of src.
+            - #invstds == 1/(the standard deviation values of the contents of src).
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -180,7 +180,7 @@ namespace dlib { namespace tt
     void batch_normalize_gradient (
         const tensor& gradient_input,
         const tensor& means,
-        const tensor& vars,
+        const tensor& invstds,
         const tensor& src,
         const tensor& gamma,
         tensor& src_grad,
@@ -189,8 +189,8 @@ namespace dlib { namespace tt
     );
     /*!
         requires
-            - vars and means should be the output of a call to
-              batch_normalize(dest,means,vars,src,gamma,beta)
+            - invstds and means should be the output of a call to
+              batch_normalize(dest,means,invstds,src,gamma,beta)
             - have_same_dimensions(gradient_input, src) == true
             - have_same_dimensions(src, src_grad) == true
             - src.num_samples() > 1
@@ -201,10 +201,10 @@ namespace dlib { namespace tt
             - gamma.nc() == src.nc()
             - gamma.k()  == src.k()
             - have_same_dimensions(means, gamma) == true
-            - have_same_dimensions(vars, gamma) == true
+            - have_same_dimensions(invstds, gamma) == true
         ensures
             - Let f(src,gamma,beta) == dot(gradient_input, dest output of
-              batch_normalize(dest,means,vars,src,gamma,beta))
+              batch_normalize(dest,means,invstds,src,gamma,beta))
             - Adds the gradient of f() with respect to src to #src_grad.
             - Adds the gradient of f() with respect to gamma to #gamma_grad.
             - Adds the gradient of f() with respect to beta to #beta_grad.
@@ -213,7 +213,7 @@ namespace dlib { namespace tt
     void batch_normalize_conv (
         resizable_tensor& dest,
         resizable_tensor& means,
-        resizable_tensor& vars,
+        resizable_tensor& invstds,
         const tensor& src,
         const tensor& gamma, 
         const tensor& beta 
@@ -227,17 +227,17 @@ namespace dlib { namespace tt
         ensures
             - have_same_dimensions(#dest, src) == true
             - #means.num_samples()==means.nr()==means.nc() == 1
-            - #vars.num_samples() ==vars.nr() ==vars.nc() == 1
-            - means.k()  == vars.k()  == src.k()
+            - #invstds.num_samples() ==invstds.nr() ==invstds.nc() == 1
+            - means.k()  == invstds.k()  == src.k()
             - #src == the batch normalized version of src.
             - #means == the mean values of the contents of src.
-            - #vars == the variance values of the contents of src.
+            - #invstds == 1/(the standard deviation values of the contents of src).
     !*/
 
     void batch_normalize_conv_gradient (
         const tensor& gradient_input,
         const tensor& means,
-        const tensor& vars,
+        const tensor& invstds,
         const tensor& src,
         const tensor& gamma,
         tensor& src_grad,
@@ -246,8 +246,8 @@ namespace dlib { namespace tt
     );
     /*!
         requires
-            - vars and means should be the output of a call to
-              batch_normalize_conv(dest,means,vars,src,gamma,beta)
+            - invstds and means should be the output of a call to
+              batch_normalize_conv(dest,means,invstds,src,gamma,beta)
             - have_same_dimensions(gradient_input, src) == true
             - have_same_dimensions(src, src_grad) == true
             - src.num_samples() > 1
@@ -256,10 +256,10 @@ namespace dlib { namespace tt
             - have_same_dimensions(gamma, beta_grad) == true
             - gamma.k()  == src.k()
             - have_same_dimensions(means, gamma) == true
-            - have_same_dimensions(vars, gamma) == true
+            - have_same_dimensions(invstds, gamma) == true
         ensures
             - Let f(src,gamma,beta) == dot(gradient_input, dest output of
-              batch_normalize_conv(dest,means,vars,src,gamma,beta))
+              batch_normalize_conv(dest,means,invstds,src,gamma,beta))
             - Adds the gradient of f() with respect to src to #src_grad.
             - Adds the gradient of f() with respect to gamma to #gamma_grad.
             - Adds the gradient of f() with respect to beta to #beta_grad.

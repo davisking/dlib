@@ -43,7 +43,7 @@ namespace dlib
         void batch_normalize (
             resizable_tensor& dest,
             resizable_tensor& means,
-            resizable_tensor& vars,
+            resizable_tensor& invstds,
             const tensor& src,
             const tensor& gamma, 
             const tensor& beta 
@@ -52,7 +52,7 @@ namespace dlib
         void batch_normalize_gradient (
             const tensor& gradient_input,
             const tensor& means,
-            const tensor& vars,
+            const tensor& invstds,
             const tensor& src,
             const tensor& gamma,
             tensor& src_grad,
@@ -63,7 +63,7 @@ namespace dlib
         void batch_normalize_conv (
             resizable_tensor& dest,
             resizable_tensor& means,
-            resizable_tensor& vars,
+            resizable_tensor& invstds,
             const tensor& src,
             const tensor& gamma, 
             const tensor& beta 
@@ -72,7 +72,7 @@ namespace dlib
         void batch_normalize_conv_gradient (
             const tensor& gradient_input,
             const tensor& means,
-            const tensor& vars,
+            const tensor& invstds,
             const tensor& src,
             const tensor& gamma,
             tensor& src_grad,
