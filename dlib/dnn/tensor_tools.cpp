@@ -27,9 +27,9 @@ namespace dlib { namespace tt
 #else
         if (trans_lhs && trans_rhs)
             dest = alpha*trans(mat(lhs))*trans(mat(rhs)) + beta*mat(dest);
-        if (!trans_lhs && trans_rhs)
+        else if (!trans_lhs && trans_rhs)
             dest = alpha*mat(lhs)*trans(mat(rhs)) + beta*mat(dest);
-        if (trans_lhs && !trans_rhs)
+        else if (trans_lhs && !trans_rhs)
             dest = alpha*trans(mat(lhs))*mat(rhs) + beta*mat(dest);
         else
             dest = alpha*mat(lhs)*mat(rhs) + beta*mat(dest);
@@ -407,15 +407,14 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void softmax (
-        resizable_tensor& dest,
+        tensor& dest,
         const tensor& src
     )
     {
 #ifdef DLIB_USE_CUDA
         cuda::softmax(dest,src);
 #else
-        // TODO
-        DLIB_CASSERT(false,"");
+        cpu::softmax(dest,src);
 #endif
     }
 
@@ -428,23 +427,21 @@ namespace dlib { namespace tt
 #ifdef DLIB_USE_CUDA
         cuda::softmax_gradient(grad, dest, gradient_input);
 #else
-        // TODO
-        DLIB_CASSERT(false,"");
+        cpu::softmax_gradient(grad, dest, gradient_input);
 #endif
     }
 
 // ----------------------------------------------------------------------------------------
 
     void sigmoid (
-        resizable_tensor& dest,
+        tensor& dest,
         const tensor& src
     )
     {
 #ifdef DLIB_USE_CUDA
         cuda::sigmoid(dest,src);
 #else
-        // TODO
-        DLIB_CASSERT(false,"");
+        cpu::sigmoid(dest,src);
 #endif
     }
 
@@ -457,23 +454,21 @@ namespace dlib { namespace tt
 #ifdef DLIB_USE_CUDA
         cuda::sigmoid_gradient(grad, dest, gradient_input);
 #else
-        // TODO
-        DLIB_CASSERT(false,"");
+        cpu::sigmoid_gradient(grad, dest, gradient_input);
 #endif
     }
 
 // ----------------------------------------------------------------------------------------
 
     void relu (
-        resizable_tensor& dest,
+        tensor& dest,
         const tensor& src
     )
     {
 #ifdef DLIB_USE_CUDA
         cuda::relu(dest,src);
 #else
-        // TODO
-        DLIB_CASSERT(false,"");
+        cpu::relu(dest,src);
 #endif
     }
 
@@ -486,23 +481,21 @@ namespace dlib { namespace tt
 #ifdef DLIB_USE_CUDA
         cuda::relu_gradient(grad, dest, gradient_input);
 #else
-        // TODO
-        DLIB_CASSERT(false,"");
+        cpu::relu_gradient(grad, dest, gradient_input);
 #endif
     }
 
 // ----------------------------------------------------------------------------------------
 
     void tanh (
-        resizable_tensor& dest,
+        tensor& dest,
         const tensor& src
     )
     {
 #ifdef DLIB_USE_CUDA
         cuda::tanh(dest,src);
 #else
-        // TODO
-        DLIB_CASSERT(false,"");
+        cpu::tanh(dest,src);
 #endif
     }
 
@@ -515,8 +508,7 @@ namespace dlib { namespace tt
 #ifdef DLIB_USE_CUDA
         cuda::tanh_gradient(grad, dest, gradient_input);
 #else
-        // TODO
-        DLIB_CASSERT(false,"");
+        cpu::tanh_gradient(grad, dest, gradient_input);
 #endif
     }
 

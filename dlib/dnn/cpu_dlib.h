@@ -4,6 +4,7 @@
 #define DLIB_DNN_CPU_H_
 
 // This file contains CPU implementations of the GPU based functions in cuda_dlib.h
+// and cudnn_dlibapi.h
 
 #include "tensor.h"
 
@@ -84,6 +85,58 @@ namespace dlib
         void threshold (
             tensor& data,
             float thresh
+        );
+
+    // -----------------------------------------------------------------------------------
+
+        void softmax (
+            tensor& dest,
+            const tensor& src
+        );
+
+        void softmax_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input
+        );
+
+    // ------------------------------------------------------------------------------------
+
+        void sigmoid (
+            tensor& dest,
+            const tensor& src
+        );
+
+        void sigmoid_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input
+        );
+
+    // ------------------------------------------------------------------------------------
+
+        void relu (
+            tensor& dest,
+            const tensor& src
+        );
+
+        void relu_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input
+        );
+
+    // ------------------------------------------------------------------------------------
+
+        void tanh (
+            tensor& dest,
+            const tensor& src
+        );
+
+        void tanh_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input
         );
 
     // -----------------------------------------------------------------------------------

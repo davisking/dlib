@@ -499,12 +499,13 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void softmax (
-        resizable_tensor& dest,
+        tensor& dest,
         const tensor& src
     );
     /*!
+        requires
+            - have_same_dimensions(dest, src) == true
         ensures
-            - have_same_dimensions(#dest, src) == true
             - Note that the softmax function is a vector valued function: 
                 s(x) == exp(x)/sum(exp(x)) 
             - Computes the softmax function on src and writes the results to dest.  The
@@ -538,12 +539,13 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void sigmoid (
-        resizable_tensor& dest,
+        tensor& dest,
         const tensor& src
     );
     /*!
+        requires
+            - have_same_dimensions(dest, src) == true
         ensures
-            - have_same_dimensions(#dest, src) == true
             - for all valid i:
                 - #dest.host()[i] == 1/(1+std::exp(-src.host()[i])) 
             - This function supports in-place operation, i.e. having
@@ -572,12 +574,13 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void relu (
-        resizable_tensor& dest,
+        tensor& dest,
         const tensor& src
     );
     /*!
+        requires
+            - have_same_dimensions(dest, src) == true
         ensures
-            - have_same_dimensions(#dest, src) == true
             - for all valid i:
                 - #dest.host()[i] == std::max(0,src.host()[i]) 
             - This function supports in-place operation, i.e. having
@@ -606,12 +609,13 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void tanh (
-        resizable_tensor& dest,
+        tensor& dest,
         const tensor& src
     );
     /*!
+        requires
+            - have_same_dimensions(dest, src) == true
         ensures
-            - have_same_dimensions(#dest, src) == true
             - for all valid i:
                 - #dest.host()[i] == std::tanh(src.host()[i]) 
             - This function supports in-place operation, i.e. having

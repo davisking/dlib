@@ -614,11 +614,11 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         void softmax (
-            resizable_tensor& dest,
+            tensor& dest,
             const tensor& src
         )
         {
-            dest.copy_size(src);
+            DLIB_CASSERT(have_same_dimensions(dest,src),"");
             if (src.size() == 0)
                 return;
 
@@ -668,11 +668,11 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         void sigmoid (
-            resizable_tensor& dest,
+            tensor& dest,
             const tensor& src
         )
         {
-            dest.copy_size(src);
+            DLIB_CASSERT(have_same_dimensions(dest,src),"");
             if (src.size() == 0)
                 return;
 
@@ -719,11 +719,11 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         void relu (
-            resizable_tensor& dest,
+            tensor& dest,
             const tensor& src
         )
         {
-            dest.copy_size(src);
+            DLIB_CASSERT(have_same_dimensions(dest,src),"");
             if (src.size() == 0)
                 return;
 
@@ -770,11 +770,11 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         void tanh (
-            resizable_tensor& dest,
+            tensor& dest,
             const tensor& src
         )
         {
-            dest.copy_size(src);
+            DLIB_CASSERT(have_same_dimensions(dest,src),"");
             if (src.size() == 0)
                 return;
 

@@ -454,7 +454,99 @@ namespace dlib
         }
 
     // -----------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------
 
+        void softmax (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            // TODO
+            DLIB_CASSERT(false,"");
+        }
+
+        void softmax_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input
+        )
+        {
+            // TODO
+            DLIB_CASSERT(false,"");
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void sigmoid (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            // TODO
+            DLIB_CASSERT(false,"");
+        }
+
+        void sigmoid_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input
+        )
+        {
+            // TODO
+            DLIB_CASSERT(false,"");
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void relu (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            dest = lowerbound(mat(src), 0);
+        }
+
+        void relu_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input
+        )
+        {
+            const float* gi = gradient_input.host();
+            const float* in = dest.host();
+            float* out = grad.host();
+            for (size_t i = 0; i < dest.size(); ++i)
+            {
+                if (in[i] > 0)
+                    out[i] = gi[i];
+                else
+                    out[i] = 0;
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void tanh (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            // TODO
+            DLIB_CASSERT(false,"");
+        }
+
+        void tanh_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input
+        )
+        {
+            // TODO
+            DLIB_CASSERT(false,"");
+        }
+
+    // ------------------------------------------------------------------------------------
 
     } 
 }

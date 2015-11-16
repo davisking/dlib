@@ -10,6 +10,7 @@
 #include <string>
 #include "../rand.h"
 #include "../string.h"
+#include "tensor_tools.h"
 
 
 namespace dlib
@@ -85,17 +86,17 @@ namespace dlib
         {
             output.set_size(sub.get_output().num_samples(), num_outputs);
 
-            output = mat(sub.get_output())*mat(params);
+            tt::gemm(0,output, 1,sub.get_output(),false, params,false);
         } 
 
         template <typename SUBNET>
         void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
         {
             // compute the gradient of the parameters.  
-            params_grad = trans(mat(sub.get_output()))*mat(gradient_input);
+            tt::gemm(0,params_grad, 1,sub.get_output(),true, gradient_input,false);
 
             // compute the gradient for the data
-            sub.get_gradient_input() += mat(gradient_input)*trans(mat(params));
+            tt::gemm(1,sub.get_gradient_input(), 1,gradient_input,false, params,true);
         }
 
         const tensor& get_layer_params() const { return params; }
@@ -147,27 +148,17 @@ namespace dlib
 
         void forward_inplace(const tensor& input, tensor& output)
         {
-            output = lowerbound(mat(input), 0);
+            tt::relu(output, input);
         } 
 
         void backward_inplace(
             const tensor& computed_output,
             const tensor& gradient_input, 
             tensor& data_grad, 
-            tensor& params_grad
+            tensor& 
         )
         {
-            const float* grad = gradient_input.host();
-            const float* in = computed_output.host();
-            float* out = data_grad.host();
-            for (unsigned long i = 0; i < computed_output.size(); ++i)
-            {
-                if (in[i] > 0)
-                    out[i] = grad[i];
-                else
-                    out[i] = 0;
-            }
-
+            tt::relu_gradient(data_grad, computed_output, gradient_input);
         }
 
         const tensor& get_layer_params() const { return params; }
