@@ -4,8 +4,6 @@
 #define DLIB_TeNSOR_TOOLS_CPP_
 
 #include "tensor_tools.h"
-#include "cpu_dlib.h"
-#include "cuda_dlib.h"
 
 namespace dlib { namespace tt
 {
@@ -145,30 +143,6 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
-    void batch_normalize_gradient (
-        const tensor& gradient_input,
-        const tensor& means,
-        const tensor& vars,
-        const tensor& src,
-        const tensor& gamma,
-        tensor& src_grad,
-        tensor& gamma_grad, 
-        tensor& beta_grad 
-    )
-    {
-#ifdef DLIB_USE_CUDA
-        /*
-        cuda::batch_normalize_gradient(gradient_input,means,vars,src,gamma,
-                                       src_grad,gamma_grad,beta_grad);
-        */
-#else
-        cpu::batch_normalize_gradient(gradient_input,means,vars,src,gamma,
-                                       src_grad,gamma_grad,beta_grad);
-#endif
-    }
-
-// ----------------------------------------------------------------------------------------
-
     void batch_normalize_conv (
         resizable_tensor& dest,
         resizable_tensor& means,
@@ -182,30 +156,6 @@ namespace dlib { namespace tt
         //cuda::batch_normalize_conv(dest,means,vars,src,gamma,beta);
 #else
         cpu::batch_normalize_conv(dest,means,vars,src,gamma,beta);
-#endif
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    void batch_normalize_conv_gradient (
-        const tensor& gradient_input,
-        const tensor& means,
-        const tensor& vars,
-        const tensor& src,
-        const tensor& gamma,
-        tensor& src_grad,
-        tensor& gamma_grad, 
-        tensor& beta_grad 
-    )
-    {
-#ifdef DLIB_USE_CUDA
-        /*
-        cuda::batch_normalize_conv_gradient(gradient_input,means,vars,src,gamma,
-                                       src_grad,gamma_grad,beta_grad);
-        */
-#else
-        cpu::batch_normalize_conv_gradient(gradient_input,means,vars,src,gamma,
-                                       src_grad,gamma_grad,beta_grad);
 #endif
     }
 

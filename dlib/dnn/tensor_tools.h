@@ -7,6 +7,8 @@
 #include "cudnn_dlibapi.h"
 #include "cublas_dlibapi.h"
 #include "curand_dlibapi.h"
+#include "cpu_dlib.h"
+#include "cuda_dlib.h"
 #include "../rand.h"
 
 namespace dlib { namespace tt
@@ -175,40 +177,50 @@ namespace dlib { namespace tt
             - #invstds == 1/(the standard deviation values of the contents of src).
     !*/
 
-// ----------------------------------------------------------------------------------------
+    class batch_normalize_gradient
+    {
+    public:
+        void operator() (
+            const tensor& gradient_input,
+            const tensor& means,
+            const tensor& invstds,
+            const tensor& src,
+            const tensor& gamma,
+            tensor& src_grad,
+            tensor& gamma_grad, 
+            tensor& beta_grad 
+        ){impl(gradient_input,means,invstds,src,gamma,src_grad,gamma_grad,beta_grad);}
+        /*!
+            requires
+                - invstds and means should be the output of a call to
+                  batch_normalize(dest,means,invstds,src,gamma,beta)
+                - have_same_dimensions(gradient_input, src) == true
+                - have_same_dimensions(src, src_grad) == true
+                - src.num_samples() > 1
+                - gamma.num_samples() == 1
+                - have_same_dimensions(gamma, gamma_grad) == true
+                - have_same_dimensions(gamma, beta_grad) == true
+                - gamma.nr() == src.nr()
+                - gamma.nc() == src.nc()
+                - gamma.k()  == src.k()
+                - have_same_dimensions(means, gamma) == true
+                - have_same_dimensions(invstds, gamma) == true
+            ensures
+                - Let f(src,gamma,beta) == dot(gradient_input, dest output of
+                  batch_normalize(dest,means,invstds,src,gamma,beta))
+                - Adds the gradient of f() with respect to src to #src_grad.
+                - Adds the gradient of f() with respect to gamma to #gamma_grad.
+                - Adds the gradient of f() with respect to beta to #beta_grad.
+        !*/
+    private:
+#ifdef DLIB_USE_CUDA
+        cuda::batch_normalize_conv_gradient impl;
+#else
+        cpu::batch_normalize_conv_gradient impl;
+#endif
+    };
 
-    void batch_normalize_gradient (
-        const tensor& gradient_input,
-        const tensor& means,
-        const tensor& invstds,
-        const tensor& src,
-        const tensor& gamma,
-        tensor& src_grad,
-        tensor& gamma_grad, 
-        tensor& beta_grad 
-    );
-    /*!
-        requires
-            - invstds and means should be the output of a call to
-              batch_normalize(dest,means,invstds,src,gamma,beta)
-            - have_same_dimensions(gradient_input, src) == true
-            - have_same_dimensions(src, src_grad) == true
-            - src.num_samples() > 1
-            - gamma.num_samples() == 1
-            - have_same_dimensions(gamma, gamma_grad) == true
-            - have_same_dimensions(gamma, beta_grad) == true
-            - gamma.nr() == src.nr()
-            - gamma.nc() == src.nc()
-            - gamma.k()  == src.k()
-            - have_same_dimensions(means, gamma) == true
-            - have_same_dimensions(invstds, gamma) == true
-        ensures
-            - Let f(src,gamma,beta) == dot(gradient_input, dest output of
-              batch_normalize(dest,means,invstds,src,gamma,beta))
-            - Adds the gradient of f() with respect to src to #src_grad.
-            - Adds the gradient of f() with respect to gamma to #gamma_grad.
-            - Adds the gradient of f() with respect to beta to #beta_grad.
-    !*/
+// ----------------------------------------------------------------------------------------
 
     void batch_normalize_conv (
         resizable_tensor& dest,
@@ -234,38 +246,48 @@ namespace dlib { namespace tt
             - #invstds == 1/(the standard deviation values of the contents of src).
     !*/
 
-    void batch_normalize_conv_gradient (
-        const tensor& gradient_input,
-        const tensor& means,
-        const tensor& invstds,
-        const tensor& src,
-        const tensor& gamma,
-        tensor& src_grad,
-        tensor& gamma_grad, 
-        tensor& beta_grad 
-    );
-    /*!
-        requires
-            - invstds and means should be the output of a call to
-              batch_normalize_conv(dest,means,invstds,src,gamma,beta)
-            - have_same_dimensions(gradient_input, src) == true
-            - have_same_dimensions(src, src_grad) == true
-            - src.num_samples() > 1
-            - gamma.num_samples()==gamma.nr()==gamma.nc() == 1
-            - have_same_dimensions(gamma, gamma_grad) == true
-            - have_same_dimensions(gamma, beta_grad) == true
-            - gamma.k()  == src.k()
-            - have_same_dimensions(means, gamma) == true
-            - have_same_dimensions(invstds, gamma) == true
-        ensures
-            - Let f(src,gamma,beta) == dot(gradient_input, dest output of
-              batch_normalize_conv(dest,means,invstds,src,gamma,beta))
-            - Adds the gradient of f() with respect to src to #src_grad.
-            - Adds the gradient of f() with respect to gamma to #gamma_grad.
-            - Adds the gradient of f() with respect to beta to #beta_grad.
-    !*/
+    class batch_normalize_conv_gradient
+    {
+    public:
+        void operator() (
+            const tensor& gradient_input,
+            const tensor& means,
+            const tensor& invstds,
+            const tensor& src,
+            const tensor& gamma,
+            tensor& src_grad,
+            tensor& gamma_grad, 
+            tensor& beta_grad 
+        ){impl(gradient_input,means,invstds,src,gamma,src_grad,gamma_grad,beta_grad);}
+        /*!
+            requires
+                - invstds and means should be the output of a call to
+                  batch_normalize_conv(dest,means,invstds,src,gamma,beta)
+                - have_same_dimensions(gradient_input, src) == true
+                - have_same_dimensions(src, src_grad) == true
+                - src.num_samples() > 1
+                - gamma.num_samples()==gamma.nr()==gamma.nc() == 1
+                - have_same_dimensions(gamma, gamma_grad) == true
+                - have_same_dimensions(gamma, beta_grad) == true
+                - gamma.k()  == src.k()
+                - have_same_dimensions(means, gamma) == true
+                - have_same_dimensions(invstds, gamma) == true
+            ensures
+                - Let f(src,gamma,beta) == dot(gradient_input, dest output of
+                  batch_normalize_conv(dest,means,invstds,src,gamma,beta))
+                - Adds the gradient of f() with respect to src to #src_grad.
+                - Adds the gradient of f() with respect to gamma to #gamma_grad.
+                - Adds the gradient of f() with respect to beta to #beta_grad.
+        !*/
+    private:
+#ifdef DLIB_USE_CUDA
+        cuda::batch_normalize_conv_gradient impl;
+#else
+        cpu::batch_normalize_conv_gradient impl;
+#endif
+    };
 
-    // -----------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------
 
     void threshold (
         tensor& data,

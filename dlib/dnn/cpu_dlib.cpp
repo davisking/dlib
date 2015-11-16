@@ -164,7 +164,7 @@ namespace dlib
             }
         }
 
-        void batch_normalize_gradient (
+        void batch_normalize_gradient::operator() (
             const tensor& gradient_input,
             const tensor& means,
             const tensor& invstds,
@@ -192,7 +192,6 @@ namespace dlib
             const auto p_invstds = invstds.host();
             const auto p_means = means.host();
 
-            resizable_tensor dvars, dmeans;
             dvars.copy_size(invstds);
             dmeans.copy_size(means);
             dvars = 0;
@@ -343,7 +342,7 @@ namespace dlib
             }
         }
 
-        void batch_normalize_conv_gradient (
+        void batch_normalize_conv_gradient::operator() (
             const tensor& gradient_input,
             const tensor& means,
             const tensor& invstds,
@@ -371,7 +370,6 @@ namespace dlib
             const auto p_invstds = invstds.host();
             const auto p_means = means.host();
 
-            resizable_tensor dvars, dmeans;
             dvars.copy_size(invstds);
             dmeans.copy_size(means);
             dvars = 0;

@@ -17,7 +17,7 @@ namespace
 
     using namespace test;
     using namespace dlib;
-    using namespace dlib::cpu;
+    using namespace dlib::tt;
     using namespace std;
 
     logger dlog("test.dnn");
@@ -99,7 +99,8 @@ namespace
         gamma_grad = 0;
         beta_grad = 0;
 
-        batch_normalize_gradient(gradient_input, means, vars, src, gamma, src_grad, gamma_grad, beta_grad);
+        batch_normalize_gradient bng;
+        bng(gradient_input, means, vars, src, gamma, src_grad, gamma_grad, beta_grad);
 
         auto grad_error = compare_gradients(src_grad, grad_src);
         dlog << LINFO << "src error: " << grad_error;
@@ -175,7 +176,8 @@ namespace
         gamma_grad = 0;
         beta_grad = 0;
 
-        batch_normalize_conv_gradient(gradient_input, means, vars, src, gamma, src_grad, gamma_grad, beta_grad);
+        batch_normalize_conv_gradient bng;
+        bng(gradient_input, means, vars, src, gamma, src_grad, gamma_grad, beta_grad);
 
 
         auto grad_error = compare_gradients(src_grad, grad_src);
