@@ -4,6 +4,7 @@
 #define DLIB_TeNSOR_TOOLS_CPP_
 
 #include "tensor_tools.h"
+#include "../string.h"
 
 namespace dlib { namespace tt
 {
@@ -40,10 +41,12 @@ namespace dlib { namespace tt
     tensor_rand::
     tensor_rand(
         unsigned long long seed
-    )
-    {
-        // TODO
-    }
+    ) 
+#ifdef DLIB_USE_CUDA
+    :rnd(seed){}
+#else
+    {rnd.set_seed(cast_to_string(seed)); }
+#endif
 
     void tensor_rand::
     fill_gaussian (
