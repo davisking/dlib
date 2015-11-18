@@ -40,12 +40,17 @@ namespace dlib
         )
         {
             DLIB_CASSERT(l.get_layer_params().size() != 0,"");
-            if (v.size() != 0)
-                v = momentum*v - weight_decay*learning_rate*mat(l.get_layer_params()) - learning_rate*mat(params_grad);
-            else
-                v =            - weight_decay*learning_rate*mat(l.get_layer_params()) - learning_rate*mat(params_grad);
+            if (v.size() == 0)
+            {
+                v.copy_size(params_grad);
+                v = 0;
+            }
+            tt::affine_transform(v, v, l.get_layer_params(), params_grad, 
+                               momentum, -weight_decay*learning_rate, -learning_rate, 0);
 
-            l.get_layer_params() += v;
+            // perform l.get_layer_params() += v;
+            tt::affine_transform(l.get_layer_params(), l.get_layer_params(), v, 1, 1, 0);
+
         }
 
         friend void serialize(const sgd& item, std::ostream& out)
@@ -70,7 +75,7 @@ namespace dlib
         }
 
     private:
-        matrix<float> v;
+        resizable_tensor v;
         float weight_decay;
         float learning_rate;
         float momentum;

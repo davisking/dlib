@@ -108,15 +108,51 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void affine_transform(
-        resizable_tensor& dest,
+        tensor& dest,
         const tensor& src,
         const float A,
         const float B
     );
     /*!
+        requires
+            - dest.size()==src.size()
         ensures
-            - have_same_dimensions(#dest,src) == true
             - #dest == A*src + B
+    !*/
+
+    void affine_transform(
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2,
+        const float A,
+        const float B,
+        const float C
+    );
+    /*!
+        requires
+            - dest.size()==src1.size()
+            - dest.size()==src2.size()
+        ensures
+            - #dest == A*src1 + src2*B + C
+    !*/
+
+    void affine_transform(
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2,
+        const tensor& src3,
+        const float A,
+        const float B,
+        const float C,
+        const float D
+    );
+    /*!
+        requires
+            - dest.size()==src1.size()
+            - dest.size()==src2.size()
+            - dest.size()==src3.size()
+        ensures
+            - #dest == A*src1 + src2*B + src3*C + D
     !*/
 
 // ----------------------------------------------------------------------------------------

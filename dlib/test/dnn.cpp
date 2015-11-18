@@ -201,6 +201,7 @@ namespace
         print_spinner();
         resizable_tensor dest, src(3,4), A(1,4), B(1,4);
         src = 2;
+        dest.copy_size(src);
         affine_transform(dest, src, 2, 3);
         dlog << LINFO << mat(dest);
         matrix<float> truth1(3,4), truth2(3,4);

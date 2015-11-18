@@ -97,7 +97,7 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void affine_transform(
-        resizable_tensor& dest,
+        tensor& dest,
         const tensor& src,
         const float A,
         const float B
@@ -107,6 +107,40 @@ namespace dlib { namespace tt
         //cuda::affine_transform(dest,src,A,B);
 #else
         cpu::affine_transform(dest,src,A,B);
+#endif
+    }
+
+    void affine_transform(
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2,
+        const float A,
+        const float B,
+        const float C
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        //cuda::affine_transform(dest,src1,src2,A,B,C);
+#else
+        cpu::affine_transform(dest,src1,src2,A,B,C);
+#endif
+    }
+
+    void affine_transform(
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2,
+        const tensor& src3,
+        const float A,
+        const float B,
+        const float C,
+        const float D
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        //cuda::affine_transform(dest,src1,src2,src3,A,B,C,D);
+#else
+        cpu::affine_transform(dest,src1,src2,src3,A,B,C,D);
 #endif
     }
 

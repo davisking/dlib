@@ -19,6 +19,7 @@ namespace dlib
             const tensor& src
         )
         {
+            DLIB_CASSERT(dest.size()==src.size(),"");
             const auto d = dest.host();
             const auto s = src.host();
             for (size_t i = 0; i < src.size(); ++i)
@@ -28,17 +29,57 @@ namespace dlib
     // -----------------------------------------------------------------------------------
 
         void affine_transform(
-            resizable_tensor& dest,
+            tensor& dest,
             const tensor& src,
             const float A,
             const float B
         )
         {
-            dest.copy_size(src);
+            DLIB_CASSERT(dest.size()==src.size(),"");
             const auto d = dest.host();
             const auto s = src.host();
             for (size_t i = 0; i < src.size(); ++i)
                 d[i] = A*s[i] + B;
+        }
+
+        void affine_transform(
+            tensor& dest,
+            const tensor& src1,
+            const tensor& src2,
+            const float A,
+            const float B,
+            const float C
+        )
+        {
+            DLIB_CASSERT(dest.size()==src1.size(),"");
+            DLIB_CASSERT(dest.size()==src2.size(),"");
+            const auto d = dest.host();
+            const auto s1 = src1.host();
+            const auto s2 = src2.host();
+            for (size_t i = 0; i < src1.size(); ++i)
+                d[i] = A*s1[i] + B*s2[i] + C;
+        }
+
+        void affine_transform(
+            tensor& dest,
+            const tensor& src1,
+            const tensor& src2,
+            const tensor& src3,
+            const float A,
+            const float B,
+            const float C,
+            const float D
+        )
+        {
+            DLIB_CASSERT(dest.size()==src1.size(),"");
+            DLIB_CASSERT(dest.size()==src2.size(),"");
+            DLIB_CASSERT(dest.size()==src3.size(),"");
+            const auto d = dest.host();
+            const auto s1 = src1.host();
+            const auto s2 = src2.host();
+            const auto s3 = src3.host();
+            for (size_t i = 0; i < src1.size(); ++i)
+                d[i] = A*s1[i] + B*s2[i] + C*s3[i] + D;
         }
 
     // -----------------------------------------------------------------------------------
