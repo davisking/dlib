@@ -502,8 +502,53 @@ namespace dlib
             const tensor& src
         )
         {
-            // TODO
-            DLIB_CASSERT(false,"");
+            DLIB_CASSERT(have_same_dimensions(dest,src),"");
+            const auto d = dest.host();
+            const auto s = src.host();
+
+            const long num = src.nr()*src.nc();
+            // Note that we subtract out the max values in each channel before applying
+            // exp() to avoid numeric overflow in the subsequent computations.  Doing this
+            // doesn't change the resulting output, it just makes it more numerically
+            // stable.
+            for (long n = 0; n < src.num_samples(); ++n)
+            {
+                auto ss = s + num*src.k()*n;
+                auto dd = d + num*src.k()*n;
+                for (long i = 0; i < num; ++i)
+                {
+                    float max_val = -std::numeric_limits<float>::infinity();
+                    for (long k = 0; k < src.k(); ++k)
+                        max_val = std::max(max_val, ss[k*num]);
+
+                    for (long k = 0; k < src.k(); ++k)
+                        dd[k*num] = std::exp(ss[k*num]-max_val);
+
+                    ++ss;
+                    ++dd;
+                }
+            }
+
+            // Now normalize each channel so they sum to 1.
+            for (long n = 0; n < src.num_samples(); ++n)
+            {
+                const auto ss = s + num*src.k()*n;
+                const auto dd = d + num*src.k()*n;
+                for (long r = 0; r < src.nr(); ++r)
+                {
+                    for (long c = 0; c < src.nc(); ++c)
+                    {
+                        const auto sss = ss+r*src.nc()+c;
+                        const auto ddd = dd+r*src.nc()+c;
+
+                        float temp = 0;
+                        for (long k = 0; k < src.k(); ++k)
+                            temp += ddd[k*num];
+                        for (long k = 0; k < src.k(); ++k)
+                            ddd[k*num] /= temp;
+                    }
+                }
+            }
         }
 
         void softmax_gradient (
@@ -512,8 +557,36 @@ namespace dlib
             const tensor& gradient_input
         )
         {
-            // TODO
-            DLIB_CASSERT(false,"");
+            DLIB_CASSERT(have_same_dimensions(grad,dest),"");
+            DLIB_CASSERT(have_same_dimensions(grad,gradient_input),"");
+            const auto d = dest.host();
+            const auto g = grad.host();
+            const auto in = gradient_input.host();
+
+            const long num = grad.nr()*grad.nc();
+
+            // Now normalize each channel so they sum to 1.
+            for (long n = 0; n < grad.num_samples(); ++n)
+            {
+                const auto d2 = d + num*grad.k()*n;
+                const auto g2 = g + num*grad.k()*n;
+                const auto in2 = in + num*grad.k()*n;
+                for (long r = 0; r < grad.nr(); ++r)
+                {
+                    for (long c = 0; c < grad.nc(); ++c)
+                    {
+                        const auto d3 = d2+r*grad.nc()+c;
+                        const auto g3 = g2+r*grad.nc()+c;
+                        const auto in3 = in2+r*grad.nc()+c;
+
+                        float temp = 0;
+                        for (long k = 0; k < grad.k(); ++k)
+                            temp += -d2[k*num]*in3[k*num];
+                        for (long k = 0; k < grad.k(); ++k)
+                            g3[k*num] = d3[k*num]*(temp+in3[k*num]);
+                    }
+                }
+            }
         }
 
     // ------------------------------------------------------------------------------------
