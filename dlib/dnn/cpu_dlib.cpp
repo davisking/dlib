@@ -523,8 +523,10 @@ namespace dlib
             const tensor& src
         )
         {
-            // TODO
-            DLIB_CASSERT(false,"");
+            const auto d = dest.host();
+            const auto s = src.host();
+            for (size_t i = 0; i < src.size(); ++i)
+                d[i] = 1/(1+std::exp(-s[i]));
         }
 
         void sigmoid_gradient (
@@ -533,8 +535,11 @@ namespace dlib
             const tensor& gradient_input
         )
         {
-            // TODO
-            DLIB_CASSERT(false,"");
+            const auto g = grad.host();
+            const auto d = dest.host();
+            const auto in = gradient_input.host();
+            for (size_t i = 0; i < dest.size(); ++i)
+                g[i] = in[i]*d[i]*(1-d[i]);
         }
 
     // ------------------------------------------------------------------------------------
