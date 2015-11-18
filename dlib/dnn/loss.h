@@ -102,43 +102,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class loss_no_label_ 
-    {
-    public:
-
-        const static unsigned int sample_expansion_factor = 1;
-
-        template <
-            typename SUBNET
-            >
-        double compute_loss (
-            const tensor& input_tensor,
-            SUBNET& sub
-        ) const
-        {
-            return 0;
-        }
-
-        friend void serialize(const loss_no_label_& , std::ostream& out)
-        {
-            serialize("loss_no_label_", out);
-        }
-
-        friend void deserialize(loss_no_label_& , std::istream& in)
-        {
-            std::string version;
-            deserialize(version, in);
-            if (version != "loss_no_label_")
-                throw serialization_error("Unexpected version found while deserializing dlib::loss_no_label_.");
-        }
-
-    };
-
-    template <typename SUBNET>
-    using loss_no_label = add_loss_layer<loss_no_label_, SUBNET>;
-
-// ----------------------------------------------------------------------------------------
-
 }
 
 #endif // DLIB_DNn_LOSS_H_
