@@ -371,8 +371,8 @@ namespace dlib
             const tensor& get_output() const { return l.private_get_output(); }
             tensor& get_gradient_input() { return l.private_get_gradient_input(); }
 
-            const subnet_wrapper<typename T::subnet_type>& subnet() const { subnetwork; }
-            subnet_wrapper<typename T::subnet_type>& subnet() { subnetwork; }
+            const subnet_wrapper<typename T::subnet_type,false>& subnet() const { return subnetwork; }
+            subnet_wrapper<typename T::subnet_type,false>& subnet() { return subnetwork; }
 
         private:
             T& l;
@@ -395,12 +395,12 @@ namespace dlib
             const tensor& get_output() const { return l.get_output(); }
             tensor& get_gradient_input() { return l.get_gradient_input(); }
 
-            const subnet_wrapper<typename T::subnet_type>& subnet() const { subnetwork; }
-            subnet_wrapper<typename T::subnet_type>& subnet() { subnetwork; }
+            const subnet_wrapper<typename T::subnet_type,false>& subnet() const { return subnetwork; }
+            subnet_wrapper<typename T::subnet_type,false>& subnet() { return subnetwork; }
 
         private:
             T& l;
-            subnet_wrapper<typename T::subnet_type> subnetwork;
+            subnet_wrapper<typename T::subnet_type,false> subnetwork;
         };
     }
 
