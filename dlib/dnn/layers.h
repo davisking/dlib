@@ -55,6 +55,43 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class bn_
+    {
+    public:
+        bn_()
+        {}
+
+        template <typename SUBNET>
+        void setup (const SUBNET& sub)
+        {
+            // TODO
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            // TODO
+        } 
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
+        {
+            // TODO
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+    private:
+
+        resizable_tensor params;
+    };
+
+    template <typename SUBNET>
+    using bn = add_layer<bn_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class fc_
     {
     public:
