@@ -140,9 +140,11 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object implements the loss layer interface defined above by
-                EXAMPLE_LOSS_LAYER_.  In particular, you use this loss to perform binary
-                classification with the hinge loss.  Therefore, the possible outputs/labels
-                when using this loss are +1 and -1.
+                EXAMPLE_LOSS_LAYER_.  In particular, it implements the hinge loss, which is
+                appropriate for binary classification problems.  Therefore, the possible
+                labels when using this loss are +1 and -1.  Moreover, it will cause the
+                network to produce outputs > 0 when predicting a member of the +1 class and
+                values < 0 otherwise.
         !*/
     public:
 
@@ -164,6 +166,10 @@ namespace dlib
                 - sub.get_output().nr() == 1
                 - sub.get_output().nc() == 1
                 - sub.get_output().k() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+            and the output label is the raw score for each classified object.  If the score
+            is > 0 then the classifier is predicting the +1 class, otherwise it is
+            predicting the -1 class.
         !*/
 
         template <
@@ -181,6 +187,7 @@ namespace dlib
                 - sub.get_output().nr() == 1
                 - sub.get_output().nc() == 1
                 - sub.get_output().k() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
                 - all values pointed to by truth are +1 or -1.
         !*/
 
@@ -194,6 +201,78 @@ namespace dlib
 
     template <typename SUBNET>
     using loss_binary_hinge = add_loss_layer<loss_binary_hinge_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class loss_binary_log_ 
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the loss layer interface defined above by
+                EXAMPLE_LOSS_LAYER_.  In particular, it implements the log loss, which is
+                appropriate for binary classification problems.  Therefore, the possible
+                labels when using this loss are +1 and -1.  Moreover, it will cause the
+                network to produce outputs > 0 when predicting a member of the +1 class and
+                values < 0 otherwise.
+
+                To be more specific, this object contains a sigmoid layer followed by a 
+                cross-entropy layer.  
+        !*/
+    public:
+
+        const static unsigned int sample_expansion_factor = 1;
+        typedef float label_type;
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            it has the additional calling requirements that: 
+                - sub.get_output().nr() == 1
+                - sub.get_output().nc() == 1
+                - sub.get_output().k() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+            and the output label is the raw score for each classified object.  If the score
+            is > 0 then the classifier is predicting the +1 class, otherwise it is
+            predicting the -1 class.
+        !*/
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss (
+            const tensor& input_tensor,
+            const_label_iterator truth, 
+            SUBNET& sub
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            it has the additional calling requirements that: 
+                - sub.get_output().nr() == 1
+                - sub.get_output().nc() == 1
+                - sub.get_output().k() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - all values pointed to by truth are +1 or -1.
+        !*/
+
+    };
+
+    void serialize(const loss_binary_log_& item, std::ostream& out);
+    void deserialize(loss_binary_log_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
+    template <typename SUBNET>
+    using loss_binary_log = add_loss_layer<loss_binary_log_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

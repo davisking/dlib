@@ -177,15 +177,171 @@ namespace dlib
                 throw serialization_error("Unexpected version found while deserializing dlib::relu_.");
         }
 
-
     private:
-
         resizable_tensor params;
     };
 
 
     template <typename SUBNET>
     using relu = add_layer<relu_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class sig_
+    {
+    public:
+        sig_() 
+        {
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& sub)
+        {
+        }
+
+        void forward_inplace(const tensor& input, tensor& output)
+        {
+            tt::sigmoid(output, input);
+        } 
+
+        void backward_inplace(
+            const tensor& computed_output,
+            const tensor& gradient_input, 
+            tensor& data_grad, 
+            tensor& 
+        )
+        {
+            tt::sigmoid_gradient(data_grad, computed_output, gradient_input);
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const sig_& , std::ostream& out)
+        {
+            serialize("sig_", out);
+        }
+
+        friend void deserialize(sig_& , std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "sig_")
+                throw serialization_error("Unexpected version found while deserializing dlib::sig_.");
+        }
+
+    private:
+        resizable_tensor params;
+    };
+
+
+    template <typename SUBNET>
+    using sig = add_layer<sig_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class htan_
+    {
+    public:
+        htan_() 
+        {
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& sub)
+        {
+        }
+
+        void forward_inplace(const tensor& input, tensor& output)
+        {
+            tt::tanh(output, input);
+        } 
+
+        void backward_inplace(
+            const tensor& computed_output,
+            const tensor& gradient_input, 
+            tensor& data_grad, 
+            tensor& 
+        )
+        {
+            tt::tanh_gradient(data_grad, computed_output, gradient_input);
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const htan_& , std::ostream& out)
+        {
+            serialize("htan_", out);
+        }
+
+        friend void deserialize(htan_& , std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "htan_")
+                throw serialization_error("Unexpected version found while deserializing dlib::htan_.");
+        }
+
+    private:
+        resizable_tensor params;
+    };
+
+
+    template <typename SUBNET>
+    using htan = add_layer<htan_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class softmax_
+    {
+    public:
+        softmax_() 
+        {
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& sub)
+        {
+        }
+
+        void forward_inplace(const tensor& input, tensor& output)
+        {
+            tt::softmax(output, input);
+        } 
+
+        void backward_inplace(
+            const tensor& computed_output,
+            const tensor& gradient_input, 
+            tensor& data_grad, 
+            tensor& 
+        )
+        {
+            tt::softmax_gradient(data_grad, computed_output, gradient_input);
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const softmax_& , std::ostream& out)
+        {
+            serialize("softmax_", out);
+        }
+
+        friend void deserialize(softmax_& , std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "softmax_")
+                throw serialization_error("Unexpected version found while deserializing dlib::softmax_.");
+        }
+
+    private:
+        resizable_tensor params;
+    };
+
+    template <typename SUBNET>
+    using softmax = add_layer<softmax_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

@@ -19,7 +19,7 @@ namespace dlib
                 This object represents a deep neural network.  In particular, it is
                 the simplified interface through which layer objects interact with their
                 subnetworks.  A layer's two important tasks are to (1) take outputs from its
-                subnetwork and forward propagate them though itself and (2) to backwards
+                subnetwork and forward propagate them through itself and (2) to backwards
                 propagate an error gradient through itself and onto its subnetwork.
                 The idea of a subnetwork is illustrated in the following diagram:
 
@@ -232,7 +232,7 @@ namespace dlib
                 - have_same_dimensions(data_input,data_output) == true
                 - setup() has been called.
             ensures
-                - Runs the data_input tensor though this layer and stores the output into
+                - Runs the data_input tensor through this layer and stores the output into
                   #data_output.
                 - This function supports in-place operation, i.e. having
                   is_same_object(data_input, data_output)==true
@@ -371,9 +371,9 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_LAYER_ interface defined above.
                 In particular, it defines a rectified linear layer.  Therefore, it passes
-                its inputs though the function f(x)=max(x,0) where f() is applied pointwise
-                across the input tensor.
-                
+                its inputs through the function 
+                    f(x)=max(x,0) 
+                where f() is applied pointwise across the input tensor.
         !*/
 
     public:
@@ -399,6 +399,125 @@ namespace dlib
 
     template <typename SUBNET>
     using relu = add_layer<relu_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class sig_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
+                In particular, it defines a sigmoid layer.  Therefore, it passes its inputs
+                through the function 
+                    f(x)=1/(1+exp(-x)) 
+                where f() is applied pointwise across the input tensor.
+        !*/
+
+    public:
+
+        sig_(
+        );
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        void forward_inplace(const tensor& input, tensor& output);
+        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+        !*/
+    };
+
+    void serialize(const sig_& item, std::ostream& out);
+    void deserialize(sig_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
+    template <typename SUBNET>
+    using sig = add_layer<sig_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class htan_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
+                In particular, it defines a hyperbolic tangent layer.  Therefore, it passes
+                its inputs through the function 
+                    f(x)=std::tanh(x)
+                where f() is applied pointwise across the input tensor.
+        !*/
+
+    public:
+
+        htan_(
+        );
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        void forward_inplace(const tensor& input, tensor& output);
+        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+        !*/
+    };
+
+    void serialize(const htan_& item, std::ostream& out);
+    void deserialize(htan_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
+    template <typename SUBNET>
+    using htan = add_layer<htan_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class softmax_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
+                In particular, it defines a softmax layer.  To be precise, we define the
+                softmax function s(x) as:
+                    s(x) == exp(x)/sum(exp(x)) 
+                where x is a vector.  Then this layer treats its input tensor as a
+                collection of multi-channel images and applies s() to each spatial location
+                in each image.  In each application, the tensor::k() channel elements at
+                each position are input to s() and then replaced by the outputs of s().   
+
+                This means that, for example, if you collapsed each output image to a 1
+                channel image by adding the channels then you would end up with images
+                where each pixel value was 1.  This is because the sum of the outputs of
+                s() will always be equal to 1.
+        !*/
+
+    public:
+
+        softmax_(
+        );
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        void forward_inplace(const tensor& input, tensor& output);
+        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+        !*/
+    };
+
+    void serialize(const softmax_& item, std::ostream& out);
+    void deserialize(softmax_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
+    template <typename SUBNET>
+    using softmax = add_layer<softmax_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
