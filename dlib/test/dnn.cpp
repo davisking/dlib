@@ -125,7 +125,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = src.host()[idx];
                 src.host()[idx] += eps;
-                softmax(dest, src);
+                tt::softmax(dest, src);
                 float result = dot(gradient_input, dest);
                 src.host()[idx] = old;
                 return result;
@@ -138,7 +138,7 @@ namespace
         src_grad.copy_size(src);
         src_grad = 0;
 
-        softmax(dest, src);
+        tt::softmax(dest, src);
         softmax_gradient(src_grad, dest, gradient_input);
 
         auto grad_error = compare_gradients(src_grad, grad_src);
