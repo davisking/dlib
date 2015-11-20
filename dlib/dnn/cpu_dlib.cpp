@@ -181,7 +181,6 @@ namespace dlib
             invstds.host(); means.host();
 
             const float eps = 0.00001;
-            p_src = src.host();
             // compute variances 
             for (long i = 0; i < num; ++i)
             {
