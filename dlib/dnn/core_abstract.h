@@ -45,6 +45,15 @@ namespace dlib
               So it basically returns make_tuple(get<1>(item),get<2>(item),get<3>(item), and so on).
     !*/
 
+    double log1pexp(
+        double x
+    );
+    /*!
+        ensures
+            - returns log(1+exp(x))
+              (except computes it using a numerically accurate method)
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <

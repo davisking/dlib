@@ -14,11 +14,29 @@
 #include "../algs.h"
 #include <utility>
 #include <tuple>
+#include <cmath>
 
 
 namespace dlib
 {
 
+// ----------------------------------------------------------------------------------------
+
+    inline double log1pexp(double x)
+    {
+        using std::exp;
+        using namespace std; // Do this instead of using std::log1p because some compilers
+                             // error out otherwise (E.g. gcc 4.9 in cygwin)
+        if (x <= -37)
+            return exp(x);
+        else if (-37 < x && x <= 18)
+            return log1p(exp(x));
+        else if (18 < x && x <= 33.3)
+            return x + exp(-x);
+        else
+            return x;
+    }
+    
 // ----------------------------------------------------------------------------------------
 
     // Tell us if T is one of the special layer types (i.e. add_layer, add_tag_layer, or
