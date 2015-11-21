@@ -250,9 +250,9 @@ namespace dlib { namespace tt
         !*/
     private:
 #ifdef DLIB_USE_CUDA
-        cuda::batch_normalize_conv_gradient impl;
+        cuda::batch_normalize_gradient impl;
 #else
-        cpu::batch_normalize_conv_gradient impl;
+        cpu::batch_normalize_gradient impl;
 #endif
     };
 
