@@ -85,43 +85,47 @@ namespace dlib
             const auto transa = trans_lhs ? CUBLAS_OP_T : CUBLAS_OP_N;
             const auto transb = trans_rhs ? CUBLAS_OP_T : CUBLAS_OP_N;
 
+            const int dest_nr = dest.num_samples();
+            const int dest_nc = dest.size()/dest_nr;
+            const int lhs_nr = lhs.num_samples();
+            const int lhs_nc = lhs.size()/lhs_nr;
+            const int rhs_nr = rhs.num_samples();
+            const int rhs_nc = rhs.size()/rhs_nr;
             if (trans_lhs && trans_rhs)
             {
-                DLIB_CASSERT( mat(dest).nr() == trans(mat(lhs)).nr() &&
-                              mat(dest).nc() == trans(mat(rhs)).nc() &&
-                              trans(mat(lhs)).nc() == trans(mat(rhs)).nr(),"")
+                DLIB_ASSERT( dest_nr == lhs_nc &&
+                              dest_nc == rhs_nr &&
+                              lhs_nr == rhs_nc,"")
             }
             else if (!trans_lhs && trans_rhs)
             {
-                DLIB_CASSERT( mat(dest).nr() == mat(lhs).nr() &&
-                              mat(dest).nc() == trans(mat(rhs)).nc() &&
-                              mat(lhs).nc() == trans(mat(rhs)).nr(),"")
+                DLIB_ASSERT( dest_nr == lhs_nr &&
+                              dest_nc == rhs_nr &&
+                              lhs_nc == rhs_nc,"")
             }
             else if (trans_lhs && !trans_rhs)
             {
-                DLIB_CASSERT( mat(dest).nr() == trans(mat(lhs)).nr() &&
-                              mat(dest).nc() == mat(rhs).nc() &&
-                              trans(mat(lhs)).nc() == mat(rhs).nr(),"")
+                DLIB_ASSERT( dest_nr == lhs_nc &&
+                              dest_nc == rhs_nc &&
+                              lhs_nr == rhs_nr,"")
             }
             else
             {
-                DLIB_CASSERT( mat(dest).nr() == mat(lhs).nr() &&
-                              mat(dest).nc() == mat(rhs).nc() &&
-                              mat(lhs).nc() == mat(rhs).nr(),"")
+                DLIB_ASSERT( dest_nr == lhs_nr &&
+                              dest_nc == rhs_nc &&
+                              lhs_nc == rhs_nr,"")
             }
 
-            const int m = mat(dest).nc();
-            const int n = mat(dest).nr();
-            const int k = trans_rhs ? mat(rhs).nc() : mat(rhs).nr();
+            const int k = trans_rhs ? rhs_nc : rhs_nr;
             check(cublasSgemm(context(),
                               transb,
                               transa, 
-                              m, n, k,
+                              dest_nc, dest_nr, k,
                               &alpha,
-                              rhs.device(), mat(rhs).nc(),
-                              lhs.device(), mat(lhs).nc(),
+                              rhs.device(), rhs_nc,
+                              lhs.device(), lhs_nc,
                               &beta,
-                              dest.device(), mat(dest).nc()));
+                              dest.device(),dest_nc));
         }
 
     // ------------------------------------------------------------------------------------
