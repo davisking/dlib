@@ -75,6 +75,18 @@ namespace
                 DLIB_TEST(max(abs(truth-mat(c))) < 1e-6);
             }
             {
+                resizable_tensor a(3,4), b(3,4), c(3,3);
+
+                c = 1;
+                a = matrix_cast<float>(gaussian_randm(a.num_samples(),a.size()/a.num_samples()));
+                b = matrix_cast<float>(gaussian_randm(b.num_samples(),b.size()/b.num_samples()));
+
+                matrix<float> truth = mat(c)+mat(a)*trans(mat(b));
+
+                cuda::gemm(1, c, 1, a, false, b, true);
+                DLIB_TEST(max(abs(truth-mat(c))) < 1e-6);
+            }
+            {
                 resizable_tensor a(3,4), b(4,3), c(3,3);
 
                 c = 1;
@@ -84,6 +96,18 @@ namespace
                 matrix<float> truth = 2*mat(c)+mat(a)*mat(b);
 
                 cuda::gemm(2, c, 1, a, false, b, false);
+                DLIB_TEST(max(abs(truth-mat(c))) < 1e-6);
+            }
+            {
+                resizable_tensor a(3,4), b(4,3), c(3,3);
+
+                c = std::numeric_limits<float>::infinity();
+                a = matrix_cast<float>(gaussian_randm(a.num_samples(),a.size()/a.num_samples()));
+                b = matrix_cast<float>(gaussian_randm(b.num_samples(),b.size()/b.num_samples()));
+
+                matrix<float> truth = mat(a)*mat(b);
+
+                cuda::gemm(0, c, 1, a, false, b, false);
                 DLIB_TEST(max(abs(truth-mat(c))) < 1e-6);
             }
             {
@@ -122,6 +146,19 @@ namespace
                 matrix<float> truth = 2*mat(c)+trans(mat(a))*mat(b);
 
                 cuda::gemm(2, c, 1, a, true, b, false);
+                DLIB_TEST(get_rect(truth) == get_rect(mat(c)));
+                DLIB_TEST(max(abs(truth-mat(c))) < 1e-6);
+            }
+            {
+                resizable_tensor a(4,3), b(4,5), c(3,5);
+
+                c = std::numeric_limits<float>::infinity();
+                a = matrix_cast<float>(gaussian_randm(a.num_samples(),a.size()/a.num_samples()));
+                b = matrix_cast<float>(gaussian_randm(b.num_samples(),b.size()/b.num_samples()));
+
+                matrix<float> truth = trans(mat(a))*mat(b);
+
+                cuda::gemm(0, c, 1, a, true, b, false);
                 DLIB_TEST(get_rect(truth) == get_rect(mat(c)));
                 DLIB_TEST(max(abs(truth-mat(c))) < 1e-6);
             }
