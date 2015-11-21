@@ -317,7 +317,7 @@ namespace dlib
     {
     public:
         sstack() {}
-        explicit sstack(const T& item_) : item(item_) {}
+        sstack(const T& item_) : item(item_) {}
 
         const T& top() const { return item; }
         T& top() { return item; }
