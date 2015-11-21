@@ -24,14 +24,28 @@ namespace dlib { namespace tt
 #ifdef DLIB_USE_CUDA
         cuda::gemm(beta, dest, alpha, lhs, trans_lhs, rhs, trans_rhs);
 #else
-        if (trans_lhs && trans_rhs)
-            dest = alpha*trans(mat(lhs))*trans(mat(rhs)) + beta*mat(dest);
-        else if (!trans_lhs && trans_rhs)
-            dest = alpha*mat(lhs)*trans(mat(rhs)) + beta*mat(dest);
-        else if (trans_lhs && !trans_rhs)
-            dest = alpha*trans(mat(lhs))*mat(rhs) + beta*mat(dest);
+        if (beta != 0)
+        {
+            if (trans_lhs && trans_rhs)
+                dest = alpha*trans(mat(lhs))*trans(mat(rhs)) + beta*mat(dest);
+            else if (!trans_lhs && trans_rhs)
+                dest = alpha*mat(lhs)*trans(mat(rhs)) + beta*mat(dest);
+            else if (trans_lhs && !trans_rhs)
+                dest = alpha*trans(mat(lhs))*mat(rhs) + beta*mat(dest);
+            else
+                dest = alpha*mat(lhs)*mat(rhs) + beta*mat(dest);
+        }
         else
-            dest = alpha*mat(lhs)*mat(rhs) + beta*mat(dest);
+        {
+            if (trans_lhs && trans_rhs)
+                dest = alpha*trans(mat(lhs))*trans(mat(rhs));
+            else if (!trans_lhs && trans_rhs)
+                dest = alpha*mat(lhs)*trans(mat(rhs));
+            else if (trans_lhs && !trans_rhs)
+                dest = alpha*trans(mat(lhs))*mat(rhs);
+            else
+                dest = alpha*mat(lhs)*mat(rhs);
+        }
 #endif
     }
 
@@ -87,7 +101,7 @@ namespace dlib { namespace tt
     {
         DLIB_CASSERT(have_same_dimensions(dest,src) == true,"");
 #ifdef DLIB_USE_CUDA
-        //cuda::multiply(dest, src);
+        cuda::multiply(dest, src);
 #else
         cpu::multiply(dest, src);
 #endif
@@ -104,7 +118,7 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        //cuda::affine_transform(dest,src,A,B);
+        cuda::affine_transform(dest,src,A,B);
 #else
         cpu::affine_transform(dest,src,A,B);
 #endif
@@ -120,7 +134,7 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        //cuda::affine_transform(dest,src1,src2,A,B,C);
+        cuda::affine_transform(dest,src1,src2,A,B,C);
 #else
         cpu::affine_transform(dest,src1,src2,A,B,C);
 #endif
@@ -138,7 +152,7 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        //cuda::affine_transform(dest,src1,src2,src3,A,B,C,D);
+        cuda::affine_transform(dest,src1,src2,src3,A,B,C,D);
 #else
         cpu::affine_transform(dest,src1,src2,src3,A,B,C,D);
 #endif
@@ -154,7 +168,7 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        //cuda::affine_transform(dest,src,A,B);
+        cuda::affine_transform(dest,src,A,B);
 #else
         cpu::affine_transform(dest,src,A,B);
 #endif
@@ -172,7 +186,7 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        //cuda::batch_normalize(dest,means,vars,src,gamma,beta);
+        cuda::batch_normalize(dest,means,vars,src,gamma,beta);
 #else
         cpu::batch_normalize(dest,means,vars,src,gamma,beta);
 #endif
@@ -190,7 +204,7 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        //cuda::batch_normalize_conv(dest,means,vars,src,gamma,beta);
+        cuda::batch_normalize_conv(dest,means,vars,src,gamma,beta);
 #else
         cpu::batch_normalize_conv(dest,means,vars,src,gamma,beta);
 #endif
@@ -204,7 +218,7 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        //cuda::threshold(data,thresh);
+        cuda::threshold(data,thresh);
 #else
         cpu::threshold(data,thresh);
 #endif
