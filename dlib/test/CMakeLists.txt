@@ -41,7 +41,6 @@ set (tests
    config_reader.cpp
    crc32.cpp
    create_iris_datafile.cpp
-   cublas.cpp
    data_io.cpp
    directed_graph.cpp
    discriminant_pca.cpp
@@ -154,6 +153,7 @@ set (tests
 if (COMPILER_CAN_DO_CPP_11)
    set(tests ${tests}
       dnn.cpp
+      cublas.cpp
       )
 endif()
 
