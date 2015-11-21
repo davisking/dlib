@@ -349,6 +349,84 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_more_ops(const long nr, const long nc)
+    {
+        print_spinner();
+#ifdef DLIB_USE_CUDA
+        // We are going to make sure that the CPU implementation of these things matches
+        // the CUDA implementation.
+
+        tensor_rand rnd;
+
+        resizable_tensor dest(nr,nc), src(nr,nc), dest2, src2;
+        resizable_tensor srcb(nr,nc), srcc(nr,nc), srcb2, srcc2;
+
+
+        rnd.fill_uniform(dest);
+        rnd.fill_uniform(src);
+        dest2 = dest; src2 = src;
+        cuda::multiply(dest, src);
+        cpu::multiply(dest2, src2);
+        DLIB_TEST(equal(mat(dest),mat(dest2)));
+
+
+        rnd.fill_uniform(dest);
+        rnd.fill_uniform(src);
+        dest2 = dest; src2 = src;
+        cuda::affine_transform(dest, src, 2, 3);
+        cpu::affine_transform(dest2, src2, 2, 3);
+        DLIB_TEST(equal(mat(dest),mat(dest2)));
+
+        rnd.fill_uniform(dest);
+        rnd.fill_uniform(src);
+        rnd.fill_uniform(srcb);
+        dest2 = dest; src2 = src; srcb2 = srcb;
+        cuda::affine_transform(dest, src, srcb, 2, 3, 4);
+        cpu::affine_transform(dest2, src2, srcb2, 2, 3, 4);
+        DLIB_TEST(equal(mat(dest),mat(dest2)));
+
+        rnd.fill_uniform(dest);
+        rnd.fill_uniform(src);
+        rnd.fill_uniform(srcb);
+        rnd.fill_uniform(srcc);
+        dest2 = dest; src2 = src; srcb2 = srcb; srcc2 = srcc;
+        cuda::affine_transform(dest, src, srcb, srcc, 2, 3, 4, 5);
+        cpu::affine_transform(dest2, src2, srcb2, srcc2, 2, 3, 4, 5);
+        DLIB_TEST(equal(mat(dest),mat(dest2)));
+
+
+        rnd.fill_uniform(dest);
+        rnd.fill_uniform(src);
+        rnd.fill_uniform(srcb);
+        rnd.fill_uniform(srcc);
+        dest2 = dest; src2 = src; srcb2 = srcb; srcc2 = srcc;
+        cuda::affine_transform(dest, src, srcb, srcc);
+        cpu::affine_transform(dest2, src2, srcb2, srcc2);
+        DLIB_TEST(equal(mat(dest),mat(dest2)));
+        // now exercise code path where the A/B tensors have num_samples()==1
+        srcb.set_size(1,nc);
+        srcc.set_size(1,nc);
+        rnd.fill_uniform(dest);
+        rnd.fill_uniform(src);
+        rnd.fill_uniform(srcb);
+        rnd.fill_uniform(srcc);
+        dest2 = dest; src2 = src; srcb2 = srcb; srcc2 = srcc;
+        cuda::affine_transform(dest, src, srcb, srcc);
+        cpu::affine_transform(dest2, src2, srcb2, srcc2);
+        DLIB_TEST(equal(mat(dest),mat(dest2)));
+
+
+        rnd.fill_uniform(src);
+        src2 = src;
+        cuda::threshold(src, 0.5);
+        cpu::threshold(src2, 0.5);
+        DLIB_TEST(equal(mat(src),mat(src2)));
+
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class dnn_tester : public tester
     {
     public:
@@ -361,6 +439,12 @@ namespace
         void perform_test (
         )
         {
+            test_more_ops(1,1);
+            test_more_ops(3,4);
+            test_more_ops(4,3);
+            test_more_ops(4,1);
+            test_more_ops(1,4);
+            test_more_ops(10000,4);
             test_tanh();
             test_softmax();
             test_sigmoid();
