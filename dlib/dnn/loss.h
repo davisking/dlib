@@ -77,7 +77,7 @@ namespace dlib
                 if (temp > 0)
                 {
                     loss += scale*temp;
-                    g[i] += -scale*y;
+                    g[i] = -scale*y;
                 }
             }
             return loss;

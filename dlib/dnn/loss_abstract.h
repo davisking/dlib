@@ -110,9 +110,9 @@ namespace dlib
                   of sub matches the expected labels given by truth.  Let's write the loss
                   function as L(input_tensor, truth, sub).  
                 - Then compute_loss() computes the gradient of L() with respect to the
-                  outputs in sub.  Specifically, compute_loss() adds the gradients into sub
-                  by performing the following tensor additions, for all valid i: 
-                    - layer<i>(sub).get_gradient_input() += the gradient of
+                  outputs in sub.  Specifically, compute_loss() assigns the gradients into
+                  sub by performing the following tensor assignments, for all valid i: 
+                    - layer<i>(sub).get_gradient_input() = the gradient of
                       L(input_tensor,truth,sub) with respect to layer<i>(sub).get_output().
                 - returns L(input_tensor,truth,sub)
         !*/
