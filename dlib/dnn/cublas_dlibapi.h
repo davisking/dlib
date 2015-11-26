@@ -6,19 +6,12 @@
 #ifdef DLIB_USE_CUDA
 
 #include "tensor.h"
-#include "../error.h"
+#include "cuda_errors.h"
 
 namespace dlib
 {
     namespace cuda 
     {
-
-    // -----------------------------------------------------------------------------------
-
-        struct cublas_error : public error
-        {
-            cublas_error(const std::string& message): error(message) {}
-        };
 
     // -----------------------------------------------------------------------------------
 

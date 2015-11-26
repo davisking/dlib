@@ -9,27 +9,36 @@
 #include <curand.h>
 #include "../string.h"
 
+static const char* curand_get_error_string(curandStatus_t s)
+{
+    switch(s)
+    {
+        case CURAND_STATUS_NOT_INITIALIZED: 
+            return "CUDA Runtime API initialization failed.";
+        case CURAND_STATUS_LENGTH_NOT_MULTIPLE:
+            return "The requested length must be a multiple of two.";
+        default:
+            return "A call to cuRAND failed";
+    }
+}
+
+// Check the return value of a call to the cuDNN runtime for an error condition.
+#define CHECK_CURAND(call)                                                      \
+{                                                                              \
+    const curandStatus_t error = call;                                         \
+    if (error != CURAND_STATUS_SUCCESS)                                        \
+    {                                                                          \
+        std::ostringstream sout;                                               \
+        sout << "Error while calling " << #call << " in file " << __FILE__ << ":" << __LINE__ << ". ";\
+        sout << "code: " << error << ", reason: " << curand_get_error_string(error);\
+        throw dlib::curand_error(sout.str());                            \
+    }                                                                          \
+}
+
 namespace dlib
 {
     namespace cuda 
     {
-
-    // ----------------------------------------------------------------------------------------
-
-        // TODO, make into a macro that prints more information like the line number, etc.
-        static void check(curandStatus_t s)
-        {
-            switch(s)
-            {
-                case CURAND_STATUS_SUCCESS: return;
-                case CURAND_STATUS_NOT_INITIALIZED: 
-                    throw curand_error("CUDA Runtime API initialization failed.");
-                case CURAND_STATUS_LENGTH_NOT_MULTIPLE:
-                    throw curand_error("The requested length must be a multiple of two.");
-                default:
-                    throw curand_error("A call to cuRAND failed: " + cast_to_string(s));
-            }
-        }
 
     // ----------------------------------------------------------------------------------------
 
@@ -39,10 +48,10 @@ namespace dlib
         ) : handle(nullptr)
         {
             curandGenerator_t gen;
-            check(curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT));
+            CHECK_CURAND(curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT));
             handle = gen;
 
-            check(curandSetPseudoRandomGeneratorSeed(gen, seed));
+            CHECK_CURAND(curandSetPseudoRandomGeneratorSeed(gen, seed));
         }
 
         curand_generator::
@@ -64,7 +73,7 @@ namespace dlib
             if (data.size() == 0)
                 return;
 
-            check(curandGenerateNormal((curandGenerator_t)handle, 
+            CHECK_CURAND(curandGenerateNormal((curandGenerator_t)handle, 
                                         data.device(),
                                         data.size(),
                                         mean,
@@ -79,7 +88,7 @@ namespace dlib
             if (data.size() == 0)
                 return;
 
-            check(curandGenerateUniform((curandGenerator_t)handle, data.device(), data.size()));
+            CHECK_CURAND(curandGenerateUniform((curandGenerator_t)handle, data.device(), data.size()));
         }
 
     // -----------------------------------------------------------------------------------

@@ -12,29 +12,40 @@
 #include <string>
 #include "cuda_utils.h"
 
+static const char* cudnn_get_error_string(cudnnStatus_t s)
+{
+    switch(s)
+    {
+        case CUDNN_STATUS_NOT_INITIALIZED: 
+            return "CUDA Runtime API initialization failed.";
+        case CUDNN_STATUS_ALLOC_FAILED: 
+            return "CUDA Resources could not be allocated.";
+        case CUDNN_STATUS_BAD_PARAM:
+            return "CUDNN_STATUS_BAD_PARAM";
+        default:
+            return "A call to cuDNN failed";
+    }
+}
+
+// Check the return value of a call to the cuDNN runtime for an error condition.
+#define CHECK_CUDNN(call)                                                      \
+{                                                                              \
+    const cudnnStatus_t error = call;                                         \
+    if (error != CUDNN_STATUS_SUCCESS)                                        \
+    {                                                                          \
+        std::ostringstream sout;                                               \
+        sout << "Error while calling " << #call << " in file " << __FILE__ << ":" << __LINE__ << ". ";\
+        sout << "code: " << error << ", reason: " << cudnn_get_error_string(error);\
+        throw dlib::cudnn_error(sout.str());                            \
+    }                                                                          \
+}
+
 
 namespace dlib
 {
 
     namespace cuda 
     {
-
-        // TODO, make into a macro that prints more information like the line number, etc.
-        static void check(cudnnStatus_t s)
-        {
-            switch(s)
-            {
-                case CUDNN_STATUS_SUCCESS: return;
-                case CUDNN_STATUS_NOT_INITIALIZED: 
-                    throw cudnn_error("CUDA Runtime API initialization failed.");
-                case CUDNN_STATUS_ALLOC_FAILED: 
-                    throw cudnn_error("CUDA Resources could not be allocated.");
-                case CUDNN_STATUS_BAD_PARAM:
-                    throw cudnn_error("CUDNN_STATUS_BAD_PARAM");
-                default:
-                    throw cudnn_error("A call to cuDNN failed: " + std::string(cudnnGetErrorString(s)));
-            }
-        }
 
     // ------------------------------------------------------------------------------------
 
@@ -58,7 +69,7 @@ namespace dlib
 
             cudnn_context()
             {
-                check(cudnnCreate(&handle));
+                CHECK_CUDNN(cudnnCreate(&handle));
             }
 
             ~cudnn_context()
@@ -112,10 +123,10 @@ namespace dlib
             else
             {
                 cudnnTensorDescriptor_t h;
-                check(cudnnCreateTensorDescriptor(&h));
+                CHECK_CUDNN(cudnnCreateTensorDescriptor(&h));
                 handle = h;
 
-                check(cudnnSetTensor4dDescriptor((cudnnTensorDescriptor_t)handle,
+                CHECK_CUDNN(cudnnSetTensor4dDescriptor((cudnnTensorDescriptor_t)handle,
                         CUDNN_TENSOR_NCHW,
                         CUDNN_DATA_FLOAT,
                         n,
@@ -137,7 +148,7 @@ namespace dlib
             {
                 int nStride, cStride, hStride, wStride;
                 cudnnDataType_t datatype;
-                check(cudnnGetTensor4dDescriptor((cudnnTensorDescriptor_t)handle,
+                CHECK_CUDNN(cudnnGetTensor4dDescriptor((cudnnTensorDescriptor_t)handle,
                         &datatype,
                         &n,
                         &k,
@@ -172,7 +183,7 @@ namespace dlib
                   (dest.nc()==src.nc() || src.nc()==1) &&
                   (dest.k()==src.k()   || src.k()==1), "");
 
-            check(cudnnAddTensor_v3(context(),
+            CHECK_CUDNN(cudnnAddTensor_v3(context(),
                                     &alpha,
                                     descriptor(src),
                                     src.device(),
@@ -188,7 +199,7 @@ namespace dlib
         {
             if (t.size() == 0)
                 return;
-            check(cudnnSetTensor(context(),
+            CHECK_CUDNN(cudnnSetTensor(context(),
                                  descriptor(t),
                                  t.device(),
                                  &value));
@@ -201,7 +212,7 @@ namespace dlib
         {
             if (t.size() == 0)
                 return;
-            check(cudnnScaleTensor(context(),
+            CHECK_CUDNN(cudnnScaleTensor(context(),
                                    descriptor(t),
                                    t.device(),
                                    &value));
@@ -222,7 +233,7 @@ namespace dlib
 
             const float alpha = 1;
             const float beta = 0;
-            check(cudnnConvolutionBackwardBias(context(),
+            CHECK_CUDNN(cudnnConvolutionBackwardBias(context(),
                                                &alpha,
                                                descriptor(gradient_input),
                                                gradient_input.device(),
@@ -304,16 +315,16 @@ namespace dlib
                 stride_y = stride_y_;
                 stride_x = stride_x_;
 
-                check(cudnnCreateFilterDescriptor((cudnnFilterDescriptor_t*)&filter_handle));
-                check(cudnnSetFilter4dDescriptor((cudnnFilterDescriptor_t)filter_handle, 
+                CHECK_CUDNN(cudnnCreateFilterDescriptor((cudnnFilterDescriptor_t*)&filter_handle));
+                CHECK_CUDNN(cudnnSetFilter4dDescriptor((cudnnFilterDescriptor_t)filter_handle, 
                                                  CUDNN_DATA_FLOAT, 
                                                  filters.num_samples(),
                                                  filters.k(),
                                                  filters.nr(),
                                                  filters.nc()));
 
-                check(cudnnCreateConvolutionDescriptor((cudnnConvolutionDescriptor_t*)&conv_handle));
-                check(cudnnSetConvolution2dDescriptor((cudnnConvolutionDescriptor_t)conv_handle,
+                CHECK_CUDNN(cudnnCreateConvolutionDescriptor((cudnnConvolutionDescriptor_t*)&conv_handle));
+                CHECK_CUDNN(cudnnSetConvolution2dDescriptor((cudnnConvolutionDescriptor_t)conv_handle,
                         filters.nr()/2, // vertical padding
                         filters.nc()/2, // horizontal padding
                         stride_y,
@@ -321,7 +332,7 @@ namespace dlib
                         1, 1, // must be 1,1
                         CUDNN_CONVOLUTION)); // could also be CUDNN_CROSS_CORRELATION
 
-                check(cudnnGetConvolution2dForwardOutputDim(
+                CHECK_CUDNN(cudnnGetConvolution2dForwardOutputDim(
                         (const cudnnConvolutionDescriptor_t)conv_handle,
                         descriptor(data),
                         (const cudnnFilterDescriptor_t)filter_handle,
@@ -336,7 +347,7 @@ namespace dlib
                 // Pick which forward algorithm we will use and allocate the necessary
                 // workspace buffer.
                 cudnnConvolutionFwdAlgo_t forward_best_algo;
-                check(cudnnGetConvolutionForwardAlgorithm(
+                CHECK_CUDNN(cudnnGetConvolutionForwardAlgorithm(
                         context(), 
                         descriptor(data),
                         (const cudnnFilterDescriptor_t)filter_handle,
@@ -346,7 +357,7 @@ namespace dlib
                         std::numeric_limits<size_t>::max(),
                         &forward_best_algo));
                 forward_algo = forward_best_algo;
-                check(cudnnGetConvolutionForwardWorkspaceSize( 
+                CHECK_CUDNN(cudnnGetConvolutionForwardWorkspaceSize( 
                         context(),
                         descriptor(data),
                         (const cudnnFilterDescriptor_t)filter_handle,
@@ -360,7 +371,7 @@ namespace dlib
                 // Pick which backward data algorithm we will use and allocate the
                 // necessary workspace buffer.
                 cudnnConvolutionBwdDataAlgo_t backward_data_best_algo;
-                check(cudnnGetConvolutionBackwardDataAlgorithm(
+                CHECK_CUDNN(cudnnGetConvolutionBackwardDataAlgorithm(
                         context(),
                         (const cudnnFilterDescriptor_t)filter_handle,
                         descriptor(dest_desc),
@@ -370,7 +381,7 @@ namespace dlib
                         std::numeric_limits<size_t>::max(),
                         &backward_data_best_algo));
                 backward_data_algo = backward_data_best_algo;
-                check(cudnnGetConvolutionBackwardDataWorkspaceSize( 
+                CHECK_CUDNN(cudnnGetConvolutionBackwardDataWorkspaceSize( 
                         context(),
                         (const cudnnFilterDescriptor_t)filter_handle,
                         descriptor(dest_desc),
@@ -384,7 +395,7 @@ namespace dlib
                 // Pick which backward filters algorithm we will use and allocate the
                 // necessary workspace buffer.
                 cudnnConvolutionBwdFilterAlgo_t backward_filters_best_algo;
-                check(cudnnGetConvolutionBackwardFilterAlgorithm(
+                CHECK_CUDNN(cudnnGetConvolutionBackwardFilterAlgorithm(
                         context(),
                         descriptor(data),
                         descriptor(dest_desc),
@@ -394,7 +405,7 @@ namespace dlib
                         std::numeric_limits<size_t>::max(),
                         &backward_filters_best_algo));
                 backward_filters_algo = backward_filters_best_algo;
-                check(cudnnGetConvolutionBackwardFilterWorkspaceSize( 
+                CHECK_CUDNN(cudnnGetConvolutionBackwardFilterWorkspaceSize( 
                         context(),
                         descriptor(data),
                         descriptor(dest_desc),
@@ -434,7 +445,7 @@ namespace dlib
 
             const float alpha = 1;
             const float beta = 0;
-            check(cudnnConvolutionForward(
+            CHECK_CUDNN(cudnnConvolutionForward(
                     context(),
                     &alpha,
                     descriptor(data),
@@ -460,7 +471,7 @@ namespace dlib
             const float beta = 1;
 
 
-            check(cudnnConvolutionBackwardData_v3(context(),
+            CHECK_CUDNN(cudnnConvolutionBackwardData_v3(context(),
                                                   &alpha,
                                                   (const cudnnFilterDescriptor_t)filter_handle,
                                                   filters.device(),
@@ -484,7 +495,7 @@ namespace dlib
         {
             const float alpha = 1;
             const float beta = 0;
-            check(cudnnConvolutionBackwardFilter_v3(context(),
+            CHECK_CUDNN(cudnnConvolutionBackwardFilter_v3(context(),
                                                     &alpha,
                                                     descriptor(data),
                                                     data.device(),
@@ -535,10 +546,10 @@ namespace dlib
             stride_x = stride_x_;
             stride_y = stride_y_;
             cudnnPoolingDescriptor_t poolingDesc;
-            check(cudnnCreatePoolingDescriptor(&poolingDesc));
+            CHECK_CUDNN(cudnnCreatePoolingDescriptor(&poolingDesc));
             handle = poolingDesc;
 
-            check(cudnnSetPooling2dDescriptor(poolingDesc,
+            CHECK_CUDNN(cudnnSetPooling2dDescriptor(poolingDesc,
                                               CUDNN_POOLING_MAX,
                                               window_height,
                                               window_width,
@@ -559,7 +570,7 @@ namespace dlib
             int outC;
             int outH;
             int outW;
-            check(cudnnGetPooling2dForwardOutputDim((const cudnnPoolingDescriptor_t)handle,
+            CHECK_CUDNN(cudnnGetPooling2dForwardOutputDim((const cudnnPoolingDescriptor_t)handle,
                                                     descriptor(src),
                                                     &outN,
                                                     &outC,
@@ -574,7 +585,7 @@ namespace dlib
             DLIB_CASSERT(dest.nr() == src.nr()/stride_y,"");
             DLIB_CASSERT(dest.nc() == src.nc()/stride_x,"");
 
-            check(cudnnPoolingForward(context(),
+            CHECK_CUDNN(cudnnPoolingForward(context(),
                                      (const cudnnPoolingDescriptor_t)handle,
                                      &alpha,
                                      descriptor(src),
@@ -596,7 +607,7 @@ namespace dlib
 
             const float alpha = 1;
             const float beta = 0;
-            check(cudnnPoolingBackward(context(),
+            CHECK_CUDNN(cudnnPoolingBackward(context(),
                                        (const cudnnPoolingDescriptor_t)handle,
                                        &alpha,
                                        descriptor(dest),
@@ -625,7 +636,7 @@ namespace dlib
             const float alpha = 1;
             const float beta = 0;
 
-            check(cudnnSoftmaxForward(context(),
+            CHECK_CUDNN(cudnnSoftmaxForward(context(),
                                       CUDNN_SOFTMAX_ACCURATE,
                                       CUDNN_SOFTMAX_MODE_CHANNEL,
                                       &alpha,
@@ -651,7 +662,7 @@ namespace dlib
 
             const float alpha = 1;
             const float beta = 0;
-            check(cudnnSoftmaxBackward(context(),
+            CHECK_CUDNN(cudnnSoftmaxBackward(context(),
                                       CUDNN_SOFTMAX_ACCURATE,
                                       CUDNN_SOFTMAX_MODE_CHANNEL,
                                       &alpha,
@@ -678,7 +689,7 @@ namespace dlib
 
             const float alpha = 1;
             const float beta = 0;
-            check(cudnnActivationForward(context(),
+            CHECK_CUDNN(cudnnActivationForward(context(),
                                          CUDNN_ACTIVATION_SIGMOID,
                                          &alpha,
                                          descriptor(src),
@@ -702,7 +713,7 @@ namespace dlib
 
             const float alpha = 1;
             const float beta = 0;
-            check(cudnnActivationBackward(context(),
+            CHECK_CUDNN(cudnnActivationBackward(context(),
                                           CUDNN_ACTIVATION_SIGMOID,
                                           &alpha,
                                           descriptor(dest),
@@ -729,7 +740,7 @@ namespace dlib
 
             const float alpha = 1;
             const float beta = 0;
-            check(cudnnActivationForward(context(),
+            CHECK_CUDNN(cudnnActivationForward(context(),
                                          CUDNN_ACTIVATION_RELU,
                                          &alpha,
                                          descriptor(src),
@@ -753,7 +764,7 @@ namespace dlib
 
             const float alpha = 1;
             const float beta = 0;
-            check(cudnnActivationBackward(context(),
+            CHECK_CUDNN(cudnnActivationBackward(context(),
                                           CUDNN_ACTIVATION_RELU,
                                           &alpha,
                                           descriptor(dest),
@@ -780,7 +791,7 @@ namespace dlib
 
             const float alpha = 1;
             const float beta = 0;
-            check(cudnnActivationForward(context(),
+            CHECK_CUDNN(cudnnActivationForward(context(),
                                          CUDNN_ACTIVATION_TANH,
                                          &alpha,
                                          descriptor(src),
@@ -804,7 +815,7 @@ namespace dlib
 
             const float alpha = 1;
             const float beta = 0;
-            check(cudnnActivationBackward(context(),
+            CHECK_CUDNN(cudnnActivationBackward(context(),
                                           CUDNN_ACTIVATION_TANH,
                                           &alpha,
                                           descriptor(dest),

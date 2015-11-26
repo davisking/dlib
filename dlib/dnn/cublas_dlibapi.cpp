@@ -9,27 +9,36 @@
 
 #include <cublas_v2.h>
 
+static const char* cublas_get_error_string(cublasStatus_t s)
+{
+    switch(s)
+    {
+        case CUBLAS_STATUS_NOT_INITIALIZED: 
+            return "CUDA Runtime API initialization failed.";
+        case CUBLAS_STATUS_ALLOC_FAILED: 
+            return "CUDA Resources could not be allocated.";
+        default:
+            return "A call to cuBLAS failed";
+    }
+}
+
+// Check the return value of a call to the cuBLAS runtime for an error condition.
+#define CHECK_CUBLAS(call)                                                      \
+{                                                                              \
+    const cublasStatus_t error = call;                                         \
+    if (error != CUBLAS_STATUS_SUCCESS)                                        \
+    {                                                                          \
+        std::ostringstream sout;                                               \
+        sout << "Error while calling " << #call << " in file " << __FILE__ << ":" << __LINE__ << ". ";\
+        sout << "code: " << error << ", reason: " << cublas_get_error_string(error);\
+        throw dlib::cublas_error(sout.str());                            \
+    }                                                                          \
+}
+
 namespace dlib
 {
     namespace cuda 
     {
-
-    // ----------------------------------------------------------------------------------------
-
-        // TODO, make into a macro that prints more information like the line number, etc.
-        static void check(cublasStatus_t s)
-        {
-            switch(s)
-            {
-                case CUBLAS_STATUS_SUCCESS: return;
-                case CUBLAS_STATUS_NOT_INITIALIZED: 
-                    throw cublas_error("CUDA Runtime API initialization failed.");
-                case CUBLAS_STATUS_ALLOC_FAILED: 
-                    throw cublas_error("CUDA Resources could not be allocated.");
-                default:
-                    throw cublas_error("A call to cuBLAS failed");
-            }
-        }
 
     // -----------------------------------------------------------------------------------
 
@@ -42,7 +51,7 @@ namespace dlib
 
             cublas_context()
             {
-                check(cublasCreate(&handle));
+                CHECK_CUBLAS(cublasCreate(&handle));
             }
             ~cublas_context()
             {
@@ -117,7 +126,7 @@ namespace dlib
             }
 
             const int k = trans_rhs ? rhs_nc : rhs_nr;
-            check(cublasSgemm(context(),
+            CHECK_CUBLAS(cublasSgemm(context(),
                               transb,
                               transa, 
                               dest_nc, dest_nr, k,

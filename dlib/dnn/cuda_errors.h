@@ -30,6 +30,28 @@ namespace dlib
 
         cudnn_error(const std::string& message): cuda_error(message) {}
     };
+
+    struct curand_error : public cuda_error
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is the exception thrown if any calls to the NVIDIA cuRAND library
+                returns an error.  
+        !*/
+
+        curand_error(const std::string& message): cuda_error(message) {}
+    };
+
+    struct cublas_error : public cuda_error
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is the exception thrown if any calls to the NVIDIA cuBLAS library
+                returns an error.  
+        !*/
+
+        cublas_error(const std::string& message): cuda_error(message) {}
+    };
 }
 
 
