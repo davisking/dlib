@@ -1284,8 +1284,9 @@ namespace dlib
         // "no label".  So here we make the constructor private with the exception that
         // add_loss_layer objects can make it (again, just to simplify add_loss_layer's
         // implementation).
-        no_label_type()=default;
+        no_label_type(){};
         template <typename LOSS_DETAILS, typename SUBNET> friend class add_loss_layer;
+        template < typename net_type, typename solver_type > friend class dnn_trainer; 
     };
 
 // ----------------------------------------------------------------------------------------

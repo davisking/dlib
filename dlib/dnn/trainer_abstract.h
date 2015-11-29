@@ -192,6 +192,8 @@ namespace dlib
                   and having it execute 10 epochs of training during each call.  This also
                   means you can serialize a trainer to disk and then, at a later date,
                   deserialize it and resume training your network where you left off.
+                - You can obtain the average loss value during the final training epoch by
+                  calling get_average_loss().
         !*/
 
         const net_type& train (
@@ -218,6 +220,67 @@ namespace dlib
                   and having it execute 10 epochs of training during each call.  This also
                   means you can serialize a trainer to disk and then, at a later date,
                   deserialize it and resume training your network where you left off.
+                - You can obtain the average loss value during the final training epoch by
+                  calling get_average_loss().
+        !*/
+
+        void train_one_step (
+            const std::vector<input_type>& data,
+            const std::vector<label_type>& labels 
+        );
+        /*!
+            requires
+                - data.size() == labels.size()
+                - net_type uses a supervised loss.  
+                  i.e. net_type::label_type != no_label_type.
+            ensures
+                - Performs one stochastic gradient update step based on the mini-batch of
+                  data and labels supplied to this function.  In particular, calling
+                  train_one_step() in a loop is equivalent to calling the train() method
+                  defined above.  However, train_one_step() allows you to stream data from
+                  disk into the training process while train() requires you to first load
+                  all the training data into RAM.  Otherwise, these training methods are
+                  equivalent.
+                - You can observe the current average loss value by calling get_average_loss().
+        !*/
+
+        void train_one_step (
+            const std::vector<input_type>& data
+        );
+        /*!
+            requires
+                - net_type uses an unsupervised loss.  
+                  i.e. net_type::label_type == no_label_type.
+            ensures
+                - Performs one stochastic gradient update step based on the mini-batch of
+                  data supplied to this function.  In particular, calling train_one_step()
+                  in a loop is equivalent to calling the train() method defined above.
+                  However, train_one_step() allows you to stream data from disk into the
+                  training process while train() requires you to first load all the
+                  training data into RAM.  Otherwise, these training methods are
+                  equivalent.
+                - You can observe the current average loss value by calling get_average_loss().
+        !*/
+
+        double get_average_loss (
+        ) const;
+        /*!
+            ensures
+                - returns the average loss value observed during previous calls to
+                  train_one_step() or train().  That is, the average output of
+                  net_type::update() during the previous mini-batch updates.
+        !*/
+
+        void clear_average_loss (
+        );
+        /*!
+            ensures
+                - #get_average_loss() == 0
+                - get_average_loss() uses a dlib::running_stats object to keep a running
+                  average of the loss values seen during the previous mini-batch updates
+                  applied during training.  Calling clear_average_loss() resets the
+                  running_stats object so it forgets about all previous loss values
+                  observed.
         !*/
 
     };

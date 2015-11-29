@@ -12,6 +12,23 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
+        void set_device (
+            int dev
+        )
+        {
+            CHECK_CUDA(cudaSetDevice(dev));
+        }
+
+        int get_device (
+        )
+        {
+            int dev = 0;
+            CHECK_CUDA(cudaGetDevice(&dev));
+            return dev;
+        }
+
+    // -----------------------------------------------------------------------------------
+
         __global__ void _cuda_multiply(float* d, const float* s, size_t n)
         {
             for (auto i : grid_stride_range(0, n))
