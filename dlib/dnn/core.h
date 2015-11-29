@@ -1278,7 +1278,7 @@ namespace dlib
     {
     private:
         // We don't want anyone making these no_label_type objects.  They are here only to
-        // allow add_loss_layer::label_type and dnn_trainer::label_type to exist which voids
+        // allow add_loss_layer::label_type and dnn_trainer::label_type to exist which avoids
         // needing to overload add_loss_layer and dnn_trainer for supervised an unsupervised
         // losses.  It also can be a type to use in template metaprogramming to indicate
         // "no label".  So here we make the constructor private with the exception that
