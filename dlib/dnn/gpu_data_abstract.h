@@ -58,9 +58,11 @@ namespace dlib
         ); 
         /*!
             ensures
-                - This function does not block.
                 - if (!device_ready()) then
-                    - Begins asynchronously copying host data to the device.
+                    - Begins asynchronously copying host data to the device once it is safe
+                      to do so.  I.e. This function will wait until any previously
+                      scheduled CUDA kernels, which are using the device() memory block,
+                      have completed before transferring the new data to the device.
                     - A call to device() that happens before the transfer completes will
                       block until the transfer is complete.  That is, it is safe to call
                       async_copy_to_device() and then immediately call device().

@@ -47,6 +47,9 @@ namespace dlib
             wait_for_transfer_to_finish();
             CHECK_CUDA(cudaMemcpy(data_host.get(), data_device.get(), data_size*sizeof(float), cudaMemcpyDeviceToHost));
             host_current = true;
+            // At this point we know our RAM block isn't in use because cudaMemcpy()
+            // implicitly syncs with the device. 
+            device_in_use = false;
             // Check for errors.  These calls to cudaGetLastError() are what help us find
             // out if our kernel launches have been failing.
             CHECK_CUDA(cudaGetLastError());
@@ -58,6 +61,13 @@ namespace dlib
     {
         if (!device_current)
         {
+            if (device_in_use)
+            {
+                // Wait for any possible CUDA kernels that might be using our memory block to
+                // complete before we overwrite the memory.
+                CHECK_CUDA(cudaStreamSynchronize(0));
+                device_in_use = false;
+            }
             CHECK_CUDA(cudaMemcpyAsync(data_device.get(), data_host.get(), data_size*sizeof(float), cudaMemcpyHostToDevice, (cudaStream_t)cuda_stream.get()));
             have_active_transfer = true;
             device_current = true;
@@ -75,6 +85,7 @@ namespace dlib
             data_size = 0;
             host_current = true;
             device_current = true;
+            device_in_use = false;
             data_host.reset();
             data_device.reset();
         }
@@ -84,6 +95,7 @@ namespace dlib
             data_size = new_size;
             host_current = true;
             device_current = true;
+            device_in_use = false;
 
             try
             {

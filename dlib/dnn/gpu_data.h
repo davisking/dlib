@@ -30,11 +30,16 @@ namespace dlib
                   modified the data and it hasn't been copied to the device yet then
                   host_current==true and device_current==false.
 
+                  Similarly, we use device_in_use==true to indicate that device() has been
+                  called and no operation to wait for all CUDA kernel completion has been
+                  executed.  So if device_in_use==true then there might be a CUDA kernel
+                  executing that is using the device memory block contained in this object.
+
         !*/
     public:
 
         gpu_data(
-        ) : data_size(0), host_current(true), device_current(true),have_active_transfer(false)
+        ) : data_size(0), host_current(true), device_current(true),have_active_transfer(false),device_in_use(false)
         {
         }
 
@@ -61,6 +66,7 @@ namespace dlib
                 data_size = 0;
                 host_current = true;
                 device_current = true;
+                device_in_use = false;
                 data_host.reset();
                 data_device.reset();
             }
@@ -69,6 +75,7 @@ namespace dlib
                 data_size = new_size;
                 host_current = true;
                 device_current = true;
+                device_in_use = false;
                 data_host.reset(new float[new_size], std::default_delete<float[]>());
                 data_device.reset();
             }
@@ -94,6 +101,7 @@ namespace dlib
             DLIB_CASSERT(false, "CUDA NOT ENABLED");
 #endif
             copy_to_device();
+            device_in_use = true;
             return data_device.get(); 
         }
 
@@ -104,6 +112,7 @@ namespace dlib
 #endif
             copy_to_device();
             host_current = false;
+            device_in_use = true;
             return data_device.get(); 
         }
 
@@ -143,6 +152,7 @@ namespace dlib
         mutable bool host_current;
         mutable bool device_current;
         mutable bool have_active_transfer;
+        mutable bool device_in_use;
 
         std::shared_ptr<float> data_host;
         std::shared_ptr<float> data_device;
