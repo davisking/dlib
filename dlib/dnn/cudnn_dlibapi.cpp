@@ -70,6 +70,7 @@ namespace dlib
             cudnn_context()
             {
                 CHECK_CUDNN(cudnnCreate(&handle));
+                CHECK_CUDA(cudaGetDevice(&device_id));
             }
 
             ~cudnn_context()
@@ -78,10 +79,24 @@ namespace dlib
             }
 
             cudnnHandle_t get_handle (
-            ) const { return handle; }
+            ) 
+            { 
+                // Check if the active device for the current thread changed.  If so then
+                // regenerate our cuDNN handle so it will use the currently selected
+                // device.
+                int new_device_id;
+                CHECK_CUDA(cudaGetDevice(&new_device_id));
+                if (new_device_id != device_id)
+                {
+                    CHECK_CUDNN(cudnnDestroy(handle));
+                    CHECK_CUDNN(cudnnCreate(&handle));
+                }
+                return handle; 
+            }
 
         private:
             cudnnHandle_t handle;
+            int device_id;
         };
 
         static cudnnHandle_t context()
