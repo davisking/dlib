@@ -4,7 +4,6 @@
 #ifdef DLIB_OPENCV_IMAGE_AbSTRACT_H_
 
 #include <opencv2/core/core.hpp>
-#include <opencv2/core/types_c.h>
 #include "../algs.h"
 #include "../pixel.h"
 
@@ -25,7 +24,7 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object is meant to be used as a simple wrapper around the OpenCV
-                IplImage struct or Mat object.  Using this class template you can turn
+                Mat object.  Using this class template you can turn
                 an OpenCV image into something that looks like a normal dlib style 
                 image object.
 
@@ -44,40 +43,6 @@ namespace dlib
     public:
         typedef pixel_type type;
         typedef default_memory_manager mem_manager_type;
-
-        cv_image (
-            const IplImage* img
-        );
-        /*!
-            requires
-                - img->dataOrder == 0
-                  (i.e. Only interleaved color channels are supported with cv_image)
-                - (img->depth&0xFF)/8*img->nChannels == sizeof(pixel_type)
-                  (i.e. The size of the pixel_type needs to match the size of the pixels 
-                  inside the OpenCV image)
-            ensures
-                - #nr() == img->height
-                  #nc() == img->width
-                - using the operator[] on this object you will be able to access the pixels
-                  inside this OpenCV image.
-        !*/
-
-        cv_image (
-            const IplImage img
-        );
-        /*!
-            requires
-                - img.dataOrder == 0
-                  (i.e. Only interleaved color channels are supported with cv_image)
-                - (img.depth&0xFF)/8*img.nChannels == sizeof(pixel_type)
-                  (i.e. The size of the pixel_type needs to match the size of the pixels 
-                  inside the OpenCV image)
-            ensures
-                - #nr() == img.height
-                  #nc() == img.width
-                - using the operator[] on this object you will be able to access the pixels
-                  inside this OpenCV image.
-        !*/
 
         cv_image (
             const cv::Mat img
@@ -163,42 +128,6 @@ namespace dlib
         /*!
             ensures
                 - #*this is an identical copy of item
-                - returns #*this
-        !*/
-
-        cv_image& operator=( 
-            const IplImage* img
-        );
-        /*!
-            requires
-                - img->dataOrder == 0
-                  (i.e. Only interleaved color channels are supported with cv_image)
-                - (img->depth&0xFF)/8*img->nChannels == sizeof(pixel_type)
-                  (i.e. The size of the pixel_type needs to match the size of the pixels 
-                  inside the OpenCV image)
-            ensures
-                - #nr() == img->height
-                  #nc() == img->width
-                - using the operator[] on this object you will be able to access the pixels
-                  inside this OpenCV image.
-                - returns #*this
-        !*/
-
-        cv_image& operator=( 
-            const IplImage img
-        );
-        /*!
-            requires
-                - img->dataOrder == 0
-                  (i.e. Only interleaved color channels are supported with cv_image)
-                - (img->depth&0xFF)/8*img->nChannels == sizeof(pixel_type)
-                  (i.e. The size of the pixel_type needs to match the size of the pixels 
-                  inside the OpenCV image)
-            ensures
-                - #nr() == img->height
-                  #nc() == img->width
-                - using the operator[] on this object you will be able to access the pixels
-                  inside this OpenCV image.
                 - returns #*this
         !*/
 
