@@ -43,9 +43,7 @@ namespace dlib
 
     public:
 
-        // A tensor is an abstract type.  Therefore, you use the resizable_tensor object
-        // below to create tensor instances.
-        virtual ~tensor() = 0;
+        virtual ~tensor();
 
         long num_samples(
         ) const; 
@@ -109,8 +107,8 @@ namespace dlib
                 - makes a tensor iterable just like the STL containers.   
         !*/
 
-        const float* host(
-        ) const;
+        virtual const float* host(
+        ) const = 0;
         /*!
             ensures
                 - returns a pointer to the host memory block of size() contiguous float
@@ -120,8 +118,8 @@ namespace dlib
                       the call to host() blocks. 
         !*/
 
-        float* host(
-        );
+        virtual float* host(
+        ) = 0;
         /*!
             ensures
                 - returns a pointer to the host memory block of size() contiguous float
@@ -135,8 +133,8 @@ namespace dlib
                   calling host().
         !*/
 
-        const float* device(
-        ) const;
+        virtual const float* device(
+        ) const = 0;
         /*!
             requires
                 - DLIB_USE_CUDA is #defined
@@ -148,8 +146,8 @@ namespace dlib
                       the call to device() blocks. 
         !*/
 
-        float* device(
-        );
+        virtual float* device(
+        ) = 0;
         /*!
             requires
                 - DLIB_USE_CUDA is #defined
@@ -444,6 +442,90 @@ namespace dlib
               the vectors together, then sums the result and returns it.
 
     !*/
+
+// ----------------------------------------------------------------------------------------
+
+    class alias_tensor_instance : public tensor
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tensor that aliases another tensor.  That is, it doesn't
+                have its own block of memory but instead simply holds pointers to the
+                memory of another tensor object.  
+        !*/
+
+        // You can't default initialize this object.  You can only get instances of it from
+        // alias_tensor::operator().
+        alias_tensor_instance(
+        ); 
+    };
+
+    class alias_tensor 
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a tool for creating tensor objects that alias other tensor objects.
+                That is, it allows you to make a tensor that references the memory space of
+                another tensor object rather than owning its own memory.  This allows you
+                to do things like interpret a single tensor in different ways or even as a
+                group of multiple tensors.
+        !*/
+    public:
+
+        alias_tensor (
+        );
+        /*!
+            ensures
+                - #size() == 0 
+                - #num_samples() == 0
+                - #k() == 0
+                - #nr() == 0
+                - #nc() == 0
+        !*/
+
+        alias_tensor (
+            long n_, long k_ = 1, long nr_ = 1, long nc_ = 1
+        );
+        /*!
+            requires
+                - n_ >= 0
+                - k_ >= 0
+                - nr_ >= 0
+                - nc_ >= 0
+            ensures
+                - #size() == n_*k_*nr_*nc_
+                - #num_samples() == n_
+                - #k() == k_
+                - #nr() == nr_
+                - #nc() == nc_
+        !*/
+
+        long num_samples() const; 
+        long k() const; 
+        long nr() const; 
+        long nc() const; 
+        size_t size() const;
+
+        alias_tensor_instance operator() (
+            tensor& t,
+            size_t offset
+        );
+        /*!
+            requires
+                - offset+size() <= t.size()
+            ensures
+                - Return a tensor that simply aliases the elements of t beginning with t's
+                  offset'th element.  Specifically, this function returns an aliasing
+                  tensor T such that:
+                    - T.size()   == size()
+                    - T.num_samples() == num_samples()
+                    - T.k()      == k()
+                    - T.nr()     == nr()
+                    - T.nc()     == nc()
+                    - T.host()   == t.host()+offset
+                    - T.device() == t.device()+offset
+        !*/
+    };
 
 // ----------------------------------------------------------------------------------------
 
