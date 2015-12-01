@@ -349,10 +349,10 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+#ifdef DLIB_USE_CUDA
     void test_more_ops(const long nr, const long nc)
     {
         print_spinner();
-#ifdef DLIB_USE_CUDA
         // We are going to make sure that the CPU implementation of these things matches
         // the CUDA implementation.
 
@@ -422,8 +422,8 @@ namespace
         cpu::threshold(src2, 0.5);
         DLIB_TEST(equal(mat(src),mat(src2)));
 
-#endif
     }
+#endif
 
 // ----------------------------------------------------------------------------------------
 
@@ -439,12 +439,14 @@ namespace
         void perform_test (
         )
         {
+#ifdef DLIB_USE_CUDA
             test_more_ops(1,1);
             test_more_ops(3,4);
             test_more_ops(4,3);
             test_more_ops(4,1);
             test_more_ops(1,4);
             test_more_ops(10000,4);
+#endif
             test_tanh();
             test_softmax();
             test_sigmoid();

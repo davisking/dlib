@@ -137,7 +137,7 @@ namespace dlib
 #else // if DLIB_USE_CUDA NOT DEFINED
 
         inline void set_device (
-            int dev
+            int 
         ){}
 
         inline int get_device (
