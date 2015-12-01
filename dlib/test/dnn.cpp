@@ -345,6 +345,41 @@ namespace
         dlog << LINFO << truth5;
         threshold(B, 0.1);
         DLIB_TEST(max(abs(truth5-mat(B))) < 1e-5);
+
+        int cnt = 0;
+        for(auto& x : A)
+            x = cnt++;
+
+        truth1.set_size(2,2);
+        truth2.set_size(2,2);
+        truth3.set_size(2,2);
+        truth1 = 0,1,2,3;
+        truth2 = 4,5,6,7;
+        truth3 = 8,9,10,11;
+
+        alias_tensor at(2,2);
+        auto A0 = at(A,0);
+        auto A4 = at(A,4);
+        auto A8 = at(A,8);
+        DLIB_TEST(mat(A0) == truth1);
+        DLIB_TEST(mat(at(A,4)) == truth2);
+        DLIB_TEST(mat(A8) == truth3);
+
+        A4 += uniform_matrix<float>(2,2,2);
+        truth2 += 2;
+        DLIB_TEST(mat(A4) == truth2);
+        truth1 = trans(reshape_to_column_vector(truth1));
+        truth2 = trans(reshape_to_column_vector(truth2));
+        truth3 = trans(reshape_to_column_vector(truth3));
+
+        DLIB_TEST(mat(A) == join_cols(truth1,join_cols(truth2,truth3)));
+
+        affine_transform(A,A,1,2);
+        truth1 += 2;
+        truth2 += 2;
+        truth3 += 2;
+        DLIB_TEST(mat(at(A,4)) == reshape(truth2,2,2));
+        DLIB_TEST(mat(A) == join_cols(truth1,join_cols(truth2,truth3)));
     }
 
 // ----------------------------------------------------------------------------------------
