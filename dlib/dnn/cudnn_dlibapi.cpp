@@ -449,14 +449,15 @@ namespace dlib
             const tensor& filters
         )
         {
+            DLIB_ASSERT(is_same_object(output,data) == false,"");
+            DLIB_ASSERT(is_same_object(output,filters) == false,"");
+
             output.set_size(out_num_samples, out_k, out_nr, out_nc);
 
-
-            // TODO, remove
-            DLIB_CASSERT(output.num_samples() == data.num_samples(),out_num_samples << "  " << data.num_samples());
-            DLIB_CASSERT(output.k() == filters.num_samples(),"");
-            DLIB_CASSERT(output.nr() == 1+(data.nr()-1)/stride_y,"");
-            DLIB_CASSERT(output.nc() == 1+(data.nc()-1)/stride_x,"");
+            DLIB_ASSERT(output.num_samples() == data.num_samples(),out_num_samples << "  " << data.num_samples());
+            DLIB_ASSERT(output.k() == filters.num_samples(),"");
+            DLIB_ASSERT(output.nr() == 1+(data.nr()-1)/stride_y,"");
+            DLIB_ASSERT(output.nc() == 1+(data.nc()-1)/stride_x,"");
 
             const float alpha = 1;
             const float beta = 0;
