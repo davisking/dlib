@@ -151,7 +151,7 @@ namespace dlib
 
 #ifdef DLIB_USE_CUDA
         virtual const cuda::tensor_descriptor& get_cudnn_tensor_descriptor (
-        ) const; 
+        ) const = 0; 
 #endif
 
     protected:
