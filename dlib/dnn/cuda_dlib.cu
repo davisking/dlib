@@ -164,6 +164,46 @@ namespace dlib
         }
 
     // -----------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------
+
+        __global__ void _cuda_batch_normalize(
+            float* dest,
+            float* means,
+            float* invstds,
+            const float* src, 
+            const float* gamma,
+            const float* beta,
+            long num,
+            long num_samples
+        )
+        {
+            const float eps = 0.00001;
+            const float invnum = 1.0f/num_samples;
+            for (auto i : grid_stride_range(0, num))
+            {
+                means[i] = 0;
+                invstds[i] = 0;
+                for (long n = 0; n < num_samples; ++n)
+                {
+                    float val = src[n*num+i];
+                    means[i] += val;
+                    invstds[i] += val*val;
+                }
+
+                means[i] *= invnum;
+                invstds[i] *= invnum;
+
+                float actual_var = invstds[i] - means[i]*means[i];
+                invstds[i] = 1.0f/::sqrt(actual_var+eps);
+
+                for (long n = 0; n < num_samples; ++n)
+                {
+                    long idx = n*num+i;
+                    float temp = (src[idx] - means[i])*invstds[i];
+                    dest[idx] = temp*gamma[i] + beta[i];
+                }
+            }
+        }
 
         void batch_normalize (
             resizable_tensor& dest,
@@ -174,8 +214,90 @@ namespace dlib
             const tensor& beta 
         )
         {
-            // TODO
-            DLIB_CASSERT(false,"");
+            DLIB_CASSERT(
+                src.num_samples() > 1 &&
+                gamma.num_samples() == 1 && 
+                beta.num_samples() == 1 && 
+                gamma.nr() == beta.nr() && beta.nr() == src.nr() &&
+                gamma.nc() == beta.nc() && beta.nc() == src.nc() &&
+                gamma.k()  == beta.k()  && beta.k() == src.k(), 
+                "\ngamma.num_samples(): " << gamma.num_samples() << 
+                "\ngamma.k():  " << gamma.k() << 
+                "\ngamma.nr(): " << gamma.nr() << 
+                "\ngamma.nc(): " << gamma.nc() << 
+                "\nbeta.num_samples(): " << beta.num_samples() << 
+                "\nbeta.k():   " << beta.k() << 
+                "\nbeta.nr():  " << beta.nr() << 
+                "\nbeta.nc():  " << beta.nc() << 
+                "\nsrc.k():   " << src.k() << 
+                "\nsrc.nr():  " << src.nr() << 
+                "\nsrc.nc():  " << src.nc() 
+            );
+
+            dest.copy_size(src);
+            means.set_size(1, src.k(), src.nr(), src.nc());
+            invstds.set_size(1, src.k(), src.nr(), src.nc());
+
+            _cuda_batch_normalize<<<512,512>>>(dest.device(),
+                                             means.device(),
+                                             invstds.device(),
+                                             src.device(),
+                                             gamma.device(),
+                                             beta.device(),
+                                             means.size(),
+                                             src.num_samples());
+        }
+
+        __global__ void _cuda_batch_normalize_gradient(
+            const float* grad,
+            const float* means,
+            const float* invstds,
+            const float* src,
+            const float* gamma,
+            float* src_grad,
+            float* gamma_grad, 
+            float* beta_grad,
+            float* dmeans,
+            float* dvars, 
+            long num,
+            long num_samples
+        )
+        {
+            const float invnum = 1.0f/num_samples;
+            for (auto i : grid_stride_range(0, num))
+            {
+                dvars[i] = 0;
+                dmeans[i] = 0;
+
+                for (long n = 0; n < num_samples; ++n)
+                {
+                    const long idx = n*num+i;
+                    const float x_hat = (src[idx] - means[i])*invstds[i];
+                    beta_grad[i] += grad[idx];
+                    gamma_grad[i] += grad[idx]*x_hat;
+
+                    const float dx = grad[idx] * gamma[i];
+
+                    dvars[i] += dx*(src[idx] - means[i])*-0.5*::pow(invstds[i], 3.0f);
+                }
+
+                for (long n = 0; n < num_samples; ++n)
+                {
+                    const long idx = n*num+i;
+                    const float dx = grad[idx]*gamma[i];
+
+                    dmeans[i] += dx*-invstds[i] + dvars[i] * -2*(src[idx] - means[i])*invnum;
+                }
+
+                for (long n = 0; n < num_samples; ++n)
+                {
+                    const long idx = n*num+i;
+                    const float dx = grad[idx]*gamma[i];
+                    src_grad[idx] += dx*invstds[i] + 
+                        dvars[i] *2*(src[idx] - means[i])*invnum + 
+                        dmeans[i]*invnum;
+                }
+            }
         }
 
         void batch_normalize_gradient::operator() (
@@ -189,11 +311,140 @@ namespace dlib
             tensor& beta_grad 
         )
         {
-            // TODO
-            DLIB_CASSERT(false,"");
+            const long num = src.k()*src.nr()*src.nc();
+            DLIB_CASSERT(num == means.size(),"");
+            DLIB_CASSERT(num == invstds.size(),"");
+            DLIB_CASSERT(num == gamma.size(),"");
+            DLIB_CASSERT(num == gamma_grad.size(),"");
+            DLIB_CASSERT(num == beta_grad.size(),"");
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src),"");
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad),"");
+
+            dvars.copy_size(invstds);
+            dmeans.copy_size(means);
+
+            _cuda_batch_normalize_gradient<<<512,512>>>(
+                gradient_input.device(),
+                means.device(),
+                invstds.device(),
+                src.device(),
+                gamma.device(),
+                src_grad.device(),
+                gamma_grad.device(),
+                beta_grad.device(),
+                dmeans.device(),
+                dvars.device(),
+                num,
+                src.num_samples());
         }
 
     // ----------------------------------------------------------------------------------------
+
+        // This function is from the article:
+        // http://devblogs.nvidia.com/parallelforall/faster-parallel-reductions-kepler/
+
+        __inline__ __device__ float warp_reduce_sum(float val) 
+        {
+            for (int offset = warpSize/2; offset > 0; offset /= 2) 
+                val += __shfl_down(val, offset);
+            return val;
+        }
+
+        __inline__ __device__ bool is_first_thread_in_warp()
+        {
+            return (threadIdx.x & (warpSize - 1)) == 0;
+        }
+
+        __inline__ __device__ void warp_reduce_atomic_add(
+            float& out, 
+            float val
+        ) 
+        /*!
+            ensures
+                - Atomically adds all the val variables in the current warp to out.
+                  See this page for an extended discussion: 
+                  http://devblogs.nvidia.com/parallelforall/faster-parallel-reductions-kepler/
+        !*/
+        {
+            val = warp_reduce_sum(val);
+            if (is_first_thread_in_warp())
+                atomicAdd(&out, val);
+        }
+
+        __global__ void _cuda_batch_normalize_conv1(
+            float* dest,
+            float* means,
+            float* invstds,
+            const float* src, 
+            const float* gamma,
+            const float* beta,
+            long num_k,
+            long num_samples,
+            long num_pixels
+        )
+        {
+            for (long k = 0; k < num_k; ++k)
+            {
+                float mval = 0;
+                float ival = 0;
+
+                // Now do two parallel reductions to compute the first two moments of the
+                // data.
+                for(auto j : grid_stride_range(0, num_samples*num_pixels))
+                {
+                    long i = j%num_pixels;
+                    long n = j/num_pixels;
+
+                    float val = src[n*num_k*num_pixels + k*num_pixels +i];
+                    mval += val;
+                    ival += val*val;
+                }
+                warp_reduce_atomic_add(means[k], mval);
+                warp_reduce_atomic_add(invstds[k], ival);
+            }
+        }
+        __global__ void _cuda_batch_normalize_conv2(
+            float* means,
+            float* invstds,
+            long num_k,
+            long num_samples,
+            long num_pixels
+        )
+        {
+            const float scale = 1.0f/(num_samples*num_pixels);
+            const float eps = 0.00001;
+            for (auto k : grid_stride_range(0, num_k))
+            {
+                means[k] *= scale;
+                auto actual_var = scale*invstds[k] - means[k]*means[k];
+                invstds[k] = 1.0f/::sqrt(actual_var + eps);
+            }
+        }
+
+        __global__ void _cuda_batch_normalize_conv3(
+            float* dest,
+            float* means,
+            float* invstds,
+            const float* src, 
+            const float* gamma,
+            const float* beta,
+            long num_k,
+            long num_samples,
+            long num_pixels
+        )
+        {
+            for (long k = 0; k < num_k; ++k)
+            {
+                for(auto j : grid_stride_range(0, num_samples*num_pixels))
+                {
+                    long i = j%num_pixels;
+                    long n = j/num_pixels;
+                    i = n*num_k*num_pixels + k*num_pixels +i;
+                    dest[i] = (src[i] - means[k])*invstds[k];
+                    dest[i] = dest[i]*gamma[k] + beta[k];
+                }
+            }
+        }
 
         void batch_normalize_conv (
             resizable_tensor& dest,
@@ -204,8 +455,172 @@ namespace dlib
             const tensor& beta 
         )
         {
-            // TODO
-            DLIB_CASSERT(false,"");
+            DLIB_CASSERT(
+                src.num_samples() > 1 &&
+                gamma.num_samples() == 1 && 
+                beta.num_samples() == 1 && 
+                gamma.nr() == 1 && 
+                beta.nr() == 1 && 
+                gamma.nc() == 1 && 
+                beta.nc() == 1 && 
+                gamma.k()  == beta.k()  && beta.k() == src.k(), 
+                "\ngamma.num_samples(): " << gamma.num_samples() << 
+                "\ngamma.k():  " << gamma.k() << 
+                "\ngamma.nr(): " << gamma.nr() << 
+                "\ngamma.nc(): " << gamma.nc() << 
+                "\nbeta.num_samples(): " << beta.num_samples() << 
+                "\nbeta.k():   " << beta.k() << 
+                "\nbeta.nr():  " << beta.nr() << 
+                "\nbeta.nc():  " << beta.nc() << 
+                "\nsrc.k():   " << src.k() << 
+                "\nsrc.nr():  " << src.nr() << 
+                "\nsrc.nc():  " << src.nc() 
+            );
+
+            dest.copy_size(src);
+            means.set_size(1, src.k());
+            invstds.set_size(1, src.k());
+
+            means = 0;
+            invstds = 0;
+            _cuda_batch_normalize_conv1<<<512,512>>>(dest.device(),
+                                             means.device(),
+                                             invstds.device(),
+                                             src.device(),
+                                             gamma.device(),
+                                             beta.device(),
+                                             src.k(),
+                                             src.num_samples(),
+                                             src.nr()*src.nc());
+
+            _cuda_batch_normalize_conv2<<<512,512>>>(
+                                             means.device(),
+                                             invstds.device(),
+                                             src.k(),
+                                             src.num_samples(),
+                                             src.nr()*src.nc());
+
+            _cuda_batch_normalize_conv3<<<512,512>>>(dest.device(),
+                                             means.device(),
+                                             invstds.device(),
+                                             src.device(),
+                                             gamma.device(),
+                                             beta.device(),
+                                             src.k(),
+                                             src.num_samples(),
+                                             src.nr()*src.nc());
+        }
+
+        __global__ void _cuda_batch_normalize_conv_gradient1(
+            const float* grad,
+            const float* means,
+            const float* invstds,
+            const float* src,
+            const float* gamma,
+            float* src_grad,
+            float* gamma_grad, 
+            float* beta_grad,
+            float* dmeans,
+            float* dvars, 
+            long num_k,
+            long num_samples,
+            long num_pixels
+        )
+        {
+            for (long k = 0; k < num_k; ++k)
+            {
+                float bval = 0;
+                float gval = 0;
+                float dval = 0;
+
+                const float invstd_pow = -0.5f*::pow(invstds[k], 3.0f);
+
+                // Now do three parallel reductions 
+                for(auto j : grid_stride_range(0, num_samples*num_pixels))
+                {
+                    long i = j%num_pixels;
+                    long n = j/num_pixels;
+                    long idx = n*num_k*num_pixels + k*num_pixels +i;
+
+                    const float x_hat = (src[idx] - means[k])*invstds[k];
+                    bval += grad[idx];
+                    gval += grad[idx]*x_hat;
+                    const float dx = grad[idx] * gamma[k];
+                    dval += dx*(src[idx] - means[k])*invstd_pow;
+                }
+                warp_reduce_atomic_add(beta_grad[k], bval);
+                warp_reduce_atomic_add(gamma_grad[k], gval);
+                warp_reduce_atomic_add(dvars[k], dval);
+            }
+        }
+
+        __global__ void _cuda_batch_normalize_conv_gradient2(
+            const float* grad,
+            const float* means,
+            const float* invstds,
+            const float* src,
+            const float* gamma,
+            float* src_grad,
+            float* gamma_grad, 
+            float* beta_grad,
+            float* dmeans,
+            float* dvars, 
+            long num_k,
+            long num_samples,
+            long num_pixels
+        )
+        {
+            const float invnum = 1.0f/(num_samples*num_pixels);
+            for (long k = 0; k < num_k; ++k)
+            {
+                float mval = 0;
+
+                // Now do a parallel reduction
+                for(auto j : grid_stride_range(0, num_samples*num_pixels))
+                {
+                    long i = j%num_pixels;
+                    long n = j/num_pixels;
+                    long idx = n*num_k*num_pixels + k*num_pixels +i;
+
+                    const float dx = grad[idx] * gamma[k];
+                    mval += -dx*invstds[k] + dvars[k] * -2*(src[idx] - means[k])*invnum;
+                }
+                warp_reduce_atomic_add(dmeans[k], mval);
+            }
+        }
+
+        __global__ void _cuda_batch_normalize_conv_gradient3(
+            const float* grad,
+            const float* means,
+            const float* invstds,
+            const float* src,
+            const float* gamma,
+            float* src_grad,
+            float* gamma_grad, 
+            float* beta_grad,
+            float* dmeans,
+            float* dvars, 
+            long num_k,
+            long num_samples,
+            long num_pixels
+        )
+        {
+            const float invnum = 1.0f/(num_samples*num_pixels);
+            for (long k = 0; k < num_k; ++k)
+            {
+                for(auto j : grid_stride_range(0, num_samples*num_pixels))
+                {
+                    long i = j%num_pixels;
+                    long n = j/num_pixels;
+                    long idx = n*num_k*num_pixels + k*num_pixels +i;
+
+                    const float dx = grad[idx] * gamma[k];
+
+                    src_grad[idx] += dx*invstds[k] + 
+                        dvars[k]*2*(src[idx] - means[k])*invnum + 
+                        dmeans[k]*invnum;
+                }
+            }
         }
 
         void batch_normalize_conv_gradient::operator() (
@@ -219,8 +634,64 @@ namespace dlib
             tensor& beta_grad 
         )
         {
-            // TODO
-            DLIB_CASSERT(false,"");
+            DLIB_CASSERT(src.k() == means.size(),"");
+            DLIB_CASSERT(src.k() == invstds.size(),"");
+            DLIB_CASSERT(src.k() == gamma.size(),"");
+            DLIB_CASSERT(src.k() == gamma_grad.size(),"");
+            DLIB_CASSERT(src.k() == beta_grad.size(),"");
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src),"");
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad),"");
+
+            dvars.copy_size(invstds);
+            dmeans.copy_size(means);
+            dvars = 0;
+            dmeans = 0;
+
+            _cuda_batch_normalize_conv_gradient1<<<512,512>>>(
+                gradient_input.device(),
+                means.device(),
+                invstds.device(),
+                src.device(),
+                gamma.device(),
+                src_grad.device(),
+                gamma_grad.device(),
+                beta_grad.device(),
+                dmeans.device(),
+                dvars.device(),
+                src.k(),
+                src.num_samples(),
+                src.nr()*src.nc());
+
+            _cuda_batch_normalize_conv_gradient2<<<512,512>>>(
+                gradient_input.device(),
+                means.device(),
+                invstds.device(),
+                src.device(),
+                gamma.device(),
+                src_grad.device(),
+                gamma_grad.device(),
+                beta_grad.device(),
+                dmeans.device(),
+                dvars.device(),
+                src.k(),
+                src.num_samples(),
+                src.nr()*src.nc());
+
+            _cuda_batch_normalize_conv_gradient3<<<512,512>>>(
+                gradient_input.device(),
+                means.device(),
+                invstds.device(),
+                src.device(),
+                gamma.device(),
+                src_grad.device(),
+                gamma_grad.device(),
+                beta_grad.device(),
+                dmeans.device(),
+                dvars.device(),
+                src.k(),
+                src.num_samples(),
+                src.nr()*src.nc());
+
         }
 
     // -----------------------------------------------------------------------------------

@@ -185,7 +185,7 @@ namespace dlib
             for (long i = 0; i < num; ++i)
             {
                 auto actual_var = p_invstds[i] - p_means[i]*p_means[i];
-                p_invstds[i] = 1.0/std::sqrt(actual_var+eps);
+                p_invstds[i] = 1.0f/std::sqrt(actual_var+eps);
             }
 
             p_src = src.host();
@@ -361,8 +361,8 @@ namespace dlib
             // compute variances 
             for (long k = 0; k < src.k(); ++k)
             {
-                auto actual_var = p_invstds[k] - p_means[k]*p_means[k];
-                p_invstds[k] = 1.0/std::sqrt(actual_var + eps);
+                float actual_var = p_invstds[k] - p_means[k]*p_means[k];
+                p_invstds[k] = 1.0f/std::sqrt(actual_var + eps);
             }
 
             p_src = src.host();
@@ -421,7 +421,7 @@ namespace dlib
             {
                 for (long k = 0; k < src.k(); ++k)
                 {
-                    const auto invstd_pow = -0.5*std::pow(p_invstds[k], 3.0f);
+                    const float invstd_pow = -0.5*std::pow(p_invstds[k], 3.0f);
                     for (long i = 0; i < num; ++i)
                     {
                         const float x_hat = (*p_src - p_means[k])*p_invstds[k];
