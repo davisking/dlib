@@ -84,6 +84,9 @@ namespace dlib
 
             filters = alias_tensor(num_filters, sub.get_output().k(), nr, nc);
             biases = alias_tensor(1,num_filters);
+
+            // set the initial bias values to zero
+            biases(params,filters.size()) = 0;
         }
 
         template <typename SUBNET>
