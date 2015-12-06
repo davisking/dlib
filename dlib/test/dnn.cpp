@@ -561,7 +561,62 @@ namespace
         DLIB_TEST(max(abs(mat(gamma_grad)-mat(gamma_grad2))) < 1e-4);
         DLIB_TEST(max(abs(mat(beta_grad)-mat(beta_grad2))) < 1e-4);
     }
+
 // ----------------------------------------------------------------------------------------
+
+    void test_layers()
+    {
+        {
+            print_spinner();
+            con_ l(3,3,3,2,2);
+            DLIB_TEST_MSG(test_layer(l), test_layer(l));
+        }
+        {
+            print_spinner();
+            con_ l(3,3,3,1,1);
+            DLIB_TEST_MSG(test_layer(l), test_layer(l));
+        }
+        {
+            print_spinner();
+            con_ l(3,3,2,1,1);
+            DLIB_TEST_MSG(test_layer(l), test_layer(l));
+        }
+        {
+            print_spinner();
+            con_ l(2,1,1,1,1);
+            DLIB_TEST_MSG(test_layer(l), test_layer(l));
+        }
+        {
+            print_spinner();
+            fc_ l;
+            DLIB_TEST_MSG(test_layer(l), test_layer(l));
+        }
+        {
+            print_spinner();
+            fc_ l(5);
+            DLIB_TEST_MSG(test_layer(l), test_layer(l));
+        }
+        {
+            print_spinner();
+            relu_ l;
+            DLIB_TEST_MSG(test_layer(l), test_layer(l));
+        }
+        {
+            print_spinner();
+            sig_ l;
+            DLIB_TEST_MSG(test_layer(l), test_layer(l));
+        }
+        {
+            print_spinner();
+            htan_ l;
+            DLIB_TEST_MSG(test_layer(l), test_layer(l));
+        }
+        {
+            print_spinner();
+            softmax_ l;
+            DLIB_TEST_MSG(test_layer(l), test_layer(l));
+        }
+    }
 
     class dnn_tester : public tester
     {
@@ -591,6 +646,7 @@ namespace
             test_basic_tensor_ops();
             compare_bn_gpu_and_cpu();
             compare_bn_conv_gpu_and_cpu();
+            test_layers();
         }
     } a;
 

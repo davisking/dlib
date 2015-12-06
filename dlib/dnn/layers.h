@@ -21,33 +21,137 @@ namespace dlib
     class con_
     {
     public:
-        con_()
+        con_(
+            long num_filters_,
+            long nr_,
+            long nc_,
+            int stride_y_ = 1,
+            int stride_x_ = 1
+        ) : 
+            num_filters(num_filters_), 
+            nr(nr_),
+            nc(nc_),
+            stride_y(stride_y_),
+            stride_x(stride_x_)
         {}
+
+        con_ (
+            const con_& item
+        ) : 
+            params(item.params),
+            num_filters(item.num_filters), 
+            nr(item.nr),
+            nc(item.nc),
+            stride_y(item.stride_y),
+            stride_x(item.stride_x),
+            filters(item.filters),
+            biases(item.biases)
+        {
+            // this->conv is non-copyable and basically stateless, so we have to write our
+            // own copy to avoid trying to copy it and getting an error.
+        }
+
+        con_& operator= (
+            const con_& item
+        )
+        {
+            if (this == &item)
+                return *this;
+
+            // this->conv is non-copyable and basically stateless, so we have to write our
+            // own copy to avoid trying to copy it and getting an error.
+            params = item.params;
+            num_filters = item.num_filters;
+            nr = item.nr;
+            nc = item.nc;
+            stride_y = item.stride_y;
+            stride_x = item.stride_x;
+            filters = item.filters;
+            biases = item.biases;
+            return *this;
+        }
 
         template <typename SUBNET>
         void setup (const SUBNET& sub)
         {
-            // TODO
+            long num_inputs = nr*nc*sub.get_output().k();
+            long num_outputs = num_filters;
+            // allocate params for the filters and also for the filter bias values.
+            params.set_size(num_inputs*num_filters + num_filters);
+
+            dlib::rand rnd("con_"+cast_to_string(num_outputs+num_inputs));
+            randomize_parameters(params, num_inputs+num_outputs, rnd);
+
+            filters = alias_tensor(num_filters, sub.get_output().k(), nr, nc);
+            biases = alias_tensor(1,num_filters);
         }
 
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
         {
-            // TODO
+            conv(output,
+                sub.get_output(),
+                filters(params,0),
+                stride_y,
+                stride_x);
+
+            tt::add(1,output,1,biases(params,filters.size()));
         } 
 
         template <typename SUBNET>
         void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
         {
-            // TODO
+            conv.get_gradient_for_data (gradient_input, filters(params,0), sub.get_gradient_input());
+            auto filt = filters(params_grad,0);
+            conv.get_gradient_for_filters (gradient_input, sub.get_output(), filt);
+            auto b = biases(params_grad, filters.size());
+            tt::add_conv_bias_gradient(b, gradient_input);
         }
 
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
+        friend void serialize(const con_& item, std::ostream& out)
+        {
+            serialize("con_", out);
+            serialize(item.params, out);
+            serialize(item.num_filters, out);
+            serialize(item.nr, out);
+            serialize(item.nc, out);
+            serialize(item.stride_y, out);
+            serialize(item.stride_y, out);
+            serialize(item.filters, out);
+            serialize(item.biases, out);
+        }
+
+        friend void deserialize(con_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "con_")
+                throw serialization_error("Unexpected version found while deserializing dlib::con_.");
+            deserialize(item.params, in);
+            deserialize(item.num_filters, in);
+            deserialize(item.nr, in);
+            deserialize(item.nc, in);
+            deserialize(item.stride_y, in);
+            deserialize(item.stride_y, in);
+            deserialize(item.filters, in);
+            deserialize(item.biases, in);
+        }
+
     private:
 
         resizable_tensor params;
+        long num_filters;
+        long nr;
+        long nc;
+        int stride_y;
+        int stride_x;
+        alias_tensor filters, biases;
+
+        tt::tensor_conv conv;
+
     };
 
     template <typename SUBNET>
@@ -179,7 +283,7 @@ namespace dlib
         }
 
         template <typename SUBNET>
-        void setup (const SUBNET& sub)
+        void setup (const SUBNET& /*sub*/)
         {
         }
 
@@ -232,7 +336,7 @@ namespace dlib
         }
 
         template <typename SUBNET>
-        void setup (const SUBNET& sub)
+        void setup (const SUBNET& /*sub*/)
         {
         }
 
@@ -285,7 +389,7 @@ namespace dlib
         }
 
         template <typename SUBNET>
-        void setup (const SUBNET& sub)
+        void setup (const SUBNET& /*sub*/)
         {
         }
 
@@ -338,7 +442,7 @@ namespace dlib
         }
 
         template <typename SUBNET>
-        void setup (const SUBNET& sub)
+        void setup (const SUBNET& /*sub*/)
         {
         }
 
