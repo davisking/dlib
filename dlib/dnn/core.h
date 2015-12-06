@@ -2020,7 +2020,7 @@ namespace dlib
                 double output_derivative = params_grad.host()[i];
                 double relative_error = (reference_derivative - output_derivative)/(reference_derivative + 1e-100);
                 double absolute_error = (reference_derivative - output_derivative);
-                if (std::abs(relative_error) > 0.02 && std::abs(absolute_error) > 0.001)
+                if (std::abs(relative_error) > 0.02 && std::abs(absolute_error) > 0.003)
                 {
                     using namespace std;
                     sout << "Gradient error in parameter #" << i <<".  Relative error: "<< relative_error << endl;
@@ -2053,7 +2053,7 @@ namespace dlib
                     output_derivative -= initial_gradient_input[i];
                 double relative_error = (reference_derivative - output_derivative)/(reference_derivative + 1e-100);
                 double absolute_error = (reference_derivative - output_derivative);
-                if (std::abs(relative_error) > 0.02 && std::abs(absolute_error) > 0.001)
+                if (std::abs(relative_error) > 0.02 && std::abs(absolute_error) > 0.003)
                 {
                     using namespace std;
                     sout << "Gradient error in data variable #" << i <<".  Relative error: "<< relative_error << endl;
