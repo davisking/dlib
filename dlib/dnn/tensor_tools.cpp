@@ -277,7 +277,8 @@ namespace dlib { namespace tt
     }
 
     void tensor_conv::
-    setup(
+    operator() (
+        resizable_tensor& output,
         const tensor& data,
         const tensor& filters,
         int stride_y,
@@ -285,22 +286,7 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        impl.setup(data, filters, stride_y, stride_x);
-#else
-        // TODO
-        DLIB_CASSERT(false,"");
-#endif
-    }
-
-    void tensor_conv::
-    operator() (
-        resizable_tensor& output,
-        const tensor& data,
-        const tensor& filters
-    )
-    {
-#ifdef DLIB_USE_CUDA
-        impl(output, data, filters);
+        impl(output, data, filters, stride_y, stride_x);
 #else
         // TODO
         DLIB_CASSERT(false,"");

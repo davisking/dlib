@@ -144,7 +144,11 @@ namespace dlib
             void clear(
             );
 
-            void setup(
+            ~tensor_conv (
+            );
+
+            void operator() (
+                resizable_tensor& output,
                 const tensor& data,
                 const tensor& filters,
                 int stride_y,
@@ -152,23 +156,8 @@ namespace dlib
             );
             /*!
                 requires
-                    - filters.k() == data.k()
                     - stride_y > 0
                     - stride_x > 0
-            !*/
-
-            ~tensor_conv (
-            );
-
-            void operator() (
-                resizable_tensor& output,
-                const tensor& data,
-                const tensor& filters
-            );
-            /*!
-                requires
-                    - The dimensions of data and filters are the same as the ones given 
-                      to the last call to setup().
                     - is_same_object(output,data) == false
                     - is_same_object(output,filters) == false
                 ensures
@@ -176,8 +165,8 @@ namespace dlib
                     - filters contains filters.num_samples() filters. 
                     - #output.num_samples() == data.num_samples()
                     - #output.k() == filters.num_samples()
-                    - #output.nr() == 1+(data.nr()-1)/stride_y
-                    - #output.nc() == 1+(data.nc()-1)/stride_x
+                    - #output.nr() == 1+(data.nr()-filters.nr()%2)/stride_y
+                    - #output.nc() == 1+(data.nc()-filters.nc()%2)/stride_x
             !*/
 
             void get_gradient_for_data (
@@ -188,9 +177,9 @@ namespace dlib
             /*!
                 requires
                     - filters has the same dimensions as the filters object give to the 
-                      last call to setup().
+                      last call to operator().
                     - data_gradient has the same dimensions as the data object give to the
-                      last call to setup().
+                      last call to operator().
                     - gradient_input has the same dimensions as the output of operator().
                     - is_same_object(data_gradient,filters) == false
                     - is_same_object(data_gradient,gradient_input) == false
@@ -209,9 +198,9 @@ namespace dlib
             /*!
                 requires
                     - filters_gradient has the same dimensions as the filters object give
-                      to the last call to setup().
+                      to the last call to operator().
                     - data has the same dimensions as the data object give to the last call
-                      to setup().
+                      to operator().
                     - gradient_input has the same dimensions as the output of operator().
                     - is_same_object(filters_gradient,data) == false
                     - is_same_object(filters_gradient,gradient_input) == false
@@ -223,10 +212,29 @@ namespace dlib
             !*/
 
         private:
-            void* filter_handle;
-            void* conv_handle;
+
+            void setup(
+                const tensor& data,
+                const tensor& filters,
+                int stride_y,
+                int stride_x
+            );
+            /*!
+                requires
+                    - filters.k() == data.k()
+                    - stride_y > 0
+                    - stride_x > 0
+            !*/
+
+            // These variables record the type of data given to the last call to setup().
             int stride_y;
             int stride_x;
+            long data_num_samples, data_k, data_nr, data_nc;
+            long filters_num_samples, filters_k, filters_nr, filters_nc;
+
+
+            void* filter_handle;
+            void* conv_handle;
 
             // dimensions of the output tensor from operator()
             int out_num_samples;

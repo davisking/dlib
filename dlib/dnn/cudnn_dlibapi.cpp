@@ -265,10 +265,6 @@ namespace dlib
         ) : 
             filter_handle(nullptr),
             conv_handle(nullptr),
-            out_num_samples(0),
-            out_k(0),
-            out_nr(0),
-            out_nc(0),
             forward_algo(0),
             forward_workspace_size_in_bytes(0),
             forward_workspace(nullptr),
@@ -279,6 +275,7 @@ namespace dlib
             backward_filters_workspace_size_in_bytes(0),
             backward_filters_workspace(nullptr)
         {
+            clear();
         }
 
         void tensor_conv::
@@ -313,6 +310,17 @@ namespace dlib
             backward_filters_workspace = nullptr;
             backward_filters_algo = 0;
             backward_filters_workspace_size_in_bytes = 0;
+
+            stride_y = 0;
+            stride_x = 0;
+            data_num_samples = 0;
+            data_k = 0;
+            data_nr = 0;
+            data_nc = 0;
+            filters_num_samples = 0;
+            filters_k = 0;
+            filters_nr = 0;
+            filters_nc = 0;
         }
 
         void tensor_conv::
@@ -324,11 +332,36 @@ namespace dlib
         ) 
         {
             DLIB_CASSERT(data.k() == filters.k(),"");
+
+            // if the last call to setup gave the same exact settings then don't do
+            // anything.
+            if (stride_y_ == stride_y && 
+                stride_x_ == stride_x &&
+                data_num_samples == data.num_samples() &&
+                data_k == data.k() &&
+                data_nr == data.nr() &&
+                data_nc == data.nc() &&
+                filters_num_samples == filters.num_samples() &&
+                filters_k == filters.k() &&
+                filters_nr == filters.nr() &&
+                filters_nc == filters.nc())
+            {
+                return;
+            }
+
             clear();
             try
             {
                 stride_y = stride_y_;
                 stride_x = stride_x_;
+                data_num_samples = data.num_samples();
+                data_k = data.k();
+                data_nr = data.nr();
+                data_nc = data.nc();
+                filters_num_samples = filters.num_samples();
+                filters_k = filters.k();
+                filters_nr = filters.nr();
+                filters_nc = filters.nc();
 
                 CHECK_CUDNN(cudnnCreateFilterDescriptor((cudnnFilterDescriptor_t*)&filter_handle));
                 CHECK_CUDNN(cudnnSetFilter4dDescriptor((cudnnFilterDescriptor_t)filter_handle, 
@@ -446,18 +479,22 @@ namespace dlib
         void tensor_conv::operator() (
             resizable_tensor& output,
             const tensor& data,
-            const tensor& filters
+            const tensor& filters,
+            int stride_y,
+            int stride_x
         )
         {
             DLIB_ASSERT(is_same_object(output,data) == false,"");
             DLIB_ASSERT(is_same_object(output,filters) == false,"");
 
+            setup(data,filters,stride_y,stride_x);
+
             output.set_size(out_num_samples, out_k, out_nr, out_nc);
 
             DLIB_ASSERT(output.num_samples() == data.num_samples(),out_num_samples << "  " << data.num_samples());
             DLIB_ASSERT(output.k() == filters.num_samples(),"");
-            DLIB_ASSERT(output.nr() == 1+(data.nr()-1)/stride_y,"");
-            DLIB_ASSERT(output.nc() == 1+(data.nc()-1)/stride_x,"");
+            DLIB_ASSERT(output.nr() == 1+(data.nr()-filters.nr()%2)/stride_y,"");
+            DLIB_ASSERT(output.nc() == 1+(data.nc()-filters.nc()%2)/stride_x,output.nc() << "  " <<1+(data.nc()-1)/stride_x << " : " << data.nc() << "  " << stride_x);
 
             const float alpha = 1;
             const float beta = 0;

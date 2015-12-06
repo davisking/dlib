@@ -397,7 +397,8 @@ namespace dlib { namespace tt
         void clear(
         );
 
-        void setup(
+        void operator() (
+            resizable_tensor& output,
             const tensor& data,
             const tensor& filters,
             int stride_y,
@@ -405,20 +406,8 @@ namespace dlib { namespace tt
         );
         /*!
             requires
-                - filters.k() == data.k()
-                    - stride_y > 0
-                    - stride_x > 0
-        !*/
-
-        void operator() (
-            resizable_tensor& output,
-            const tensor& data,
-            const tensor& filters
-        );
-        /*!
-            requires
-                - The dimensions of data and filters are the same as the ones given 
-                  to the last call to setup().
+                - stride_y > 0
+                - stride_x > 0
                 - is_same_object(output,data) == false
                 - is_same_object(output,filters) == false
             ensures
@@ -426,8 +415,8 @@ namespace dlib { namespace tt
                     - filters contains filters.num_samples() filters. 
                     - #output.num_samples() == data.num_samples()
                     - #output.k() == filters.num_samples()
-                    - #output.nr() == 1+(data.nr()-1)/stride_y
-                    - #output.nc() == 1+(data.nc()-1)/stride_x
+                    - #output.nr() == 1+(data.nr()-filters.nr()%2)/stride_y
+                    - #output.nc() == 1+(data.nc()-filters.nc()%2)/stride_x
         !*/
 
         void get_gradient_for_data (
@@ -438,9 +427,9 @@ namespace dlib { namespace tt
         /*!
             requires
                 - filters has the same dimensions as the filters object give to the last
-                  call to setup().
+                  call to operator().
                 - data_gradient has the same dimensions as the data object give to the last
-                  call to setup().
+                  call to operator().
                 - gradient_input has the same dimensions as the output of operator().
                 - is_same_object(data_gradient,filters) == false
                 - is_same_object(data_gradient,gradient_input) == false
@@ -459,9 +448,9 @@ namespace dlib { namespace tt
         /*!
             requires
                 - filters_gradient has the same dimensions as the filters object give to
-                  the last call to setup().
+                  the last call to operator().
                 - data has the same dimensions as the data object give to the last call to
-                  setup().
+                  operator().
                 - gradient_input has the same dimensions as the output of operator().
                 - is_same_object(filters_gradient,data) == false
                 - is_same_object(filters_gradient,gradient_input) == false
