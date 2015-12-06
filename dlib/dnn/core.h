@@ -199,7 +199,7 @@ namespace dlib
         auto call_layer_forward(
             layer_type& layer,
             const SUBNET& sub, 
-            tensor& data_output
+            tensor& /*data_output*/
         ) -> decltype(layer.forward(sub,rt()))
         {
             // This overload of call_layer_forward() is here because this template
@@ -1895,8 +1895,10 @@ namespace dlib
         const float base_eps = 0.01;
         using namespace timpl;
         // Do some setup
+        running_stats<double> rs_data, rs_params;
         dlib::rand rnd;
-        for (int iter = 0; iter < 5; ++iter)
+        std::ostringstream sout;
+        for (int iter = 0; iter < 10; ++iter)
         {
             test_layer_subnet subnetwork(rnd);
             resizable_tensor output, out2, out3;
@@ -1911,7 +1913,6 @@ namespace dlib
             input_grad.copy_size(output);
             fill_with_gassuan_random_numbers(input_grad, rnd);
 
-            std::ostringstream sout;
 
             // The f() we are computing gradients of is this thing.  It's value at the current
             // parameter and data values is:
@@ -2020,7 +2021,8 @@ namespace dlib
                 double output_derivative = params_grad.host()[i];
                 double relative_error = (reference_derivative - output_derivative)/(reference_derivative + 1e-100);
                 double absolute_error = (reference_derivative - output_derivative);
-                if (std::abs(relative_error) > 0.02 && std::abs(absolute_error) > 0.003)
+                rs_params.add(std::abs(relative_error));
+                if (std::abs(relative_error) > 0.05 && std::abs(absolute_error) > 0.005)
                 {
                     using namespace std;
                     sout << "Gradient error in parameter #" << i <<".  Relative error: "<< relative_error << endl;
@@ -2028,7 +2030,6 @@ namespace dlib
                     sout << "output derivative:   " << output_derivative << endl;
                     return layer_test_results(sout.str()); 
                 }
-
             }
 
             // ==================================================================
@@ -2053,7 +2054,8 @@ namespace dlib
                     output_derivative -= initial_gradient_input[i];
                 double relative_error = (reference_derivative - output_derivative)/(reference_derivative + 1e-100);
                 double absolute_error = (reference_derivative - output_derivative);
-                if (std::abs(relative_error) > 0.02 && std::abs(absolute_error) > 0.003)
+                rs_data.add(std::abs(relative_error));
+                if (std::abs(relative_error) > 0.05 && std::abs(absolute_error) > 0.005)
                 {
                     using namespace std;
                     sout << "Gradient error in data variable #" << i <<".  Relative error: "<< relative_error << endl;
@@ -2064,6 +2066,19 @@ namespace dlib
             }
 
         } // end for (int iter = 0; iter < 5; ++iter)
+
+        if (rs_params.mean() > 0.003)
+        {
+            using namespace std;
+            sout << "Average parameter gradient error is somewhat large at: "<< rs_params.mean() << endl;
+            return layer_test_results(sout.str()); 
+        }
+        if (rs_data.mean() > 0.003)
+        {
+            using namespace std;
+            sout << "Average data gradient error is somewhat large at: "<< rs_data.mean() << endl;
+            return layer_test_results(sout.str()); 
+        }
 
         return layer_test_results();
     }
