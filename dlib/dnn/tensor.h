@@ -521,6 +521,30 @@ namespace dlib
         alias_tensor_instance inst;
     };
 
+    inline void serialize(const alias_tensor& item, std::ostream& out)
+    {
+        int version = 1;
+        serialize(version, out);
+        serialize(item.num_samples(), out);
+        serialize(item.k(), out);
+        serialize(item.nr(), out);
+        serialize(item.nc(), out);
+    }
+
+    inline void deserialize(alias_tensor& item, std::istream& in)
+    {
+        int version = 0;
+        deserialize(version, in);
+        if (version != 1)
+            throw serialization_error("Unexpected version found while deserializing dlib::alias_tensor.");
+        long num_samples, k, nr, nc;
+        deserialize(num_samples, in);
+        deserialize(k, in);
+        deserialize(nr, in);
+        deserialize(nc, in);
+        item = alias_tensor(num_samples, k, nr, nc);
+    }
+
 // ----------------------------------------------------------------------------------------
 
 }

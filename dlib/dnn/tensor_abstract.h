@@ -527,6 +527,12 @@ namespace dlib
         !*/
     };
 
+    void serialize(const alias_tensor& item, std::ostream& out)
+    void deserialize(alias_tensor& item, std::istream& in);
+    /*!
+        provides serialization support for alias_tensor.  
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
 }
