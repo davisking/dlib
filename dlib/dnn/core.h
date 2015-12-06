@@ -261,16 +261,13 @@ namespace dlib
         dlib::rand& rnd
     )
     {
-        float* data = params.host();
-        for (size_t i = 0; i < params.size(); ++i)
+        for (auto& val : params)
         {
             // Draw a random number to initialize the layer according to formula (16)
             // from Understanding the difficulty of training deep feedforward neural
             // networks by Xavier Glorot and Yoshua Bengio.
-            float val = 2*rnd.get_random_float()-1;
+            val = 2*rnd.get_random_float()-1;
             val *= std::sqrt(6.0/(num_inputs_and_outputs));
-
-            data[i] = val;
         }
     }
 
