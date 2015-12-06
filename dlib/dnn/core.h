@@ -1896,168 +1896,174 @@ namespace dlib
         using namespace timpl;
         // Do some setup
         dlib::rand rnd;
-        test_layer_subnet subnetwork(rnd);
-        resizable_tensor output, out2, out3;
-        // Run setup() and forward() as well to make sure any calls to subnet() have
-        // happened before we start assuming we know how many data elements there are
-        // (since we do a lazy layer creation thing based on calls to subnet() inside
-        // test_layer_subnet).
-        l.setup(subnetwork);
-        impl::call_layer_forward(l, subnetwork, output);
-
-        resizable_tensor input_grad;
-        input_grad.copy_size(output);
-        fill_with_gassuan_random_numbers(input_grad, rnd);
-
-        std::ostringstream sout;
-
-        // The f() we are computing gradients of is this thing.  It's value at the current
-        // parameter and data values is:
-        //sout << "f(data,params): " << dot(output, input_grad) << std::endl;
-
-        // We are going to save a copy of the subnetwork.get_gradient_input() data before we do
-        // backpropagation since the backward() function is supposed to *add* to the
-        // gradients rather than overwrite them.  We will use this saved data to check if
-        // that is the case.
-        const unsigned long num_data_inputs = subnetwork.count_outputs();
-        std::vector<float> initial_gradient_input(num_data_inputs);
-        for (unsigned long i = 0; i < num_data_inputs; ++i)
-            initial_gradient_input[i] = subnetwork.get_gradient_input_element(i);
-
-
-        // Now tell the layer to compute all the gradients.  In the rest of this function
-        // we will just be checking that these gradients were computed correctly by
-        // comparing them to a central differences approximation.
-        resizable_tensor params_grad;
-        params_grad.copy_size(l.get_layer_params());
-        // But first, set the params grad to something crazy so that it's very obvious if
-        // it doesn't get fully assigned.
-        params_grad = std::numeric_limits<float>::infinity();
-        impl::call_layer_backward(l, output, input_grad, subnetwork, params_grad);
-
-        static_assert(impl::is_inplace_layer(l, subnetwork) == impl::has_inplace_backward(l, subnetwork),
-            "Layer not defined correctly.  forward and backward methods must either both be in-place or both out-of-place. ");
-
-        // Make sure the outputs of forward() and backward() are the same when they are run
-        // in in-place mode.
-        if (impl::is_inplace_layer(l, subnetwork))
+        for (int iter = 0; iter < 5; ++iter)
         {
-            test_layer_subnet subnetwork2(rnd);
-            layer_details_type ll(l);
-            ll.setup(subnetwork2);
-            resizable_tensor ip_out;
-            impl::call_layer_forward(ll, subnetwork2, ip_out);
-            impl::call_layer_forward(ll, subnetwork2, subnetwork2.get_mutable_output());
-            const auto forward_error = max(abs(mat(ip_out) - mat(subnetwork2.get_output())));
-            if (forward_error > 0.00001)
-            {
-                using namespace std;
-                sout << "This layer is supposed to support in-place computations but the output of forward_inplace()\n";
-                sout << "changes when invoked in-place vs. out-of-place. The error was: " << forward_error << endl;
-                return layer_test_results(sout.str()); 
-            }
-
-            resizable_tensor params_grad;
-            params_grad.copy_size(ll.get_layer_params());
-            params_grad = std::numeric_limits<float>::infinity();
+            test_layer_subnet subnetwork(rnd);
+            resizable_tensor output, out2, out3;
+            // Run setup() and forward() as well to make sure any calls to subnet() have
+            // happened before we start assuming we know how many data elements there are
+            // (since we do a lazy layer creation thing based on calls to subnet() inside
+            // test_layer_subnet).
+            l.setup(subnetwork);
+            impl::call_layer_forward(l, subnetwork, output);
 
             resizable_tensor input_grad;
-            input_grad.copy_size(ip_out);
+            input_grad.copy_size(output);
             fill_with_gassuan_random_numbers(input_grad, rnd);
-            resizable_tensor params_grad1, params_grad2, data_grad1, data_grad2;
-            params_grad1 = params_grad;
-            params_grad2 = params_grad;
-            // Now call backward() and make sure it works as well.
-            subnetwork2.get_gradient_input() = 9999;
-            impl::call_layer_backward(ll, ip_out, input_grad, subnetwork2, params_grad1);
-            data_grad1 = subnetwork2.get_gradient_input();
 
-            subnetwork2.get_gradient_input() = mat(input_grad);
-            impl::call_layer_backward(ll, ip_out, subnetwork2.get_gradient_input(), subnetwork2, params_grad2);
-            data_grad2 = subnetwork2.get_gradient_input();
-            if (params_grad.size() != 0)
+            std::ostringstream sout;
+
+            // The f() we are computing gradients of is this thing.  It's value at the current
+            // parameter and data values is:
+            //sout << "f(data,params): " << dot(output, input_grad) << std::endl;
+
+            // We are going to save a copy of the subnetwork.get_gradient_input() data before we do
+            // backpropagation since the backward() function is supposed to *add* to the
+            // gradients rather than overwrite them.  We will use this saved data to check if
+            // that is the case.
+            const unsigned long num_data_inputs = subnetwork.count_outputs();
+            std::vector<float> initial_gradient_input(num_data_inputs);
+            for (unsigned long i = 0; i < num_data_inputs; ++i)
+                initial_gradient_input[i] = subnetwork.get_gradient_input_element(i);
+
+
+            // Now tell the layer to compute all the gradients.  In the rest of this function
+            // we will just be checking that these gradients were computed correctly by
+            // comparing them to a central differences approximation.
+            resizable_tensor params_grad;
+            params_grad.copy_size(l.get_layer_params());
+            // But first, set the params grad to something crazy so that it's very obvious if
+            // it doesn't get fully assigned.
+            params_grad = std::numeric_limits<float>::infinity();
+            impl::call_layer_backward(l, output, input_grad, subnetwork, params_grad);
+
+            static_assert(impl::is_inplace_layer(l, subnetwork) == impl::has_inplace_backward(l, subnetwork),
+                "Layer not defined correctly.  forward and backward methods must either both be in-place or both out-of-place. ");
+
+            // Make sure the outputs of forward() and backward() are the same when they are run
+            // in in-place mode.
+            if (impl::is_inplace_layer(l, subnetwork))
             {
-                const auto backward_param_error = max(abs(mat(params_grad1) - mat(params_grad2)));
-                if (backward_param_error > 0.00001)
+                test_layer_subnet subnetwork2(rnd);
+                layer_details_type ll(l);
+                ll.setup(subnetwork2);
+                resizable_tensor ip_out;
+                impl::call_layer_forward(ll, subnetwork2, ip_out);
+                impl::call_layer_forward(ll, subnetwork2, subnetwork2.get_mutable_output());
+                const auto forward_error = max(abs(mat(ip_out) - mat(subnetwork2.get_output())));
+                if (forward_error > 0.00001)
+                {
+                    using namespace std;
+                    sout << "This layer is supposed to support in-place computations but the output of forward_inplace()\n";
+                    sout << "changes when invoked in-place vs. out-of-place. The error was: " << forward_error << endl;
+                    return layer_test_results(sout.str()); 
+                }
+
+                resizable_tensor params_grad;
+                params_grad.copy_size(ll.get_layer_params());
+                params_grad = std::numeric_limits<float>::infinity();
+
+                resizable_tensor input_grad;
+                input_grad.copy_size(ip_out);
+                fill_with_gassuan_random_numbers(input_grad, rnd);
+                resizable_tensor params_grad1, params_grad2, data_grad1, data_grad2;
+                params_grad1 = params_grad;
+                params_grad2 = params_grad;
+                // Now call backward() and make sure it works as well.
+                subnetwork2.get_gradient_input() = 9999;
+                impl::call_layer_backward(ll, ip_out, input_grad, subnetwork2, params_grad1);
+                data_grad1 = subnetwork2.get_gradient_input();
+
+                subnetwork2.get_gradient_input() = mat(input_grad);
+                impl::call_layer_backward(ll, ip_out, subnetwork2.get_gradient_input(), subnetwork2, params_grad2);
+                data_grad2 = subnetwork2.get_gradient_input();
+                if (params_grad.size() != 0)
+                {
+                    const auto backward_param_error = max(abs(mat(params_grad1) - mat(params_grad2)));
+                    if (backward_param_error > 0.00001)
+                    {
+                        using namespace std;
+                        sout << "This layer is supposed to support in-place computations but the output of backward_inplace()\n";
+                        sout << "changes when invoked in-place vs. out-of-place. The error was: " << backward_param_error << endl;
+                        return layer_test_results(sout.str()); 
+                    }
+                }
+                const auto backward_data_error = max(abs(mat(data_grad1) - mat(data_grad2)));
+                if (backward_data_error > 0.00001)
                 {
                     using namespace std;
                     sout << "This layer is supposed to support in-place computations but the output of backward_inplace()\n";
-                    sout << "changes when invoked in-place vs. out-of-place. The error was: " << backward_param_error << endl;
+                    sout << "changes when invoked in-place vs. out-of-place. The error was: " << backward_data_error << endl;
                     return layer_test_results(sout.str()); 
                 }
             }
-            const auto backward_data_error = max(abs(mat(data_grad1) - mat(data_grad2)));
-            if (backward_data_error > 0.00001)
+
+            // ==================================================================
+            // first validate the way the parameter gradients are computed
+            for (unsigned long i = 0; i < params_grad.size(); ++i)
             {
-                using namespace std;
-                sout << "This layer is supposed to support in-place computations but the output of backward_inplace()\n";
-                sout << "changes when invoked in-place vs. out-of-place. The error was: " << backward_data_error << endl;
-                return layer_test_results(sout.str()); 
-            }
-        }
+                layer_details_type l1(l);
 
-        // ==================================================================
-        // first validate the way the parameter gradients are computed
-        for (unsigned long i = 0; i < params_grad.size(); ++i)
-        {
-            layer_details_type l1(l);
+                float eps = l1.get_layer_params().host()[i]*base_eps;
+                if (eps == 0)
+                    eps = base_eps;
+                const float oldval = l1.get_layer_params().host()[i];
+                l1.get_layer_params().host()[i] = oldval+eps;
+                impl::call_layer_forward(l1, subnetwork, out2);
+                l1.get_layer_params().host()[i] = oldval-eps;
+                impl::call_layer_forward(l1, subnetwork, out3);
+                l1.get_layer_params().host()[i] = oldval;
 
-            float eps = l1.get_layer_params().host()[i]*base_eps;
-            if (eps == 0)
-                eps = base_eps;
-            const float oldval = l1.get_layer_params().host()[i];
-            l1.get_layer_params().host()[i] = oldval+eps;
-            impl::call_layer_forward(l1, subnetwork, out2);
-            l1.get_layer_params().host()[i] = oldval-eps;
-            impl::call_layer_forward(l1, subnetwork, out3);
-            l1.get_layer_params().host()[i] = oldval;
+                // Compute a reference derivative via a central differences approximation and
+                // compare it to the one output by the layer and make sure they match.
+                double reference_derivative = (dot(out2,input_grad)-dot(out3, input_grad))/(2*eps);
+                double output_derivative = params_grad.host()[i];
+                double relative_error = (reference_derivative - output_derivative)/(reference_derivative + 1e-100);
+                double absolute_error = (reference_derivative - output_derivative);
+                if (std::abs(relative_error) > 0.02 && std::abs(absolute_error) > 0.001)
+                {
+                    using namespace std;
+                    sout << "Gradient error in parameter #" << i <<".  Relative error: "<< relative_error << endl;
+                    sout << "expected derivative: " << reference_derivative << endl;
+                    sout << "output derivative:   " << output_derivative << endl;
+                    return layer_test_results(sout.str()); 
+                }
 
-            // Compute a reference derivative via a central differences approximation and
-            // compare it to the one output by the layer and make sure they match.
-            double reference_derivative = (dot(out2,input_grad)-dot(out3, input_grad))/(2*eps);
-            double output_derivative = params_grad.host()[i];
-            double relative_error = (reference_derivative - output_derivative)/(reference_derivative + 1e-100);
-            if (std::abs(relative_error) > 0.01)
-            {
-                using namespace std;
-                sout << "Gradient error in parameter #" << i <<".  Relative error: "<< relative_error << endl;
-                sout << "expected derivative: " << reference_derivative << endl;
-                sout << "output derivative:   " << output_derivative << endl;
-                return layer_test_results(sout.str()); 
             }
 
-        }
-
-        // ==================================================================
-        // now validate the data gradients
-        for (unsigned long i = 0; i < num_data_inputs; ++i)
-        {
-            const float oldval = subnetwork.get_output_element(i);
-            float eps = oldval*base_eps;
-            if (eps == 0)
-                eps = base_eps;
-            subnetwork.get_output_element(i) = oldval+eps;
-            impl::call_layer_forward(l, subnetwork, out2);
-            subnetwork.get_output_element(i) = oldval-eps;
-            impl::call_layer_forward(l, subnetwork, out3);
-            subnetwork.get_output_element(i) = oldval;
-
-            // Compute a reference derivative via a central differences approximation and
-            // compare it to the one output by the layer and make sure they match.
-            double reference_derivative = (dot(out2,input_grad)-dot(out3, input_grad))/(2*eps);
-            double output_derivative = subnetwork.get_gradient_input_element(i);
-            if (!impl::is_inplace_layer(l,subnetwork))
-                output_derivative -= initial_gradient_input[i];
-            double relative_error = (reference_derivative - output_derivative)/(reference_derivative + 1e-100);
-            if (std::abs(relative_error) > 0.01)
+            // ==================================================================
+            // now validate the data gradients
+            for (unsigned long i = 0; i < num_data_inputs; ++i)
             {
-                using namespace std;
-                sout << "Gradient error in data variable #" << i <<".  Relative error: "<< relative_error << endl;
-                sout << "expected derivative: " << reference_derivative << endl;
-                sout << "output derivative:   " << output_derivative << endl;
-                return layer_test_results(sout.str()); 
+                const float oldval = subnetwork.get_output_element(i);
+                float eps = oldval*base_eps;
+                if (eps == 0)
+                    eps = base_eps;
+                subnetwork.get_output_element(i) = oldval+eps;
+                impl::call_layer_forward(l, subnetwork, out2);
+                subnetwork.get_output_element(i) = oldval-eps;
+                impl::call_layer_forward(l, subnetwork, out3);
+                subnetwork.get_output_element(i) = oldval;
+
+                // Compute a reference derivative via a central differences approximation and
+                // compare it to the one output by the layer and make sure they match.
+                double reference_derivative = (dot(out2,input_grad)-dot(out3, input_grad))/(2*eps);
+                double output_derivative = subnetwork.get_gradient_input_element(i);
+                if (!impl::is_inplace_layer(l,subnetwork))
+                    output_derivative -= initial_gradient_input[i];
+                double relative_error = (reference_derivative - output_derivative)/(reference_derivative + 1e-100);
+                double absolute_error = (reference_derivative - output_derivative);
+                if (std::abs(relative_error) > 0.02 && std::abs(absolute_error) > 0.001)
+                {
+                    using namespace std;
+                    sout << "Gradient error in data variable #" << i <<".  Relative error: "<< relative_error << endl;
+                    sout << "expected derivative: " << reference_derivative << endl;
+                    sout << "output derivative:   " << output_derivative << endl;
+                    return layer_test_results(sout.str()); 
+                }
             }
-        }
+
+        } // end for (int iter = 0; iter < 5; ++iter)
 
         return layer_test_results();
     }
