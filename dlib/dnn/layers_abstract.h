@@ -329,6 +329,8 @@ namespace dlib
             unsigned long num_outputs
         );
         /*!
+            requires
+                - num_outputs > 0
             ensures
                 - #get_num_outputs() == num_outputs
         !*/
@@ -362,6 +364,112 @@ namespace dlib
 
     template <typename SUBNET>
     using fc = add_layer<fc_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class con_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
+                In particular, it defines a convolution layer that takes an input tensor
+                (nominally representing an image) and convolves it with a set of filters
+                and then outputs the results. 
+        !*/
+
+    public:
+        con_(
+        );
+        /*!
+            ensures
+                - #num_filters() == 1
+                - #nr() == 3
+                - #nc() == 3
+                - #stride_y() == 1
+                - #stride_x() == 1
+        !*/
+
+        con_(
+            long num_filters_,
+            long nr_,
+            long nc_,
+            int stride_y_ = 1,
+            int stride_x_ = 1
+        );
+        /*!
+            requires
+                - num_filters_ > 0
+                - nr_ > 0
+                - nc_ > 0
+                - stride_y_ > 0
+                - stride_x_ > 0
+            ensures
+                - #num_filters() == num_filters_ 
+                - #nr() == nr_
+                - #nc() == nc_
+                - #stride_y() == stride_y_
+                - #stride_x() == stride_x_
+        !*/
+
+        long num_filters(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of filters contained in this layer.  The k dimension
+                  of the output tensors produced by this layer will be equal to the number
+                  of filters.
+        !*/
+
+        long nr(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of rows in the filters in this layer.
+        !*/
+
+        long nc(
+        ) const;
+        /*!
+            ensures
+                - returns the number of columns in the filters in this layer.
+        !*/
+
+        long stride_y(
+        ) const; 
+        /*!
+            ensures
+                - returns the vertical stride used when convolving the filters over an
+                  image.  That is, each filter will be moved stride_y() pixels down at a
+                  time when it moves over the image.
+        !*/
+
+        long stride_x(
+        ) const;
+        /*!
+            ensures
+                - returns the horizontal stride used when convolving the filters over an
+                  image.  That is, each filter will be moved stride_x() pixels right at a
+                  time when it moves over the image.
+        !*/
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+        !*/
+    };
+
+    void serialize(const con_& item, std::ostream& out);
+    void deserialize(con_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
+    template <typename SUBNET>
+    using con = add_layer<con_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

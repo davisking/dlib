@@ -21,6 +21,16 @@ namespace dlib
     class con_
     {
     public:
+
+        con_ (
+        ) : 
+            _num_filters(1),
+            _nr(3),
+            _nc(3),
+            _stride_y(1),
+            _stride_x(1)
+        {}
+
         con_(
             long num_filters_,
             long nr_,
@@ -28,22 +38,28 @@ namespace dlib
             int stride_y_ = 1,
             int stride_x_ = 1
         ) : 
-            num_filters(num_filters_), 
-            nr(nr_),
-            nc(nc_),
-            stride_y(stride_y_),
-            stride_x(stride_x_)
+            _num_filters(num_filters_), 
+            _nr(nr_),
+            _nc(nc_),
+            _stride_y(stride_y_),
+            _stride_x(stride_x_)
         {}
+
+        long num_filters() const { return _num_filters; }
+        long nr() const { return _nr; }
+        long nc() const { return _nc; }
+        long stride_y() const { return _stride_y; }
+        long stride_x() const { return _stride_x; }
 
         con_ (
             const con_& item
         ) : 
             params(item.params),
-            num_filters(item.num_filters), 
-            nr(item.nr),
-            nc(item.nc),
-            stride_y(item.stride_y),
-            stride_x(item.stride_x),
+            _num_filters(item._num_filters), 
+            _nr(item._nr),
+            _nc(item._nc),
+            _stride_y(item._stride_y),
+            _stride_x(item._stride_x),
             filters(item.filters),
             biases(item.biases)
         {
@@ -61,11 +77,11 @@ namespace dlib
             // this->conv is non-copyable and basically stateless, so we have to write our
             // own copy to avoid trying to copy it and getting an error.
             params = item.params;
-            num_filters = item.num_filters;
-            nr = item.nr;
-            nc = item.nc;
-            stride_y = item.stride_y;
-            stride_x = item.stride_x;
+            _num_filters = item._num_filters;
+            _nr = item._nr;
+            _nc = item._nc;
+            _stride_y = item._stride_y;
+            _stride_x = item._stride_x;
             filters = item.filters;
             biases = item.biases;
             return *this;
@@ -74,16 +90,16 @@ namespace dlib
         template <typename SUBNET>
         void setup (const SUBNET& sub)
         {
-            long num_inputs = nr*nc*sub.get_output().k();
-            long num_outputs = num_filters;
+            long num_inputs = _nr*_nc*sub.get_output().k();
+            long num_outputs = _num_filters;
             // allocate params for the filters and also for the filter bias values.
-            params.set_size(num_inputs*num_filters + num_filters);
+            params.set_size(num_inputs*_num_filters + _num_filters);
 
             dlib::rand rnd("con_"+cast_to_string(num_outputs+num_inputs));
             randomize_parameters(params, num_inputs+num_outputs, rnd);
 
-            filters = alias_tensor(num_filters, sub.get_output().k(), nr, nc);
-            biases = alias_tensor(1,num_filters);
+            filters = alias_tensor(_num_filters, sub.get_output().k(), _nr, _nc);
+            biases = alias_tensor(1,_num_filters);
 
             // set the initial bias values to zero
             biases(params,filters.size()) = 0;
@@ -95,8 +111,8 @@ namespace dlib
             conv(output,
                 sub.get_output(),
                 filters(params,0),
-                stride_y,
-                stride_x);
+                _stride_y,
+                _stride_x);
 
             tt::add(1,output,1,biases(params,filters.size()));
         } 
@@ -118,11 +134,11 @@ namespace dlib
         {
             serialize("con_", out);
             serialize(item.params, out);
-            serialize(item.num_filters, out);
-            serialize(item.nr, out);
-            serialize(item.nc, out);
-            serialize(item.stride_y, out);
-            serialize(item.stride_y, out);
+            serialize(item._num_filters, out);
+            serialize(item._nr, out);
+            serialize(item._nc, out);
+            serialize(item._stride_y, out);
+            serialize(item._stride_y, out);
             serialize(item.filters, out);
             serialize(item.biases, out);
         }
@@ -134,11 +150,11 @@ namespace dlib
             if (version != "con_")
                 throw serialization_error("Unexpected version found while deserializing dlib::con_.");
             deserialize(item.params, in);
-            deserialize(item.num_filters, in);
-            deserialize(item.nr, in);
-            deserialize(item.nc, in);
-            deserialize(item.stride_y, in);
-            deserialize(item.stride_y, in);
+            deserialize(item._num_filters, in);
+            deserialize(item._nr, in);
+            deserialize(item._nc, in);
+            deserialize(item._stride_y, in);
+            deserialize(item._stride_y, in);
             deserialize(item.filters, in);
             deserialize(item.biases, in);
         }
@@ -146,11 +162,11 @@ namespace dlib
     private:
 
         resizable_tensor params;
-        long num_filters;
-        long nr;
-        long nc;
-        int stride_y;
-        int stride_x;
+        long _num_filters;
+        long _nr;
+        long _nc;
+        int _stride_y;
+        int _stride_x;
         alias_tensor filters, biases;
 
         tt::tensor_conv conv;
