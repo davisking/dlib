@@ -28,6 +28,23 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
+        void multiply (
+            tensor& dest,
+            const tensor& src1,
+            const tensor& src2
+        )
+        {
+            DLIB_CASSERT(dest.size()==src1.size(),"");
+            DLIB_CASSERT(dest.size()==src2.size(),"");
+            const auto d = dest.host();
+            const auto s1 = src1.host();
+            const auto s2 = src2.host();
+            for (size_t i = 0; i < src1.size(); ++i)
+                d[i] = s1[i]*s2[i];
+        }
+
+    // -----------------------------------------------------------------------------------
+
         void affine_transform(
             tensor& dest,
             const tensor& src,

@@ -110,6 +110,24 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void multiply (
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2
+    )
+    {
+        DLIB_CASSERT(have_same_dimensions(dest,src1) == true,"");
+        DLIB_CASSERT(have_same_dimensions(dest,src2) == true,"");
+#ifdef DLIB_USE_CUDA
+        cuda::multiply(dest, src1, src2);
+#else
+        cpu::multiply(dest, src1, src2);
+#endif
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void affine_transform(
         tensor& dest,
         const tensor& src,

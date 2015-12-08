@@ -107,6 +107,23 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void multiply (
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2
+    );
+    /*!
+        requires
+            - have_same_dimensions(dest,src1) == true
+            - have_same_dimensions(dest,src2) == true
+        ensures
+            - #dest == src1*src2
+              That is, for all valid i:
+                #dest.host()[i] == src1.host()[i]*src2.host()[i]
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     void affine_transform(
         tensor& dest,
         const tensor& src,

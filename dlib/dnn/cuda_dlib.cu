@@ -48,6 +48,27 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
+        __global__ void _cuda_multiply(float* d, const float* s1, const float* s2, size_t n)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                d[i] = s1[i]*s2[i];
+            }
+        }
+
+        void multiply (
+            tensor& dest,
+            const tensor& src1,
+            const tensor& src2
+        )
+        {
+            DLIB_CASSERT(dest.size()==src1.size(),"");
+            DLIB_CASSERT(dest.size()==src2.size(),"");
+            _cuda_multiply<<<512,512>>>(dest.device(), src1.device(), src2.device(), src1.size());
+        }
+
+    // -----------------------------------------------------------------------------------
+
         __global__ void _cuda_affine_transform(float* d, const float* s, size_t n, float A, float B)
         {
             for (auto i : grid_stride_range(0, n))
