@@ -343,7 +343,7 @@ namespace dlib
         void init()
         {
             num_epochs = 300;
-            mini_batch_size = 11;
+            mini_batch_size = 32;
             verbose = false;
             cuda_device_id = dlib::cuda::get_device();
             start();
