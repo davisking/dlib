@@ -116,8 +116,13 @@ namespace dlib { namespace tt
         const tensor& src2
     )
     {
-        DLIB_CASSERT(have_same_dimensions(dest,src1) == true,"");
-        DLIB_CASSERT(have_same_dimensions(dest,src2) == true,"");
+        DLIB_CASSERT(dest.k() == src1.k() && src1.k() == src2.k() &&
+            dest.nr() == src1.nr() && src1.nr() == src2.nr() &&
+            dest.nc() == src1.nc() && src1.nc() == src2.nc() ,"");
+        const long MD = std::max(std::max(dest.num_samples(),src1.num_samples()),src2.num_samples());
+        DLIB_CASSERT((dest.num_samples()==1 || dest.num_samples()==MD) &&
+                    (src1.num_samples()==1 || src1.num_samples()==MD) &&
+                    (src2.num_samples()==1 || src2.num_samples()==MD) ,"");
 #ifdef DLIB_USE_CUDA
         cuda::multiply(dest, src1, src2);
 #else

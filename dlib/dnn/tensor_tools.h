@@ -92,6 +92,7 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+// TODO, delete this function
     void multiply (
         tensor& dest,
         const tensor& src
@@ -114,12 +115,23 @@ namespace dlib { namespace tt
     );
     /*!
         requires
-            - have_same_dimensions(dest,src1) == true
-            - have_same_dimensions(dest,src2) == true
+            - dest.k()  == src1.k()  == src2.k()
+            - dest.nr() == src1.nr() == src2.nr()
+            - dest.nc() == src1.nc() == src2.nc()
+            - dest.num_samples(), src1.num_samples(), and src2.num_samples() must each
+              either be 1 or whichever ones aren't equal to 1 must have the same values.
         ensures
-            - #dest == src1*src2
-              That is, for all valid i:
-                #dest.host()[i] == src1.host()[i]*src2.host()[i]
+            - let MD = max(dest.num_samples(), src1.num_samples(), src2.num_samples)
+            - This function pointwise multiplies src1 with src2 and stores the result into
+              #dest.  However, how the multiplication happens depends on the dimensions of
+              the tensors.  First, when src1 and src2 are multiplied together, if either
+              has a num_samples() dimension that is != MD, then it is first replicated to
+              produce a tensor with num_samples()==MD dimensions and then they are
+              pointwise multiplied together.
+
+              Second, if dest.num_samples()==1, then after the pointwise multiplication of
+              src1 with src2, the result has its samples summed to produce an output tensor
+              with num_samples()==1 which is then assigned to #dest.
     !*/
 
 // ----------------------------------------------------------------------------------------

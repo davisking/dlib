@@ -380,6 +380,40 @@ namespace
         truth3 += 2;
         DLIB_TEST(mat(at(A,4)) == reshape(truth2,2,2));
         DLIB_TEST(mat(A) == join_cols(truth1,join_cols(truth2,truth3)));
+
+        {
+            resizable_tensor dest(3,4);
+            resizable_tensor A, B;
+            A = dest;
+            B = dest;
+
+            tensor_rand rnd;
+            rnd.fill_uniform(dest);
+            rnd.fill_uniform(A);
+            rnd.fill_uniform(B);
+
+            dest.set_size(1,4);
+
+            tt::multiply(dest, A, B);
+            DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(mat(A),mat(B))))) < 1e-6); 
+
+            A.set_size(1,4);
+            rnd.fill_uniform(A);
+            matrix<float> AA = join_cols(mat(A),mat(A)); AA = join_cols(mat(A),AA);
+
+            tt::multiply(dest, A, B);
+            DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6); 
+
+            tt::multiply(dest, B, A);
+            DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6); 
+
+            dest.set_size(3,4);
+            tt::multiply(dest, B, A);
+            DLIB_TEST(max(abs(mat(dest)-pointwise_multiply(AA,mat(B)))) < 1e-6); 
+
+            tt::multiply(dest, A, B);
+            DLIB_TEST(max(abs(mat(dest)-pointwise_multiply(AA,mat(B)))) < 1e-6); 
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -457,8 +491,40 @@ namespace
         cpu::threshold(src2, 0.5);
         DLIB_TEST(equal(mat(src),mat(src2)));
 
+        {
+            resizable_tensor dest(3,4);
+            resizable_tensor A, B;
+            A = dest;
+            B = dest;
+
+            tensor_rand rnd;
+            rnd.fill_uniform(dest);
+            rnd.fill_uniform(A);
+            rnd.fill_uniform(B);
+
+            dest.set_size(1,4);
+
+            cuda::multiply(dest, A, B);
+            DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(mat(A),mat(B))))) < 1e-6); 
+
+            A.set_size(1,4);
+            rnd.fill_uniform(A);
+            matrix<float> AA = join_cols(mat(A),mat(A)); AA = join_cols(mat(A),AA);
+
+            cuda::multiply(dest, A, B);
+            DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6); 
+
+            cuda::multiply(dest, B, A);
+            DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6); 
+
+            dest.set_size(3,4);
+            cuda::multiply(dest, B, A);
+            DLIB_TEST(max(abs(mat(dest)-pointwise_multiply(AA,mat(B)))) < 1e-6); 
+
+            cuda::multiply(dest, A, B);
+            DLIB_TEST(max(abs(mat(dest)-pointwise_multiply(AA,mat(B)))) < 1e-6); 
+        }
     }
-#endif
 
 // ----------------------------------------------------------------------------------------
 
@@ -561,6 +627,7 @@ namespace
         DLIB_TEST(max(abs(mat(gamma_grad)-mat(gamma_grad2))) < 1e-4);
         DLIB_TEST(max(abs(mat(beta_grad)-mat(beta_grad2))) < 1e-4);
     }
+#endif
 
 // ----------------------------------------------------------------------------------------
 
@@ -642,6 +709,8 @@ namespace
             test_more_ops(4,1);
             test_more_ops(1,4);
             test_more_ops(10000,4);
+            compare_bn_gpu_and_cpu();
+            compare_bn_conv_gpu_and_cpu();
 #endif
             test_tanh();
             test_softmax();
@@ -649,8 +718,6 @@ namespace
             test_batch_normalize();
             test_batch_normalize_conv();
             test_basic_tensor_ops();
-            compare_bn_gpu_and_cpu();
-            compare_bn_conv_gpu_and_cpu();
             test_layers();
         }
     } a;

@@ -34,13 +34,38 @@ namespace dlib
             const tensor& src2
         )
         {
-            DLIB_CASSERT(dest.size()==src1.size(),"");
-            DLIB_CASSERT(dest.size()==src2.size(),"");
+            DLIB_CASSERT(dest.k() == src1.k() && src1.k() == src2.k() &&
+                dest.nr() == src1.nr() && src1.nr() == src2.nr() &&
+                dest.nc() == src1.nc() && src1.nc() == src2.nc() ,"");
+            const long MD = std::max(std::max(dest.num_samples(),src1.num_samples()),src2.num_samples());
+            DLIB_CASSERT((dest.num_samples()==1 || dest.num_samples()==MD) &&
+                (src1.num_samples()==1 || src1.num_samples()==MD) &&
+                (src2.num_samples()==1 || src2.num_samples()==MD) ,"");
+
+            if (dest.size() == 0)
+                return;
+
+            const size_t max_size = std::max(std::max(dest.size(),src1.size()),src2.size());
             const auto d = dest.host();
             const auto s1 = src1.host();
             const auto s2 = src2.host();
-            for (size_t i = 0; i < src1.size(); ++i)
-                d[i] = s1[i]*s2[i];
+            if (dest.size() == src1.size() && src1.size() == src2.size())
+            {
+                for (size_t i = 0; i < src1.size(); ++i)
+                    d[i] = s1[i]*s2[i];
+            }
+            else if (dest.num_samples() == 1)
+            {
+                for (size_t i = 0; i < dest.size(); ++i)
+                    d[i] = 0;
+                for (size_t i = 0; i < max_size; ++i)
+                    d[i%dest.size()] += s1[i%src1.size()]*s2[i%src2.size()];
+            }
+            else
+            {
+                for (size_t i = 0; i < max_size; ++i)
+                    d[i] = s1[i%src1.size()]*s2[i%src2.size()];
+            }
         }
 
     // -----------------------------------------------------------------------------------
@@ -422,6 +447,10 @@ namespace dlib
             DLIB_CASSERT(src.k() == beta_grad.size(),"");
             DLIB_CASSERT(have_same_dimensions(gradient_input, src),"");
             DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad),"");
+
+            beta_grad = 0;
+            gamma_grad = 0;
+
             auto p_grad = gradient_input.host();
             auto p_src = src.host();
             const auto p_gamma = gamma.host();   
