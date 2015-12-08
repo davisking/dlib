@@ -224,6 +224,9 @@ namespace dlib
             DLIB_CASSERT(num == beta_grad.size(),"");
             DLIB_CASSERT(have_same_dimensions(gradient_input, src),"");
             DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad),"");
+
+            beta_grad = 0;
+            gamma_grad = 0;
             auto p_grad = gradient_input.host();
             auto p_src = src.host();
             const auto p_gamma = gamma.host();   

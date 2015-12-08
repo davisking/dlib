@@ -245,8 +245,8 @@ namespace dlib { namespace tt
                 - Let f(src,gamma,beta) == dot(gradient_input, dest output of
                   batch_normalize(dest,means,invstds,src,gamma,beta))
                 - Adds the gradient of f() with respect to src to #src_grad.
-                - Adds the gradient of f() with respect to gamma to #gamma_grad.
-                - Adds the gradient of f() with respect to beta to #beta_grad.
+                - Assigns the gradient of f() with respect to gamma to #gamma_grad.
+                - Assigns the gradient of f() with respect to beta to #beta_grad.
         !*/
     private:
 #ifdef DLIB_USE_CUDA
@@ -312,8 +312,8 @@ namespace dlib { namespace tt
                 - Let f(src,gamma,beta) == dot(gradient_input, dest output of
                   batch_normalize_conv(dest,means,invstds,src,gamma,beta))
                 - Adds the gradient of f() with respect to src to #src_grad.
-                - Adds the gradient of f() with respect to gamma to #gamma_grad.
-                - Adds the gradient of f() with respect to beta to #beta_grad.
+                - Assigns the gradient of f() with respect to gamma to #gamma_grad.
+                - Assigns the gradient of f() with respect to beta to #beta_grad.
         !*/
     private:
 #ifdef DLIB_USE_CUDA

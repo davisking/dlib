@@ -268,6 +268,8 @@ namespace dlib
             {
                 dvars[i] = 0;
                 dmeans[i] = 0;
+                gamma_grad[i] = 0;
+                beta_grad[i] = 0;
 
                 for (long n = 0; n < num_samples; ++n)
                 {
@@ -646,6 +648,8 @@ namespace dlib
             dmeans.copy_size(means);
             dvars = 0;
             dmeans = 0;
+            gamma_grad = 0;
+            beta_grad = 0;
 
             _cuda_batch_normalize_conv_gradient1<<<512,512>>>(
                 gradient_input.device(),
