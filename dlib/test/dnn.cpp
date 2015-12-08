@@ -203,8 +203,8 @@ namespace
         gamma_grad.copy_size(gamma);
         beta_grad.copy_size(beta);
         src_grad = 0;
-        gamma_grad = 0;
-        beta_grad = 0;
+        gamma_grad = 8;
+        beta_grad = 8;
 
         batch_normalize_gradient bng;
         bng(gradient_input, means, vars, src, gamma, src_grad, gamma_grad, beta_grad);
@@ -280,8 +280,8 @@ namespace
         gamma_grad.copy_size(gamma);
         beta_grad.copy_size(beta);
         src_grad = 0;
-        gamma_grad = 0;
-        beta_grad = 0;
+        gamma_grad = 9;
+        beta_grad = 9;
 
         batch_normalize_conv_gradient bng;
         bng(gradient_input, means, vars, src, gamma, src_grad, gamma_grad, beta_grad);
@@ -566,6 +566,11 @@ namespace
 
     void test_layers()
     {
+        {
+            print_spinner();
+            bn_ l;
+            DLIB_TEST_MSG(test_layer(l), test_layer(l));
+        }
         {
             print_spinner();
             con_ l(3,3,3,2,2);
