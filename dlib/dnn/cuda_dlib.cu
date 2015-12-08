@@ -160,12 +160,13 @@ namespace dlib
         }
 
         void affine_transform(
-            resizable_tensor& dest,
+            tensor& dest,
             const tensor& src,
             const tensor& A,
             const tensor& B
         )
         {
+            DLIB_CASSERT(have_same_dimensions(dest, src),"");
             DLIB_CASSERT(
                   ((A.num_samples()==1 && B.num_samples()==1) ||
                   (A.num_samples()==src.num_samples() && B.num_samples()==src.num_samples())) &&
@@ -173,7 +174,6 @@ namespace dlib
                   A.nc()==B.nc() && B.nc()==src.nc() &&
                   A.k() ==B.k()  && B.k()==src.k(),"");
 
-            dest.copy_size(src);
             if (A.num_samples() == 1)
             {
                 _cuda_affine_transform3<<<512,512>>>(dest.device(), src.device(), src.size(), A.device(), B.device(), A.size());

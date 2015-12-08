@@ -179,7 +179,7 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void affine_transform(
-        resizable_tensor& dest,
+        tensor& dest,
         const tensor& src,
         const tensor& A,
         const tensor& B

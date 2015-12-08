@@ -175,13 +175,14 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void affine_transform(
-        resizable_tensor& dest,
+        tensor& dest,
         const tensor& src,
         const tensor& A,
         const tensor& B
     );
     /*!
         requires
+            - have_same_dimensions(dest,src) == true
             - if (A.num_samples() == 1) then
                 - B.num_samples() == 1
             - else
@@ -191,7 +192,6 @@ namespace dlib { namespace tt
             - A.nc() == B.nc() == src.nc()
             - A.k()  == B.k()  == src.k()
         ensures
-            - have_same_dimensions(#dest,src) == true
             - if (A.num_samples() == 1) then
                 - #dest == A*src + B
                     (done for each sample in src)
