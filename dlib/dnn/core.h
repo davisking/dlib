@@ -2019,7 +2019,7 @@ namespace dlib
                 double relative_error = (reference_derivative - output_derivative)/(reference_derivative + 1e-100);
                 double absolute_error = (reference_derivative - output_derivative);
                 rs_params.add(std::abs(relative_error));
-                if (std::abs(relative_error) > 0.05 && std::abs(absolute_error) > 0.005)
+                if (std::abs(relative_error) > 0.05 && std::abs(absolute_error) > 0.006)
                 {
                     using namespace std;
                     sout << "Gradient error in parameter #" << i <<".  Relative error: "<< relative_error << endl;
@@ -2052,7 +2052,7 @@ namespace dlib
                 double relative_error = (reference_derivative - output_derivative)/(reference_derivative + 1e-100);
                 double absolute_error = (reference_derivative - output_derivative);
                 rs_data.add(std::abs(relative_error));
-                if (std::abs(relative_error) > 0.05 && std::abs(absolute_error) > 0.005)
+                if (std::abs(relative_error) > 0.05 && std::abs(absolute_error) > 0.006)
                 {
                     using namespace std;
                     sout << "Gradient error in data variable #" << i <<".  Relative error: "<< relative_error << endl;
