@@ -472,6 +472,56 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class dropout_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
+                In particular, it defines a dropout layer.  Therefore, it passes its inputs
+                through the stochastic function f(x) which outputs either 0 or x.  The
+                probability of 0 being output is given by the drop_rate argument to this
+                object's constructor.
+        !*/
+
+    public:
+
+        explicit dropout_(
+            float drop_rate = 0.5
+        );
+        /*!
+            ensures
+                - #get_drop_rate() == drop_rate
+        !*/
+
+        float get_drop_rate (
+        ) const; 
+        /*!
+            ensures
+                - returns the probability that an individual input value to this layer will
+                  be replaced with 0.
+        !*/
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        void forward_inplace(const tensor& input, tensor& output);
+        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+        !*/
+    };
+
+    void serialize(const dropout_& item, std::ostream& out);
+    void deserialize(dropout_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
+    template <typename SUBNET>
+    using dropout = add_layer<dropout_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class relu_
     {
         /*!

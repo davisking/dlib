@@ -335,6 +335,96 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class dropout_
+    {
+    public:
+        explicit dropout_(
+            float drop_rate_ = 0.5
+        ) :
+            drop_rate(drop_rate_)
+        {
+        }
+
+        // We have to add a copy constructor and assignment operator because the rnd object
+        // is non-copyable.
+        dropout_(
+            const dropout_& item
+        ) : drop_rate(item.drop_rate), mask(item.mask)
+        {}
+
+        dropout_& operator= (
+            const dropout_& item
+        )
+        {
+            if (this == &item)
+                return *this;
+
+            drop_rate = item.drop_rate;
+            mask = item.mask;
+            return *this;
+        }
+
+        float get_drop_rate (
+        ) const { return drop_rate; }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& /*sub*/)
+        {
+        }
+
+        void forward_inplace(const tensor& input, tensor& output)
+        {
+            // create a random mask and use it to filter the data
+            mask.copy_size(input);
+            rnd.fill_uniform(mask);
+            tt::threshold(mask, drop_rate);
+            tt::multiply(output, input, mask);
+        } 
+
+        void backward_inplace(
+            const tensor& /*computed_output*/,
+            const tensor& gradient_input, 
+            tensor& data_grad, 
+            tensor& /*params_grad*/
+        )
+        {
+            tt::multiply(data_grad, mask, gradient_input);
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const dropout_& item, std::ostream& out)
+        {
+            serialize("dropout_", out);
+            serialize(item.drop_rate, out);
+            serialize(item.mask, out);
+        }
+
+        friend void deserialize(dropout_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "dropout_")
+                throw serialization_error("Unexpected version found while deserializing dlib::dropout_.");
+            deserialize(item.drop_rate, in);
+            deserialize(item.mask, in);
+        }
+
+    private:
+        float drop_rate;
+        resizable_tensor mask;
+
+        tt::tensor_rand rnd;
+        resizable_tensor params; // unused
+    };
+
+
+    template <typename SUBNET>
+    using dropout = add_layer<dropout_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class relu_
     {
     public:
