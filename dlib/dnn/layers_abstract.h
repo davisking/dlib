@@ -192,10 +192,10 @@ namespace dlib
             requires
                 - SUBNET implements the SUBNET interface defined at the top of this file.
                 - setup() has been called.
-                - computed_output is the tensor resulting from calling forward(sub,computed_output).
+                - computed_output is the tensor resulting from calling forward(sub,computed_output).  
                   Moreover, this was the most recent call to forward().  This means that
-                  backward() is allowed to cache intermediate results computed during
-                  forward() and use them for the backward computation.
+                  forward() is allowed to cache intermediate results so they can be used
+                  during the backward computation.
                 - have_same_dimensions(gradient_input, computed_output)
                 - have_same_dimensions(sub.get_gradient_input(), sub.get_output()) == true
                 - have_same_dimensions(params_grad, get_layer_params()) == true
@@ -248,9 +248,8 @@ namespace dlib
             requires
                 - setup() has been called.
                 - computed_output is the tensor resulting from the most recent call to
-                  forward_inplace().  This means that backward_inplace() is allowed to
-                  cache intermediate results computed during forward_inplace() and use them
-                  for the backward computation.
+                  forward_inplace().  This means that forward_inplace() is allowed to cache
+                  intermediate results so they can be used during the backward computation.
                 - have_same_dimensions(gradient_input, data_grad) == true
                 - have_same_dimensions(gradient_input, computed_output) == true
                 - have_same_dimensions(params_grad, get_layer_params()) == true
