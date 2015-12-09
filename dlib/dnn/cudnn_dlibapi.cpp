@@ -22,6 +22,10 @@ static const char* cudnn_get_error_string(cudnnStatus_t s)
             return "CUDA Resources could not be allocated.";
         case CUDNN_STATUS_BAD_PARAM:
             return "CUDNN_STATUS_BAD_PARAM";
+        case CUDNN_STATUS_EXECUTION_FAILED:
+            return "CUDNN_STATUS_EXECUTION_FAILED";
+        case CUDNN_STATUS_NOT_SUPPORTED:
+            return "CUDNN_STATUS_NOT_SUPPORTED";
         default:
             return "A call to cuDNN failed";
     }
