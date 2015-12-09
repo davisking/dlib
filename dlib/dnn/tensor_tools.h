@@ -406,7 +406,29 @@ namespace dlib { namespace tt
             - gradient_input.size() > 0
             - is_same_object(grad,gradient_input) == false
         ensures
-            - let BIAS be a tensor with all dimensions equal to 1 except for k which is >= 1.
+            - let BIAS be a tensor with the same dimensions as grad.
+            - let OUT be the output of add(1,OUT,1,BIAS)
+            - let f(gradient_input,BIAS) == dot(gradient_input,OUT)
+            - Then this function computes the gradient of f() with respect to BIAS and
+              assigns it to grad.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    void add_bias_gradient (
+        tensor& grad,
+        const tensor& gradient_input
+    );
+    /*!
+        requires
+            - grad.num_samples() == 1
+            - gradient_input.k() == grad.k()
+            - gradient_input.nr() == grad.nr()
+            - gradient_input.nc() == grad.nc()
+            - gradient_input.size() > 0
+            - is_same_object(grad,gradient_input) == false
+        ensures
+            - let BIAS be a tensor with the same dimensions as grad.
             - let OUT be the output of add(1,OUT,1,BIAS)
             - let f(gradient_input,BIAS) == dot(gradient_input,OUT)
             - Then this function computes the gradient of f() with respect to BIAS and

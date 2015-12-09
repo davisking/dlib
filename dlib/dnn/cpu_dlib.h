@@ -26,6 +26,18 @@ namespace dlib
             const tensor& src2
         );
 
+        void add(
+            float beta,
+            tensor& dest,
+            float alpha,
+            const tensor& src
+        );
+
+        void add_bias_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        );
+
     // -----------------------------------------------------------------------------------
 
         void affine_transform(

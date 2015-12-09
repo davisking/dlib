@@ -68,6 +68,77 @@ namespace dlib
             }
         }
 
+        void add(
+            float beta,
+            tensor& dest,
+            float alpha,
+            const tensor& src
+        )
+        {
+            DLIB_CASSERT(
+                  (dest.num_samples()==src.num_samples() || src.num_samples()==1) &&
+                  (dest.nr()==src.nr() || src.nr()==1) &&
+                  (dest.nc()==src.nc() || src.nc()==1) &&
+                  (dest.k()==src.k()   || src.k()==1) && 
+                  is_same_object(src,dest) == false , "");
+
+            if (beta == 0 && alpha == 0)
+            {
+                dest = 0;
+                return;
+            }
+
+            auto d = dest.host();
+            auto s = src.host();
+            for (long n = 0; n < dest.num_samples(); ++n)
+            {
+                const auto sn = src.num_samples()==1 ? 0:n;
+                for (long k = 0; k < dest.k(); ++k)
+                {
+                    const auto sk = src.k()==1 ? 0:k;
+                    for (long r = 0; r < dest.nr(); ++r)
+                    {
+                        const auto sr = src.nr()==1 ? 0:r;
+                        for (long c = 0; c < dest.nc(); ++c)
+                        {
+                            const auto sc = src.nc()==1 ? 0:c;
+
+                            const auto s_idx = ((sn*src.k() + sk)*src.nr() + sr)*src.nc() + sc;
+                            *d = beta*(*d) + alpha*s[s_idx];
+                            ++d;
+                        }
+                    }
+                }
+            }
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        void add_bias_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        )
+        {
+            DLIB_CASSERT(
+                  grad.num_samples() == 1 &&
+                  gradient_input.k() == grad.k() &&
+                  gradient_input.nr() == grad.nr() &&
+                  gradient_input.nc() == grad.nc() &&
+                  gradient_input.size() > 0,"");
+
+            auto out = grad.host();
+            auto in = gradient_input.host();
+
+            for (size_t i = 0; i < grad.size(); ++i)
+                out[i] = *in++;
+
+            for (long i = 1; i < gradient_input.num_samples(); ++i)
+            {
+                for (size_t i = 0; i < grad.size(); ++i)
+                    out[i] += *in++;
+            }
+        }
+
     // -----------------------------------------------------------------------------------
 
         void affine_transform(

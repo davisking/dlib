@@ -259,8 +259,7 @@ namespace dlib { namespace tt
 #ifdef DLIB_USE_CUDA
         cuda::add(beta,dest,alpha,src);
 #else
-        // TODO
-        DLIB_CASSERT(false,"");
+        cpu::add(beta,dest,alpha,src);
 #endif
     }
 
@@ -276,6 +275,22 @@ namespace dlib { namespace tt
 #else
         // TODO
         DLIB_CASSERT(false,"");
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void add_bias_gradient (
+        tensor& grad,
+        const tensor& gradient_input
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        // TODO
+        DLIB_CASSERT(false,"");
+        //cuda::add_bias_gradient(grad,gradient_input);
+#else
+        cpu::add_bias_gradient(grad,gradient_input);
 #endif
     }
 
