@@ -286,9 +286,7 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        // TODO
-        DLIB_CASSERT(false,"");
-        //cuda::add_bias_gradient(grad,gradient_input);
+        cuda::add_bias_gradient(grad,gradient_input);
 #else
         cpu::add_bias_gradient(grad,gradient_input);
 #endif

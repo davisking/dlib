@@ -505,7 +505,7 @@ namespace
             dest.set_size(1,4);
 
             cuda::multiply(dest, A, B);
-            DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(mat(A),mat(B))))) < 1e-6); 
+            DLIB_TEST_MSG(max(abs(mat(dest)-sum_rows(pointwise_multiply(mat(A),mat(B))))) < 1e-6, max(abs(mat(dest)-sum_rows(pointwise_multiply(mat(A),mat(B)))))); 
 
             A.set_size(1,4);
             rnd.fill_uniform(A);
@@ -633,6 +633,11 @@ namespace
 
     void test_layers()
     {
+        {
+            print_spinner();
+            affine_ l;
+            DLIB_TEST_MSG(test_layer(l), test_layer(l));
+        }
         {
             print_spinner();
             bn_ l;

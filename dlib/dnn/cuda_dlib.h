@@ -76,6 +76,13 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
+        void add_bias_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        );
+
+    // -----------------------------------------------------------------------------------
+
         void batch_normalize (
             resizable_tensor& dest,
             resizable_tensor& means,

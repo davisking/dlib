@@ -34,6 +34,41 @@ namespace dlib
 {
     namespace cuda
     {
+
+    // ------------------------------------------------------------------------------------
+
+        // This function is from the article:
+        // http://devblogs.nvidia.com/parallelforall/faster-parallel-reductions-kepler/
+        __inline__ __device__ float warp_reduce_sum(float val) 
+        {
+            for (int offset = warpSize/2; offset > 0; offset /= 2) 
+                val += __shfl_down(val, offset);
+            return val;
+        }
+
+        __inline__ __device__ bool is_first_thread_in_warp()
+        {
+            return (threadIdx.x & (warpSize - 1)) == 0;
+        }
+
+        __inline__ __device__ void warp_reduce_atomic_add(
+            float& out, 
+            float val
+        ) 
+        /*!
+            ensures
+                - Atomically adds all the val variables in the current warp to out.
+                  See this page for an extended discussion: 
+                  http://devblogs.nvidia.com/parallelforall/faster-parallel-reductions-kepler/
+        !*/
+        {
+            val = warp_reduce_sum(val);
+            if (is_first_thread_in_warp())
+                atomicAdd(&out, val);
+        }
+
+    // ------------------------------------------------------------------------------------
+
         class grid_stride_range
         {
             /*!

@@ -48,11 +48,30 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
-        __global__ void _cuda_multiply(float* d, const float* s1, const float* s2, size_t n)
+        __global__ void _cuda_multiply1(float* d, const float* s1, const float* s2, size_t n)
         {
             for (auto i : grid_stride_range(0, n))
             {
                 d[i] = s1[i]*s2[i];
+            }
+        }
+        __global__ void _cuda_multiply2(float* d, const float* s1, const float* s2, 
+                                       size_t n, size_t s1_n, size_t s2_n, size_t max_size)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                d[i] = 0;
+                for (size_t j = i; j < max_size; j += n)
+                    d[i] += s1[j%s1_n]*s2[j%s2_n];
+            }
+        }
+
+        __global__ void _cuda_multiply3(float* d, const float* s1, const float* s2, 
+                                       size_t n, size_t s1_n, size_t s2_n)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                d[i] = s1[i%s1_n]*s2[i%s2_n];
             }
         }
 
@@ -62,9 +81,36 @@ namespace dlib
             const tensor& src2
         )
         {
-            DLIB_CASSERT(dest.size()==src1.size(),"");
-            DLIB_CASSERT(dest.size()==src2.size(),"");
-            _cuda_multiply<<<512,512>>>(dest.device(), src1.device(), src2.device(), src1.size());
+
+            DLIB_CASSERT(dest.k() == src1.k() && src1.k() == src2.k() &&
+                dest.nr() == src1.nr() && src1.nr() == src2.nr() &&
+                dest.nc() == src1.nc() && src1.nc() == src2.nc() ,"");
+            const long MD = std::max(std::max(dest.num_samples(),src1.num_samples()),src2.num_samples());
+            DLIB_CASSERT((dest.num_samples()==1 || dest.num_samples()==MD) &&
+                (src1.num_samples()==1 || src1.num_samples()==MD) &&
+                (src2.num_samples()==1 || src2.num_samples()==MD) ,"");
+
+            if (dest.size() == 0)
+                return;
+
+            const size_t max_size = std::max(std::max(dest.size(),src1.size()),src2.size());
+            const auto d = dest.host();
+            const auto s1 = src1.host();
+            const auto s2 = src2.host();
+            if (dest.size() == src1.size() && src1.size() == src2.size())
+            {
+                _cuda_multiply1<<<512,512>>>(dest.device(), src1.device(), src2.device(), src1.size());
+            }
+            else if (dest.num_samples() == 1)
+            {
+                _cuda_multiply2<<<512,512>>>(dest.device(), src1.device(), src2.device(), 
+                                             dest.size(), src1.size(), src2.size(), max_size);
+            }
+            else
+            {
+                _cuda_multiply3<<<512,512>>>(dest.device(), src1.device(), src2.device(), 
+                                             dest.size(), src1.size(), src2.size());
+            }
         }
 
     // -----------------------------------------------------------------------------------
@@ -182,6 +228,33 @@ namespace dlib
             {
                 _cuda_affine_transform2<<<512,512>>>(dest.device(), src.device(), src.size(), A.device(), B.device());
             }
+        }
+
+    // -----------------------------------------------------------------------------------
+
+        __global__ void _add_bias_gradient(float* out, const float* in, size_t n, size_t total_n)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                out[i] = in[i];
+                for (size_t j = i+n; j < total_n; j+=n)
+                    out[i] += in[j];
+            }
+        }
+
+        void add_bias_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        )
+        {
+            DLIB_CASSERT(
+                  grad.num_samples() == 1 &&
+                  gradient_input.k() == grad.k() &&
+                  gradient_input.nr() == grad.nr() &&
+                  gradient_input.nc() == grad.nc() &&
+                  gradient_input.size() > 0,"");
+
+            _add_bias_gradient<<<512,512>>>(grad.device(), gradient_input.device(), grad.size(), gradient_input.size());
         }
 
     // -----------------------------------------------------------------------------------
@@ -362,37 +435,6 @@ namespace dlib
         }
 
     // ----------------------------------------------------------------------------------------
-
-        // This function is from the article:
-        // http://devblogs.nvidia.com/parallelforall/faster-parallel-reductions-kepler/
-
-        __inline__ __device__ float warp_reduce_sum(float val) 
-        {
-            for (int offset = warpSize/2; offset > 0; offset /= 2) 
-                val += __shfl_down(val, offset);
-            return val;
-        }
-
-        __inline__ __device__ bool is_first_thread_in_warp()
-        {
-            return (threadIdx.x & (warpSize - 1)) == 0;
-        }
-
-        __inline__ __device__ void warp_reduce_atomic_add(
-            float& out, 
-            float val
-        ) 
-        /*!
-            ensures
-                - Atomically adds all the val variables in the current warp to out.
-                  See this page for an extended discussion: 
-                  http://devblogs.nvidia.com/parallelforall/faster-parallel-reductions-kepler/
-        !*/
-        {
-            val = warp_reduce_sum(val);
-            if (is_first_thread_in_warp())
-                atomicAdd(&out, val);
-        }
 
         __global__ void _cuda_batch_normalize_conv1(
             float* dest,
