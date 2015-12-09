@@ -196,7 +196,8 @@ namespace dlib
                   (dest.num_samples()==src.num_samples() || src.num_samples()==1) &&
                   (dest.nr()==src.nr() || src.nr()==1) &&
                   (dest.nc()==src.nc() || src.nc()==1) &&
-                  (dest.k()==src.k()   || src.k()==1), "");
+                  (dest.k()==src.k()   || src.k()==1) &&
+                  is_same_object(src,dest) == false , "");
 
             CHECK_CUDNN(cudnnAddTensor_v3(context(),
                                     &alpha,
