@@ -1885,11 +1885,11 @@ namespace dlib
     template <
         typename layer_details_type
         >
-    layer_test_results test_layer (
-        layer_details_type l
+    layer_test_results impl_test_layer (
+        layer_details_type l,
+        const float base_eps 
     )
     {
-        const float base_eps = 0.01;
         using namespace timpl;
         // Do some setup
         running_stats<double> rs_data, rs_params;
@@ -2078,6 +2078,25 @@ namespace dlib
         }
 
         return layer_test_results();
+    }
+
+    template <
+        typename layer_details_type
+        >
+    layer_test_results test_layer (
+        layer_details_type l
+    )
+    {
+        // Try a few different derivative step sizes to see if any work. 
+        for (float base_eps = 0.0001; base_eps < 0.1; base_eps *= 2)
+        {
+            auto result = impl_test_layer(l, base_eps);
+            if (result)
+                return result;
+        }
+        // However, if none of the step sizes worked then try this one and probably result
+        // in returning an error.
+        return impl_test_layer(l, 0.01);
     }
 
 // ----------------------------------------------------------------------------------------
