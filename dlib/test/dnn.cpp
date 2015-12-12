@@ -417,8 +417,8 @@ namespace
 
         {
             resizable_tensor A, B;
-            A.set_size(2,3);
-            B.set_size(2,3);
+            A.set_size(2,3,4,5);
+            B.set_size(2,3,4,5);
 
             tensor_rand rnd;
             rnd.fill_uniform(A);
@@ -451,19 +451,29 @@ namespace
             DLIB_TEST(max(abs(mat(A)-truth )) < 1e-6);
 
 
-            B.set_size(1,3);
+            B.set_size(1,3,4,5);
             rnd.fill_uniform(A);
             rnd.fill_uniform(B);
             truth = 2*mat(A) + 3*join_cols(mat(B), mat(B));
             tt::add(2, A, 3, B);
             DLIB_TEST(max(abs(mat(A)-truth )) < 1e-6);
+            DLIB_TEST(A.num_samples()==2);
 
-            B.set_size(2,1);
+            B.set_size(1,1,4,5);
             rnd.fill_uniform(A);
             rnd.fill_uniform(B);
-            truth = 2*mat(A) + 3*join_rows(mat(B), join_rows(mat(B),mat(B)));
+            matrix<float> temp = join_rows(mat(B), join_rows(mat(B),mat(B)));
+            truth = 2*mat(A) + 3*join_cols(temp,temp);
             tt::add(2, A, 3, B);
-            DLIB_TEST(max(abs(mat(A)-truth )) < 1e-6);
+            DLIB_TEST_MSG(max(abs(mat(A)-truth )) < 1e-6, max(abs(mat(A)-truth )));
+
+            B.set_size(1,3,1,1);
+            rnd.fill_uniform(A);
+            rnd.fill_uniform(B);
+            resizable_tensor AA(A), BB(B);
+            tt::add(2, A, 3, B);
+            cpu::add(2, AA, 3, BB);
+            DLIB_TEST_MSG(max(abs(mat(A)-mat(AA) )) < 1e-6, max(abs(mat(A)-mat(AA) )));
         }
     }
 
