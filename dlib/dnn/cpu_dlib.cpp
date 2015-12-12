@@ -694,7 +694,6 @@ namespace dlib
 
             const long num = grad.nr()*grad.nc();
 
-            // Now normalize each channel so they sum to 1.
             for (long n = 0; n < grad.num_samples(); ++n)
             {
                 const auto d2 = d + num*grad.k()*n;
@@ -710,7 +709,7 @@ namespace dlib
 
                         float temp = 0;
                         for (long k = 0; k < grad.k(); ++k)
-                            temp += -d2[k*num]*in3[k*num];
+                            temp += -d3[k*num]*in3[k*num];
                         for (long k = 0; k < grad.k(); ++k)
                             g3[k*num] = d3[k*num]*(temp+in3[k*num]);
                     }
