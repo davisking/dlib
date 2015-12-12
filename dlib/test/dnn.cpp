@@ -114,10 +114,12 @@ namespace
     void test_softmax()
     {
         print_spinner();
-        resizable_tensor src(5,5), dest(5,5), gradient_input(5,5);
-        src = matrix_cast<float>(gaussian_randm(5,5, 0));
-        dest = matrix_cast<float>(gaussian_randm(5,5, 1));
-        gradient_input = matrix_cast<float>(gaussian_randm(5,5, 2));
+        const long nr = 3;
+        const long nc = 3;
+        resizable_tensor src(5,5,nr,nr), dest(5,5,nr,nc), gradient_input(5,5,nr,nc);
+        src = matrix_cast<float>(gaussian_randm(5,5*nr*nc, 0));
+        dest = matrix_cast<float>(gaussian_randm(5,5*nr*nc, 1));
+        gradient_input = matrix_cast<float>(gaussian_randm(5,5*nr*nc, 2));
 
 
 
