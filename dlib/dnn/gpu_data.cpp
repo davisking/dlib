@@ -81,6 +81,13 @@ namespace dlib
     {
         if (new_size == 0)
         {
+            if (device_in_use)
+            {
+                // Wait for any possible CUDA kernels that might be using our memory block to
+                // complete before we free the memory.
+                CHECK_CUDA(cudaStreamSynchronize(0));
+                device_in_use = false;
+            }
             wait_for_transfer_to_finish();
             data_size = 0;
             host_current = true;
@@ -91,6 +98,13 @@ namespace dlib
         }
         else if (new_size != data_size)
         {
+            if (device_in_use)
+            {
+                // Wait for any possible CUDA kernels that might be using our memory block to
+                // complete before we free the memory.
+                CHECK_CUDA(cudaStreamSynchronize(0));
+                device_in_use = false;
+            }
             wait_for_transfer_to_finish();
             data_size = new_size;
             host_current = true;
