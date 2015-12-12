@@ -73,10 +73,11 @@ namespace dlib
         );
         /*!
             requires
-                - dest.num_samples()==src.num_samples() || src.num_samples()==1
-                - dest.nr()==src.nr() || src.nr()==1
-                - dest.nc()==src.nc() || src.nc()==1
-                - dest.k()==src.k()   || src.k()==1
+                - One of the following is true: 
+                    - have_same_dimensions(src, dest)
+                    - src.num_samples()==1 && src.k()==dest.k() && src.nr()==1 && src.nc()==1
+                    - src.num_samples()==1 && src.k()==dest.k() && src.nr()==dest.nr() && src.nc()==dest.nc()
+                    - src.num_samples()==1 && src.k()==1 && src.nr()==dest.nr() && src.nc()==dest.nc()
                 - is_same_object(src,dest) == false
             ensures
                 - performs: dest = beta*dest + alpha*src
