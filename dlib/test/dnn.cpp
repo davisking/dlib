@@ -698,6 +698,11 @@ namespace
     {
         {
             print_spinner();
+            max_pool_ l;
+            DLIB_TEST_MSG(test_layer(l), test_layer(l));
+        }
+        {
+            print_spinner();
             affine_ l;
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
