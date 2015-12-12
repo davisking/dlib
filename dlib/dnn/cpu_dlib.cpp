@@ -16,20 +16,6 @@ namespace dlib
 
         void multiply (
             tensor& dest,
-            const tensor& src
-        )
-        {
-            DLIB_CASSERT(dest.size()==src.size(),"");
-            const auto d = dest.host();
-            const auto s = src.host();
-            for (size_t i = 0; i < src.size(); ++i)
-                d[i] *= s[i];
-        }
-
-    // -----------------------------------------------------------------------------------
-
-        void multiply (
-            tensor& dest,
             const tensor& src1,
             const tensor& src2
         )

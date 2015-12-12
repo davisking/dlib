@@ -92,22 +92,6 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
-// TODO, delete this function
-    void multiply (
-        tensor& dest,
-        const tensor& src
-    );
-    /*!
-        requires
-            - have_same_dimensions(dest,src) == true
-        ensures
-            - #dest == dest*src 
-              That is, for all valid i:
-                #dest.host()[i] == dest.host()[i]*src.host()[i]
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
     void multiply (
         tensor& dest,
         const tensor& src1,

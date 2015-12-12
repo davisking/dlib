@@ -17,11 +17,6 @@ namespace dlib
 
         void multiply (
             tensor& dest,
-            const tensor& src
-        );
-
-        void multiply (
-            tensor& dest,
             const tensor& src1,
             const tensor& src2
         );

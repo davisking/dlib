@@ -96,22 +96,6 @@ namespace dlib { namespace tt
 
     void multiply (
         tensor& dest,
-        const tensor& src
-    )
-    {
-        DLIB_CASSERT(have_same_dimensions(dest,src) == true,"");
-#ifdef DLIB_USE_CUDA
-        cuda::multiply(dest, src);
-#else
-        cpu::multiply(dest, src);
-#endif
-
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    void multiply (
-        tensor& dest,
         const tensor& src1,
         const tensor& src2
     )
