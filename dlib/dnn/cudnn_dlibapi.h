@@ -328,6 +328,8 @@ namespace dlib
 
         private:
             void* handle;
+            int window_height;
+            int window_width;
             int stride_y;
             int stride_x;
         };
