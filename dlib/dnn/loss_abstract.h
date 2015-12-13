@@ -182,7 +182,7 @@ namespace dlib
             SUBNET& sub
         ) const;
         /*!
-            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss() except
             it has the additional calling requirements that: 
                 - sub.get_output().nr() == 1
                 - sub.get_output().nc() == 1
@@ -254,7 +254,7 @@ namespace dlib
             SUBNET& sub
         ) const;
         /*!
-            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss() except
             it has the additional calling requirements that: 
                 - sub.get_output().nr() == 1
                 - sub.get_output().nc() == 1
@@ -273,6 +273,80 @@ namespace dlib
 
     template <typename SUBNET>
     using loss_binary_log = add_loss_layer<loss_binary_log_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class loss_multiclass_log_ 
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the loss layer interface defined above by
+                EXAMPLE_LOSS_LAYER_.  In particular, it implements the multiclass logistic
+                regression loss (e.g. negative log-likelihood loss), which is appropriate
+                for multiclass classification problems.  This means that the possible
+                labels when using this loss are integers >= 0.  
+                
+                Moreover, if after training you were to replace the loss layer of the
+                network with a softmax layer, the network outputs would give the
+                probabilities of each class assignment.  That is, if you have K classes
+                then the network should output tensors with the tensor::k()'th dimension
+                equal to K.  Applying softmax to these K values gives the probabilities of
+                each class.  The index into that K dimensional vector with the highest
+                probability is the predicted class label.
+        !*/
+
+    public:
+
+        const static unsigned int sample_expansion_factor = 1;
+        typedef unsigned long label_type;
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            it has the additional calling requirements that: 
+                - sub.get_output().nr() == 1
+                - sub.get_output().nc() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+            and the output label is the predicted class for each classified object.  The number
+            of possible output classes is sub.get_output().k()+1.
+        !*/
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss (
+            const tensor& input_tensor,
+            const_label_iterator truth, 
+            SUBNET& sub
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss() except
+            it has the additional calling requirements that: 
+                - sub.get_output().nr() == 1
+                - sub.get_output().nc() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - all values pointed to by truth are < sub.get_output().k()
+        !*/
+
+    };
+
+    void serialize(const loss_multiclass_log_& item, std::ostream& out);
+    void deserialize(loss_multiclass_log_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
+    template <typename SUBNET>
+    using loss_multiclass_log = add_loss_layer<loss_multiclass_log_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
