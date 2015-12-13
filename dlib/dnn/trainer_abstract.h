@@ -143,7 +143,7 @@ namespace dlib
 
         void set_num_epochs (
             unsigned long num
-        ) const;
+        );
         /*!
             requires
                 - num > 0

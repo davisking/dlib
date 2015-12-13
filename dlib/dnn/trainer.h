@@ -100,7 +100,7 @@ namespace dlib
 
         void set_num_epochs (
             unsigned long num
-        ) const 
+        )  
         {
             DLIB_CASSERT(num > 0,"");
             num_epochs = num;
