@@ -15,9 +15,9 @@ namespace dlib
     void load_mnist_dataset (
         const std::string& folder_name,
         std::vector<matrix<unsigned char> >& training_images,
-        std::vector<int>& training_labels,
+        std::vector<unsigned long>& training_labels,
         std::vector<matrix<unsigned char> >& testing_images,
-        std::vector<int>& testing_labels
+        std::vector<unsigned long>& testing_labels
     );
 }
 
