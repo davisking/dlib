@@ -522,7 +522,189 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-// TODO, add spec for max_pool_, bn_, and affine_ layers.  
+    class affine_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
+                In particular, it applies a simple pointwise linear transformation to an
+                input tensor.  You can think of it as having two parameter tensors, A and
+                B, that each have the same dimensionality as the input tensor (except their
+                num_samples() dimensions are 1).  If the input tensor is called INPUT
+                then the output of this layer is simply:
+                    A*INPUT+B
+                where all operations are performed element wise and each sample in the
+                INPUT tensor is processed separately.
+        !*/
+
+    public:
+
+        affine_(
+        );
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        void forward_inplace(const tensor& input, tensor& output);
+        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+        !*/
+    };
+
+    void serialize(const affine_& item, std::ostream& out);
+    void deserialize(affine_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
+    template <typename SUBNET>
+    using affine = add_layer<affine_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class bn_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
+                In particular, it defines a batch normalization layer that implements the
+                method described in the paper: 
+                    Batch Normalization: Accelerating Deep Network Training by Reducing
+                    Internal Covariate Shift by Sergey Ioffe and Christian Szegedy
+                
+                In particular, this layer produces output tensors with the same
+                dimensionality as the input tensors, except that the mean and variances of
+                the elements have been standardized. 
+        !*/
+
+    public:
+        bn_(
+        );
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+        !*/
+    };
+
+    void serialize(const bn_& item, std::ostream& out);
+    void deserialize(bn_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
+    template <typename SUBNET>
+    using bn = add_layer<bn_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class max_pool_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
+                In particular, it defines a max pooling layer that takes an input tensor
+                and downsamples it.  It does this by sliding a window over the images in an
+                input tensor and outputting, for each channel, the maximum element within
+                the window.  
+
+                To be precise, if we call the input tensor IN and the output tensor OUT,
+                then OUT is defined as follows:
+                    - OUT.num_samples() == IN.num_samples()
+                    - OUT.k()  == IN.k()
+                    - OUT.nr() == IN.nr()/stride_y()
+                    - OUT.nc() == IN.nc()/stride_x()
+                    - for all valid s, k, r, and c:
+                        - image_plane(OUT,s,k)(r,c) == max(subm_clipped(image_plane(IN,s,k),
+                                                                        r*stride_y(),
+                                                                        c*stride_x(),
+                                                                        nr(),
+                                                                        nc()))
+        !*/
+
+    public:
+
+        max_pool_ (
+        );
+        /*!
+            ensures
+                - #nr() == 3
+                - #nc() == 3
+                - #stride_y() == 1
+                - #stride_x() == 1
+        !*/
+
+        max_pool_(
+            long nr_,
+            long nc_,
+            int stride_y_ = 1,
+            int stride_x_ = 1
+        ); 
+        /*!
+            ensures
+                - #nr() == nr_ 
+                - #nc() == nc_ 
+                - #stride_y() == stride_y_
+                - #stride_x() == stride_x_
+        !*/
+
+        long nr(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of rows in the max pooling window.
+        !*/
+
+        long nc(
+        ) const;
+        /*!
+            ensures
+                - returns the number of columns in the max pooling window.
+        !*/
+
+        long stride_y(
+        ) const; 
+        /*!
+            ensures
+                - returns the vertical stride used when scanning the max pooling window
+                  over an image.  That is, each window will be moved stride_y() pixels down
+                  at a time when it moves over the image.
+        !*/
+
+        long stride_x(
+        ) const;
+        /*!
+            ensures
+                - returns the horizontal stride used when scanning the max pooling window
+                  over an image.  That is, each window will be moved stride_x() pixels down
+                  at a time when it moves over the image.
+        !*/
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& computed_output, const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_LAYER_ interface. 
+            Note that this layer doesn't have any parameters, so the tensor returned by
+            get_layer_params() is always empty.
+        !*/
+    };
+
+    void serialize(const max_pool_& item, std::ostream& out);
+    void deserialize(max_pool_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
+    template <typename SUBNET>
+    using max_pool = add_layer<max_pool_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -549,6 +731,8 @@ namespace dlib
         tensor& get_layer_params(); 
         /*!
             These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+            Note that this layer doesn't have any parameters, so the tensor returned by
+            get_layer_params() is always empty.
         !*/
     };
 
@@ -586,6 +770,8 @@ namespace dlib
         tensor& get_layer_params(); 
         /*!
             These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+            Note that this layer doesn't have any parameters, so the tensor returned by
+            get_layer_params() is always empty.
         !*/
     };
 
@@ -623,6 +809,8 @@ namespace dlib
         tensor& get_layer_params(); 
         /*!
             These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+            Note that this layer doesn't have any parameters, so the tensor returned by
+            get_layer_params() is always empty.
         !*/
     };
 
@@ -668,6 +856,8 @@ namespace dlib
         tensor& get_layer_params(); 
         /*!
             These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+            Note that this layer doesn't have any parameters, so the tensor returned by
+            get_layer_params() is always empty.
         !*/
     };
 
