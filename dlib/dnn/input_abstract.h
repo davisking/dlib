@@ -135,6 +135,10 @@ namespace dlib
                   For example, a matrix<float,3,3> would turn into a tensor with 3 rows, 3
                   columns, and k()==1.  Or a matrix<rgb_pixel,4,5> would turn into a tensor
                   with 4 rows, 5 columns, and k()==3 (since rgb_pixels have 3 channels).
+                - If the input data contains pixels of type unsigned char, rgb_pixel, or
+                  other pixel types with a basic_pixel_type of unsigned char then each
+                  value written to the output tensor is first divided by 256.0 so that the
+                  resulting outputs are all in the range [0,1].
         !*/
     };
 

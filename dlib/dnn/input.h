@@ -58,6 +58,8 @@ namespace dlib
             // initialize data to the right size to contain the stuff in the iterator range.
             data.set_size(std::distance(ibegin,iend), pixel_traits<T>::num, nr, nc);
 
+            typedef typename pixel_traits<T>::basic_pixel_type bptype;
+
             const size_t offset = nr*nc;
             auto ptr = data.host();
             for (auto i = ibegin; i != iend; ++i)
@@ -70,7 +72,10 @@ namespace dlib
                         auto p = ptr++;
                         for (long j = 0; j < temp.size(); ++j)
                         {
-                            *p = temp(j);
+                            if (is_same_type<bptype,unsigned char>::value)
+                                *p = temp(j)/256.0;
+                            else
+                                *p = temp(j);
                             p += offset;
                         }
                     }
@@ -130,6 +135,7 @@ namespace dlib
             
             // initialize data to the right size to contain the stuff in the iterator range.
             data.set_size(std::distance(ibegin,iend), pixel_traits<T>::num, nr, nc);
+            typedef typename pixel_traits<T>::basic_pixel_type bptype;
 
             const size_t offset = nr*nc;
             auto ptr = data.host();
@@ -143,7 +149,10 @@ namespace dlib
                         auto p = ptr++;
                         for (long j = 0; j < temp.size(); ++j)
                         {
-                            *p = temp(j);
+                            if (is_same_type<bptype,unsigned char>::value)
+                                *p = temp(j)/256.0;
+                            else
+                                *p = temp(j);
                             p += offset;
                         }
                     }
