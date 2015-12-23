@@ -114,6 +114,15 @@ namespace dlib
         }
 
         template <typename layer_type, typename SUBNET>
+        constexpr auto backward_requires_forward_output(
+            layer_type& layer,
+            SUBNET& sub
+        ) -> typename alwaysbool<decltype(layer.backward_inplace(rt(),sub.get_gradient_input(),rt()))>::type
+        {
+            return false;
+        }
+
+        template <typename layer_type, typename SUBNET>
         constexpr auto has_inplace_backward(
             layer_type& layer,
             SUBNET& sub
@@ -136,6 +145,15 @@ namespace dlib
             layer_type& layer,
             SUBNET& sub
         ) -> typename alwaysbool<decltype(layer.backward_inplace(rt(),rt(),sub.get_gradient_input(),rt()))>::type
+        {
+            return true;
+        }
+
+        template <typename layer_type, typename SUBNET>
+        constexpr auto has_inplace_backward(
+            layer_type& layer,
+            SUBNET& sub
+        ) -> typename alwaysbool<decltype(layer.backward_inplace(rt(),sub.get_gradient_input(),rt()))>::type
         {
             return true;
         }
@@ -192,6 +210,18 @@ namespace dlib
         ) -> decltype(layer.backward_inplace(computed_output,gradient_input,sub.get_gradient_input(),params_grad))
         {
             layer.backward_inplace(computed_output,gradient_input,sub.get_gradient_input(),params_grad);
+        }
+
+        template <typename layer_type, typename SUBNET>
+        auto call_layer_backward(
+            layer_type& layer,
+            const tensor& , 
+            const tensor& gradient_input, 
+            SUBNET& sub, 
+            tensor& params_grad
+        ) -> decltype(layer.backward_inplace(gradient_input,sub.get_gradient_input(),params_grad))
+        {
+            layer.backward_inplace(gradient_input,sub.get_gradient_input(),params_grad);
         }
 
 
