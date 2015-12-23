@@ -183,37 +183,113 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void batch_normalize_inference (
+        resizable_tensor& dest,
+        const tensor& src,
+        const tensor& gamma, 
+        const tensor& beta,
+        const tensor& running_means,
+        const tensor& running_invstds
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::batch_normalize_inference(dest,src,gamma,beta,running_means,running_invstds);
+#else
+        cpu::batch_normalize_inference(dest,src,gamma,beta,running_means,running_invstds);
+#endif
+    }
+
     void batch_normalize (
         resizable_tensor& dest,
         resizable_tensor& means,
         resizable_tensor& vars,
+        const double averaging_factor,
+        resizable_tensor& running_means,
+        resizable_tensor& running_invstds,
         const tensor& src,
         const tensor& gamma, 
         const tensor& beta 
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::batch_normalize(dest,means,vars,src,gamma,beta);
+        cuda::batch_normalize(dest,means,vars,averaging_factor,running_means,running_invstds,src,gamma,beta);
 #else
-        cpu::batch_normalize(dest,means,vars,src,gamma,beta);
+        cpu::batch_normalize(dest,means,vars,averaging_factor,running_means,running_invstds,src,gamma,beta);
+#endif
+    }
+
+    void batch_normalize_gradient (
+            const tensor& gradient_input,
+            const tensor& means,
+            const tensor& invstds,
+            const tensor& src,
+            const tensor& gamma,
+            tensor& src_grad,
+            tensor& gamma_grad, 
+            tensor& beta_grad 
+    )
+    {
+             
+#ifdef DLIB_USE_CUDA
+        cuda::batch_normalize_gradient(gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
+#else
+        cpu::batch_normalize_gradient(gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
 #endif
     }
 
 // ----------------------------------------------------------------------------------------
 
+    void batch_normalize_conv_inference (
+        resizable_tensor& dest,
+        const tensor& src,
+        const tensor& gamma, 
+        const tensor& beta,
+        const tensor& running_means,
+        const tensor& running_invstds
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::batch_normalize_conv_inference(dest,src,gamma,beta,running_means,running_invstds);
+#else
+        cpu::batch_normalize_conv_inference(dest,src,gamma,beta,running_means,running_invstds);
+#endif
+    }
+
     void batch_normalize_conv (
         resizable_tensor& dest,
         resizable_tensor& means,
         resizable_tensor& vars,
+        const double averaging_factor,
+        resizable_tensor& running_means,
+        resizable_tensor& running_invstds,
         const tensor& src,
         const tensor& gamma, 
         const tensor& beta 
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::batch_normalize_conv(dest,means,vars,src,gamma,beta);
+        cuda::batch_normalize_conv(dest,means,vars,averaging_factor,running_means,running_invstds,src,gamma,beta);
 #else
-        cpu::batch_normalize_conv(dest,means,vars,src,gamma,beta);
+        cpu::batch_normalize_conv(dest,means,vars,averaging_factor,running_means,running_invstds,src,gamma,beta);
+#endif
+    }
+
+    void batch_normalize_conv_gradient (
+            const tensor& gradient_input,
+            const tensor& means,
+            const tensor& invstds,
+            const tensor& src,
+            const tensor& gamma,
+            tensor& src_grad,
+            tensor& gamma_grad, 
+            tensor& beta_grad 
+    )
+    {
+             
+#ifdef DLIB_USE_CUDA
+        cuda::batch_normalize_conv_gradient(gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
+#else
+        cpu::batch_normalize_conv_gradient(gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
 #endif
     }
 

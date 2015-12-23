@@ -78,60 +78,6 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
-        void batch_normalize (
-            resizable_tensor& dest,
-            resizable_tensor& means,
-            resizable_tensor& invstds,
-            const tensor& src,
-            const tensor& gamma, 
-            const tensor& beta 
-        );
-
-        class batch_normalize_gradient
-        {
-        public:
-            void operator() (
-                const tensor& gradient_input,
-                const tensor& means,
-                const tensor& invstds,
-                const tensor& src,
-                const tensor& gamma,
-                tensor& src_grad,
-                tensor& gamma_grad, 
-                tensor& beta_grad 
-            );
-        private:
-            resizable_tensor dvars, dmeans;
-        };
-
-        void batch_normalize_conv (
-            resizable_tensor& dest,
-            resizable_tensor& means,
-            resizable_tensor& invstds,
-            const tensor& src,
-            const tensor& gamma, 
-            const tensor& beta 
-        );
-
-        class batch_normalize_conv_gradient
-        {
-        public:
-            void operator() (
-                const tensor& gradient_input,
-                const tensor& means,
-                const tensor& invstds,
-                const tensor& src,
-                const tensor& gamma,
-                tensor& src_grad,
-                tensor& gamma_grad, 
-                tensor& beta_grad 
-            );
-        private:
-            resizable_tensor dvars, dmeans;
-        };
-
-    // -----------------------------------------------------------------------------------
-
         void threshold (
             tensor& data,
             float thresh

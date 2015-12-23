@@ -563,6 +563,12 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    enum batch_normalization_mode
+    {
+        BATCH_NORM_CONV = 0,
+        BATCH_NORM_FC = 1
+    };
+
     class bn_
     {
         /*!
@@ -581,6 +587,34 @@ namespace dlib
     public:
         bn_(
         );
+        /*!
+            ensures
+                - #get_mode() == BATCH_NORM_FC
+        !*/
+
+        explicit bn_(
+            batch_normalization_mode mode
+        );
+        /*!
+            ensures
+                - #get_mode() == mode 
+        !*/
+
+        batch_normalization_mode get_mode(
+        ) const; 
+        /*!
+            ensures
+                - returns the mode of this layer, either BATCH_NORM_CONV or BATCH_NORM_FC.
+                  If the mode is BATCH_NORM_FC then the normalization is applied across the
+                  samples in a tensor (i.e. k()*nr()*nc() different things will be
+                  normalized).  Otherwise, normalization is applied across everything
+                  except for the k() dimension, resulting in there being only k()
+                  normalization equations that are applied spatially over the tensor.
+
+                  Therefore, if you are putting batch normalization after a fully connected
+                  layer you should use BATCH_NORM_FC.  Otherwise, if you are putting batch
+                  normalization after a convolutional layer you should use BATCH_NORM_CONV.
+        !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);

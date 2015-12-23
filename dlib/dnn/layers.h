@@ -298,19 +298,37 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    enum batch_normalization_mode
+    {
+        BATCH_NORM_CONV = 0,
+        BATCH_NORM_FC = 1
+    };
+
     class bn_
     {
     public:
-        bn_() : num_updates(0), running_stats_window_size(1000), running_nim_out_of_date(true)
+        bn_() : num_updates(0), running_stats_window_size(1000), mode(BATCH_NORM_FC)
         {}
+
+        explicit bn_(batch_normalization_mode mode_) : num_updates(0), running_stats_window_size(1000), mode(mode_)
+        {}
+
+        batch_normalization_mode get_mode() const { return mode; }
 
         template <typename SUBNET>
         void setup (const SUBNET& sub)
         {
-            gamma = alias_tensor(1,
-                            sub.get_output().k(),
-                            sub.get_output().nr(),
-                            sub.get_output().nc());
+            if (mode == BATCH_NORM_FC)
+            {
+                gamma = alias_tensor(1,
+                                sub.get_output().k(),
+                                sub.get_output().nr(),
+                                sub.get_output().nc());
+            }
+            else
+            {
+                gamma = alias_tensor(1, sub.get_output().k());
+            }
             beta = gamma;
 
             params.set_size(gamma.size()+beta.size());
@@ -318,15 +336,11 @@ namespace dlib
             gamma(params,0) = 1;
             beta(params,gamma.size()) = 0;
 
-            running_means.set_size(1,
-                            sub.get_output().k(),
-                            sub.get_output().nr(),
-                            sub.get_output().nc());
-            running_invstds.copy_size(running_means);
+            running_means.copy_size(gamma(params,0));
+            running_invstds.copy_size(gamma(params,0));
             running_means = 0;
             running_invstds = 1;
             num_updates = 0;
-            running_nim_out_of_date = true;
         }
 
         template <typename SUBNET>
@@ -336,27 +350,20 @@ namespace dlib
             auto b = beta(params,gamma.size());
             if (sub.get_output().num_samples() > 1)
             {
-                tt::batch_normalize(output, means, invstds, sub.get_output(), g, b); 
-
-                const double decay = num_updates/(num_updates+1.0);
+                const double decay = 1.0 - num_updates/(num_updates+1.0);
                 if (num_updates <running_stats_window_size)
                     ++num_updates;
-                tt::affine_transform(running_means, running_means, means, decay, 1-decay, 0);
-                tt::affine_transform(running_invstds, running_invstds, invstds, decay, 1-decay, 0);
-                running_nim_out_of_date = true;
+                if (mode == BATCH_NORM_FC)
+                    tt::batch_normalize(output, means, invstds, decay, running_means, running_invstds, sub.get_output(), g, b);
+                else 
+                    tt::batch_normalize_conv(output, means, invstds, decay, running_means, running_invstds, sub.get_output(), g, b);
             }
             else // we are running in testing mode so we just linearly scale the input tensor.
             {
-                if (running_nim_out_of_date)
-                {
-                    running_nim_out_of_date = false;
-                    running_nim.copy_size(running_means);
-                    tt::multiply(running_nim, running_means, running_invstds);
-                    running_nim *= -1;
-                }
-                output.copy_size(sub.get_output());
-                tt::affine_transform(output, sub.get_output(), running_invstds, running_nim);
-                tt::affine_transform(output, output, g, b);
+                if (mode == BATCH_NORM_FC)
+                    tt::batch_normalize_inference(output, sub.get_output(), g, b, running_means, running_invstds);
+                else
+                    tt::batch_normalize_conv_inference(output, sub.get_output(), g, b, running_means, running_invstds);
             }
         } 
 
@@ -366,7 +373,10 @@ namespace dlib
             auto g = gamma(params,0);
             auto g_grad = gamma(params_grad, 0);
             auto b_grad = beta(params_grad, gamma.size());
-            bng(gradient_input, means, invstds, sub.get_output(), g, sub.get_gradient_input(), g_grad, b_grad);
+            if (mode == BATCH_NORM_FC)
+                tt::batch_normalize_gradient(gradient_input, means, invstds, sub.get_output(), g, sub.get_gradient_input(), g_grad, b_grad );
+            else
+                tt::batch_normalize_conv_gradient(gradient_input, means, invstds, sub.get_output(), g, sub.get_gradient_input(), g_grad, b_grad );
         }
 
         const tensor& get_layer_params() const { return params; }
@@ -384,6 +394,7 @@ namespace dlib
             serialize(item.running_invstds, out);
             serialize(item.num_updates, out);
             serialize(item.running_stats_window_size, out);
+            serialize((int)item.mode, out);
         }
 
         friend void deserialize(bn_& item, std::istream& in)
@@ -401,21 +412,20 @@ namespace dlib
             deserialize(item.running_invstds, in);
             deserialize(item.num_updates, in);
             deserialize(item.running_stats_window_size, in);
-            item.running_nim_out_of_date = true;
+            int mode;
+            deserialize(mode, in);
+            item.mode = (batch_normalization_mode)mode;
         }
 
     private:
 
-        tt::batch_normalize_gradient bng;
         resizable_tensor params;
         alias_tensor gamma, beta;
         resizable_tensor means, running_means;
         resizable_tensor invstds, running_invstds;
         unsigned long num_updates;
         unsigned long running_stats_window_size;
-        
-        bool running_nim_out_of_date;
-        resizable_tensor running_nim;
+        batch_normalization_mode mode;
     };
 
     template <typename SUBNET>

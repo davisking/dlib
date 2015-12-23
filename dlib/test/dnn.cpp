@@ -151,7 +151,7 @@ namespace
     void test_batch_normalize()
     {
         print_spinner();
-        resizable_tensor src(5,5), gamma(1,5), beta(1,5), dest, means, vars, gradient_input(5,5);
+        resizable_tensor src(5,5), gamma(1,5), beta(1,5), dest, dest2, means, vars, gradient_input(5,5);
         src = matrix_cast<float>(gaussian_randm(5,5, 0));
         gamma = matrix_cast<float>(gaussian_randm(1,5, 1));
         beta = matrix_cast<float>(gaussian_randm(1,5, 2));
@@ -160,14 +160,18 @@ namespace
         gamma = 1;
         beta = 0;
 
-        batch_normalize(dest, means, vars, src, gamma, beta);
+        resizable_tensor running_means;
+        resizable_tensor running_invstds;
+        batch_normalize(dest, means, vars, 1, running_means, running_invstds, src, gamma, beta);
+        batch_normalize_inference(dest2, src, gamma, beta, running_means, running_invstds);
+        DLIB_TEST(max(abs(mat(dest2)-mat(dest))) < 1e-5);
 
 
         auto grad_src = [&](long idx) {
             auto f = [&](float eps) {
                 const float old = src.host()[idx];
                 src.host()[idx] += eps;
-                batch_normalize(dest, means, vars, src, gamma, beta);
+                batch_normalize(dest, means, vars, 1, running_means, running_invstds, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 src.host()[idx] = old;
                 return result;
@@ -179,7 +183,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = gamma.host()[idx];
                 gamma.host()[idx] += eps;
-                batch_normalize(dest, means, vars, src, gamma, beta);
+                batch_normalize(dest, means, vars, 1, running_means, running_invstds, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 gamma.host()[idx] = old;
                 return result;
@@ -191,7 +195,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = beta.host()[idx];
                 beta.host()[idx] += eps;
-                batch_normalize(dest, means, vars, src, gamma, beta);
+                batch_normalize(dest, means, vars, 1, running_means, running_invstds, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 beta.host()[idx] = old;
                 return result;
@@ -208,8 +212,7 @@ namespace
         gamma_grad = 8;
         beta_grad = 8;
 
-        batch_normalize_gradient bng;
-        bng(gradient_input, means, vars, src, gamma, src_grad, gamma_grad, beta_grad);
+        batch_normalize_gradient(gradient_input, means, vars, src, gamma, src_grad, gamma_grad, beta_grad);
 
         auto grad_error = compare_gradients(src_grad, grad_src);
         dlog << LINFO << "src error: " << grad_error;
@@ -227,7 +230,7 @@ namespace
     void test_batch_normalize_conv()
     {
         print_spinner();
-        resizable_tensor src(5,5,4,4), gamma(1,5), beta(1,5), dest, means, vars, gradient_input(5,5,4,4);
+        resizable_tensor src(5,5,4,4), gamma(1,5), beta(1,5), dest, dest2, means, vars, gradient_input(5,5,4,4);
         src = matrix_cast<float>(gaussian_randm(5,5*4*4, 0));
         gamma = matrix_cast<float>(gaussian_randm(1,5, 1));
         beta = matrix_cast<float>(gaussian_randm(1,5, 2));
@@ -236,14 +239,18 @@ namespace
         gamma = 1;
         beta = 0;
 
-        batch_normalize_conv(dest, means, vars, src, gamma, beta);
+        resizable_tensor running_means;
+        resizable_tensor running_invstds;
+        batch_normalize_conv(dest, means, vars, 1, running_means, running_invstds, src, gamma, beta);
+        batch_normalize_conv_inference(dest2, src, gamma, beta, running_means, running_invstds);
+        DLIB_TEST(max(abs(mat(dest2)-mat(dest))) < 1e-5);
 
 
         auto grad_src = [&](long idx) {
             auto f = [&](float eps) {
                 const float old = src.host()[idx];
                 src.host()[idx] += eps;
-                batch_normalize_conv(dest, means, vars, src, gamma, beta);
+                batch_normalize_conv(dest, means, vars, 1, running_means, running_invstds, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 src.host()[idx] = old;
                 return result;
@@ -255,7 +262,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = gamma.host()[idx];
                 gamma.host()[idx] += eps;
-                batch_normalize_conv(dest, means, vars, src, gamma, beta);
+                batch_normalize_conv(dest, means, vars, 1, running_means, running_invstds, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 gamma.host()[idx] = old;
                 return result;
@@ -267,7 +274,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = beta.host()[idx];
                 beta.host()[idx] += eps;
-                batch_normalize_conv(dest, means, vars, src, gamma, beta);
+                batch_normalize_conv(dest, means, vars, 1, running_means, running_invstds, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 beta.host()[idx] = old;
                 return result;
@@ -285,8 +292,7 @@ namespace
         gamma_grad = 9;
         beta_grad = 9;
 
-        batch_normalize_conv_gradient bng;
-        bng(gradient_input, means, vars, src, gamma, src_grad, gamma_grad, beta_grad);
+        batch_normalize_conv_gradient(gradient_input, means, vars, src, gamma, src_grad, gamma_grad, beta_grad);
 
 
         auto grad_error = compare_gradients(src_grad, grad_src);
@@ -597,6 +603,8 @@ namespace
         resizable_tensor dest, dest2;
         resizable_tensor means, means2;
         resizable_tensor invstds, invstds2;
+        resizable_tensor running_means, running_means2;
+        resizable_tensor running_invstds, running_invstds2;
         resizable_tensor src(64,20,100,100);
         resizable_tensor gamma(1,20,100,100);
         resizable_tensor beta(1,20,100,100);
@@ -605,17 +613,21 @@ namespace
         tt::tensor_rand rnd;
         rnd.fill_uniform(src);
 
-        cpu::batch_normalize(dest,means,invstds, src, gamma, beta);
 
-        cuda::batch_normalize(dest2,means2,invstds2, src, gamma, beta);
+        cpu::batch_normalize(dest, means, invstds, 1, running_means, running_invstds, src, gamma, beta);
+        cuda::batch_normalize(dest2,means2,invstds2, 1, running_means2, running_invstds2, src, gamma, beta);
 
         dlog << LINFO << "dest error:    "<< max(abs(mat(dest) -mat(dest2)));
         dlog << LINFO << "means error:   "<< max(abs(mat(means) -mat(means2)));
         dlog << LINFO << "invstds error: "<< max(abs(mat(invstds) -mat(invstds2)));
+        dlog << LINFO << "running_means error:   "<< max(abs(mat(running_means) -mat(running_means2)));
+        dlog << LINFO << "running_invstds error: "<< max(abs(mat(running_invstds) -mat(running_invstds2)));
 
-        DLIB_TEST(max(abs(mat(dest) -mat(dest2))) < 1e-5);
-        DLIB_TEST(max(abs(mat(means) -mat(means2))) < 1e-5);
-        DLIB_TEST(max(abs(mat(invstds) -mat(invstds2))) < 1e-5);
+        DLIB_TEST(max(abs(mat(dest) -mat(dest2))) < 1e-4);
+        DLIB_TEST(max(abs(mat(means) -mat(means2))) < 1e-4);
+        DLIB_TEST(max(abs(mat(invstds) -mat(invstds2))) < 1e-4);
+        DLIB_TEST(max(abs(mat(running_means) -mat(running_means2))) < 1e-4);
+        DLIB_TEST(max(abs(mat(running_invstds) -mat(running_invstds2))) < 1e-4);
 
 
         // now check that the gradients match as well
@@ -629,17 +641,15 @@ namespace
         rnd.fill_uniform(gradient_input);
 
 
-        cpu::batch_normalize_gradient cpu_bng;
-        cpu_bng(gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
-        cuda::batch_normalize_gradient cuda_bng;
-        cuda_bng(gradient_input, means, invstds, src, gamma, src_grad2, gamma_grad2, beta_grad2);
+        cpu::batch_normalize_gradient(gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
+        cuda::batch_normalize_gradient(gradient_input, means, invstds, src, gamma, src_grad2, gamma_grad2, beta_grad2);
 
         dlog << LINFO << "src_grad error:   " << max(abs(mat(src_grad)-mat(src_grad2)));
         dlog << LINFO << "gamma_grad error: " << max(abs(mat(gamma_grad)-mat(gamma_grad2)));
         dlog << LINFO << "beta_grad error:  " << max(abs(mat(beta_grad)-mat(beta_grad2)));
-        DLIB_TEST(max(abs(mat(src_grad)-mat(src_grad2))) < 1e-5);
-        DLIB_TEST(max(abs(mat(gamma_grad)-mat(gamma_grad2))) < 1e-5);
-        DLIB_TEST(max(abs(mat(beta_grad)-mat(beta_grad2))) < 1e-5);
+        DLIB_TEST(max(abs(mat(src_grad)-mat(src_grad2))) < 1e-4);
+        DLIB_TEST(max(abs(mat(gamma_grad)-mat(gamma_grad2))) < 1e-4);
+        DLIB_TEST(max(abs(mat(beta_grad)-mat(beta_grad2))) < 1e-4);
     }
 
     void compare_bn_conv_gpu_and_cpu()
@@ -648,6 +658,8 @@ namespace
         resizable_tensor dest, dest2;
         resizable_tensor means, means2;
         resizable_tensor invstds, invstds2;
+        resizable_tensor running_means, running_means2;
+        resizable_tensor running_invstds, running_invstds2;
         resizable_tensor src(2,8,10,9);
         resizable_tensor gamma(1,8);
         resizable_tensor beta(1,8);
@@ -656,17 +668,20 @@ namespace
         tt::tensor_rand rnd;
         rnd.fill_uniform(src);
 
-        cpu::batch_normalize_conv(dest,means,invstds, src, gamma, beta);
-
-        cuda::batch_normalize_conv(dest2,means2,invstds2, src, gamma, beta);
+        cpu::batch_normalize_conv(dest,means,invstds,1,running_means,running_invstds, src, gamma, beta);
+        cuda::batch_normalize_conv(dest2,means2,invstds2,1,running_means2,running_invstds2, src, gamma, beta);
 
         dlog << LINFO << "dest error:    "<< max(abs(mat(dest) -mat(dest2)));
         dlog << LINFO << "means error:   "<< max(abs(mat(means) -mat(means2)));
         dlog << LINFO << "invstds error: "<< max(abs(mat(invstds) -mat(invstds2)));
+        dlog << LINFO << "running_means error:   "<< max(abs(mat(running_means) -mat(running_means2)));
+        dlog << LINFO << "running_invstds error: "<< max(abs(mat(running_invstds) -mat(running_invstds2)));
 
         DLIB_TEST(max(abs(mat(dest) -mat(dest2))) < 1e-4);
         DLIB_TEST(max(abs(mat(means) -mat(means2))) < 1e-4);
         DLIB_TEST(max(abs(mat(invstds) -mat(invstds2))) < 1e-4);
+        DLIB_TEST(max(abs(mat(running_means) -mat(running_means2))) < 1e-4);
+        DLIB_TEST(max(abs(mat(running_invstds) -mat(running_invstds2))) < 1e-4);
 
         resizable_tensor gradient_input;
         resizable_tensor src_grad, gamma_grad, beta_grad;
@@ -678,10 +693,8 @@ namespace
         rnd.fill_uniform(gradient_input);
 
 
-        cpu::batch_normalize_conv_gradient cpu_bng;
-        cpu_bng(gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
-        cuda::batch_normalize_conv_gradient cuda_bng;
-        cuda_bng(gradient_input, means, invstds, src, gamma, src_grad2, gamma_grad2, beta_grad2);
+        cpu::batch_normalize_conv_gradient(gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
+        cuda::batch_normalize_conv_gradient(gradient_input, means, invstds, src, gamma, src_grad2, gamma_grad2, beta_grad2);
 
         dlog << LINFO << "src_grad error:   " << max(abs(mat(src_grad)-mat(src_grad2)));
         dlog << LINFO << "gamma_grad error: " << max(abs(mat(gamma_grad)-mat(gamma_grad2)));
@@ -721,8 +734,8 @@ namespace
         // make sure max_pool does what it's spec says it should.
         DLIB_TEST( A.num_samples() == B.num_samples());
         DLIB_TEST( A.k() == B.k());
-        DLIB_TEST( A.nr() == B.nr()/stride_y);
-        DLIB_TEST( A.nc() == B.nc()/stride_x);
+        DLIB_TEST( A.nr() == 1+(B.nr()-window_height%2)/stride_y);
+        DLIB_TEST( A.nc() == 1+(B.nc()-window_width%2)/stride_x);
         for (long s = 0; s < A.num_samples(); ++s)
         {
             for (long k = 0; k < A.k(); ++k)
@@ -732,10 +745,10 @@ namespace
                     for (long c = 0; c < A.nc(); ++c)
                     {
                         DLIB_TEST(image_plane(A,s,k)(r,c) == max(subm_clipped(image_plane(B,s,k),
-                                    r*stride_y,
-                                    c*stride_x,
-                                    window_height,
-                                    window_width)));
+                                    centered_rect(c*stride_x,
+                                                  r*stride_y,
+                                                  window_width,
+                                                  window_height))));
                     }
                 }
             }
@@ -838,6 +851,7 @@ namespace
             test_max_pool(1,1,2,3);
             test_max_pool(3,3,1,1);
             test_max_pool(3,3,2,2);
+            test_max_pool(2,2,2,2);
             test_max_pool(4,5,3,1);
             test_tanh();
             test_softmax();

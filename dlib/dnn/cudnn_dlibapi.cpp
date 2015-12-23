@@ -11,6 +11,7 @@
 #include <iostream>
 #include <string>
 #include "cuda_utils.h"
+#include "cpu_dlib.h"
 
 static const char* cudnn_get_error_string(cudnnStatus_t s)
 {
@@ -269,6 +270,344 @@ namespace dlib
                                                &beta,
                                                descriptor(grad),
                                                grad.device()));
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void batch_normalize_inference (
+            resizable_tensor& dest,
+            const tensor& src,
+            const tensor& gamma, 
+            const tensor& beta,
+            const tensor& running_means,
+            const tensor& running_invstds
+        )
+        {
+            DLIB_CASSERT(
+                gamma.num_samples() == 1 && 
+                gamma.nr() == src.nr() &&
+                gamma.nc() == src.nc() &&
+                gamma.k()  == src.k() &&
+                have_same_dimensions(gamma, beta) &&
+                have_same_dimensions(gamma, running_means) &&
+                have_same_dimensions(gamma, running_invstds), 
+                "\ngamma.num_samples(): " << gamma.num_samples() << 
+                "\ngamma.k():  " << gamma.k() << 
+                "\ngamma.nr(): " << gamma.nr() << 
+                "\ngamma.nc(): " << gamma.nc() << 
+                "\nbeta.num_samples(): " << beta.num_samples() << 
+                "\nbeta.k():   " << beta.k() << 
+                "\nbeta.nr():  " << beta.nr() << 
+                "\nbeta.nc():  " << beta.nc() << 
+                "\nrunning_means.num_samples(): " << running_means.num_samples() << 
+                "\nrunning_means.k():   " << running_means.k() << 
+                "\nrunning_means.nr():  " << running_means.nr() << 
+                "\nrunning_means.nc():  " << running_means.nc() << 
+                "\nrunning_invstds.num_samples(): " << running_invstds.num_samples() << 
+                "\nrunning_invstds.k():   " << running_invstds.k() << 
+                "\nrunning_invstds.nr():  " << running_invstds.nr() << 
+                "\nrunning_invstds.nc():  " << running_invstds.nc() << 
+                "\nsrc.k():   " << src.k() << 
+                "\nsrc.nr():  " << src.nr() << 
+                "\nsrc.nc():  " << src.nc() 
+            );
+            const float in_scale = 1;
+            const float out_scale = 0;
+
+            dest.copy_size(src);
+
+            CHECK_CUDNN(cudnnBatchNormalizationForwardInference(
+                                context(),
+                                CUDNN_BATCHNORM_PER_ACTIVATION,
+                                &in_scale,
+                                &out_scale,
+                                descriptor(src),
+                                src.device(),
+                                descriptor(dest),
+                                dest.device(),
+                                descriptor(gamma),
+                                gamma.device(),
+                                beta.device(),
+                                running_means.device(),
+                                running_invstds.device(),
+                                dlib::cpu::BATCH_NORM_EPS));
+        }
+
+        void batch_normalize (
+            resizable_tensor& dest,
+            resizable_tensor& means,
+            resizable_tensor& invstds,
+            const double averaging_factor,
+            resizable_tensor& running_means,
+            resizable_tensor& running_invstds,
+            const tensor& src,
+            const tensor& gamma, 
+            const tensor& beta 
+        )
+        {
+            DLIB_CASSERT(0 <= averaging_factor && averaging_factor <= 1, "averaging_factor: " << averaging_factor);
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_means,means),"");
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_invstds,invstds),"");
+            DLIB_CASSERT(
+                src.num_samples() > 1 &&
+                gamma.num_samples() == 1 && 
+                beta.num_samples() == 1 && 
+                gamma.nr() == beta.nr() && beta.nr() == src.nr() &&
+                gamma.nc() == beta.nc() && beta.nc() == src.nc() &&
+                gamma.k()  == beta.k()  && beta.k() == src.k(), 
+                "\ngamma.num_samples(): " << gamma.num_samples() << 
+                "\ngamma.k():  " << gamma.k() << 
+                "\ngamma.nr(): " << gamma.nr() << 
+                "\ngamma.nc(): " << gamma.nc() << 
+                "\nbeta.num_samples(): " << beta.num_samples() << 
+                "\nbeta.k():   " << beta.k() << 
+                "\nbeta.nr():  " << beta.nr() << 
+                "\nbeta.nc():  " << beta.nc() << 
+                "\nsrc.k():   " << src.k() << 
+                "\nsrc.nr():  " << src.nr() << 
+                "\nsrc.nc():  " << src.nc() 
+            );
+
+            const float in_scale = 1;
+            const float out_scale = 0;
+
+            dest.copy_size(src);
+            means.set_size(1, src.k(), src.nr(), src.nc());
+            invstds.copy_size(means);
+            running_means.copy_size(means);
+            running_invstds.copy_size(means);
+
+            CHECK_CUDNN(cudnnBatchNormalizationForwardTraining(
+                                context(),
+                                CUDNN_BATCHNORM_PER_ACTIVATION,
+                                &in_scale,
+                                &out_scale,
+                                descriptor(src),
+                                src.device(),
+                                descriptor(dest),
+                                dest.device(),
+                                descriptor(gamma),
+                                gamma.device(),
+                                beta.device(),
+                                averaging_factor,
+                                running_means.device(),
+                                running_invstds.device(),
+                                dlib::cpu::BATCH_NORM_EPS,
+                                means.device(),
+                                invstds.device()));
+        }
+
+        void batch_normalize_gradient(
+            const tensor& gradient_input,
+            const tensor& means,
+            const tensor& invstds,
+            const tensor& src,
+            const tensor& gamma,
+            tensor& src_grad,
+            tensor& gamma_grad, 
+            tensor& beta_grad 
+        )
+        {
+            const long num = src.k()*src.nr()*src.nc();
+            DLIB_CASSERT(src.num_samples() > 1, "");
+            DLIB_CASSERT(num == means.size(),"");
+            DLIB_CASSERT(num == invstds.size(),"");
+            DLIB_CASSERT(num == gamma.size(),"");
+            DLIB_CASSERT(num == gamma_grad.size(),"");
+            DLIB_CASSERT(num == beta_grad.size(),"");
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src),"");
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad),"");
+
+            const float in_scale = 1;
+            const float out_scale = 1;
+
+            CHECK_CUDNN(cudnnBatchNormalizationBackward(
+                                context(),
+                                CUDNN_BATCHNORM_PER_ACTIVATION,
+                                &in_scale,
+                                &out_scale,
+                                descriptor(src),
+                                src.device(),
+                                descriptor(gradient_input),
+                                gradient_input.device(),
+                                descriptor(src_grad),
+                                src_grad.device(),
+                                descriptor(gamma),
+                                gamma.device(),
+                                gamma_grad.device(),
+                                beta_grad.device(),
+                                dlib::cpu::BATCH_NORM_EPS,
+                                means.device(),
+                                invstds.device()));
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void batch_normalize_conv_inference (
+            resizable_tensor& dest,
+            const tensor& src,
+            const tensor& gamma, 
+            const tensor& beta,
+            const tensor& running_means,
+            const tensor& running_invstds
+        )
+        {
+            DLIB_CASSERT(
+                gamma.num_samples() == 1 && 
+                gamma.nr() == 1 &&
+                gamma.nc() == 1 &&
+                gamma.k()  == src.k() &&
+                have_same_dimensions(gamma, beta) &&
+                have_same_dimensions(gamma, running_means) &&
+                have_same_dimensions(gamma, running_invstds), 
+                "\ngamma.num_samples(): " << gamma.num_samples() << 
+                "\ngamma.k():  " << gamma.k() << 
+                "\ngamma.nr(): " << gamma.nr() << 
+                "\ngamma.nc(): " << gamma.nc() << 
+                "\nbeta.num_samples(): " << beta.num_samples() << 
+                "\nbeta.k():   " << beta.k() << 
+                "\nbeta.nr():  " << beta.nr() << 
+                "\nbeta.nc():  " << beta.nc() << 
+                "\nrunning_means.num_samples(): " << running_means.num_samples() << 
+                "\nrunning_means.k():   " << running_means.k() << 
+                "\nrunning_means.nr():  " << running_means.nr() << 
+                "\nrunning_means.nc():  " << running_means.nc() << 
+                "\nrunning_invstds.num_samples(): " << running_invstds.num_samples() << 
+                "\nrunning_invstds.k():   " << running_invstds.k() << 
+                "\nrunning_invstds.nr():  " << running_invstds.nr() << 
+                "\nrunning_invstds.nc():  " << running_invstds.nc() << 
+                "\nsrc.k():   " << src.k() << 
+                "\nsrc.nr():  " << src.nr() << 
+                "\nsrc.nc():  " << src.nc() 
+            );
+            const float in_scale = 1;
+            const float out_scale = 0;
+
+            dest.copy_size(src);
+
+            CHECK_CUDNN(cudnnBatchNormalizationForwardInference(
+                                context(),
+                                CUDNN_BATCHNORM_SPATIAL,
+                                &in_scale,
+                                &out_scale,
+                                descriptor(src),
+                                src.device(),
+                                descriptor(dest),
+                                dest.device(),
+                                descriptor(gamma),
+                                gamma.device(),
+                                beta.device(),
+                                running_means.device(),
+                                running_invstds.device(),
+                                dlib::cpu::BATCH_NORM_EPS));
+        }
+
+        void batch_normalize_conv (
+            resizable_tensor& dest,
+            resizable_tensor& means,
+            resizable_tensor& invstds,
+            const double averaging_factor,
+            resizable_tensor& running_means,
+            resizable_tensor& running_invstds,
+            const tensor& src,
+            const tensor& gamma, 
+            const tensor& beta 
+        )
+        {
+            DLIB_CASSERT(0 <= averaging_factor && averaging_factor <= 1, "averaging_factor: " << averaging_factor);
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_means,means),"");
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_invstds,invstds),"");
+            DLIB_CASSERT(
+                src.num_samples() > 1 &&
+                gamma.num_samples() == 1 && 
+                beta.num_samples() == 1 && 
+                gamma.nr() == 1 && 
+                beta.nr() == 1 && 
+                gamma.nc() == 1 && 
+                beta.nc() == 1 && 
+                gamma.k()  == beta.k()  && beta.k() == src.k(), 
+                "\ngamma.num_samples(): " << gamma.num_samples() << 
+                "\ngamma.k():  " << gamma.k() << 
+                "\ngamma.nr(): " << gamma.nr() << 
+                "\ngamma.nc(): " << gamma.nc() << 
+                "\nbeta.num_samples(): " << beta.num_samples() << 
+                "\nbeta.k():   " << beta.k() << 
+                "\nbeta.nr():  " << beta.nr() << 
+                "\nbeta.nc():  " << beta.nc() << 
+                "\nsrc.k():   " << src.k() << 
+                "\nsrc.nr():  " << src.nr() << 
+                "\nsrc.nc():  " << src.nc() 
+            );
+            const float in_scale = 1;
+            const float out_scale = 0;
+
+            dest.copy_size(src);
+            means.set_size(1, src.k());
+            invstds.copy_size(means);
+            running_means.copy_size(means);
+            running_invstds.copy_size(means);
+
+            CHECK_CUDNN(cudnnBatchNormalizationForwardTraining(
+                                context(),
+                                CUDNN_BATCHNORM_SPATIAL,
+                                &in_scale,
+                                &out_scale,
+                                descriptor(src),
+                                src.device(),
+                                descriptor(dest),
+                                dest.device(),
+                                descriptor(gamma),
+                                gamma.device(),
+                                beta.device(),
+                                averaging_factor,
+                                running_means.device(),
+                                running_invstds.device(),
+                                dlib::cpu::BATCH_NORM_EPS,
+                                means.device(),
+                                invstds.device()));
+        }
+
+        void batch_normalize_conv_gradient(
+            const tensor& gradient_input,
+            const tensor& means,
+            const tensor& invstds,
+            const tensor& src,
+            const tensor& gamma,
+            tensor& src_grad,
+            tensor& gamma_grad, 
+            tensor& beta_grad 
+        )
+        {
+            const long num = src.nr()*src.nc();
+            DLIB_CASSERT(src.k() == means.size(),"");
+            DLIB_CASSERT(src.k() == invstds.size(),"");
+            DLIB_CASSERT(src.k() == gamma.size(),"");
+            DLIB_CASSERT(src.k() == gamma_grad.size(),"");
+            DLIB_CASSERT(src.k() == beta_grad.size(),"");
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src),"");
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad),"");
+
+            const float in_scale = 1;
+            const float out_scale = 1;
+
+            CHECK_CUDNN(cudnnBatchNormalizationBackward(
+                                context(),
+                                CUDNN_BATCHNORM_SPATIAL,
+                                &in_scale,
+                                &out_scale,
+                                descriptor(src),
+                                src.device(),
+                                descriptor(gradient_input),
+                                gradient_input.device(),
+                                descriptor(src_grad),
+                                src_grad.device(),
+                                descriptor(gamma),
+                                gamma.device(),
+                                gamma_grad.device(),
+                                beta_grad.device(),
+                                dlib::cpu::BATCH_NORM_EPS,
+                                means.device(),
+                                invstds.device()));
         }
 
     // ------------------------------------------------------------------------------------
@@ -636,7 +975,8 @@ namespace dlib
                                                 CUDNN_POOLING_MAX,
                                                 window_height,
                                                 window_width,
-                                                0,0, // no padding
+                                                window_height/2,
+                                                window_width/2,  
                                                 stride_y,
                                                 stride_x));
             }
@@ -671,8 +1011,18 @@ namespace dlib
 
             DLIB_CASSERT(dest.num_samples() == src.num_samples(),"");
             DLIB_CASSERT(dest.k() == src.k(),"");
-            DLIB_CASSERT(dest.nr() == src.nr()/stride_y, stride_y << ", " << dest.nr() << "  " << src.nr()/stride_y);
-            DLIB_CASSERT(dest.nc() == src.nc()/stride_x, stride_x << ", " << dest.nc() << "  " << src.nc()/stride_x);
+            DLIB_CASSERT(dest.nr() == 1+(src.nr()-window_height%2)/stride_y, 
+                "\n stride_y: " << stride_y  <<
+                "\n window_height: " << window_height  <<
+                "\n src.nr(): " << src.nr()  <<
+                "\n dest.nr(): " << dest.nr()  <<
+                "\n src.nr()/stride_y: " <<  src.nr()/stride_y); 
+            DLIB_CASSERT(dest.nc() == 1+(src.nc()-window_width%2)/stride_x, 
+                "\n stride_x: " << stride_x  <<
+                "\n window_width: " << window_width  <<
+                "\n src.nc(): " << src.nc()  <<
+                "\n dest.nc(): " << dest.nc()  <<
+                "\n src.nc()/stride_x: " <<  src.nc()/stride_x); 
 
             CHECK_CUDNN(cudnnPoolingForward(context(),
                                      (const cudnnPoolingDescriptor_t)handle,

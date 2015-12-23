@@ -198,10 +198,38 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void batch_normalize_inference (
+        resizable_tensor& dest,
+        const tensor& src,
+        const tensor& gamma, 
+        const tensor& beta,
+        const tensor& running_means,
+        const tensor& running_invstds
+    );
+    /*!
+        requires
+            - gamma.num_samples() == 1 
+            - gamma.nr() == src.nr() 
+            - gamma.nc() == src.nc() 
+            - gamma.k()  == src.k()
+            - have_same_dimensions(gamma, beta) 
+            - have_same_dimensions(gamma, running_means) 
+            - have_same_dimensions(gamma, running_invstds)
+        ensures
+            - Just linearly transforms src as a call to batch_normalize() would if the resulting
+              means and invstds were running_means and running_invstds.  That is, this function 
+              performs: 
+                dest = gamma*(src-running_means)*running_invstds + beta
+              Note that it does it in a pointwise fashion over the samples in src.
+    !*/
+
     void batch_normalize (
         resizable_tensor& dest,
         resizable_tensor& means,
         resizable_tensor& invstds,
+        const double averaging_factor,
+        resizable_tensor& running_means,
+        resizable_tensor& running_invstds,
         const tensor& src,
         const tensor& gamma, 
         const tensor& beta 
@@ -214,6 +242,10 @@ namespace dlib { namespace tt
             - gamma.nr() == beta.nr() == src.nr()
             - gamma.nc() == beta.nc() == src.nc()
             - gamma.k()  == beta.k()  == src.k()
+            - 0 <= averaging_factor <= 1
+            - if (averaging_factor != 1)
+                - have_same_dimensions(running_means, means) == true
+                - have_same_dimensions(running_invstds, invstds) == true
         ensures
             - have_same_dimensions(#dest, src) == true
             - #means.num_samples() == 1
@@ -224,57 +256,78 @@ namespace dlib { namespace tt
             - #src == the batch normalized version of src.
             - #means == the mean values of the contents of src.
             - #invstds == 1/(the standard deviation values of the contents of src).
+            - #running_means = (1-averaging_factor)*mat(#running_means) + averaging_factor*mat(#means);
+            - #running_invstds = (1-averaging_factor)*mat(#running_invstds) + averaging_factor*mat(#invstds);
     !*/
 
-    class batch_normalize_gradient
-    {
-    public:
-        void operator() (
-            const tensor& gradient_input,
-            const tensor& means,
-            const tensor& invstds,
-            const tensor& src,
-            const tensor& gamma,
-            tensor& src_grad,
-            tensor& gamma_grad, 
-            tensor& beta_grad 
-        ){impl(gradient_input,means,invstds,src,gamma,src_grad,gamma_grad,beta_grad);}
-        /*!
-            requires
-                - invstds and means should be the output of a call to
-                  batch_normalize(dest,means,invstds,src,gamma,beta)
-                - have_same_dimensions(gradient_input, src) == true
-                - have_same_dimensions(src, src_grad) == true
-                - src.num_samples() > 1
-                - gamma.num_samples() == 1
-                - have_same_dimensions(gamma, gamma_grad) == true
-                - have_same_dimensions(gamma, beta_grad) == true
-                - gamma.nr() == src.nr()
-                - gamma.nc() == src.nc()
-                - gamma.k()  == src.k()
-                - have_same_dimensions(means, gamma) == true
-                - have_same_dimensions(invstds, gamma) == true
-            ensures
-                - Let f(src,gamma,beta) == dot(gradient_input, dest output of
-                  batch_normalize(dest,means,invstds,src,gamma,beta))
-                - Adds the gradient of f() with respect to src to #src_grad.
-                - Assigns the gradient of f() with respect to gamma to #gamma_grad.
-                - Assigns the gradient of f() with respect to beta to #beta_grad.
-        !*/
-    private:
-#ifdef DLIB_USE_CUDA
-        cuda::batch_normalize_gradient impl;
-#else
-        cpu::batch_normalize_gradient impl;
-#endif
-    };
+    void batch_normalize_gradient (
+        const tensor& gradient_input,
+        const tensor& means,
+        const tensor& invstds,
+        const tensor& src,
+        const tensor& gamma,
+        tensor& src_grad,
+        tensor& gamma_grad, 
+        tensor& beta_grad 
+    );
+    /*!
+        requires
+            - invstds and means should be the output of a call to
+              batch_normalize(dest,means,invstds,src,gamma,beta)
+            - have_same_dimensions(gradient_input, src) == true
+            - have_same_dimensions(src, src_grad) == true
+            - src.num_samples() > 1
+            - gamma.num_samples() == 1
+            - have_same_dimensions(gamma, gamma_grad) == true
+            - have_same_dimensions(gamma, beta_grad) == true
+            - gamma.nr() == src.nr()
+            - gamma.nc() == src.nc()
+            - gamma.k()  == src.k()
+            - have_same_dimensions(means, gamma) == true
+            - have_same_dimensions(invstds, gamma) == true
+        ensures
+            - Let f(src,gamma,beta) == dot(gradient_input, dest output of
+              batch_normalize(dest,means,invstds,src,gamma,beta))
+            - Adds the gradient of f() with respect to src to #src_grad.
+            - Assigns the gradient of f() with respect to gamma to #gamma_grad.
+            - Assigns the gradient of f() with respect to beta to #beta_grad.
+    !*/
 
 // ----------------------------------------------------------------------------------------
+
+    void batch_normalize_conv_inference (
+        resizable_tensor& dest,
+        const tensor& src,
+        const tensor& gamma, 
+        const tensor& beta,
+        const tensor& running_means,
+        const tensor& running_invstds
+    );
+    /*!
+        requires
+            - gamma.num_samples() == 1 
+            - gamma.nr() == 1 
+            - gamma.nc() == 1 
+            - gamma.k()  == src.k()
+            - have_same_dimensions(gamma, beta) 
+            - have_same_dimensions(gamma, running_means) 
+            - have_same_dimensions(gamma, running_invstds)
+        ensures
+            - Just linearly transforms src as a call to batch_normalize() would if the resulting
+              means and invstds were running_means and running_invstds.  That is, this function 
+              performs: 
+                dest = gamma*(src-running_means)*running_invstds + beta
+              Note that it does it in a pointwise fashion over the samples, rows, and
+              columns in src.
+    !*/
 
     void batch_normalize_conv (
         resizable_tensor& dest,
         resizable_tensor& means,
         resizable_tensor& invstds,
+        const double averaging_factor,
+        resizable_tensor& running_means,
+        resizable_tensor& running_invstds,
         const tensor& src,
         const tensor& gamma, 
         const tensor& beta 
@@ -285,6 +338,10 @@ namespace dlib { namespace tt
             - gamma.num_samples()==gamma.nr()==gamma.nc() == 1
             - beta.num_samples() ==beta.nr() ==gamma.nc() == 1
             - gamma.k()  == beta.k()  == src.k()
+            - 0 <= averaging_factor <= 1
+            - if (averaging_factor != 1)
+                - have_same_dimensions(running_means, means) == true
+                - have_same_dimensions(running_invstds, invstds) == true
         ensures
             - have_same_dimensions(#dest, src) == true
             - #means.num_samples()==means.nr()==means.nc() == 1
@@ -293,12 +350,11 @@ namespace dlib { namespace tt
             - #src == the batch normalized version of src.
             - #means == the mean values of the contents of src.
             - #invstds == 1/(the standard deviation values of the contents of src).
+            - #running_means = (1-averaging_factor)*mat(#running_means) + averaging_factor*mat(#means);
+            - #running_invstds = (1-averaging_factor)*mat(#running_invstds) + averaging_factor*mat(#invstds);
     !*/
 
-    class batch_normalize_conv_gradient
-    {
-    public:
-        void operator() (
+    void batch_normalize_conv_gradient (
             const tensor& gradient_input,
             const tensor& means,
             const tensor& invstds,
@@ -307,34 +363,27 @@ namespace dlib { namespace tt
             tensor& src_grad,
             tensor& gamma_grad, 
             tensor& beta_grad 
-        ){impl(gradient_input,means,invstds,src,gamma,src_grad,gamma_grad,beta_grad);}
-        /*!
-            requires
-                - invstds and means should be the output of a call to
-                  batch_normalize_conv(dest,means,invstds,src,gamma,beta)
-                - have_same_dimensions(gradient_input, src) == true
-                - have_same_dimensions(src, src_grad) == true
-                - src.num_samples() > 1
-                - gamma.num_samples()==gamma.nr()==gamma.nc() == 1
-                - have_same_dimensions(gamma, gamma_grad) == true
-                - have_same_dimensions(gamma, beta_grad) == true
-                - gamma.k()  == src.k()
-                - have_same_dimensions(means, gamma) == true
-                - have_same_dimensions(invstds, gamma) == true
-            ensures
-                - Let f(src,gamma,beta) == dot(gradient_input, dest output of
-                  batch_normalize_conv(dest,means,invstds,src,gamma,beta))
-                - Adds the gradient of f() with respect to src to #src_grad.
-                - Assigns the gradient of f() with respect to gamma to #gamma_grad.
-                - Assigns the gradient of f() with respect to beta to #beta_grad.
-        !*/
-    private:
-#ifdef DLIB_USE_CUDA
-        cuda::batch_normalize_conv_gradient impl;
-#else
-        cpu::batch_normalize_conv_gradient impl;
-#endif
-    };
+    );
+    /*!
+        requires
+            - invstds and means should be the output of a call to
+              batch_normalize_conv(dest,means,invstds,src,gamma,beta)
+            - have_same_dimensions(gradient_input, src) == true
+            - have_same_dimensions(src, src_grad) == true
+            - src.num_samples() > 1
+            - gamma.num_samples()==gamma.nr()==gamma.nc() == 1
+            - have_same_dimensions(gamma, gamma_grad) == true
+            - have_same_dimensions(gamma, beta_grad) == true
+            - gamma.k()  == src.k()
+            - have_same_dimensions(means, gamma) == true
+            - have_same_dimensions(invstds, gamma) == true
+        ensures
+            - Let f(src,gamma,beta) == dot(gradient_input, dest output of
+              batch_normalize_conv(dest,means,invstds,src,gamma,beta))
+            - Adds the gradient of f() with respect to src to #src_grad.
+            - Assigns the gradient of f() with respect to gamma to #gamma_grad.
+            - Assigns the gradient of f() with respect to beta to #beta_grad.
+    !*/
 
 // -----------------------------------------------------------------------------------
 
@@ -540,14 +589,14 @@ namespace dlib { namespace tt
             ensures
                 - #dest.num_samples() == src.num_samples()
                 - #dest.k() == src.k()
-                - #dest.nr() == src.nr()/stride_y
-                - #dest.nc() == src.nc()/stride_x
+                - #dest.nr() == 1+(src.nr()-window_height%2)/stride_y
+                - #dest.nc() == 1+(src.nc()-window_width%2)/stride_x
                 - for all valid s, k, r, and c:
                     - image_plane(#dest,s,k)(r,c) == max(subm_clipped(image_plane(src,s,k),
-                                                                        r*stride_y,
-                                                                        c*stride_x,
-                                                                        window_height,
-                                                                        window_width))
+                                                                      centered_rect(c*stride_x,
+                                                                                    r*stride_y,
+                                                                                    window_width,
+                                                                                    window_height)))
         !*/
 
         void get_gradient(

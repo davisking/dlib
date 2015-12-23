@@ -234,15 +234,79 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
+        void batch_normalize_inference (
+            resizable_tensor& dest,
+            const tensor& src,
+            const tensor& gamma, 
+            const tensor& beta,
+            const tensor& running_means,
+            const tensor& running_invstds
+        )
+        {
+            DLIB_CASSERT(
+                gamma.num_samples() == 1 && 
+                gamma.nr() == src.nr() &&
+                gamma.nc() == src.nc() &&
+                gamma.k()  == src.k() &&
+                have_same_dimensions(gamma, beta) &&
+                have_same_dimensions(gamma, running_means) &&
+                have_same_dimensions(gamma, running_invstds), 
+                "\ngamma.num_samples(): " << gamma.num_samples() << 
+                "\ngamma.k():  " << gamma.k() << 
+                "\ngamma.nr(): " << gamma.nr() << 
+                "\ngamma.nc(): " << gamma.nc() << 
+                "\nbeta.num_samples(): " << beta.num_samples() << 
+                "\nbeta.k():   " << beta.k() << 
+                "\nbeta.nr():  " << beta.nr() << 
+                "\nbeta.nc():  " << beta.nc() << 
+                "\nrunning_means.num_samples(): " << running_means.num_samples() << 
+                "\nrunning_means.k():   " << running_means.k() << 
+                "\nrunning_means.nr():  " << running_means.nr() << 
+                "\nrunning_means.nc():  " << running_means.nc() << 
+                "\nrunning_invstds.num_samples(): " << running_invstds.num_samples() << 
+                "\nrunning_invstds.k():   " << running_invstds.k() << 
+                "\nrunning_invstds.nr():  " << running_invstds.nr() << 
+                "\nrunning_invstds.nc():  " << running_invstds.nc() << 
+                "\nsrc.k():   " << src.k() << 
+                "\nsrc.nr():  " << src.nr() << 
+                "\nsrc.nc():  " << src.nc() 
+            );
+            dest.copy_size(src);
+
+            auto d = dest.host();
+            auto s = src.host();
+            auto g = gamma.host();
+            auto b = beta.host();
+            auto m = running_means.host();
+            auto i = running_invstds.host();
+
+            const long num = src.k()*src.nr()*src.nc();
+            for (long n = 0; n < src.num_samples(); ++n)
+            {
+                for (long k = 0; k < num; ++k)
+                {
+                    *d = g[k]*(*s - m[k])*i[k] + b[k];
+                    ++d;
+                    ++s;
+                }
+            }
+        }
+
         void batch_normalize (
             resizable_tensor& dest,
             resizable_tensor& means,
             resizable_tensor& invstds,
+            const double averaging_factor,
+            resizable_tensor& running_means,
+            resizable_tensor& running_invstds,
             const tensor& src,
             const tensor& gamma, 
             const tensor& beta 
         )
         {
+            DLIB_CASSERT(0 <= averaging_factor && averaging_factor <= 1, "averaging_factor: " << averaging_factor);
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_means,means),"");
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_invstds,invstds),"");
             DLIB_CASSERT(
                 src.num_samples() > 1 &&
                 gamma.num_samples() == 1 && 
@@ -289,12 +353,11 @@ namespace dlib
             // copy data back to host
             invstds.host(); means.host();
 
-            const float eps = 0.00001;
             // compute variances 
             for (long i = 0; i < num; ++i)
             {
                 auto actual_var = p_invstds[i] - p_means[i]*p_means[i];
-                p_invstds[i] = 1.0f/std::sqrt(actual_var+eps);
+                p_invstds[i] = 1.0f/std::sqrt(actual_var+BATCH_NORM_EPS);
             }
 
             p_src = src.host();
@@ -311,9 +374,23 @@ namespace dlib
                     ++p_dest;
                 }
             }
+
+            // now keep track of the running means and invstds
+            running_means.copy_size(means);
+            running_invstds.copy_size(invstds);
+            if (averaging_factor != 1)
+            {
+                running_means = (1-averaging_factor)*mat(running_means) + averaging_factor*mat(means);
+                running_invstds = (1-averaging_factor)*mat(running_invstds) + averaging_factor*mat(invstds);
+            }
+            else
+            {
+                running_means = means;
+                running_invstds = invstds;
+            }
         }
 
-        void batch_normalize_gradient::operator() (
+        void batch_normalize_gradient (
             const tensor& gradient_input,
             const tensor& means,
             const tensor& invstds,
@@ -326,6 +403,7 @@ namespace dlib
         {
 
             const long num = src.k()*src.nr()*src.nc();
+            DLIB_CASSERT(src.num_samples() > 1, "");
             DLIB_CASSERT(num == means.size(),"");
             DLIB_CASSERT(num == invstds.size(),"");
             DLIB_CASSERT(num == gamma.size(),"");
@@ -344,6 +422,7 @@ namespace dlib
             const auto p_invstds = invstds.host();
             const auto p_means = means.host();
 
+            resizable_tensor dvars, dmeans;
             dvars.copy_size(invstds);
             dmeans.copy_size(means);
             dvars = 0;
@@ -406,15 +485,82 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        void batch_normalize_conv_inference (
+            resizable_tensor& dest,
+            const tensor& src,
+            const tensor& gamma, 
+            const tensor& beta,
+            const tensor& running_means,
+            const tensor& running_invstds
+        )
+        {
+            DLIB_CASSERT(
+                gamma.num_samples() == 1 && 
+                gamma.nr() == 1 &&
+                gamma.nc() == 1 &&
+                gamma.k()  == src.k() &&
+                have_same_dimensions(gamma, beta) &&
+                have_same_dimensions(gamma, running_means) &&
+                have_same_dimensions(gamma, running_invstds), 
+                "\ngamma.num_samples(): " << gamma.num_samples() << 
+                "\ngamma.k():  " << gamma.k() << 
+                "\ngamma.nr(): " << gamma.nr() << 
+                "\ngamma.nc(): " << gamma.nc() << 
+                "\nbeta.num_samples(): " << beta.num_samples() << 
+                "\nbeta.k():   " << beta.k() << 
+                "\nbeta.nr():  " << beta.nr() << 
+                "\nbeta.nc():  " << beta.nc() << 
+                "\nrunning_means.num_samples(): " << running_means.num_samples() << 
+                "\nrunning_means.k():   " << running_means.k() << 
+                "\nrunning_means.nr():  " << running_means.nr() << 
+                "\nrunning_means.nc():  " << running_means.nc() << 
+                "\nrunning_invstds.num_samples(): " << running_invstds.num_samples() << 
+                "\nrunning_invstds.k():   " << running_invstds.k() << 
+                "\nrunning_invstds.nr():  " << running_invstds.nr() << 
+                "\nrunning_invstds.nc():  " << running_invstds.nc() << 
+                "\nsrc.k():   " << src.k() << 
+                "\nsrc.nr():  " << src.nr() << 
+                "\nsrc.nc():  " << src.nc() 
+            );
+            dest.copy_size(src);
+
+            auto d = dest.host();
+            auto s = src.host();
+            auto g = gamma.host();
+            auto b = beta.host();
+            auto m = running_means.host();
+            auto i = running_invstds.host();
+
+            const long num = src.nr()*src.nc();
+            for (long n = 0; n < src.num_samples(); ++n)
+            {
+                for (long k = 0; k < src.k(); ++k)
+                {
+                    for (long j = 0; j < num; ++j)
+                    {
+                        *d = g[k]*(*s - m[k])*i[k] + b[k];
+                        ++d;
+                        ++s;
+                    }
+                }
+            }
+        }
+
         void batch_normalize_conv (
             resizable_tensor& dest,
             resizable_tensor& means,
             resizable_tensor& invstds,
+            const double averaging_factor,
+            resizable_tensor& running_means,
+            resizable_tensor& running_invstds,
             const tensor& src,
             const tensor& gamma, 
             const tensor& beta 
         )
         {
+            DLIB_CASSERT(0 <= averaging_factor && averaging_factor <= 1, "averaging_factor: " << averaging_factor);
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_means,means),"");
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_invstds,invstds),"");
             DLIB_CASSERT(
                 src.num_samples() > 1 &&
                 gamma.num_samples() == 1 && 
@@ -468,13 +614,12 @@ namespace dlib
             // copy data back to host
             invstds.host(); means.host();
 
-            const float eps = 0.00001;
             p_src = src.host();
             // compute variances 
             for (long k = 0; k < src.k(); ++k)
             {
                 float actual_var = p_invstds[k] - p_means[k]*p_means[k];
-                p_invstds[k] = 1.0f/std::sqrt(actual_var + eps);
+                p_invstds[k] = 1.0f/std::sqrt(actual_var + BATCH_NORM_EPS);
             }
 
             p_src = src.host();
@@ -492,9 +637,23 @@ namespace dlib
                     }
                 }
             }
+
+            // now keep track of the running means and invstds
+            running_means.copy_size(means);
+            running_invstds.copy_size(invstds);
+            if (averaging_factor != 1)
+            {
+                running_means = (1-averaging_factor)*mat(running_means) + averaging_factor*mat(means);
+                running_invstds = (1-averaging_factor)*mat(running_invstds) + averaging_factor*mat(invstds);
+            }
+            else
+            {
+                running_means = means;
+                running_invstds = invstds;
+            }
         }
 
-        void batch_normalize_conv_gradient::operator() (
+        void batch_normalize_conv_gradient(
             const tensor& gradient_input,
             const tensor& means,
             const tensor& invstds,
@@ -507,6 +666,7 @@ namespace dlib
         {
 
             const long num = src.nr()*src.nc();
+            DLIB_CASSERT(src.num_samples() > 1, "");
             DLIB_CASSERT(src.k() == means.size(),"");
             DLIB_CASSERT(src.k() == invstds.size(),"");
             DLIB_CASSERT(src.k() == gamma.size(),"");
@@ -526,6 +686,7 @@ namespace dlib
             const auto p_invstds = invstds.host();
             const auto p_means = means.host();
 
+            resizable_tensor dvars, dmeans;
             dvars.copy_size(invstds);
             dmeans.copy_size(means);
             dvars = 0;

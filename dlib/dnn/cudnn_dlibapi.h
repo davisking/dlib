@@ -134,6 +134,74 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        void batch_normalize_inference (
+            resizable_tensor& dest,
+            const tensor& src,
+            const tensor& gamma, 
+            const tensor& beta,
+            const tensor& running_means,
+            const tensor& running_invstds
+        );
+
+        void batch_normalize (
+            resizable_tensor& dest,
+            resizable_tensor& means,
+            resizable_tensor& invstds,
+            const double averaging_factor,
+            resizable_tensor& running_means,
+            resizable_tensor& running_invstds,
+            const tensor& src,
+            const tensor& gamma, 
+            const tensor& beta 
+        );
+
+        void batch_normalize_gradient(
+            const tensor& gradient_input,
+            const tensor& means,
+            const tensor& invstds,
+            const tensor& src,
+            const tensor& gamma,
+            tensor& src_grad,
+            tensor& gamma_grad, 
+            tensor& beta_grad 
+        );
+
+    // ------------------------------------------------------------------------------------
+
+        void batch_normalize_conv_inference (
+            resizable_tensor& dest,
+            const tensor& src,
+            const tensor& gamma, 
+            const tensor& beta,
+            const tensor& running_means,
+            const tensor& running_invstds
+        );
+
+        void batch_normalize_conv (
+            resizable_tensor& dest,
+            resizable_tensor& means,
+            resizable_tensor& invstds,
+            const double averaging_factor,
+            resizable_tensor& running_means,
+            resizable_tensor& running_invstds,
+            const tensor& src,
+            const tensor& gamma, 
+            const tensor& beta 
+        );
+
+        void batch_normalize_conv_gradient(
+            const tensor& gradient_input,
+            const tensor& means,
+            const tensor& invstds,
+            const tensor& src,
+            const tensor& gamma,
+            tensor& src_grad,
+            tensor& gamma_grad, 
+            tensor& beta_grad 
+        );
+
+    // ------------------------------------------------------------------------------------
+
         class tensor_conv
         {
         public:
@@ -295,14 +363,14 @@ namespace dlib
                 ensures
                     - #dest.num_samples() == src.num_samples()
                     - #dest.k() == src.k()
-                    - #dest.nr() == src.nr()/stride_y
-                    - #dest.nc() == src.nc()/stride_x
+                    - #dest.nr() == 1+(src.nr()-window_height%2)/stride_y
+                    - #dest.nc() == 1+(src.nc()-window_width%2)/stride_x
                     - for all valid s, k, r, and c:
                         - image_plane(#dest,s,k)(r,c) == max(subm_clipped(image_plane(src,s,k),
-                                                                          r*stride_y,
-                                                                          c*stride_x,
-                                                                          window_height,
-                                                                          window_width))
+                                                                          centered_rect(c*stride_x,
+                                                                                        r*stride_y,
+                                                                                        window_width,
+                                                                                        window_height)))
             !*/
 
             void get_gradient(
