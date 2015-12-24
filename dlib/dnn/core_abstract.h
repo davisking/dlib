@@ -33,16 +33,28 @@ namespace dlib
     !*/
 
     template <
-        typename Head, 
-        typename... Tail
+        typename... T 
         >
-    std::tuple<Tail...> tuple_tail(
-        const std::tuple<Head, Tail...>& item 
+    auto tuple_tail(
+        const std::tuple<T...>& item 
     );
     /*!
         ensures
-            - returns a tuple that contains everything in item except for get<0>(item).
-              So it basically returns make_tuple(get<1>(item),get<2>(item),get<3>(item), and so on).
+            - returns a tuple that contains everything in item except for tuple_head(item).
+              The items will be in the same order as they are in item, just without
+              tuple_head(item).
+            - This function will correctly handle nested tuples.
+    !*/
+
+    template <typename... T>
+    auto tuple_head (
+        const std::tuple<T...>& item
+    ); 
+    /*!
+        ensures
+            - returns a copy of the first thing in the tuple that isn't a std::tuple.
+              Essentially, this function calls std::get<0>() recursively on item until
+              a non-std::tuple object is found.
     !*/
 
     double log1pexp(
@@ -214,14 +226,14 @@ namespace dlib
                 - #subnet()        == subnet_type(item.subnet())
         !*/
 
-        template <typename ...T, typename ...U>
+        template <typename ...T, typename LD, typename ...U>
         add_layer(
-            const std::tuple<layer_details_type,U...>& layer_det, 
+            const std::tuple<LD,U...>& layer_det, 
             T&& ...args
         );
         /*!
             ensures
-                - #layer_details() == layer_details_type(get<0>(layer_det))
+                - #layer_details() == layer_details_type(tuple_head(layer_det))
                 - #subnet()        == subnet_type(tuple_tail(layer_det),args)
         !*/
 

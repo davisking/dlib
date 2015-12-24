@@ -59,7 +59,7 @@ namespace dlib
         template <size_t max>
         struct ct_make_integer_range
         {
-            // recursively call push_back on ct_integers_list to build a range from 0 to max
+            // recursively call push_back on ct_integers_list to build a range from 1 to max
             // inclusive.
             typedef typename ct_make_integer_range<max-1>::type::template push_back<max>::type type;
         };
@@ -78,6 +78,57 @@ namespace dlib
         {
             return std::make_tuple(std::get<indices>(item)...);
         }
+
+        template <typename Head, typename... Tail>
+        std::tuple<Tail...> basic_tuple_tail(
+            const std::tuple<Head, Tail...>& item
+        )
+        {
+            return tuple_subset(item, typename ct_make_integer_range<sizeof...(Tail)>::type());
+        }
+
+        template <typename T>
+        std::tuple<T> tuple_flatten(const T& t) 
+        {
+            return std::make_tuple(t);
+        }
+
+        template <typename... T>
+        auto tuple_flatten(
+            const std::tuple<T...>& item
+        ) -> decltype(tuple_flatten(item, typename ct_make_integer_range<sizeof...(T)>::type()))
+        {
+            return tuple_flatten(item, typename ct_make_integer_range<sizeof...(T)>::type());
+        }
+
+        template <size_t... indices, typename... T>
+        auto tuple_flatten(
+            const std::tuple<T...>& item, 
+            ct_integers_list<indices...>
+        ) -> decltype(std::tuple_cat(tuple_flatten(std::get<indices-1>(item))...))
+        {
+            return std::tuple_cat(tuple_flatten(std::get<indices-1>(item))...);
+        }
+
+        template <typename T>
+        struct tuple_head_helper
+        {
+            typedef T type;
+            static const type& get(const T& item) 
+            {
+                return item;
+            }
+        };
+
+        template <typename T, typename... U>
+        struct tuple_head_helper<std::tuple<T, U...>>
+        {
+            typedef typename tuple_head_helper<T>::type type;
+            static const type& get(const std::tuple<T,U...>& item) 
+            {
+                return tuple_head_helper<T>::get(std::get<0>(item));
+            }
+        };
 
         template <typename T> struct alwaysbool { typedef bool type; };
 
@@ -275,14 +326,28 @@ namespace dlib
 
     } // end namespace impl
 
-    template <typename Head, typename... Tail>
-    std::tuple<Tail...> tuple_tail(
-        const std::tuple<Head, Tail...>& item
-    )
+    template <typename... T>
+    typename impl::tuple_head_helper<std::tuple<T...>>::type tuple_head (
+        const std::tuple<T...>& item
+    ) 
     {
-        return impl::tuple_subset(item, typename impl::ct_make_integer_range<sizeof...(Tail)>::type());
+        return impl::tuple_head_helper<std::tuple<T...>>::get(item);
     }
 
+    template <typename... T>
+    auto tuple_tail(
+        const std::tuple<T...>& item
+    ) -> decltype(impl::basic_tuple_tail(impl::tuple_flatten(item)))
+    {
+        return impl::basic_tuple_tail(impl::tuple_flatten(item));
+    }
+
+    inline std::tuple<> tuple_tail(
+        const std::tuple<>& item
+    ) 
+    {
+        return item;
+    }
 // ----------------------------------------------------------------------------------------
 
     inline void randomize_parameters (
@@ -540,12 +605,12 @@ namespace dlib
                 subnetwork.disable_output_and_gradient_getters();
         }
 
-        template <typename ...T, typename ...U>
+        template <typename ...T, typename LD, typename ...U>
         add_layer(
-            const std::tuple<LAYER_DETAILS,U...>& layer_det, 
+            const std::tuple<LD,U...>& layer_det, 
             T&& ...args
         ) : 
-            details(std::get<0>(layer_det)), 
+            details(tuple_head(layer_det)), 
             subnetwork(tuple_tail(layer_det),std::forward<T>(args)...),
             this_layer_setup_called(false),
             gradient_input_is_stale(true),
@@ -555,10 +620,10 @@ namespace dlib
                 subnetwork.disable_output_and_gradient_getters();
         }
 
-        template <typename ...T, typename ...U>
+        template <typename ...T, typename LD, typename ...U>
         add_layer(
             std::tuple<>,
-            const std::tuple<LAYER_DETAILS,U...>& layer_det, 
+            const std::tuple<LD,U...>& layer_det, 
             T&& ...args
         ) : add_layer(layer_det,args...) { }
 
@@ -859,12 +924,12 @@ namespace dlib
 
         add_layer(
             const std::tuple<LAYER_DETAILS>& layer_det
-        ) : add_layer(std::get<0>(layer_det)) {}
+        ) : add_layer(tuple_head(layer_det)) {}
 
         add_layer(
             const std::tuple<LAYER_DETAILS>& layer_det,
             INPUT_LAYER il
-        ) : add_layer(std::get<0>(layer_det),il) {}
+        ) : add_layer(tuple_head(layer_det),il) {}
 
         template <typename input_iterator>
         void to_tensor (
