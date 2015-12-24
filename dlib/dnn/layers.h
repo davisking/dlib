@@ -553,30 +553,51 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    enum fc_bias_mode{
+        FC_HAS_BIAS = 0,
+        FC_NO_BIAS = 1
+    };
+
     class fc_
     {
     public:
-        fc_() : num_outputs(1), num_inputs(0)
+        fc_() : num_outputs(1), num_inputs(0), bias_mode(FC_HAS_BIAS)
         {
         }
 
         explicit fc_(
-            unsigned long num_outputs_
-        ) : num_outputs(num_outputs_), num_inputs(0)
+            unsigned long num_outputs_, 
+            fc_bias_mode mode = FC_HAS_BIAS
+        ) : num_outputs(num_outputs_), num_inputs(0), bias_mode(mode)
         {
         }
 
         unsigned long get_num_outputs (
         ) const { return num_outputs; }
 
+        fc_bias_mode get_bias_mode (
+        ) const { return bias_mode; }
+
         template <typename SUBNET>
         void setup (const SUBNET& sub)
         {
             num_inputs = sub.get_output().nr()*sub.get_output().nc()*sub.get_output().k();
-            params.set_size(num_inputs, num_outputs);
+            if (bias_mode == FC_HAS_BIAS)
+                params.set_size(num_inputs+1, num_outputs);
+            else
+                params.set_size(num_inputs, num_outputs);
 
             dlib::rand rnd("fc_"+cast_to_string(num_outputs));
             randomize_parameters(params, num_inputs+num_outputs, rnd);
+
+            weights = alias_tensor(num_inputs, num_outputs);
+
+            if (bias_mode == FC_HAS_BIAS)
+            {
+                biases = alias_tensor(1,num_outputs);
+                // set the initial bias values to zero
+                biases(params,weights.size()) = 0;
+            }
         }
 
         template <typename SUBNET>
@@ -584,17 +605,32 @@ namespace dlib
         {
             output.set_size(sub.get_output().num_samples(), num_outputs);
 
-            tt::gemm(0,output, 1,sub.get_output(),false, params,false);
+            auto w = weights(params, 0);
+            tt::gemm(0,output, 1,sub.get_output(),false, w,false);
+            if (bias_mode == FC_HAS_BIAS)
+            {
+                auto b = biases(params, weights.size());
+                tt::add(1,output,1,b);
+            }
         } 
 
         template <typename SUBNET>
         void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
         {
-            // compute the gradient of the parameters.  
-            tt::gemm(0,params_grad, 1,sub.get_output(),true, gradient_input,false);
+            // compute the gradient of the weight parameters.  
+            auto pw = weights(params_grad, 0);
+            tt::gemm(0,pw, 1,sub.get_output(),true, gradient_input,false);
+
+            if (bias_mode == FC_HAS_BIAS)
+            {
+                // compute the gradient of the bias parameters.  
+                auto pb = biases(params_grad, weights.size());
+                tt::add_bias_gradient(pb, gradient_input);
+            }
 
             // compute the gradient for the data
-            tt::gemm(1,sub.get_gradient_input(), 1,gradient_input,false, params,true);
+            auto w = weights(params, 0);
+            tt::gemm(1,sub.get_gradient_input(), 1,gradient_input,false, w,true);
         }
 
         const tensor& get_layer_params() const { return params; }
@@ -606,6 +642,9 @@ namespace dlib
             serialize(item.num_outputs, out);
             serialize(item.num_inputs, out);
             serialize(item.params, out);
+            serialize(item.weights, out);
+            serialize(item.biases, out);
+            serialize((int)item.bias_mode, out);
         }
 
         friend void deserialize(fc_& item, std::istream& in)
@@ -617,6 +656,11 @@ namespace dlib
             deserialize(item.num_outputs, in);
             deserialize(item.num_inputs, in);
             deserialize(item.params, in);
+            deserialize(item.weights, in);
+            deserialize(item.biases, in);
+            int bmode = 0;
+            deserialize(bmode, in);
+            item.bias_mode = (fc_bias_mode)bmode;
         }
 
     private:
@@ -624,8 +668,9 @@ namespace dlib
         unsigned long num_outputs;
         unsigned long num_inputs;
         resizable_tensor params;
+        alias_tensor weights, biases;
+        fc_bias_mode bias_mode;
     };
-
 
     template <typename SUBNET>
     using fc = add_layer<fc_, SUBNET>;

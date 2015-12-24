@@ -864,7 +864,12 @@ namespace
         }
         {
             print_spinner();
-            fc_ l(5);
+            fc_ l(5,FC_HAS_BIAS);
+            DLIB_TEST_MSG(test_layer(l), test_layer(l));
+        }
+        {
+            print_spinner();
+            fc_ l(5,FC_NO_BIAS);
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {

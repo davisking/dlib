@@ -313,6 +313,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    enum fc_bias_mode{
+        FC_HAS_BIAS = 0,
+        FC_NO_BIAS = 1
+    };
+
     class fc_
     {
         /*!
@@ -328,16 +333,19 @@ namespace dlib
         /*!
             ensures
                 - #get_num_outputs() == 1
+                - #get_bias_mode() == FC_HAS_BIAS
         !*/
 
         explicit fc_(
-            unsigned long num_outputs
+            unsigned long num_outputs,
+            fc_bias_mode mode = FC_HAS_BIAS
         );
         /*!
             requires
                 - num_outputs > 0
             ensures
                 - #get_num_outputs() == num_outputs
+                - #get_bias_mode() == mode
         !*/
 
         unsigned long get_num_outputs (
@@ -349,6 +357,15 @@ namespace dlib
                     - T.num_samples() == however many samples were given to forward().
                     - T.k() == get_num_outputs()
                     - The rest of the dimensions of T will be 1.
+        !*/
+
+        fc_bias_mode get_bias_mode (
+        ) const;
+        /*!
+            ensures
+                - returns the bias mode which determines if this layer includes bias terms.
+                  That is, if the bias mode is FC_HAS_BIAS then a different constant scalar
+                  is added to each of the outputs of this layer. 
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
