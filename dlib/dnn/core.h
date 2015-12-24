@@ -487,6 +487,10 @@ namespace dlib
         friend class add_layer;
         template <typename T, bool is_first, typename E>
         friend class dimpl::subnet_wrapper;
+        template <unsigned long T, typename U, typename E>
+        friend class add_tag_layer;
+        template <template<typename> class T, typename U>
+        friend class add_skip_layer;
 
         // Allow copying networks from one to another as long as their corresponding 
         // layers can be constructed from each other.
@@ -714,7 +718,7 @@ namespace dlib
         ) 
         {
             // This layer can run in-place if it's an in-place capable layer and also if
-            // the layer it's on top of doesn't need it's own output tensor (since in-place
+            // the layer it's on top of doesn't need its own output tensor (since in-place
             // layers overwrite that tensor)
             return impl::is_inplace_layer(details, subnetwork) && !subnetwork.this_layer_requires_forward_output();
         }
@@ -787,6 +791,10 @@ namespace dlib
         friend class add_layer;
         template <typename T, bool is_first, typename E>
         friend class dimpl::subnet_wrapper;
+        template <unsigned long T, typename U, typename E>
+        friend class add_tag_layer;
+        template <template<typename> class T, typename U>
+        friend class add_skip_layer;
 
         // Allow copying networks from one to another as long as their corresponding 
         // layers can be constructed from each other.
@@ -1157,6 +1165,36 @@ namespace dlib
 
     private:
 
+        template <typename T, typename U, typename E>
+        friend class add_layer;
+        template <typename T, bool is_first, typename E>
+        friend class dimpl::subnet_wrapper;
+        template <unsigned long T, typename U, typename E>
+        friend class add_tag_layer;
+        template <template<typename> class T, typename U>
+        friend class add_skip_layer;
+
+        // You woudln't put a tag on a layer if you didn't want to access its forward
+        // outputs.  So this is always true.
+        bool this_layer_requires_forward_output(
+        ) { return true; } 
+
+        void disable_output_and_gradient_getters (
+        ) 
+        { 
+            // This should never happen because only inplace layers call
+            // disable_output_and_gradient_getters(), however, putting a tag layer right
+            // before an inplace layer basically means you don't want the following layer
+            // to operate in place.  So the inplace layer should turn itself into an
+            // out-of-place layer and not call disable_output_and_gradient_getters(). 
+            DLIB_CASSERT(false,"This should never happen");
+        }
+
+        tensor& private_get_output() const
+        { return subnetwork.private_get_output(); }
+        tensor& private_get_gradient_input() 
+        { return subnetwork.private_get_gradient_input(); }
+
         subnet_type subnetwork;
     };
 
@@ -1277,6 +1315,36 @@ namespace dlib
         }
 
     private:
+
+        template <typename T, typename U, typename E>
+        friend class add_layer;
+        template <typename T, bool is_first, typename E>
+        friend class dimpl::subnet_wrapper;
+        template <unsigned long T, typename U, typename E>
+        friend class add_tag_layer;
+        template <template<typename> class T, typename U>
+        friend class add_skip_layer;
+
+        // You woudln't put a tag on a layer if you didn't want to access its forward
+        // outputs.  So this is always true.
+        bool this_layer_requires_forward_output(
+        ) { return true; } 
+
+        void disable_output_and_gradient_getters (
+        ) 
+        { 
+            // This should never happen because only inplace layers call
+            // disable_output_and_gradient_getters(), however, putting a tag layer right
+            // before an inplace layer basically means you don't want the following layer
+            // to operate in place.  So the inplace layer should turn itself into an
+            // out-of-place layer and not call disable_output_and_gradient_getters(). 
+            DLIB_CASSERT(false,"This should never happen");
+        }
+
+        tensor& private_get_output() const
+        { return get_output(); }
+        tensor& private_get_gradient_input() 
+        { return get_gradient_input(); }
 
         void swap(add_tag_layer& item)
         {
@@ -1774,6 +1842,26 @@ namespace dlib
         }
 
     private:
+
+        template <typename T, typename U, typename E>
+        friend class add_layer;
+        template <typename T, bool is_first, typename E>
+        friend class dimpl::subnet_wrapper;
+        template <unsigned long T, typename U, typename E>
+        friend class add_tag_layer;
+        template <template<typename> class T, typename U>
+        friend class add_skip_layer;
+
+        bool this_layer_requires_forward_output(
+        ) { return layer<TAG_TYPE>(subnetwork).this_layer_requires_forward_output(); } 
+
+        void disable_output_and_gradient_getters (
+        ) { layer<TAG_TYPE>(subnetwork).disable_output_and_gradient_getters(); }
+
+        tensor& private_get_output() const
+        { return layer<TAG_TYPE>(subnetwork).private_get_output(); }
+        tensor& private_get_gradient_input() 
+        { return layer<TAG_TYPE>(subnetwork).private_get_gradient_input(); }
 
         subnet_type subnetwork;
     };
