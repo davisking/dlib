@@ -30,6 +30,12 @@ namespace dlib
             const tensor& src2
         );
 
+        void add (
+            tensor& dest,
+            const tensor& src1,
+            const tensor& src2
+        );
+
     // -----------------------------------------------------------------------------------
 
         void affine_transform(

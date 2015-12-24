@@ -426,6 +426,20 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void add (
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2
+    );
+    /*!
+        ensures
+            - performs: dest = src1 + src2
+              The addition happens pointwise according to 4D tensor arithmetic.  If the
+              dimensions don't match then missing elements are presumed to be equal to 0.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     void assign_conv_bias_gradient (
         tensor& grad,
         const tensor& gradient_input

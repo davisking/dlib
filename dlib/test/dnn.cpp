@@ -493,6 +493,60 @@ namespace
 // ----------------------------------------------------------------------------------------
 
 #ifdef DLIB_USE_CUDA
+
+    void test_add()
+    {
+        print_spinner();
+        dlib::rand rnd;
+        tt::tensor_rand trnd;
+        for (int iter = 0; iter < 300; ++iter)
+        {
+            resizable_tensor dest1(rnd.get_random_32bit_number()%4+1,
+                                  rnd.get_random_32bit_number()%4+1,
+                                  rnd.get_random_32bit_number()%4+1,
+                                  rnd.get_random_32bit_number()%4+1);
+            resizable_tensor dest2;
+            dest2.copy_size(dest1);
+            resizable_tensor src1(rnd.get_random_32bit_number()%4+1,
+                                  rnd.get_random_32bit_number()%4+1,
+                                  rnd.get_random_32bit_number()%4+1,
+                                  rnd.get_random_32bit_number()%4+1);
+            resizable_tensor src2(rnd.get_random_32bit_number()%4+1,
+                                  rnd.get_random_32bit_number()%4+1,
+                                  rnd.get_random_32bit_number()%4+1,
+                                  rnd.get_random_32bit_number()%4+1);
+
+            trnd.fill_uniform(dest1);
+            trnd.fill_uniform(dest2);
+            trnd.fill_uniform(src1);
+            trnd.fill_uniform(src2);
+            cpu::add(dest1, src1, src2);
+            cuda::add(dest2, src1, src2);
+
+            DLIB_TEST(max(abs(mat(dest1) - mat(dest2))) < 1e-5);
+        }
+
+        // make sure we have a test for the case where all tensors have the same
+        // dimensions.
+        resizable_tensor dest1(3,4,5,6);
+        resizable_tensor dest2;
+        resizable_tensor src1;
+        resizable_tensor src2;
+        dest2.copy_size(dest1);
+        src1.copy_size(dest1);
+        src2.copy_size(dest1);
+
+        trnd.fill_uniform(dest1);
+        trnd.fill_uniform(dest2);
+        trnd.fill_uniform(src1);
+        trnd.fill_uniform(src2);
+
+        cpu::add(dest1, src1, src2);
+        cuda::add(dest2, src1, src2);
+
+        DLIB_TEST(max(abs(mat(dest1) - mat(dest2))) < 1e-5);
+    }
+
     void test_more_ops(const long nr, const long nc)
     {
         using namespace dlib::tt;
@@ -950,6 +1004,7 @@ namespace
             test_more_ops(10000,4);
             compare_bn_gpu_and_cpu();
             compare_bn_conv_gpu_and_cpu();
+            test_add();
 #endif
             test_max_pool(1,1,2,3);
             test_max_pool(3,3,1,1);

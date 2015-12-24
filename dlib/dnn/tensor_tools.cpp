@@ -325,6 +325,21 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void add (
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::add(dest, src1, src2);
+#else
+        cpu::add(dest, src1, src2);
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void assign_conv_bias_gradient (
         tensor& grad,
         const tensor& gradient_input

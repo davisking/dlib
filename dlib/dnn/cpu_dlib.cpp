@@ -110,6 +110,67 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        void add (
+            tensor& dest,
+            const tensor& src1,
+            const tensor& src2
+        )
+        {
+            auto d = dest.host();
+            auto s1 = src1.host();
+            auto s2 = src2.host();
+
+            // Do the simple and fast version if everything has the same dimensions
+            if (have_same_dimensions(dest, src1) &&
+                have_same_dimensions(dest, src2))
+            {
+                for (size_t i = 0; i < dest.size(); ++i)
+                    d[i] = s1[i] + s2[i];
+                return;
+            }
+
+            // Otherwise, do the more complex version with bounds checking.
+            for (long n = 0; n < dest.num_samples(); ++n)
+            {
+                for (long k = 0; k < dest.k(); ++k)
+                {
+                    for (long r = 0; r < dest.nr(); ++r)
+                    {
+                        for (long c = 0; c < dest.nc(); ++c)
+                        {
+                            float v1 = 0;
+                            float v2 = 0;
+
+                            // if this index is inside src1
+                            if (n < src1.num_samples() && 
+                                k < src1.k() && 
+                                r < src1.nr() && 
+                                c < src1.nc() )
+                            {
+                                const auto s_idx = ((n*src1.k() + k)*src1.nr() + r)*src1.nc() + c;
+                                v1 = s1[s_idx];
+                            }
+
+                            // if this index is inside src2
+                            if (n < src2.num_samples() && 
+                                k < src2.k() && 
+                                r < src2.nr() && 
+                                c < src2.nc() )
+                            {
+                                const auto s_idx = ((n*src2.k() + k)*src2.nr() + r)*src2.nc() + c;
+                                v2 = s2[s_idx];
+                            }
+
+                            *d = v1 + v2;
+                            ++d;
+                        }
+                    }
+                }
+            }
+        }
+
+    // ----------------------------------------------------------------------------------------
+
         void assign_bias_gradient (
             tensor& grad,
             const tensor& gradient_input
