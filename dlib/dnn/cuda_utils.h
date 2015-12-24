@@ -37,6 +37,66 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        __inline__ __device__ size_t pack_idx (
+            size_t dim_size3,
+            size_t dim_size2,
+            size_t dim_size1,
+            size_t idx4,
+            size_t idx3,
+            size_t idx2,
+            size_t idx1
+        )
+        /*!
+            ensures
+                - Converts a 4D array index into a 1D index assuming row major layout.  To
+                  understand precisely what this function does, imagine we had an array
+                  declared like this:
+                    int ARRAY[anything][dim_size3][dim_size2][dim_size1];
+                  Then we could index it like this:
+                    ARRAY[idx4][idx3][idx2][idx1]
+                  or equivalently like this:
+                    ((int*)ARRAY)[pack_idx(dim_size3,dim_size2,dim_size1, idx4,idx3,idx2,idx1)]
+        !*/
+        {
+            return ((idx4*dim_size3 + idx3)*dim_size2 + idx2)*dim_size1 + idx1;
+        }
+
+        __inline__ __device__ void unpack_idx (
+            size_t idx,
+            size_t dim_size3,
+            size_t dim_size2,
+            size_t dim_size1,
+            size_t& idx4,
+            size_t& idx3,
+            size_t& idx2,
+            size_t& idx1
+        )
+        /*!
+            ensures
+                - This function computes the inverse of pack_idx().  Therefore, 
+                  if PACKED == pack_idx(dim_size3,dim_size2,dim_size1, idx4,idx3,idx2,idx1)
+                  then unpack_idx(PACKED,dim_size3,dim_size2,dim_size1, IDX4,IDX3,IDX2,IDX1)
+                  results in:
+                    - IDX1 == idx1
+                    - IDX2 == idx2
+                    - IDX3 == idx3
+                    - IDX4 == idx4
+        !*/
+        {
+            idx1 = idx%dim_size1;
+
+            idx /= dim_size1;
+            idx2 = idx%dim_size2;
+
+            idx /= dim_size2;
+            idx3 = idx%dim_size3;
+
+            idx /= dim_size3;
+            idx4 = idx;
+        }
+
+    // ------------------------------------------------------------------------------------
+
         // This function is from the article:
         // http://devblogs.nvidia.com/parallelforall/faster-parallel-reductions-kepler/
         __inline__ __device__ float warp_reduce_sum(float val) 
