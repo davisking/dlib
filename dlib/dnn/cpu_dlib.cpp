@@ -110,7 +110,7 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        void add_bias_gradient (
+        void assign_bias_gradient (
             tensor& grad,
             const tensor& gradient_input
         )

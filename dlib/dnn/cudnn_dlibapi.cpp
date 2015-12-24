@@ -248,7 +248,7 @@ namespace dlib
                                    &value));
         }
 
-        void add_conv_bias_gradient (
+        void assign_conv_bias_gradient (
             tensor& grad,
             const tensor& gradient_input
         )

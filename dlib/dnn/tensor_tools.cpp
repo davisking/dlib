@@ -325,13 +325,13 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
-    void add_conv_bias_gradient (
+    void assign_conv_bias_gradient (
         tensor& grad,
         const tensor& gradient_input
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::add_conv_bias_gradient(grad,gradient_input);
+        cuda::assign_conv_bias_gradient(grad,gradient_input);
 #else
         // TODO
         DLIB_CASSERT(false,"");
@@ -340,15 +340,15 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
-    void add_bias_gradient (
+    void assign_bias_gradient (
         tensor& grad,
         const tensor& gradient_input
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::add_bias_gradient(grad,gradient_input);
+        cuda::assign_bias_gradient(grad,gradient_input);
 #else
-        cpu::add_bias_gradient(grad,gradient_input);
+        cpu::assign_bias_gradient(grad,gradient_input);
 #endif
     }
 

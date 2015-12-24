@@ -426,7 +426,7 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
-    void add_conv_bias_gradient (
+    void assign_conv_bias_gradient (
         tensor& grad,
         const tensor& gradient_input
     );
@@ -449,7 +449,7 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
-    void add_bias_gradient (
+    void assign_bias_gradient (
         tensor& grad,
         const tensor& gradient_input
     );

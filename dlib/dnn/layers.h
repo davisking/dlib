@@ -124,7 +124,7 @@ namespace dlib
             auto filt = filters(params_grad,0);
             conv.get_gradient_for_filters (gradient_input, sub.get_output(), filt);
             auto b = biases(params_grad, filters.size());
-            tt::add_conv_bias_gradient(b, gradient_input);
+            tt::assign_conv_bias_gradient(b, gradient_input);
         }
 
         const tensor& get_layer_params() const { return params; }
@@ -625,7 +625,7 @@ namespace dlib
             {
                 // compute the gradient of the bias parameters.  
                 auto pb = biases(params_grad, weights.size());
-                tt::add_bias_gradient(pb, gradient_input);
+                tt::assign_bias_gradient(pb, gradient_input);
             }
 
             // compute the gradient for the data
@@ -812,7 +812,7 @@ namespace dlib
             tt::multiply(data_grad, gradient_input, g);
 
             tt::multiply(g_grad, gradient_input, computed_output);
-            tt::add_bias_gradient(b_grad, gradient_input);
+            tt::assign_bias_gradient(b_grad, gradient_input);
         }
 
         const tensor& get_layer_params() const { return params; }
