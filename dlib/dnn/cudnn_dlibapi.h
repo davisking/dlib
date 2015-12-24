@@ -326,52 +326,43 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        class max_pool
+        class pooling
         {
-            /*!
-            !*/
         public:
 
-            max_pool(const max_pool&) = delete;
-            max_pool& operator=(const max_pool&) = delete;
+            pooling(const pooling&) = delete;
+            pooling& operator=(const pooling&) = delete;
 
-            max_pool (
+            pooling (
             );
 
-            ~max_pool(
+            ~pooling(
             );
 
             void clear(
             );
 
-            void setup(
+            void setup_max_pooling(
                 int window_height,
                 int window_width,
                 int stride_y,
                 int stride_x
             );
 
+            void setup_avg_pooling(
+                int window_height,
+                int window_width,
+                int stride_y,
+                int stride_x
+            );
+
+            bool does_max_pooling(
+            ) const { return do_max_pooling; }
+
             void operator() (
                 resizable_tensor& dest,
                 const tensor& src
             );
-            /*!
-                requires
-                    - is_same_object(dest,src) == false
-                    - src.nr() >= stride_y
-                    - src.nc() >= stride_x
-                ensures
-                    - #dest.num_samples() == src.num_samples()
-                    - #dest.k() == src.k()
-                    - #dest.nr() == 1+(src.nr()-window_height%2)/stride_y
-                    - #dest.nc() == 1+(src.nc()-window_width%2)/stride_x
-                    - for all valid s, k, r, and c:
-                        - image_plane(#dest,s,k)(r,c) == max(subm_clipped(image_plane(src,s,k),
-                                                                          centered_rect(c*stride_x,
-                                                                                        r*stride_y,
-                                                                                        window_width,
-                                                                                        window_height)))
-            !*/
 
             void get_gradient(
                 const tensor& gradient_input, 
@@ -379,27 +370,23 @@ namespace dlib
                 const tensor& src,
                 tensor& grad 
             );
-            /*!
-                requires
-                    - have_same_dimensions(gradient_input,dest) == true
-                    - have_same_dimensions(src,grad) == true
-                    - dest contains the result of calling (*this)(dest,src)
-                    - is_same_object(grad,gradient_input) == false
-                    - is_same_object(grad,dest) == false
-                    - is_same_object(grad,src) == false
-                ensures
-                    - Recalling that dest is the output of (*this)(dest,src),
-                      let f(src) == dot(gradient_input,dest)
-                    - Then this function computes the gradient of f() with respect to src
-                      and adds it to grad.
-            !*/
 
         private:
+
+            void setup(
+                int window_height,
+                int window_width,
+                int stride_y,
+                int stride_x,
+                int pooling_mode
+            );
+
             void* handle;
             int window_height;
             int window_width;
             int stride_y;
             int stride_x;
+            bool do_max_pooling;
         };
 
     // ------------------------------------------------------------------------------------

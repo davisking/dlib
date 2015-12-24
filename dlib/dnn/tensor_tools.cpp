@@ -422,13 +422,13 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    max_pool::
-    max_pool (
+    pooling::
+    pooling (
     )
     {
     }
 
-    void max_pool::
+    void pooling::
     clear(
     )
     {
@@ -440,8 +440,8 @@ namespace dlib { namespace tt
 #endif
     }
 
-    void max_pool::
-    setup(
+    void pooling::
+    setup_max_pooling(
         int window_height,
         int window_width,
         int stride_y,
@@ -449,14 +449,42 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        impl.setup(window_height, window_width, stride_y, stride_x);
+        impl.setup_max_pooling(window_height, window_width, stride_y, stride_x);
 #else
         // TODO
         DLIB_CASSERT(false,"");
 #endif
     }
 
-    void max_pool::
+    void pooling::
+    setup_avg_pooling(
+        int window_height,
+        int window_width,
+        int stride_y,
+        int stride_x
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        impl.setup_avg_pooling(window_height, window_width, stride_y, stride_x);
+#else
+        // TODO
+        DLIB_CASSERT(false,"");
+#endif
+    }
+
+    bool pooling::
+    does_max_pooling (
+    ) const
+    {
+#ifdef DLIB_USE_CUDA
+        return impl.does_max_pooling();
+#else
+        // TODO
+        DLIB_CASSERT(false,"");
+#endif
+    }
+
+    void pooling::
     operator() (
         resizable_tensor& dest,
         const tensor& src
@@ -470,7 +498,7 @@ namespace dlib { namespace tt
 #endif
     }
 
-    void max_pool::
+    void pooling::
     get_gradient(
         const tensor& gradient_input, 
         const tensor& dest,

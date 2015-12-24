@@ -920,18 +920,18 @@ namespace dlib
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
 
-        max_pool::max_pool (
+        pooling::pooling (
         ) : handle(nullptr),window_height(0),window_width(0),stride_y(0),stride_x(0)
         {
         }
 
-        max_pool::~max_pool(
+        pooling::~pooling(
         )
         {
             clear();
         }
 
-        void max_pool::
+        void pooling::
         clear(
         )
         {
@@ -944,12 +944,37 @@ namespace dlib
             stride_x = 0;
         }
 
-        void max_pool::
-        setup(
+        void pooling::
+        setup_max_pooling(
             int window_height_,
             int window_width_,
             int stride_y_,
             int stride_x_
+        )
+        {
+            setup(window_height_, window_width_, stride_y_, stride_x_, CUDNN_POOLING_MAX);
+            do_max_pooling = true;
+        }
+
+        void pooling::
+        setup_avg_pooling(
+            int window_height_,
+            int window_width_,
+            int stride_y_,
+            int stride_x_
+        )
+        {
+            setup(window_height_, window_width_, stride_y_, stride_x_, CUDNN_POOLING_AVERAGE_COUNT_EXCLUDE_PADDING);
+            do_max_pooling = false;
+        }
+
+        void pooling::
+        setup(
+            int window_height_,
+            int window_width_,
+            int stride_y_,
+            int stride_x_,
+            int pooling_mode
         )
         {
             if (window_height == window_height_ &&
@@ -972,7 +997,7 @@ namespace dlib
                 handle = poolingDesc;
 
                 CHECK_CUDNN(cudnnSetPooling2dDescriptor(poolingDesc,
-                                                CUDNN_POOLING_MAX,
+                                                (cudnnPoolingMode_t)pooling_mode,
                                                 window_height,
                                                 window_width,
                                                 window_height/2,
@@ -987,7 +1012,7 @@ namespace dlib
             }
         }
 
-        void max_pool::
+        void pooling::
         operator() (
             resizable_tensor& dest,
             const tensor& src
@@ -1034,7 +1059,7 @@ namespace dlib
                                      dest.device()));
         }
 
-        void max_pool::get_gradient(
+        void pooling::get_gradient(
             const tensor& gradient_input, 
             const tensor& dest,
             const tensor& src,

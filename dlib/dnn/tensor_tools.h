@@ -557,27 +557,37 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
-    class max_pool
+    class pooling
     {
         /*!
         !*/
     public:
 
-        max_pool(const max_pool&) = delete;
-        max_pool& operator=(const max_pool&) = delete;
+        pooling(const pooling&) = delete;
+        pooling& operator=(const pooling&) = delete;
 
-        max_pool (
+        pooling (
         );
 
         void clear(
         );
 
-        void setup(
+        void setup_max_pooling(
             int window_height,
             int window_width,
             int stride_y,
             int stride_x
         );
+
+        void setup_avg_pooling(
+            int window_height,
+            int window_width,
+            int stride_y,
+            int stride_x
+        );
+
+        bool does_max_pooling(
+        ) const;
 
         void operator() (
             resizable_tensor& dest,
@@ -592,7 +602,14 @@ namespace dlib { namespace tt
                 - #dest.nr() == 1+(src.nr()-window_height%2)/stride_y
                 - #dest.nc() == 1+(src.nc()-window_width%2)/stride_x
                 - for all valid s, k, r, and c:
-                    - image_plane(#dest,s,k)(r,c) == max(subm_clipped(image_plane(src,s,k),
+                    - if (does_max_pooling()) then
+                        - image_plane(#dest,s,k)(r,c) == max(subm_clipped(image_plane(src,s,k),
+                                                                      centered_rect(c*stride_x,
+                                                                                    r*stride_y,
+                                                                                    window_width,
+                                                                                    window_height)))
+                    - else
+                        - image_plane(#dest,s,k)(r,c) == mean(subm_clipped(image_plane(src,s,k),
                                                                       centered_rect(c*stride_x,
                                                                                     r*stride_y,
                                                                                     window_width,
@@ -622,7 +639,7 @@ namespace dlib { namespace tt
 
         private:
 #ifdef DLIB_USE_CUDA
-        cuda::max_pool impl;
+        cuda::pooling impl;
 #else
         // TODO
 #endif

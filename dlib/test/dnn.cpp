@@ -17,7 +17,6 @@ namespace
 
     using namespace test;
     using namespace dlib;
-    using namespace dlib::tt;
     using namespace std;
 
     logger dlog("test.dnn");
@@ -43,6 +42,7 @@ namespace
 
     void test_tanh()
     {
+        using namespace dlib::tt;
         print_spinner();
         resizable_tensor src(5,5), dest(5,5), gradient_input(5,5);
         src = matrix_cast<float>(gaussian_randm(5,5, 0));
@@ -78,6 +78,7 @@ namespace
 
     void test_sigmoid()
     {
+        using namespace dlib::tt;
         print_spinner();
         resizable_tensor src(5,5), dest(5,5), gradient_input(5,5);
         src = matrix_cast<float>(gaussian_randm(5,5, 0));
@@ -113,6 +114,7 @@ namespace
 
     void test_softmax()
     {
+        using namespace dlib::tt;
         print_spinner();
         const long nr = 3;
         const long nc = 3;
@@ -150,6 +152,7 @@ namespace
 
     void test_batch_normalize()
     {
+        using namespace dlib::tt;
         print_spinner();
         resizable_tensor src(5,5), gamma(1,5), beta(1,5), dest, dest2, means, vars, gradient_input(5,5);
         src = matrix_cast<float>(gaussian_randm(5,5, 0));
@@ -229,6 +232,7 @@ namespace
 
     void test_batch_normalize_conv()
     {
+        using namespace dlib::tt;
         print_spinner();
         resizable_tensor src(5,5,4,4), gamma(1,5), beta(1,5), dest, dest2, means, vars, gradient_input(5,5,4,4);
         src = matrix_cast<float>(gaussian_randm(5,5*4*4, 0));
@@ -313,6 +317,7 @@ namespace
 
     void test_basic_tensor_ops()
     {
+        using namespace dlib::tt;
         print_spinner();
         resizable_tensor dest, src(3,4), A(1,4), B(1,4);
         src = 2;
@@ -490,6 +495,7 @@ namespace
 #ifdef DLIB_USE_CUDA
     void test_more_ops(const long nr, const long nc)
     {
+        using namespace dlib::tt;
         print_spinner();
         // We are going to make sure that the CPU implementation of these things matches
         // the CUDA implementation.
@@ -726,12 +732,12 @@ namespace
         rnd.fill_gaussian(gradient_input,0,1);
 
 
-        tt::max_pool mp;
+        tt::pooling mp;
 
-        mp.setup(window_height,window_width,stride_y,stride_x);
+        mp.setup_max_pooling(window_height,window_width,stride_y,stride_x);
         mp(A, B);
 
-        // make sure max_pool does what it's spec says it should.
+        // make sure max pooling does what it's spec says it should.
         DLIB_TEST( A.num_samples() == B.num_samples());
         DLIB_TEST( A.k() == B.k());
         DLIB_TEST( A.nr() == 1+(B.nr()-window_height%2)/stride_y);
@@ -757,11 +763,68 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_avg_pool(
+        const int window_height,
+        const int window_width,
+        const int stride_y,
+        const int stride_x 
+    )
+    {
+        print_spinner();
+        resizable_tensor A, B, gradient_input;
+        A.set_size(2,2,16,7);
+        B.copy_size(A);
+        gradient_input.copy_size(A);
+
+        tt::tensor_rand rnd;
+        rnd.fill_gaussian(A,0,1);
+        rnd.fill_gaussian(B,0,1);
+        rnd.fill_gaussian(gradient_input,0,1);
+
+
+        tt::pooling mp;
+
+        mp.setup_avg_pooling(window_height,window_width,stride_y,stride_x);
+        mp(A, B);
+
+        // make sure avg pooling does what it's spec says it should.
+        DLIB_TEST( A.num_samples() == B.num_samples());
+        DLIB_TEST( A.k() == B.k());
+        DLIB_TEST( A.nr() == 1+(B.nr()-window_height%2)/stride_y);
+        DLIB_TEST( A.nc() == 1+(B.nc()-window_width%2)/stride_x);
+        for (long s = 0; s < A.num_samples(); ++s)
+        {
+            for (long k = 0; k < A.k(); ++k)
+            {
+                for (long r = 0; r < A.nr(); ++r)
+                {
+                    for (long c = 0; c < A.nc(); ++c)
+                    {
+                        float expected = mean(subm_clipped(image_plane(B,s,k),
+                                            centered_rect(c*stride_x,
+                                                        r*stride_y,
+                                                        window_width,
+                                                        window_height)));
+                        float err = abs(image_plane(A,s,k)(r,c) - expected);
+                        DLIB_TEST_MSG(err < 1e-5, err << "  " << expected << "  " << image_plane(A,s,k)(r,c));
+                    }
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void test_layers()
     {
         {
             print_spinner();
             max_pool_ l;
+            DLIB_TEST_MSG(test_layer(l), test_layer(l));
+        }
+        {
+            print_spinner();
+            avg_pool_ l;
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {
@@ -826,6 +889,40 @@ namespace
         }
     }
 
+// ----------------------------------------------------------------------------------------
+
+    template <typename T> using rcon = max_pool<relu<bn<con<T>>>>;
+    std::tuple<max_pool_,relu_,bn_,con_> rcon_ (unsigned long n) 
+    {
+        return std::make_tuple(max_pool_(2,2,2,2),relu_(),bn_(BATCH_NORM_CONV),con_(n,5,5));
+    }
+
+    template <typename T> using rfc = relu<bn<fc<T>>>;
+    std::tuple<relu_,bn_,fc_> rfc_ (unsigned long n) 
+    {
+        return std::make_tuple(relu_(),bn_(),fc_(n));
+    }
+
+    void test_tagging(
+    )
+    {
+        typedef loss_multiclass_log<rfc<skip1<rfc<rfc<tag1<rcon<rcon<input<matrix<unsigned char>>>>>>>>>> net_type;
+
+        net_type net(rfc_(10),
+            rfc_(84),
+            rfc_(120),
+            rcon_(16),
+            rcon_(6)
+        );
+
+        DLIB_TEST(layer<tag1>(net).num_layers == 9);
+        DLIB_TEST(layer<skip1>(net).num_layers == 9+3+3+1);
+        DLIB_TEST(&layer<skip1>(net).get_output() == &layer<tag1>(net).get_output());
+        DLIB_TEST(&layer<skip1>(net).get_output() != &layer<tag1>(net).subnet().subnet().get_output());
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class dnn_tester : public tester
     {
     public:
@@ -838,6 +935,7 @@ namespace
         void perform_test (
         )
         {
+            test_tagging();
 #ifdef DLIB_USE_CUDA
             test_more_ops(1,1);
             test_more_ops(3,4);
@@ -853,6 +951,11 @@ namespace
             test_max_pool(3,3,2,2);
             test_max_pool(2,2,2,2);
             test_max_pool(4,5,3,1);
+            test_avg_pool(1,1,2,3);
+            test_avg_pool(3,3,1,1);
+            test_avg_pool(3,3,2,2);
+            test_avg_pool(2,2,2,2);
+            test_avg_pool(4,5,3,1);
             test_tanh();
             test_softmax();
             test_sigmoid();
