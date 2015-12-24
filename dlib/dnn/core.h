@@ -740,8 +740,8 @@ namespace dlib
         }
 
 
-        subnet_type subnetwork;
         LAYER_DETAILS details;
+        subnet_type subnetwork;
         bool this_layer_setup_called;
         bool gradient_input_is_stale;
         bool get_output_and_gradient_input_disabled;
