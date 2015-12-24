@@ -1041,6 +1041,75 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        template<typename> class tag
+        >
+    class add_prev_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
+                This layer simply adds the output of two previous layers.  In particular,
+                it adds the tensor from its immediate predecessor layer, sub.get_output(),
+                with the tensor from a deeper layer, layer<tag>(sub).get_output().
+
+                Therefore, you supply a tag via add_prev_'s template argument that tells it
+                what layer to add to the output of the previous layer.  The result of this
+                addition is output by add_prev_.  Finally, the addition happens pointwise
+                according to 4D tensor arithmetic.  If the dimensions don't match then
+                missing elements are presumed to be equal to 0.
+        !*/
+
+    public:
+        add_prev_(
+        ); 
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+        !*/
+    };
+
+    void serialize(const add_prev_& item, std::ostream& out);
+    void deserialize(add_prev_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
+    template <
+        template<typename> class tag,
+        typename SUBNET
+        >
+    using add_prev = add_layer<add_prev_<tag>, SUBNET>;
+
+    // Here we add some convenient aliases for using add_prev_ with the tag layers. 
+    template <typename SUBNET> using add_prev1  = add_prev<tag1, SUBNET>;
+    template <typename SUBNET> using add_prev2  = add_prev<tag2, SUBNET>;
+    template <typename SUBNET> using add_prev3  = add_prev<tag3, SUBNET>;
+    template <typename SUBNET> using add_prev4  = add_prev<tag4, SUBNET>;
+    template <typename SUBNET> using add_prev5  = add_prev<tag5, SUBNET>;
+    template <typename SUBNET> using add_prev6  = add_prev<tag6, SUBNET>;
+    template <typename SUBNET> using add_prev7  = add_prev<tag7, SUBNET>;
+    template <typename SUBNET> using add_prev8  = add_prev<tag8, SUBNET>;
+    template <typename SUBNET> using add_prev9  = add_prev<tag9, SUBNET>;
+    template <typename SUBNET> using add_prev10 = add_prev<tag10, SUBNET>;
+    using add_prev1_  = add_prev_<tag1>;
+    using add_prev2_  = add_prev_<tag2>;
+    using add_prev3_  = add_prev_<tag3>;
+    using add_prev4_  = add_prev_<tag4>;
+    using add_prev5_  = add_prev_<tag5>;
+    using add_prev6_  = add_prev_<tag6>;
+    using add_prev7_  = add_prev_<tag7>;
+    using add_prev8_  = add_prev_<tag8>;
+    using add_prev9_  = add_prev_<tag9>;
+    using add_prev10_ = add_prev_<tag10>;
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_LAYERS_ABSTRACT_H_
