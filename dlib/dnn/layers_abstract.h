@@ -380,6 +380,13 @@ namespace dlib
                 In particular, it defines a convolution layer that takes an input tensor
                 (nominally representing an image) and convolves it with a set of filters
                 and then outputs the results. 
+
+                The dimensions of the tensors output by this layer are as follows (letting
+                IN be the input tensor and OUT the output tensor):
+                    - OUT.num_samples() == IN.num_samples()
+                    - OUT.k()  == num_filters()
+                    - OUT.nr() == 1+(IN.nr()-nr()%2)/stride_y()
+                    - OUT.nc() == 1+(IN.nc()-nc()%2)/stride_x()
         !*/
 
     public:
