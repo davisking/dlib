@@ -393,6 +393,16 @@ namespace dlib
                   update() method.  
         !*/
 
+        const tensor& get_final_data_gradient(
+        ) const;
+        /*!
+            ensures
+                - if update() has been called to back-propagate a gradient through this
+                  network then you can call get_final_data_gradient() to obtain the last
+                  gradient computed.  That is, this function returns the gradient of the
+                  network with respect to its inputs.
+        !*/
+
         template <typename solver_type>
         void update(
             const tensor& x, 
@@ -412,6 +422,38 @@ namespace dlib
                 - Back propagates the error gradient, get_gradient_input(), through this
                   network and uses the provided solvers to update the network parameters.
                 - All elements of #get_gradient_input() are set to 0. 
+                - have_same_dimensions(#get_final_data_gradient(), x) == true
+                - #get_final_data_gradient() contains the gradient of the network with
+                  respect to x.
+        !*/
+
+        template <typename solver_type>
+        void update(
+            const tensor& x, 
+            const tensor& gradient_input,
+            sstack<solver_type,num_layers>& solvers
+        );
+        /*!
+            requires
+                - forward(x) was called to forward propagate x though the network.
+                  Moreover, this was the most recent call to forward() and x has not been
+                  subsequently modified in any way.
+                - have_same_dimensions(gradient_input, get_output()) == true
+                - This instance of solvers has only ever been used with this network.  That
+                  is, if you want to call update() on some other neural network object then
+                  you must not reuse the same solvers object.
+            ensures
+                - This function is identical to the version of update() defined immediately
+                  above except that it back-propagates gradient_input through the network
+                  instead of get_gradient_input().  Therefore, this version of update is
+                  equivalent to performing:
+                    get_gradient_input() = gradient_input;
+                    update(x,solvers);
+                  Except that calling update(x,gradient_input,solvers) avoids the copy
+                  and is therefore slightly more efficient.
+                - All elements of #get_gradient_input() are set to 0. 
+                - #get_final_data_gradient() contains the gradient of the network with
+                  respect to x.
         !*/
 
         void clean(

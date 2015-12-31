@@ -731,13 +731,22 @@ namespace dlib
             return private_get_gradient_input();
         }
 
+        const tensor& get_final_data_gradient(
+        ) const { return subnetwork.get_final_data_gradient(); }
+
         template <typename solver_type>
         void update(const tensor& x, sstack<solver_type,num_layers>& solvers)
+        {
+            update(x,private_get_gradient_input(),solvers);
+        }
+
+        template <typename solver_type>
+        void update(const tensor& x, const tensor& gradient_input, sstack<solver_type,num_layers>& solvers)
         {
             dimpl::subnet_wrapper<subnet_type> wsub(*subnetwork);
             params_grad.copy_size(details.get_layer_params());
             impl::call_layer_backward(details, private_get_output(),
-                private_get_gradient_input(), wsub, static_cast<tensor&>(params_grad));
+                gradient_input, wsub, static_cast<tensor&>(params_grad));
             // Don't try to adjust the parameters if this layer doesn't have any.
             if (params_grad.size() != 0)
                 solvers.top()(details, static_cast<const tensor&>(params_grad));
@@ -1015,13 +1024,22 @@ namespace dlib
             return private_get_gradient_input();
         }
 
+        const tensor& get_final_data_gradient(
+        ) const { return grad_final_ignored; }
+
         template <typename solver_type>
         void update(const tensor& x, sstack<solver_type,num_layers>& solvers)
+        {
+            update(x,private_get_gradient_input(),solvers);
+        }
+
+        template <typename solver_type>
+        void update(const tensor& x, const tensor& gradient_input, sstack<solver_type,num_layers>& solvers)
         {
             subnet_wrapper wsub(x, grad_final_ignored);
             params_grad.copy_size(details.get_layer_params());
             impl::call_layer_backward(details, private_get_output(),
-                private_get_gradient_input(), wsub, static_cast<tensor&>(params_grad));
+                gradient_input, wsub, static_cast<tensor&>(params_grad));
             // Don't try to adjust the parameters if this layer doesn't have any.
             if (params_grad.size() != 0)
                 solvers.top()(details, static_cast<const tensor&>(params_grad));
@@ -1210,10 +1228,19 @@ namespace dlib
             return subnetwork.get_gradient_input();
         }
 
+        const tensor& get_final_data_gradient(
+        ) const { return subnetwork.get_final_data_gradient(); }
+
         template <typename solver_type>
         void update(const tensor& x, sstack<solver_type,num_layers>& solvers)
         {
             subnetwork.update(x,solvers.pop());
+        }
+
+        template <typename solver_type>
+        void update(const tensor& x, const tensor& gradient_input, sstack<solver_type,num_layers>& solvers)
+        {
+            subnetwork.update(x,gradient_input,solvers.pop());
         }
 
         const subnet_type& subnet() const { return subnetwork; }
@@ -1346,6 +1373,9 @@ namespace dlib
             return cached_output; 
         }
 
+        const tensor& get_final_data_gradient(
+        ) const { return grad_final_ignored; }
+
         tensor& get_gradient_input() 
         { 
             if (!have_same_dimensions(cached_output, grad_final_ignored))
@@ -1358,6 +1388,12 @@ namespace dlib
 
         template <typename solver_type>
         void update(const tensor& /*x*/, sstack<solver_type,num_layers>& /*solvers*/)
+        {
+            // nothing to update
+        }
+
+        template <typename solver_type>
+        void update(const tensor& /*x*/, const tensor& gradient_input, sstack<solver_type,num_layers>& /*solvers*/)
         {
             // nothing to update
         }
@@ -1881,10 +1917,22 @@ namespace dlib
             return layer<TAG_TYPE>(subnetwork).get_gradient_input();
         }
 
+        const tensor& get_final_data_gradient(
+        ) const 
+        { 
+            return subnetwork.get_final_data_gradient(); 
+        }
+
         template <typename solver_type>
         void update(const tensor& x, sstack<solver_type,num_layers>& solvers)
         {
             subnetwork.update(x,solvers.pop());
+        }
+
+        template <typename solver_type>
+        void update(const tensor& x, const tensor& gradient_input, sstack<solver_type,num_layers>& solvers)
+        {
+            subnetwork.update(x,gradient_input,solvers.pop());
         }
 
         const subnet_type& subnet() const 
