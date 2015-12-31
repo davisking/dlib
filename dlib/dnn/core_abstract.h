@@ -400,8 +400,9 @@ namespace dlib
         );
         /*!
             requires
-                - forward(x) was called to forward propagate x though the network.  Moreover,
-                  this was the most recent call to forward().
+                - forward(x) was called to forward propagate x though the network.
+                  Moreover, this was the most recent call to forward() and x has not been
+                  subsequently modified in any way.
                 - get_gradient_input() has been set equal to the gradient of this network's
                   output with respect to some loss function.
                 - This instance of solvers has only ever been used with this network.  That
