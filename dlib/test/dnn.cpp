@@ -974,8 +974,8 @@ namespace
             rcon_(6)
         );
 
-        DLIB_TEST(layer<tag1>(net).num_layers == 9);
-        DLIB_TEST(layer<skip1>(net).num_layers == 9+3+3+1);
+        DLIB_TEST(layer<tag1>(net).num_layers == 8);
+        DLIB_TEST(layer<skip1>(net).num_layers == 8+3+3);
         DLIB_TEST(&layer<skip1>(net).get_output() == &layer<tag1>(net).get_output());
         DLIB_TEST(&layer<skip1>(net).get_output() != &layer<tag1>(net).subnet().subnet().get_output());
     }

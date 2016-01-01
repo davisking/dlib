@@ -69,48 +69,38 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
-        size_t N
+        typename T
         >
     class sstack
     {
         /*!
-            REQUIREMENTS ON T
-                - T is default and copy constructable.
-
-            REQUIREMENTS ON N
-                - N > 0
-
             WHAT THIS OBJECT REPRESENTS
-                This is a basic stack of T objects.  It holds N of the objects and is
-                entirely allocated on the stack rather than on the heap.
+                This is a basic stack of T objects.  It contains no data itself but simply
+                points to a memory range of T object and allows you to access that block of
+                T objects as a stack.
         !*/
 
     public:
         typedef T value_type;
-        const static size_t num_elements = N;
 
-        sstack(
+        sstack() = delete;
+
+        sstack (
+            T* data,
+            size_t s
         );
         /*!
             ensures
-                - #size() == N
-                - All elements of this stack are default constructed.
-        !*/
-
-        sstack(
-            const T& item
-        );
-        /*!
-            ensures
-                - #size() == N
-                - Initializes all N elements in this stack with the given item.  E.g.
-                  top()==item, pop().top()==item, pop().pop().top()==item, etc.
+                - #size() == s
+                - #top() == *data
+                - #pop(i).top() == data[i]
         !*/
 
         const T& top(
         ) const;
         /*!
+            requires
+                - size() != 0
             ensures
                 - returns the top element of the stack.
         !*/
@@ -118,46 +108,41 @@ namespace dlib
         T& top(
         );
         /*!
+            requires
+                - size() != 0
             ensures
                 - returns the top element of the stack.  
         !*/
-
 
         size_t size(
         ) const;
         /*!
             ensures
-                - returns the number of elements in this stack.  In particular, the number
-                  returned is always N.
+                - returns the number of elements in this stack.  
         !*/
 
-        const sstack<T,N-1>& pop(
-        ) const;
-        /*!
-            requires
-                - size() > 1
-            ensures
-                - returns a reference to the sub-stack S such that:
-                    - S.size() == size()-1.
-                    - S.top() is the next element in the stack.
-        !*/
-
-        sstack<T,N-1>& pop(
+        sstack pop(
+            size_t num = 1
         ); 
         /*!
             requires
-                - size() > 1
+                - num < size()
             ensures
                 - returns a reference to the sub-stack S such that:
-                    - S.size() == size()-1.
-                    - S.top() is the next element in the stack.
+                    - S.size() == size()-num.
+                    - S.top() is num elements down the stack. 
         !*/
     };
 
-    void serialize(const sstack& item, std::ostream& out);
-    void deserialize(sstack& item, std::istream& in);
+    template <
+        typename T
+        >
+    sstack<T> make_sstack(
+        std::vector<T>& item
+    ) { return sstack<T>(item.data(), item.size()); }
     /*!
-        provides serialization support  
+        ensures
+            - returns a sstack that sits on top of the given std::vector.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -180,6 +165,7 @@ namespace dlib
                     - SUBNET is an add_layer object.
                     - SUBNET is an add_tag_layer object.
                     - SUBNET is an add_skip_layer object.
+                    - SUBNET is a repeat object.
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a deep neural network.  In particular, it is a tool
@@ -406,7 +392,7 @@ namespace dlib
         template <typename solver_type>
         void update(
             const tensor& x, 
-            sstack<solver_type,num_layers>& solvers
+            sstack<solver_type> solvers
         );
         /*!
             requires
@@ -415,9 +401,10 @@ namespace dlib
                   subsequently modified in any way.
                 - get_gradient_input() has been set equal to the gradient of this network's
                   output with respect to some loss function.
-                - This instance of solvers has only ever been used with this network.  That
+                - The given solvers have only ever been used with this network.  That
                   is, if you want to call update() on some other neural network object then
-                  you must not reuse the same solvers object.
+                  you must NOT reuse the same solvers object.
+                - solvers.size() >= num_layers
             ensures
                 - Back propagates the error gradient, get_gradient_input(), through this
                   network and uses the provided solvers to update the network parameters.
@@ -431,7 +418,7 @@ namespace dlib
         void update(
             const tensor& x, 
             const tensor& gradient_input,
-            sstack<solver_type,num_layers>& solvers
+            sstack<solver_type> solvers
         );
         /*!
             requires
@@ -439,9 +426,10 @@ namespace dlib
                   Moreover, this was the most recent call to forward() and x has not been
                   subsequently modified in any way.
                 - have_same_dimensions(gradient_input, get_output()) == true
-                - This instance of solvers has only ever been used with this network.  That
+                - The given solvers have only ever been used with this network.  That
                   is, if you want to call update() on some other neural network object then
-                  you must not reuse the same solvers object.
+                  you must NOT reuse the same solvers object.
+                - solvers.size() >= num_layers
             ensures
                 - This function is identical to the version of update() defined immediately
                   above except that it back-propagates gradient_input through the network
@@ -504,6 +492,7 @@ namespace dlib
                     - SUBNET is an add_layer object.
                     - SUBNET is an add_tag_layer object.
                     - SUBNET is an add_skip_layer object.
+                    - SUBNET is a repeat object.
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a deep neural network.  In particular, it is a tool
@@ -766,7 +755,7 @@ namespace dlib
         double update (
             const tensor& x,
             label_iterator lbegin,
-            sstack<solver_type,num_layers>& solvers
+            sstack<solver_type> solvers
         );
         /*!
             requires
@@ -774,9 +763,10 @@ namespace dlib
                 - x.num_samples() > 0
                 - lbegin == iterator pointing to the start of a range of
                   x.num_samples()/sample_expansion_factor label_type elements.
-                - This instance of solvers has only ever been used with this network.  That
+                - The given solvers have only ever been used with this network.  That
                   is, if you want to call update() on some other neural network object then
-                  you must not reuse the same solvers object.
+                  you must NOT reuse the same solvers object.
+                - solvers.size() >= num_layers
             ensures
                 - runs x through the network, compares the output to the expected output
                   pointed to by lbegin, and updates the network parameters via
@@ -793,7 +783,7 @@ namespace dlib
             input_iterator ibegin,
             input_iterator iend,
             label_iterator lbegin,
-            sstack<solver_type,num_layers>& solvers
+            sstack<solver_type> solvers
         );
         /*!
             requires
@@ -801,9 +791,10 @@ namespace dlib
                 - std::distance(ibegin,iend) > 0
                 - lbegin == iterator pointing to the start of a range of
                   std::distance(ibegin,iend) label_type elements.
-                - This instance of solvers has only ever been used with this network.  That
+                - The given solvers have only ever been used with this network.  That
                   is, if you want to call update() on some other neural network object then
-                  you must not reuse the same solvers object.
+                  you must NOT reuse the same solvers object.
+                - solvers.size() >= num_layers
             ensures
                 - runs [ibegin,iend) through the network, compares the output to the
                   expected output pointed to by lbegin, and updates the network parameters
@@ -820,16 +811,17 @@ namespace dlib
         template <typename solver_type>
         double update (
             const tensor& x,
-            sstack<solver_type,num_layers>& solvers
+            sstack<solver_type> solvers
         );
         /*!
             requires
                 - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
                 - x.num_samples()%sample_expansion_factor == 0
                 - x.num_samples() > 0
-                - This instance of solvers has only ever been used with this network.  That
+                - The given solvers have only ever been used with this network.  That
                   is, if you want to call update() on some other neural network object then
-                  you must not reuse the same solvers object.
+                  you must NOT reuse the same solvers object.
+                - solvers.size() >= num_layers
             ensures
                 - runs x through the network and updates the network parameters by
                   back-propagating the loss gradient through the network.
@@ -842,16 +834,17 @@ namespace dlib
         double update (
             input_iterator ibegin,
             input_iterator iend,
-            sstack<solver_type,num_layers>& solvers
+            sstack<solver_type> solvers
         );
         /*!
             requires
                 - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
                 - [ibegin, iend) is an iterator range over input_type objects.
                 - std::distance(ibegin,iend) > 0
-                - This instance of solvers has only ever been used with this network.  That
+                - The given solvers have only ever been used with this network.  That
                   is, if you want to call update() on some other neural network object then
-                  you must not reuse the same solvers object.
+                  you must NOT reuse the same solvers object.
+                - solvers.size() >= num_layers
             ensures
                 - runs [ibegin,iend) through the network and updates the network parameters
                   by back-propagating the loss gradient through the network.
@@ -884,6 +877,115 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        size_t num,
+        template<typename> class LAYER, 
+        typename SUBNET
+        >
+    class repeat 
+    {
+        /*!
+            REQUIREMENTS ON num
+                - num > 0
+
+            REQUIREMENTS ON LAYER
+                - LAYER must be a template that stacks more layers onto a deep neural
+                  network.  For example, if net_type were a network without a loss layer,
+                  then it should be legal to create a deeper network with a type of
+                  LAYER<net_type>.
+
+            REQUIREMENTS ON SUBNET
+                - One of the following must be true:
+                    - SUBNET is an add_layer object.
+                    - SUBNET is an add_tag_layer object.
+                    - SUBNET is an add_skip_layer object.
+                    - SUBNET is a repeat object.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object adds more layers to a deep neural network.  In particular, it
+                adds LAYER on top of SUBNET num times.  So for example, if num were 2 then
+                repeat<2,LAYER,SUBNET> would create a network equivalent to LAYER<LAYER<SUBNET>>.
+
+                Also, this object provides an interface identical to the one defined by the
+                add_layer object except that we add the num_repetitions() and
+                get_repeated_layer() methods.  These additions are shown below along with
+                some additional explanatory comments.
+        !*/
+
+    public:
+
+        typedef SUBNET subnet_type;
+        typedef typename SUBNET::input_type input_type;
+        const static size_t num_layers = (LAYER<SUBNET>::num_layers-SUBNET::num_layers)*num + SUBNET::num_layers;
+        const static unsigned int sample_expansion_factor = SUBNET::sample_expansion_factor;
+        typedef LAYER<an_unspecified_input_type> repeated_layer_type;
+
+        template <typename T, typename ...U>
+        repeat(
+            T arg1,
+            U ...args2
+        );
+        /*!
+            ensures
+                - arg1 is used to initialize the num_repetitions() copies of LAYER inside
+                  this object.  That is, all the LAYER elements are initialized identically
+                  by being given copies of arg1.
+                - The rest of the arguments to the constructor, i.e. args2, are passed to
+                  SUBNET's constructor.  
+        !*/
+
+        size_t num_repetitions (
+        ) const; 
+        /*!
+            ensures
+                - returns num (i.e. the number of times LAYER was stacked on top of SUBNET)
+        !*/
+
+        const repeated_layer_type& get_repeated_layer (
+            size_t i 
+        ) const;
+        /*!
+            requires
+                - i < num_repetitions()
+            ensures
+                - returns a reference to the i-th instance of LAYER.  For example,
+                  get_repeated_layer(0) returns the instance of LAYER that is on the top of
+                  the network while get_repeated_layer(num_repetitions()-1) returns the
+                  instance of LAYER that is stacked immediately on top of SUBNET.
+        !*/
+
+        repeated_layer_type& get_repeated_layer (
+            size_t i 
+        );
+        /*!
+            requires
+                - i < num_repetitions()
+            ensures
+                - returns a reference to the i-th instance of LAYER.  For example,
+                  get_repeated_layer(0) returns the instance of LAYER that is on the top of
+                  the network while get_repeated_layer(num_repetitions()-1) returns the
+                  instance of LAYER that is stacked immediately on top of SUBNET.
+        !*/
+
+        const subnet_type& subnet(
+        ) const; 
+        /*!
+            ensures
+                - returns the SUBNET base network that repeat sits on top of.  If you want
+                  to access the LAYER components then you must use get_repeated_layer(). 
+        !*/
+
+        subnet_type& subnet(
+        ); 
+        /*!
+            ensures
+                - returns the SUBNET base network that repeat sits on top of.  If you want
+                  to access the LAYER components then you must use get_repeated_layer(). 
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         unsigned long ID, 
         typename SUBNET
         >
@@ -897,6 +999,7 @@ namespace dlib
                     - SUBNET is an add_layer object.
                     - SUBNET is an add_tag_layer object.
                     - SUBNET is an add_skip_layer object.
+                    - SUBNET is a repeat object.
 
             WHAT THIS OBJECT REPRESENTS
                 This object adds a new layer to a deep neural network.  However, this layer
@@ -942,6 +1045,7 @@ namespace dlib
                     - SUBNET is an add_layer object.
                     - SUBNET is an add_tag_layer object.
                     - SUBNET is an add_skip_layer object.
+                    - SUBNET is a repeat object.
 
             WHAT THIS OBJECT REPRESENTS
                 This object adds a new layer to a deep neural network which draws its

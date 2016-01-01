@@ -93,24 +93,30 @@ namespace dlib
                   assigned to each element in get_solvers(). 
         !*/
 
-        const sstack<solver_type,net_type::num_layers>& get_solvers (
+        const std::vector<solver_type>& get_solvers (
         ) const; 
         /*!
             ensures
                 - returns the solvers used to optimize each layer of the neural network
                   get_net().  In particular, the first layer's solver is
-                  get_solvers().top(), the second layer's solver is
-                  get_solvers().pop().top(), and so on.
+                  get_solvers()[0], the second layer's solver is
+                  get_solvers()[1], and so on.
         !*/
 
-        sstack<solver_type,net_type::num_layers>& get_solvers (
+        std::vector<solver_type>& get_solvers (
         ); 
         /*!
             ensures
                 - returns the solvers used to optimize each layer of the neural network
                   get_net().  In particular, the first layer's solver is
-                  get_solvers().top(), the second layer's solver is
-                  get_solvers().pop().top(), and so on.
+                  get_solvers()[0], the second layer's solver is
+                  get_solvers()[1], and so on.
+                - It should be noted that you should never change the number of elements in
+                  the vector returned by get_solvers() (i.e. don't do something that
+                  changes get_solvers().size()).  It will be set to net_type::num_layers by
+                  this object and you should leave it at that.  The non-const version of
+                  get_solvers() is provided only so you can tweak the parameters of a
+                  particular solver.
         !*/
 
         unsigned long get_mini_batch_size (
