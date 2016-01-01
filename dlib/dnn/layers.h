@@ -265,7 +265,7 @@ namespace dlib
             serialize(item._nr, out);
             serialize(item._nc, out);
             serialize(item._stride_y, out);
-            serialize(item._stride_y, out);
+            serialize(item._stride_x, out);
         }
 
         friend void deserialize(max_pool_& item, std::istream& in)
@@ -277,7 +277,7 @@ namespace dlib
             deserialize(item._nr, in);
             deserialize(item._nc, in);
             deserialize(item._stride_y, in);
-            deserialize(item._stride_y, in);
+            deserialize(item._stride_x, in);
 
             item.mp.setup_max_pooling(item._nr, item._nc, item._stride_y, item._stride_x);
         }
