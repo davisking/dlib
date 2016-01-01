@@ -138,7 +138,7 @@ namespace dlib
             serialize(item._nr, out);
             serialize(item._nc, out);
             serialize(item._stride_y, out);
-            serialize(item._stride_y, out);
+            serialize(item._stride_x, out);
             serialize(item.filters, out);
             serialize(item.biases, out);
         }
@@ -154,7 +154,7 @@ namespace dlib
             deserialize(item._nr, in);
             deserialize(item._nc, in);
             deserialize(item._stride_y, in);
-            deserialize(item._stride_y, in);
+            deserialize(item._stride_x, in);
             deserialize(item.filters, in);
             deserialize(item.biases, in);
         }
@@ -385,7 +385,7 @@ namespace dlib
             serialize(item._nr, out);
             serialize(item._nc, out);
             serialize(item._stride_y, out);
-            serialize(item._stride_y, out);
+            serialize(item._stride_x, out);
         }
 
         friend void deserialize(avg_pool_& item, std::istream& in)
@@ -397,7 +397,7 @@ namespace dlib
             deserialize(item._nr, in);
             deserialize(item._nc, in);
             deserialize(item._stride_y, in);
-            deserialize(item._stride_y, in);
+            deserialize(item._stride_x, in);
 
             item.ap.setup_avg_pooling(item._nr, item._nc, item._stride_y, item._stride_x);
         }
