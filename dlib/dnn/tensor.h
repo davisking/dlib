@@ -7,6 +7,7 @@
 #include <cstring>
 #include "../matrix.h"
 #include "cudnn_dlibapi.h"
+#include "cublas_dlibapi.h"
 #include "gpu_data.h"
 #include <memory>
 
@@ -405,7 +406,9 @@ namespace dlib
         const tensor& b
     )
     {
-        // TODO, do on GPU?
+#ifdef DLIB_USE_CUDA
+        return cuda::dot(a,b);
+#else
         DLIB_CASSERT(a.size() == b.size(), "");
         const float* da = a.host();
         const float* db = b.host();
@@ -413,6 +416,7 @@ namespace dlib
         for (size_t i = 0; i < a.size(); ++i)
             sum += da[i]*db[i];
         return sum;
+#endif
     }
 
 // ----------------------------------------------------------------------------------------
