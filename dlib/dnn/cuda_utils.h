@@ -129,6 +129,56 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        struct max_jobs
+        {
+            max_jobs(size_t n) : num(n) {}
+            size_t num;
+        };
+
+        template <typename Kernel, typename... T>
+        void launch_kernel (
+            Kernel K,
+            T ...args
+        )
+        /*!
+            ensures
+                - launches the given kernel K(args...).  The point of this function is to
+                  automatically set the kernel launch parameters to something reasonable
+                  based on the properties of the kernel and the current GPU card.
+        !*/
+        {
+            int num_blocks, num_threads;
+            CHECK_CUDA(cudaOccupancyMaxPotentialBlockSize(&num_blocks,&num_threads,K));
+            K<<<num_blocks,num_threads>>>(args...);
+        }
+
+        template <typename Kernel, typename... T>
+        void launch_kernel (
+            Kernel K,
+            max_jobs m,
+            T ...args
+        )
+        /*!
+            ensures
+                - This function is just like launch_kernel(K,args...) except that you can
+                  additionally supply a max_jobs number that tells it how many possible
+                  total threads could be used.  This is useful when launching potentially
+                  small jobs that might not need the number of threads suggested by
+                  launch_kernel().  
+        !*/
+        {
+            int num_blocks, num_threads;
+            CHECK_CUDA(cudaOccupancyMaxPotentialBlockSize(&num_blocks,&num_threads,K));
+            // Check if the job is really small and we don't really need to launch a kernel
+            // with this many blocks and threads.
+            if (num_blocks*num_threads > m.num)
+                num_blocks = (m.num+num_threads-1)/num_threads;
+
+            K<<<num_blocks,num_threads>>>(args...);
+        }
+
+    // ------------------------------------------------------------------------------------
+
         class grid_stride_range
         {
             /*!

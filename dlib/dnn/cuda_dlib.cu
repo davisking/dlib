@@ -80,16 +80,16 @@ namespace dlib
             const auto s2 = src2.host();
             if (dest.size() == src1.size() && src1.size() == src2.size())
             {
-                _cuda_multiply1<<<512,512>>>(dest.device(), src1.device(), src2.device(), src1.size());
+                launch_kernel(_cuda_multiply1,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), src1.size());
             }
             else if (dest.num_samples() == 1)
             {
-                _cuda_multiply2<<<512,512>>>(dest.device(), src1.device(), src2.device(), 
+                launch_kernel(_cuda_multiply2,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), 
                                              dest.size(), src1.size(), src2.size(), max_size);
             }
             else
             {
-                _cuda_multiply3<<<512,512>>>(dest.device(), src1.device(), src2.device(), 
+                launch_kernel(_cuda_multiply3,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), 
                                              dest.size(), src1.size(), src2.size());
             }
         }
@@ -150,23 +150,24 @@ namespace dlib
             if (have_same_dimensions(dest, src1) &&
                 have_same_dimensions(dest, src2))
             {
-                _cuda_add1<<<512,512>>>(dest.device(), src1.device(), src2.device(), dest.size());
+                launch_kernel(_cuda_add1,max_jobs(dest.size()), dest.device(), src1.device(), src2.device(), dest.size());
             }
             else
             {
                 // Otherwise, do the more complex version with bounds checking.
-                _cuda_add2<<<512,512>>>(dest.device(), src1.device(), src2.device(), 
-                                        dest.num_samples(), dest.k(), dest.nr(), dest.nc(),
-                                        src1.num_samples(), src1.k(), src1.nr(), src1.nc(),
-                                        src2.num_samples(), src2.k(), src2.nr(), src2.nc()
-                                        );
+                launch_kernel(_cuda_add2,max_jobs(dest.size()),
+                            dest.device(), src1.device(), src2.device(), 
+                            dest.num_samples(), dest.k(), dest.nr(), dest.nc(),
+                            src1.num_samples(), src1.k(), src1.nr(), src1.nc(),
+                            src2.num_samples(), src2.k(), src2.nr(), src2.nc()
+                            );
             }
 
         }
 
     // ------------------------------------------------------------------------------------
 
-        __global__ void _cuda_affine_transform(float* d, const float* s, size_t n, float A, float B)
+        __global__ void _cuda_affine_transform1(float* d, const float* s, size_t n, float A, float B)
         {
             for (auto i : grid_stride_range(0, n))
             {
@@ -182,12 +183,12 @@ namespace dlib
         )
         {
             DLIB_CASSERT(dest.size()==src.size(),"");
-            _cuda_affine_transform<<<512,512>>>(dest.device(), src.device(), src.size(), A, B);
+            launch_kernel(_cuda_affine_transform1,max_jobs(dest.size()),dest.device(), src.device(), src.size(), A, B);
         }
 
     // ----------------------------------------------------------------------------------------
 
-        __global__ void _cuda_affine_transform(float* d, const float* s1, const float* s2, size_t n, float A, float B, float C)
+        __global__ void _cuda_affine_transform4(float* d, const float* s1, const float* s2, size_t n, float A, float B, float C)
         {
             for (auto i : grid_stride_range(0, n))
             {
@@ -206,12 +207,12 @@ namespace dlib
         {
             DLIB_CASSERT(dest.size()==src1.size(),"");
             DLIB_CASSERT(dest.size()==src2.size(),"");
-            _cuda_affine_transform<<<512,512>>>(dest.device(), src1.device(), src2.device(), dest.size(), A, B, C);
+            launch_kernel(_cuda_affine_transform4,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), dest.size(), A, B, C);
         }
 
     // ----------------------------------------------------------------------------------------
 
-        __global__ void _cuda_affine_transform(
+        __global__ void _cuda_affine_transform5(
             float* d, const float* s1, const float* s2, const float* s3, size_t n, float A, float B, float C, float D
         )
         {
@@ -235,7 +236,7 @@ namespace dlib
             DLIB_CASSERT(dest.size()==src1.size(),"");
             DLIB_CASSERT(dest.size()==src2.size(),"");
             DLIB_CASSERT(dest.size()==src3.size(),"");
-            _cuda_affine_transform<<<512,512>>>(dest.device(), src1.device(),
+            launch_kernel(_cuda_affine_transform5,max_jobs(dest.size()),dest.device(), src1.device(),
                 src2.device(), src3.device(), dest.size(), A, B, C, D);
         }
 
@@ -273,11 +274,11 @@ namespace dlib
 
             if (A.num_samples() == 1)
             {
-                _cuda_affine_transform3<<<512,512>>>(dest.device(), src.device(), src.size(), A.device(), B.device(), A.size());
+                launch_kernel(_cuda_affine_transform3,max_jobs(dest.size()),dest.device(), src.device(), src.size(), A.device(), B.device(), A.size());
             }
             else
             {
-                _cuda_affine_transform2<<<512,512>>>(dest.device(), src.device(), src.size(), A.device(), B.device());
+                launch_kernel(_cuda_affine_transform2,max_jobs(dest.size()),dest.device(), src.device(), src.size(), A.device(), B.device());
             }
         }
 
@@ -305,7 +306,7 @@ namespace dlib
                   gradient_input.nc() == grad.nc() &&
                   gradient_input.size() > 0,"");
 
-            _add_bias_gradient<<<512,512>>>(grad.device(), gradient_input.device(), grad.size(), gradient_input.size());
+            launch_kernel(_add_bias_gradient,max_jobs(grad.size()),grad.device(), gradient_input.device(), grad.size(), gradient_input.size());
         }
 
     // -----------------------------------------------------------------------------------
@@ -324,11 +325,37 @@ namespace dlib
             float thresh
         )
         {
-            _cuda_threshold<<<512,512>>>(data.device(), data.size(), thresh);
+            launch_kernel(_cuda_threshold,max_jobs(data.size()),data.device(), data.size(), thresh);
         }
 
     // ------------------------------------------------------------------------------------
 
+        __global__ void _cuda_dot(const float* a, const float* b, size_t n, float* result)
+        {
+            // Parallel sum everything into local temp variables.
+            float temp = 0;
+            for(auto i : grid_stride_range(0, n))
+                temp += a[i]*b[i];
+
+            // Then do the warp reduce add thing to merge into one output value.
+            warp_reduce_atomic_add(*result, temp);
+        }
+
+
+        void dot (
+            const tensor& a,
+            const tensor& b,
+            tensor& result,
+            size_t idx
+        )
+        {
+            DLIB_CASSERT(a.size() == b.size(), "");
+            DLIB_CASSERT(idx < result.size(), "");
+
+            launch_kernel(_cuda_dot, max_jobs(a.size()), a.device(), b.device(), a.size(), result.device()+idx);
+        }
+
+        // ----------------------------------------------------------------------------------------
     }
 }
 
