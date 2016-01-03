@@ -12,6 +12,7 @@
 #include <string>
 #include "cuda_utils.h"
 #include "cpu_dlib.h"
+#include "cuda_dlib.h"
 
 static const char* cudnn_get_error_string(cudnnStatus_t s)
 {
@@ -212,6 +213,14 @@ namespace dlib
                     <<"\n\t src.nr():           " << src.nr()
                     <<"\n\t src.nc():           " << src.nc()
                     );
+
+            if (dest.size() == src.size() && beta == 1)
+            {
+                // Call the dlib function in this case since it's faster than the one that
+                // comes with cuDNN (at least as of cuDNN v4).
+                add_scaled(dest, alpha, src);
+                return;
+            }
 
             CHECK_CUDNN(cudnnAddTensor_v3(context(),
                                     &alpha,

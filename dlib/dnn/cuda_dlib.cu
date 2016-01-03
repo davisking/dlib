@@ -212,6 +212,26 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        __global__ void _cuda_add_scaled(float* d, const float* s, size_t n, float scale)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                d[i] += scale*s[i]; 
+            }
+        }
+
+        void add_scaled(
+            tensor& dest,
+            const float scale,
+            const tensor& src
+        )
+        {
+            DLIB_CASSERT(dest.size()==src.size(),"");
+            launch_kernel(_cuda_add_scaled,max_jobs(dest.size()),dest.device(), src.device(), dest.size(), scale);
+        }
+
+    // ----------------------------------------------------------------------------------------
+
         __global__ void _cuda_affine_transform5(
             float* d, const float* s1, const float* s2, const float* s3, size_t n, float A, float B, float C, float D
         )
