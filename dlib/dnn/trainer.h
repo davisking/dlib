@@ -35,12 +35,12 @@ namespace dlib
         typedef typename net_type::input_type input_type;
 
         dnn_trainer(
-        ) : job_pipe(0)
+        ) : job_pipe(0), solvers(net_type::num_layers)
         {
             init();
         }
 
-        explicit dnn_trainer(const net_type& net_) : job_pipe(0), net(net_)
+        explicit dnn_trainer(const net_type& net_) : job_pipe(0), net(net_), solvers(net_type::num_layers)
         {
             init();
         }
