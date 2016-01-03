@@ -307,6 +307,20 @@ namespace dlib { namespace tt
 #endif
     }
 
+    void dot (
+        const tensor& a,
+        const tensor& b,
+        tensor& result,
+        size_t idx
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::dot(a,b,result,idx);
+#else
+        cpu::dot(a,b,result,idx);
+#endif
+    }
+
 // ----------------------------------------------------------------------------------------
 
     void add(

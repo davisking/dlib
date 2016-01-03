@@ -154,6 +154,13 @@ namespace dlib
             float thresh
         );
 
+        void dot (
+            const tensor& a,
+            const tensor& b,
+            tensor& result,
+            size_t idx
+        );
+
     // -----------------------------------------------------------------------------------
 
         void softmax (

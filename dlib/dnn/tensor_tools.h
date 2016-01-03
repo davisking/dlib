@@ -398,6 +398,27 @@ namespace dlib { namespace tt
                 - #data.host()[i] == data.host()[i]>thresh ? 1 : 0
     !*/
 
+    void dot (
+        const tensor& a,
+        const tensor& b,
+        tensor& result,
+        size_t idx
+    );
+    /*!
+        requires
+            - a.size() == b.size()
+            - idx < result.size()
+        ensures
+            - #result.host()[idx] == result.host()[idx] + dot(a,b);
+              I.e. Adds the dot product between a and b into the idx-th element of result.
+              The reason you might want to use this more complex version of dot() is
+              because, when using CUDA, it runs by generating asynchronous kernel launches
+              whereas the version of dot() that returns the result immediately as a scalar
+              must block the host while we wait for the result to be computed and then
+              transfered from the GPU do the host for return by dot().  So this version of
+              dot() might be much faster in some cases.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     void add(

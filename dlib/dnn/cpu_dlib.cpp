@@ -830,6 +830,23 @@ namespace dlib
                 d[i] = d[i]>thresh ? 1:0;
         }
 
+        void dot (
+            const tensor& a,
+            const tensor& b,
+            tensor& result,
+            size_t idx
+        )
+        {
+            DLIB_CASSERT(a.size() == b.size(), "");
+            DLIB_CASSERT(idx < result.size(), "");
+
+            const auto aa = a.host();
+            const auto bb = b.host();
+            auto r = result.host();
+            for (size_t i = 0; i < a.size(); ++i)
+                r[idx] += aa[i]*bb[i];
+        }
+
     // -----------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------
