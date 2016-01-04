@@ -2569,6 +2569,7 @@ namespace dlib
                     sout << "Gradient error in parameter #" << i <<".  Relative error: "<< relative_error << endl;
                     sout << "expected derivative: " << reference_derivative << endl;
                     sout << "output derivative:   " << output_derivative << endl;
+                    sout << "iteration:           " << iter << endl;
                     return layer_test_results(sout.str()); 
                 }
             }
@@ -2606,6 +2607,7 @@ namespace dlib
                     sout << "Gradient error in data variable #" << i <<".  Relative error: "<< relative_error << endl;
                     sout << "expected derivative: " << reference_derivative << endl;
                     sout << "output derivative:   " << output_derivative << endl;
+                    sout << "iteration:           " << iter << endl;
                     return layer_test_results(sout.str()); 
                 }
             }
