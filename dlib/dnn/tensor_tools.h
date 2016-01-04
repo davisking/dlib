@@ -595,6 +595,9 @@ namespace dlib { namespace tt
     class pooling
     {
         /*!
+            WHAT THIS OBJECT REPRESENTS
+                The pooling object is a tool for performing spatial pooling over a tensor.
+                It can be configured to do either max or average pooling.
         !*/
     public:
 
@@ -602,35 +605,56 @@ namespace dlib { namespace tt
         pooling& operator=(const pooling&) = delete;
 
         pooling (
-        );
+        ) = default;
 
         void clear(
-        );
+        ) { impl.clear(); }
 
         void setup_max_pooling(
             int window_height,
             int window_width,
             int stride_y,
             int stride_x
-        );
+        ) { impl.setup_max_pooling(window_height, window_width, stride_y, stride_x); }
+        /*!
+            requires
+                - window_height > 0
+                - window_width > 0
+                - stride_y > 0
+                - stride_x > 0
+            ensures
+                - When you call operator() it will do max pooling with the given
+                  parameters.
+        !*/
 
         void setup_avg_pooling(
             int window_height,
             int window_width,
             int stride_y,
             int stride_x
-        );
+        ) { impl.setup_avg_pooling(window_height, window_width, stride_y, stride_x); }
+        /*!
+            requires
+                - window_height > 0
+                - window_width > 0
+                - stride_y > 0
+                - stride_x > 0
+            ensures
+                - When you call operator() it will do average pooling with the given
+                  parameters.
+        !*/
 
         bool does_max_pooling(
-        ) const;
+        ) const { return impl.does_max_pooling(); }
 
         void operator() (
             resizable_tensor& dest,
             const tensor& src
-        );
+        ) { impl(dest, src); }
         /*!
             requires
                 - is_same_object(dest,src) == false
+                - either setup_max_pooling() or setup_avg_pooling() has been called.
             ensures
                 - #dest.num_samples() == src.num_samples()
                 - #dest.k() == src.k()
@@ -656,7 +680,7 @@ namespace dlib { namespace tt
             const tensor& dest,
             const tensor& src,
             tensor& grad 
-        );
+        ) { impl.get_gradient(gradient_input, dest, src, grad); }
         /*!
             requires
                 - have_same_dimensions(gradient_input,dest) == true
@@ -676,7 +700,7 @@ namespace dlib { namespace tt
 #ifdef DLIB_USE_CUDA
         cuda::pooling impl;
 #else
-        // TODO
+        cpu::pooling impl;
 #endif
     };
 

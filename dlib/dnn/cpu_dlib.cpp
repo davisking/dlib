@@ -1023,6 +1023,225 @@ namespace dlib
         }
 
     // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+
+        pooling::pooling (
+        ) : window_height(0),window_width(0),stride_y(0),stride_x(0),do_max_pooling(true)
+        {
+        }
+
+        void pooling::
+        clear(
+        )
+        {
+            window_height = 0;
+            window_width = 0;
+            stride_y = 0;
+            stride_x = 0;
+        }
+
+        void pooling::
+        setup_max_pooling(
+            int window_height_,
+            int window_width_,
+            int stride_y_,
+            int stride_x_
+        )
+        {
+            DLIB_CASSERT(window_width_ > 0,"");
+            DLIB_CASSERT(window_height_ > 0,"");
+            DLIB_CASSERT(stride_y_ > 0,"");
+            DLIB_CASSERT(stride_x_ > 0,"");
+
+            window_height = window_height_;
+            window_width = window_width_;
+            stride_y = stride_y_;
+            stride_x = stride_x_;
+            do_max_pooling = true;
+        }
+
+        void pooling::
+        setup_avg_pooling(
+            int window_height_,
+            int window_width_,
+            int stride_y_,
+            int stride_x_
+        )
+        {
+            DLIB_CASSERT(window_width_ > 0,"");
+            DLIB_CASSERT(window_height_ > 0,"");
+            DLIB_CASSERT(stride_y_ > 0,"");
+            DLIB_CASSERT(stride_x_ > 0,"");
+
+            window_height = window_height_;
+            window_width = window_width_;
+            stride_y = stride_y_;
+            stride_x = stride_x_;
+            do_max_pooling = false;
+        }
+
+        void pooling::
+        operator() (
+            resizable_tensor& dest,
+            const tensor& src
+        )
+        {
+            DLIB_CASSERT(window_width > 0,"");
+            DLIB_CASSERT(window_height > 0,"");
+            DLIB_CASSERT(stride_y > 0,"");
+            DLIB_CASSERT(stride_x > 0,"");
+
+            dest.set_size(
+                 src.num_samples(),
+                 src.k(),
+                 1+(src.nr()-window_height%2)/stride_y,
+                 1+(src.nc()-window_width%2)/stride_x
+                );
+
+            if (src.size() == 0)
+            {
+                dest = 0;
+                return;
+            }
+
+
+            auto d = dest.host();
+            auto s = src.host();
+            if (does_max_pooling())
+            {
+                for (long n = 0; n < dest.num_samples(); ++n)
+                {
+                    for (long k = 0; k < dest.k(); ++k)
+                    {
+                        auto simg = image_plane(src,n,k);
+                        auto dimg = d + (n*dest.k() + k)*dest.nr()*dest.nc();
+
+                        for (long r = 0; r < dest.nr(); ++r)
+                        {
+                            for (long c = 0; c < dest.nc(); ++c)
+                            {
+                                auto win = centered_rect(c*stride_x,
+                                    r*stride_y,
+                                    window_width,
+                                    window_height);
+                                dimg[r*dest.nc() + c] = max(subm_clipped(simg,win));
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (long n = 0; n < dest.num_samples(); ++n)
+                {
+                    for (long k = 0; k < dest.k(); ++k)
+                    {
+                        auto simg = image_plane(src,n,k);
+                        auto dimg = d + (n*dest.k() + k)*dest.nr()*dest.nc();
+
+                        for (long r = 0; r < dest.nr(); ++r)
+                        {
+                            for (long c = 0; c < dest.nc(); ++c)
+                            {
+                                auto win = centered_rect(c*stride_x,
+                                    r*stride_y,
+                                    window_width,
+                                    window_height);
+                                dimg[r*dest.nc() + c] = mean(subm_clipped(simg,win));
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+
+        void pooling::get_gradient(
+            const tensor& gradient_input, 
+            const tensor& dest,
+            const tensor& src,
+            tensor& grad 
+        )
+        {
+            DLIB_CASSERT(have_same_dimensions(gradient_input,dest),"");
+            DLIB_CASSERT(have_same_dimensions(src,grad),"");
+
+
+            if (src.size() == 0)
+            {
+                return;
+            }
+
+
+            auto gi = gradient_input.host();
+            auto g = grad.host();
+            auto s = src.host();
+            if (does_max_pooling())
+            {
+                for (long n = 0; n < dest.num_samples(); ++n)
+                {
+                    for (long k = 0; k < dest.k(); ++k)
+                    {
+                        auto simg = image_plane(src,n,k);
+                        auto gimg = g + (n*grad.k() + k)*grad.nr()*grad.nc();
+                        auto giimg = gi + (n*dest.k() + k)*dest.nr()*dest.nc();
+                        auto imgbox = get_rect(simg);
+
+                        for (long r = 0; r < dest.nr(); ++r)
+                        {
+                            for (long c = 0; c < dest.nc(); ++c)
+                            {
+                                auto win = centered_rect(c*stride_x,
+                                    r*stride_y,
+                                    window_width,
+                                    window_height).intersect(imgbox);
+                                auto p = max_point(subm(simg,win))+win.tl_corner();
+                                gimg[p.y()*grad.nc()+p.x()] += giimg[r*dest.nc()+c];
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (long n = 0; n < dest.num_samples(); ++n)
+                {
+                    for (long k = 0; k < dest.k(); ++k)
+                    {
+                        auto simg = image_plane(src,n,k);
+                        auto gimg = g + (n*grad.k() + k)*grad.nr()*grad.nc();
+                        auto giimg = gi + (n*dest.k() + k)*dest.nr()*dest.nc();
+                        auto imgbox = get_rect(simg);
+
+                        for (long r = 0; r < dest.nr(); ++r)
+                        {
+                            for (long c = 0; c < dest.nc(); ++c)
+                            {
+                                auto win = centered_rect(c*stride_x,
+                                    r*stride_y,
+                                    window_width,
+                                    window_height).intersect(imgbox);
+                                const float delta = giimg[r*dest.nc()+c]/win.area();
+                                for (long y = win.top(); y <= win.bottom(); ++y)
+                                {
+                                    for (long x = win.left(); x <= win.right(); ++x)
+                                    {
+                                        gimg[y*grad.nc()+x] += delta;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+
+
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
 
     } 
 }

@@ -215,6 +215,59 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
+        class pooling
+        {
+        public:
+
+            pooling(const pooling&) = delete;
+            pooling& operator=(const pooling&) = delete;
+
+            pooling (
+            );
+
+            void clear(
+            );
+
+            void setup_max_pooling(
+                int window_height,
+                int window_width,
+                int stride_y,
+                int stride_x
+            );
+
+            void setup_avg_pooling(
+                int window_height,
+                int window_width,
+                int stride_y,
+                int stride_x
+            );
+
+            bool does_max_pooling(
+            ) const { return do_max_pooling; }
+
+            void operator() (
+                resizable_tensor& dest,
+                const tensor& src
+            );
+
+            void get_gradient(
+                const tensor& gradient_input, 
+                const tensor& dest,
+                const tensor& src,
+                tensor& grad 
+            );
+
+        private:
+            int window_height;
+            int window_width;
+            int stride_y;
+            int stride_x;
+            bool do_max_pooling;
+
+        };
+
+    // -----------------------------------------------------------------------------------
+
     } 
 }
 
