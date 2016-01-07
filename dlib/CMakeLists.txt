@@ -16,7 +16,7 @@ project(dlib)
 
 set(CPACK_PACKAGE_VERSION_MAJOR "18")
 set(CPACK_PACKAGE_VERSION_MINOR "18")
-set(CPACK_PACKAGE_VERSION_PATCH "0")
+set(CPACK_PACKAGE_VERSION_PATCH "99")
 set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 
 set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
@@ -432,11 +432,11 @@ if (NOT TARGET dlib)
                REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
 
 
-       configure_file(${CMAKE_SOURCE_DIR}/../dlib/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+       configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
        # overwrite config.h with the configured one
        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h DESTINATION include/dlib)
 
-       configure_file(${CMAKE_SOURCE_DIR}/../dlib/revision.h.in ${CMAKE_CURRENT_BINARY_DIR}/revision.h)
+       configure_file(${PROJECT_SOURCE_DIR}/revision.h.in ${CMAKE_CURRENT_BINARY_DIR}/revision.h)
        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/revision.h DESTINATION include/dlib)
 
        install(FILES "LICENSE.txt" DESTINATION share/doc/dlib)
