@@ -126,7 +126,7 @@ namespace dlib
             serialize(item.residual_squared, out);
         }
 
-        friend void deserialize (running_gradient& item, std::ostream& in)
+        friend void deserialize (running_gradient& item, std::istream& in)
         {
             int version = 0;
             deserialize(version, in);
