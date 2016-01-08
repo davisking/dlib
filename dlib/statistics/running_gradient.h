@@ -5,6 +5,7 @@
 
 #include "running_gradient_abstract.h"
 #include "../algs.h"
+#include "../serialize.h"
 #include <cmath>
 #include "../matrix.h"
 
@@ -113,6 +114,28 @@ namespace dlib
                 );
 
             return 1-probability_gradient_less_than(thresh);
+        }
+
+        friend void serialize (const running_gradient& item, std::ostream& out)
+        {
+            int version = 1;
+            serialize(version, out);
+            serialize(item.n, out);
+            serialize(item.R, out);
+            serialize(item.w, out);
+            serialize(item.residual_squared, out);
+        }
+
+        friend void deserialize (running_gradient& item, std::ostream& in)
+        {
+            int version = 0;
+            deserialize(version, in);
+            if (version != 1)
+                throw serialization_error("Unexpected version found while deserializing dlib::running_gradient.");
+            deserialize(item.n, in);
+            deserialize(item.R, in);
+            deserialize(item.w, in);
+            deserialize(item.residual_squared, in);
         }
 
     private:
