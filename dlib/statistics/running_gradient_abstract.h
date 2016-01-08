@@ -100,6 +100,22 @@ namespace dlib
         !*/
 
     };
+
+    void serialize (
+        const running_gradient& item, 
+        std::ostream& out 
+    );
+    /*!
+        provides serialization support 
+    !*/
+
+    void deserialize (
+        running_gradient& item, 
+        std::istream& in
+    );
+    /*!
+        provides serialization support 
+    !*/
 }
 
 #endif // DLIB_RuNNING_GRADIENT_ABSTRACT_Hh_
