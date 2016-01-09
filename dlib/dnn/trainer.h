@@ -281,20 +281,10 @@ namespace dlib
             sync_filename = filename;
             time_between_syncs = time_between_syncs_;
 
-            // check if the sync file already exists, if it does we should load it.  We
-            // first check for a .tmp version since that would be the newest if it existed.
-            // If it doesn't exist we check the canonical sync file.
-            std::ifstream fin(filename+".tmp", std::ios::binary);
+            // check if the sync file already exists, if it does we should load it.
+            std::ifstream fin(filename, std::ios::binary);
             if (fin)
-            {
                 deserialize(*this, fin);
-            }
-            else
-            {
-                std::ifstream fin(filename, std::ios::binary);
-                if (fin)
-                    deserialize(*this, fin);
-            }
         }
 
         double get_average_loss (
@@ -521,6 +511,9 @@ namespace dlib
                 // save our state to a temp file
                 std::string tempfile = sync_filename + ".tmp";
                 std::ofstream fout(tempfile, std::ios::binary);
+                // compact network before saving to disk.
+                wait_for_thread_to_pause();
+                this->net.clean(); 
                 serialize(*this, fout);
                 fout.close();
 
