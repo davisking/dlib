@@ -460,10 +460,11 @@ namespace dlib
                   That is, for each layer we will have:
                     - get_output().num_samples() == 0
                     - get_gradient_input().num_samples() == 0
-                  However, running new input data though this network will still have the
-                  same output it would have had regardless of any calls to clean().
-                  The purpose of clean() is to compact the network object prior to saving
-                  it to disk so that it takes up less space and the IO is quicker.
+                  However, running new input data though this network will still produce
+                  the same output it would have produced regardless of any calls to
+                  clean().  The purpose of clean() is to compact the network object prior
+                  to saving it to disk so that it takes up less space and the IO is
+                  quicker.
         !*/
 
     };
