@@ -18,11 +18,11 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 A solver defines the parameter update rule for a single layer in a deep
-                neural network.  It takes a parameter gradient vector and a layer and
-                updates the layer's parameters.  Importantly, each solver instance is used
-                with only one layer in a network.  This allows us to define solvers that
-                have per layer state, for example, a solver may keep a momentum term and
-                apply it to its update rule.
+                neural network.  It takes a parameter gradient vector and the layer's
+                parameters and tells you how the parameters should be updated.
+                Importantly, each solver instance is used with only one layer in a network.
+                This allows us to define solvers that have per layer state, for example, a
+                solver may keep a momentum term and apply it to its update rule.
 
                 Note that there is no dlib::EXAMPLE_SOLVER type.  It is shown here purely
                 to document the interface a solver object must implement.
@@ -33,22 +33,22 @@ namespace dlib
         EXAMPLE_SOLVER(
         );
 
-        template <typename LAYER_DETAILS>
-        void operator() (
-            LAYER_DETAILS& l, 
+        const tensor& operator() (
+            const tensor& params,
             const tensor& params_grad
-        );
+        )
         /*!
             requires
-                - LAYER_DETAILS implements the EXAMPLE_LAYER_ interface defined in
-                  layers_abstract.h.
-                - l.get_layer_params().size() != 0
-                - have_same_dimensions(l.get_layer_params(), params_grad) == true.
+                - params.size() != 0
+                - have_same_dimensions(params, params_grad) == true.
                 - When this function is invoked on a particular solver instance, it is
-                  always supplied with the same LAYER_DETAILS object.
+                  always supplied with parameters from the same layer instance.  That is,
+                  the solver is allowed to remember things from one invocation to another
+                  and to assume that it is being serially applied to optimize the same
+                  parameters. 
             ensures
-                - Updates the parameters in l.  That is, l.get_layer_params() is modified
-                  based on the parameter gradient vector stored in params_grad.
+                - Returns a step vector V that is intended to be used to update the
+                  parameters by adding V to params.
         !*/
     };
 

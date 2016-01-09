@@ -33,24 +33,23 @@ namespace dlib
         float get_learning_rate (
         ) const { return learning_rate; }
 
-        template <typename LAYER_DETAILS>
-        void operator() (
-            LAYER_DETAILS& l, 
+        const tensor& operator() (
+            const tensor& params,
             const tensor& params_grad
         )
         {
-            DLIB_CASSERT(l.get_layer_params().size() != 0,"");
+            DLIB_CASSERT(params.size() != 0,"");
             if (v.size() == 0)
             {
                 v.copy_size(params_grad);
                 v = 0;
             }
-            tt::affine_transform(v, v, l.get_layer_params(), params_grad, 
+            
+            //perform: v = momentum*mat(v) - weight_decay*learning_rate*mat(params) - learning_rate*mat(params_grad);
+            tt::affine_transform(v, v, params, params_grad, 
                                momentum, -weight_decay*learning_rate, -learning_rate, 0);
 
-            // perform l.get_layer_params() += v;
-            tt::affine_transform(l.get_layer_params(), l.get_layer_params(), v, 1, 1, 0);
-
+            return v;
         }
 
         friend void serialize(const sgd& item, std::ostream& out)

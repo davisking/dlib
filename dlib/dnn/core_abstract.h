@@ -392,7 +392,8 @@ namespace dlib
         template <typename solver_type>
         void update(
             const tensor& x, 
-            sstack<solver_type> solvers
+            sstack<solver_type> solvers,
+            double step_size
         );
         /*!
             requires
@@ -405,9 +406,12 @@ namespace dlib
                   is, if you want to call update() on some other neural network object then
                   you must NOT reuse the same solvers object.
                 - solvers.size() >= num_layers
+                - 0 < step_size <= 1
             ensures
                 - Back propagates the error gradient, get_gradient_input(), through this
                   network and uses the provided solvers to update the network parameters.
+                - The parameter delta vector output by the solvers is multiplied by
+                  step_size before being added to the parameters.
                 - All elements of #get_gradient_input() are set to 0. 
                 - have_same_dimensions(#get_final_data_gradient(), x) == true
                 - #get_final_data_gradient() contains the gradient of the network with
@@ -418,7 +422,8 @@ namespace dlib
         void update(
             const tensor& x, 
             const tensor& gradient_input,
-            sstack<solver_type> solvers
+            sstack<solver_type> solvers,
+            double step_size
         );
         /*!
             requires
@@ -430,6 +435,7 @@ namespace dlib
                   is, if you want to call update() on some other neural network object then
                   you must NOT reuse the same solvers object.
                 - solvers.size() >= num_layers
+                - 0 < step_size <= 1
             ensures
                 - This function is identical to the version of update() defined immediately
                   above except that it back-propagates gradient_input through the network
@@ -439,6 +445,8 @@ namespace dlib
                     update(x,solvers);
                   Except that calling update(x,gradient_input,solvers) avoids the copy
                   and is therefore slightly more efficient.
+                - The parameter delta vector output by the solvers is multiplied by
+                  step_size before being added to the parameters.
                 - All elements of #get_gradient_input() are set to 0. 
                 - #get_final_data_gradient() contains the gradient of the network with
                   respect to x.
@@ -755,7 +763,8 @@ namespace dlib
         double update (
             const tensor& x,
             label_iterator lbegin,
-            sstack<solver_type> solvers
+            sstack<solver_type> solvers,
+            double step_size
         );
         /*!
             requires
@@ -767,6 +776,7 @@ namespace dlib
                   is, if you want to call update() on some other neural network object then
                   you must NOT reuse the same solvers object.
                 - solvers.size() >= num_layers
+                - 0 < step_size <= 1
             ensures
                 - runs x through the network, compares the output to the expected output
                   pointed to by lbegin, and updates the network parameters via
@@ -775,6 +785,8 @@ namespace dlib
                     - the expected label of the kth sample in x is *(lbegin+k/sample_expansion_factor).
                 - The provided solvers are used to update the parameters in each layer of
                   the network.
+                - The parameter delta vector output by the solvers is multiplied by
+                  step_size before being added to the parameters.
                 - returns compute_loss(x,lbegin)
         !*/
 
@@ -783,7 +795,8 @@ namespace dlib
             input_iterator ibegin,
             input_iterator iend,
             label_iterator lbegin,
-            sstack<solver_type> solvers
+            sstack<solver_type> solvers,
+            double step_size
         );
         /*!
             requires
@@ -795,6 +808,7 @@ namespace dlib
                   is, if you want to call update() on some other neural network object then
                   you must NOT reuse the same solvers object.
                 - solvers.size() >= num_layers
+                - 0 < step_size <= 1
             ensures
                 - runs [ibegin,iend) through the network, compares the output to the
                   expected output pointed to by lbegin, and updates the network parameters
@@ -803,6 +817,8 @@ namespace dlib
                     - the expected label of *(ibegin+k) is *(lbegin+k).
                 - The provided solvers are used to update the parameters in each layer of
                   the network.
+                - The parameter delta vector output by the solvers is multiplied by
+                  step_size before being added to the parameters.
                 - returns compute_loss(ibegin,iend,lbegin)
         !*/
 
@@ -811,7 +827,8 @@ namespace dlib
         template <typename solver_type>
         double update (
             const tensor& x,
-            sstack<solver_type> solvers
+            sstack<solver_type> solvers,
+            double step_size
         );
         /*!
             requires
@@ -822,11 +839,14 @@ namespace dlib
                   is, if you want to call update() on some other neural network object then
                   you must NOT reuse the same solvers object.
                 - solvers.size() >= num_layers
+                - 0 < step_size <= 1
             ensures
                 - runs x through the network and updates the network parameters by
                   back-propagating the loss gradient through the network.
                 - The provided solvers are used to update the parameters in each layer of
                   the network.
+                - The parameter delta vector output by the solvers is multiplied by
+                  step_size before being added to the parameters.
                 - returns compute_loss(x)
         !*/
 
@@ -834,7 +854,8 @@ namespace dlib
         double update (
             input_iterator ibegin,
             input_iterator iend,
-            sstack<solver_type> solvers
+            sstack<solver_type> solvers,
+            double step_size
         );
         /*!
             requires
@@ -845,11 +866,14 @@ namespace dlib
                   is, if you want to call update() on some other neural network object then
                   you must NOT reuse the same solvers object.
                 - solvers.size() >= num_layers
+                - 0 < step_size <= 1
             ensures
                 - runs [ibegin,iend) through the network and updates the network parameters
                   by back-propagating the loss gradient through the network.
                 - The provided solvers are used to update the parameters in each layer of
                   the network.
+                - The parameter delta vector output by the solvers is multiplied by
+                  step_size before being added to the parameters.
                 - returns compute_loss(ibegin,iend)
         !*/
 

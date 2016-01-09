@@ -46,6 +46,12 @@ namespace dlib
             ensures
                 - #get_net() == a default initialized net_type object.
                 - #get_solvers() == a set of default initialized solvers.
+                - #get_max_num_epochs() == 10000
+                - #get_mini_batch_size() == 128
+                - #get_step_size() == 1
+                - #get_min_step_size() == 1e-4
+                - #get_iterations_between_step_size_adjust() == 2000
+                - #get_step_size_shrink() == 0.1
         !*/
 
         explicit dnn_trainer(
@@ -55,6 +61,12 @@ namespace dlib
             ensures
                 - #get_net() == net 
                 - #get_solvers() == a set of default initialized solvers.
+                - #get_max_num_epochs() == 10000
+                - #get_mini_batch_size() == 128
+                - #get_step_size() == 1
+                - #get_min_step_size() == 1e-4
+                - #get_iterations_between_step_size_adjust() == 2000
+                - #get_step_size_shrink() == 0.1
         !*/
 
         dnn_trainer(
@@ -66,6 +78,12 @@ namespace dlib
                 - #get_net() == net 
                 - #get_solvers() == a set of solvers that are all initialized with the
                   provided solver instance.
+                - #get_max_num_epochs() == 10000
+                - #get_mini_batch_size() == 128
+                - #get_step_size() == 1
+                - #get_min_step_size() == 1e-4
+                - #get_iterations_between_step_size_adjust() == 2000
+                - #get_step_size_shrink() == 0.1
         !*/
 
         const net_type& get_net (
@@ -139,22 +157,107 @@ namespace dlib
                 - #get_mini_batch_size() == batch_size
         !*/
 
-        unsigned long get_num_epochs (
+        unsigned long get_max_num_epochs (
         ) const; 
         /*!
             ensures
-                - Returns the number of passes over the training data we will execute when
-                  train() is called. 
+                - train() will execute at most get_max_num_epochs() iterations over the
+                  training data before returning.
         !*/
 
-        void set_num_epochs (
+        void set_max_num_epochs (
             unsigned long num
         );
         /*!
             requires
                 - num > 0
             ensures
-                - @get_num_epochs() == num
+                - #get_max_num_epochs() == num
+        !*/
+
+        void set_setep_size (
+            double ss
+        );
+        /*!
+            requires
+                - ss > 0
+            ensures
+                - #get_step_size() == ss
+        !*/
+
+        double get_step_size(
+        ) const;
+        /*!
+            ensures
+                - During each training step, a solver tells us how to modify the parameters
+                  of each layer in the network.  It does this by outputting a step vector,
+                  that when added to the parameters, will hopefully result in improved
+                  network performance.  In our case, at during each step, we multiply the
+                  step vector from the solver by get_step_size() before adding it to the
+                  parameters.  Therefore, get_step_size() controls the "learning rate" used
+                  during training. 
+        !*/
+
+        void set_min_step_size (
+            double ss
+        );
+        /*!
+            requires
+                - ss > 0
+            ensures
+                - #get_min_step_size() == ss
+        !*/
+
+        double get_min_step_size (
+        ) const;
+        /*!
+            ensures
+                - During training, this object will test if progress is still being made
+                  and if it isn't then it will reduce get_step_size() by setting it to
+                  get_step_size()*get_step_size_shrink().  However, it will not reduce it
+                  below get_min_step_size().  Once this minimum step size is crossed the
+                  training will terminate.
+        !*/
+
+        void set_iterations_between_step_size_adjust (
+            unsigned long min_iter
+        );
+        /*!
+            ensures
+                - #get_iterations_between_step_size_adjust() == min_iter
+        !*/
+
+        unsigned long get_iterations_between_step_size_adjust (
+        ) const;
+        /*!
+            ensures
+                - This object monitors the progress of training and estimates if the
+                  training error is being reduced.  It does this by looking at
+                  get_iterations_between_step_size_adjust() mini-batch results and applying
+                  the statistical test defined by the running_gradient object to see if the
+                  training error is getting smaller.  
+
+                  Therefore, get_iterations_between_step_size_adjust() should always be set
+                  to something sensibly large so that this test can be done with reasonably
+                  high confidence.
+        !*/
+
+        void set_step_size_shrink_amount (
+            double shrink
+        );
+        /*!
+            requires
+                - 0 < shrink && shrink <= 1
+            ensures
+                - #get_step_size_shrink() == shrink
+        !*/
+
+        double get_step_size_shrink (
+        ) const;
+        /*!
+            ensures
+                - Whenever the training routine thinks it isn't making progress anymore it
+                  will reduce get_step_size() by multiplying it by get_step_size_shrink().
         !*/
 
         void be_verbose (
@@ -185,8 +288,10 @@ namespace dlib
                 - Trains a supervised neural network based on the given training data.
                   The goal of training is to find the network parameters that minimize
                   get_net().compute_loss(data.begin(), data.end(), labels.begin()). 
-                - The optimizer will run for get_num_epochs() epochs and each layer in the
-                  network will be optimized by its corresponding solver in get_solvers().  
+                - The optimizer will run until get_step_size() < get_min_step_size() or
+                  get_max_num_epochs() training epochs have been executes. 
+                - Each layer in the network will be optimized by its corresponding solver
+                  in get_solvers().  
                 - returns #get_net()
                   (i.e. the trained network can also be accessed by calling get_net() after
                   train() finishes executing)
@@ -213,8 +318,10 @@ namespace dlib
                 - Trains an unsupervised neural network based on the given training data.
                   The goal of training is to find the network parameters that minimize
                   get_net().compute_loss(data.begin(), data.end()). 
-                - The optimizer will run for get_num_epochs() epochs and each layer in the
-                  network will be optimized by its corresponding solver in get_solvers().  
+                - The optimizer will run until get_step_size() < get_min_step_size() or
+                  get_max_num_epochs() training epochs have been executes. 
+                - Each layer in the network will be optimized by its corresponding solver
+                  in get_solvers().  
                 - returns #get_net()
                   (i.e. the trained network can also be accessed by calling get_net() after
                   train() finishes executing)
