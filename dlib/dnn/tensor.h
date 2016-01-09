@@ -264,11 +264,13 @@ namespace dlib
 
         resizable_tensor(const resizable_tensor& item) 
         {
+            // TODO, do the copy with cuda?
             copy_size(item);
             std::memcpy(data_instance.host(), item.host(), data_instance.size()*sizeof(float));
         }
         resizable_tensor(const tensor& item) 
         {
+            // TODO, do the copy with cuda?
             copy_size(item);
             std::memcpy(data_instance.host(), item.host(), data_instance.size()*sizeof(float));
         }
