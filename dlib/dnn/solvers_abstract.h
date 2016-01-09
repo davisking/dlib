@@ -78,7 +78,7 @@ namespace dlib
     public:
 
         sgd(
-            float learning_rate = 0.001,
+            float learning_rate = 0.01,
             float weight_decay = 0.0005,
             float momentum = 0.9 
         ); 
