@@ -148,21 +148,29 @@ if (NOT TARGET dlib)
          set (dlib_needed_libraries ${pthreadlib})
 
          if (NOT DLIB_NO_GUI_SUPPORT)
-            find_library(xlib X11)
-            # Make sure X11 is in the include path.  Note that we look for
-            # Xlocale.h rather than Xlib.h because it avoids finding a partial
-            # copy of the X11 headers on systems with anaconda installed.
-            find_path(xlib_path Xlocale.h
-               PATHS 
-               /Developer/SDKs/MacOSX10.4u.sdk/usr/X11R6/include
-               /opt/local/include
-               PATH_SUFFIXES X11
-               )
-            if (xlib AND xlib_path)
-               get_filename_component(x11_path ${xlib_path} PATH CACHE)
-               include_directories(${x11_path})
-               set(dlib_needed_libraries ${dlib_needed_libraries} ${xlib} )
+            find_package(X11 QUIET)
+            if (X11_FOUND)
+               include_directories(${X11_INCLUDE_DIR})
+               set (dlib_needed_libraries ${dlib_needed_libraries} ${X11_LIBRARIES})
             else()
+               find_library(xlib X11)
+               # Make sure X11 is in the include path.  Note that we look for
+               # Xlocale.h rather than Xlib.h because it avoids finding a partial
+               # copy of the X11 headers on systems with anaconda installed.
+               find_path(xlib_path Xlocale.h
+                  PATHS 
+                  /Developer/SDKs/MacOSX10.4u.sdk/usr/X11R6/include
+                  /opt/local/include
+                  PATH_SUFFIXES X11
+                  )
+               if (xlib AND xlib_path)
+                  get_filename_component(x11_path ${xlib_path} PATH CACHE)
+                  include_directories(${x11_path})
+                  set(dlib_needed_libraries ${dlib_needed_libraries} ${xlib} )
+                  set(X11_FOUND 1)
+               endif()
+            endif()
+            if (NOT X11_FOUND)
                message(" *****************************************************************************")
                message(" *** DLIB GUI SUPPORT DISABLED BECAUSE X11 DEVELOPMENT LIBRARIES NOT FOUND ***")
                message(" *** Make sure XQuartz is installed if you want GUI support.               ***")
