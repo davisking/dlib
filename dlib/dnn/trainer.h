@@ -133,19 +133,49 @@ namespace dlib
             const std::vector<label_type>& labels 
         )
         {
+            if (verbose)
+            {
+                using namespace std::chrono;
+                auto now_time = system_clock::now();
+                if (now_time-last_time > seconds(40))
+                {
+                    last_time = now_time;
+                    std::cout << "step#: " << rpad(cast_to_string(train_one_step_calls),epoch_string_pad) << "  " 
+                        << "step size: " << rpad(cast_to_string(step_size),ss_string_pad) << "  "
+                        << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) 
+                        << std::endl;
+                    clear_average_loss();
+                }
+            }
             sync_to_disk();
             job.labels = labels;
             net.to_tensor(data.begin(), data.end(), job.t);
             job_pipe.enqueue(job);
+            ++train_one_step_calls;
         }
 
         void train_one_step (
             const std::vector<input_type>& data
         )
         {
+            if (verbose)
+            {
+                using namespace std::chrono;
+                auto now_time = system_clock::now();
+                if (now_time-last_time > seconds(40))
+                {
+                    last_time = now_time;
+                    std::cout << "step#: " << rpad(cast_to_string(train_one_step_calls),epoch_string_pad) << "  " 
+                        << "step size: " << rpad(cast_to_string(step_size),ss_string_pad) << "  "
+                        << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) 
+                        << std::endl;
+                    clear_average_loss();
+                }
+            }
             sync_to_disk();
             net.to_tensor(data.begin(), data.end(), job.t);
             job_pipe.enqueue(job);
+            ++train_one_step_calls;
         }
 
         void train (
@@ -164,20 +194,10 @@ namespace dlib
                 ++epoch_iteration)
             {
                 using namespace std::chrono;
-                auto last_time = system_clock::now();
+                last_time = system_clock::now();
                 clear_average_loss();
                 for (; epoch_pos < data.size() && step_size >= min_step_size; epoch_pos += mini_batch_size)
                 {
-                    sync_to_disk();
-                    net.to_tensor(data.begin()+epoch_pos, 
-                                  data.begin()+std::min(epoch_pos+mini_batch_size,data.size()), 
-                                  job.t);
-                    job.labels.assign(labels.begin()+epoch_pos,
-                                      labels.begin()+std::min(epoch_pos+mini_batch_size,data.size()));
-                    job_pipe.enqueue(job);
-                    updated_the_network = true;
-
-
                     if (verbose)
                     {
                         auto now_time = system_clock::now();
@@ -192,6 +212,14 @@ namespace dlib
                         }
                     }
 
+                    sync_to_disk();
+                    net.to_tensor(data.begin()+epoch_pos, 
+                                  data.begin()+std::min(epoch_pos+mini_batch_size,data.size()), 
+                                  job.t);
+                    job.labels.assign(labels.begin()+epoch_pos,
+                                      labels.begin()+std::min(epoch_pos+mini_batch_size,data.size()));
+                    job_pipe.enqueue(job);
+                    updated_the_network = true;
                 }
                 epoch_pos = 0;
 
@@ -229,18 +257,10 @@ namespace dlib
                 ++epoch_iteration)
             {
                 using namespace std::chrono;
-                auto last_time = system_clock::now();
+                last_time = system_clock::now();
                 clear_average_loss();
                 for (; epoch_pos < data.size() && step_size >= min_step_size; epoch_pos += mini_batch_size)
                 {
-                    sync_to_disk();
-                    net.to_tensor(data.begin()+epoch_pos, 
-                                  data.begin()+std::min(epoch_pos+mini_batch_size,data.size()), 
-                                  job.t);
-                    job_pipe.enqueue(job);
-                    updated_the_network = true;
-
-
                     if (verbose)
                     {
                         auto now_time = system_clock::now();
@@ -254,6 +274,13 @@ namespace dlib
                                 << std::endl;
                         }
                     }
+
+                    sync_to_disk();
+                    net.to_tensor(data.begin()+epoch_pos, 
+                                  data.begin()+std::min(epoch_pos+mini_batch_size,data.size()), 
+                                  job.t);
+                    job_pipe.enqueue(job);
+                    updated_the_network = true;
                 }
                 epoch_pos = 0;
 
@@ -432,6 +459,7 @@ namespace dlib
             step_size_shrink = 0.1;
             epoch_iteration = 0;
             epoch_pos = 0;
+            train_one_step_calls = 0;
             start();
         }
 
@@ -460,6 +488,7 @@ namespace dlib
             serialize(item.step_size_shrink.load(), out);
             serialize(item.epoch_iteration, out);
             serialize(item.epoch_pos, out);
+            serialize(item.train_one_step_calls, out);
         }
         friend void deserialize(dnn_trainer& item, std::istream& in)
         {
@@ -494,6 +523,7 @@ namespace dlib
             deserialize(dtemp, in); item.step_size_shrink = dtemp;
             deserialize(item.epoch_iteration, in);
             deserialize(item.epoch_pos, in);
+            deserialize(item.train_one_step_calls, in);
         }
         void sync_to_disk (
             bool do_it_now = false
@@ -548,6 +578,8 @@ namespace dlib
         std::chrono::seconds time_between_syncs;
         unsigned long epoch_iteration;
         unsigned long epoch_pos;
+        std::chrono::time_point<std::chrono::system_clock> last_time;
+        unsigned long long train_one_step_calls;
 
         // The job object is not logically part of the state of this object. It is here
         // only to avoid reallocating it over and over.
