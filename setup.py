@@ -265,7 +265,7 @@ def enqueue_output(out, queue):
 def _log_buf(buf):
     if not buf:
         return
-    buf = buf.decode("latin-1")
+    buf = buf.decode(sys.stdout.encoding)
     buf = buf.rstrip()
     lines = buf.splitlines()
     for line in lines:
