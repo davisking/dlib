@@ -11,6 +11,13 @@
 #include "shared_ptr_thread_safe_abstract.h"
 #include "../threads/threads_kernel.h"
 
+// Don't warn about the use of std::auto_ptr in this file.  There is a pragma at the end of
+// this file that re-enables the warning.
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 
 namespace dlib 
 {
@@ -257,8 +264,6 @@ namespace dlib
             }
         }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
         template<typename Y>
         explicit shared_ptr_thread_safe(
             std::auto_ptr<Y>& r
@@ -272,7 +277,6 @@ namespace dlib
             shared_node = new shared_ptr_thread_safe_node;
             data = r.release();
         }
-#pragma GCC diagnostic push
 
         shared_ptr_thread_safe& operator= (
             const shared_ptr_thread_safe& r
@@ -291,8 +295,6 @@ namespace dlib
             return *this;
         }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
         template<typename Y> 
         shared_ptr_thread_safe& operator= (
             std::auto_ptr<Y>& r
@@ -309,7 +311,6 @@ namespace dlib
             data = r.release();
             return *this;
         }
-#pragma GCC diagnostic push
 
         void reset()
         {
@@ -495,6 +496,10 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 }
 

@@ -10,6 +10,12 @@
 #include "../algs.h"
 #include "shared_ptr_abstract.h"
 
+// Don't warn about the use of std::auto_ptr in this file.  There is a pragma at the end of
+// this file that re-enables the warning.
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 namespace dlib 
 {
@@ -294,8 +300,6 @@ namespace dlib
             shared_node->ref_count += 1;
         }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
         template<typename Y>
         explicit shared_ptr(
             std::auto_ptr<Y>& r
@@ -310,7 +314,6 @@ namespace dlib
             shared_node->del = new default_deleter;
             data = r.release();
         }
-#pragma GCC diagnostic pop
 
         shared_ptr& operator= (
             const shared_ptr& r
@@ -329,8 +332,6 @@ namespace dlib
             return *this;
         }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
         template<typename Y> 
         shared_ptr& operator= (
             std::auto_ptr<Y>& r
@@ -348,7 +349,6 @@ namespace dlib
             data = r.release();
             return *this;
         }
-#pragma GCC diagnostic pop
 
         void reset()
         {
@@ -526,6 +526,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
 }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 #endif // DLIB_SHARED_PTr_
 
