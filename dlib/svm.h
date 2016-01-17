@@ -1,5 +1,10 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
+
+#ifdef DLIB_ALL_SOURCE_END
+#include "dlib_basic_cpp_build_tutorial.txt"
+#endif
+
 #ifndef DLIB_SVm_HEADER
 #define DLIB_SVm_HEADER
 
