@@ -12,6 +12,19 @@
 
 <current>
 New Features:
+      
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="18.18" date="Oct 28, 2015">
+New Features:
    - Added the set_ptrm() routine for assigning dlib::matrix objects to arbitrary
      memory blocks.
       
@@ -30,8 +43,7 @@ Other:
         install target.  Now dlib can be installed system wide by executing 
         'cmake PATH_TO_DLIB; make install'.  This also includes installing the
         appropriate scripts for CMake's find_package(dlib) to work.
-
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
