@@ -257,6 +257,7 @@
          <term file="linear_algebra.html" name="find_projective_transform"     include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="rotation_matrix"           include="dlib/geometry.h"/>
          <term file="algorithms.html" name="running_stats"                 include="dlib/statistics.h"/>
+         <term file="algorithms.html" name="running_gradient"              include="dlib/statistics/running_gradient.h"/>
          <term file="algorithms.html" name="running_scalar_covariance"     include="dlib/statistics.h"/>
          <term file="algorithms.html" name="mean_sign_agreement"           include="dlib/statistics.h"/>
          <term file="algorithms.html" name="correlation"                   include="dlib/statistics.h"/>
