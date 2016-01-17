@@ -313,7 +313,7 @@ namespace dlib { namespace tt
             - have_same_dimensions(gamma, running_means) 
             - have_same_dimensions(gamma, running_invstds)
         ensures
-            - Just linearly transforms src as a call to batch_normalize() would if the resulting
+            - Just linearly transforms src as a call to batch_normalize_conv() would if the resulting
               means and invstds were running_means and running_invstds.  That is, this function 
               performs: 
                 dest = gamma*(src-running_means)*running_invstds + beta
