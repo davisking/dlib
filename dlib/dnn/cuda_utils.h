@@ -249,6 +249,91 @@ namespace dlib
             size_t iend;
         };
 
+    // ------------------------------------------------------------------------------------
+
+        class grid_stride_range_y
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object is just like grid_stride_range except that it looks at
+                    CUDA's y thread index (e.g. threadIdx.y) instead of the x index.
+                    Therefore, if you launch a cuda kernel with a statement like:
+                        dim3 blocks(10,1);
+                        dim3 threads(32,32);  // You need to have x any not equal to 1 to get parallelism over both loops.
+                        add_arrays<<<blocks,threads>>>(a,b,out,nr,nc);
+                    You can perform a nested 2D parallel for loop rather than doing just a
+                    1D for loop.
+                   
+                    So the code in the kernel would look like this if you wanted to add two
+                    2D matrices:
+                        __global__ void add_arrays(
+                            const float* a, 
+                            const float* b, 
+                            float* out, 
+                            size_t nr,
+                            size_t nc
+                        )
+                        {
+                            for (auto r : grid_stride_range_y(0, nr))
+                            {
+                                for (auto c : grid_stride_range(0, nc))
+                                {
+                                    auto i = r*nc+c;
+                                    out[i] = a[i]+b[i];
+                                }
+                            }
+                        }
+            !*/
+
+        public:
+            __device__ grid_stride_range_y(
+                size_t ibegin_,
+                size_t iend_
+            ) : 
+                ibegin(ibegin_),
+                iend(iend_)
+            {}
+
+            class iterator
+            {
+            public:
+                __device__ iterator() {}
+                __device__ iterator(size_t pos_) : pos(pos_) {}
+
+                __device__ size_t operator*() const
+                {
+                    return pos;
+                }
+
+                __device__ iterator& operator++()
+                {
+                    pos += gridDim.y * blockDim.y;
+                    return *this;
+                }
+
+                __device__ bool operator!=(const iterator& item) const
+                { return pos < item.pos; }
+
+            private:
+                size_t pos;
+            };
+
+            __device__ iterator begin() const
+            {
+                return iterator(ibegin+blockDim.y * blockIdx.y + threadIdx.y);
+            }
+            __device__ iterator end() const
+            {
+                return iterator(iend);
+            }
+        private:
+
+            size_t ibegin;
+            size_t iend;
+        };
+
+    // ------------------------------------------------------------------------------------
+
     }
 }
 
