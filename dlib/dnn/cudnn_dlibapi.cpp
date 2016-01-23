@@ -268,7 +268,9 @@ namespace dlib
                   grad.nr() == 1 &&
                   grad.nc() == 1 &&
                   gradient_input.k() == grad.k() &&
-                  gradient_input.size() > 0,"");
+                  gradient_input.size() > 0 &&
+                  is_same_object(grad,gradient_input) == false
+                  ,"");
 
             const float alpha = 1;
             const float beta = 0;
