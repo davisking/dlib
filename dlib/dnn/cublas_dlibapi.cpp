@@ -7,7 +7,6 @@
 
 #include "cublas_dlibapi.h"
 #include "cuda_utils.h"
-#include "tensor.h"
 
 #include <cublas_v2.h>
 
@@ -87,23 +86,6 @@ namespace dlib
         {
             thread_local cublas_context c;
             return c.get_handle();
-        }
-
-    // -----------------------------------------------------------------------------------
-
-        float dot (
-            const tensor& a,
-            const tensor& b
-        )
-        {
-            DLIB_CASSERT(a.size() == b.size(), "");
-            float result = 0;
-            CHECK_CUBLAS(cublasSdot(context(), 
-                                    a.size(),
-                                    a.device(), 1,
-                                    b.device(), 1,
-                                    &result));
-            return result;
         }
 
     // -----------------------------------------------------------------------------------

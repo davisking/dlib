@@ -5,29 +5,13 @@
 
 #ifdef DLIB_USE_CUDA
 
+#include "tensor.h"
 #include "cuda_errors.h"
 
 namespace dlib
 {
-    class tensor;
-
     namespace cuda 
     {
-
-    // -----------------------------------------------------------------------------------
-
-        float dot (
-            const tensor& a,
-            const tensor& b
-        );
-        /*!
-            requires
-                - a.size() == b.size()
-            ensures
-                - returns the dot product between a and b when they are both treated as
-                  a.size() dimensional vectors.  That is, this function pointwise
-                  multiplies the vectors together, then sums the result and returns it.
-        !*/
 
     // -----------------------------------------------------------------------------------
 
