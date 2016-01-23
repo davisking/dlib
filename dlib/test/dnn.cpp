@@ -763,7 +763,101 @@ namespace
         DLIB_TEST(max(abs(mat(gamma_grad)-mat(gamma_grad2))) < 1e-4);
         DLIB_TEST(max(abs(mat(beta_grad)-mat(beta_grad2))) < 1e-4);
     }
-#endif
+
+
+    void test_more_ops2()
+    {
+        dlib::rand rnd;
+        tt::tensor_rand trand;
+
+        for (int iter = 0; iter < 100; ++iter)
+        {
+            print_spinner();
+            resizable_tensor dest1, dest2, src1, src2;
+            src1.set_size(rnd.get_random_32bit_number()%30+1,
+                rnd.get_random_32bit_number()%30+1,
+                rnd.get_random_32bit_number()%30+1,
+                rnd.get_random_32bit_number()%30+1);
+            dest1.copy_size(src1);
+            dest2.copy_size(src1);
+            src2.set_size(1,src1.k(),1,1);
+
+            trand.fill_uniform(dest1);
+            trand.fill_uniform(dest2);
+            trand.fill_uniform(src1);
+            trand.fill_uniform(src2);
+
+            cpu::multiply_conv(dest1, src1, src2);
+            cuda::multiply_conv(dest2, src1, src2);
+            DLIB_TEST(max(abs(mat(dest1)-mat(dest2))) < 1e-5);
+
+
+            // now try it using the other mode of multiply_conv
+            src2.copy_size(src1);
+            dest1.set_size(1,src1.k(),1,1);
+            dest2.set_size(1,src1.k(),1,1);
+            trand.fill_uniform(dest1);
+            trand.fill_uniform(dest2);
+            trand.fill_uniform(src1);
+            trand.fill_uniform(src2);
+            cpu::multiply_conv(dest1, src1, src2);
+            cuda::multiply_conv(dest2, src1, src2);
+            const float scale = max(abs(mat(dest1)));
+            const float scalem = mean(abs(mat(dest1)));
+            DLIB_TEST_MSG(max(abs(mat(dest1)-mat(dest2)))/scale < 1e-4 , max(abs(mat(dest1)-mat(dest2)))/scale);
+            DLIB_TEST_MSG(mean(abs(mat(dest1)-mat(dest2)))/scalem < 1e-5 , mean(abs(mat(dest1)-mat(dest2)))/scalem);
+        }
+
+        for (int iter = 0; iter < 100; ++iter)
+        {
+            print_spinner();
+            resizable_tensor dest1, dest2, src, A, B;
+            src.set_size(rnd.get_random_32bit_number()%30+1,
+                rnd.get_random_32bit_number()%30+1,
+                rnd.get_random_32bit_number()%30+1,
+                rnd.get_random_32bit_number()%30+1);
+            dest1.copy_size(src);
+            dest2.copy_size(src);
+            A.set_size(1,src.k(),1,1);
+            B.set_size(1,src.k(),1,1);
+
+            trand.fill_uniform(dest1);
+            trand.fill_uniform(dest2);
+            trand.fill_uniform(src);
+            trand.fill_uniform(A);
+            trand.fill_uniform(B);
+
+            cpu::affine_transform_conv(dest1, src, A, B);
+            cuda::affine_transform_conv(dest2, src, A, B);
+            DLIB_TEST(max(abs(mat(dest1)-mat(dest2))) < 1e-5);
+        }
+
+        for (int iter = 0; iter < 100; ++iter)
+        {
+            print_spinner();
+            resizable_tensor dest1, dest2, g;
+            g.set_size(rnd.get_random_32bit_number()%30+1,
+                rnd.get_random_32bit_number()%30+1,
+                rnd.get_random_32bit_number()%30+1,
+                rnd.get_random_32bit_number()%30+1);
+            dest1.set_size(1,g.k(),1,1);
+            dest2.set_size(1,g.k(),1,1);
+
+            trand.fill_uniform(dest1);
+            trand.fill_uniform(dest2);
+            trand.fill_uniform(g);
+
+            cpu::assign_conv_bias_gradient(dest1, g);
+            cuda::assign_conv_bias_gradient(dest2, g);
+            const float scale = max(abs(mat(dest1)));
+            const float scalem = mean(abs(mat(dest1)));
+            DLIB_TEST_MSG(max(abs(mat(dest1)-mat(dest2)))/scale < 1e-4 , max(abs(mat(dest1)-mat(dest2)))/scale);
+            DLIB_TEST_MSG(mean(abs(mat(dest1)-mat(dest2)))/scalem < 1e-5 , mean(abs(mat(dest1)-mat(dest2)))/scalem);
+        }
+
+    }
+
+#endif // DLIB_USE_CUDA
 
 // ----------------------------------------------------------------------------------------
 
@@ -883,12 +977,22 @@ namespace
         }
         {
             print_spinner();
-            affine_ l;
+            affine_ l(CONV_MODE);
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {
             print_spinner();
-            bn_ l;
+            affine_ l(FC_MODE);
+            DLIB_TEST_MSG(test_layer(l), test_layer(l));
+        }
+        {
+            print_spinner();
+            bn_ l(CONV_MODE);
+            DLIB_TEST_MSG(test_layer(l), test_layer(l));
+        }
+        {
+            print_spinner();
+            bn_ l(FC_MODE);
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {
@@ -953,7 +1057,7 @@ namespace
     template <typename T> using rcon = max_pool<relu<bn<con<T>>>>;
     std::tuple<max_pool_,relu_,bn_,con_> rcon_ (unsigned long n) 
     {
-        return std::make_tuple(max_pool_(2,2,2,2),relu_(),bn_(BATCH_NORM_CONV),con_(n,5,5));
+        return std::make_tuple(max_pool_(2,2,2,2),relu_(),bn_(CONV_MODE),con_(n,5,5));
     }
 
     template <typename T> using rfc = relu<bn<fc<T>>>;
@@ -996,6 +1100,7 @@ namespace
         {
             test_tagging();
 #ifdef DLIB_USE_CUDA
+            test_more_ops2();
             test_more_ops(1,1);
             test_more_ops(3,4);
             test_more_ops(4,3);

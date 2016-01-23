@@ -552,51 +552,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class affine_
+    enum layer_mode
     {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
-                In particular, it applies a simple pointwise linear transformation to an
-                input tensor.  You can think of it as having two parameter tensors, A and
-                B, that each have the same dimensionality as the input tensor (except their
-                num_samples() dimensions are 1).  If the input tensor is called INPUT
-                then the output of this layer is simply:
-                    A*INPUT+B
-                where all operations are performed element wise and each sample in the
-                INPUT tensor is processed separately.
-        !*/
-
-    public:
-
-        affine_(
-        );
-
-        template <typename SUBNET> void setup (const SUBNET& sub);
-        void forward_inplace(const tensor& input, tensor& output);
-        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
-        const tensor& get_layer_params() const; 
-        tensor& get_layer_params(); 
-        /*!
-            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
-        !*/
-    };
-
-    void serialize(const affine_& item, std::ostream& out);
-    void deserialize(affine_& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
-
-    template <typename SUBNET>
-    using affine = add_layer<affine_, SUBNET>;
-
-// ----------------------------------------------------------------------------------------
-
-    enum batch_normalization_mode
-    {
-        BATCH_NORM_CONV = 0,
-        BATCH_NORM_FC = 1
+        CONV_MODE = 0, // convolutional mode
+        FC_MODE = 1    // fully connected mode
     };
 
     class bn_
@@ -611,7 +570,19 @@ namespace dlib
                 
                 In particular, this layer produces output tensors with the same
                 dimensionality as the input tensors, except that the mean and variances of
-                the elements have been standardized. 
+                the elements have been standardized to 0 and 1 respectively. 
+
+                It should also be noted that when tensors with a num_samples() dimension of
+                1 are passed to this layer it doesn't perform batch normalization.
+                Instead, it runs in "inference mode" where the learned linear normalizing
+                transformation is used to transform the tensor. 
+
+                Finally, after you finish training a batch normalized network, it is a good
+                idea to replace each bn_ layer with an affine_ layer because the affine_
+                layer is faster and will never surprise you by performing batch
+                normalization on tensors that have a num_samples() dimension > 1.  This allows
+                you to run large mini-batches of samples through your final network without
+                batch normalization executing at all. 
         !*/
 
     public:
@@ -619,31 +590,46 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_mode() == BATCH_NORM_FC
+                - #get_mode() == FC_MODE
+                - get_running_stats_window_size() == 1000
         !*/
 
         explicit bn_(
-            batch_normalization_mode mode
+            layer_mode mode
         );
         /*!
             ensures
                 - #get_mode() == mode 
+                - get_running_stats_window_size() == 1000
         !*/
 
-        batch_normalization_mode get_mode(
+        layer_mode get_mode(
         ) const; 
         /*!
             ensures
-                - returns the mode of this layer, either BATCH_NORM_CONV or BATCH_NORM_FC.
-                  If the mode is BATCH_NORM_FC then the normalization is applied across the
+                - returns the mode of this layer, either CONV_MODE or FC_MODE.
+                  If the mode is FC_MODE then the normalization is applied across the
                   samples in a tensor (i.e. k()*nr()*nc() different things will be
                   normalized).  Otherwise, normalization is applied across everything
                   except for the k() dimension, resulting in there being only k()
                   normalization equations that are applied spatially over the tensor.
 
                   Therefore, if you are putting batch normalization after a fully connected
-                  layer you should use BATCH_NORM_FC.  Otherwise, if you are putting batch
-                  normalization after a convolutional layer you should use BATCH_NORM_CONV.
+                  layer you should use FC_MODE.  Otherwise, if you are putting batch
+                  normalization after a convolutional layer you should use CONV_MODE.
+        !*/
+
+        unsigned long get_running_stats_window_size (
+        ) const; 
+        /*!
+            ensures
+                - Just as recommended in the batch normalization paper, this object keeps a
+                  running average of the mean and standard deviations of the features.
+                  These averages are used during "inference mode" so you can run a single
+                  object through a batch normalized network.  They are also what is used to
+                  initialize an affine_ layer that is constructed from a bn_ layer.  This
+                  function returns the effective number of recent samples used to compute
+                  the running average.
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
@@ -664,6 +650,90 @@ namespace dlib
 
     template <typename SUBNET>
     using bn = add_layer<bn_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class affine_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
+                In particular, it applies a simple pointwise linear transformation to an
+                input tensor.  You can think of it as having two parameter tensors, A and
+                B.  If the input tensor is called INPUT then the output of this layer is:
+                    A*INPUT+B
+                where all operations are performed element wise and each sample in the
+                INPUT tensor is processed separately.
+
+                Moreover, this object has two modes that effect the dimensionalities of A
+                and B and how they are applied to compute A*INPUT+B.  If
+                get_mode()==FC_MODE then A and B each have the same dimensionality as the
+                input tensor, except their num_samples() dimensions are 1.  If
+                get_mode()==CONV_MODE then A and B have all their dimensions set to 1
+                except for k(), which is equal to INPUT.k().
+
+                In either case, the computation of A*INPUT+B is performed pointwise over all
+                the elements of INPUT using either:
+                    OUTPUT(n,k,r,c) == A(1,k,r,c)*INPUT(n,k,r,c)+B(1,k,r,c)
+                or
+                    OUTPUT(n,k,r,c) == A(1,k,1,1)*INPUT(n,k,r,c)+B(1,k,1,1)
+                as appropriate.
+        !*/
+
+    public:
+
+        affine_(
+        );
+        /*!
+            ensures
+                - #get_mode() == FC_MODE
+        !*/
+
+        affine_(
+            const bn_& layer
+        );
+        /*!
+            ensures
+                - Constructs affine_ so that it performs the same transformation as the
+                  supplied batch normalization layer.  You would want to do this after you
+                  finish training a network with bn_ layers because the affine_ layer will
+                  execute faster.  
+                - #get_mode() == layer.get_mode()
+        !*/
+
+        explicit affine_(
+            layer_mode mode
+        );
+        /*!
+            ensures
+                - #get_mode() == mode 
+        !*/
+
+        layer_mode get_mode(
+        ) const; 
+        /*!
+            ensures
+                - returns the mode of this layer, either CONV_MODE or FC_MODE.  
+        !*/
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        void forward_inplace(const tensor& input, tensor& output);
+        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+        !*/
+    };
+
+    void serialize(const affine_& item, std::ostream& out);
+    void deserialize(affine_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
+    template <typename SUBNET>
+    using affine = add_layer<affine_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

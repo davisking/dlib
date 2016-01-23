@@ -418,27 +418,31 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    enum batch_normalization_mode
+    enum layer_mode
     {
-        BATCH_NORM_CONV = 0,
-        BATCH_NORM_FC = 1
+        CONV_MODE = 0,
+        FC_MODE = 1
     };
 
     class bn_
     {
     public:
-        bn_() : num_updates(0), running_stats_window_size(1000), mode(BATCH_NORM_FC)
+        bn_() : num_updates(0), running_stats_window_size(1000), mode(FC_MODE)
         {}
 
-        explicit bn_(batch_normalization_mode mode_) : num_updates(0), running_stats_window_size(1000), mode(mode_)
+        explicit bn_(layer_mode mode_) : num_updates(0), running_stats_window_size(1000), mode(mode_)
         {}
 
-        batch_normalization_mode get_mode() const { return mode; }
+        bn_(layer_mode mode_, unsigned long window_size) : num_updates(0), running_stats_window_size(window_size), mode(mode_)
+        {}
+
+        layer_mode get_mode() const { return mode; }
+        unsigned long get_running_stats_window_size () const { return running_stats_window_size; }
 
         template <typename SUBNET>
         void setup (const SUBNET& sub)
         {
-            if (mode == BATCH_NORM_FC)
+            if (mode == FC_MODE)
             {
                 gamma = alias_tensor(1,
                                 sub.get_output().k(),
@@ -473,14 +477,14 @@ namespace dlib
                 const double decay = 1.0 - num_updates/(num_updates+1.0);
                 if (num_updates <running_stats_window_size)
                     ++num_updates;
-                if (mode == BATCH_NORM_FC)
+                if (mode == FC_MODE)
                     tt::batch_normalize(output, means, invstds, decay, running_means, running_invstds, sub.get_output(), g, b);
                 else 
                     tt::batch_normalize_conv(output, means, invstds, decay, running_means, running_invstds, sub.get_output(), g, b);
             }
             else // we are running in testing mode so we just linearly scale the input tensor.
             {
-                if (mode == BATCH_NORM_FC)
+                if (mode == FC_MODE)
                     tt::batch_normalize_inference(output, sub.get_output(), g, b, running_means, running_invstds);
                 else
                     tt::batch_normalize_conv_inference(output, sub.get_output(), g, b, running_means, running_invstds);
@@ -493,7 +497,7 @@ namespace dlib
             auto g = gamma(params,0);
             auto g_grad = gamma(params_grad, 0);
             auto b_grad = beta(params_grad, gamma.size());
-            if (mode == BATCH_NORM_FC)
+            if (mode == FC_MODE)
                 tt::batch_normalize_gradient(gradient_input, means, invstds, sub.get_output(), g, sub.get_gradient_input(), g_grad, b_grad );
             else
                 tt::batch_normalize_conv_gradient(gradient_input, means, invstds, sub.get_output(), g, sub.get_gradient_input(), g_grad, b_grad );
@@ -534,10 +538,12 @@ namespace dlib
             deserialize(item.running_stats_window_size, in);
             int mode;
             deserialize(mode, in);
-            item.mode = (batch_normalization_mode)mode;
+            item.mode = (layer_mode)mode;
         }
 
     private:
+
+        friend class affine_;
 
         resizable_tensor params;
         alias_tensor gamma, beta;
@@ -545,7 +551,7 @@ namespace dlib
         resizable_tensor invstds, running_invstds;
         unsigned long num_updates;
         unsigned long running_stats_window_size;
-        batch_normalization_mode mode;
+        layer_mode mode;
     };
 
     template <typename SUBNET>
@@ -770,17 +776,53 @@ namespace dlib
     {
     public:
         affine_(
-        ) 
+        ) : mode(FC_MODE)
         {
         }
+
+        explicit affine_(
+            layer_mode mode_
+        ) : mode(mode_)
+        {
+        }
+
+        affine_(
+            const bn_& item
+        )
+        {
+            gamma = item.gamma;
+            beta = item.beta;
+            mode = item.mode;
+
+            params.copy_size(item.params);
+
+            auto g = gamma(params,0);
+            auto b = beta(params,gamma.size());
+            
+            resizable_tensor temp(item.params);
+            auto sg = gamma(temp,0);
+            auto sb = beta(temp,gamma.size());
+
+            g = pointwise_multiply(mat(sg), mat(item.running_invstds));
+            b = mat(sb) - pointwise_multiply(mat(g), mat(item.running_means));
+        }
+
+        layer_mode get_mode() const { return mode; }
 
         template <typename SUBNET>
         void setup (const SUBNET& sub)
         {
-            gamma = alias_tensor(1,
-                            sub.get_output().k(),
-                            sub.get_output().nr(),
-                            sub.get_output().nc());
+            if (mode == FC_MODE)
+            {
+                gamma = alias_tensor(1,
+                                sub.get_output().k(),
+                                sub.get_output().nr(),
+                                sub.get_output().nc());
+            }
+            else
+            {
+                gamma = alias_tensor(1, sub.get_output().k());
+            }
             beta = gamma;
 
             params.set_size(gamma.size()+beta.size());
@@ -793,7 +835,10 @@ namespace dlib
         {
             auto g = gamma(params,0);
             auto b = beta(params,gamma.size());
-            tt::affine_transform(output, input, g, b);
+            if (mode == FC_MODE)
+                tt::affine_transform(output, input, g, b);
+            else
+                tt::affine_transform_conv(output, input, g, b);
         } 
 
         void backward_inplace(
@@ -809,10 +854,18 @@ namespace dlib
             auto b_grad = beta(params_grad,gamma.size());
 
             // We are computing the gradient of dot(gradient_input, computed_output*g + b)
-            tt::multiply(data_grad, gradient_input, g);
-
-            tt::multiply(g_grad, gradient_input, computed_output);
-            tt::assign_bias_gradient(b_grad, gradient_input);
+            if (mode == FC_MODE)
+            {
+                tt::multiply(data_grad, gradient_input, g);
+                tt::multiply(g_grad, gradient_input, computed_output);
+                tt::assign_bias_gradient(b_grad, gradient_input);
+            }
+            else
+            {
+                tt::multiply_conv(data_grad, gradient_input, g);
+                tt::multiply_conv(g_grad, gradient_input, computed_output);
+                tt::assign_conv_bias_gradient(b_grad, gradient_input);
+            }
         }
 
         const tensor& get_layer_params() const { return params; }
@@ -824,6 +877,7 @@ namespace dlib
             serialize(item.params, out);
             serialize(item.gamma, out);
             serialize(item.beta, out);
+            serialize((int)item.mode, out);
         }
 
         friend void deserialize(affine_& item, std::istream& in)
@@ -835,11 +889,15 @@ namespace dlib
             deserialize(item.params, in);
             deserialize(item.gamma, in);
             deserialize(item.beta, in);
+            int mode;
+            deserialize(mode, in);
+            item.mode = (layer_mode)mode;
         }
 
     private:
         resizable_tensor params; 
         alias_tensor gamma, beta;
+        layer_mode mode;
     };
 
     template <typename SUBNET>
