@@ -96,6 +96,68 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        __global__ void _cuda_multiply_conv(float* d, const float* s1, size_t n, const float* s2, size_t bs, size_t ks)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                auto k = (i/bs)%ks;
+                d[i] = s1[i]*s2[k];
+            }
+        }
+
+        __global__ void _cuda_multiply_conv2(float* d, const float* s1, size_t n, const float* s2, size_t bs, size_t ks)
+        {
+            // zero initialize d before we begin.
+            for (auto i : grid_stride_range(0, ks))
+                d[i] = 0;
+            __syncthreads();
+
+            // loop over all the image planes
+            for (auto i : grid_stride_range_y(0, n))
+            {
+                // sum all the elements in the i-th image plane
+                float temp = 0;
+                for (auto j : grid_stride_range(i*bs, (i+1)*bs))
+                    temp += s1[j]*s2[j];
+                auto k = i%ks;
+                // and store the sum into d[k]
+                warp_reduce_atomic_add(d[k], temp);
+            }
+        }
+
+
+        void multiply_conv (
+            tensor& dest,
+            const tensor& src1,
+            const tensor& src2
+        )
+        {
+            if (have_same_dimensions(dest,src1))
+            {
+                DLIB_CASSERT(src2.num_samples() == 1 && src2.nr() == 1 && src2.nc() == 1 && src2.k() == src1.k(),"");
+                if (dest.size() == 0)
+                    return;
+
+                launch_kernel(_cuda_multiply_conv,max_jobs(dest.size()),
+                    dest.device(), src1.device(), src1.size(), src2.device(), src1.nr()*src1.nc(), src1.k());
+            }
+            else
+            {
+                DLIB_CASSERT(have_same_dimensions(src1,src2),"");
+                DLIB_CASSERT(dest.num_samples() == 1 && dest.nr() == 1 && dest.nc() == 1 && dest.k() == src1.k(),"");
+                if (dest.size() == 0)
+                    return;
+
+                dim3 blocks(10,1);
+                dim3 threads(32,32); // x size must be 32 because we are using warp_reduce_atomic_add() in the kernel.
+                _cuda_multiply_conv2<<<blocks,threads>>>(
+                    dest.device(), src1.device(), src1.num_samples()*src1.k(), src2.device(), src1.nr()*src1.nc(), src1.k());
+            }
+
+        }
+
+    // ------------------------------------------------------------------------------------
+
         __global__ void _cuda_add1(float* d, const float* s1, const float* s2, size_t n)
         {
             for (auto i : grid_stride_range(0, n))
@@ -300,6 +362,32 @@ namespace dlib
             {
                 launch_kernel(_cuda_affine_transform2,max_jobs(dest.size()),dest.device(), src.device(), src.size(), A.device(), B.device());
             }
+        }
+
+    // -----------------------------------------------------------------------------------
+
+        __global__ void _cuda_affine_transform_conv(float* d, const float* s, size_t n, const float* A, const float* B, size_t bs, size_t ks)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                auto k = (i/bs)%ks;
+                d[i] = A[k]*s[i] + B[k];
+            }
+        }
+
+        void affine_transform_conv(
+            tensor& dest,
+            const tensor& src,
+            const tensor& A,
+            const tensor& B
+        )
+        {
+            DLIB_CASSERT(have_same_dimensions(dest, src),"");
+            DLIB_CASSERT(have_same_dimensions(A, B),"");
+            DLIB_CASSERT(A.num_samples() == 1 && A.nr() == 1 && A.nc() == 1 && A.k() == src.k(),"");
+
+            launch_kernel(_cuda_affine_transform_conv,max_jobs(dest.size()),
+                    dest.device(), src.device(), src.size(), A.device(), B.device(), src.nr()*src.nc(), src.k());
         }
 
     // -----------------------------------------------------------------------------------

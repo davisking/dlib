@@ -54,6 +54,57 @@ namespace dlib
             }
         }
 
+        void multiply_conv (
+            tensor& dest,
+            const tensor& src1,
+            const tensor& src2
+        )
+        {
+            auto d = dest.host();
+            auto s1 = src1.host();
+            auto s2 = src2.host();
+            if (have_same_dimensions(dest,src1))
+            {
+                DLIB_CASSERT(src2.num_samples() == 1 && src2.nr() == 1 && src2.nc() == 1 && src2.k() == src1.k(),"");
+
+                for (long n = 0; n < dest.num_samples(); ++n)
+                {
+                    for (long k = 0; k < dest.k(); ++k)
+                    {
+                        for (long r = 0; r < dest.nr(); ++r)
+                        {
+                            for (long c = 0; c < dest.nc(); ++c)
+                            {
+                                *d++ = (*s1++)*s2[k];
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                DLIB_CASSERT(have_same_dimensions(src1,src2),"");
+                DLIB_CASSERT(dest.num_samples() == 1 && dest.nr() == 1 && dest.nc() == 1 && dest.k() == src1.k(),"");
+
+                for (long k = 0; k < src1.k(); ++k)
+                    d[k] = 0;
+
+                for (long n = 0; n < src1.num_samples(); ++n)
+                {
+                    for (long k = 0; k < src1.k(); ++k)
+                    {
+                        for (long r = 0; r < src1.nr(); ++r)
+                        {
+                            for (long c = 0; c < src1.nc(); ++c)
+                            {
+                                d[k] += (*s1++)*(*s2++);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         void add(
             float beta,
             tensor& dest,
@@ -196,6 +247,44 @@ namespace dlib
             }
         }
 
+    // ------------------------------------------------------------------------------------
+
+        void assign_conv_bias_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        )
+        {
+            DLIB_CASSERT(
+                  grad.num_samples() == 1 &&
+                  grad.k()  >= 1 &&
+                  grad.nr() == 1 &&
+                  grad.nc() == 1 &&
+                  gradient_input.k() == grad.k() &&
+                  gradient_input.size() > 0 && 
+                  is_same_object(grad,gradient_input) == false
+                  ,"");
+
+            auto g = grad.host();
+            auto gi = gradient_input.host();
+
+            for (long k = 0; k < gradient_input.k(); ++k)
+                g[k] = 0;
+
+            for (long n = 0; n < gradient_input.num_samples(); ++n)
+            {
+                for (long k = 0; k < gradient_input.k(); ++k)
+                {
+                    for (long r = 0; r < gradient_input.nr(); ++r)
+                    {
+                        for (long c = 0; c < gradient_input.nc(); ++c)
+                        {
+                            g[k] += (*gi++);
+                        }
+                    }
+                }
+            }
+        }
+
     // -----------------------------------------------------------------------------------
 
         void affine_transform(
@@ -290,6 +379,41 @@ namespace dlib
             {
                 for (size_t i = 0; i < src.size(); ++i)
                     d[i] = a[i]*s[i] + b[i];
+            }
+        }
+
+    // -----------------------------------------------------------------------------------
+
+        void affine_transform_conv(
+            tensor& dest,
+            const tensor& src,
+            const tensor& A,
+            const tensor& B
+        )
+        {
+            DLIB_CASSERT(have_same_dimensions(dest,src),"");
+            DLIB_CASSERT(have_same_dimensions(A,B),"");
+            DLIB_CASSERT(A.num_samples() == 1 &&
+                         A.nr() == 1 &&
+                         A.nc() == 1 &&
+                         A.k() == src.k(), "");
+
+            auto d = dest.host();
+            auto s = src.host();
+            const auto a = A.host();
+            const auto b = B.host();
+            for (long n = 0; n < dest.num_samples(); ++n)
+            {
+                for (long k = 0; k < dest.k(); ++k)
+                {
+                    for (long r = 0; r < dest.nr(); ++r)
+                    {
+                        for (long c = 0; c < dest.nc(); ++c)
+                        {
+                            *d++ = a[k]*(*s++) + b[k];
+                        }
+                    }
+                }
             }
         }
 
@@ -1237,7 +1361,6 @@ namespace dlib
             }
 
         }
-
 
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------

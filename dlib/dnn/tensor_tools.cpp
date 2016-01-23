@@ -115,6 +115,19 @@ namespace dlib { namespace tt
 
     }
 
+    void multiply_conv (
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::multiply_conv(dest, src1, src2);
+#else
+        cpu::multiply_conv(dest, src1, src2);
+#endif
+    }
+
 // ----------------------------------------------------------------------------------------
 
     void affine_transform(
@@ -178,6 +191,22 @@ namespace dlib { namespace tt
         cuda::affine_transform(dest,src,A,B);
 #else
         cpu::affine_transform(dest,src,A,B);
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void affine_transform_conv(
+        tensor& dest,
+        const tensor& src,
+        const tensor& A,
+        const tensor& B
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::affine_transform_conv(dest,src,A,B);
+#else
+        cpu::affine_transform_conv(dest,src,A,B);
 #endif
     }
 
@@ -362,8 +391,7 @@ namespace dlib { namespace tt
 #ifdef DLIB_USE_CUDA
         cuda::assign_conv_bias_gradient(grad,gradient_input);
 #else
-        // TODO
-        DLIB_CASSERT(false,"");
+        cpu::assign_conv_bias_gradient(grad,gradient_input);
 #endif
     }
 

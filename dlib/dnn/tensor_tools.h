@@ -118,6 +118,34 @@ namespace dlib { namespace tt
               with num_samples()==1 which is then assigned to #dest.
     !*/
 
+    void multiply_conv (
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2
+    );
+    /*!
+        requires
+            - if (have_same_dimensions(dest, src1) == true) then
+                - src2.num_samples() == 1
+                - src2.nr() == 1
+                - src2.nc() == 1
+                - src2.k() == src1.k()
+            - else
+                - have_same_dimensions(src1, src2) == true) 
+                - dest.num_samples() == 1
+                - dest.nr() == 1
+                - dest.nc() == 1
+                - dest.k() == src1.k()
+        ensures
+            - Performs #dest == src1*src2 
+              In particular, if the elements of dest, src1, and src2 were indexed by (n,k,r,c) then
+              we would have:
+                - if (have_same_dimensions(dest,src1)) then
+                    #dest(n,k,r,c) == src1(n,k,r,c)*src2(k)
+                - else
+                    #dest(k) == sum over {n,r,c} of src1(n,k,r,c)*src2(n,k,r,c)
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     void affine_transform(
@@ -194,6 +222,29 @@ namespace dlib { namespace tt
             - else
                 - for all valid i:
                     - #dest.host()[i] == A.host()[i]*src.host()[i] + B.host()[i]  
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    void affine_transform_conv(
+        tensor& dest,
+        const tensor& src,
+        const tensor& A,
+        const tensor& B
+    );
+    /*!
+        requires
+            - have_same_dimensions(dest,src) == true
+            - have_same_dimensions(A, B) == true
+            - A.num_samples() == 1
+            - A.nr() == 1
+            - A.nc() == 1
+            - A.k() == src.k()
+        ensures
+            - Performs #dest == A*src + B
+              In particular, if the elements of dest and src were indexed by (n,k,r,c) then
+              we would have:
+                #dest(n,k,r,c) == A(k)*src(n,k,r,c) + B(k).
     !*/
 
 // ----------------------------------------------------------------------------------------

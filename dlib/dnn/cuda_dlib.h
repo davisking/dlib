@@ -30,6 +30,12 @@ namespace dlib
             const tensor& src2
         );
 
+        void multiply_conv (
+            tensor& dest,
+            const tensor& src1,
+            const tensor& src2
+        );
+
         void add (
             tensor& dest,
             const tensor& src1,
@@ -76,6 +82,15 @@ namespace dlib
     // -----------------------------------------------------------------------------------
 
         void affine_transform(
+            tensor& dest,
+            const tensor& src,
+            const tensor& A,
+            const tensor& B
+        );
+
+    // -----------------------------------------------------------------------------------
+
+        void affine_transform_conv(
             tensor& dest,
             const tensor& src,
             const tensor& A,
