@@ -15,6 +15,7 @@
 #include <utility>
 #include <tuple>
 #include <cmath>
+#include <vector>
 #include "tensor_tools.h"
 
 
@@ -1920,6 +1921,21 @@ namespace dlib
         {
             (*this)(&x, &x+1, &temp_label);
             return temp_label;
+        }
+
+        std::vector<label_type> operator() (
+            const std::vector<input_type>& data,
+            size_t batch_size = 128
+        )
+        {
+            std::vector<label_type> results(data.size());
+            auto o = results.begin();
+            for (auto i = data.begin(); i < data.end(); i+=batch_size, o+=batch_size)
+            {
+                auto end = std::min(i+batch_size, data.end());
+                (*this)(i, end, o);
+            }
+            return results;
         }
 
         template <typename label_iterator>

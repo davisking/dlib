@@ -7,6 +7,7 @@
 #include <memory>
 #include <type_traits>
 #include <tuple>
+#include <vector>
 #include "../rand.h"
 
 
@@ -683,6 +684,25 @@ namespace dlib
         /*!
             ensures
                 - runs a single object, x, through the network and returns the output.
+                - loss_details().to_label() is used to convert the network output into a
+                  label_type.
+        !*/
+
+        std::vector<label_type> operator() (
+            const std::vector<input_type>& data,
+            size_t batch_size = 128
+        );
+        /*!
+            requires
+                - batch_size > 0
+            ensures
+                - runs all the objects in data through the network and returns their
+                  predicted labels.  This means this function returns a vector V such that:
+                    - V.size() == data.size()
+                    - for all valid i: V[i] == the predicted label of data[i].
+                - Elements of data are run through the network in batches of batch_size
+                  items.  Using a batch_size > 1 can be faster because it better exploits
+                  the available hardware parallelism.
                 - loss_details().to_label() is used to convert the network output into a
                   label_type.
         !*/
