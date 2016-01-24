@@ -237,6 +237,14 @@ namespace dlib
             }
         }
 
+        __global__ void _cuda_affine_transform1_0(float* d, const float* s, size_t n, float A)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                d[i] = A*s[i];
+            }
+        }
+
         void affine_transform(
             tensor& dest,
             const tensor& src,
@@ -245,7 +253,10 @@ namespace dlib
         )
         {
             DLIB_CASSERT(dest.size()==src.size(),"");
-            launch_kernel(_cuda_affine_transform1,max_jobs(dest.size()),dest.device(), src.device(), src.size(), A, B);
+            if (B != 0)
+                launch_kernel(_cuda_affine_transform1,max_jobs(dest.size()),dest.device(), src.device(), src.size(), A, B);
+            else
+                launch_kernel(_cuda_affine_transform1_0,max_jobs(dest.size()),dest.device(), src.device(), src.size(), A);
         }
 
     // ----------------------------------------------------------------------------------------
@@ -255,6 +266,14 @@ namespace dlib
             for (auto i : grid_stride_range(0, n))
             {
                 d[i] = A*s1[i] + B*s2[i] + C;
+            }
+        }
+
+        __global__ void _cuda_affine_transform4_0(float* d, const float* s1, const float* s2, size_t n, float A, float B)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                d[i] = A*s1[i] + B*s2[i];
             }
         }
 
@@ -269,7 +288,10 @@ namespace dlib
         {
             DLIB_CASSERT(dest.size()==src1.size(),"");
             DLIB_CASSERT(dest.size()==src2.size(),"");
-            launch_kernel(_cuda_affine_transform4,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), dest.size(), A, B, C);
+            if (C != 0)
+                launch_kernel(_cuda_affine_transform4,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), dest.size(), A, B, C);
+            else
+                launch_kernel(_cuda_affine_transform4_0,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), dest.size(), A, B);
         }
 
     // ----------------------------------------------------------------------------------------
