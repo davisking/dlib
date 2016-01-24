@@ -20,6 +20,14 @@ set(MATLAB_LIB_FOLDERS
    "${MATLAB_HOME}/extern/lib/win64/microsoft"
    "${MATLAB_HOME}/bin/glnxa64"
    )
+# If there is a MATLAB_HOME environment variable then look there as well.
+if (DEFINED ENV{MATLAB_HOME})
+    set(MATLAB_LIB_FOLDERS
+        "$ENV{MATLAB_HOME}/extern/lib/win64/microsoft"
+        "$ENV{MATLAB_HOME}/bin/glnxa64"
+        ${MATLAB_LIB_FOLDERS}
+    )
+endif()
 # Find the MATLAB libraries that need to get linked into the mex file
 if (WIN32)
    find_library(MATLAB_MEX_LIBRARY libmex PATHS ${MATLAB_LIB_FOLDERS} )
@@ -31,14 +39,18 @@ else()
    find_library(MATLAB_ENG_LIBRARY eng    PATHS ${MATLAB_LIB_FOLDERS} )
 endif()
 set(MATLAB_LIBRARIES ${MATLAB_MEX_LIBRARY} ${MATLAB_MX_LIBRARY} ${MATLAB_ENG_LIBRARY})
-INCLUDE_DIRECTORIES("${MATLAB_HOME}/extern/include")
+# Figure out the path to MATLAB's mex.h so we can add it to the include search path.
+find_path(mex_header_path mex.h
+    PATHS "$ENV{MATLAB_HOME}/extern/include"
+        "${MATLAB_HOME}/extern/include"
+    )
+INCLUDE_DIRECTORIES(${mex_header_path})
+
 # Determine the path to cmake_mex_wrapper file so we can add it to the include search path..
 string(REGEX REPLACE "cmake_mex_wrapper$" "" dlib_matlab_binding_path ${CMAKE_CURRENT_LIST_FILE})
 INCLUDE_DIRECTORIES("${dlib_matlab_binding_path}")
-
-# Determine the path to dlib so we can add it to the include search path.
-string(REGEX REPLACE "cmake_mex_wrapper$" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
-INCLUDE_DIRECTORIES(${dlib_path}/../..)
+# Also add dlib to the include search path 
+INCLUDE_DIRECTORIES(${dlib_matlab_binding_path}/../..) 
 
 ADD_DEFINITIONS(-DMATLAB_MEX_FILE)
 

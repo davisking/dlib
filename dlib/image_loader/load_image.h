@@ -9,6 +9,7 @@
 #include "jpeg_loader.h"
 #include "image_loader.h"
 #include <fstream>
+#include <sstream>
 
 namespace dlib
 {
@@ -71,15 +72,37 @@ namespace dlib
 
         if (im_type == image_file_type::JPG)
         {
-            throw image_load_error("Unable to load image in file " + file_name + ".\n" +
-                "You must #define DLIB_JPEG_SUPPORT and link to libjpeg to read JPEG files.\n" +
-                "Do this by following the instructions at http://dlib.net/compile.html.");
+            std::ostringstream sout;
+            sout << "Unable to load image in file " + file_name + ".\n" +
+                    "You must #define DLIB_JPEG_SUPPORT and link to libjpeg to read JPEG files.\n" +
+                    "Do this by following the instructions at http://dlib.net/compile.html.\n\n";
+#ifdef _MSC_VER
+            sout << "Note that you must cause DLIB_JPEG_SUPPORT to be defined for your entire project.\n";
+            sout << "So don't #define it in one file, add it to the C/C++->Preprocessor->Preprocessor Definitions\n";
+            sout << "field in Visual Studio's Property Pages window so it takes effect for your entire application.";
+#else
+            sout << "Note that you must cause DLIB_JPEG_SUPPORT to be defined for your entire project.\n";
+            sout << "So don't #define it in one file, use a compiler switch like -DDLIB_JPEG_SUPPORT\n";
+            sout << "so it takes effect for your entire application.";
+#endif
+            throw image_load_error(sout.str());
         }
         else if (im_type == image_file_type::PNG)
         {
-            throw image_load_error("Unable to load image in file " + file_name + ".\n" +
-                "You must #define DLIB_PNG_SUPPORT and link to libpng to read PNG files.\n" +
-                "Do this by following the instructions at http://dlib.net/compile.html.");
+            std::ostringstream sout;
+            sout << "Unable to load image in file " + file_name + ".\n" +
+                    "You must #define DLIB_PNG_SUPPORT and link to libpng to read PNG files.\n" +
+                    "Do this by following the instructions at http://dlib.net/compile.html.\n\n";
+#ifdef _MSC_VER
+            sout << "Note that you must cause DLIB_PNG_SUPPORT to be defined for your entire project.\n";
+            sout << "So don't #define it in one file, add it to the C/C++->Preprocessor->Preprocessor Definitions\n";
+            sout << "field in Visual Studio's Property Pages window so it takes effect for your entire application.\n";
+#else
+            sout << "Note that you must cause DLIB_PNG_SUPPORT to be defined for your entire project.\n";
+            sout << "So don't #define it in one file, use a compiler switch like -DDLIB_PNG_SUPPORT\n";
+            sout << "so it takes effect for your entire application.";
+#endif
+            throw image_load_error(sout.str());
         }
         else
         {

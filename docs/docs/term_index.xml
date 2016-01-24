@@ -257,6 +257,7 @@
          <term file="linear_algebra.html" name="find_projective_transform"     include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="rotation_matrix"           include="dlib/geometry.h"/>
          <term file="algorithms.html" name="running_stats"                 include="dlib/statistics.h"/>
+         <term file="algorithms.html" name="running_gradient"              include="dlib/statistics/running_gradient.h"/>
          <term file="algorithms.html" name="running_scalar_covariance"     include="dlib/statistics.h"/>
          <term file="algorithms.html" name="mean_sign_agreement"           include="dlib/statistics.h"/>
          <term file="algorithms.html" name="correlation"                   include="dlib/statistics.h"/>
@@ -1431,6 +1432,7 @@
          <term link="other.html#dlib_testing_suite" name="unit testing"/>
          <term file="other.html" name="logger"                       include="dlib/logger.h"/>
          <term file="other.html" name="vectorstream"                 include="dlib/vectorstream.h"/>
+         <term file="other.html" name="unserialize"                  include="dlib/vectorstream.h"/>
          <term file="other.html" name="member_function_pointer"      include="dlib/member_function_pointer.h"/>
          <term file="other.html" name="make_mfp"                     include="dlib/member_function_pointer.h"/>
          <term file="other.html" name="bound_function_pointer"       include="dlib/bound_function_pointer.h"/>

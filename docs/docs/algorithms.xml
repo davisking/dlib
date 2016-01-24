@@ -58,6 +58,7 @@
          <item>rand</item> 
          <item>median</item> 
          <item>running_stats</item> 
+         <item>running_gradient</item> 
          <item>running_scalar_covariance</item> 
          <item>mean_sign_agreement</item> 
          <item>correlation</item> 
@@ -474,6 +475,20 @@
                                  
       </component>
       
+      
+   <!-- ************************************************************************* -->
+
+      <component cpp11="true">
+         <name>running_gradient</name>
+         <file>dlib/statistics/running_gradient.h</file>
+         <spec_file link="true">dlib/statistics/running_gradient_abstract.h</spec_file>
+         <description>
+                This object is a tool for estimating if a noisy sequence of numbers is
+                trending up or down and by how much.  It does this by finding the least
+                squares fit of a line to the data and then allows you to perform a
+                statistical test on the slope of that line.
+         </description>
+      </component>
       
    <!-- ************************************************************************* -->
 
