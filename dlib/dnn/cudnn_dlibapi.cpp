@@ -849,8 +849,10 @@ namespace dlib
             int stride_x
         )
         {
-            DLIB_ASSERT(is_same_object(output,data) == false,"");
-            DLIB_ASSERT(is_same_object(output,filters) == false,"");
+            DLIB_CASSERT(is_same_object(output,data) == false,"");
+            DLIB_CASSERT(is_same_object(output,filters) == false,"");
+            DLIB_CASSERT(filters.k() == data.k(),"");
+            DLIB_CASSERT(stride_y > 0 && stride_x > 0,"");
 
             setup(data,filters,stride_y,stride_x);
 
