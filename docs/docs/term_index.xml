@@ -1430,6 +1430,7 @@
          <term link="other.html#dlib_testing_suite" name="unit testing"/>
          <term file="other.html" name="logger"                       include="dlib/logger.h"/>
          <term file="other.html" name="vectorstream"                 include="dlib/vectorstream.h"/>
+         <term file="other.html" name="unserialize"                  include="dlib/vectorstream.h"/>
          <term file="other.html" name="member_function_pointer"      include="dlib/member_function_pointer.h"/>
          <term file="other.html" name="make_mfp"                     include="dlib/member_function_pointer.h"/>
          <term file="other.html" name="bound_function_pointer"       include="dlib/bound_function_pointer.h"/>

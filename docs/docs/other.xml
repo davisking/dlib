@@ -34,6 +34,7 @@
          <item>timeout</item> 
          <item>member_function_pointer</item>
          <item>vectorstream</item>
+         <item>unserialize</item>
          <item>bound_function_pointer</item>
          <item>error</item>
          <item>console_progress_indicator</item>
@@ -399,6 +400,20 @@
                 contents to and from the stream.  This is particularly useful when used as
                 a source or target for <a href="#serialize">serialization</a> routines.
                </p>
+         </description>
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>unserialize</name>
+         <file>dlib/vectorstream.h</file>
+         <spec_file>dlib/vectorstream/unserialize_abstract.h</spec_file>
+         <description>
+            This object effectively allows you to peek at the next serialized 
+            object in an istream.  It does this by allowing you to read an object
+            and then put it back.
          </description>
       </component>
       
