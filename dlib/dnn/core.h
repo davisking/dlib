@@ -1923,12 +1923,13 @@ namespace dlib
             return temp_label;
         }
 
+        template <typename iterable_type>
         std::vector<label_type> operator() (
-            const std::vector<input_type>& data,
+            const iterable_type& data,
             size_t batch_size = 128
         )
         {
-            std::vector<label_type> results(data.size());
+            std::vector<label_type> results(std::distance(data.begin(), data.end()));
             auto o = results.begin();
             for (auto i = data.begin(); i < data.end(); i+=batch_size, o+=batch_size)
             {

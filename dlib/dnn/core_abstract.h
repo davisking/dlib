@@ -688,13 +688,17 @@ namespace dlib
                   label_type.
         !*/
 
+        template <typename iterable_type>
         std::vector<label_type> operator() (
-            const std::vector<input_type>& data,
+            const iterable_type& data,
             size_t batch_size = 128
         );
         /*!
             requires
                 - batch_size > 0
+                - data must have a .begin() and .end() that supply iterators over a
+                  sequence of input_type elements.  E.g. data could have a type of
+                  std::vector<input_type>
             ensures
                 - runs all the objects in data through the network and returns their
                   predicted labels.  This means this function returns a vector V such that:
