@@ -494,6 +494,80 @@ namespace
 
 #ifdef DLIB_USE_CUDA
 
+    void test_conv()
+    {
+        cuda::tensor_conv conv1;
+        cpu::tensor_conv conv2;
+
+        dlib::rand prnd;
+        for (int iter = 0; iter < 400; ++iter)
+        {
+            print_spinner();
+
+            resizable_tensor data(prnd.get_random_32bit_number()%5+1,
+                prnd.get_random_32bit_number()%5+1,
+                prnd.get_random_32bit_number()%30+1,
+                prnd.get_random_32bit_number()%30+1
+            );
+            resizable_tensor filters(
+                prnd.get_random_32bit_number()%5+1,
+                data.k(),
+                prnd.get_random_32bit_number()%6+1,
+                prnd.get_random_32bit_number()%6+1 
+            );
+
+            tt::tensor_rand rnd;
+            rnd.fill_uniform(data);
+            rnd.fill_uniform(filters);
+
+
+            resizable_tensor output1, output2;
+
+
+            const int stride_y = prnd.get_random_32bit_number()%5+1;
+            const int stride_x = prnd.get_random_32bit_number()%5+1;
+            conv1(output1, data, filters, stride_y,stride_x);
+
+            conv2(output2, data, filters, stride_y,stride_x);
+
+            dlog << LINFO << "forward error: "<< max(abs(mat(output1)-mat(output2)));
+            DLIB_TEST(max(abs(mat(output1)-mat(output2))) < 1e-3);
+
+
+
+            resizable_tensor gi, data_gradient1, data_gradient2;
+            gi.copy_size(output1);
+            rnd.fill_uniform(gi);
+
+            data_gradient1.copy_size(data);
+            data_gradient2.copy_size(data);
+            data_gradient1 = 1;
+            data_gradient2 = 1;
+
+            conv1.get_gradient_for_data(gi, filters, data_gradient1);
+            conv2.get_gradient_for_data(gi, filters, data_gradient2);
+
+            dlog << LINFO << "data gradient error: "<< max(abs(mat(data_gradient1)-mat(data_gradient2)));
+            DLIB_TEST(max(abs(mat(data_gradient1)-mat(data_gradient2))) < 1e-3);
+
+
+            resizable_tensor filter_gradient1, filter_gradient2;
+            gi.copy_size(output1);
+            rnd.fill_uniform(gi);
+
+            filter_gradient1.copy_size(filters);
+            filter_gradient2.copy_size(filters);
+            filter_gradient1 = 1;
+            filter_gradient2 = 1;
+
+            conv1.get_gradient_for_filters(gi, data, filter_gradient1);
+            conv2.get_gradient_for_filters(gi, data, filter_gradient2);
+
+            dlog << LINFO << "filter gradient error: "<< max(abs(mat(filter_gradient1)-mat(filter_gradient2)));
+            DLIB_TEST(max(abs(mat(filter_gradient1)-mat(filter_gradient2))) < 1e-3);
+        }
+    }
+
     void test_add()
     {
         print_spinner();
@@ -1105,6 +1179,7 @@ namespace
         {
             test_tagging();
 #ifdef DLIB_USE_CUDA
+            test_conv();
             test_more_ops2();
             test_more_ops(1,1);
             test_more_ops(3,4);
