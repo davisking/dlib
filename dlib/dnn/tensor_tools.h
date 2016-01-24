@@ -563,10 +563,10 @@ namespace dlib { namespace tt
         tensor_conv(const tensor_conv&) = delete;
         tensor_conv& operator=(const tensor_conv&) = delete;
 
-        tensor_conv();
+        tensor_conv() {}
 
         void clear(
-        );
+        ) { impl.clear(); }
 
         void operator() (
             resizable_tensor& output,
@@ -574,38 +574,39 @@ namespace dlib { namespace tt
             const tensor& filters,
             int stride_y,
             int stride_x
-        );
+        ) { impl(output,data,filters,stride_y,stride_x); }
         /*!
             requires
                 - stride_y > 0
                 - stride_x > 0
                 - is_same_object(output,data) == false
                 - is_same_object(output,filters) == false
+                - filters.k() == data.k()
             ensures
                 - convolves filters over data.  
-                    - filters contains filters.num_samples() filters. 
-                    - #output.num_samples() == data.num_samples()
-                    - #output.k() == filters.num_samples()
-                    - #output.nr() == 1+(data.nr()-filters.nr()%2)/stride_y
-                    - #output.nc() == 1+(data.nc()-filters.nc()%2)/stride_x
+                - filters contains filters.num_samples() filters. 
+                - #output.num_samples() == data.num_samples()
+                - #output.k() == filters.num_samples()
+                - #output.nr() == 1+(data.nr()-filters.nr()%2)/stride_y
+                - #output.nc() == 1+(data.nc()-filters.nc()%2)/stride_x
         !*/
 
         void get_gradient_for_data (
             const tensor& gradient_input, 
             const tensor& filters,
             tensor& data_gradient
-        );
+        ) { impl.get_gradient_for_data(gradient_input,filters,data_gradient); }
         /*!
             requires
-                - filters has the same dimensions as the filters object give to the last
+                - filters has the same dimensions as the filters object given to the last
                   call to operator().
-                - data_gradient has the same dimensions as the data object give to the last
+                - data_gradient has the same dimensions as the data object given to the last
                   call to operator().
-                - gradient_input has the same dimensions as the output of operator().
+                - gradient_input has the same dimensions as the last output of operator().
                 - is_same_object(data_gradient,filters) == false
                 - is_same_object(data_gradient,gradient_input) == false
             ensures
-                - let OUT be the output of (*this)(OUT,data,filters).
+                - let OUT be the output of (*this)(OUT,data,filters,sx,sy).
                 - let f(data,filters) == dot(OUT, gradient_input)
                 - This function finds the gradient of f() with respect to data and adds
                   this gradient to data_gradient.
@@ -615,18 +616,18 @@ namespace dlib { namespace tt
             const tensor& gradient_input, 
             const tensor& data,
             tensor& filters_gradient
-        );
+        ) { impl.get_gradient_for_filters(gradient_input,data,filters_gradient); }
         /*!
             requires
-                - filters_gradient has the same dimensions as the filters object give to
+                - filters_gradient has the same dimensions as the filters object given to
                   the last call to operator().
-                - data has the same dimensions as the data object give to the last call to
+                - data has the same dimensions as the data object given to the last call to
                   operator().
-                - gradient_input has the same dimensions as the output of operator().
+                - gradient_input has the same dimensions as the last output of operator().
                 - is_same_object(filters_gradient,data) == false
                 - is_same_object(filters_gradient,gradient_input) == false
             ensures
-                - let OUT be the output of (*this)(OUT,data,filters).
+                - let OUT be the output of (*this)(OUT,data,filters,sx,sy).
                 - let f(data,filters) == dot(OUT, gradient_input)
                 - This function finds the gradient of f() with respect to filters and assigns 
                   this gradient to filters_gradient.
@@ -636,7 +637,7 @@ namespace dlib { namespace tt
 #ifdef DLIB_USE_CUDA
         cuda::tensor_conv impl;
 #else
-        // TODO
+        cpu::tensor_conv impl;
 #endif
 
     };

@@ -288,6 +288,45 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
+        class tensor_conv
+        {
+        public:
+            tensor_conv(const tensor_conv&) = delete;
+            tensor_conv& operator=(const tensor_conv&) = delete;
+
+            tensor_conv() {}
+
+            void clear(
+            ) {}
+
+            void operator() (
+                resizable_tensor& output,
+                const tensor& data,
+                const tensor& filters,
+                int stride_y,
+                int stride_x
+            );
+
+            void get_gradient_for_data (
+                const tensor& gradient_input, 
+                const tensor& filters,
+                tensor& data_gradient
+            );
+
+            void get_gradient_for_filters (
+                const tensor& gradient_input, 
+                const tensor& data,
+                tensor& filters_gradient
+            );
+
+        private:
+
+            long last_stride_y;
+            long last_stride_x;
+        };
+
+    // -----------------------------------------------------------------------------------
+
     } 
 }
 

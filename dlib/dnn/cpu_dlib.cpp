@@ -1366,6 +1366,174 @@ namespace dlib
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
 
+        void img2col(
+            matrix<float>& output,
+            const tensor& data,
+            long n,
+            long filter_nr,
+            long filter_nc,
+            long stride_y,
+            long stride_x
+        )
+        {
+            const auto d = data.host() + data.k()*data.nr()*data.nc()*n;
+            const rectangle boundary = get_rect(data);
+
+            const long out_nr = 1+(data.nr()-filter_nr%2)/stride_y;
+            const long out_nc = 1+(data.nc()-filter_nc%2)/stride_x;
+
+            output.set_size(out_nr*out_nc, 
+                            data.k()*filter_nr*filter_nc);
+            DLIB_CASSERT(output.size() != 0,"");
+            float* t = &output(0,0);
+
+            // now fill in the Toeplitz output matrix for the n-th sample in data.  
+            size_t cnt = 0;
+            for (long r = -(1-filter_nr%2); r < data.nr(); r+=stride_y)
+            {
+                for (long c = -(1-filter_nc%2); c < data.nc(); c+=stride_x)
+                {
+                    for (long k = 0; k < data.k(); ++k)
+                    {
+                        for (long y = 0; y < filter_nr; ++y)
+                        {
+                            for (long x = 0; x < filter_nc; ++x)
+                            {
+                                DLIB_CASSERT(cnt < output.size(),"");
+                                long xx = c-x+filter_nc/2;
+                                long yy = r-y+filter_nr/2;
+                                if (boundary.contains(xx,yy))
+                                    *t = d[(k*data.nr() + yy)*data.nc() + xx];
+                                else
+                                    *t = 0;
+                                ++t;
+                                ++cnt;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        void col2img(
+            const matrix<float>& output,
+            tensor& data,
+            long n,
+            long filter_nr,
+            long filter_nc,
+            long stride_y,
+            long stride_x
+        )
+        {
+            const auto d = data.host() + data.k()*data.nr()*data.nc()*n;
+            const rectangle boundary = get_rect(data);
+
+            DLIB_CASSERT(output.size() != 0,"");
+            const float* t = &output(0,0);
+
+            // now fill in the Toeplitz output matrix for the n-th sample in data.  
+            for (long r = -(1-filter_nr%2); r < data.nr(); r+=stride_y)
+            {
+                for (long c = -(1-filter_nc%2); c < data.nc(); c+=stride_x)
+                {
+                    for (long k = 0; k < data.k(); ++k)
+                    {
+                        for (long y = 0; y < filter_nr; ++y)
+                        {
+                            for (long x = 0; x < filter_nc; ++x)
+                            {
+                                long xx = c-x+filter_nc/2;
+                                long yy = r-y+filter_nr/2;
+                                if (boundary.contains(xx,yy))
+                                    d[(k*data.nr() + yy)*data.nc() + xx] += *t;
+                                ++t;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        void tensor_conv::operator() (
+            resizable_tensor& output,
+            const tensor& data,
+            const tensor& filters,
+            int stride_y,
+            int stride_x
+        )
+        {
+            DLIB_CASSERT(is_same_object(output,data) == false,"");
+            DLIB_CASSERT(is_same_object(output,filters) == false,"");
+            DLIB_CASSERT(filters.k() == data.k(),"");
+            DLIB_CASSERT(stride_y > 0 && stride_x > 0,"");
+
+            output.set_size(data.num_samples(),
+                            filters.num_samples(),
+                            1+(data.nr()-filters.nr()%2)/stride_y,
+                            1+(data.nc()-filters.nc()%2)/stride_x);
+
+            matrix<float> temp;
+            for (long n = 0; n < data.num_samples(); ++n)
+            {
+                img2col(temp, data, n, filters.nr(), filters.nc(), stride_y, stride_x);
+                output.set_sample(n, mat(filters)*trans(temp));
+            }
+
+            last_stride_y = stride_y;
+            last_stride_x = stride_x;
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void tensor_conv::
+        get_gradient_for_data (
+            const tensor& gradient_input, 
+            const tensor& filters,
+            tensor& data_gradient
+        )
+        {
+            matrix<float> temp;
+            for (long n = 0; n < gradient_input.num_samples(); ++n)
+            {
+                auto gi = mat(gradient_input.host()+gradient_input.k()*gradient_input.nr()*gradient_input.nc()*n,
+                              gradient_input.k(),
+                              gradient_input.nr()*gradient_input.nc());
+                                    
+
+                temp = trans(gi)*mat(filters);
+                col2img(temp, data_gradient, n, filters.nr(), filters.nc(), last_stride_y, last_stride_x);
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void tensor_conv::
+        get_gradient_for_filters (
+            const tensor& gradient_input, 
+            const tensor& data,
+            tensor& filters_gradient
+        )
+        {
+            matrix<float> temp;
+            for (long n = 0; n < gradient_input.num_samples(); ++n)
+            {
+                auto gi = mat(gradient_input.host()+gradient_input.k()*gradient_input.nr()*gradient_input.nc()*n,
+                              gradient_input.k(),
+                              gradient_input.nr()*gradient_input.nc());
+
+
+                img2col(temp, data, n, filters_gradient.nr(), filters_gradient.nc(), last_stride_y, last_stride_x);
+                if (n == 0)
+                    filters_gradient = gi*temp;
+                else
+                    filters_gradient += gi*temp;
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+
     } 
 }
 
