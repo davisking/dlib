@@ -154,6 +154,11 @@ namespace dlib
                   This kind of pattern is useful if you want to use one type of layer
                   during training but a different type of layer during testing since it
                   allows you to easily convert between related deep neural network types.  
+
+                  Additionally, if you provide a constructor to build a layer from another
+                  layer type you should also write your layer's deserialize() routine such
+                  that it can read that other layer's serialized data in addition to your
+                  own serialized data.  
         !*/
 
         template <typename SUBNET>

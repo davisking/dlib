@@ -11,6 +11,7 @@
 #include "../rand.h"
 #include "../string.h"
 #include "tensor_tools.h"
+#include "../vectorstream.h"
 
 
 namespace dlib
@@ -884,6 +885,17 @@ namespace dlib
         {
             std::string version;
             deserialize(version, in);
+            if (version == "bn_")
+            {
+                // Since we can build an affine_ from a bn_ we check if that's what is in
+                // the stream and if so then just convert it right here.
+                unserialize sin(version, in);
+                bn_ temp;
+                deserialize(temp, sin);
+                item = temp;
+                return;
+            }
+
             if (version != "affine_")
                 throw serialization_error("Unexpected version found while deserializing dlib::affine_.");
             deserialize(item.params, in);
