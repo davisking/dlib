@@ -4,6 +4,7 @@
 #define DLIB_VECTORSTReAMh_
 
 #include "vectorstream/vectorstream.h"
+#include "vectorstream/unserialize.h"
 
 
 #endif // DLIB_VECTORSTReAMh_
