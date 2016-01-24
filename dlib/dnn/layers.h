@@ -692,6 +692,7 @@ namespace dlib
         ) :
             drop_rate(drop_rate_)
         {
+            DLIB_CASSERT(0 <= drop_rate && drop_rate <= 1,"");
         }
 
         // We have to add a copy constructor and assignment operator because the rnd object
@@ -770,6 +771,81 @@ namespace dlib
 
     template <typename SUBNET>
     using dropout = add_layer<dropout_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class multiply_
+    {
+    public:
+        explicit multiply_(
+            float val_ = 0.5
+        ) :
+            val(val_)
+        {
+        }
+
+        multiply_ (
+            const dropout_& item
+        ) : val(1-item.get_drop_rate()) {}
+
+        float get_multiply_value (
+        ) const { return val; }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& /*sub*/)
+        {
+        }
+
+        void forward_inplace(const tensor& input, tensor& output)
+        {
+            tt::affine_transform(output, input, val, 0);
+        } 
+
+        void backward_inplace(
+            const tensor& gradient_input, 
+            tensor& data_grad, 
+            tensor& /*params_grad*/
+        )
+        {
+            tt::affine_transform(data_grad, gradient_input, val, 0);
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const multiply_& item, std::ostream& out)
+        {
+            serialize("multiply_", out);
+            serialize(item.val, out);
+        }
+
+        friend void deserialize(multiply_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version == "dropout_")
+            {
+                // Since we can build a multiply_ from a dropout_ we check if that's what
+                // is in the stream and if so then just convert it right here.
+                unserialize sin(version, in);
+                dropout_ temp;
+                deserialize(temp, sin);
+                item = temp;
+                return;
+            }
+
+            if (version != "multiply_")
+                throw serialization_error("Unexpected version found while deserializing dlib::multiply_.");
+            deserialize(item.val, in);
+        }
+
+    private:
+        float val;
+        resizable_tensor params; // unused
+    };
+
+    template <typename SUBNET>
+    using multiply = add_layer<multiply_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

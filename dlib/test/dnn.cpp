@@ -351,7 +351,7 @@ namespace
         DLIB_TEST(max(abs(truth3-mat(dest))) < 1e-5);
 
         matrix<float> truth4 = pointwise_multiply(mat(A), mat(B));
-        multiply(A, A, B);
+        tt::multiply(A, A, B);
         DLIB_TEST(max(abs(truth4-mat(A))) < 1e-5);
 
         matrix<float> truth5 = mat(B) > 0.1;
@@ -965,6 +965,11 @@ namespace
 
     void test_layers()
     {
+        {
+            print_spinner();
+            multiply_ l;
+            DLIB_TEST_MSG(test_layer(l), test_layer(l));
+        }
         {
             print_spinner();
             max_pool_ l;

@@ -516,6 +516,10 @@ namespace dlib
                 through the stochastic function f(x) which outputs either 0 or x.  The
                 probability of 0 being output is given by the drop_rate argument to this
                 object's constructor.
+
+                Note that, after you finish training a network with dropout, it is a good
+                idea to replace each dropout_ layer with a multiply_ layer because the
+                multiply_ layer is faster and deterministic. 
         !*/
 
     public:
@@ -524,6 +528,8 @@ namespace dlib
             float drop_rate = 0.5
         );
         /*!
+            requires
+                - 0 <= drop_rate <= 1
             ensures
                 - #get_drop_rate() == drop_rate
         !*/
@@ -554,6 +560,64 @@ namespace dlib
 
     template <typename SUBNET>
     using dropout = add_layer<dropout_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class multiply_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
+                In particular, it defines a basic layer that just multiplies its input
+                tensor with a constant value and returns the result.  It therefore has no
+                learnable parameters.
+        !*/
+
+    public:
+        explicit multiply_(
+            float val = 0.5
+        ); 
+        /*!
+            ensures
+                - #get_multiply_value() == val
+        !*/
+
+        multiply_ (
+            const dropout_& item
+        ); 
+        /*!
+            ensures
+                - #get_multiply_value() == 1-item.get_drop_rate()
+                  (i.e. We construct the multiply_ layer so that it is essentially a
+                  deterministic version of the given dropout_ layer)
+        !*/
+
+        float get_multiply_value (
+        ) const;
+        /*!
+            ensures
+                - this layer simply multiplies its input tensor by get_multiply_value() and
+                  produces the result as output.
+        !*/
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        void forward_inplace(const tensor& input, tensor& output);
+        void backward_inplace(const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+        !*/
+    };
+
+    void serialize(const multiply_& item, std::ostream& out);
+    void deserialize(multiply_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
+    template <typename SUBNET>
+    using multiply = add_layer<multiply_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
