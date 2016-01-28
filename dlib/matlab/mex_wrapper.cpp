@@ -714,6 +714,23 @@ namespace mex_binding
     void validate_and_populate_arg(
         long arg_idx,
         const mxArray *prhs,
+        matlab_struct& arg
+    )
+    {
+        if (!mxIsStruct(prhs))
+        {
+            std::ostringstream sout;
+            sout << " argument " << arg_idx+1 << " must be a struct";
+            throw invalid_args_exception(sout.str());
+        }
+
+        arg.set_struct_handle(prhs);
+    }
+
+
+    void validate_and_populate_arg(
+        long arg_idx,
+        const mxArray *prhs,
         std::string& arg
     )
     {
@@ -736,7 +753,6 @@ namespace mex_binding
         }
         arg.resize(size);
     }
-
 
 // ----------------------------------------------------------------------------------------
 
@@ -902,6 +918,14 @@ namespace mex_binding
                 *mat++ = item(r,c);
             }
         }
+    }
+
+    void assign_to_matlab(
+        mxArray*& plhs,
+        matlab_struct& item
+    )
+    {
+        plhs = (mxArray*)item.release_struct_to_matlab();
     }
 
     void assign_to_matlab(
@@ -2159,6 +2183,182 @@ void call_matlab (
     setup_output_args(function_name, plhs[i], A10, i);
 
     free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+}
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+template <typename T>
+matlab_struct::sub::operator T() const
+{
+    if (struct_handle == 0)
+        throw dlib::error("Attempt to access data in an empty struct.");
+
+    mxArray* temp = mxGetFieldByNumber((const mxArray*)struct_handle, 0, field_idx);
+    if (temp == 0)
+        throw dlib::error("Attempt to access data in an empty struct.");
+
+    T item;
+    try
+    {
+        mex_binding::validate_and_populate_arg(0,temp,item);
+    }
+    catch(mex_binding::invalid_args_exception& e)
+    {
+        std::ostringstream sout;
+        sout << "Struct field '" << mxGetFieldNameByNumber((const mxArray*)struct_handle, field_idx) << "' can't be interpreted as the requested type."
+             << endl << e.msg;
+        throw dlib::error(sout.str());
+    }
+    return item;
+}
+
+const matlab_struct::sub matlab_struct::
+operator[] (const std::string& name) const
+{
+    if (struct_handle == 0)
+        throw dlib::error("Struct does not have a field named '" + name + "'.");
+
+    matlab_struct::sub temp;
+    temp.struct_handle = struct_handle;
+    temp.field_idx = mxGetFieldNumber((const mxArray*)struct_handle, name.c_str());
+    if (temp.field_idx == -1 )
+        throw dlib::error("Struct does not have a field named '" + name + "'.");
+    return temp;
+}
+
+matlab_struct::sub matlab_struct::
+operator[] (const std::string& name) 
+{
+    if (struct_handle == 0)
+    {
+        // We make a struct from scratch and mark that we will free it unless it gets
+        // written back to matlab by assign_to_matlab().
+        mwSize dims[1] = {1};
+        const char* name_str = name.c_str();
+        struct_handle = mxCreateStructArray(1, dims, 1, &name_str);
+        should_free = true;
+        if (struct_handle == 0)
+            throw dlib::error("Error creating struct from within mex function.");
+    }
+
+
+    matlab_struct::sub temp;
+    temp.struct_handle = struct_handle;
+    if ((temp.field_idx=mxGetFieldNumber((mxArray*)struct_handle, name.c_str())) == -1)
+    {
+        if ((temp.field_idx=mxAddField((mxArray*)struct_handle, name.c_str())) == -1)
+        {
+            throw dlib::error("Unable to add field '"+name + "' to struct.");
+        }
+    }
+    return temp;
+}
+
+const matlab_struct::sub matlab_struct::sub::
+operator[] (const std::string& name) const
+{
+    if (struct_handle == 0)
+        throw dlib::error("Struct does not have a field named '" + name + "'.");
+
+    matlab_struct::sub temp;
+    temp.struct_handle = mxGetFieldByNumber((const mxArray*)struct_handle, 0, field_idx);
+    if (temp.struct_handle == 0)
+        throw dlib::error("Failure to get struct field while calling mxGetFieldByNumber()");
+
+    if (!mxIsStruct((const mxArray*)temp.struct_handle))
+        throw dlib::error("Struct sub-field element '"+name+"' is not another struct.");
+
+    temp.field_idx = mxGetFieldNumber((const mxArray*)temp.struct_handle, name.c_str());
+    if (temp.field_idx == -1 )
+        throw dlib::error("Struct does not have a field named '" + name + "'.");
+    return temp;
+}
+
+matlab_struct::sub matlab_struct::sub::
+operator[] (const std::string& name) 
+{
+    if (struct_handle == 0)
+        throw dlib::error("Struct does not have a field named '" + name + "'.");
+
+    matlab_struct::sub temp;
+    temp.struct_handle = mxGetFieldByNumber((const mxArray*)struct_handle, 0, field_idx);
+    // We are replacing this field with a struct if it exists and isn't already a struct
+    if (temp.struct_handle != 0 && !mxIsStruct((const mxArray*)temp.struct_handle))
+    {
+        mxDestroyArray((mxArray*)temp.struct_handle);
+        temp.struct_handle = 0;
+    }
+    if (temp.struct_handle == 0)
+    {
+        mwSize dims[1] = {1};
+        temp.struct_handle = mxCreateStructArray(1, dims, 0, 0);
+        if (temp.struct_handle == 0)
+            throw dlib::error("Failure to create new sub-struct field");
+        mxSetFieldByNumber((mxArray*)struct_handle, 0, field_idx, (mxArray*)temp.struct_handle);
+    }
+
+
+    if ((temp.field_idx=mxGetFieldNumber((mxArray*)temp.struct_handle, name.c_str())) == -1)
+    {
+        if ((temp.field_idx=mxAddField((mxArray*)temp.struct_handle, name.c_str())) == -1)
+        {
+            throw dlib::error("Unable to add field '"+name + "' to struct.");
+        }
+    }
+    return temp;
+}
+
+bool matlab_struct::has_field (
+    const std::string& name
+) const
+{
+    if (struct_handle == 0)
+        return false;
+    return mxGetFieldNumber((const mxArray*)struct_handle, name.c_str()) != -1;
+}
+
+bool matlab_struct::sub::has_field (
+    const std::string& name
+) const
+{
+    if (struct_handle == 0)
+        return false;
+    mxArray* temp = mxGetFieldByNumber((const mxArray*)struct_handle, 0, field_idx);
+    if (temp == 0 || !mxIsStruct(temp))
+        return false;
+    return mxGetFieldNumber(temp, name.c_str()) != -1;
+}
+
+template <typename T>
+matlab_struct::sub& matlab_struct::sub::operator= (
+    const T& new_val 
+)
+{
+    // Delete anything in the field before we overwrite it
+    mxArray* item = mxGetFieldByNumber((mxArray*)struct_handle, 0, field_idx);
+    if (item != 0)
+    {
+        mxDestroyArray((mxArray*)item);
+        item = 0;
+    }
+
+    // Now set the field
+    mex_binding::assign_to_matlab(item, new_val);
+    mxSetFieldByNumber((mxArray*)struct_handle, 0, field_idx, item);
+
+    return *this;
+}
+
+matlab_struct::
+~matlab_struct (
+)
+{
+    if (struct_handle && should_free)
+    {
+        mxDestroyArray((mxArray*)struct_handle);
+        struct_handle = 0;
+    }
 }
 
 // ----------------------------------------------------------------------------------------

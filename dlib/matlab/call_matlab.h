@@ -7,6 +7,60 @@
 #include <string>
 
 // ----------------------------------------------------------------------------------------
+
+
+class matlab_struct 
+{
+    /*!
+        WHAT THIS OBJECT REPRESENTS
+            This object lets you interface with MATLAB structs from C++.  For example,
+            given a MATLAB struct named mystruct, you could access it's fields like this:
+                MATLAB way: mystruct.field
+                C++ way:    mystruct["field"]
+                MATLAB way: mystruct.field.subfield
+                C++ way:    mystruct["field"]["subfield"]
+
+            To get the values as C++ types you do something like this:
+                int val = mystruct["field"];
+
+            See also example_mex_struct.cpp for an example that uses this part of the API.
+    !*/
+
+    class sub;
+public:
+    matlab_struct() : struct_handle(0),should_free(false) {}
+    ~matlab_struct();
+
+    const sub operator[] (const std::string& name) const;
+    sub operator[] (const std::string& name);
+    bool has_field(const std::string& name) const;
+
+    const void* release_struct_to_matlab() { const void* temp=struct_handle; struct_handle = 0; return temp; }
+    void set_struct_handle(const void* sh) { struct_handle = sh; }
+private:
+
+    class sub 
+    {
+    public:
+        sub() : struct_handle(0), field_idx(-1) {}
+
+        template <typename T> operator T() const;
+        template <typename T> sub& operator= (const T& new_val);
+        const sub operator[] (const std::string& name) const;
+        sub operator[] (const std::string& name);
+        bool has_field(const std::string& name) const;
+    private:
+        friend class matlab_struct;
+        const void* struct_handle;
+        int field_idx;
+        sub& operator=(const sub&);
+    };
+    const void* struct_handle;
+    bool should_free;
+    matlab_struct& operator=(const matlab_struct&); 
+};
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
 template <typename T> 
