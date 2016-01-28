@@ -12,4 +12,5 @@ include(../cmake)
 #    add_mex_function(some_other_mex_function pthread dlib fftw) 
 add_mex_function(example_mex_function dlib)
 add_mex_function(example_mex_callback dlib)
+add_mex_function(example_mex_struct dlib)
 
