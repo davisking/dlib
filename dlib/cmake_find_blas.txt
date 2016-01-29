@@ -49,40 +49,43 @@ if (UNIX)
    include(CheckLibraryExists)
 
 
-   # Search for the needed libraries from the MKL.  We will try to link against the mkl_rt
-   # file first since this way avoids linking bugs in some cases.
-   find_library(mkl_rt mkl_rt ${mkl_search_path})
-   mark_as_advanced(  mkl_rt )
-   # if we found the MKL 
-   if ( mkl_rt)
-      set(blas_libraries  ${mkl_rt} )
-      set(lapack_libraries  ${mkl_rt} )
-      set(blas_found 1)
-      set(lapack_found 1)
-      set(found_intel_mkl 1)
-      message(STATUS "Found Intel MKL BLAS/LAPACK library")
-   endif()
+   # Don't try to use the Intel MKL when we are building a MATLAB mex file
+   # since it will usually conflict with MATLAB's copy of the MKL and cause
+   # problems.
+   if (NOT BUILDING_MATLAB_MEX_FILE)
+        # Search for the needed libraries from the MKL.  We will try to link against the mkl_rt
+        # file first since this way avoids linking bugs in some cases.
+        find_library(mkl_rt mkl_rt ${mkl_search_path})
+        mark_as_advanced(  mkl_rt )
+        # if we found the MKL 
+        if ( mkl_rt)
+            set(blas_libraries  ${mkl_rt} )
+            set(lapack_libraries  ${mkl_rt} )
+            set(blas_found 1)
+            set(lapack_found 1)
+            set(found_intel_mkl 1)
+            message(STATUS "Found Intel MKL BLAS/LAPACK library")
+        endif()
 
+        if (NOT found_intel_mkl)
+            # Search for the needed libraries from the MKL.  This time try looking for a different
+            # set of MKL files and try to link against those.
+            find_library(mkl_core mkl_core ${mkl_search_path})
+            find_library(mkl_thread mkl_intel_thread ${mkl_search_path})
+            find_library(mkl_iomp iomp5 ${mkl_search_path})
+            find_library(mkl_pthread pthread ${mkl_search_path})
 
-
-   if (NOT found_intel_mkl)
-      # Search for the needed libraries from the MKL.  This time try looking for a different
-      # set of MKL files and try to link against those.
-      find_library(mkl_core mkl_core ${mkl_search_path})
-      find_library(mkl_thread mkl_intel_thread ${mkl_search_path})
-      find_library(mkl_iomp iomp5 ${mkl_search_path})
-      find_library(mkl_pthread pthread ${mkl_search_path})
-
-      mark_as_advanced( mkl_intel mkl_core mkl_thread mkl_iomp mkl_pthread)
-      # If we found the MKL 
-      if (mkl_intel AND mkl_core AND mkl_thread AND mkl_iomp AND mkl_pthread)
-         set(blas_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
-         set(lapack_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
-         set(blas_found 1)
-         set(lapack_found 1)
-         set(found_intel_mkl 1)
-         message(STATUS "Found Intel MKL BLAS/LAPACK library")
-      endif()
+            mark_as_advanced( mkl_intel mkl_core mkl_thread mkl_iomp mkl_pthread)
+            # If we found the MKL 
+            if (mkl_intel AND mkl_core AND mkl_thread AND mkl_iomp AND mkl_pthread)
+                set(blas_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
+                set(lapack_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
+                set(blas_found 1)
+                set(lapack_found 1)
+                set(found_intel_mkl 1)
+                message(STATUS "Found Intel MKL BLAS/LAPACK library")
+            endif()
+        endif()
    endif()
 
 
@@ -98,6 +101,7 @@ if (UNIX)
         /usr/lib/atlas
         /usr/lib/openblas-base
         /opt/OpenBLAS/lib
+        $ENV{OPENBLAS_HOME}/lib
         )
 
    INCLUDE (CheckFunctionExists)
@@ -220,6 +224,8 @@ elseif(WIN32 AND NOT MINGW)
     check_type_size( "void*" SIZE_OF_VOID_PTR)
     if (SIZE_OF_VOID_PTR EQUAL 8)
         set( mkl_search_path
+            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/lib/intel64" 
+            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/lib/intel64" 
             "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/intel64"
             "C:/Program Files (x86)/Intel/Composer XE/compiler/lib/intel64"
             "C:/Program Files/Intel/Composer XE/mkl/lib/intel64"
@@ -228,6 +234,8 @@ elseif(WIN32 AND NOT MINGW)
         find_library(mkl_intel  mkl_intel_lp64 ${mkl_search_path})
     else()
         set( mkl_search_path
+            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/lib/ia32" 
+            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/lib/ia32"
             "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/ia32"
             "C:/Program Files (x86)/Intel/Composer XE/compiler/lib/ia32"
             "C:/Program Files/Intel/Composer XE/mkl/lib/ia32"
