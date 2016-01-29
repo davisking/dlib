@@ -5,6 +5,7 @@
 
 cmake_minimum_required(VERSION 2.8.4)
 
+set(BUILDING_MATLAB_MEX_FILE true)
 
 # Find MATLAB's include directory and needed libraries 
 find_program(MATLAB_EXECUTABLE matlab PATHS
