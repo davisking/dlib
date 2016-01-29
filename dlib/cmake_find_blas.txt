@@ -218,6 +218,8 @@ elseif(WIN32 AND NOT MINGW)
     check_type_size( "void*" SIZE_OF_VOID_PTR)
     if (SIZE_OF_VOID_PTR EQUAL 8)
         set( mkl_search_path
+            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/lib/intel64" 
+            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/lib/intel64" 
             "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/intel64"
             "C:/Program Files (x86)/Intel/Composer XE/compiler/lib/intel64"
             "C:/Program Files/Intel/Composer XE/mkl/lib/intel64"
@@ -226,6 +228,8 @@ elseif(WIN32 AND NOT MINGW)
         find_library(mkl_intel  mkl_intel_lp64 ${mkl_search_path})
     else()
         set( mkl_search_path
+            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/lib/ia32" 
+            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/lib/ia32"
             "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/ia32"
             "C:/Program Files (x86)/Intel/Composer XE/compiler/lib/ia32"
             "C:/Program Files/Intel/Composer XE/mkl/lib/ia32"
