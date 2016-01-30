@@ -240,7 +240,7 @@ namespace dlib
                 return;
             CHECK_CUDNN(cudnnSetTensor(context(),
                                  descriptor(t),
-                                 t.device(),
+                                 t.device_write_only(),
                                  &value));
         }
 

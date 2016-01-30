@@ -46,8 +46,10 @@ namespace dlib
 
         virtual const float* host() const = 0;
         virtual float*       host() = 0; 
+        virtual float*       host_write_only() = 0;
         virtual const float* device() const = 0;
         virtual float*       device() = 0;
+        virtual float*       device_write_only() = 0;
 
         tensor& operator= (float val)
         {
@@ -62,8 +64,9 @@ namespace dlib
                 return *this;
             }
 #endif
-            for (auto& d : *this)
-                d = val;
+            auto d = host_write_only();
+            for (size_t i = 0; i < size(); ++i)
+                d[i] = val;
 
             return *this;
         }
@@ -95,7 +98,7 @@ namespace dlib
             static_assert((is_same_type<float, typename EXP::type>::value == true),
                 "To assign a matrix to a tensor the matrix must contain float values");
 
-            set_ptrm(host(), m_n, m_nr*m_nc*m_k) = item;
+            set_ptrm(host_write_only(), m_n, m_nr*m_nc*m_k) = item;
             return *this;
         }
 
@@ -279,8 +282,10 @@ namespace dlib
 
         virtual const float* host() const { return data_instance.host(); }
         virtual float*       host()       { return data_instance.host(); }
+        virtual float*       host_write_only() { return data_instance.host_write_only(); }
         virtual const float* device() const { return data_instance.device(); }
         virtual float*       device()       { return data_instance.device(); }
+        virtual float*       device_write_only() { return data_instance.device_write_only(); }
 
         void clear(
         )
@@ -441,8 +446,10 @@ namespace dlib
 
         virtual const float* host() const { return data_instance->host()+data_offset; }
         virtual float*       host()       { return data_instance->host()+data_offset; }
+        virtual float*       host_write_only()    { return data_instance->host()+data_offset; }
         virtual const float* device() const { return data_instance->device()+data_offset; }
         virtual float*       device()       { return data_instance->device()+data_offset; }
+        virtual float*       device_write_only()  { return data_instance->device()+data_offset; }
 
 
 #ifdef DLIB_USE_CUDA

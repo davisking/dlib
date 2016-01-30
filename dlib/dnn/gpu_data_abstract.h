@@ -125,6 +125,20 @@ namespace dlib
                   calling host().
         !*/
 
+        float* host_write_only(
+        );
+        /*!
+            ensures
+                - This function returns the same pointer as host(), except that it never
+                  performs a device to host memory copy.  Instead, it immediately marks the
+                  device side data as out of date, effectively discarding it.  Therefore,
+                  the values in the data pointed to by host_write_only() are undefined and
+                  you should only call host_write_only() if you are going to assign to
+                  every memory location in the returned memory block.  
+                - #host_ready() == true
+                - #device_ready() == false 
+        !*/
+
         const float* device(
         ) const;
         /*!
@@ -153,6 +167,23 @@ namespace dlib
                 - #host_ready() == false
                 - #device_ready() == true
         !*/
+
+        float* device_write_only(
+        );
+        /*!
+            requires
+                - DLIB_USE_CUDA is #defined
+            ensures
+                - This function returns the same pointer as device(), except that it never
+                  performs a host to device memory copy.  Instead, it immediately marks the
+                  host side data as out of date, effectively discarding it.  Therefore, the
+                  values in the data pointed to by device_write_only() are undefined and
+                  you should only call device_write_only() if you are going to assign to
+                  every memory location in the returned memory block.  
+                - #host_ready() == false 
+                - #device_ready() == true 
+        !*/
+
 
         size_t size(
         ) const; 
