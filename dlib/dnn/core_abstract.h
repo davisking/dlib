@@ -1135,7 +1135,8 @@ namespace dlib
     );
     /*!
         requires
-            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or add_tag_layer.
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
         ensures
             - This function chains together i calls to n.subnet() and returns the
               result.  So for example:
@@ -1160,7 +1161,8 @@ namespace dlib
     );
     /*!
         requires
-            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or add_tag_layer.
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
         ensures
             - returns the first layer in n that is of type Match.  E.g. if net_type is
               fc<relu<fc<input<sample_type>>>> then calling layer<relu>(n) would return
@@ -1177,7 +1179,8 @@ namespace dlib
     );
     /*!
         requires
-            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or add_tag_layer.
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
         ensures
             - returns layer<i>(layer<Match>(n))
     !*/
