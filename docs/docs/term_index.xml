@@ -1321,6 +1321,8 @@
 
          <term file="imaging.html" name="integral_image"          include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="integral_image_generic"  include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="disturb_colors"          include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="random_color_transform"  include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="hough_transform"         include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="skeleton"                include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="hessian_pyramid"         include="dlib/image_keypoint.h"/>
