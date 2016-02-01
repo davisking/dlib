@@ -68,7 +68,7 @@ namespace dlib
             const double scale = 1.0/output_tensor.num_samples();
             double loss = 0;
             const float* out_data = output_tensor.host();
-            float* g = grad.host();
+            float* g = grad.host_write_only();
             for (long i = 0; i < output_tensor.num_samples(); ++i)
             {
                 const float y = *truth++;
@@ -78,6 +78,10 @@ namespace dlib
                 {
                     loss += scale*temp;
                     g[i] = -scale*y;
+                }
+                else
+                {
+                    g[i] = 0;
                 }
             }
             return loss;

@@ -95,6 +95,13 @@ namespace dlib
             return data_host.get(); 
         }
 
+        float* host_write_only() 
+        {
+            host_current = true;
+            device_current = false;
+            return data_host.get(); 
+        }
+
         const float* device() const 
         { 
 #ifndef DLIB_USE_CUDA
@@ -112,6 +119,18 @@ namespace dlib
 #endif
             copy_to_device();
             host_current = false;
+            device_in_use = true;
+            return data_device.get(); 
+        }
+
+        float* device_write_only()
+        {
+#ifndef DLIB_USE_CUDA
+            DLIB_CASSERT(false, "CUDA NOT ENABLED");
+#endif
+            wait_for_transfer_to_finish();
+            host_current = false;
+            device_current = true;
             device_in_use = true;
             return data_device.get(); 
         }

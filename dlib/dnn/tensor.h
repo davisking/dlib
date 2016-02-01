@@ -8,6 +8,7 @@
 #include "../matrix.h"
 #include "cudnn_dlibapi.h"
 #include "gpu_data.h"
+#include "../byte_orderer.h"
 #include <memory>
 
 namespace dlib
@@ -46,8 +47,10 @@ namespace dlib
 
         virtual const float* host() const = 0;
         virtual float*       host() = 0; 
+        virtual float*       host_write_only() = 0;
         virtual const float* device() const = 0;
         virtual float*       device() = 0;
+        virtual float*       device_write_only() = 0;
 
         tensor& operator= (float val)
         {
@@ -62,8 +65,9 @@ namespace dlib
                 return *this;
             }
 #endif
-            for (auto& d : *this)
-                d = val;
+            auto d = host_write_only();
+            for (size_t i = 0; i < size(); ++i)
+                d[i] = val;
 
             return *this;
         }
@@ -95,7 +99,7 @@ namespace dlib
             static_assert((is_same_type<float, typename EXP::type>::value == true),
                 "To assign a matrix to a tensor the matrix must contain float values");
 
-            set_ptrm(host(), m_n, m_nr*m_nc*m_k) = item;
+            set_ptrm(host_write_only(), m_n, m_nr*m_nc*m_k) = item;
             return *this;
         }
 
@@ -279,8 +283,10 @@ namespace dlib
 
         virtual const float* host() const { return data_instance.host(); }
         virtual float*       host()       { return data_instance.host(); }
+        virtual float*       host_write_only() { return data_instance.host_write_only(); }
         virtual const float* device() const { return data_instance.device(); }
         virtual float*       device()       { return data_instance.device(); }
+        virtual float*       device_write_only() { return data_instance.device_write_only(); }
 
         void clear(
         )
@@ -373,21 +379,33 @@ namespace dlib
 
     inline void serialize(const tensor& item, std::ostream& out)
     {
-        int version = 1;
+        int version = 2;
         serialize(version, out);
         serialize(item.num_samples(), out);
         serialize(item.k(), out);
         serialize(item.nr(), out);
         serialize(item.nc(), out);
-        for (auto& d : item)
-            serialize(d, out);
+        byte_orderer bo;
+        auto sbuf = out.rdbuf();
+        for (auto d : item)
+        {
+            // Write out our data as 4byte little endian IEEE floats rather than using
+            // dlib's default float serialization.  We do this because it will result in
+            // more compact outputs.  It's slightly less portable but it seems doubtful
+            // that any CUDA enabled platform isn't going to use IEEE floats.  But if one
+            // does we can just update the serialization code here to handle it if such a
+            // platform is encountered.
+            bo.host_to_little(d);
+            static_assert(sizeof(d)==4, "This serialization code assumes we are writing 4 byte floats");
+            sbuf->sputn((char*)&d, sizeof(d));
+        }
     }
 
     inline void deserialize(resizable_tensor& item, std::istream& in)
     {
         int version;
         deserialize(version, in);
-        if (version != 1)
+        if (version != 2)
             throw serialization_error("Unexpected version found while deserializing dlib::resizable_tensor.");
 
         long num_samples=0, k=0, nr=0, nc=0;
@@ -396,8 +414,18 @@ namespace dlib
         deserialize(nr, in);
         deserialize(nc, in);
         item.set_size(num_samples, k, nr, nc);
+        byte_orderer bo;
+        auto sbuf = in.rdbuf();
         for (auto& d : item)
-            deserialize(d, in);
+        {
+            static_assert(sizeof(d)==4, "This serialization code assumes we are writing 4 byte floats");
+            if (sbuf->sgetn((char*)&d,sizeof(d)) != sizeof(d))
+            {
+                in.setstate(std::ios::badbit);
+                throw serialization_error("Error reading data while deserializing dlib::resizable_tensor.");
+            }
+            bo.little_to_host(d);
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -441,8 +469,10 @@ namespace dlib
 
         virtual const float* host() const { return data_instance->host()+data_offset; }
         virtual float*       host()       { return data_instance->host()+data_offset; }
+        virtual float*       host_write_only()    { return data_instance->host()+data_offset; }
         virtual const float* device() const { return data_instance->device()+data_offset; }
         virtual float*       device()       { return data_instance->device()+data_offset; }
+        virtual float*       device_write_only()  { return data_instance->device()+data_offset; }
 
 
 #ifdef DLIB_USE_CUDA
