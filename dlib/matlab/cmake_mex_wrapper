@@ -67,13 +67,6 @@ INCLUDE(InstallRequiredSystemLibraries)
 
 MACRO(add_mex_function name )
    ADD_LIBRARY(${name} MODULE ${name}.cpp )
-   if (UNIX)
-      if (DEFINED ENV{MATLAB_HOME})
-         set_target_properties(${name} PROPERTIES LINK_FLAGS "-Wl,--version-script,$ENV{MATLAB_HOME}/extern/lib/glnxa64/mexFunction.map")
-      else()
-         set_target_properties(${name} PROPERTIES LINK_FLAGS "-Wl,--version-script,${MATLAB_HOME}/extern/lib/glnxa64/mexFunction.map")
-      endif()
-   endif()
 
     # Change the output file extension to a mex extension.
    if (WIN32)

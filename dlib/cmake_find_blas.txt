@@ -49,44 +49,46 @@ if (UNIX)
    include(CheckLibraryExists)
 
 
-   # Don't try to use the Intel MKL when we are building a MATLAB mex file
-   # since it will usually conflict with MATLAB's copy of the MKL and cause
-   # problems.
-   if (NOT BUILDING_MATLAB_MEX_FILE)
-        # Search for the needed libraries from the MKL.  We will try to link against the mkl_rt
-        # file first since this way avoids linking bugs in some cases.
-        find_library(mkl_rt mkl_rt ${mkl_search_path})
-        mark_as_advanced(  mkl_rt )
-        # if we found the MKL 
-        if ( mkl_rt)
-            set(blas_libraries  ${mkl_rt} )
-            set(lapack_libraries  ${mkl_rt} )
+    # Search for the needed libraries from the MKL.  We will try to link against the mkl_rt
+    # file first since this way avoids linking bugs in some cases.
+    find_library(mkl_rt mkl_rt ${mkl_search_path})
+    mark_as_advanced(  mkl_rt )
+    # if we found the MKL 
+    if ( mkl_rt)
+        set(blas_libraries  ${mkl_rt} )
+        set(lapack_libraries  ${mkl_rt} )
+        set(blas_found 1)
+        set(lapack_found 1)
+        set(found_intel_mkl 1)
+        message(STATUS "Found Intel MKL BLAS/LAPACK library")
+        if (BUILDING_MATLAB_MEX_FILE)
+            message(STATUS "\n!!!! Don't forget to set the BLAS_VERSION and LAPACK_VERSION environment variables to !!!!\n!!!! ${blas_libraries} so MATLAB doesn't explode when you run this mex file !!!!\n")
+        endif()
+    endif()
+
+    if (BUILDING_MATLAB_MEX_FILE)
+        return()
+    endif()
+
+    if (NOT found_intel_mkl)
+        # Search for the needed libraries from the MKL.  This time try looking for a different
+        # set of MKL files and try to link against those.
+        find_library(mkl_core mkl_core ${mkl_search_path})
+        find_library(mkl_thread mkl_intel_thread ${mkl_search_path})
+        find_library(mkl_iomp iomp5 ${mkl_search_path})
+        find_library(mkl_pthread pthread ${mkl_search_path})
+
+        mark_as_advanced( mkl_intel mkl_core mkl_thread mkl_iomp mkl_pthread)
+        # If we found the MKL 
+        if (mkl_intel AND mkl_core AND mkl_thread AND mkl_iomp AND mkl_pthread)
+            set(blas_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
+            set(lapack_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
             set(blas_found 1)
             set(lapack_found 1)
             set(found_intel_mkl 1)
             message(STATUS "Found Intel MKL BLAS/LAPACK library")
         endif()
-
-        if (NOT found_intel_mkl)
-            # Search for the needed libraries from the MKL.  This time try looking for a different
-            # set of MKL files and try to link against those.
-            find_library(mkl_core mkl_core ${mkl_search_path})
-            find_library(mkl_thread mkl_intel_thread ${mkl_search_path})
-            find_library(mkl_iomp iomp5 ${mkl_search_path})
-            find_library(mkl_pthread pthread ${mkl_search_path})
-
-            mark_as_advanced( mkl_intel mkl_core mkl_thread mkl_iomp mkl_pthread)
-            # If we found the MKL 
-            if (mkl_intel AND mkl_core AND mkl_thread AND mkl_iomp AND mkl_pthread)
-                set(blas_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
-                set(lapack_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
-                set(blas_found 1)
-                set(lapack_found 1)
-                set(found_intel_mkl 1)
-                message(STATUS "Found Intel MKL BLAS/LAPACK library")
-            endif()
-        endif()
-   endif()
+    endif()
 
 
    # try to find some other LAPACK libraries if we didn't find the MKL
@@ -107,11 +109,7 @@ if (UNIX)
    INCLUDE (CheckFunctionExists)
 
    if (NOT blas_found)
-      if (BUILDING_MATLAB_MEX_FILE)
-         find_library(cblas_lib libopenblas.a PATHS ${extra_paths})
-      else()
-         find_library(cblas_lib openblas PATHS ${extra_paths})
-      endif()
+      find_library(cblas_lib openblas PATHS ${extra_paths})
       if (cblas_lib)
          set(blas_libraries ${cblas_lib})
          set(blas_found 1)
