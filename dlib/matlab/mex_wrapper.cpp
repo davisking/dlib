@@ -897,7 +897,7 @@ namespace mex_binding
         }
         else if (is_same_type<dlib::rgb_pixel, type>::value)
         {
-            mwSize dims[3] = {(unsigned long)item.nr(), (unsigned long)item.nc(), 3};
+            mwSize dims[3] = {(mwSize)item.nr(), (mwSize)item.nc(), 3};
             plhs = mxCreateNumericArray(3, dims, mxUINT8_CLASS, mxREAL);
 
             assign_image_to_matlab((dlib::uint8*)mxGetData(plhs), item);
