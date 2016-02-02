@@ -253,6 +253,8 @@ namespace mex_binding
 
 // -------------------------------------------------------
 
+    struct user_hit_ctrl_c {};
+
     struct invalid_args_exception
     {
         invalid_args_exception(const std::string& msg_): msg(msg_) {}
@@ -1573,6 +1575,10 @@ namespace mex_binding
             mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
                               ("Input" + e.msg).c_str());
         }
+        catch (user_hit_ctrl_c& )
+        {
+            // do nothing, just return to matlab
+        }
         catch (dlib::error& e)
         {
             mexErrMsgIdAndTxt("mex_function:error",
@@ -2369,6 +2375,14 @@ void call_matlab (
 )
 {
     call_matlab("feval", funct);
+}
+
+extern "C" bool utIsInterruptPending();
+void check_for_ctrl_c(
+)
+{
+    if (utIsInterruptPending())
+        throw mex_binding::user_hit_ctrl_c();
 }
 
 // ----------------------------------------------------------------------------------------
