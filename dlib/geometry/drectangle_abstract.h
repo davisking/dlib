@@ -319,6 +319,25 @@ namespace dlib
                 - returns #*this
         !*/
 
+        bool operator== (
+            const drectangle& rect
+        ) const;
+        /*!
+            ensures
+                - if (top() == rect.top() && left() == rect.left() &&
+                      right() == rect.right() && bottom() == rect.bottom()) then
+                    - returns true
+                - else
+                    - returns false
+        !*/
+
+        bool operator!= (
+            const drectangle& rect
+        ) const;
+        /*!
+            ensures
+                - returns !(*this == rect)
+        !*/
     };
 
 // ----------------------------------------------------------------------------------------

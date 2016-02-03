@@ -45,6 +45,75 @@ namespace dlib
         std::string random_seed;
     };
 
+    inline void serialize (
+        const shape_predictor_training_options& item,
+        std::ostream& out
+    )
+    {
+        try
+        {
+            serialize(item.be_verbose,out);
+            serialize(item.cascade_depth,out);
+            serialize(item.tree_depth,out);
+            serialize(item.num_trees_per_cascade_level,out);
+            serialize(item.nu,out);
+            serialize(item.oversampling_amount,out);
+            serialize(item.feature_pool_size,out);
+            serialize(item.lambda_param,out);
+            serialize(item.num_test_splits,out);
+            serialize(item.feature_pool_region_padding,out);
+            serialize(item.random_seed,out);
+        }
+        catch (serialization_error& e)
+        {
+            throw serialization_error(e.info + "\n   while serializing an object of type shape_predictor_training_options");
+        }
+    }
+
+    inline void deserialize (
+        shape_predictor_training_options& item,
+        std::istream& in
+    )
+    {
+        try
+        {
+            deserialize(item.be_verbose,in);
+            deserialize(item.cascade_depth,in);
+            deserialize(item.tree_depth,in);
+            deserialize(item.num_trees_per_cascade_level,in);
+            deserialize(item.nu,in);
+            deserialize(item.oversampling_amount,in);
+            deserialize(item.feature_pool_size,in);
+            deserialize(item.lambda_param,in);
+            deserialize(item.num_test_splits,in);
+            deserialize(item.feature_pool_region_padding,in);
+            deserialize(item.random_seed,in);
+        }
+        catch (serialization_error& e)
+        {
+            throw serialization_error(e.info + "\n   while deserializing an object of type shape_predictor_training_options");
+        }
+    }
+
+    string print_shape_predictor_training_options(const shape_predictor_training_options& o)
+    {
+        std::ostringstream sout;
+        sout << "shape_predictor_training_options("
+            << "be_verbose=" << o.be_verbose << ","
+            << "cascade_depth=" << o.cascade_depth << ","
+            << "tree_depth=" << o.tree_depth << ","
+            << "num_trees_per_cascade_level=" << o.num_trees_per_cascade_level << ","
+            << "nu=" << o.nu << ","
+            << "oversampling_amount=" << o.oversampling_amount << ","
+            << "feature_pool_size=" << o.feature_pool_size << ","
+            << "lambda_param=" << o.lambda_param << ","
+            << "num_test_splits=" << o.num_test_splits << ","
+            << "feature_pool_region_padding=" << o.feature_pool_region_padding << ","
+            << "random_seed=" << o.random_seed
+        << ")";
+        return sout.str();
+    }
+
 // ----------------------------------------------------------------------------------------
 
     namespace impl

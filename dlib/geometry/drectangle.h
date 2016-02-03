@@ -195,6 +195,19 @@ namespace dlib
             return *this;
         }
 
+        bool operator== (
+            const drectangle& rect
+        ) const
+        {
+            return (l == rect.l) && (t == rect.t) && (r == rect.r) && (b == rect.b);
+        }
+
+        bool operator!= (
+            const drectangle& rect
+        ) const
+        {
+            return !(*this == rect);
+        }
 
     private:
         double l;

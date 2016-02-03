@@ -90,6 +90,8 @@ void bind_rectangles()
         .def("intersect", &::intersect<type>, (arg("rectangle")))
         .def("__str__", &::print_rectangle_str<type>)
         .def("__repr__", &::print_rectangle_repr<type>)
+        .def(self == self)
+        .def(self != self)
         .def_pickle(serialize_pickle<type>());
     }
     {
@@ -112,6 +114,8 @@ void bind_rectangles()
         .def("intersect", &::intersect<type>, (arg("rectangle")))
         .def("__str__", &::print_rectangle_str<type>)
         .def("__repr__", &::print_rectangle_repr<type>)
+        .def(self == self)
+        .def(self != self)
         .def_pickle(serialize_pickle<type>());
     }
     {
