@@ -3,11 +3,7 @@
 # information about it at http://www.cmake.org
 #
 
-# setting this makes CMake allow normal looking if else statements
-SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
-
-cmake_minimum_required(VERSION 2.4)
-set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
+cmake_minimum_required(VERSION 2.8.4)
 
 # default to a Release build (except if CMAKE_BUILD_TYPE is set)
 include(release_build_by_default)
@@ -18,8 +14,8 @@ set(CPACK_PACKAGE_VERSION_MAJOR "18")
 set(CPACK_PACKAGE_VERSION_MINOR "18")
 set(CPACK_PACKAGE_VERSION_PATCH "99")
 set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
+set(DLIB_VERSION ${VERSION} PARENT_SCOPE)
 
-set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
 # Suppress cmake warnings about changes in new versions.
 if(COMMAND cmake_policy) 
    cmake_policy(SET CMP0003 NEW) 
