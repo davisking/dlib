@@ -29,6 +29,8 @@ BOOST_PYTHON_MODULE(dlib)
     // since it is full of huge amounts of template clutter.
     boost::python::docstring_options options(true,true,false);
 
+    boost::python::scope().attr("__version__") = "18.18";
+
     bind_matrix();
     bind_vector();
     bind_svm_c_trainer();
