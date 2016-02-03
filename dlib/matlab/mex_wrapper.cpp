@@ -253,6 +253,8 @@ namespace mex_binding
 
 // -------------------------------------------------------
 
+    struct user_hit_ctrl_c {};
+
     struct invalid_args_exception
     {
         invalid_args_exception(const std::string& msg_): msg(msg_) {}
@@ -897,7 +899,7 @@ namespace mex_binding
         }
         else if (is_same_type<dlib::rgb_pixel, type>::value)
         {
-            mwSize dims[3] = {(unsigned long)item.nr(), (unsigned long)item.nc(), 3};
+            mwSize dims[3] = {(mwSize)item.nr(), (mwSize)item.nc(), 3};
             plhs = mxCreateNumericArray(3, dims, mxUINT8_CLASS, mxREAL);
 
             assign_image_to_matlab((dlib::uint8*)mxGetData(plhs), item);
@@ -1572,6 +1574,10 @@ namespace mex_binding
         {
             mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
                               ("Input" + e.msg).c_str());
+        }
+        catch (user_hit_ctrl_c& )
+        {
+            // do nothing, just return to matlab
         }
         catch (dlib::error& e)
         {
@@ -2369,6 +2375,14 @@ void call_matlab (
 )
 {
     call_matlab("feval", funct);
+}
+
+extern "C" bool utIsInterruptPending();
+void check_for_ctrl_c(
+)
+{
+    if (utIsInterruptPending())
+        throw mex_binding::user_hit_ctrl_c();
 }
 
 // ----------------------------------------------------------------------------------------

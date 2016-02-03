@@ -6,6 +6,7 @@
 cmake_minimum_required(VERSION 2.8.4)
 
 set(BUILDING_MATLAB_MEX_FILE true)
+set(CMAKE_POSITION_INDEPENDENT_CODE True)
 
 # Find MATLAB's include directory and needed libraries 
 find_program(MATLAB_EXECUTABLE matlab PATHS
@@ -67,6 +68,7 @@ INCLUDE(InstallRequiredSystemLibraries)
 
 MACRO(add_mex_function name )
    ADD_LIBRARY(${name} MODULE ${name}.cpp )
+
     # Change the output file extension to a mex extension.
    if (WIN32)
       set_target_properties(${name} PROPERTIES SUFFIX ".mexw64")

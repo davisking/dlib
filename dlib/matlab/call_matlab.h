@@ -8,6 +8,14 @@
 
 // ----------------------------------------------------------------------------------------
 
+void check_for_ctrl_c();
+/*!
+    ensures
+        - If the user of MATLAB has pressed ctrl+c then this function will throw an
+          exception.
+!*/
+
+// ----------------------------------------------------------------------------------------
 
 class matlab_struct 
 {
