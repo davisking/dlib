@@ -1,6 +1,6 @@
 This folder contains a set of tools which make it easy to create MATLAB mex
 functions.  To understand how they work, you should read the
-example_mex_function.cpp and example_mex_callback.cpp examples.
+example_mex_function.cpp, example_mex_struct.cpp, and  example_mex_callback.cpp examples.
 
 To compile them, you can use CMake.  In particular, from this folder execute
 these commands:
