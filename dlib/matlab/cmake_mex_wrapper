@@ -67,7 +67,17 @@ INCLUDE(InstallRequiredSystemLibraries)
 
 
 MACRO(add_mex_function name )
-   ADD_LIBRARY(${name} MODULE ${name}.cpp )
+    ADD_LIBRARY(${name} MODULE ${name}.cpp )
+    if (UNIX)
+        # Doing this prevents our mex function from exporting any symbols
+        # other than mexFunction().  This sometimes doesn't matter but sometimes
+        # avoids causing errors or otherwise bad behavior in MATLAB.
+        if (DEFINED ENV{MATLAB_HOME})
+            set_target_properties(${name} PROPERTIES LINK_FLAGS "-Wl,--version-script,$ENV{MATLAB_HOME}/extern/lib/glnxa64/mexFunction.map")
+        else()
+            set_target_properties(${name} PROPERTIES LINK_FLAGS "-Wl,--version-script,${MATLAB_HOME}/extern/lib/glnxa64/mexFunction.map")
+        endif()
+    endif()
 
     # Change the output file extension to a mex extension.
    if (WIN32)

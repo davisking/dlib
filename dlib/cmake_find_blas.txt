@@ -23,6 +23,23 @@ SET(lapack_found 0)
 if (UNIX)
     message(STATUS "Searching for BLAS and LAPACK")
 
+    if (BUILDING_MATLAB_MEX_FILE)
+        find_library(MATLAB_BLAS_LIBRARY mwblas  PATHS ${MATLAB_LIB_FOLDERS} )
+        find_library(MATLAB_LAPACK_LIBRARY mwlapack  PATHS ${MATLAB_LIB_FOLDERS} )
+        if (MATLAB_BLAS_LIBRARY AND MATLAB_LAPACK_LIBRARY)
+            add_subdirectory(external/cblas)
+            set(blas_libraries  ${MATLAB_BLAS_LIBRARY} cblas  )
+            set(lapack_libraries  ${MATLAB_LAPACK_LIBRARY} )
+            set(blas_found 1)
+            set(lapack_found 1)
+            message(STATUS "Found MATLAB's BLAS and LAPACK libraries")
+        endif()
+        # Don't try to link to anything other than MATLAB's own internal blas
+        # and lapack libraries because doing so generally upsets MATLAB.  So
+        # we just end here no matter what.
+        return()
+    endif()
+
     include(CheckTypeSize)
     check_type_size( "void*" SIZE_OF_VOID_PTR)
 
@@ -61,14 +78,8 @@ if (UNIX)
         set(lapack_found 1)
         set(found_intel_mkl 1)
         message(STATUS "Found Intel MKL BLAS/LAPACK library")
-        if (BUILDING_MATLAB_MEX_FILE)
-            message(STATUS "\n!!!! Don't forget to set the BLAS_VERSION and LAPACK_VERSION environment variables to !!!!\n!!!! ${blas_libraries} so MATLAB doesn't explode when you run this mex file !!!!\n")
-        endif()
     endif()
 
-    if (BUILDING_MATLAB_MEX_FILE)
-        return()
-    endif()
 
     if (NOT found_intel_mkl)
         # Search for the needed libraries from the MKL.  This time try looking for a different
