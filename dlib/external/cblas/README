@@ -1,0 +1,7 @@
+This folder contains a copy of CBLAS (from http://www.netlib.org/blas/) which
+has been setup so you can compile it with CMake.  It also only compiles the
+part of CBLAS needed by dlib.
+
+Most BLAS libraries come with CBLAS, however, some don't.  In particular, if
+you are using the BLAS that comes with MATLAB then you will need this CBLAS
+code linked into your own to get dlib working with MATLAB's built in BLAS.
