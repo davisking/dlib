@@ -1041,8 +1041,10 @@
          <description>
             dlib contains a tool that makes it easy to call C++ code from MATLAB.  It's
             documented in the examples in the dlib/matlab folder.  In particular, the
-            <a href="dlib/matlab/example_mex_function.cpp.html">dlib/matlab/example_mex_function.cpp</a> and
-            <a href="dlib/matlab/example_mex_callback.cpp.html">dlib/matlab/example_mex_callback.cpp</a> examples.
+            <a href="dlib/matlab/example_mex_function.cpp.html">dlib/matlab/example_mex_function.cpp</a>,
+            <a href="dlib/matlab/example_mex_callback.cpp.html">dlib/matlab/example_mex_callback.cpp</a>, and
+            <a href="dlib/matlab/example_mex_struct.cpp.html">dlib/matlab/example_mex_struct.cpp</a>
+            examples.
             You can also easily compile these files using CMake.  See the instructions in the README file
             in the dlib/matlab folder for further details.
          </description>
