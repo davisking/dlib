@@ -17,6 +17,10 @@
 #include "matrix_op.h"
 #include <utility>
 
+#ifdef MATLAB_MEX_FILE
+#include <mex.h>
+#endif
+
 #ifdef _MSC_VER
 // Disable the following warnings for Visual Studio
 
@@ -1239,6 +1243,26 @@ namespace dlib
             return data(0);
         }
 
+#ifdef MATLAB_MEX_FILE
+        void _private_set_mxArray(
+            mxArray* mem 
+        )
+        {
+            data._private_set_mxArray(mem);
+        }
+
+        mxArray* _private_release_mxArray(
+        )
+        {
+            return data._private_release_mxArray();
+        }
+
+        void _private_mark_non_persistent()
+        {
+            data._private_mark_non_persistent();
+        }
+#endif
+
         void set_size (
             long rows,
             long cols
@@ -1970,6 +1994,9 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
+
+    typedef matrix<double,0,0,default_memory_manager,column_major_layout> matrix_colmajor;
+    typedef matrix<float,0,0,default_memory_manager,column_major_layout> fmatrix_colmajor;
 
 }
 

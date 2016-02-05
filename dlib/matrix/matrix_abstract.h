@@ -645,7 +645,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
+    /*!A matrix_colmajor 
+        This is just a typedef of the matrix object that uses column major layout. 
+    !*/
+    typedef matrix<double,0,0,default_memory_manager,column_major_layout> matrix_colmajor;
+
+    /*!A fmatrix_colmajor 
+        This is just a typedef of the matrix object that uses column major layout. 
+    !*/
+    typedef matrix<float,0,0,default_memory_manager,column_major_layout> fmatrix_colmajor;
+
+// ----------------------------------------------------------------------------------------
+template <
         typename T,
         long NR,
         long NC,

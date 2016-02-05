@@ -6,6 +6,9 @@
 #include "../algs.h"
 #include "matrix_fwd.h"
 #include "matrix_data_layout_abstract.h"
+#ifdef MATLAB_MEX_FILE
+#include <mex.h>
+#endif
 
 // GCC 4.8 gives false alarms about some matrix operations going out of bounds.  Disable
 // these false warnings.
@@ -180,6 +183,12 @@ namespace dlib
             {
             }
 
+#ifdef MATLAB_MEX_FILE
+            void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
+            mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
+            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+#endif
+
         private:
             T data[num_rows*num_cols];
         };
@@ -242,6 +251,12 @@ namespace dlib
             )
             {
             }
+
+#ifdef MATLAB_MEX_FILE
+            void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
+            mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
+            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+#endif
 
         private:
 
@@ -317,6 +332,12 @@ namespace dlib
                 data = pool.allocate_array(nr*nc);
                 nr_ = nr;
             }
+
+#ifdef MATLAB_MEX_FILE
+            void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
+            mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
+            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+#endif
 
         private:
 
@@ -395,6 +416,12 @@ namespace dlib
                 data = pool.allocate_array(nr*nc);
                 nc_ = nc;
             }
+
+#ifdef MATLAB_MEX_FILE
+            void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
+            mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
+            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+#endif
 
         private:
 
@@ -476,6 +503,11 @@ namespace dlib
                 nc_ = nc;
             }
 
+#ifdef MATLAB_MEX_FILE
+            void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
+            mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
+            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+#endif
         private:
             T* data;
             long nr_;
@@ -593,6 +625,12 @@ namespace dlib
             {
             }
 
+#ifdef MATLAB_MEX_FILE
+            void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
+            mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
+            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+#endif
+
         private:
             T data[num_cols*num_rows];
         };
@@ -655,6 +693,12 @@ namespace dlib
             )
             {
             }
+
+#ifdef MATLAB_MEX_FILE
+            void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
+            mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
+            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+#endif
 
         private:
 
@@ -730,6 +774,12 @@ namespace dlib
                 data = pool.allocate_array(nr*nc);
                 nr_ = nr;
             }
+
+#ifdef MATLAB_MEX_FILE
+            void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
+            mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
+            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+#endif
 
         private:
 
@@ -809,6 +859,12 @@ namespace dlib
                 nc_ = nc;
             }
 
+#ifdef MATLAB_MEX_FILE
+            void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
+            mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
+            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+#endif
+
         private:
 
             T* data;
@@ -869,6 +925,12 @@ namespace dlib
                 pool.swap(item.pool);
             }
 
+#ifdef MATLAB_MEX_FILE
+            void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
+            mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
+            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+#endif
+
             long nr (
             ) const { return nr_; }
 
@@ -894,7 +956,251 @@ namespace dlib
             long nr_;
             long nc_;
             typename mem_manager::template rebind<T>::other pool;
-            };
+        };
+
+#ifdef MATLAB_MEX_FILE
+        template <
+            long num_rows,
+            long num_cols
+            >
+        class layout<double,num_rows,num_cols,default_memory_manager,5> : noncopyable // when num_rows == 0 && num_cols == 0
+        {
+        public:
+            const static long NR = num_rows;
+            const static long NC = num_cols;
+
+            layout (
+            ): data(0), nr_(0), nc_(0), make_persistent(true),set_by_private_set_mxArray(false),mem(0) { }
+
+            ~layout ()
+            { 
+                if (!set_by_private_set_mxArray && mem) 
+                {
+                    mxDestroyArray(mem); 
+                    mem = 0;
+                    data = 0;
+                }
+            }
+
+            double& operator() (
+                long r, 
+                long c
+            ) { return data[c*nr_ + r]; }
+
+            const double& operator() (
+                long r, 
+                long c
+            ) const { return data[c*nr_ + r]; }
+
+            double& operator() (
+                long i 
+            ) { return data[i]; }
+
+            const double& operator() (
+                long i 
+            ) const { return data[i]; }
+
+            void _private_set_mxArray (
+                mxArray* mem_
+            )
+            {
+                // We don't own the pointer, so make note of that so we won't try to free
+                // it.
+                set_by_private_set_mxArray = true;
+                mem = mem_;
+                data = mxGetPr(mem);
+                nr_ = mxGetM(mem);
+                nc_ = mxGetN(mem);
+            }
+
+            mxArray* _private_release_mxArray()
+            {
+                DLIB_CASSERT(!make_persistent,"");
+                mxArray* temp = mem;
+                mem = 0;
+                set_by_private_set_mxArray = false;
+                data = 0;
+                nr_ = 0;
+                nc_ = 0;
+                return temp;
+            }
+
+            void _private_mark_non_persistent()
+            {
+                make_persistent = false;
+            }
+
+            void swap(
+                layout& item
+            )
+            {
+                std::swap(item.make_persistent,make_persistent);
+                std::swap(item.set_by_private_set_mxArray,set_by_private_set_mxArray);
+                std::swap(item.mem,mem);
+                std::swap(item.data,data);
+                std::swap(item.nc_,nc_);
+                std::swap(item.nr_,nr_);
+            }
+
+            long nr (
+            ) const { return nr_; }
+
+            long nc (
+            ) const { return nc_; }
+
+            void set_size (
+                long nr,
+                long nc
+            )
+            {
+                if (!set_by_private_set_mxArray && mem) 
+                {
+                    mxDestroyArray(mem); 
+                    mem = 0;
+                    data = 0;
+                }
+                set_by_private_set_mxArray = false;
+
+                mem = mxCreateDoubleMatrix(nr, nc, mxREAL);
+                if (mem == 0)
+                    throw std::bad_alloc();
+                if (make_persistent)
+                    mexMakeArrayPersistent(mem);
+                data = mxGetPr(mem);
+                nr_ = nr;
+                nc_ = nc;
+            }
+
+        private:
+            double* data;
+            long nr_;
+            long nc_;
+            bool make_persistent;
+            bool set_by_private_set_mxArray;
+            mxArray* mem;
+        };
+
+        template <
+            long num_rows,
+            long num_cols
+            >
+        class layout<float,num_rows,num_cols,default_memory_manager,5> : noncopyable // when num_rows == 0 && num_cols == 0
+        {
+        public:
+            const static long NR = num_rows;
+            const static long NC = num_cols;
+
+            layout (
+            ): data(0), nr_(0), nc_(0), make_persistent(true),set_by_private_set_mxArray(false),mem(0) { }
+
+            ~layout ()
+            { 
+                if (!set_by_private_set_mxArray && mem) 
+                {
+                    mxDestroyArray(mem); 
+                    mem = 0;
+                    data = 0;
+                }
+            }
+
+            float& operator() (
+                long r, 
+                long c
+            ) { return data[c*nr_ + r]; }
+
+            const float& operator() (
+                long r, 
+                long c
+            ) const { return data[c*nr_ + r]; }
+
+            float& operator() (
+                long i 
+            ) { return data[i]; }
+
+            const float& operator() (
+                long i 
+            ) const { return data[i]; }
+
+            void _private_set_mxArray (
+                mxArray* mem_
+            )
+            {
+                // We don't own the pointer, so make note of that so we won't try to free
+                // it.
+                set_by_private_set_mxArray = true;
+                mem = mem_;
+                data = (float*)mxGetData(mem);
+                nr_ = mxGetM(mem);
+                nc_ = mxGetN(mem);
+            }
+
+            mxArray* _private_release_mxArray()
+            {
+                DLIB_CASSERT(!make_persistent,"");
+                mxArray* temp = mem;
+                mem = 0;
+                set_by_private_set_mxArray = false;
+                data = 0;
+                nr_ = 0;
+                nc_ = 0;
+                return temp;
+            }
+
+            void _private_mark_non_persistent()
+            {
+                make_persistent = false;
+            }
+
+            void swap(
+                layout& item
+            )
+            {
+                std::swap(item.make_persistent,make_persistent);
+                std::swap(item.set_by_private_set_mxArray,set_by_private_set_mxArray);
+                std::swap(item.mem,mem);
+                std::swap(item.data,data);
+                std::swap(item.nc_,nc_);
+                std::swap(item.nr_,nr_);
+            }
+
+            long nr (
+            ) const { return nr_; }
+
+            long nc (
+            ) const { return nc_; }
+
+            void set_size (
+                long nr,
+                long nc
+            )
+            {
+                if (!set_by_private_set_mxArray && mem) 
+                {
+                    mxDestroyArray(mem); 
+                    mem = 0;
+                    data = 0;
+                }
+                set_by_private_set_mxArray = false;
+
+                mem = mxCreateNumericMatrix(nr, nc, mxSINGLE_CLASS, mxREAL);
+                if (mem == 0)
+                    throw std::bad_alloc();
+                if (make_persistent)
+                    mexMakeArrayPersistent(mem);
+                data = (float*)mxGetData(mem);
+                nr_ = nr;
+                nc_ = nc;
+            }
+
+        private:
+            float* data;
+            long nr_;
+            long nc_;
+            bool make_persistent;
+            bool set_by_private_set_mxArray;
+            mxArray* mem;
+        };
+#endif
 
     };
 

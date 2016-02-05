@@ -263,6 +263,20 @@ namespace mex_binding
 
 // -------------------------------------------------------
 
+    template <typename T>
+    struct is_column_major_matrix : public default_is_kind_value {};
+
+    template <
+        typename T,
+        long num_rows,
+        long num_cols,
+        typename mem_manager
+        >
+    struct is_column_major_matrix<matrix<T,num_rows,num_cols,mem_manager,column_major_layout> > 
+    { static const bool value = true; }; 
+
+// -------------------------------------------------------
+
     template <
         typename matrix_type,
         typename EXP
@@ -563,7 +577,10 @@ namespace mex_binding
                     sout << " argument " << arg_idx+1 << " must be a matrix of doubles";
                     throw invalid_args_exception(sout.str());
                 }
-                assign_mat(arg_idx, arg , pointer_to_matrix(mxGetPr(prhs), nc, nr));
+                if (is_column_major_matrix<T>::value)
+                    arg._private_set_mxArray((mxArray*)prhs);
+                else
+                    assign_mat(arg_idx, arg , pointer_to_matrix(mxGetPr(prhs), nc, nr));
             }
             else if (is_same_type<type, float>::value)
             {
@@ -574,7 +591,10 @@ namespace mex_binding
                     throw invalid_args_exception(sout.str());
                 }
 
-                assign_mat(arg_idx, arg , pointer_to_matrix((const float*)mxGetData(prhs), nc, nr));
+                if (is_column_major_matrix<T>::value)
+                    arg._private_set_mxArray((mxArray*)prhs);
+                else
+                    assign_mat(arg_idx, arg , pointer_to_matrix((const float*)mxGetData(prhs), nc, nr));
             }
             else if (is_same_type<type, bool>::value)
             {
@@ -924,6 +944,26 @@ namespace mex_binding
 
     void assign_to_matlab(
         mxArray*& plhs,
+        matrix_colmajor& item
+    )
+    {
+        // Don't need to do a copy if it's this kind of matrix since we can just
+        // pull the underlying mxArray out directly and thus avoid a copy.
+        plhs = item._private_release_mxArray();
+    }
+
+    void assign_to_matlab(
+        mxArray*& plhs,
+        fmatrix_colmajor& item
+    )
+    {
+        // Don't need to do a copy if it's this kind of matrix since we can just
+        // pull the underlying mxArray out directly and thus avoid a copy.
+        plhs = item._private_release_mxArray();
+    }
+
+    void assign_to_matlab(
+        mxArray*& plhs,
         matlab_struct& item
     )
     {
@@ -991,6 +1031,14 @@ namespace mex_binding
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
+    void mark_non_persistent (const T&){}
+
+    void mark_non_persistent(matrix_colmajor& item) { item._private_mark_non_persistent(); }
+    void mark_non_persistent(fmatrix_colmajor& item) { item._private_mark_non_persistent(); }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         unsigned long num_args
         >
@@ -1009,6 +1057,8 @@ namespace mex_binding
             typedef typename sig_traits<funct>::arg1_type arg1_type;
 
             typename basic_type<arg1_type>::type A1;
+
+            mark_non_persistent(A1);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1035,6 +1085,9 @@ namespace mex_binding
 
             typename basic_type<arg1_type>::type A1;
             typename basic_type<arg2_type>::type A2;
+
+            mark_non_persistent(A1);
+            mark_non_persistent(A2);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1065,6 +1118,10 @@ namespace mex_binding
             typename basic_type<arg1_type>::type A1;
             typename basic_type<arg2_type>::type A2;
             typename basic_type<arg3_type>::type A3;
+
+            mark_non_persistent(A1);
+            mark_non_persistent(A2);
+            mark_non_persistent(A3);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1099,6 +1156,11 @@ namespace mex_binding
             typename basic_type<arg2_type>::type A2;
             typename basic_type<arg3_type>::type A3;
             typename basic_type<arg4_type>::type A4;
+
+            mark_non_persistent(A1);
+            mark_non_persistent(A2);
+            mark_non_persistent(A3);
+            mark_non_persistent(A4);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1138,6 +1200,12 @@ namespace mex_binding
             typename basic_type<arg3_type>::type A3;
             typename basic_type<arg4_type>::type A4;
             typename basic_type<arg5_type>::type A5;
+
+            mark_non_persistent(A1);
+            mark_non_persistent(A2);
+            mark_non_persistent(A3);
+            mark_non_persistent(A4);
+            mark_non_persistent(A5);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1182,6 +1250,13 @@ namespace mex_binding
             typename basic_type<arg4_type>::type A4;
             typename basic_type<arg5_type>::type A5;
             typename basic_type<arg6_type>::type A6;
+
+            mark_non_persistent(A1);
+            mark_non_persistent(A2);
+            mark_non_persistent(A3);
+            mark_non_persistent(A4);
+            mark_non_persistent(A5);
+            mark_non_persistent(A6);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1230,6 +1305,14 @@ namespace mex_binding
             typename basic_type<arg5_type>::type A5;
             typename basic_type<arg6_type>::type A6;
             typename basic_type<arg7_type>::type A7;
+
+            mark_non_persistent(A1);
+            mark_non_persistent(A2);
+            mark_non_persistent(A3);
+            mark_non_persistent(A4);
+            mark_non_persistent(A5);
+            mark_non_persistent(A6);
+            mark_non_persistent(A7);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1282,6 +1365,15 @@ namespace mex_binding
             typename basic_type<arg6_type>::type A6;
             typename basic_type<arg7_type>::type A7;
             typename basic_type<arg8_type>::type A8;
+
+            mark_non_persistent(A1);
+            mark_non_persistent(A2);
+            mark_non_persistent(A3);
+            mark_non_persistent(A4);
+            mark_non_persistent(A5);
+            mark_non_persistent(A6);
+            mark_non_persistent(A7);
+            mark_non_persistent(A8);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1338,6 +1430,16 @@ namespace mex_binding
             typename basic_type<arg7_type>::type A7;
             typename basic_type<arg8_type>::type A8;
             typename basic_type<arg9_type>::type A9;
+
+            mark_non_persistent(A1);
+            mark_non_persistent(A2);
+            mark_non_persistent(A3);
+            mark_non_persistent(A4);
+            mark_non_persistent(A5);
+            mark_non_persistent(A6);
+            mark_non_persistent(A7);
+            mark_non_persistent(A8);
+            mark_non_persistent(A9);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1399,6 +1501,17 @@ namespace mex_binding
             typename basic_type<arg8_type>::type A8;
             typename basic_type<arg9_type>::type A9;
             typename basic_type<arg10_type>::type A10;
+
+            mark_non_persistent(A1);
+            mark_non_persistent(A2);
+            mark_non_persistent(A3);
+            mark_non_persistent(A4);
+            mark_non_persistent(A5);
+            mark_non_persistent(A6);
+            mark_non_persistent(A7);
+            mark_non_persistent(A8);
+            mark_non_persistent(A9);
+            mark_non_persistent(A10);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
