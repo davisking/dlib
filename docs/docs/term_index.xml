@@ -481,6 +481,8 @@
          <term file="containers.html" name="map"                  include="dlib/map.h"/>
 
 
+         <term file="dlib/matrix/matrix_abstract.h.html" name="matrix_colmajor"       include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_abstract.h.html" name="fmatrix_colmajor"      include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_abstract.h.html" name="csv"       include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_data_layout_abstract.h.html" name="row_major_layout"       include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_data_layout_abstract.h.html" name="column_major_layout"    include="dlib/matrix.h"/>
