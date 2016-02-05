@@ -518,6 +518,13 @@ namespace mex_binding
 // -------------------------------------------------------
 
     template <typename T>
+    void call_private_set_mxArray(T&, mxArray*) {}
+    void call_private_set_mxArray(matrix_colmajor& item, mxArray* m) { item._private_set_mxArray(m); }
+    void call_private_set_mxArray(fmatrix_colmajor& item, mxArray* m) { item._private_set_mxArray(m); }
+
+// -------------------------------------------------------
+
+    template <typename T>
     void validate_and_populate_arg (
         long arg_idx,
         const mxArray *prhs,
@@ -578,7 +585,7 @@ namespace mex_binding
                     throw invalid_args_exception(sout.str());
                 }
                 if (is_column_major_matrix<T>::value)
-                    arg._private_set_mxArray((mxArray*)prhs);
+                    call_private_set_mxArray(arg, (mxArray*)prhs);
                 else
                     assign_mat(arg_idx, arg , pointer_to_matrix(mxGetPr(prhs), nc, nr));
             }
@@ -592,7 +599,7 @@ namespace mex_binding
                 }
 
                 if (is_column_major_matrix<T>::value)
-                    arg._private_set_mxArray((mxArray*)prhs);
+                    call_private_set_mxArray(arg,(mxArray*)prhs);
                 else
                     assign_mat(arg_idx, arg , pointer_to_matrix((const float*)mxGetData(prhs), nc, nr));
             }
