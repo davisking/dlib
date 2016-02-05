@@ -29,6 +29,11 @@ BOOST_PYTHON_MODULE(dlib)
     // since it is full of huge amounts of template clutter.
     boost::python::docstring_options options(true,true,false);
 
+#define DLIB_QUOTE_STRING(x) DLIB_QUOTE_STRING2(x)
+#define DLIB_QUOTE_STRING2(x) #x
+
+    boost::python::scope().attr("__version__") = DLIB_QUOTE_STRING(DLIB_VERSION);
+
     bind_matrix();
     bind_vector();
     bind_svm_c_trainer();

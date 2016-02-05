@@ -210,7 +210,9 @@ void bind_shape_predictors()
                       e.g a padding of 0.5 would cause the algorithm to sample pixels from a box that was 2x2 pixels")
         .add_property("random_seed", &type::random_seed,
                                      &type::random_seed,
-                      "The random seed used by the internal random number generator");
+                      "The random seed used by the internal random number generator")
+        .def("__str__", &::print_shape_predictor_training_options)
+        .def_pickle(serialize_pickle<type>());
     }
     {
     typedef shape_predictor type;
