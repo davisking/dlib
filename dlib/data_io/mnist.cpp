@@ -6,6 +6,7 @@
 #include "mnist.h"
 #include <fstream>
 #include "../byte_orderer.h"
+#include "../uintn.h"
 
 // ----------------------------------------------------------------------------------------
 
@@ -33,7 +34,7 @@ namespace dlib
         byte_orderer bo;
 
         // make sure the files have the contents we expect.
-        uint32_t magic, num, nr, nc, num2, num3, num4;
+        uint32 magic, num, nr, nc, num2, num3, num4;
         fin1.read((char*)&magic, sizeof(magic));  bo.big_to_host(magic);
         fin1.read((char*)&num, sizeof(num));  bo.big_to_host(num);
         fin1.read((char*)&nr, sizeof(nr));  bo.big_to_host(nr);
