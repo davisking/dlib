@@ -151,6 +151,51 @@ namespace dlib
         matrix<double,2,1> w;
         double residual_squared;
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    double probability_gradient_less_than (
+        const T& container,
+        double thresh
+    )
+    {
+        running_gradient g;
+        for(auto&& v : container)
+            g.add(v);
+
+        // make sure requires clause is not broken
+        DLIB_ASSERT(g.current_n() > 2,
+            "\t double probability_gradient_less_than()"
+            << "\n\t You need more than 2 elements in the given container to call this function."
+        );
+        return g.probability_gradient_less_than(thresh);
+    }
+
+    template <
+        typename T
+        >
+    double probability_gradient_greater_than (
+        const T& container,
+        double thresh
+    )
+    {
+        running_gradient g;
+        for(auto&& v : container)
+            g.add(v);
+
+        // make sure requires clause is not broken
+        DLIB_ASSERT(g.current_n() > 2,
+            "\t double probability_gradient_greater_than()"
+            << "\n\t You need more than 2 elements in the given container to call this function."
+        );
+        return g.probability_gradient_greater_than(thresh);
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_RuNNING_GRADIENT_Hh_

@@ -116,6 +116,45 @@ namespace dlib
     /*!
         provides serialization support 
     !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    double probability_gradient_less_than (
+        const T& container,
+        double thresh
+    );
+    /*!
+        requires
+            - container muse be a container of double values that can be enumerated with a
+              range based for loop.
+            - The container must contain more than 2 elements.
+        ensures
+            - Puts all the elements of container into a running_gradient object, R, and
+              then returns R.probability_gradient_less_than(thresh). 
+    !*/
+
+    template <
+        typename T
+        >
+    double probability_gradient_greater_than (
+        const T& container,
+        double thresh
+    );
+    /*!
+        requires
+            - container muse be a container of double values that can be enumerated with a
+              range based for loop.
+            - The container must contain more than 2 elements.
+        ensures
+            - Puts all the elements of container into a running_gradient object, R, and
+              then returns R.probability_gradient_greater_than(thresh).
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_RuNNING_GRADIENT_ABSTRACT_Hh_
