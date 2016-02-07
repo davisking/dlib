@@ -62,6 +62,7 @@
         - std::string
         - std::wstring
         - std::vector
+        - std::deque
         - std::map
         - std::set
         - std::pair
@@ -79,6 +80,7 @@
         - std::string
         - std::wstring
         - std::vector
+        - std::deque
         - std::map
         - std::set
         - std::pair
@@ -143,6 +145,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <deque>
 #include <complex>
 #include <map>
 #include <set>
@@ -652,6 +655,18 @@ namespace dlib
         std::istream& in
     );
 
+    template <typename T, typename alloc>
+    void serialize (
+        const std::deque<T,alloc>& item,
+        std::ostream& out
+    );
+
+    template <typename T, typename alloc>
+    void deserialize (
+        std::deque<T,alloc>& item,
+        std::istream& in
+    );
+
     inline void serialize (
         const std::string& item,
         std::ostream& out
@@ -1033,6 +1048,44 @@ namespace dlib
         }
         catch (serialization_error& e)
         { throw serialization_error(e.info + "\n   while deserializing object of type std::vector"); }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename alloc>
+    void serialize (
+        const std::deque<T,alloc>& item,
+        std::ostream& out
+    )
+    {
+        try
+        { 
+            const unsigned long size = static_cast<unsigned long>(item.size());
+
+            serialize(size,out); 
+            for (unsigned long i = 0; i < item.size(); ++i)
+                serialize(item[i],out);
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while serializing object of type std::deque"); }
+    }
+
+    template <typename T, typename alloc>
+    void deserialize (
+        std::deque<T, alloc>& item,
+        std::istream& in
+    )
+    {
+        try 
+        { 
+            unsigned long size;
+            deserialize(size,in); 
+            item.resize(size);
+            for (unsigned long i = 0; i < size; ++i)
+                deserialize(item[i],in);
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while deserializing object of type std::deque"); }
     }
 
 // ----------------------------------------------------------------------------------------
