@@ -258,6 +258,8 @@
          <term file="linear_algebra.html" name="rotation_matrix"           include="dlib/geometry.h"/>
          <term file="algorithms.html" name="running_stats"                 include="dlib/statistics.h"/>
          <term file="algorithms.html" name="running_gradient"              include="dlib/statistics/running_gradient.h"/>
+         <term file="dlib/statistics/running_gradient_abstract.h.html" name="probability_gradient_greater_than"  include="dlib/statistics/running_gradient.h"/>
+         <term file="dlib/statistics/running_gradient_abstract.h.html" name="probability_gradient_less_than"  include="dlib/statistics/running_gradient.h"/>
          <term file="algorithms.html" name="running_scalar_covariance"     include="dlib/statistics.h"/>
          <term file="algorithms.html" name="mean_sign_agreement"           include="dlib/statistics.h"/>
          <term file="algorithms.html" name="correlation"                   include="dlib/statistics.h"/>
