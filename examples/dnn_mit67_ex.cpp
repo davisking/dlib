@@ -9,7 +9,6 @@
 #include <dlib/image_transforms.h>
 #include <dlib/dir_nav.h>
 #include <iterator>
-#include <regex>
 
 using namespace std;
 using namespace dlib;
@@ -116,18 +115,13 @@ std::vector<image_info> get_mit67_listing(
     auto subdirs = directory(images_folder).get_dirs();
     // sort the sub directories so the numeric labels will be assigned in sorted order.
     std::sort(subdirs.begin(), subdirs.end());
-    regex is_gif(".*_gif.jpg");
     for (auto subdir : subdirs)
     {
         // Now get all the images in this scene type
         temp.label = subdir.name();
         for (auto image_file : subdir.get_files())
         {
-            // Ignore gif files in this dataset since dlib::load_image() doesn't support
-            // them and there are only a tiny number of them.
             temp.filename = image_file;
-            if (regex_match(temp.filename, is_gif))
-                continue;
             results.push_back(temp);
         }
         ++temp.numeric_label;
