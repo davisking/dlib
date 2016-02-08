@@ -82,28 +82,30 @@ namespace dlib
                 GifFileType* gif = DGifOpenFileName(file_name.c_str());
                 try
                 {
-                    if (gif == 0)
-                        throw image_load_error("Couldn't open file " + file_name);
+                    if (gif == 0) throw image_load_error("Couldn't open file " + file_name);
                     if (DGifSlurp(gif) != GIF_OK)
                         throw image_load_error("Error reading from " + file_name);
 
                     if (gif->ImageCount != 1)   throw image_load_error("Dlib only supports reading GIF files containing one image.");
-                    if (gif->SColorMap == 0)    throw image_load_error("Unsupported GIF format 1.");
-                    if (gif->SavedImages == 0)  throw image_load_error("Unsupported GIF format 2.");
-                    if (gif->SavedImages->ImageDesc.Width != gif->SWidth)   throw image_load_error("Unsupported GIF format 3.");
-                    if (gif->SavedImages->ImageDesc.Height != gif->SHeight) throw image_load_error("Unsupported GIF format 4.");
-                    if (gif->SColorMap->ColorCount != 256)  throw image_load_error("Unsupported GIF format 5.");
-                    if (gif->SColorMap->BitsPerPixel != 8)  throw image_load_error("Unsupported GIF format 6.");
-                    if (gif->SavedImages->RasterBits == 0)  throw image_load_error("Unsupported GIF format 7.");
-                    if (gif->SColorMap->Colors == 0)        throw image_load_error("Unsupported GIF format 8.");
+                    if (gif->SavedImages == 0)  throw image_load_error("Unsupported GIF format 1.");
+
+                    ColorMapObject* cmo=gif->SColorMap?gif->SColorMap:gif->SavedImages->ImageDesc.ColorMap;
+
+                    if (cmo==0)                                             throw image_load_error("Unsupported GIF format 2.");
+                    if (cmo->Colors == 0)                                   throw image_load_error("Unsupported GIF format 3.");
+                    if (gif->SavedImages->ImageDesc.Width != gif->SWidth)   throw image_load_error("Unsupported GIF format 4.");
+                    if (gif->SavedImages->ImageDesc.Height != gif->SHeight) throw image_load_error("Unsupported GIF format 5.");
+                    if (gif->SavedImages->RasterBits == 0)                  throw image_load_error("Unsupported GIF format 6.");
 
                     img.set_size(gif->SHeight, gif->SWidth);
                     unsigned char* raster = gif->SavedImages->RasterBits;
-                    GifColorType* colormap = gif->SColorMap->Colors;
+                    GifColorType* colormap = cmo->Colors;
                     for (long r = 0; r < img.nr(); ++r)
                     {
                         for (long c = 0; c < img.nc(); ++c)
                         {
+                            if (*raster >= cmo->ColorCount)
+                                throw image_load_error("Invalid GIF color value");
                             rgb_pixel p;
                             p.red = colormap[*raster].Red;
                             p.green = colormap[*raster].Green;
