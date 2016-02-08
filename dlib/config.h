@@ -14,10 +14,11 @@
 //#define DLIB_NO_GUI_SUPPORT
 //#define DLIB_ENABLE_STACK_TRACE
 
-// You should also consider telling dlib to link against libjpeg, libpng, fftw, CUDA, and a
-// BLAS and LAPACK library.  To do this you need to uncomment the following #defines.
+// You should also consider telling dlib to link against libjpeg, libpng, libgif, fftw, CUDA, 
+// and a BLAS and LAPACK library.  To do this you need to uncomment the following #defines.
 // #define DLIB_JPEG_SUPPORT
 // #define DLIB_PNG_SUPPORT
+// #define DLIB_GIF_SUPPORT
 // #define DLIB_USE_FFTW
 // #define DLIB_USE_BLAS
 // #define DLIB_USE_LAPACK

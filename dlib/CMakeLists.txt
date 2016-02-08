@@ -14,9 +14,13 @@ include(use_cpp_11.cmake)
 
 set(CPACK_PACKAGE_VERSION_MAJOR "18")
 set(CPACK_PACKAGE_VERSION_MINOR "18")
-set(CPACK_PACKAGE_VERSION_PATCH "99")
+set(CPACK_PACKAGE_VERSION_PATCH "100")
 set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
-set(DLIB_VERSION ${VERSION} PARENT_SCOPE)
+# Set DLIB_VERSION in the including CMake file so they can use it to do whatever they want. 
+get_directory_property(has_parent PARENT_DIRECTORY)
+if(has_parent)
+   set(DLIB_VERSION ${VERSION} PARENT_SCOPE)
+endif()
 
 set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
 # Suppress cmake warnings about changes in new versions.
@@ -68,6 +72,8 @@ if (NOT TARGET dlib)
    "Disable this if you don't want to use NVIDIA CUDA" )
    set (DLIB_PNG_SUPPORT_STR
    "Disable this if you don't want to link against libpng" )
+   set (DLIB_GIF_SUPPORT_STR
+   "Disable this if you don't want to link against libgif" )
    set (DLIB_JPEG_SUPPORT_STR
    "Disable this if you don't want to link against libjpeg" )
    set (DLIB_LINK_WITH_SQLITE3_STR
@@ -103,6 +109,7 @@ if (NOT TARGET dlib)
       option(DLIB_USE_LAPACK ${DLIB_USE_LAPACK_STR} OFF)
       option(DLIB_USE_CUDA ${DLIB_USE_CUDA_STR} OFF)
       option(DLIB_PNG_SUPPORT ${DLIB_PNG_SUPPORT_STR} OFF)
+      option(DLIB_GIF_SUPPORT ${DLIB_GIF_SUPPORT_STR} OFF)
       #option(DLIB_USE_FFTW ${DLIB_USE_FFTW_STR} OFF)
    else()
       option(DLIB_JPEG_SUPPORT ${DLIB_JPEG_SUPPORT_STR} ON)
@@ -111,6 +118,7 @@ if (NOT TARGET dlib)
       option(DLIB_USE_LAPACK ${DLIB_USE_LAPACK_STR} ON)
       option(DLIB_USE_CUDA ${DLIB_USE_CUDA_STR} ON)
       option(DLIB_PNG_SUPPORT ${DLIB_PNG_SUPPORT_STR} ON)
+      option(DLIB_GIF_SUPPORT ${DLIB_GIF_SUPPORT_STR} ON)
       #option(DLIB_USE_FFTW ${DLIB_USE_FFTW_STR} ON)
    endif()
    toggle_preprocessor_switch(DLIB_JPEG_SUPPORT)
@@ -118,6 +126,7 @@ if (NOT TARGET dlib)
    toggle_preprocessor_switch(DLIB_USE_LAPACK)
    toggle_preprocessor_switch(DLIB_USE_CUDA)
    toggle_preprocessor_switch(DLIB_PNG_SUPPORT) 
+   toggle_preprocessor_switch(DLIB_GIF_SUPPORT) 
    #toggle_preprocessor_switch(DLIB_USE_FFTW)
 
 
@@ -274,6 +283,17 @@ if (NOT TARGET dlib)
       endif()
 
       INCLUDE (CheckFunctionExists)
+
+      if (DLIB_GIF_SUPPORT)
+         find_package(GIF QUIET)
+         if (GIF_FOUND)
+            include_directories(${GIF_INCLUDE_DIR})
+            set (dlib_needed_libraries ${dlib_needed_libraries} ${GIF_LIBRARY})
+         else()
+            set(DLIB_GIF_SUPPORT OFF CACHE STRING ${DLIB_GIF_SUPPORT_STR} FORCE )
+            toggle_preprocessor_switch(DLIB_GIF_SUPPORT)
+         endif()
+      endif()
 
       if (DLIB_PNG_SUPPORT)
          # try to find libpng 
