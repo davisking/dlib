@@ -96,22 +96,49 @@ namespace dlib
                     if (gif->SavedImages->ImageDesc.Width != gif->SWidth)   throw image_load_error("Unsupported GIF format 4.");
                     if (gif->SavedImages->ImageDesc.Height != gif->SHeight) throw image_load_error("Unsupported GIF format 5.");
                     if (gif->SavedImages->RasterBits == 0)                  throw image_load_error("Unsupported GIF format 6.");
+                    if (gif->Image.Top != 0)                                throw image_load_error("Unsupported GIF format 7.");
+                    if (gif->Image.Left != 0)                               throw image_load_error("Unsupported GIF format 8.");
 
                     img.set_size(gif->SHeight, gif->SWidth);
                     unsigned char* raster = gif->SavedImages->RasterBits;
                     GifColorType* colormap = cmo->Colors;
-                    for (long r = 0; r < img.nr(); ++r)
+                    if (gif->Image.Interlace) 
                     {
-                        for (long c = 0; c < img.nc(); ++c)
+                        const long interlaced_offset[] = { 0, 4, 2, 1 }; 
+                        const long interlaced_jumps[] = { 8, 8, 4, 2 }; 
+                        for (int i = 0; i < 4; ++i)
                         {
-                            if (*raster >= cmo->ColorCount)
-                                throw image_load_error("Invalid GIF color value");
-                            rgb_pixel p;
-                            p.red = colormap[*raster].Red;
-                            p.green = colormap[*raster].Green;
-                            p.blue = colormap[*raster].Blue;
-                            assign_pixel(img[r][c], p);
-                            ++raster;
+                            for (long r = interlaced_offset[i]; r < img.nr(); r += interlaced_jumps[i]) 
+                            {
+                                for (long c = 0; c < img.nc(); ++c)
+                                {
+                                    if (*raster >= cmo->ColorCount)
+                                        throw image_load_error("Invalid GIF color value");
+                                    rgb_pixel p;
+                                    p.red = colormap[*raster].Red;
+                                    p.green = colormap[*raster].Green;
+                                    p.blue = colormap[*raster].Blue;
+                                    assign_pixel(img[r][c], p);
+                                    ++raster;
+                                }
+                            }
+                        }
+                    }
+                    else 
+                    {
+                        for (long r = 0; r < img.nr(); ++r)
+                        {
+                            for (long c = 0; c < img.nc(); ++c)
+                            {
+                                if (*raster >= cmo->ColorCount)
+                                    throw image_load_error("Invalid GIF color value");
+                                rgb_pixel p;
+                                p.red = colormap[*raster].Red;
+                                p.green = colormap[*raster].Green;
+                                p.blue = colormap[*raster].Blue;
+                                assign_pixel(img[r][c], p);
+                                ++raster;
+                            }
                         }
                     }
                     DGifCloseFile(gif);
