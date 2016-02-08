@@ -235,7 +235,6 @@ namespace dlib
 
             // Note that output_tensor.k() should match the number of labels.
 
-            const float* out_data = output_tensor.host();
             for (long i = 0; i < output_tensor.num_samples(); ++i)
             {
                 // The index of the largest output for this sample is the label.
