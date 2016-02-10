@@ -939,12 +939,13 @@ namespace mex_binding
         }
 
 
+        const_temp_matrix<T> m(item);
 
-        for (long c = 0; c < item.nc(); ++c)
+        for (long c = 0; c < m.nc(); ++c)
         {
-            for ( long  r= 0; r < item.nr(); ++r)
+            for ( long r = 0; r < m.nr(); ++r)
             {
-                *mat++ = item(r,c);
+                *mat++ = m(r,c);
             }
         }
     }
