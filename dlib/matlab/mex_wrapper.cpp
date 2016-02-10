@@ -2292,6 +2292,7 @@ void call_matlab (
     setup_input_args(prhs[nrhs], A6, nrhs);
     setup_input_args(prhs[nrhs], A7, nrhs);
     setup_input_args(prhs[nrhs], A8, nrhs);
+    setup_input_args(prhs[nrhs], A9, nrhs);
     setup_input_args(prhs[nrhs], A10, nrhs);
 
     const int nlhs = num_args - nrhs;
@@ -2306,6 +2307,7 @@ void call_matlab (
     setup_output_args(function_name, plhs[i], A6, i);
     setup_output_args(function_name, plhs[i], A7, i);
     setup_output_args(function_name, plhs[i], A8, i);
+    setup_output_args(function_name, plhs[i], A9, i);
     setup_output_args(function_name, plhs[i], A10, i);
 
     free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
@@ -2317,6 +2319,14 @@ void call_matlab (
 template <typename T>
 matlab_struct::sub::operator T() const
 {
+    T item;
+    get(item);
+    return item;
+}
+
+template <typename T>
+void matlab_struct::sub::get(T& item) const
+{
     if (struct_handle == 0)
         throw dlib::error("Attempt to access data in an empty struct.");
 
@@ -2324,7 +2334,6 @@ matlab_struct::sub::operator T() const
     if (temp == 0)
         throw dlib::error("Attempt to access data in an empty struct.");
 
-    T item;
     try
     {
         mex_binding::validate_and_populate_arg(0,temp,item);
@@ -2336,7 +2345,6 @@ matlab_struct::sub::operator T() const
              << endl << e.msg;
         throw dlib::error(sout.str());
     }
-    return item;
 }
 
 const matlab_struct::sub matlab_struct::

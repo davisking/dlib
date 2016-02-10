@@ -1027,6 +1027,7 @@ namespace dlib
 
             void _private_mark_non_persistent()
             {
+                DLIB_CASSERT(mem == 0,"You can't convert a persistent matlab array to non-persistent.");
                 make_persistent = false;
             }
 
@@ -1148,6 +1149,7 @@ namespace dlib
 
             void _private_mark_non_persistent()
             {
+                DLIB_CASSERT(mem == 0,"You can't convert a persistent matlab array to non-persistent.");
                 make_persistent = false;
             }
 

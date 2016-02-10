@@ -30,6 +30,9 @@ class matlab_struct
 
             To get the values as C++ types you do something like this:
                 int val = mystruct["field"];
+            or 
+                int val;  
+                mystruct["field"].get(val);
 
             See also example_mex_struct.cpp for an example that uses this part of the API.
     !*/
@@ -53,6 +56,7 @@ private:
         sub() : struct_handle(0), field_idx(-1) {}
 
         template <typename T> operator T() const;
+        template <typename T> void get(T& item) const; 
         template <typename T> sub& operator= (const T& new_val);
         const sub operator[] (const std::string& name) const;
         sub operator[] (const std::string& name);
