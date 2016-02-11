@@ -1435,6 +1435,9 @@ namespace dlib
             }
             else
             {
+                DLIB_ASSERT(size() == 0, 
+                    "\t const matrix::operator+=(m)"
+                    << "\n\t You are trying to add two matrices that have incompatible dimensions.");
                 *this = m;
             }
             return *this;
@@ -1469,6 +1472,9 @@ namespace dlib
             }
             else
             {
+                DLIB_ASSERT(size() == 0, 
+                    "\t const matrix::operator-=(m)"
+                    << "\n\t You are trying to subtract two matrices that have incompatible dimensions.");
                 *this = -m;
             }
             return *this;
@@ -1495,6 +1501,10 @@ namespace dlib
             }
             else
             {
+                DLIB_ASSERT(this->size() == 0, 
+                    "\t const matrix::operator+=(m)"
+                    << "\n\t You are trying to add two matrices that have incompatible dimensions.");
+
                 set_size(m.nr(), m.nc());
                 for (long i = 0; i < size; ++i)
                     data(i) = m.data(i);
@@ -1514,6 +1524,9 @@ namespace dlib
             }
             else
             {
+                DLIB_ASSERT(this->size() == 0, 
+                    "\t const matrix::operator-=(m)"
+                    << "\n\t You are trying to subtract two matrices that have incompatible dimensions.");
                 set_size(m.nr(), m.nc());
                 for (long i = 0; i < size; ++i)
                     data(i) = -m.data(i);
