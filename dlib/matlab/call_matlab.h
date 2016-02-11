@@ -520,5 +520,12 @@ void call_matlab (
 
 // ----------------------------------------------------------------------------------------
 
+// We define this function here so that, if you write some code that has check_for_ctrl_c()
+// sprinkled throughout it you can still compile that code outside the mex wrapper
+// environment and these calls will simply be no-ops.
+#ifndef MATLAB_MEX_FILE
+inline void check_for_ctrl_c() {}
+#endif
+
 #endif // MIT_LL_CALL_MATLAB_H__
 
