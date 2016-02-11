@@ -466,6 +466,19 @@ class build(_build):
         if sys.version_info >= (3, 0):
             cmake_extra_arch += ['-DPYTHON3=yes']
 
+        log.info("Detected platform: %s" % sys.platform)
+        if sys.platform == "darwin":
+            # build on OS X
+            inc_dir = get_python_inc()
+            cmake_extra_arch += ['-DPYTHON_INCLUDE_DIR={inc}'.format(inc=inc_dir)]
+
+            # by default, cmake will choose the system python lib in /usr/lib
+            # this checks the sysconfig and will correctly pick up a brewed python lib
+            # e.g. in /usr/local/Cellar
+            py_ver = get_python_version()
+            py_lib = os.path.join(get_config_var('LIBDIR'), 'libpython'+py_ver+'.dylib')
+            cmake_extra_arch += ['-DPYTHON_LIBRARY={lib}'.format(lib=py_lib)]
+
         if platform_arch == '64bit' and sys.platform == "win32":
             # 64bit build on Windows
 
