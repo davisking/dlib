@@ -37,7 +37,7 @@ from distutils.command.build_ext import build_ext as _build_ext
 from distutils.command.build import build as _build
 from distutils.errors import DistutilsSetupError
 from distutils.spawn import find_executable
-from distutils.sysconfig import get_python_inc, get_python_version
+from distutils.sysconfig import get_python_inc, get_python_version, get_config_var
 from distutils import log
 import os
 import sys
