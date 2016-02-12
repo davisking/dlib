@@ -492,6 +492,10 @@ namespace dlib
         /*!
             requires
                 - matrix_exp<EXP>::type == T
+                - One of the following is true:
+                    - nr() == m.nr() && nc() == m.nc()
+                    - size() == 0
+                  (i.e. this matrix must have matching dimensions or it must be empty)
             ensures
                 - if (nr() == m.nr() && nc() == m.nc()) then
                     - #(*this) == *this + m
@@ -509,6 +513,10 @@ namespace dlib
         /*!
             requires
                 - matrix_exp<EXP>::type == T
+                - One of the following is true:
+                    - nr() == m.nr() && nc() == m.nc()
+                    - size() == 0
+                  (i.e. this matrix must have matching dimensions or it must be empty)
             ensures
                 - if (nr() == m.nr() && nc() == m.nc()) then
                     - #(*this) == *this - m
