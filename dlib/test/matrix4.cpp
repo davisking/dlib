@@ -631,6 +631,16 @@ namespace
                 3,3,3;
             DLIB_TEST(upperbound(m,3) == M);
         }
+        
+        {
+            matrix<double,9,5> A = randm(9,5);
+            matrix<double> B = A;
+            
+            orthogonalize(A);
+            orthogonalize(B);
+            
+            DLIB_TEST(equal(A,B));
+        }
     }
 
 

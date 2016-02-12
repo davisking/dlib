@@ -62,8 +62,9 @@ namespace dlib
         const matrix_type get_q (
         ) const;
 
+        template <typename T, long R, long C, typename MM, typename L>
         void get_q (
-            matrix_type& Q
+            matrix<T,R,C,MM,L>& Q
         ) const;
 
         template <typename EXP>
@@ -270,9 +271,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename matrix_exp_type>
+    template <typename T, long R, long C, typename MM, typename L>
     void qr_decomposition<matrix_exp_type>::
     get_q(
-        matrix_type& X
+        matrix<T,R,C,MM,L>& X
     ) const
     {
 #ifdef DLIB_USE_LAPACK
