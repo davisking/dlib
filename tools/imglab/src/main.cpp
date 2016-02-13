@@ -60,7 +60,7 @@ void create_new_dataset (
             // then parser[i] should be a directory
 
             std::vector<file> files = get_files_in_directory_tree(parser[i], 
-                                                                  match_endings(".png .PNG .jpeg .JPEG .jpg .JPG .bmp .BMP .dng .DNG"),
+                                                                  match_endings(".png .PNG .jpeg .JPEG .jpg .JPG .bmp .BMP .dng .DNG .gif .GIF"),
                                                                   depth);
             sort(files.begin(), files.end());
 
