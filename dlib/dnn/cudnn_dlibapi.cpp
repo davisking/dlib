@@ -431,12 +431,16 @@ namespace dlib
 
             const float in_scale = 1;
             const float out_scale = 1;
+            const float in_scale_params = 1;
+            const float out_scale_params = 0;
 
             CHECK_CUDNN(cudnnBatchNormalizationBackward(
                                 context(),
                                 CUDNN_BATCHNORM_PER_ACTIVATION,
                                 &in_scale,
                                 &out_scale,
+                                &in_scale_params,
+                                &out_scale_params,
                                 descriptor(src),
                                 src.device(),
                                 descriptor(gradient_input),
@@ -600,12 +604,16 @@ namespace dlib
 
             const float in_scale = 1;
             const float out_scale = 1;
+            const float in_scale_params = 1;
+            const float out_scale_params = 0;
 
             CHECK_CUDNN(cudnnBatchNormalizationBackward(
                                 context(),
                                 CUDNN_BATCHNORM_SPATIAL,
                                 &in_scale,
                                 &out_scale,
+                                &in_scale_params,
+                                &out_scale_params,
                                 descriptor(src),
                                 src.device(),
                                 descriptor(gradient_input),

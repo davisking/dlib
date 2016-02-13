@@ -1,0 +1,17 @@
+
+message(STATUS "Looking for cuDNN install...")
+# Look for cudnn, we will look in the same place as other CUDA
+# libraries and also a few other places as well.
+find_path(cudnn_include cudnn.h
+    HINTS ${CUDA_INCLUDE_DIRS}
+    PATHS /usr/local/include
+    )
+get_filename_component(cudnn_hint_path ${CUDA_CUBLAS_LIBRARIES} PATH)
+find_library(cudnn cudnn
+    HINTS ${cudnn_hint_path}
+    PATHS /usr/local/lib64 
+            /usr/local/cuda/lib64
+            /usr/local/cuda/lib
+            /usr/local/lib
+    )
+mark_as_advanced(cudnn cudnn_include)
