@@ -595,7 +595,7 @@ namespace dlib
                     if (active_size == index.size())
                         break;
 
-                    // Turn of shrinking on the next iteration.  We will stop if the
+                    // Turn off shrinking on the next iteration.  We will stop if the
                     // tolerance is still <= eps when shrinking is off.
                     active_size = index.size();
                     PG_max_prev = std::numeric_limits<scalar_type>::infinity();
