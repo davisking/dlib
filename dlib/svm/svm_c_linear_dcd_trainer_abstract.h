@@ -67,6 +67,7 @@ namespace dlib
                 - #forces_last_weight_to_1() == false
                 - #includes_bias() == true
                 - #shrinking_enabled() == true
+                - #solving_svm_l2_problem() == false
         !*/
 
         explicit svm_c_linear_dcd_trainer (
@@ -86,6 +87,7 @@ namespace dlib
                 - #forces_last_weight_to_1() == false
                 - #includes_bias() == true
                 - #shrinking_enabled() == true
+                - #solving_svm_l2_problem() == false
         !*/
 
         bool includes_bias (
@@ -138,6 +140,23 @@ namespace dlib
         /*!
             ensures
                 - #shrinking_enabled() == enabled
+        !*/
+
+        bool solving_svm_l2_problem (
+        ) const; 
+        /*!
+            ensures
+                - returns true if this solver will solve the L2 version of the SVM
+                  objective function.  That is, if solving_svm_l2_problem()==true then this
+                  object, rather than using the hinge loss, uses the squared hinge loss.
+        !*/
+
+        void solve_svm_l2_problem (
+            bool enabled
+        ); 
+        /*!
+            ensures
+                - #solving_svm_l2_problem() == enabled
         !*/
 
         void be_verbose (
