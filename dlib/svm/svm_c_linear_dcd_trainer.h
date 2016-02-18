@@ -414,6 +414,9 @@ namespace dlib
             dlib::rand rnd;
 
         public:
+
+            const std::vector<scalar_type>& get_alpha () const { return alpha; }
+
             friend void serialize(const optimizer_state& item, std::ostream& out)
             {
                 const int version = 1;
