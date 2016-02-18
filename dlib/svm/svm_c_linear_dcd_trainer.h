@@ -228,12 +228,17 @@ namespace dlib
         private:
 
             template <
-                typename in_sample_vector_type
+                typename in_sample_vector_type,
+                typename in_scalar_vector_type
                 >
             void init(
                 const in_sample_vector_type& x,
+                const in_scalar_vector_type& y,
                 bool have_bias_,
-                bool last_weight_1_
+                bool last_weight_1_,
+                bool do_svm_l2_,
+                scalar_type Cpos,
+                scalar_type Cneg
             )
             {
                 const long new_dims = max_index_plus_one(x);
@@ -345,6 +350,14 @@ namespace dlib
                     else if (Q.back() != 0)
                     {
                         index.push_back(i);
+                    }
+
+                    if (do_svm_l2_)
+                    {
+                        if (y(i) > 0)
+                            Q.back() += 1/(2*Cpos);
+                        else
+                            Q.back() += 1/(2*Cneg);
                     }
                 }
 
@@ -499,7 +512,7 @@ namespace dlib
             }
 #endif
 
-            state.init(x,have_bias,last_weight_1);
+            state.init(x,y,have_bias,last_weight_1,do_svm_l2,Cpos,Cneg);
 
             std::vector<scalar_type>& alpha = state.alpha;
             scalar_vector_type& w = state.w;
