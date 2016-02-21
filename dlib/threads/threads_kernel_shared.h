@@ -43,7 +43,7 @@ extern "C"
     extern int USER_ERROR__missing_dlib_all_source_cpp_file__OR__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives_;
     inline int dlib_check_consistent_assert_usage() { USER_ERROR__missing_dlib_all_source_cpp_file__OR__inconsistent_use_of_DEBUG_or_ENABLE_ASSERTS_preprocessor_directives_ = 0; return 0; }
 #endif
-    const int dlib_check_assert_helper_variable = dlib_check_consistent_assert_usage();
+    const int DLIB_NO_WARN_UNUSED dlib_check_assert_helper_variable = dlib_check_consistent_assert_usage();
 }
 
 

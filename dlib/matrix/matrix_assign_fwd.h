@@ -5,8 +5,9 @@
 
 // GCC 4.8 gives false alarms about some variables being uninitialized.  Disable these
 // false warnings.
-#if ( defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ == 8)
-    #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#if defined(__GNUC__) && ((__GNUC__ >= 4 && __GNUC_MINOR__ >= 8) || (__GNUC__ > 4))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 
 #include "../enable_if.h"
@@ -402,6 +403,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
 }
+
+#if defined(__GNUC__) && ((__GNUC__ >= 4 && __GNUC_MINOR__ >= 8) || (__GNUC__ > 4))
+#pragma GCC diagnostic pop
+#endif
 
 #endif // DLIB_MATRIx_ASSIGn_FWD_
 

@@ -283,8 +283,10 @@ namespace
 
     matrix<double,2,1> rosen_residual_derivative_double (int i, const matrix<double,2,1>& m)
     { return rosen_residual_derivative(i,m); }
+    /*
     matrix<float,2,1> rosen_residual_derivative_float (int i, const matrix<float,2,1>& m)
     { return rosen_residual_derivative(i,m); }
+    */
 
     double rosen_big_residual_double (int i, const matrix<double,2,1>& m)
     { return rosen_big_residual(i,m); }
