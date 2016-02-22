@@ -35,7 +35,7 @@ namespace dlib
                     Minimize: f(w) == 0.5*(1-lasso_lambda)*length_squared(w) + lasso_lambda*sum(abs(w)) + C*R(w)
 
                     Where lasso_lambda is a number in the range [0, 1) and controls
-                    trade-off between doing L2 and L2 regularization.  R(w) has the same
+                    trade-off between doing L1 and L2 regularization.  R(w) has the same
                     interpretation as above.
                        
 
@@ -153,7 +153,7 @@ namespace dlib
                     Minimize: f(w) == 0.5*(1-lasso_lambda)*length_squared(w) + lasso_lambda*sum(abs(w)) + C*R(w)
 
                     Where lasso_lambda is a number in the range [0, 1) and controls
-                    trade-off between doing L2 and L2 regularization.  R(w) has the same
+                    trade-off between doing L1 and L2 regularization.  R(w) has the same
                     interpretation as above.
                        
 
