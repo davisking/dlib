@@ -99,10 +99,11 @@ namespace
 
         const double C = 2;
 
-        matrix<double,0,1> alpha(2), true_alpha(2);
+        matrix<double,0,1> alpha(2), true_alpha(2), d(3), lambda;
         alpha = C/2, C/2;
+        d = 0;
 
-        solve_qp4_using_smo(A, tmp(trans(A)*A), b, alpha, 1e-9, 800);
+        solve_qp4_using_smo(A, tmp(trans(A)*A), b, d, alpha, lambda, 1e-9, 800);
         matrix<double,0,1> w = lowerbound(-A*alpha, 0);
 
         dlog << LINFO << "*******************************************************";
@@ -136,10 +137,11 @@ namespace
 
         const double C = 2;
 
-        matrix<double,0,1> alpha(2), true_alpha(2);
+        matrix<double,0,1> alpha(2), true_alpha(2), d(3), lambda;
         alpha = C/2, C/2;
+        d = 0;
 
-        solve_qp4_using_smo(A, tmp(trans(A)*A), b, alpha, 1e-9, 800);
+        solve_qp4_using_smo(A, tmp(trans(A)*A), b, d, alpha, lambda, 1e-9, 800);
         matrix<double,0,1> w = lowerbound(-A*alpha, 0);
 
         dlog << LINFO << "*******************************************************";
@@ -173,10 +175,11 @@ namespace
 
         const double C = 2;
 
-        matrix<double,0,1> alpha(2), true_alpha(2);
+        matrix<double,0,1> alpha(2), true_alpha(2), d(3), lambda;
         alpha = C/2, C/2;
+        d = 0;
 
-        solve_qp4_using_smo(A, tmp(trans(A)*A), b, alpha, 1e-9, 800);
+        solve_qp4_using_smo(A, tmp(trans(A)*A), b, d, alpha, lambda, 1e-9, 800);
         matrix<double,0,1> w = lowerbound(-A*alpha, 0);
 
         dlog << LINFO << "*******************************************************";
@@ -211,10 +214,11 @@ namespace
 
         const double C = 2;
 
-        matrix<double,0,1> alpha(3), true_alpha(3);
+        matrix<double,0,1> alpha(3), true_alpha(3), d(3), lambda;
         alpha = C/2, C/2, 0;
+        d = 0;
 
-        solve_qp4_using_smo(A, tmp(trans(A)*A), b, alpha, 1e-9, 800);
+        solve_qp4_using_smo(A, tmp(trans(A)*A), b, d, alpha, lambda, 1e-9, 800);
         matrix<double,0,1> w = lowerbound(-A*alpha, 0);
 
 
@@ -249,10 +253,10 @@ namespace
 
         const double C = 2;
 
-        matrix<double,0,1> alpha(2), true_alpha(2);
+        matrix<double,0,1> alpha(2), true_alpha(2), d(3), lambda;
         alpha = C/2, C/2;
 
-        solve_qp4_using_smo(A, tmp(trans(A)*A), b, alpha, 1e-9, 800);
+        solve_qp4_using_smo(A, tmp(trans(A)*A), b, d, alpha, lambda, 1e-9, 800);
         matrix<double,0,1> w = lowerbound(-A*alpha, 0);
 
         dlog << LINFO << "*******************************************************";
@@ -285,10 +289,10 @@ namespace
 
         const double C = 2;
 
-        matrix<double,0,1> alpha(3), true_alpha(3);
+        matrix<double,0,1> alpha(3), true_alpha(3), d(3), lambda;
         alpha = C/2, C/2, 0;
 
-        solve_qp4_using_smo(A, tmp(trans(A)*A), b, alpha, 1e-9, 800);
+        solve_qp4_using_smo(A, tmp(trans(A)*A), b, d, alpha, lambda, 1e-9, 800);
         matrix<double,0,1> w = lowerbound(-A*alpha, 0);
 
         dlog << LINFO << "*******************************************************";
@@ -327,10 +331,11 @@ namespace
 
         const double C = 2;
 
-        matrix<double,0,1> alpha(3), true_alpha(3);
+        matrix<double,0,1> alpha(3), true_alpha(3), d(3), lambda;
         alpha = C/2, C/2, 0;
+        d = 0;
 
-        solve_qp4_using_smo(A, Q, b, alpha, 1e-9, 800);
+        solve_qp4_using_smo(A, Q, b, d, alpha, lambda, 1e-9, 800);
 
         dlog << LINFO << "*******************************************************";
 
