@@ -74,7 +74,7 @@ namespace dlib
         )
         {
             bool my_fault = true;
-            uint64 this_con_id;
+            uint64 this_con_id=0;
             try
             {
                 sockstreambuf buf(&con);

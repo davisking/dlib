@@ -215,15 +215,20 @@ namespace dlib
         typename EXP1,
         typename EXP2,
         typename EXP3,
-        typename T, long NR, long NC, typename MM, typename L
+        typename EXP4,
+        typename T, long NR, long NC, typename MM, typename L,
+        long NR2, long NC2
         >
     unsigned long solve_qp4_using_smo ( 
         const matrix_exp<EXP1>& A,
         const matrix_exp<EXP2>& Q,
         const matrix_exp<EXP3>& b,
+        const matrix_exp<EXP4>& d,
         matrix<T,NR,NC,MM,L>& alpha,
+        matrix<T,NR2,NC2,MM,L>& lambda,
         T eps,
-        unsigned long max_iter
+        unsigned long max_iter,
+        T max_lambda = std::numeric_limits<T>::infinity()
     )
     {
         // make sure requires clause is not broken
@@ -251,6 +256,15 @@ namespace dlib
                      << "\n\t eps:                  " << eps 
                      << "\n\t max_iter:             " << max_iter 
         );
+        DLIB_ASSERT(is_col_vector(d) == true &&
+                     max_lambda >= 0 &&
+                     d.size() == A.nr(),
+                     "\t void solve_qp4_using_smo()"
+                     << "\n\t Invalid arguments were given to this function"
+                     << "\n\t A.nr():     " << A.nr()
+                     << "\n\t d.size():   " << d.size()
+                     << "\n\t max_lambda: " << max_lambda
+        );
 
         const T C = sum(alpha);
 
@@ -263,9 +277,14 @@ namespace dlib
             solve_qp_using_smo() routine.  
         */
 
+        const bool d_is_zero = d==zeros_matrix(d);
+
         // compute optimal lambda for current alpha
-        matrix<T,NR,1,MM,L> lambda = A*alpha;
-        lambda = lowerbound(lambda, 0);
+        if (d_is_zero)
+            lambda = A*alpha;
+        else
+            lambda = A*alpha + d;
+        lambda = clamp(lambda, 0, max_lambda);
 
         // Compute f'(alpha) (i.e. the gradient of f(alpha) with respect to alpha) for the current alpha.  
         matrix<T,NR,NC,MM,L> df = Q*alpha - b - trans(A)*lambda;
@@ -308,8 +327,11 @@ namespace dlib
             {
                 // compute optimal lambda and recheck the duality gap to make
                 // sure we have really converged.
-                lambda = A*alpha;
-                lambda = lowerbound(lambda, 0);
+                if (d_is_zero)
+                    lambda = A*alpha;
+                else
+                    lambda = A*alpha + d;
+                lambda = clamp(lambda, 0, max_lambda);
                 df = Q*alpha - b - trans(A)*lambda;
 
                 if (trans(alpha)*df - C*min(df) < eps)
@@ -347,8 +369,11 @@ namespace dlib
             if ((iter%300) == 299)
             {
                 // compute the optimal lambda for the current alpha
-                lambda = A*alpha;
-                lambda = lowerbound(lambda, 0);
+                if (d_is_zero)
+                    lambda = A*alpha;
+                else
+                    lambda = A*alpha + d;
+                lambda = clamp(lambda, 0, max_lambda);
 
                 // Perform this form of the update every so often because doing so can help
                 // avoid the buildup of numerical errors you get with the alternate update
