@@ -432,7 +432,7 @@ if (NOT TARGET dlib)
                    ARCHIVE DESTINATION lib)
        endif()
 
-       install(DIRECTORY ${CMAKE_SOURCE_DIR}/ DESTINATION include/dlib
+       install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION include/dlib
                FILES_MATCHING PATTERN "*.h"
                REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
 
