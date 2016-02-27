@@ -60,7 +60,7 @@ namespace dlib
                 - #get_max_num_epochs() == 10000
                 - #get_mini_batch_size() == 128
                 - #get_step_size() == 1
-                - #get_min_step_size() == 1e-4
+                - #get_min_step_size() == 1e-3
                 - #get_iterations_between_step_size_adjust() == 2000
                 - #get_step_size_shrink() == 0.1
         !*/
@@ -149,7 +149,7 @@ namespace dlib
                 - #get_max_num_epochs() == num
         !*/
 
-        void set_setep_size (
+        void set_step_size (
             double ss
         );
         /*!
