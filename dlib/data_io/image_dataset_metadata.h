@@ -45,7 +45,9 @@ namespace dlib
                 truncated(false),
                 occluded(false),
                 ignore(false),
-                angle(0)
+                angle(0),
+                pose(0),
+                detection_score(0)
             {}
 
             rectangle rect;
@@ -58,6 +60,8 @@ namespace dlib
             bool truncated;
             bool occluded;
             bool ignore;
+            double pose;
+            double detection_score;
 
             // The angle of the object in radians.  Positive values indicate that the
             // object at the center of the box is rotated clockwise by angle radians.  A
