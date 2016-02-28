@@ -34,7 +34,9 @@ namespace dlib
                 truncated(false),
                 occluded(false),
                 ignore(false),
-                angle(0)
+                angle(0),
+                pose(0),
+                detection_score(0)
             {}
 
             box (
