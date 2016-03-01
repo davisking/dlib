@@ -7,6 +7,42 @@
    <!-- ************************************************************************* -->
    <questions group="General">
 
+      <question text="It doesn't work?">
+         Do not post a question like "I'm using dlib, and it doesn't work?" or
+         "I'm using the object detector and it doesn't work, what do I do?".
+         If this is all you say then I have no idea what is wrong.  99% of the
+         time it's some kind of user error.  1% of the time it's some problem
+         in dlib.  But again, without more information it's impossible to know.
+         So please don't post questions like this.  
+
+         <p>
+         If you think you found some kind of bug or problem in dlib then feel
+         free to post on <a href="https://sourceforge.net/p/dclib/discussion">sourceforge</a> 
+         or <a href="https://github.com/davisking/dlib/issues">github</a>.  
+         But include the version of dlib you are using, what you
+         are trying, what happened, what you expected to have happened instead, etc.
+         </p>
+
+         <p>
+         On the other hand, if you haven't found a bug or problem in dlib, but
+         instead are looking for machine learning/computer vision/programming
+         consulting then you can still <a href="https://sourceforge.net/p/dclib/discussion">post your question on sourceforge</a>.  
+         But be clear that this is what you are asking for.  Maybe someone will
+         help you or you can find someone to pay money in exchange for a
+         solution to your problem.  
+         </p>
+         
+         <p>
+         However, don't try to get someone to write your code for you by
+         repeatedly asking a question like "ok, what do I type next to make a
+         program that does X?".  I get this question all the time from people 
+         who obviously don't know how to program.  If you are not familiar
+         with C++ it's much better to learn it by 
+         <a href="http://dlib.net/books.html">reading one of the excellent books on the topic</a>
+         than by an infinite sequence of questions posted in the dlib forums.
+         </p>
+
+      </question>
 
       <question text="How can I use dlib in Visual Studio?">
          There are instructions on the <a href="compile.html">How to Compile</a> page.  

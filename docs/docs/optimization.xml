@@ -507,9 +507,9 @@ subject to the following constraint:
                                 0.5*trans(lambda)*lambda - trans(lambda)*A*alpha - trans(lambda)*d
    subject to the following constraints:
       sum(alpha)  == C 
-      min(alpha)  >= 0 
-      min(lambda) >= 0
-      max(lambda) <= max_lambda 
+      min(alpha)  &gt;= 0 
+      min(lambda) &gt;= 0
+      max(lambda) &lt;= max_lambda 
    Where f is convex.  This means that Q should be positive-semidefinite.
 </pre>
 
