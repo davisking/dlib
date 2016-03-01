@@ -132,6 +132,13 @@ if (NOT TARGET dlib)
          stack_trace.cpp
          )
 
+      set(dlib_needed_libraries)
+      if(UNIX)
+         set(CMAKE_THREAD_PREFER_PTHREAD ON)
+         find_package(Threads REQUIRED)
+         set(dlib_needed_libraries ${dlib_needed_libraries} ${CMAKE_THREAD_LIBS_INIT})
+      endif()
+
       # we want to link to the right stuff depending on our platform.  
       if (WIN32 AND NOT CYGWIN) ###############################################################################
          if (DLIB_NO_GUI_SUPPORT)
@@ -140,9 +147,6 @@ if (NOT TARGET dlib)
             set (dlib_needed_libraries ws2_32 winmm comctl32 gdi32 imm32)
          endif()
       elseif(APPLE) ############################################################################
-         find_library(pthreadlib pthread)
-         set (dlib_needed_libraries ${pthreadlib})
-
          if (NOT DLIB_NO_GUI_SUPPORT)
             find_package(X11 QUIET)
             if (X11_FOUND)
@@ -178,9 +182,6 @@ if (NOT TARGET dlib)
 
          mark_as_advanced(pthreadlib xlib xlib_path x11_path)
       else () ##################################################################################
-         find_library(pthreadlib pthread)
-         set (dlib_needed_libraries ${pthreadlib})
-
          # link to the nsl library if it exists.  this is something you need sometimes 
          find_library(nsllib nsl)
          if (nsllib)
@@ -431,7 +432,7 @@ if (NOT TARGET dlib)
                    ARCHIVE DESTINATION lib)
        endif()
 
-       install(DIRECTORY ${CMAKE_SOURCE_DIR}/ DESTINATION include/dlib
+       install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION include/dlib
                FILES_MATCHING PATTERN "*.h"
                REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
 
