@@ -455,6 +455,9 @@ if (NOT TARGET dlib)
             # linux).
             list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-std=c++11;-D__STRICT_ANSI__")
 
+            set(CUDNN_INCLUDE_DIR "" CACHE PATH "Directory in which to look for cudnn include files")
+            set(CUDNN_LIBRARY_DIR "" CACHE PATH "Directory in which to look for cudnn library")
+
             include(dnn/test_for_cudnn/find_cudnn.txt)
 
             if (cudnn AND NOT DEFINED cuda_test_compile_worked AND NOT DEFINED cudnn_test_compile_worked)
