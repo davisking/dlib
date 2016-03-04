@@ -468,7 +468,7 @@ if (NOT TARGET dlib)
                   message(STATUS "Checking if you have the right version of cuDNN installed.")
                   try_compile(cudnn_test_compile_worked ${PROJECT_BINARY_DIR}/cudnn_test_build 
                               ${PROJECT_SOURCE_DIR}/dnn/test_for_cudnn cudnn_test
-                              CMAKE_FLAGS -Dcudnn=${cudnn} -Dcudnn_include=${cudnn_include})
+                              CMAKE_FLAGS -DCUDNN_INCLUDE_DIR=${CUDNN_INCLUDE_DIR} -DCUDNN_LIBRARY_DIR=${CUDNN_LIBRARY_DIR})
                   if (cudnn_test_compile_worked)
                      message(STATUS "Found cuDNN: " ${cudnn})
                   else()
