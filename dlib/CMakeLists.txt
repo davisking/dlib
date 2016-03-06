@@ -455,6 +455,9 @@ if (NOT TARGET dlib)
             # linux).
             list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-std=c++11;-D__STRICT_ANSI__")
 
+            set(CUDNN_INCLUDE_DIR "" CACHE PATH "Directory in which to look for cudnn include files")
+            set(CUDNN_LIBRARY_DIR "" CACHE PATH "Directory in which to look for cudnn library")
+
             include(dnn/test_for_cudnn/find_cudnn.txt)
 
             if (cudnn AND NOT DEFINED cuda_test_compile_worked AND NOT DEFINED cudnn_test_compile_worked)
@@ -467,7 +470,8 @@ if (NOT TARGET dlib)
                else()
                   message(STATUS "Checking if you have the right version of cuDNN installed.")
                   try_compile(cudnn_test_compile_worked ${PROJECT_BINARY_DIR}/cudnn_test_build 
-                              ${PROJECT_SOURCE_DIR}/dnn/test_for_cudnn cudnn_test)
+                              ${PROJECT_SOURCE_DIR}/dnn/test_for_cudnn cudnn_test
+                              CMAKE_FLAGS -DCUDNN_INCLUDE_DIR=${CUDNN_INCLUDE_DIR} -DCUDNN_LIBRARY_DIR=${CUDNN_LIBRARY_DIR})
                   if (cudnn_test_compile_worked)
                      message(STATUS "Found cuDNN: " ${cudnn})
                   else()
