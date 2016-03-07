@@ -465,7 +465,7 @@ namespace dlib
 
         // First we use a coordinate descent method to initialize alpha. 
         double max_df = 0;
-        for (unsigned long iter = 0; iter < alpha.size()*2; ++iter)
+        for (long iter = 0; iter < alpha.size()*2; ++iter)
         {
             max_df = 0;
             long best_r =0;
