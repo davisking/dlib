@@ -57,7 +57,7 @@ using namespace std;
 // Make a function named mex_function() and put your code inside it.
 // Note that the return type should be void.  Use non-const reference
 // arguments to return outputs.  Finally, mex_function() must have no
-// more than 10 arguments.
+// more than 20 arguments.
 void mex_function (
     const matrix_colmajor& x,
     const matrix_colmajor& y,
