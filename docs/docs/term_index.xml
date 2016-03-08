@@ -153,6 +153,7 @@
          <term file="optimization.html" name="find_min_single_variable"       include="dlib/optimization.h"/>
          <term file="optimization.html" name="find_min_using_approximate_derivatives" include="dlib/optimization.h"/>
          <term file="optimization.html" name="find_min_bobyqa"                include="dlib/optimization.h"/>
+         <term file="optimization.html" name="solve_qp_box_constrained"       include="dlib/optimization.h"/>
          <term file="optimization.html" name="solve_qp_using_smo"             include="dlib/optimization.h"/>
          <term file="optimization.html" name="solve_qp2_using_smo"            include="dlib/optimization.h"/>
          <term file="optimization.html" name="solve_qp3_using_smo"            include="dlib/optimization.h"/>

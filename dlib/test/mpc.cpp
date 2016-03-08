@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include <dlib/control.h>
+#include <dlib/optimization.h>
 #include "tester.h"
 
 namespace  
@@ -313,6 +314,27 @@ namespace
 
                 initial_state = A*initial_state + B*control + C;
                 //cout << control(0) << "\t" << trans(initial_state);
+            }
+
+            {
+                // also just generally test our QP solver.
+                matrix<double,20,20> Q = gaussian_randm(20,20,5);
+                Q = Q*trans(Q);
+
+                matrix<double,20,1> b = randm(20,1)-0.5;
+                matrix<double,20,1> alpha, lower, upper, alpha2;
+                alpha = 0;
+                alpha2 = 0;
+                lower = -4;
+                upper = 3;
+
+                solve_qp_box_using_smo(Q,b,alpha,lower, upper, 0.000000001, 500000);
+                solve_qp_box_constrained(Q,b,alpha2,lower, upper, 0.000000001, 50000);
+                dlog << LINFO << trans(alpha);
+                dlog << LINFO << trans(alpha2);
+                dlog << LINFO << "objective value:  " << 0.5*trans(alpha)*Q*alpha + trans(b)*alpha;
+                dlog << LINFO << "objective value2: " << 0.5*trans(alpha2)*Q*alpha + trans(b)*alpha2;
+                DLIB_TEST_MSG(max(abs(alpha-alpha2)) < 1e-7, max(abs(alpha-alpha2)));
             }
         }
     } a;
