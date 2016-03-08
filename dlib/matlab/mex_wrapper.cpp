@@ -173,6 +173,66 @@
 #define ELSE_ASSIGN_ARG_10
 #endif
 
+#ifdef ARG_11_DEFAULT 
+#define ELSE_ASSIGN_ARG_11 else A11 = ARG_11_DEFAULT;
+#else
+#define ELSE_ASSIGN_ARG_11
+#endif
+
+#ifdef ARG_12_DEFAULT 
+#define ELSE_ASSIGN_ARG_12 else A12 = ARG_12_DEFAULT;
+#else
+#define ELSE_ASSIGN_ARG_12
+#endif
+
+#ifdef ARG_13_DEFAULT 
+#define ELSE_ASSIGN_ARG_13 else A13 = ARG_13_DEFAULT;
+#else
+#define ELSE_ASSIGN_ARG_13
+#endif
+
+#ifdef ARG_14_DEFAULT 
+#define ELSE_ASSIGN_ARG_14 else A14 = ARG_14_DEFAULT;
+#else
+#define ELSE_ASSIGN_ARG_14
+#endif
+
+#ifdef ARG_15_DEFAULT 
+#define ELSE_ASSIGN_ARG_15 else A15 = ARG_15_DEFAULT;
+#else
+#define ELSE_ASSIGN_ARG_15
+#endif
+
+#ifdef ARG_16_DEFAULT 
+#define ELSE_ASSIGN_ARG_16 else A16 = ARG_16_DEFAULT;
+#else
+#define ELSE_ASSIGN_ARG_16
+#endif
+
+#ifdef ARG_17_DEFAULT 
+#define ELSE_ASSIGN_ARG_17 else A17 = ARG_17_DEFAULT;
+#else
+#define ELSE_ASSIGN_ARG_17
+#endif
+
+#ifdef ARG_18_DEFAULT 
+#define ELSE_ASSIGN_ARG_18 else A18 = ARG_18_DEFAULT;
+#else
+#define ELSE_ASSIGN_ARG_18
+#endif
+
+#ifdef ARG_19_DEFAULT 
+#define ELSE_ASSIGN_ARG_19 else A19 = ARG_19_DEFAULT;
+#else
+#define ELSE_ASSIGN_ARG_19
+#endif
+
+#ifdef ARG_20_DEFAULT 
+#define ELSE_ASSIGN_ARG_20 else A20 = ARG_20_DEFAULT;
+#else
+#define ELSE_ASSIGN_ARG_20
+#endif
+
 // ----------------------------------------------------------------------------------------
 
 namespace mex_binding
@@ -203,7 +263,17 @@ namespace mex_binding
             is_input_type<typename sig_traits<funct>::arg7_type>::value +
             is_input_type<typename sig_traits<funct>::arg8_type>::value +
             is_input_type<typename sig_traits<funct>::arg9_type>::value +
-            is_input_type<typename sig_traits<funct>::arg10_type>::value; 
+            is_input_type<typename sig_traits<funct>::arg10_type>::value + 
+            is_input_type<typename sig_traits<funct>::arg11_type>::value + 
+            is_input_type<typename sig_traits<funct>::arg12_type>::value + 
+            is_input_type<typename sig_traits<funct>::arg13_type>::value + 
+            is_input_type<typename sig_traits<funct>::arg14_type>::value + 
+            is_input_type<typename sig_traits<funct>::arg15_type>::value + 
+            is_input_type<typename sig_traits<funct>::arg16_type>::value + 
+            is_input_type<typename sig_traits<funct>::arg17_type>::value + 
+            is_input_type<typename sig_traits<funct>::arg18_type>::value + 
+            is_input_type<typename sig_traits<funct>::arg19_type>::value + 
+            is_input_type<typename sig_traits<funct>::arg20_type>::value; 
 
         const static unsigned long num_outputs= is_output_type<typename sig_traits<funct>::arg1_type>::value +
             is_output_type<typename sig_traits<funct>::arg2_type>::value +
@@ -214,7 +284,17 @@ namespace mex_binding
             is_output_type<typename sig_traits<funct>::arg7_type>::value +
             is_output_type<typename sig_traits<funct>::arg8_type>::value +
             is_output_type<typename sig_traits<funct>::arg9_type>::value +
-            is_output_type<typename sig_traits<funct>::arg10_type>::value; 
+            is_output_type<typename sig_traits<funct>::arg10_type>::value + 
+            is_output_type<typename sig_traits<funct>::arg11_type>::value + 
+            is_output_type<typename sig_traits<funct>::arg12_type>::value + 
+            is_output_type<typename sig_traits<funct>::arg13_type>::value + 
+            is_output_type<typename sig_traits<funct>::arg14_type>::value + 
+            is_output_type<typename sig_traits<funct>::arg15_type>::value + 
+            is_output_type<typename sig_traits<funct>::arg16_type>::value + 
+            is_output_type<typename sig_traits<funct>::arg17_type>::value + 
+            is_output_type<typename sig_traits<funct>::arg18_type>::value + 
+            is_output_type<typename sig_traits<funct>::arg19_type>::value + 
+            is_output_type<typename sig_traits<funct>::arg20_type>::value; 
     };
 
 // ----------------------------------------------------------------------------------------
@@ -1550,6 +1630,1001 @@ namespace mex_binding
         }
     };
 
+    template <>
+    struct call_mex_function_helper<11>
+    {
+        template <typename funct>
+        void callit(
+            const funct& ,
+            int nlhs, mxArray *plhs[],
+            int nrhs, const mxArray *prhs[]
+        ) const
+        {
+            typedef typename sig_traits<funct>::arg1_type arg1_type;
+            typedef typename sig_traits<funct>::arg2_type arg2_type;
+            typedef typename sig_traits<funct>::arg3_type arg3_type;
+            typedef typename sig_traits<funct>::arg4_type arg4_type;
+            typedef typename sig_traits<funct>::arg5_type arg5_type;
+            typedef typename sig_traits<funct>::arg6_type arg6_type;
+            typedef typename sig_traits<funct>::arg7_type arg7_type;
+            typedef typename sig_traits<funct>::arg8_type arg8_type;
+            typedef typename sig_traits<funct>::arg9_type arg9_type;
+            typedef typename sig_traits<funct>::arg10_type arg10_type;
+            typedef typename sig_traits<funct>::arg11_type arg11_type;
+
+            typename basic_type<arg1_type>::type A1;
+            typename basic_type<arg2_type>::type A2;
+            typename basic_type<arg3_type>::type A3;
+            typename basic_type<arg4_type>::type A4;
+            typename basic_type<arg5_type>::type A5;
+            typename basic_type<arg6_type>::type A6;
+            typename basic_type<arg7_type>::type A7;
+            typename basic_type<arg8_type>::type A8;
+            typename basic_type<arg9_type>::type A9;
+            typename basic_type<arg10_type>::type A10;
+            typename basic_type<arg11_type>::type A11;
+
+            mark_non_persistent(A1);
+            mark_non_persistent(A2);
+            mark_non_persistent(A3);
+            mark_non_persistent(A4);
+            mark_non_persistent(A5);
+            mark_non_persistent(A6);
+            mark_non_persistent(A7);
+            mark_non_persistent(A8);
+            mark_non_persistent(A9);
+            mark_non_persistent(A10);
+            mark_non_persistent(A11);
+
+            int i = 0;
+            if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
+            if (i < nrhs && is_input_type<arg2_type>::value) {validate_and_populate_arg(i,prhs[i],A2); ++i;} ELSE_ASSIGN_ARG_2;
+            if (i < nrhs && is_input_type<arg3_type>::value) {validate_and_populate_arg(i,prhs[i],A3); ++i;} ELSE_ASSIGN_ARG_3;
+            if (i < nrhs && is_input_type<arg4_type>::value) {validate_and_populate_arg(i,prhs[i],A4); ++i;} ELSE_ASSIGN_ARG_4;
+            if (i < nrhs && is_input_type<arg5_type>::value) {validate_and_populate_arg(i,prhs[i],A5); ++i;} ELSE_ASSIGN_ARG_5;
+            if (i < nrhs && is_input_type<arg6_type>::value) {validate_and_populate_arg(i,prhs[i],A6); ++i;} ELSE_ASSIGN_ARG_6;
+            if (i < nrhs && is_input_type<arg7_type>::value) {validate_and_populate_arg(i,prhs[i],A7); ++i;} ELSE_ASSIGN_ARG_7;
+            if (i < nrhs && is_input_type<arg8_type>::value) {validate_and_populate_arg(i,prhs[i],A8); ++i;} ELSE_ASSIGN_ARG_8;
+            if (i < nrhs && is_input_type<arg9_type>::value) {validate_and_populate_arg(i,prhs[i],A9); ++i;} ELSE_ASSIGN_ARG_9;
+            if (i < nrhs && is_input_type<arg10_type>::value) {validate_and_populate_arg(i,prhs[i],A10); ++i;} ELSE_ASSIGN_ARG_10;
+            if (i < nrhs && is_input_type<arg11_type>::value) {validate_and_populate_arg(i,prhs[i],A11); ++i;} ELSE_ASSIGN_ARG_11;
+
+            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11);
+
+
+            i = 0;
+            if (is_output_type<arg1_type>::value) {assign_to_matlab(plhs[i],A1); ++i;}
+            if (is_output_type<arg2_type>::value) {assign_to_matlab(plhs[i],A2); ++i;}
+            if (is_output_type<arg3_type>::value) {assign_to_matlab(plhs[i],A3); ++i;}
+            if (is_output_type<arg4_type>::value) {assign_to_matlab(plhs[i],A4); ++i;}
+            if (is_output_type<arg5_type>::value) {assign_to_matlab(plhs[i],A5); ++i;}
+            if (is_output_type<arg6_type>::value) {assign_to_matlab(plhs[i],A6); ++i;}
+            if (is_output_type<arg7_type>::value) {assign_to_matlab(plhs[i],A7); ++i;}
+            if (is_output_type<arg8_type>::value) {assign_to_matlab(plhs[i],A8); ++i;}
+            if (is_output_type<arg9_type>::value) {assign_to_matlab(plhs[i],A9); ++i;}
+            if (is_output_type<arg10_type>::value) {assign_to_matlab(plhs[i],A10); ++i;}
+            if (is_output_type<arg11_type>::value) {assign_to_matlab(plhs[i],A11); ++i;}
+        }
+    };
+
+    template <>
+    struct call_mex_function_helper<12>
+    {
+        template <typename funct>
+        void callit(
+            const funct& ,
+            int nlhs, mxArray *plhs[],
+            int nrhs, const mxArray *prhs[]
+        ) const
+        {
+            typedef typename sig_traits<funct>::arg1_type arg1_type;
+            typedef typename sig_traits<funct>::arg2_type arg2_type;
+            typedef typename sig_traits<funct>::arg3_type arg3_type;
+            typedef typename sig_traits<funct>::arg4_type arg4_type;
+            typedef typename sig_traits<funct>::arg5_type arg5_type;
+            typedef typename sig_traits<funct>::arg6_type arg6_type;
+            typedef typename sig_traits<funct>::arg7_type arg7_type;
+            typedef typename sig_traits<funct>::arg8_type arg8_type;
+            typedef typename sig_traits<funct>::arg9_type arg9_type;
+            typedef typename sig_traits<funct>::arg10_type arg10_type;
+            typedef typename sig_traits<funct>::arg11_type arg11_type;
+            typedef typename sig_traits<funct>::arg12_type arg12_type;
+
+            typename basic_type<arg1_type>::type A1;
+            typename basic_type<arg2_type>::type A2;
+            typename basic_type<arg3_type>::type A3;
+            typename basic_type<arg4_type>::type A4;
+            typename basic_type<arg5_type>::type A5;
+            typename basic_type<arg6_type>::type A6;
+            typename basic_type<arg7_type>::type A7;
+            typename basic_type<arg8_type>::type A8;
+            typename basic_type<arg9_type>::type A9;
+            typename basic_type<arg10_type>::type A10;
+            typename basic_type<arg11_type>::type A11;
+            typename basic_type<arg12_type>::type A12;
+
+            mark_non_persistent(A1);
+            mark_non_persistent(A2);
+            mark_non_persistent(A3);
+            mark_non_persistent(A4);
+            mark_non_persistent(A5);
+            mark_non_persistent(A6);
+            mark_non_persistent(A7);
+            mark_non_persistent(A8);
+            mark_non_persistent(A9);
+            mark_non_persistent(A10);
+            mark_non_persistent(A11);
+            mark_non_persistent(A12);
+
+            int i = 0;
+            if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
+            if (i < nrhs && is_input_type<arg2_type>::value) {validate_and_populate_arg(i,prhs[i],A2); ++i;} ELSE_ASSIGN_ARG_2;
+            if (i < nrhs && is_input_type<arg3_type>::value) {validate_and_populate_arg(i,prhs[i],A3); ++i;} ELSE_ASSIGN_ARG_3;
+            if (i < nrhs && is_input_type<arg4_type>::value) {validate_and_populate_arg(i,prhs[i],A4); ++i;} ELSE_ASSIGN_ARG_4;
+            if (i < nrhs && is_input_type<arg5_type>::value) {validate_and_populate_arg(i,prhs[i],A5); ++i;} ELSE_ASSIGN_ARG_5;
+            if (i < nrhs && is_input_type<arg6_type>::value) {validate_and_populate_arg(i,prhs[i],A6); ++i;} ELSE_ASSIGN_ARG_6;
+            if (i < nrhs && is_input_type<arg7_type>::value) {validate_and_populate_arg(i,prhs[i],A7); ++i;} ELSE_ASSIGN_ARG_7;
+            if (i < nrhs && is_input_type<arg8_type>::value) {validate_and_populate_arg(i,prhs[i],A8); ++i;} ELSE_ASSIGN_ARG_8;
+            if (i < nrhs && is_input_type<arg9_type>::value) {validate_and_populate_arg(i,prhs[i],A9); ++i;} ELSE_ASSIGN_ARG_9;
+            if (i < nrhs && is_input_type<arg10_type>::value) {validate_and_populate_arg(i,prhs[i],A10); ++i;} ELSE_ASSIGN_ARG_10;
+            if (i < nrhs && is_input_type<arg11_type>::value) {validate_and_populate_arg(i,prhs[i],A11); ++i;} ELSE_ASSIGN_ARG_11;
+            if (i < nrhs && is_input_type<arg12_type>::value) {validate_and_populate_arg(i,prhs[i],A12); ++i;} ELSE_ASSIGN_ARG_12;
+
+            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12);
+
+
+            i = 0;
+            if (is_output_type<arg1_type>::value) {assign_to_matlab(plhs[i],A1); ++i;}
+            if (is_output_type<arg2_type>::value) {assign_to_matlab(plhs[i],A2); ++i;}
+            if (is_output_type<arg3_type>::value) {assign_to_matlab(plhs[i],A3); ++i;}
+            if (is_output_type<arg4_type>::value) {assign_to_matlab(plhs[i],A4); ++i;}
+            if (is_output_type<arg5_type>::value) {assign_to_matlab(plhs[i],A5); ++i;}
+            if (is_output_type<arg6_type>::value) {assign_to_matlab(plhs[i],A6); ++i;}
+            if (is_output_type<arg7_type>::value) {assign_to_matlab(plhs[i],A7); ++i;}
+            if (is_output_type<arg8_type>::value) {assign_to_matlab(plhs[i],A8); ++i;}
+            if (is_output_type<arg9_type>::value) {assign_to_matlab(plhs[i],A9); ++i;}
+            if (is_output_type<arg10_type>::value) {assign_to_matlab(plhs[i],A10); ++i;}
+            if (is_output_type<arg11_type>::value) {assign_to_matlab(plhs[i],A11); ++i;}
+            if (is_output_type<arg12_type>::value) {assign_to_matlab(plhs[i],A12); ++i;}
+        }
+    };
+
+    template <>
+    struct call_mex_function_helper<13>
+    {
+        template <typename funct>
+        void callit(
+            const funct& ,
+            int nlhs, mxArray *plhs[],
+            int nrhs, const mxArray *prhs[]
+        ) const
+        {
+            typedef typename sig_traits<funct>::arg1_type arg1_type;
+            typedef typename sig_traits<funct>::arg2_type arg2_type;
+            typedef typename sig_traits<funct>::arg3_type arg3_type;
+            typedef typename sig_traits<funct>::arg4_type arg4_type;
+            typedef typename sig_traits<funct>::arg5_type arg5_type;
+            typedef typename sig_traits<funct>::arg6_type arg6_type;
+            typedef typename sig_traits<funct>::arg7_type arg7_type;
+            typedef typename sig_traits<funct>::arg8_type arg8_type;
+            typedef typename sig_traits<funct>::arg9_type arg9_type;
+            typedef typename sig_traits<funct>::arg10_type arg10_type;
+            typedef typename sig_traits<funct>::arg11_type arg11_type;
+            typedef typename sig_traits<funct>::arg12_type arg12_type;
+            typedef typename sig_traits<funct>::arg13_type arg13_type;
+
+            typename basic_type<arg1_type>::type A1;
+            typename basic_type<arg2_type>::type A2;
+            typename basic_type<arg3_type>::type A3;
+            typename basic_type<arg4_type>::type A4;
+            typename basic_type<arg5_type>::type A5;
+            typename basic_type<arg6_type>::type A6;
+            typename basic_type<arg7_type>::type A7;
+            typename basic_type<arg8_type>::type A8;
+            typename basic_type<arg9_type>::type A9;
+            typename basic_type<arg10_type>::type A10;
+            typename basic_type<arg11_type>::type A11;
+            typename basic_type<arg12_type>::type A12;
+            typename basic_type<arg13_type>::type A13;
+
+            mark_non_persistent(A1);
+            mark_non_persistent(A2);
+            mark_non_persistent(A3);
+            mark_non_persistent(A4);
+            mark_non_persistent(A5);
+            mark_non_persistent(A6);
+            mark_non_persistent(A7);
+            mark_non_persistent(A8);
+            mark_non_persistent(A9);
+            mark_non_persistent(A10);
+            mark_non_persistent(A11);
+            mark_non_persistent(A12);
+            mark_non_persistent(A13);
+
+            int i = 0;
+            if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
+            if (i < nrhs && is_input_type<arg2_type>::value) {validate_and_populate_arg(i,prhs[i],A2); ++i;} ELSE_ASSIGN_ARG_2;
+            if (i < nrhs && is_input_type<arg3_type>::value) {validate_and_populate_arg(i,prhs[i],A3); ++i;} ELSE_ASSIGN_ARG_3;
+            if (i < nrhs && is_input_type<arg4_type>::value) {validate_and_populate_arg(i,prhs[i],A4); ++i;} ELSE_ASSIGN_ARG_4;
+            if (i < nrhs && is_input_type<arg5_type>::value) {validate_and_populate_arg(i,prhs[i],A5); ++i;} ELSE_ASSIGN_ARG_5;
+            if (i < nrhs && is_input_type<arg6_type>::value) {validate_and_populate_arg(i,prhs[i],A6); ++i;} ELSE_ASSIGN_ARG_6;
+            if (i < nrhs && is_input_type<arg7_type>::value) {validate_and_populate_arg(i,prhs[i],A7); ++i;} ELSE_ASSIGN_ARG_7;
+            if (i < nrhs && is_input_type<arg8_type>::value) {validate_and_populate_arg(i,prhs[i],A8); ++i;} ELSE_ASSIGN_ARG_8;
+            if (i < nrhs && is_input_type<arg9_type>::value) {validate_and_populate_arg(i,prhs[i],A9); ++i;} ELSE_ASSIGN_ARG_9;
+            if (i < nrhs && is_input_type<arg10_type>::value) {validate_and_populate_arg(i,prhs[i],A10); ++i;} ELSE_ASSIGN_ARG_10;
+            if (i < nrhs && is_input_type<arg11_type>::value) {validate_and_populate_arg(i,prhs[i],A11); ++i;} ELSE_ASSIGN_ARG_11;
+            if (i < nrhs && is_input_type<arg12_type>::value) {validate_and_populate_arg(i,prhs[i],A12); ++i;} ELSE_ASSIGN_ARG_12;
+            if (i < nrhs && is_input_type<arg13_type>::value) {validate_and_populate_arg(i,prhs[i],A13); ++i;} ELSE_ASSIGN_ARG_13;
+
+            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13);
+
+
+            i = 0;
+            if (is_output_type<arg1_type>::value) {assign_to_matlab(plhs[i],A1); ++i;}
+            if (is_output_type<arg2_type>::value) {assign_to_matlab(plhs[i],A2); ++i;}
+            if (is_output_type<arg3_type>::value) {assign_to_matlab(plhs[i],A3); ++i;}
+            if (is_output_type<arg4_type>::value) {assign_to_matlab(plhs[i],A4); ++i;}
+            if (is_output_type<arg5_type>::value) {assign_to_matlab(plhs[i],A5); ++i;}
+            if (is_output_type<arg6_type>::value) {assign_to_matlab(plhs[i],A6); ++i;}
+            if (is_output_type<arg7_type>::value) {assign_to_matlab(plhs[i],A7); ++i;}
+            if (is_output_type<arg8_type>::value) {assign_to_matlab(plhs[i],A8); ++i;}
+            if (is_output_type<arg9_type>::value) {assign_to_matlab(plhs[i],A9); ++i;}
+            if (is_output_type<arg10_type>::value) {assign_to_matlab(plhs[i],A10); ++i;}
+            if (is_output_type<arg11_type>::value) {assign_to_matlab(plhs[i],A11); ++i;}
+            if (is_output_type<arg12_type>::value) {assign_to_matlab(plhs[i],A12); ++i;}
+            if (is_output_type<arg13_type>::value) {assign_to_matlab(plhs[i],A13); ++i;}
+        }
+    };
+
+    template <>
+    struct call_mex_function_helper<14>
+    {
+        template <typename funct>
+        void callit(
+            const funct& ,
+            int nlhs, mxArray *plhs[],
+            int nrhs, const mxArray *prhs[]
+        ) const
+        {
+            typedef typename sig_traits<funct>::arg1_type arg1_type;
+            typedef typename sig_traits<funct>::arg2_type arg2_type;
+            typedef typename sig_traits<funct>::arg3_type arg3_type;
+            typedef typename sig_traits<funct>::arg4_type arg4_type;
+            typedef typename sig_traits<funct>::arg5_type arg5_type;
+            typedef typename sig_traits<funct>::arg6_type arg6_type;
+            typedef typename sig_traits<funct>::arg7_type arg7_type;
+            typedef typename sig_traits<funct>::arg8_type arg8_type;
+            typedef typename sig_traits<funct>::arg9_type arg9_type;
+            typedef typename sig_traits<funct>::arg10_type arg10_type;
+            typedef typename sig_traits<funct>::arg11_type arg11_type;
+            typedef typename sig_traits<funct>::arg12_type arg12_type;
+            typedef typename sig_traits<funct>::arg13_type arg13_type;
+            typedef typename sig_traits<funct>::arg14_type arg14_type;
+
+            typename basic_type<arg1_type>::type A1;
+            typename basic_type<arg2_type>::type A2;
+            typename basic_type<arg3_type>::type A3;
+            typename basic_type<arg4_type>::type A4;
+            typename basic_type<arg5_type>::type A5;
+            typename basic_type<arg6_type>::type A6;
+            typename basic_type<arg7_type>::type A7;
+            typename basic_type<arg8_type>::type A8;
+            typename basic_type<arg9_type>::type A9;
+            typename basic_type<arg10_type>::type A10;
+            typename basic_type<arg11_type>::type A11;
+            typename basic_type<arg12_type>::type A12;
+            typename basic_type<arg13_type>::type A13;
+            typename basic_type<arg14_type>::type A14;
+
+            mark_non_persistent(A1);
+            mark_non_persistent(A2);
+            mark_non_persistent(A3);
+            mark_non_persistent(A4);
+            mark_non_persistent(A5);
+            mark_non_persistent(A6);
+            mark_non_persistent(A7);
+            mark_non_persistent(A8);
+            mark_non_persistent(A9);
+            mark_non_persistent(A10);
+            mark_non_persistent(A11);
+            mark_non_persistent(A12);
+            mark_non_persistent(A13);
+            mark_non_persistent(A14);
+
+            int i = 0;
+            if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
+            if (i < nrhs && is_input_type<arg2_type>::value) {validate_and_populate_arg(i,prhs[i],A2); ++i;} ELSE_ASSIGN_ARG_2;
+            if (i < nrhs && is_input_type<arg3_type>::value) {validate_and_populate_arg(i,prhs[i],A3); ++i;} ELSE_ASSIGN_ARG_3;
+            if (i < nrhs && is_input_type<arg4_type>::value) {validate_and_populate_arg(i,prhs[i],A4); ++i;} ELSE_ASSIGN_ARG_4;
+            if (i < nrhs && is_input_type<arg5_type>::value) {validate_and_populate_arg(i,prhs[i],A5); ++i;} ELSE_ASSIGN_ARG_5;
+            if (i < nrhs && is_input_type<arg6_type>::value) {validate_and_populate_arg(i,prhs[i],A6); ++i;} ELSE_ASSIGN_ARG_6;
+            if (i < nrhs && is_input_type<arg7_type>::value) {validate_and_populate_arg(i,prhs[i],A7); ++i;} ELSE_ASSIGN_ARG_7;
+            if (i < nrhs && is_input_type<arg8_type>::value) {validate_and_populate_arg(i,prhs[i],A8); ++i;} ELSE_ASSIGN_ARG_8;
+            if (i < nrhs && is_input_type<arg9_type>::value) {validate_and_populate_arg(i,prhs[i],A9); ++i;} ELSE_ASSIGN_ARG_9;
+            if (i < nrhs && is_input_type<arg10_type>::value) {validate_and_populate_arg(i,prhs[i],A10); ++i;} ELSE_ASSIGN_ARG_10;
+            if (i < nrhs && is_input_type<arg11_type>::value) {validate_and_populate_arg(i,prhs[i],A11); ++i;} ELSE_ASSIGN_ARG_11;
+            if (i < nrhs && is_input_type<arg12_type>::value) {validate_and_populate_arg(i,prhs[i],A12); ++i;} ELSE_ASSIGN_ARG_12;
+            if (i < nrhs && is_input_type<arg13_type>::value) {validate_and_populate_arg(i,prhs[i],A13); ++i;} ELSE_ASSIGN_ARG_13;
+            if (i < nrhs && is_input_type<arg14_type>::value) {validate_and_populate_arg(i,prhs[i],A14); ++i;} ELSE_ASSIGN_ARG_14;
+
+            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14);
+
+
+            i = 0;
+            if (is_output_type<arg1_type>::value) {assign_to_matlab(plhs[i],A1); ++i;}
+            if (is_output_type<arg2_type>::value) {assign_to_matlab(plhs[i],A2); ++i;}
+            if (is_output_type<arg3_type>::value) {assign_to_matlab(plhs[i],A3); ++i;}
+            if (is_output_type<arg4_type>::value) {assign_to_matlab(plhs[i],A4); ++i;}
+            if (is_output_type<arg5_type>::value) {assign_to_matlab(plhs[i],A5); ++i;}
+            if (is_output_type<arg6_type>::value) {assign_to_matlab(plhs[i],A6); ++i;}
+            if (is_output_type<arg7_type>::value) {assign_to_matlab(plhs[i],A7); ++i;}
+            if (is_output_type<arg8_type>::value) {assign_to_matlab(plhs[i],A8); ++i;}
+            if (is_output_type<arg9_type>::value) {assign_to_matlab(plhs[i],A9); ++i;}
+            if (is_output_type<arg10_type>::value) {assign_to_matlab(plhs[i],A10); ++i;}
+            if (is_output_type<arg11_type>::value) {assign_to_matlab(plhs[i],A11); ++i;}
+            if (is_output_type<arg12_type>::value) {assign_to_matlab(plhs[i],A12); ++i;}
+            if (is_output_type<arg13_type>::value) {assign_to_matlab(plhs[i],A13); ++i;}
+            if (is_output_type<arg14_type>::value) {assign_to_matlab(plhs[i],A14); ++i;}
+        }
+    };
+
+    template <>
+    struct call_mex_function_helper<15>
+    {
+        template <typename funct>
+        void callit(
+            const funct& ,
+            int nlhs, mxArray *plhs[],
+            int nrhs, const mxArray *prhs[]
+        ) const
+        {
+            typedef typename sig_traits<funct>::arg1_type arg1_type;
+            typedef typename sig_traits<funct>::arg2_type arg2_type;
+            typedef typename sig_traits<funct>::arg3_type arg3_type;
+            typedef typename sig_traits<funct>::arg4_type arg4_type;
+            typedef typename sig_traits<funct>::arg5_type arg5_type;
+            typedef typename sig_traits<funct>::arg6_type arg6_type;
+            typedef typename sig_traits<funct>::arg7_type arg7_type;
+            typedef typename sig_traits<funct>::arg8_type arg8_type;
+            typedef typename sig_traits<funct>::arg9_type arg9_type;
+            typedef typename sig_traits<funct>::arg10_type arg10_type;
+            typedef typename sig_traits<funct>::arg11_type arg11_type;
+            typedef typename sig_traits<funct>::arg12_type arg12_type;
+            typedef typename sig_traits<funct>::arg13_type arg13_type;
+            typedef typename sig_traits<funct>::arg14_type arg14_type;
+            typedef typename sig_traits<funct>::arg15_type arg15_type;
+
+            typename basic_type<arg1_type>::type A1;
+            typename basic_type<arg2_type>::type A2;
+            typename basic_type<arg3_type>::type A3;
+            typename basic_type<arg4_type>::type A4;
+            typename basic_type<arg5_type>::type A5;
+            typename basic_type<arg6_type>::type A6;
+            typename basic_type<arg7_type>::type A7;
+            typename basic_type<arg8_type>::type A8;
+            typename basic_type<arg9_type>::type A9;
+            typename basic_type<arg10_type>::type A10;
+            typename basic_type<arg11_type>::type A11;
+            typename basic_type<arg12_type>::type A12;
+            typename basic_type<arg13_type>::type A13;
+            typename basic_type<arg14_type>::type A14;
+            typename basic_type<arg15_type>::type A15;
+
+            mark_non_persistent(A1);
+            mark_non_persistent(A2);
+            mark_non_persistent(A3);
+            mark_non_persistent(A4);
+            mark_non_persistent(A5);
+            mark_non_persistent(A6);
+            mark_non_persistent(A7);
+            mark_non_persistent(A8);
+            mark_non_persistent(A9);
+            mark_non_persistent(A10);
+            mark_non_persistent(A11);
+            mark_non_persistent(A12);
+            mark_non_persistent(A13);
+            mark_non_persistent(A14);
+            mark_non_persistent(A15);
+
+            int i = 0;
+            if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
+            if (i < nrhs && is_input_type<arg2_type>::value) {validate_and_populate_arg(i,prhs[i],A2); ++i;} ELSE_ASSIGN_ARG_2;
+            if (i < nrhs && is_input_type<arg3_type>::value) {validate_and_populate_arg(i,prhs[i],A3); ++i;} ELSE_ASSIGN_ARG_3;
+            if (i < nrhs && is_input_type<arg4_type>::value) {validate_and_populate_arg(i,prhs[i],A4); ++i;} ELSE_ASSIGN_ARG_4;
+            if (i < nrhs && is_input_type<arg5_type>::value) {validate_and_populate_arg(i,prhs[i],A5); ++i;} ELSE_ASSIGN_ARG_5;
+            if (i < nrhs && is_input_type<arg6_type>::value) {validate_and_populate_arg(i,prhs[i],A6); ++i;} ELSE_ASSIGN_ARG_6;
+            if (i < nrhs && is_input_type<arg7_type>::value) {validate_and_populate_arg(i,prhs[i],A7); ++i;} ELSE_ASSIGN_ARG_7;
+            if (i < nrhs && is_input_type<arg8_type>::value) {validate_and_populate_arg(i,prhs[i],A8); ++i;} ELSE_ASSIGN_ARG_8;
+            if (i < nrhs && is_input_type<arg9_type>::value) {validate_and_populate_arg(i,prhs[i],A9); ++i;} ELSE_ASSIGN_ARG_9;
+            if (i < nrhs && is_input_type<arg10_type>::value) {validate_and_populate_arg(i,prhs[i],A10); ++i;} ELSE_ASSIGN_ARG_10;
+            if (i < nrhs && is_input_type<arg11_type>::value) {validate_and_populate_arg(i,prhs[i],A11); ++i;} ELSE_ASSIGN_ARG_11;
+            if (i < nrhs && is_input_type<arg12_type>::value) {validate_and_populate_arg(i,prhs[i],A12); ++i;} ELSE_ASSIGN_ARG_12;
+            if (i < nrhs && is_input_type<arg13_type>::value) {validate_and_populate_arg(i,prhs[i],A13); ++i;} ELSE_ASSIGN_ARG_13;
+            if (i < nrhs && is_input_type<arg14_type>::value) {validate_and_populate_arg(i,prhs[i],A14); ++i;} ELSE_ASSIGN_ARG_14;
+            if (i < nrhs && is_input_type<arg15_type>::value) {validate_and_populate_arg(i,prhs[i],A15); ++i;} ELSE_ASSIGN_ARG_15;
+
+            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15);
+
+
+            i = 0;
+            if (is_output_type<arg1_type>::value) {assign_to_matlab(plhs[i],A1); ++i;}
+            if (is_output_type<arg2_type>::value) {assign_to_matlab(plhs[i],A2); ++i;}
+            if (is_output_type<arg3_type>::value) {assign_to_matlab(plhs[i],A3); ++i;}
+            if (is_output_type<arg4_type>::value) {assign_to_matlab(plhs[i],A4); ++i;}
+            if (is_output_type<arg5_type>::value) {assign_to_matlab(plhs[i],A5); ++i;}
+            if (is_output_type<arg6_type>::value) {assign_to_matlab(plhs[i],A6); ++i;}
+            if (is_output_type<arg7_type>::value) {assign_to_matlab(plhs[i],A7); ++i;}
+            if (is_output_type<arg8_type>::value) {assign_to_matlab(plhs[i],A8); ++i;}
+            if (is_output_type<arg9_type>::value) {assign_to_matlab(plhs[i],A9); ++i;}
+            if (is_output_type<arg10_type>::value) {assign_to_matlab(plhs[i],A10); ++i;}
+            if (is_output_type<arg11_type>::value) {assign_to_matlab(plhs[i],A11); ++i;}
+            if (is_output_type<arg12_type>::value) {assign_to_matlab(plhs[i],A12); ++i;}
+            if (is_output_type<arg13_type>::value) {assign_to_matlab(plhs[i],A13); ++i;}
+            if (is_output_type<arg14_type>::value) {assign_to_matlab(plhs[i],A14); ++i;}
+            if (is_output_type<arg15_type>::value) {assign_to_matlab(plhs[i],A15); ++i;}
+        }
+    };
+
+    template <>
+    struct call_mex_function_helper<16>
+    {
+        template <typename funct>
+        void callit(
+            const funct& ,
+            int nlhs, mxArray *plhs[],
+            int nrhs, const mxArray *prhs[]
+        ) const
+        {
+            typedef typename sig_traits<funct>::arg1_type arg1_type;
+            typedef typename sig_traits<funct>::arg2_type arg2_type;
+            typedef typename sig_traits<funct>::arg3_type arg3_type;
+            typedef typename sig_traits<funct>::arg4_type arg4_type;
+            typedef typename sig_traits<funct>::arg5_type arg5_type;
+            typedef typename sig_traits<funct>::arg6_type arg6_type;
+            typedef typename sig_traits<funct>::arg7_type arg7_type;
+            typedef typename sig_traits<funct>::arg8_type arg8_type;
+            typedef typename sig_traits<funct>::arg9_type arg9_type;
+            typedef typename sig_traits<funct>::arg10_type arg10_type;
+            typedef typename sig_traits<funct>::arg11_type arg11_type;
+            typedef typename sig_traits<funct>::arg12_type arg12_type;
+            typedef typename sig_traits<funct>::arg13_type arg13_type;
+            typedef typename sig_traits<funct>::arg14_type arg14_type;
+            typedef typename sig_traits<funct>::arg15_type arg15_type;
+            typedef typename sig_traits<funct>::arg16_type arg16_type;
+
+            typename basic_type<arg1_type>::type A1;
+            typename basic_type<arg2_type>::type A2;
+            typename basic_type<arg3_type>::type A3;
+            typename basic_type<arg4_type>::type A4;
+            typename basic_type<arg5_type>::type A5;
+            typename basic_type<arg6_type>::type A6;
+            typename basic_type<arg7_type>::type A7;
+            typename basic_type<arg8_type>::type A8;
+            typename basic_type<arg9_type>::type A9;
+            typename basic_type<arg10_type>::type A10;
+            typename basic_type<arg11_type>::type A11;
+            typename basic_type<arg12_type>::type A12;
+            typename basic_type<arg13_type>::type A13;
+            typename basic_type<arg14_type>::type A14;
+            typename basic_type<arg15_type>::type A15;
+            typename basic_type<arg16_type>::type A16;
+
+            mark_non_persistent(A1);
+            mark_non_persistent(A2);
+            mark_non_persistent(A3);
+            mark_non_persistent(A4);
+            mark_non_persistent(A5);
+            mark_non_persistent(A6);
+            mark_non_persistent(A7);
+            mark_non_persistent(A8);
+            mark_non_persistent(A9);
+            mark_non_persistent(A10);
+            mark_non_persistent(A11);
+            mark_non_persistent(A12);
+            mark_non_persistent(A13);
+            mark_non_persistent(A14);
+            mark_non_persistent(A15);
+            mark_non_persistent(A16);
+
+            int i = 0;
+            if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
+            if (i < nrhs && is_input_type<arg2_type>::value) {validate_and_populate_arg(i,prhs[i],A2); ++i;} ELSE_ASSIGN_ARG_2;
+            if (i < nrhs && is_input_type<arg3_type>::value) {validate_and_populate_arg(i,prhs[i],A3); ++i;} ELSE_ASSIGN_ARG_3;
+            if (i < nrhs && is_input_type<arg4_type>::value) {validate_and_populate_arg(i,prhs[i],A4); ++i;} ELSE_ASSIGN_ARG_4;
+            if (i < nrhs && is_input_type<arg5_type>::value) {validate_and_populate_arg(i,prhs[i],A5); ++i;} ELSE_ASSIGN_ARG_5;
+            if (i < nrhs && is_input_type<arg6_type>::value) {validate_and_populate_arg(i,prhs[i],A6); ++i;} ELSE_ASSIGN_ARG_6;
+            if (i < nrhs && is_input_type<arg7_type>::value) {validate_and_populate_arg(i,prhs[i],A7); ++i;} ELSE_ASSIGN_ARG_7;
+            if (i < nrhs && is_input_type<arg8_type>::value) {validate_and_populate_arg(i,prhs[i],A8); ++i;} ELSE_ASSIGN_ARG_8;
+            if (i < nrhs && is_input_type<arg9_type>::value) {validate_and_populate_arg(i,prhs[i],A9); ++i;} ELSE_ASSIGN_ARG_9;
+            if (i < nrhs && is_input_type<arg10_type>::value) {validate_and_populate_arg(i,prhs[i],A10); ++i;} ELSE_ASSIGN_ARG_10;
+            if (i < nrhs && is_input_type<arg11_type>::value) {validate_and_populate_arg(i,prhs[i],A11); ++i;} ELSE_ASSIGN_ARG_11;
+            if (i < nrhs && is_input_type<arg12_type>::value) {validate_and_populate_arg(i,prhs[i],A12); ++i;} ELSE_ASSIGN_ARG_12;
+            if (i < nrhs && is_input_type<arg13_type>::value) {validate_and_populate_arg(i,prhs[i],A13); ++i;} ELSE_ASSIGN_ARG_13;
+            if (i < nrhs && is_input_type<arg14_type>::value) {validate_and_populate_arg(i,prhs[i],A14); ++i;} ELSE_ASSIGN_ARG_14;
+            if (i < nrhs && is_input_type<arg15_type>::value) {validate_and_populate_arg(i,prhs[i],A15); ++i;} ELSE_ASSIGN_ARG_15;
+            if (i < nrhs && is_input_type<arg16_type>::value) {validate_and_populate_arg(i,prhs[i],A16); ++i;} ELSE_ASSIGN_ARG_16;
+
+            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16);
+
+
+            i = 0;
+            if (is_output_type<arg1_type>::value) {assign_to_matlab(plhs[i],A1); ++i;}
+            if (is_output_type<arg2_type>::value) {assign_to_matlab(plhs[i],A2); ++i;}
+            if (is_output_type<arg3_type>::value) {assign_to_matlab(plhs[i],A3); ++i;}
+            if (is_output_type<arg4_type>::value) {assign_to_matlab(plhs[i],A4); ++i;}
+            if (is_output_type<arg5_type>::value) {assign_to_matlab(plhs[i],A5); ++i;}
+            if (is_output_type<arg6_type>::value) {assign_to_matlab(plhs[i],A6); ++i;}
+            if (is_output_type<arg7_type>::value) {assign_to_matlab(plhs[i],A7); ++i;}
+            if (is_output_type<arg8_type>::value) {assign_to_matlab(plhs[i],A8); ++i;}
+            if (is_output_type<arg9_type>::value) {assign_to_matlab(plhs[i],A9); ++i;}
+            if (is_output_type<arg10_type>::value) {assign_to_matlab(plhs[i],A10); ++i;}
+            if (is_output_type<arg11_type>::value) {assign_to_matlab(plhs[i],A11); ++i;}
+            if (is_output_type<arg12_type>::value) {assign_to_matlab(plhs[i],A12); ++i;}
+            if (is_output_type<arg13_type>::value) {assign_to_matlab(plhs[i],A13); ++i;}
+            if (is_output_type<arg14_type>::value) {assign_to_matlab(plhs[i],A14); ++i;}
+            if (is_output_type<arg15_type>::value) {assign_to_matlab(plhs[i],A15); ++i;}
+            if (is_output_type<arg16_type>::value) {assign_to_matlab(plhs[i],A16); ++i;}
+        }
+    };
+
+    template <>
+    struct call_mex_function_helper<17>
+    {
+        template <typename funct>
+        void callit(
+            const funct& ,
+            int nlhs, mxArray *plhs[],
+            int nrhs, const mxArray *prhs[]
+        ) const
+        {
+            typedef typename sig_traits<funct>::arg1_type arg1_type;
+            typedef typename sig_traits<funct>::arg2_type arg2_type;
+            typedef typename sig_traits<funct>::arg3_type arg3_type;
+            typedef typename sig_traits<funct>::arg4_type arg4_type;
+            typedef typename sig_traits<funct>::arg5_type arg5_type;
+            typedef typename sig_traits<funct>::arg6_type arg6_type;
+            typedef typename sig_traits<funct>::arg7_type arg7_type;
+            typedef typename sig_traits<funct>::arg8_type arg8_type;
+            typedef typename sig_traits<funct>::arg9_type arg9_type;
+            typedef typename sig_traits<funct>::arg10_type arg10_type;
+            typedef typename sig_traits<funct>::arg11_type arg11_type;
+            typedef typename sig_traits<funct>::arg12_type arg12_type;
+            typedef typename sig_traits<funct>::arg13_type arg13_type;
+            typedef typename sig_traits<funct>::arg14_type arg14_type;
+            typedef typename sig_traits<funct>::arg15_type arg15_type;
+            typedef typename sig_traits<funct>::arg16_type arg16_type;
+            typedef typename sig_traits<funct>::arg17_type arg17_type;
+
+            typename basic_type<arg1_type>::type A1;
+            typename basic_type<arg2_type>::type A2;
+            typename basic_type<arg3_type>::type A3;
+            typename basic_type<arg4_type>::type A4;
+            typename basic_type<arg5_type>::type A5;
+            typename basic_type<arg6_type>::type A6;
+            typename basic_type<arg7_type>::type A7;
+            typename basic_type<arg8_type>::type A8;
+            typename basic_type<arg9_type>::type A9;
+            typename basic_type<arg10_type>::type A10;
+            typename basic_type<arg11_type>::type A11;
+            typename basic_type<arg12_type>::type A12;
+            typename basic_type<arg13_type>::type A13;
+            typename basic_type<arg14_type>::type A14;
+            typename basic_type<arg15_type>::type A15;
+            typename basic_type<arg16_type>::type A16;
+            typename basic_type<arg17_type>::type A17;
+
+            mark_non_persistent(A1);
+            mark_non_persistent(A2);
+            mark_non_persistent(A3);
+            mark_non_persistent(A4);
+            mark_non_persistent(A5);
+            mark_non_persistent(A6);
+            mark_non_persistent(A7);
+            mark_non_persistent(A8);
+            mark_non_persistent(A9);
+            mark_non_persistent(A10);
+            mark_non_persistent(A11);
+            mark_non_persistent(A12);
+            mark_non_persistent(A13);
+            mark_non_persistent(A14);
+            mark_non_persistent(A15);
+            mark_non_persistent(A16);
+            mark_non_persistent(A17);
+
+            int i = 0;
+            if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
+            if (i < nrhs && is_input_type<arg2_type>::value) {validate_and_populate_arg(i,prhs[i],A2); ++i;} ELSE_ASSIGN_ARG_2;
+            if (i < nrhs && is_input_type<arg3_type>::value) {validate_and_populate_arg(i,prhs[i],A3); ++i;} ELSE_ASSIGN_ARG_3;
+            if (i < nrhs && is_input_type<arg4_type>::value) {validate_and_populate_arg(i,prhs[i],A4); ++i;} ELSE_ASSIGN_ARG_4;
+            if (i < nrhs && is_input_type<arg5_type>::value) {validate_and_populate_arg(i,prhs[i],A5); ++i;} ELSE_ASSIGN_ARG_5;
+            if (i < nrhs && is_input_type<arg6_type>::value) {validate_and_populate_arg(i,prhs[i],A6); ++i;} ELSE_ASSIGN_ARG_6;
+            if (i < nrhs && is_input_type<arg7_type>::value) {validate_and_populate_arg(i,prhs[i],A7); ++i;} ELSE_ASSIGN_ARG_7;
+            if (i < nrhs && is_input_type<arg8_type>::value) {validate_and_populate_arg(i,prhs[i],A8); ++i;} ELSE_ASSIGN_ARG_8;
+            if (i < nrhs && is_input_type<arg9_type>::value) {validate_and_populate_arg(i,prhs[i],A9); ++i;} ELSE_ASSIGN_ARG_9;
+            if (i < nrhs && is_input_type<arg10_type>::value) {validate_and_populate_arg(i,prhs[i],A10); ++i;} ELSE_ASSIGN_ARG_10;
+            if (i < nrhs && is_input_type<arg11_type>::value) {validate_and_populate_arg(i,prhs[i],A11); ++i;} ELSE_ASSIGN_ARG_11;
+            if (i < nrhs && is_input_type<arg12_type>::value) {validate_and_populate_arg(i,prhs[i],A12); ++i;} ELSE_ASSIGN_ARG_12;
+            if (i < nrhs && is_input_type<arg13_type>::value) {validate_and_populate_arg(i,prhs[i],A13); ++i;} ELSE_ASSIGN_ARG_13;
+            if (i < nrhs && is_input_type<arg14_type>::value) {validate_and_populate_arg(i,prhs[i],A14); ++i;} ELSE_ASSIGN_ARG_14;
+            if (i < nrhs && is_input_type<arg15_type>::value) {validate_and_populate_arg(i,prhs[i],A15); ++i;} ELSE_ASSIGN_ARG_15;
+            if (i < nrhs && is_input_type<arg16_type>::value) {validate_and_populate_arg(i,prhs[i],A16); ++i;} ELSE_ASSIGN_ARG_16;
+            if (i < nrhs && is_input_type<arg17_type>::value) {validate_and_populate_arg(i,prhs[i],A17); ++i;} ELSE_ASSIGN_ARG_17;
+
+            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17);
+
+
+            i = 0;
+            if (is_output_type<arg1_type>::value) {assign_to_matlab(plhs[i],A1); ++i;}
+            if (is_output_type<arg2_type>::value) {assign_to_matlab(plhs[i],A2); ++i;}
+            if (is_output_type<arg3_type>::value) {assign_to_matlab(plhs[i],A3); ++i;}
+            if (is_output_type<arg4_type>::value) {assign_to_matlab(plhs[i],A4); ++i;}
+            if (is_output_type<arg5_type>::value) {assign_to_matlab(plhs[i],A5); ++i;}
+            if (is_output_type<arg6_type>::value) {assign_to_matlab(plhs[i],A6); ++i;}
+            if (is_output_type<arg7_type>::value) {assign_to_matlab(plhs[i],A7); ++i;}
+            if (is_output_type<arg8_type>::value) {assign_to_matlab(plhs[i],A8); ++i;}
+            if (is_output_type<arg9_type>::value) {assign_to_matlab(plhs[i],A9); ++i;}
+            if (is_output_type<arg10_type>::value) {assign_to_matlab(plhs[i],A10); ++i;}
+            if (is_output_type<arg11_type>::value) {assign_to_matlab(plhs[i],A11); ++i;}
+            if (is_output_type<arg12_type>::value) {assign_to_matlab(plhs[i],A12); ++i;}
+            if (is_output_type<arg13_type>::value) {assign_to_matlab(plhs[i],A13); ++i;}
+            if (is_output_type<arg14_type>::value) {assign_to_matlab(plhs[i],A14); ++i;}
+            if (is_output_type<arg15_type>::value) {assign_to_matlab(plhs[i],A15); ++i;}
+            if (is_output_type<arg16_type>::value) {assign_to_matlab(plhs[i],A16); ++i;}
+            if (is_output_type<arg17_type>::value) {assign_to_matlab(plhs[i],A17); ++i;}
+        }
+    };
+
+    template <>
+    struct call_mex_function_helper<18>
+    {
+        template <typename funct>
+        void callit(
+            const funct& ,
+            int nlhs, mxArray *plhs[],
+            int nrhs, const mxArray *prhs[]
+        ) const
+        {
+            typedef typename sig_traits<funct>::arg1_type arg1_type;
+            typedef typename sig_traits<funct>::arg2_type arg2_type;
+            typedef typename sig_traits<funct>::arg3_type arg3_type;
+            typedef typename sig_traits<funct>::arg4_type arg4_type;
+            typedef typename sig_traits<funct>::arg5_type arg5_type;
+            typedef typename sig_traits<funct>::arg6_type arg6_type;
+            typedef typename sig_traits<funct>::arg7_type arg7_type;
+            typedef typename sig_traits<funct>::arg8_type arg8_type;
+            typedef typename sig_traits<funct>::arg9_type arg9_type;
+            typedef typename sig_traits<funct>::arg10_type arg10_type;
+            typedef typename sig_traits<funct>::arg11_type arg11_type;
+            typedef typename sig_traits<funct>::arg12_type arg12_type;
+            typedef typename sig_traits<funct>::arg13_type arg13_type;
+            typedef typename sig_traits<funct>::arg14_type arg14_type;
+            typedef typename sig_traits<funct>::arg15_type arg15_type;
+            typedef typename sig_traits<funct>::arg16_type arg16_type;
+            typedef typename sig_traits<funct>::arg17_type arg17_type;
+            typedef typename sig_traits<funct>::arg18_type arg18_type;
+
+            typename basic_type<arg1_type>::type A1;
+            typename basic_type<arg2_type>::type A2;
+            typename basic_type<arg3_type>::type A3;
+            typename basic_type<arg4_type>::type A4;
+            typename basic_type<arg5_type>::type A5;
+            typename basic_type<arg6_type>::type A6;
+            typename basic_type<arg7_type>::type A7;
+            typename basic_type<arg8_type>::type A8;
+            typename basic_type<arg9_type>::type A9;
+            typename basic_type<arg10_type>::type A10;
+            typename basic_type<arg11_type>::type A11;
+            typename basic_type<arg12_type>::type A12;
+            typename basic_type<arg13_type>::type A13;
+            typename basic_type<arg14_type>::type A14;
+            typename basic_type<arg15_type>::type A15;
+            typename basic_type<arg16_type>::type A16;
+            typename basic_type<arg17_type>::type A17;
+            typename basic_type<arg18_type>::type A18;
+
+            mark_non_persistent(A1);
+            mark_non_persistent(A2);
+            mark_non_persistent(A3);
+            mark_non_persistent(A4);
+            mark_non_persistent(A5);
+            mark_non_persistent(A6);
+            mark_non_persistent(A7);
+            mark_non_persistent(A8);
+            mark_non_persistent(A9);
+            mark_non_persistent(A10);
+            mark_non_persistent(A11);
+            mark_non_persistent(A12);
+            mark_non_persistent(A13);
+            mark_non_persistent(A14);
+            mark_non_persistent(A15);
+            mark_non_persistent(A16);
+            mark_non_persistent(A17);
+            mark_non_persistent(A18);
+
+            int i = 0;
+            if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
+            if (i < nrhs && is_input_type<arg2_type>::value) {validate_and_populate_arg(i,prhs[i],A2); ++i;} ELSE_ASSIGN_ARG_2;
+            if (i < nrhs && is_input_type<arg3_type>::value) {validate_and_populate_arg(i,prhs[i],A3); ++i;} ELSE_ASSIGN_ARG_3;
+            if (i < nrhs && is_input_type<arg4_type>::value) {validate_and_populate_arg(i,prhs[i],A4); ++i;} ELSE_ASSIGN_ARG_4;
+            if (i < nrhs && is_input_type<arg5_type>::value) {validate_and_populate_arg(i,prhs[i],A5); ++i;} ELSE_ASSIGN_ARG_5;
+            if (i < nrhs && is_input_type<arg6_type>::value) {validate_and_populate_arg(i,prhs[i],A6); ++i;} ELSE_ASSIGN_ARG_6;
+            if (i < nrhs && is_input_type<arg7_type>::value) {validate_and_populate_arg(i,prhs[i],A7); ++i;} ELSE_ASSIGN_ARG_7;
+            if (i < nrhs && is_input_type<arg8_type>::value) {validate_and_populate_arg(i,prhs[i],A8); ++i;} ELSE_ASSIGN_ARG_8;
+            if (i < nrhs && is_input_type<arg9_type>::value) {validate_and_populate_arg(i,prhs[i],A9); ++i;} ELSE_ASSIGN_ARG_9;
+            if (i < nrhs && is_input_type<arg10_type>::value) {validate_and_populate_arg(i,prhs[i],A10); ++i;} ELSE_ASSIGN_ARG_10;
+            if (i < nrhs && is_input_type<arg11_type>::value) {validate_and_populate_arg(i,prhs[i],A11); ++i;} ELSE_ASSIGN_ARG_11;
+            if (i < nrhs && is_input_type<arg12_type>::value) {validate_and_populate_arg(i,prhs[i],A12); ++i;} ELSE_ASSIGN_ARG_12;
+            if (i < nrhs && is_input_type<arg13_type>::value) {validate_and_populate_arg(i,prhs[i],A13); ++i;} ELSE_ASSIGN_ARG_13;
+            if (i < nrhs && is_input_type<arg14_type>::value) {validate_and_populate_arg(i,prhs[i],A14); ++i;} ELSE_ASSIGN_ARG_14;
+            if (i < nrhs && is_input_type<arg15_type>::value) {validate_and_populate_arg(i,prhs[i],A15); ++i;} ELSE_ASSIGN_ARG_15;
+            if (i < nrhs && is_input_type<arg16_type>::value) {validate_and_populate_arg(i,prhs[i],A16); ++i;} ELSE_ASSIGN_ARG_16;
+            if (i < nrhs && is_input_type<arg17_type>::value) {validate_and_populate_arg(i,prhs[i],A17); ++i;} ELSE_ASSIGN_ARG_17;
+            if (i < nrhs && is_input_type<arg18_type>::value) {validate_and_populate_arg(i,prhs[i],A18); ++i;} ELSE_ASSIGN_ARG_18;
+
+            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18);
+
+
+            i = 0;
+            if (is_output_type<arg1_type>::value) {assign_to_matlab(plhs[i],A1); ++i;}
+            if (is_output_type<arg2_type>::value) {assign_to_matlab(plhs[i],A2); ++i;}
+            if (is_output_type<arg3_type>::value) {assign_to_matlab(plhs[i],A3); ++i;}
+            if (is_output_type<arg4_type>::value) {assign_to_matlab(plhs[i],A4); ++i;}
+            if (is_output_type<arg5_type>::value) {assign_to_matlab(plhs[i],A5); ++i;}
+            if (is_output_type<arg6_type>::value) {assign_to_matlab(plhs[i],A6); ++i;}
+            if (is_output_type<arg7_type>::value) {assign_to_matlab(plhs[i],A7); ++i;}
+            if (is_output_type<arg8_type>::value) {assign_to_matlab(plhs[i],A8); ++i;}
+            if (is_output_type<arg9_type>::value) {assign_to_matlab(plhs[i],A9); ++i;}
+            if (is_output_type<arg10_type>::value) {assign_to_matlab(plhs[i],A10); ++i;}
+            if (is_output_type<arg11_type>::value) {assign_to_matlab(plhs[i],A11); ++i;}
+            if (is_output_type<arg12_type>::value) {assign_to_matlab(plhs[i],A12); ++i;}
+            if (is_output_type<arg13_type>::value) {assign_to_matlab(plhs[i],A13); ++i;}
+            if (is_output_type<arg14_type>::value) {assign_to_matlab(plhs[i],A14); ++i;}
+            if (is_output_type<arg15_type>::value) {assign_to_matlab(plhs[i],A15); ++i;}
+            if (is_output_type<arg16_type>::value) {assign_to_matlab(plhs[i],A16); ++i;}
+            if (is_output_type<arg17_type>::value) {assign_to_matlab(plhs[i],A17); ++i;}
+            if (is_output_type<arg18_type>::value) {assign_to_matlab(plhs[i],A18); ++i;}
+        }
+    };
+
+    template <>
+    struct call_mex_function_helper<19>
+    {
+        template <typename funct>
+        void callit(
+            const funct& ,
+            int nlhs, mxArray *plhs[],
+            int nrhs, const mxArray *prhs[]
+        ) const
+        {
+            typedef typename sig_traits<funct>::arg1_type arg1_type;
+            typedef typename sig_traits<funct>::arg2_type arg2_type;
+            typedef typename sig_traits<funct>::arg3_type arg3_type;
+            typedef typename sig_traits<funct>::arg4_type arg4_type;
+            typedef typename sig_traits<funct>::arg5_type arg5_type;
+            typedef typename sig_traits<funct>::arg6_type arg6_type;
+            typedef typename sig_traits<funct>::arg7_type arg7_type;
+            typedef typename sig_traits<funct>::arg8_type arg8_type;
+            typedef typename sig_traits<funct>::arg9_type arg9_type;
+            typedef typename sig_traits<funct>::arg10_type arg10_type;
+            typedef typename sig_traits<funct>::arg11_type arg11_type;
+            typedef typename sig_traits<funct>::arg12_type arg12_type;
+            typedef typename sig_traits<funct>::arg13_type arg13_type;
+            typedef typename sig_traits<funct>::arg14_type arg14_type;
+            typedef typename sig_traits<funct>::arg15_type arg15_type;
+            typedef typename sig_traits<funct>::arg16_type arg16_type;
+            typedef typename sig_traits<funct>::arg17_type arg17_type;
+            typedef typename sig_traits<funct>::arg18_type arg18_type;
+            typedef typename sig_traits<funct>::arg19_type arg19_type;
+
+            typename basic_type<arg1_type>::type A1;
+            typename basic_type<arg2_type>::type A2;
+            typename basic_type<arg3_type>::type A3;
+            typename basic_type<arg4_type>::type A4;
+            typename basic_type<arg5_type>::type A5;
+            typename basic_type<arg6_type>::type A6;
+            typename basic_type<arg7_type>::type A7;
+            typename basic_type<arg8_type>::type A8;
+            typename basic_type<arg9_type>::type A9;
+            typename basic_type<arg10_type>::type A10;
+            typename basic_type<arg11_type>::type A11;
+            typename basic_type<arg12_type>::type A12;
+            typename basic_type<arg13_type>::type A13;
+            typename basic_type<arg14_type>::type A14;
+            typename basic_type<arg15_type>::type A15;
+            typename basic_type<arg16_type>::type A16;
+            typename basic_type<arg17_type>::type A17;
+            typename basic_type<arg18_type>::type A18;
+            typename basic_type<arg19_type>::type A19;
+
+            mark_non_persistent(A1);
+            mark_non_persistent(A2);
+            mark_non_persistent(A3);
+            mark_non_persistent(A4);
+            mark_non_persistent(A5);
+            mark_non_persistent(A6);
+            mark_non_persistent(A7);
+            mark_non_persistent(A8);
+            mark_non_persistent(A9);
+            mark_non_persistent(A10);
+            mark_non_persistent(A11);
+            mark_non_persistent(A12);
+            mark_non_persistent(A13);
+            mark_non_persistent(A14);
+            mark_non_persistent(A15);
+            mark_non_persistent(A16);
+            mark_non_persistent(A17);
+            mark_non_persistent(A18);
+            mark_non_persistent(A19);
+
+            int i = 0;
+            if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
+            if (i < nrhs && is_input_type<arg2_type>::value) {validate_and_populate_arg(i,prhs[i],A2); ++i;} ELSE_ASSIGN_ARG_2;
+            if (i < nrhs && is_input_type<arg3_type>::value) {validate_and_populate_arg(i,prhs[i],A3); ++i;} ELSE_ASSIGN_ARG_3;
+            if (i < nrhs && is_input_type<arg4_type>::value) {validate_and_populate_arg(i,prhs[i],A4); ++i;} ELSE_ASSIGN_ARG_4;
+            if (i < nrhs && is_input_type<arg5_type>::value) {validate_and_populate_arg(i,prhs[i],A5); ++i;} ELSE_ASSIGN_ARG_5;
+            if (i < nrhs && is_input_type<arg6_type>::value) {validate_and_populate_arg(i,prhs[i],A6); ++i;} ELSE_ASSIGN_ARG_6;
+            if (i < nrhs && is_input_type<arg7_type>::value) {validate_and_populate_arg(i,prhs[i],A7); ++i;} ELSE_ASSIGN_ARG_7;
+            if (i < nrhs && is_input_type<arg8_type>::value) {validate_and_populate_arg(i,prhs[i],A8); ++i;} ELSE_ASSIGN_ARG_8;
+            if (i < nrhs && is_input_type<arg9_type>::value) {validate_and_populate_arg(i,prhs[i],A9); ++i;} ELSE_ASSIGN_ARG_9;
+            if (i < nrhs && is_input_type<arg10_type>::value) {validate_and_populate_arg(i,prhs[i],A10); ++i;} ELSE_ASSIGN_ARG_10;
+            if (i < nrhs && is_input_type<arg11_type>::value) {validate_and_populate_arg(i,prhs[i],A11); ++i;} ELSE_ASSIGN_ARG_11;
+            if (i < nrhs && is_input_type<arg12_type>::value) {validate_and_populate_arg(i,prhs[i],A12); ++i;} ELSE_ASSIGN_ARG_12;
+            if (i < nrhs && is_input_type<arg13_type>::value) {validate_and_populate_arg(i,prhs[i],A13); ++i;} ELSE_ASSIGN_ARG_13;
+            if (i < nrhs && is_input_type<arg14_type>::value) {validate_and_populate_arg(i,prhs[i],A14); ++i;} ELSE_ASSIGN_ARG_14;
+            if (i < nrhs && is_input_type<arg15_type>::value) {validate_and_populate_arg(i,prhs[i],A15); ++i;} ELSE_ASSIGN_ARG_15;
+            if (i < nrhs && is_input_type<arg16_type>::value) {validate_and_populate_arg(i,prhs[i],A16); ++i;} ELSE_ASSIGN_ARG_16;
+            if (i < nrhs && is_input_type<arg17_type>::value) {validate_and_populate_arg(i,prhs[i],A17); ++i;} ELSE_ASSIGN_ARG_17;
+            if (i < nrhs && is_input_type<arg18_type>::value) {validate_and_populate_arg(i,prhs[i],A18); ++i;} ELSE_ASSIGN_ARG_18;
+            if (i < nrhs && is_input_type<arg19_type>::value) {validate_and_populate_arg(i,prhs[i],A19); ++i;} ELSE_ASSIGN_ARG_19;
+
+            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18,A19);
+
+
+            i = 0;
+            if (is_output_type<arg1_type>::value) {assign_to_matlab(plhs[i],A1); ++i;}
+            if (is_output_type<arg2_type>::value) {assign_to_matlab(plhs[i],A2); ++i;}
+            if (is_output_type<arg3_type>::value) {assign_to_matlab(plhs[i],A3); ++i;}
+            if (is_output_type<arg4_type>::value) {assign_to_matlab(plhs[i],A4); ++i;}
+            if (is_output_type<arg5_type>::value) {assign_to_matlab(plhs[i],A5); ++i;}
+            if (is_output_type<arg6_type>::value) {assign_to_matlab(plhs[i],A6); ++i;}
+            if (is_output_type<arg7_type>::value) {assign_to_matlab(plhs[i],A7); ++i;}
+            if (is_output_type<arg8_type>::value) {assign_to_matlab(plhs[i],A8); ++i;}
+            if (is_output_type<arg9_type>::value) {assign_to_matlab(plhs[i],A9); ++i;}
+            if (is_output_type<arg10_type>::value) {assign_to_matlab(plhs[i],A10); ++i;}
+            if (is_output_type<arg11_type>::value) {assign_to_matlab(plhs[i],A11); ++i;}
+            if (is_output_type<arg12_type>::value) {assign_to_matlab(plhs[i],A12); ++i;}
+            if (is_output_type<arg13_type>::value) {assign_to_matlab(plhs[i],A13); ++i;}
+            if (is_output_type<arg14_type>::value) {assign_to_matlab(plhs[i],A14); ++i;}
+            if (is_output_type<arg15_type>::value) {assign_to_matlab(plhs[i],A15); ++i;}
+            if (is_output_type<arg16_type>::value) {assign_to_matlab(plhs[i],A16); ++i;}
+            if (is_output_type<arg17_type>::value) {assign_to_matlab(plhs[i],A17); ++i;}
+            if (is_output_type<arg18_type>::value) {assign_to_matlab(plhs[i],A18); ++i;}
+            if (is_output_type<arg19_type>::value) {assign_to_matlab(plhs[i],A19); ++i;}
+        }
+    };
+
+    template <>
+    struct call_mex_function_helper<20>
+    {
+        template <typename funct>
+        void callit(
+            const funct& ,
+            int nlhs, mxArray *plhs[],
+            int nrhs, const mxArray *prhs[]
+        ) const
+        {
+            typedef typename sig_traits<funct>::arg1_type arg1_type;
+            typedef typename sig_traits<funct>::arg2_type arg2_type;
+            typedef typename sig_traits<funct>::arg3_type arg3_type;
+            typedef typename sig_traits<funct>::arg4_type arg4_type;
+            typedef typename sig_traits<funct>::arg5_type arg5_type;
+            typedef typename sig_traits<funct>::arg6_type arg6_type;
+            typedef typename sig_traits<funct>::arg7_type arg7_type;
+            typedef typename sig_traits<funct>::arg8_type arg8_type;
+            typedef typename sig_traits<funct>::arg9_type arg9_type;
+            typedef typename sig_traits<funct>::arg10_type arg10_type;
+            typedef typename sig_traits<funct>::arg11_type arg11_type;
+            typedef typename sig_traits<funct>::arg12_type arg12_type;
+            typedef typename sig_traits<funct>::arg13_type arg13_type;
+            typedef typename sig_traits<funct>::arg14_type arg14_type;
+            typedef typename sig_traits<funct>::arg15_type arg15_type;
+            typedef typename sig_traits<funct>::arg16_type arg16_type;
+            typedef typename sig_traits<funct>::arg17_type arg17_type;
+            typedef typename sig_traits<funct>::arg18_type arg18_type;
+            typedef typename sig_traits<funct>::arg19_type arg19_type;
+            typedef typename sig_traits<funct>::arg20_type arg20_type;
+
+            typename basic_type<arg1_type>::type A1;
+            typename basic_type<arg2_type>::type A2;
+            typename basic_type<arg3_type>::type A3;
+            typename basic_type<arg4_type>::type A4;
+            typename basic_type<arg5_type>::type A5;
+            typename basic_type<arg6_type>::type A6;
+            typename basic_type<arg7_type>::type A7;
+            typename basic_type<arg8_type>::type A8;
+            typename basic_type<arg9_type>::type A9;
+            typename basic_type<arg10_type>::type A10;
+            typename basic_type<arg11_type>::type A11;
+            typename basic_type<arg12_type>::type A12;
+            typename basic_type<arg13_type>::type A13;
+            typename basic_type<arg14_type>::type A14;
+            typename basic_type<arg15_type>::type A15;
+            typename basic_type<arg16_type>::type A16;
+            typename basic_type<arg17_type>::type A17;
+            typename basic_type<arg18_type>::type A18;
+            typename basic_type<arg19_type>::type A19;
+            typename basic_type<arg20_type>::type A20;
+
+            mark_non_persistent(A1);
+            mark_non_persistent(A2);
+            mark_non_persistent(A3);
+            mark_non_persistent(A4);
+            mark_non_persistent(A5);
+            mark_non_persistent(A6);
+            mark_non_persistent(A7);
+            mark_non_persistent(A8);
+            mark_non_persistent(A9);
+            mark_non_persistent(A10);
+            mark_non_persistent(A11);
+            mark_non_persistent(A12);
+            mark_non_persistent(A13);
+            mark_non_persistent(A14);
+            mark_non_persistent(A15);
+            mark_non_persistent(A16);
+            mark_non_persistent(A17);
+            mark_non_persistent(A18);
+            mark_non_persistent(A19);
+            mark_non_persistent(A20);
+
+            int i = 0;
+            if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
+            if (i < nrhs && is_input_type<arg2_type>::value) {validate_and_populate_arg(i,prhs[i],A2); ++i;} ELSE_ASSIGN_ARG_2;
+            if (i < nrhs && is_input_type<arg3_type>::value) {validate_and_populate_arg(i,prhs[i],A3); ++i;} ELSE_ASSIGN_ARG_3;
+            if (i < nrhs && is_input_type<arg4_type>::value) {validate_and_populate_arg(i,prhs[i],A4); ++i;} ELSE_ASSIGN_ARG_4;
+            if (i < nrhs && is_input_type<arg5_type>::value) {validate_and_populate_arg(i,prhs[i],A5); ++i;} ELSE_ASSIGN_ARG_5;
+            if (i < nrhs && is_input_type<arg6_type>::value) {validate_and_populate_arg(i,prhs[i],A6); ++i;} ELSE_ASSIGN_ARG_6;
+            if (i < nrhs && is_input_type<arg7_type>::value) {validate_and_populate_arg(i,prhs[i],A7); ++i;} ELSE_ASSIGN_ARG_7;
+            if (i < nrhs && is_input_type<arg8_type>::value) {validate_and_populate_arg(i,prhs[i],A8); ++i;} ELSE_ASSIGN_ARG_8;
+            if (i < nrhs && is_input_type<arg9_type>::value) {validate_and_populate_arg(i,prhs[i],A9); ++i;} ELSE_ASSIGN_ARG_9;
+            if (i < nrhs && is_input_type<arg10_type>::value) {validate_and_populate_arg(i,prhs[i],A10); ++i;} ELSE_ASSIGN_ARG_10;
+            if (i < nrhs && is_input_type<arg11_type>::value) {validate_and_populate_arg(i,prhs[i],A11); ++i;} ELSE_ASSIGN_ARG_11;
+            if (i < nrhs && is_input_type<arg12_type>::value) {validate_and_populate_arg(i,prhs[i],A12); ++i;} ELSE_ASSIGN_ARG_12;
+            if (i < nrhs && is_input_type<arg13_type>::value) {validate_and_populate_arg(i,prhs[i],A13); ++i;} ELSE_ASSIGN_ARG_13;
+            if (i < nrhs && is_input_type<arg14_type>::value) {validate_and_populate_arg(i,prhs[i],A14); ++i;} ELSE_ASSIGN_ARG_14;
+            if (i < nrhs && is_input_type<arg15_type>::value) {validate_and_populate_arg(i,prhs[i],A15); ++i;} ELSE_ASSIGN_ARG_15;
+            if (i < nrhs && is_input_type<arg16_type>::value) {validate_and_populate_arg(i,prhs[i],A16); ++i;} ELSE_ASSIGN_ARG_16;
+            if (i < nrhs && is_input_type<arg17_type>::value) {validate_and_populate_arg(i,prhs[i],A17); ++i;} ELSE_ASSIGN_ARG_17;
+            if (i < nrhs && is_input_type<arg18_type>::value) {validate_and_populate_arg(i,prhs[i],A18); ++i;} ELSE_ASSIGN_ARG_18;
+            if (i < nrhs && is_input_type<arg19_type>::value) {validate_and_populate_arg(i,prhs[i],A19); ++i;} ELSE_ASSIGN_ARG_19;
+            if (i < nrhs && is_input_type<arg20_type>::value) {validate_and_populate_arg(i,prhs[i],A20); ++i;} ELSE_ASSIGN_ARG_20;
+
+            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18,A19,A20);
+
+
+            i = 0;
+            if (is_output_type<arg1_type>::value) {assign_to_matlab(plhs[i],A1); ++i;}
+            if (is_output_type<arg2_type>::value) {assign_to_matlab(plhs[i],A2); ++i;}
+            if (is_output_type<arg3_type>::value) {assign_to_matlab(plhs[i],A3); ++i;}
+            if (is_output_type<arg4_type>::value) {assign_to_matlab(plhs[i],A4); ++i;}
+            if (is_output_type<arg5_type>::value) {assign_to_matlab(plhs[i],A5); ++i;}
+            if (is_output_type<arg6_type>::value) {assign_to_matlab(plhs[i],A6); ++i;}
+            if (is_output_type<arg7_type>::value) {assign_to_matlab(plhs[i],A7); ++i;}
+            if (is_output_type<arg8_type>::value) {assign_to_matlab(plhs[i],A8); ++i;}
+            if (is_output_type<arg9_type>::value) {assign_to_matlab(plhs[i],A9); ++i;}
+            if (is_output_type<arg10_type>::value) {assign_to_matlab(plhs[i],A10); ++i;}
+            if (is_output_type<arg11_type>::value) {assign_to_matlab(plhs[i],A11); ++i;}
+            if (is_output_type<arg12_type>::value) {assign_to_matlab(plhs[i],A12); ++i;}
+            if (is_output_type<arg13_type>::value) {assign_to_matlab(plhs[i],A13); ++i;}
+            if (is_output_type<arg14_type>::value) {assign_to_matlab(plhs[i],A14); ++i;}
+            if (is_output_type<arg15_type>::value) {assign_to_matlab(plhs[i],A15); ++i;}
+            if (is_output_type<arg16_type>::value) {assign_to_matlab(plhs[i],A16); ++i;}
+            if (is_output_type<arg17_type>::value) {assign_to_matlab(plhs[i],A17); ++i;}
+            if (is_output_type<arg18_type>::value) {assign_to_matlab(plhs[i],A18); ++i;}
+            if (is_output_type<arg19_type>::value) {assign_to_matlab(plhs[i],A19); ++i;}
+            if (is_output_type<arg20_type>::value) {assign_to_matlab(plhs[i],A20); ++i;}
+        }
+    };
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -1661,7 +2736,107 @@ namespace mex_binding
             ++defaulted_args;
             // You can only set an argument's default value if it is an input argument.
             COMPILE_TIME_ASSERT(is_input_type<typename sig_traits<funct>::arg10_type>::value);
+            #ifndef ARG_11_DEFAULT
+                // You can't define a default for argument 10 if you don't define one for argument 11 also.
+                COMPILE_TIME_ASSERT(expected_args < 11);
+            #endif
             COMPILE_TIME_ASSERT(10 <= expected_args); // You can't define a default for an argument that doesn't exist.
+        #endif
+        #ifdef ARG_11_DEFAULT
+            ++defaulted_args;
+            // You can only set an argument's default value if it is an input argument.
+            COMPILE_TIME_ASSERT(is_input_type<typename sig_traits<funct>::arg11_type>::value);
+            #ifndef ARG_12_DEFAULT
+                // You can't define a default for argument 11 if you don't define one for argument 12 also.
+                COMPILE_TIME_ASSERT(expected_args < 12);
+            #endif
+            COMPILE_TIME_ASSERT(11 <= expected_args); // You can't define a default for an argument that doesn't exist.
+        #endif
+        #ifdef ARG_12_DEFAULT
+            ++defaulted_args;
+            // You can only set an argument's default value if it is an input argument.
+            COMPILE_TIME_ASSERT(is_input_type<typename sig_traits<funct>::arg12_type>::value);
+            #ifndef ARG_13_DEFAULT
+                // You can't define a default for argument 12 if you don't define one for argument 13 also.
+                COMPILE_TIME_ASSERT(expected_args < 13);
+            #endif
+            COMPILE_TIME_ASSERT(12 <= expected_args); // You can't define a default for an argument that doesn't exist.
+        #endif
+        #ifdef ARG_13_DEFAULT
+            ++defaulted_args;
+            // You can only set an argument's default value if it is an input argument.
+            COMPILE_TIME_ASSERT(is_input_type<typename sig_traits<funct>::arg13_type>::value);
+            #ifndef ARG_14_DEFAULT
+                // You can't define a default for argument 13 if you don't define one for argument 14 also.
+                COMPILE_TIME_ASSERT(expected_args < 14);
+            #endif
+            COMPILE_TIME_ASSERT(13 <= expected_args); // You can't define a default for an argument that doesn't exist.
+        #endif
+        #ifdef ARG_14_DEFAULT
+            ++defaulted_args;
+            // You can only set an argument's default value if it is an input argument.
+            COMPILE_TIME_ASSERT(is_input_type<typename sig_traits<funct>::arg14_type>::value);
+            #ifndef ARG_15_DEFAULT
+                // You can't define a default for argument 14 if you don't define one for argument 15 also.
+                COMPILE_TIME_ASSERT(expected_args < 15);
+            #endif
+            COMPILE_TIME_ASSERT(14 <= expected_args); // You can't define a default for an argument that doesn't exist.
+        #endif
+        #ifdef ARG_15_DEFAULT
+            ++defaulted_args;
+            // You can only set an argument's default value if it is an input argument.
+            COMPILE_TIME_ASSERT(is_input_type<typename sig_traits<funct>::arg15_type>::value);
+            #ifndef ARG_16_DEFAULT
+                // You can't define a default for argument 15 if you don't define one for argument 16 also.
+                COMPILE_TIME_ASSERT(expected_args < 16);
+            #endif
+            COMPILE_TIME_ASSERT(15 <= expected_args); // You can't define a default for an argument that doesn't exist.
+        #endif
+        #ifdef ARG_16_DEFAULT
+            ++defaulted_args;
+            // You can only set an argument's default value if it is an input argument.
+            COMPILE_TIME_ASSERT(is_input_type<typename sig_traits<funct>::arg16_type>::value);
+            #ifndef ARG_17_DEFAULT
+                // You can't define a default for argument 16 if you don't define one for argument 17 also.
+                COMPILE_TIME_ASSERT(expected_args < 17);
+            #endif
+            COMPILE_TIME_ASSERT(16 <= expected_args); // You can't define a default for an argument that doesn't exist.
+        #endif
+        #ifdef ARG_17_DEFAULT
+            ++defaulted_args;
+            // You can only set an argument's default value if it is an input argument.
+            COMPILE_TIME_ASSERT(is_input_type<typename sig_traits<funct>::arg17_type>::value);
+            #ifndef ARG_18_DEFAULT
+                // You can't define a default for argument 17 if you don't define one for argument 18 also.
+                COMPILE_TIME_ASSERT(expected_args < 18);
+            #endif
+            COMPILE_TIME_ASSERT(17 <= expected_args); // You can't define a default for an argument that doesn't exist.
+        #endif
+        #ifdef ARG_18_DEFAULT
+            ++defaulted_args;
+            // You can only set an argument's default value if it is an input argument.
+            COMPILE_TIME_ASSERT(is_input_type<typename sig_traits<funct>::arg18_type>::value);
+            #ifndef ARG_19_DEFAULT
+                // You can't define a default for argument 18 if you don't define one for argument 19 also.
+                COMPILE_TIME_ASSERT(expected_args < 19);
+            #endif
+            COMPILE_TIME_ASSERT(18 <= expected_args); // You can't define a default for an argument that doesn't exist.
+        #endif
+        #ifdef ARG_19_DEFAULT
+            ++defaulted_args;
+            // You can only set an argument's default value if it is an input argument.
+            COMPILE_TIME_ASSERT(is_input_type<typename sig_traits<funct>::arg19_type>::value);
+            #ifndef ARG_20_DEFAULT
+                // You can't define a default for argument 19 if you don't define one for argument 20 also.
+                COMPILE_TIME_ASSERT(expected_args < 20);
+            #endif
+            COMPILE_TIME_ASSERT(19 <= expected_args); // You can't define a default for an argument that doesn't exist.
+        #endif
+        #ifdef ARG_20_DEFAULT
+            ++defaulted_args;
+            // You can only set an argument's default value if it is an input argument.
+            COMPILE_TIME_ASSERT(is_input_type<typename sig_traits<funct>::arg20_type>::value);
+            COMPILE_TIME_ASSERT(20 <= expected_args); // You can't define a default for an argument that doesn't exist.
         #endif
 
 
@@ -2310,6 +3485,836 @@ void call_matlab (
     setup_output_args(function_name, plhs[i], A8, i);
     setup_output_args(function_name, plhs[i], A9, i);
     setup_output_args(function_name, plhs[i], A10, i);
+
+    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+}
+
+template <
+    typename T1, 
+    typename T2,
+    typename T3,
+    typename T4,
+    typename T5,
+    typename T6,
+    typename T7,
+    typename T8,
+    typename T9,
+    typename T10,
+    typename T11
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1,
+    const T2& A2,
+    const T3& A3,
+    const T4& A4,
+    const T5& A5,
+    const T6& A6,
+    const T7& A7,
+    const T8& A8,
+    const T9& A9,
+    const T10& A10,
+    const T11& A11
+) 
+{
+    using namespace mex_binding;
+    const int num_args = 11;
+    mxArray* plhs[num_args] = {0};
+    mxArray* prhs[num_args] = {0};
+
+    int nrhs = 0;
+    setup_input_args(prhs[nrhs], A1, nrhs);
+    setup_input_args(prhs[nrhs], A2, nrhs);
+    setup_input_args(prhs[nrhs], A3, nrhs);
+    setup_input_args(prhs[nrhs], A4, nrhs);
+    setup_input_args(prhs[nrhs], A5, nrhs);
+    setup_input_args(prhs[nrhs], A6, nrhs);
+    setup_input_args(prhs[nrhs], A7, nrhs);
+    setup_input_args(prhs[nrhs], A8, nrhs);
+    setup_input_args(prhs[nrhs], A9, nrhs);
+    setup_input_args(prhs[nrhs], A10, nrhs);
+    setup_input_args(prhs[nrhs], A11, nrhs);
+
+    const int nlhs = num_args - nrhs;
+    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+    int i = 0;
+    setup_output_args(function_name, plhs[i], A1, i);
+    setup_output_args(function_name, plhs[i], A2, i);
+    setup_output_args(function_name, plhs[i], A3, i);
+    setup_output_args(function_name, plhs[i], A4, i);
+    setup_output_args(function_name, plhs[i], A5, i);
+    setup_output_args(function_name, plhs[i], A6, i);
+    setup_output_args(function_name, plhs[i], A7, i);
+    setup_output_args(function_name, plhs[i], A8, i);
+    setup_output_args(function_name, plhs[i], A9, i);
+    setup_output_args(function_name, plhs[i], A10, i);
+    setup_output_args(function_name, plhs[i], A11, i);
+
+    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+}
+
+template <
+    typename T1, 
+    typename T2,
+    typename T3,
+    typename T4,
+    typename T5,
+    typename T6,
+    typename T7,
+    typename T8,
+    typename T9,
+    typename T10,
+    typename T11,
+    typename T12
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1,
+    const T2& A2,
+    const T3& A3,
+    const T4& A4,
+    const T5& A5,
+    const T6& A6,
+    const T7& A7,
+    const T8& A8,
+    const T9& A9,
+    const T10& A10,
+    const T11& A11,
+    const T12& A12
+) 
+{
+    using namespace mex_binding;
+    const int num_args = 12;
+    mxArray* plhs[num_args] = {0};
+    mxArray* prhs[num_args] = {0};
+
+    int nrhs = 0;
+    setup_input_args(prhs[nrhs], A1, nrhs);
+    setup_input_args(prhs[nrhs], A2, nrhs);
+    setup_input_args(prhs[nrhs], A3, nrhs);
+    setup_input_args(prhs[nrhs], A4, nrhs);
+    setup_input_args(prhs[nrhs], A5, nrhs);
+    setup_input_args(prhs[nrhs], A6, nrhs);
+    setup_input_args(prhs[nrhs], A7, nrhs);
+    setup_input_args(prhs[nrhs], A8, nrhs);
+    setup_input_args(prhs[nrhs], A9, nrhs);
+    setup_input_args(prhs[nrhs], A10, nrhs);
+    setup_input_args(prhs[nrhs], A11, nrhs);
+    setup_input_args(prhs[nrhs], A12, nrhs);
+
+    const int nlhs = num_args - nrhs;
+    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+    int i = 0;
+    setup_output_args(function_name, plhs[i], A1, i);
+    setup_output_args(function_name, plhs[i], A2, i);
+    setup_output_args(function_name, plhs[i], A3, i);
+    setup_output_args(function_name, plhs[i], A4, i);
+    setup_output_args(function_name, plhs[i], A5, i);
+    setup_output_args(function_name, plhs[i], A6, i);
+    setup_output_args(function_name, plhs[i], A7, i);
+    setup_output_args(function_name, plhs[i], A8, i);
+    setup_output_args(function_name, plhs[i], A9, i);
+    setup_output_args(function_name, plhs[i], A10, i);
+    setup_output_args(function_name, plhs[i], A11, i);
+    setup_output_args(function_name, plhs[i], A12, i);
+
+    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+}
+
+template <
+    typename T1, 
+    typename T2,
+    typename T3,
+    typename T4,
+    typename T5,
+    typename T6,
+    typename T7,
+    typename T8,
+    typename T9,
+    typename T10,
+    typename T11,
+    typename T12,
+    typename T13
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1,
+    const T2& A2,
+    const T3& A3,
+    const T4& A4,
+    const T5& A5,
+    const T6& A6,
+    const T7& A7,
+    const T8& A8,
+    const T9& A9,
+    const T10& A10,
+    const T11& A11,
+    const T12& A12,
+    const T13& A13
+) 
+{
+    using namespace mex_binding;
+    const int num_args = 13;
+    mxArray* plhs[num_args] = {0};
+    mxArray* prhs[num_args] = {0};
+
+    int nrhs = 0;
+    setup_input_args(prhs[nrhs], A1, nrhs);
+    setup_input_args(prhs[nrhs], A2, nrhs);
+    setup_input_args(prhs[nrhs], A3, nrhs);
+    setup_input_args(prhs[nrhs], A4, nrhs);
+    setup_input_args(prhs[nrhs], A5, nrhs);
+    setup_input_args(prhs[nrhs], A6, nrhs);
+    setup_input_args(prhs[nrhs], A7, nrhs);
+    setup_input_args(prhs[nrhs], A8, nrhs);
+    setup_input_args(prhs[nrhs], A9, nrhs);
+    setup_input_args(prhs[nrhs], A10, nrhs);
+    setup_input_args(prhs[nrhs], A11, nrhs);
+    setup_input_args(prhs[nrhs], A12, nrhs);
+    setup_input_args(prhs[nrhs], A13, nrhs);
+
+    const int nlhs = num_args - nrhs;
+    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+    int i = 0;
+    setup_output_args(function_name, plhs[i], A1, i);
+    setup_output_args(function_name, plhs[i], A2, i);
+    setup_output_args(function_name, plhs[i], A3, i);
+    setup_output_args(function_name, plhs[i], A4, i);
+    setup_output_args(function_name, plhs[i], A5, i);
+    setup_output_args(function_name, plhs[i], A6, i);
+    setup_output_args(function_name, plhs[i], A7, i);
+    setup_output_args(function_name, plhs[i], A8, i);
+    setup_output_args(function_name, plhs[i], A9, i);
+    setup_output_args(function_name, plhs[i], A10, i);
+    setup_output_args(function_name, plhs[i], A11, i);
+    setup_output_args(function_name, plhs[i], A12, i);
+    setup_output_args(function_name, plhs[i], A13, i);
+
+    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+}
+
+template <
+    typename T1, 
+    typename T2,
+    typename T3,
+    typename T4,
+    typename T5,
+    typename T6,
+    typename T7,
+    typename T8,
+    typename T9,
+    typename T10,
+    typename T11,
+    typename T12,
+    typename T13,
+    typename T14
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1,
+    const T2& A2,
+    const T3& A3,
+    const T4& A4,
+    const T5& A5,
+    const T6& A6,
+    const T7& A7,
+    const T8& A8,
+    const T9& A9,
+    const T10& A10,
+    const T11& A11,
+    const T12& A12,
+    const T13& A13,
+    const T14& A14
+) 
+{
+    using namespace mex_binding;
+    const int num_args = 14;
+    mxArray* plhs[num_args] = {0};
+    mxArray* prhs[num_args] = {0};
+
+    int nrhs = 0;
+    setup_input_args(prhs[nrhs], A1, nrhs);
+    setup_input_args(prhs[nrhs], A2, nrhs);
+    setup_input_args(prhs[nrhs], A3, nrhs);
+    setup_input_args(prhs[nrhs], A4, nrhs);
+    setup_input_args(prhs[nrhs], A5, nrhs);
+    setup_input_args(prhs[nrhs], A6, nrhs);
+    setup_input_args(prhs[nrhs], A7, nrhs);
+    setup_input_args(prhs[nrhs], A8, nrhs);
+    setup_input_args(prhs[nrhs], A9, nrhs);
+    setup_input_args(prhs[nrhs], A10, nrhs);
+    setup_input_args(prhs[nrhs], A11, nrhs);
+    setup_input_args(prhs[nrhs], A12, nrhs);
+    setup_input_args(prhs[nrhs], A13, nrhs);
+    setup_input_args(prhs[nrhs], A14, nrhs);
+
+    const int nlhs = num_args - nrhs;
+    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+    int i = 0;
+    setup_output_args(function_name, plhs[i], A1, i);
+    setup_output_args(function_name, plhs[i], A2, i);
+    setup_output_args(function_name, plhs[i], A3, i);
+    setup_output_args(function_name, plhs[i], A4, i);
+    setup_output_args(function_name, plhs[i], A5, i);
+    setup_output_args(function_name, plhs[i], A6, i);
+    setup_output_args(function_name, plhs[i], A7, i);
+    setup_output_args(function_name, plhs[i], A8, i);
+    setup_output_args(function_name, plhs[i], A9, i);
+    setup_output_args(function_name, plhs[i], A10, i);
+    setup_output_args(function_name, plhs[i], A11, i);
+    setup_output_args(function_name, plhs[i], A12, i);
+    setup_output_args(function_name, plhs[i], A13, i);
+    setup_output_args(function_name, plhs[i], A14, i);
+
+    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+}
+
+template <
+    typename T1, 
+    typename T2,
+    typename T3,
+    typename T4,
+    typename T5,
+    typename T6,
+    typename T7,
+    typename T8,
+    typename T9,
+    typename T10,
+    typename T11,
+    typename T12,
+    typename T13,
+    typename T14,
+    typename T15
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1,
+    const T2& A2,
+    const T3& A3,
+    const T4& A4,
+    const T5& A5,
+    const T6& A6,
+    const T7& A7,
+    const T8& A8,
+    const T9& A9,
+    const T10& A10,
+    const T11& A11,
+    const T12& A12,
+    const T13& A13,
+    const T14& A14,
+    const T15& A15
+) 
+{
+    using namespace mex_binding;
+    const int num_args = 15;
+    mxArray* plhs[num_args] = {0};
+    mxArray* prhs[num_args] = {0};
+
+    int nrhs = 0;
+    setup_input_args(prhs[nrhs], A1, nrhs);
+    setup_input_args(prhs[nrhs], A2, nrhs);
+    setup_input_args(prhs[nrhs], A3, nrhs);
+    setup_input_args(prhs[nrhs], A4, nrhs);
+    setup_input_args(prhs[nrhs], A5, nrhs);
+    setup_input_args(prhs[nrhs], A6, nrhs);
+    setup_input_args(prhs[nrhs], A7, nrhs);
+    setup_input_args(prhs[nrhs], A8, nrhs);
+    setup_input_args(prhs[nrhs], A9, nrhs);
+    setup_input_args(prhs[nrhs], A10, nrhs);
+    setup_input_args(prhs[nrhs], A11, nrhs);
+    setup_input_args(prhs[nrhs], A12, nrhs);
+    setup_input_args(prhs[nrhs], A13, nrhs);
+    setup_input_args(prhs[nrhs], A14, nrhs);
+    setup_input_args(prhs[nrhs], A15, nrhs);
+
+    const int nlhs = num_args - nrhs;
+    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+    int i = 0;
+    setup_output_args(function_name, plhs[i], A1, i);
+    setup_output_args(function_name, plhs[i], A2, i);
+    setup_output_args(function_name, plhs[i], A3, i);
+    setup_output_args(function_name, plhs[i], A4, i);
+    setup_output_args(function_name, plhs[i], A5, i);
+    setup_output_args(function_name, plhs[i], A6, i);
+    setup_output_args(function_name, plhs[i], A7, i);
+    setup_output_args(function_name, plhs[i], A8, i);
+    setup_output_args(function_name, plhs[i], A9, i);
+    setup_output_args(function_name, plhs[i], A10, i);
+    setup_output_args(function_name, plhs[i], A11, i);
+    setup_output_args(function_name, plhs[i], A12, i);
+    setup_output_args(function_name, plhs[i], A13, i);
+    setup_output_args(function_name, plhs[i], A14, i);
+    setup_output_args(function_name, plhs[i], A15, i);
+
+    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+}
+
+template <
+    typename T1, 
+    typename T2,
+    typename T3,
+    typename T4,
+    typename T5,
+    typename T6,
+    typename T7,
+    typename T8,
+    typename T9,
+    typename T10,
+    typename T11,
+    typename T12,
+    typename T13,
+    typename T14,
+    typename T15,
+    typename T16
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1,
+    const T2& A2,
+    const T3& A3,
+    const T4& A4,
+    const T5& A5,
+    const T6& A6,
+    const T7& A7,
+    const T8& A8,
+    const T9& A9,
+    const T10& A10,
+    const T11& A11,
+    const T12& A12,
+    const T13& A13,
+    const T14& A14,
+    const T15& A15,
+    const T16& A16
+) 
+{
+    using namespace mex_binding;
+    const int num_args = 16;
+    mxArray* plhs[num_args] = {0};
+    mxArray* prhs[num_args] = {0};
+
+    int nrhs = 0;
+    setup_input_args(prhs[nrhs], A1, nrhs);
+    setup_input_args(prhs[nrhs], A2, nrhs);
+    setup_input_args(prhs[nrhs], A3, nrhs);
+    setup_input_args(prhs[nrhs], A4, nrhs);
+    setup_input_args(prhs[nrhs], A5, nrhs);
+    setup_input_args(prhs[nrhs], A6, nrhs);
+    setup_input_args(prhs[nrhs], A7, nrhs);
+    setup_input_args(prhs[nrhs], A8, nrhs);
+    setup_input_args(prhs[nrhs], A9, nrhs);
+    setup_input_args(prhs[nrhs], A10, nrhs);
+    setup_input_args(prhs[nrhs], A11, nrhs);
+    setup_input_args(prhs[nrhs], A12, nrhs);
+    setup_input_args(prhs[nrhs], A13, nrhs);
+    setup_input_args(prhs[nrhs], A14, nrhs);
+    setup_input_args(prhs[nrhs], A15, nrhs);
+    setup_input_args(prhs[nrhs], A16, nrhs);
+
+    const int nlhs = num_args - nrhs;
+    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+    int i = 0;
+    setup_output_args(function_name, plhs[i], A1, i);
+    setup_output_args(function_name, plhs[i], A2, i);
+    setup_output_args(function_name, plhs[i], A3, i);
+    setup_output_args(function_name, plhs[i], A4, i);
+    setup_output_args(function_name, plhs[i], A5, i);
+    setup_output_args(function_name, plhs[i], A6, i);
+    setup_output_args(function_name, plhs[i], A7, i);
+    setup_output_args(function_name, plhs[i], A8, i);
+    setup_output_args(function_name, plhs[i], A9, i);
+    setup_output_args(function_name, plhs[i], A10, i);
+    setup_output_args(function_name, plhs[i], A11, i);
+    setup_output_args(function_name, plhs[i], A12, i);
+    setup_output_args(function_name, plhs[i], A13, i);
+    setup_output_args(function_name, plhs[i], A14, i);
+    setup_output_args(function_name, plhs[i], A15, i);
+    setup_output_args(function_name, plhs[i], A16, i);
+
+    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+}
+
+template <
+    typename T1, 
+    typename T2,
+    typename T3,
+    typename T4,
+    typename T5,
+    typename T6,
+    typename T7,
+    typename T8,
+    typename T9,
+    typename T10,
+    typename T11,
+    typename T12,
+    typename T13,
+    typename T14,
+    typename T15,
+    typename T16,
+    typename T17
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1,
+    const T2& A2,
+    const T3& A3,
+    const T4& A4,
+    const T5& A5,
+    const T6& A6,
+    const T7& A7,
+    const T8& A8,
+    const T9& A9,
+    const T10& A10,
+    const T11& A11,
+    const T12& A12,
+    const T13& A13,
+    const T14& A14,
+    const T15& A15,
+    const T16& A16,
+    const T17& A17
+) 
+{
+    using namespace mex_binding;
+    const int num_args = 17;
+    mxArray* plhs[num_args] = {0};
+    mxArray* prhs[num_args] = {0};
+
+    int nrhs = 0;
+    setup_input_args(prhs[nrhs], A1, nrhs);
+    setup_input_args(prhs[nrhs], A2, nrhs);
+    setup_input_args(prhs[nrhs], A3, nrhs);
+    setup_input_args(prhs[nrhs], A4, nrhs);
+    setup_input_args(prhs[nrhs], A5, nrhs);
+    setup_input_args(prhs[nrhs], A6, nrhs);
+    setup_input_args(prhs[nrhs], A7, nrhs);
+    setup_input_args(prhs[nrhs], A8, nrhs);
+    setup_input_args(prhs[nrhs], A9, nrhs);
+    setup_input_args(prhs[nrhs], A10, nrhs);
+    setup_input_args(prhs[nrhs], A11, nrhs);
+    setup_input_args(prhs[nrhs], A12, nrhs);
+    setup_input_args(prhs[nrhs], A13, nrhs);
+    setup_input_args(prhs[nrhs], A14, nrhs);
+    setup_input_args(prhs[nrhs], A15, nrhs);
+    setup_input_args(prhs[nrhs], A16, nrhs);
+    setup_input_args(prhs[nrhs], A17, nrhs);
+
+    const int nlhs = num_args - nrhs;
+    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+    int i = 0;
+    setup_output_args(function_name, plhs[i], A1, i);
+    setup_output_args(function_name, plhs[i], A2, i);
+    setup_output_args(function_name, plhs[i], A3, i);
+    setup_output_args(function_name, plhs[i], A4, i);
+    setup_output_args(function_name, plhs[i], A5, i);
+    setup_output_args(function_name, plhs[i], A6, i);
+    setup_output_args(function_name, plhs[i], A7, i);
+    setup_output_args(function_name, plhs[i], A8, i);
+    setup_output_args(function_name, plhs[i], A9, i);
+    setup_output_args(function_name, plhs[i], A10, i);
+    setup_output_args(function_name, plhs[i], A11, i);
+    setup_output_args(function_name, plhs[i], A12, i);
+    setup_output_args(function_name, plhs[i], A13, i);
+    setup_output_args(function_name, plhs[i], A14, i);
+    setup_output_args(function_name, plhs[i], A15, i);
+    setup_output_args(function_name, plhs[i], A16, i);
+    setup_output_args(function_name, plhs[i], A17, i);
+
+    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+}
+
+template <
+    typename T1, 
+    typename T2,
+    typename T3,
+    typename T4,
+    typename T5,
+    typename T6,
+    typename T7,
+    typename T8,
+    typename T9,
+    typename T10,
+    typename T11,
+    typename T12,
+    typename T13,
+    typename T14,
+    typename T15,
+    typename T16,
+    typename T17,
+    typename T18
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1,
+    const T2& A2,
+    const T3& A3,
+    const T4& A4,
+    const T5& A5,
+    const T6& A6,
+    const T7& A7,
+    const T8& A8,
+    const T9& A9,
+    const T10& A10,
+    const T11& A11,
+    const T12& A12,
+    const T13& A13,
+    const T14& A14,
+    const T15& A15,
+    const T16& A16,
+    const T17& A17,
+    const T18& A18
+) 
+{
+    using namespace mex_binding;
+    const int num_args = 18;
+    mxArray* plhs[num_args] = {0};
+    mxArray* prhs[num_args] = {0};
+
+    int nrhs = 0;
+    setup_input_args(prhs[nrhs], A1, nrhs);
+    setup_input_args(prhs[nrhs], A2, nrhs);
+    setup_input_args(prhs[nrhs], A3, nrhs);
+    setup_input_args(prhs[nrhs], A4, nrhs);
+    setup_input_args(prhs[nrhs], A5, nrhs);
+    setup_input_args(prhs[nrhs], A6, nrhs);
+    setup_input_args(prhs[nrhs], A7, nrhs);
+    setup_input_args(prhs[nrhs], A8, nrhs);
+    setup_input_args(prhs[nrhs], A9, nrhs);
+    setup_input_args(prhs[nrhs], A10, nrhs);
+    setup_input_args(prhs[nrhs], A11, nrhs);
+    setup_input_args(prhs[nrhs], A12, nrhs);
+    setup_input_args(prhs[nrhs], A13, nrhs);
+    setup_input_args(prhs[nrhs], A14, nrhs);
+    setup_input_args(prhs[nrhs], A15, nrhs);
+    setup_input_args(prhs[nrhs], A16, nrhs);
+    setup_input_args(prhs[nrhs], A17, nrhs);
+    setup_input_args(prhs[nrhs], A18, nrhs);
+
+    const int nlhs = num_args - nrhs;
+    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+    int i = 0;
+    setup_output_args(function_name, plhs[i], A1, i);
+    setup_output_args(function_name, plhs[i], A2, i);
+    setup_output_args(function_name, plhs[i], A3, i);
+    setup_output_args(function_name, plhs[i], A4, i);
+    setup_output_args(function_name, plhs[i], A5, i);
+    setup_output_args(function_name, plhs[i], A6, i);
+    setup_output_args(function_name, plhs[i], A7, i);
+    setup_output_args(function_name, plhs[i], A8, i);
+    setup_output_args(function_name, plhs[i], A9, i);
+    setup_output_args(function_name, plhs[i], A10, i);
+    setup_output_args(function_name, plhs[i], A11, i);
+    setup_output_args(function_name, plhs[i], A12, i);
+    setup_output_args(function_name, plhs[i], A13, i);
+    setup_output_args(function_name, plhs[i], A14, i);
+    setup_output_args(function_name, plhs[i], A15, i);
+    setup_output_args(function_name, plhs[i], A16, i);
+    setup_output_args(function_name, plhs[i], A17, i);
+    setup_output_args(function_name, plhs[i], A18, i);
+
+    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+}
+
+template <
+    typename T1, 
+    typename T2,
+    typename T3,
+    typename T4,
+    typename T5,
+    typename T6,
+    typename T7,
+    typename T8,
+    typename T9,
+    typename T10,
+    typename T11,
+    typename T12,
+    typename T13,
+    typename T14,
+    typename T15,
+    typename T16,
+    typename T17,
+    typename T18,
+    typename T19
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1,
+    const T2& A2,
+    const T3& A3,
+    const T4& A4,
+    const T5& A5,
+    const T6& A6,
+    const T7& A7,
+    const T8& A8,
+    const T9& A9,
+    const T10& A10,
+    const T11& A11,
+    const T12& A12,
+    const T13& A13,
+    const T14& A14,
+    const T15& A15,
+    const T16& A16,
+    const T17& A17,
+    const T18& A18,
+    const T19& A19
+) 
+{
+    using namespace mex_binding;
+    const int num_args = 19;
+    mxArray* plhs[num_args] = {0};
+    mxArray* prhs[num_args] = {0};
+
+    int nrhs = 0;
+    setup_input_args(prhs[nrhs], A1, nrhs);
+    setup_input_args(prhs[nrhs], A2, nrhs);
+    setup_input_args(prhs[nrhs], A3, nrhs);
+    setup_input_args(prhs[nrhs], A4, nrhs);
+    setup_input_args(prhs[nrhs], A5, nrhs);
+    setup_input_args(prhs[nrhs], A6, nrhs);
+    setup_input_args(prhs[nrhs], A7, nrhs);
+    setup_input_args(prhs[nrhs], A8, nrhs);
+    setup_input_args(prhs[nrhs], A9, nrhs);
+    setup_input_args(prhs[nrhs], A10, nrhs);
+    setup_input_args(prhs[nrhs], A11, nrhs);
+    setup_input_args(prhs[nrhs], A12, nrhs);
+    setup_input_args(prhs[nrhs], A13, nrhs);
+    setup_input_args(prhs[nrhs], A14, nrhs);
+    setup_input_args(prhs[nrhs], A15, nrhs);
+    setup_input_args(prhs[nrhs], A16, nrhs);
+    setup_input_args(prhs[nrhs], A17, nrhs);
+    setup_input_args(prhs[nrhs], A18, nrhs);
+    setup_input_args(prhs[nrhs], A19, nrhs);
+
+    const int nlhs = num_args - nrhs;
+    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+    int i = 0;
+    setup_output_args(function_name, plhs[i], A1, i);
+    setup_output_args(function_name, plhs[i], A2, i);
+    setup_output_args(function_name, plhs[i], A3, i);
+    setup_output_args(function_name, plhs[i], A4, i);
+    setup_output_args(function_name, plhs[i], A5, i);
+    setup_output_args(function_name, plhs[i], A6, i);
+    setup_output_args(function_name, plhs[i], A7, i);
+    setup_output_args(function_name, plhs[i], A8, i);
+    setup_output_args(function_name, plhs[i], A9, i);
+    setup_output_args(function_name, plhs[i], A10, i);
+    setup_output_args(function_name, plhs[i], A11, i);
+    setup_output_args(function_name, plhs[i], A12, i);
+    setup_output_args(function_name, plhs[i], A13, i);
+    setup_output_args(function_name, plhs[i], A14, i);
+    setup_output_args(function_name, plhs[i], A15, i);
+    setup_output_args(function_name, plhs[i], A16, i);
+    setup_output_args(function_name, plhs[i], A17, i);
+    setup_output_args(function_name, plhs[i], A18, i);
+    setup_output_args(function_name, plhs[i], A19, i);
+
+    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+}
+
+template <
+    typename T1, 
+    typename T2,
+    typename T3,
+    typename T4,
+    typename T5,
+    typename T6,
+    typename T7,
+    typename T8,
+    typename T9,
+    typename T10,
+    typename T11,
+    typename T12,
+    typename T13,
+    typename T14,
+    typename T15,
+    typename T16,
+    typename T17,
+    typename T18,
+    typename T19,
+    typename T20
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1,
+    const T2& A2,
+    const T3& A3,
+    const T4& A4,
+    const T5& A5,
+    const T6& A6,
+    const T7& A7,
+    const T8& A8,
+    const T9& A9,
+    const T10& A10,
+    const T11& A11,
+    const T12& A12,
+    const T13& A13,
+    const T14& A14,
+    const T15& A15,
+    const T16& A16,
+    const T17& A17,
+    const T18& A18,
+    const T19& A19,
+    const T20& A20
+) 
+{
+    using namespace mex_binding;
+    const int num_args = 20;
+    mxArray* plhs[num_args] = {0};
+    mxArray* prhs[num_args] = {0};
+
+    int nrhs = 0;
+    setup_input_args(prhs[nrhs], A1, nrhs);
+    setup_input_args(prhs[nrhs], A2, nrhs);
+    setup_input_args(prhs[nrhs], A3, nrhs);
+    setup_input_args(prhs[nrhs], A4, nrhs);
+    setup_input_args(prhs[nrhs], A5, nrhs);
+    setup_input_args(prhs[nrhs], A6, nrhs);
+    setup_input_args(prhs[nrhs], A7, nrhs);
+    setup_input_args(prhs[nrhs], A8, nrhs);
+    setup_input_args(prhs[nrhs], A9, nrhs);
+    setup_input_args(prhs[nrhs], A10, nrhs);
+    setup_input_args(prhs[nrhs], A11, nrhs);
+    setup_input_args(prhs[nrhs], A12, nrhs);
+    setup_input_args(prhs[nrhs], A13, nrhs);
+    setup_input_args(prhs[nrhs], A14, nrhs);
+    setup_input_args(prhs[nrhs], A15, nrhs);
+    setup_input_args(prhs[nrhs], A16, nrhs);
+    setup_input_args(prhs[nrhs], A17, nrhs);
+    setup_input_args(prhs[nrhs], A18, nrhs);
+    setup_input_args(prhs[nrhs], A19, nrhs);
+    setup_input_args(prhs[nrhs], A20, nrhs);
+
+    const int nlhs = num_args - nrhs;
+    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+    int i = 0;
+    setup_output_args(function_name, plhs[i], A1, i);
+    setup_output_args(function_name, plhs[i], A2, i);
+    setup_output_args(function_name, plhs[i], A3, i);
+    setup_output_args(function_name, plhs[i], A4, i);
+    setup_output_args(function_name, plhs[i], A5, i);
+    setup_output_args(function_name, plhs[i], A6, i);
+    setup_output_args(function_name, plhs[i], A7, i);
+    setup_output_args(function_name, plhs[i], A8, i);
+    setup_output_args(function_name, plhs[i], A9, i);
+    setup_output_args(function_name, plhs[i], A10, i);
+    setup_output_args(function_name, plhs[i], A11, i);
+    setup_output_args(function_name, plhs[i], A12, i);
+    setup_output_args(function_name, plhs[i], A13, i);
+    setup_output_args(function_name, plhs[i], A14, i);
+    setup_output_args(function_name, plhs[i], A15, i);
+    setup_output_args(function_name, plhs[i], A16, i);
+    setup_output_args(function_name, plhs[i], A17, i);
+    setup_output_args(function_name, plhs[i], A18, i);
+    setup_output_args(function_name, plhs[i], A19, i);
+    setup_output_args(function_name, plhs[i], A20, i);
 
     free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
 }
