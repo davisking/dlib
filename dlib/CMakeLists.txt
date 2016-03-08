@@ -462,13 +462,21 @@ if (NOT TARGET dlib)
                # make sure cuda is really working by doing a test compile
                message(STATUS "Building a CUDA test project to see if your compiler is compatible with CUDA...")
                try_compile(cuda_test_compile_worked ${PROJECT_BINARY_DIR}/cuda_test_build 
-                           ${PROJECT_SOURCE_DIR}/dnn/test_for_cuda cuda_test)
+                           ${PROJECT_SOURCE_DIR}/dnn/test_for_cuda cuda_test
+                           CMAKE_FLAGS "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+                                       "-DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}"
+                                       "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}"
+                           )
                if (NOT cuda_test_compile_worked)
                   message(STATUS "*** CUDA was found but your compiler failed to compile a simple CUDA program so dlib isn't going to use CUDA. ***")
                else()
                   message(STATUS "Checking if you have the right version of cuDNN installed.")
                   try_compile(cudnn_test_compile_worked ${PROJECT_BINARY_DIR}/cudnn_test_build 
-                              ${PROJECT_SOURCE_DIR}/dnn/test_for_cudnn cudnn_test)
+                              ${PROJECT_SOURCE_DIR}/dnn/test_for_cudnn cudnn_test
+                              CMAKE_FLAGS "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+                                          "-DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}"
+                                          "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}"
+                                          )
                   if (cudnn_test_compile_worked)
                      message(STATUS "Found cuDNN: " ${cudnn})
                   else()
@@ -498,6 +506,7 @@ if (NOT TARGET dlib)
             toggle_preprocessor_switch(DLIB_USE_CUDA)
             if (NOT cudnn OR NOT cudnn_include OR NOT cudnn_test_compile_worked)
                message(STATUS "*** cuDNN V4.0 OR GREATER NOT FOUND.  DLIB WILL NOT USE CUDA. ***")
+               message(STATUS "*** If you have cuDNN then set CMAKE_PREFIX_PATH to include cuDNN's folder.")
             endif()
             if (NOT COMPILER_CAN_DO_CPP_11)
                message(STATUS "*** Dlib CUDA support requires C++11 but your compiler doesn't support it. ***")
