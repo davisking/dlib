@@ -2946,7 +2946,7 @@ namespace mex_binding
             setp(&buf[0], &buf[0] + buf.size()-2);
 
             // make cout send data to mex_warn_streambuf
-            std::cout.rdbuf(this);
+            std::cerr.rdbuf(this);
         }
 
 
