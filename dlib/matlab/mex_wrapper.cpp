@@ -3021,1502 +3021,1414 @@ namespace mex_binding
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-void call_matlab (
-    const std::string& function_name
-) 
+namespace dlib
 {
-    using namespace mex_binding;
-
-    call_matlab_for_real(0,NULL,0,NULL, function_name);
-}
-
-template <typename T1>
-void free_callback_resources (
-    int nlhs,
-    mxArray* plhs[],
-    int nrhs,
-    mxArray* prhs[]
-)
-{
-    // free resources
-    for (int i = 0; i < nlhs; ++i)
-        mxDestroyArray(plhs[i]);
-
-    for (int i = 0; i < nrhs; ++i)
+    void call_matlab (
+        const std::string& function_name
+    ) 
     {
-        // don't call mxDestroyArray() on function handles (which should only ever be in prhs[0])
-        if (i == 0 && dlib::is_same_type<T1,function_handle>::value)
-            continue;
-        mxDestroyArray(prhs[i]);
+        using namespace mex_binding;
+
+        call_matlab_for_real(0,NULL,0,NULL, function_name);
     }
-}
-
-template <
-    typename T1
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 1;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
-
-template <
-    typename T1, 
-    typename T2
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1,
-    const T2& A2
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 2;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-    setup_input_args(prhs[nrhs], A2, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-    setup_output_args(function_name, plhs[i], A2, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
-
-template <
-    typename T1, 
-    typename T2,
-    typename T3
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 3;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-    setup_input_args(prhs[nrhs], A2, nrhs);
-    setup_input_args(prhs[nrhs], A3, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-    setup_output_args(function_name, plhs[i], A2, i);
-    setup_output_args(function_name, plhs[i], A3, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
-
-
-template <
-    typename T1, 
-    typename T2,
-    typename T3,
-    typename T4
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 4;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-    setup_input_args(prhs[nrhs], A2, nrhs);
-    setup_input_args(prhs[nrhs], A3, nrhs);
-    setup_input_args(prhs[nrhs], A4, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-    setup_output_args(function_name, plhs[i], A2, i);
-    setup_output_args(function_name, plhs[i], A3, i);
-    setup_output_args(function_name, plhs[i], A4, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
-
-
-template <
-    typename T1, 
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4,
-    const T5& A5
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 5;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-    setup_input_args(prhs[nrhs], A2, nrhs);
-    setup_input_args(prhs[nrhs], A3, nrhs);
-    setup_input_args(prhs[nrhs], A4, nrhs);
-    setup_input_args(prhs[nrhs], A5, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-    setup_output_args(function_name, plhs[i], A2, i);
-    setup_output_args(function_name, plhs[i], A3, i);
-    setup_output_args(function_name, plhs[i], A4, i);
-    setup_output_args(function_name, plhs[i], A5, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
-
-
-template <
-    typename T1, 
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5,
-    typename T6
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4,
-    const T5& A5,
-    const T6& A6
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 6;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-    setup_input_args(prhs[nrhs], A2, nrhs);
-    setup_input_args(prhs[nrhs], A3, nrhs);
-    setup_input_args(prhs[nrhs], A4, nrhs);
-    setup_input_args(prhs[nrhs], A5, nrhs);
-    setup_input_args(prhs[nrhs], A6, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-    setup_output_args(function_name, plhs[i], A2, i);
-    setup_output_args(function_name, plhs[i], A3, i);
-    setup_output_args(function_name, plhs[i], A4, i);
-    setup_output_args(function_name, plhs[i], A5, i);
-    setup_output_args(function_name, plhs[i], A6, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
-
-
-template <
-    typename T1, 
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5,
-    typename T6,
-    typename T7
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4,
-    const T5& A5,
-    const T6& A6,
-    const T7& A7
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 7;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-    setup_input_args(prhs[nrhs], A2, nrhs);
-    setup_input_args(prhs[nrhs], A3, nrhs);
-    setup_input_args(prhs[nrhs], A4, nrhs);
-    setup_input_args(prhs[nrhs], A5, nrhs);
-    setup_input_args(prhs[nrhs], A6, nrhs);
-    setup_input_args(prhs[nrhs], A7, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-    setup_output_args(function_name, plhs[i], A2, i);
-    setup_output_args(function_name, plhs[i], A3, i);
-    setup_output_args(function_name, plhs[i], A4, i);
-    setup_output_args(function_name, plhs[i], A5, i);
-    setup_output_args(function_name, plhs[i], A6, i);
-    setup_output_args(function_name, plhs[i], A7, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
-
-
-template <
-    typename T1, 
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5,
-    typename T6,
-    typename T7,
-    typename T8
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4,
-    const T5& A5,
-    const T6& A6,
-    const T7& A7,
-    const T8& A8
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 8;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-    setup_input_args(prhs[nrhs], A2, nrhs);
-    setup_input_args(prhs[nrhs], A3, nrhs);
-    setup_input_args(prhs[nrhs], A4, nrhs);
-    setup_input_args(prhs[nrhs], A5, nrhs);
-    setup_input_args(prhs[nrhs], A6, nrhs);
-    setup_input_args(prhs[nrhs], A7, nrhs);
-    setup_input_args(prhs[nrhs], A8, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-    setup_output_args(function_name, plhs[i], A2, i);
-    setup_output_args(function_name, plhs[i], A3, i);
-    setup_output_args(function_name, plhs[i], A4, i);
-    setup_output_args(function_name, plhs[i], A5, i);
-    setup_output_args(function_name, plhs[i], A6, i);
-    setup_output_args(function_name, plhs[i], A7, i);
-    setup_output_args(function_name, plhs[i], A8, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
-
-
-
-template <
-    typename T1, 
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5,
-    typename T6,
-    typename T7,
-    typename T8,
-    typename T9
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4,
-    const T5& A5,
-    const T6& A6,
-    const T7& A7,
-    const T8& A8,
-    const T9& A9
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 9;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-    setup_input_args(prhs[nrhs], A2, nrhs);
-    setup_input_args(prhs[nrhs], A3, nrhs);
-    setup_input_args(prhs[nrhs], A4, nrhs);
-    setup_input_args(prhs[nrhs], A5, nrhs);
-    setup_input_args(prhs[nrhs], A6, nrhs);
-    setup_input_args(prhs[nrhs], A7, nrhs);
-    setup_input_args(prhs[nrhs], A8, nrhs);
-    setup_input_args(prhs[nrhs], A9, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-    setup_output_args(function_name, plhs[i], A2, i);
-    setup_output_args(function_name, plhs[i], A3, i);
-    setup_output_args(function_name, plhs[i], A4, i);
-    setup_output_args(function_name, plhs[i], A5, i);
-    setup_output_args(function_name, plhs[i], A6, i);
-    setup_output_args(function_name, plhs[i], A7, i);
-    setup_output_args(function_name, plhs[i], A8, i);
-    setup_output_args(function_name, plhs[i], A9, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
-
-
-template <
-    typename T1, 
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5,
-    typename T6,
-    typename T7,
-    typename T8,
-    typename T9,
-    typename T10
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4,
-    const T5& A5,
-    const T6& A6,
-    const T7& A7,
-    const T8& A8,
-    const T9& A9,
-    const T10& A10
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 10;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-    setup_input_args(prhs[nrhs], A2, nrhs);
-    setup_input_args(prhs[nrhs], A3, nrhs);
-    setup_input_args(prhs[nrhs], A4, nrhs);
-    setup_input_args(prhs[nrhs], A5, nrhs);
-    setup_input_args(prhs[nrhs], A6, nrhs);
-    setup_input_args(prhs[nrhs], A7, nrhs);
-    setup_input_args(prhs[nrhs], A8, nrhs);
-    setup_input_args(prhs[nrhs], A9, nrhs);
-    setup_input_args(prhs[nrhs], A10, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-    setup_output_args(function_name, plhs[i], A2, i);
-    setup_output_args(function_name, plhs[i], A3, i);
-    setup_output_args(function_name, plhs[i], A4, i);
-    setup_output_args(function_name, plhs[i], A5, i);
-    setup_output_args(function_name, plhs[i], A6, i);
-    setup_output_args(function_name, plhs[i], A7, i);
-    setup_output_args(function_name, plhs[i], A8, i);
-    setup_output_args(function_name, plhs[i], A9, i);
-    setup_output_args(function_name, plhs[i], A10, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
-
-template <
-    typename T1, 
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5,
-    typename T6,
-    typename T7,
-    typename T8,
-    typename T9,
-    typename T10,
-    typename T11
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4,
-    const T5& A5,
-    const T6& A6,
-    const T7& A7,
-    const T8& A8,
-    const T9& A9,
-    const T10& A10,
-    const T11& A11
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 11;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-    setup_input_args(prhs[nrhs], A2, nrhs);
-    setup_input_args(prhs[nrhs], A3, nrhs);
-    setup_input_args(prhs[nrhs], A4, nrhs);
-    setup_input_args(prhs[nrhs], A5, nrhs);
-    setup_input_args(prhs[nrhs], A6, nrhs);
-    setup_input_args(prhs[nrhs], A7, nrhs);
-    setup_input_args(prhs[nrhs], A8, nrhs);
-    setup_input_args(prhs[nrhs], A9, nrhs);
-    setup_input_args(prhs[nrhs], A10, nrhs);
-    setup_input_args(prhs[nrhs], A11, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-    setup_output_args(function_name, plhs[i], A2, i);
-    setup_output_args(function_name, plhs[i], A3, i);
-    setup_output_args(function_name, plhs[i], A4, i);
-    setup_output_args(function_name, plhs[i], A5, i);
-    setup_output_args(function_name, plhs[i], A6, i);
-    setup_output_args(function_name, plhs[i], A7, i);
-    setup_output_args(function_name, plhs[i], A8, i);
-    setup_output_args(function_name, plhs[i], A9, i);
-    setup_output_args(function_name, plhs[i], A10, i);
-    setup_output_args(function_name, plhs[i], A11, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
-
-template <
-    typename T1, 
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5,
-    typename T6,
-    typename T7,
-    typename T8,
-    typename T9,
-    typename T10,
-    typename T11,
-    typename T12
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4,
-    const T5& A5,
-    const T6& A6,
-    const T7& A7,
-    const T8& A8,
-    const T9& A9,
-    const T10& A10,
-    const T11& A11,
-    const T12& A12
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 12;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-    setup_input_args(prhs[nrhs], A2, nrhs);
-    setup_input_args(prhs[nrhs], A3, nrhs);
-    setup_input_args(prhs[nrhs], A4, nrhs);
-    setup_input_args(prhs[nrhs], A5, nrhs);
-    setup_input_args(prhs[nrhs], A6, nrhs);
-    setup_input_args(prhs[nrhs], A7, nrhs);
-    setup_input_args(prhs[nrhs], A8, nrhs);
-    setup_input_args(prhs[nrhs], A9, nrhs);
-    setup_input_args(prhs[nrhs], A10, nrhs);
-    setup_input_args(prhs[nrhs], A11, nrhs);
-    setup_input_args(prhs[nrhs], A12, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-    setup_output_args(function_name, plhs[i], A2, i);
-    setup_output_args(function_name, plhs[i], A3, i);
-    setup_output_args(function_name, plhs[i], A4, i);
-    setup_output_args(function_name, plhs[i], A5, i);
-    setup_output_args(function_name, plhs[i], A6, i);
-    setup_output_args(function_name, plhs[i], A7, i);
-    setup_output_args(function_name, plhs[i], A8, i);
-    setup_output_args(function_name, plhs[i], A9, i);
-    setup_output_args(function_name, plhs[i], A10, i);
-    setup_output_args(function_name, plhs[i], A11, i);
-    setup_output_args(function_name, plhs[i], A12, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
-
-template <
-    typename T1, 
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5,
-    typename T6,
-    typename T7,
-    typename T8,
-    typename T9,
-    typename T10,
-    typename T11,
-    typename T12,
-    typename T13
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4,
-    const T5& A5,
-    const T6& A6,
-    const T7& A7,
-    const T8& A8,
-    const T9& A9,
-    const T10& A10,
-    const T11& A11,
-    const T12& A12,
-    const T13& A13
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 13;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-    setup_input_args(prhs[nrhs], A2, nrhs);
-    setup_input_args(prhs[nrhs], A3, nrhs);
-    setup_input_args(prhs[nrhs], A4, nrhs);
-    setup_input_args(prhs[nrhs], A5, nrhs);
-    setup_input_args(prhs[nrhs], A6, nrhs);
-    setup_input_args(prhs[nrhs], A7, nrhs);
-    setup_input_args(prhs[nrhs], A8, nrhs);
-    setup_input_args(prhs[nrhs], A9, nrhs);
-    setup_input_args(prhs[nrhs], A10, nrhs);
-    setup_input_args(prhs[nrhs], A11, nrhs);
-    setup_input_args(prhs[nrhs], A12, nrhs);
-    setup_input_args(prhs[nrhs], A13, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-    setup_output_args(function_name, plhs[i], A2, i);
-    setup_output_args(function_name, plhs[i], A3, i);
-    setup_output_args(function_name, plhs[i], A4, i);
-    setup_output_args(function_name, plhs[i], A5, i);
-    setup_output_args(function_name, plhs[i], A6, i);
-    setup_output_args(function_name, plhs[i], A7, i);
-    setup_output_args(function_name, plhs[i], A8, i);
-    setup_output_args(function_name, plhs[i], A9, i);
-    setup_output_args(function_name, plhs[i], A10, i);
-    setup_output_args(function_name, plhs[i], A11, i);
-    setup_output_args(function_name, plhs[i], A12, i);
-    setup_output_args(function_name, plhs[i], A13, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
-
-template <
-    typename T1, 
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5,
-    typename T6,
-    typename T7,
-    typename T8,
-    typename T9,
-    typename T10,
-    typename T11,
-    typename T12,
-    typename T13,
-    typename T14
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4,
-    const T5& A5,
-    const T6& A6,
-    const T7& A7,
-    const T8& A8,
-    const T9& A9,
-    const T10& A10,
-    const T11& A11,
-    const T12& A12,
-    const T13& A13,
-    const T14& A14
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 14;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-    setup_input_args(prhs[nrhs], A2, nrhs);
-    setup_input_args(prhs[nrhs], A3, nrhs);
-    setup_input_args(prhs[nrhs], A4, nrhs);
-    setup_input_args(prhs[nrhs], A5, nrhs);
-    setup_input_args(prhs[nrhs], A6, nrhs);
-    setup_input_args(prhs[nrhs], A7, nrhs);
-    setup_input_args(prhs[nrhs], A8, nrhs);
-    setup_input_args(prhs[nrhs], A9, nrhs);
-    setup_input_args(prhs[nrhs], A10, nrhs);
-    setup_input_args(prhs[nrhs], A11, nrhs);
-    setup_input_args(prhs[nrhs], A12, nrhs);
-    setup_input_args(prhs[nrhs], A13, nrhs);
-    setup_input_args(prhs[nrhs], A14, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-    setup_output_args(function_name, plhs[i], A2, i);
-    setup_output_args(function_name, plhs[i], A3, i);
-    setup_output_args(function_name, plhs[i], A4, i);
-    setup_output_args(function_name, plhs[i], A5, i);
-    setup_output_args(function_name, plhs[i], A6, i);
-    setup_output_args(function_name, plhs[i], A7, i);
-    setup_output_args(function_name, plhs[i], A8, i);
-    setup_output_args(function_name, plhs[i], A9, i);
-    setup_output_args(function_name, plhs[i], A10, i);
-    setup_output_args(function_name, plhs[i], A11, i);
-    setup_output_args(function_name, plhs[i], A12, i);
-    setup_output_args(function_name, plhs[i], A13, i);
-    setup_output_args(function_name, plhs[i], A14, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
-
-template <
-    typename T1, 
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5,
-    typename T6,
-    typename T7,
-    typename T8,
-    typename T9,
-    typename T10,
-    typename T11,
-    typename T12,
-    typename T13,
-    typename T14,
-    typename T15
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4,
-    const T5& A5,
-    const T6& A6,
-    const T7& A7,
-    const T8& A8,
-    const T9& A9,
-    const T10& A10,
-    const T11& A11,
-    const T12& A12,
-    const T13& A13,
-    const T14& A14,
-    const T15& A15
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 15;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-    setup_input_args(prhs[nrhs], A2, nrhs);
-    setup_input_args(prhs[nrhs], A3, nrhs);
-    setup_input_args(prhs[nrhs], A4, nrhs);
-    setup_input_args(prhs[nrhs], A5, nrhs);
-    setup_input_args(prhs[nrhs], A6, nrhs);
-    setup_input_args(prhs[nrhs], A7, nrhs);
-    setup_input_args(prhs[nrhs], A8, nrhs);
-    setup_input_args(prhs[nrhs], A9, nrhs);
-    setup_input_args(prhs[nrhs], A10, nrhs);
-    setup_input_args(prhs[nrhs], A11, nrhs);
-    setup_input_args(prhs[nrhs], A12, nrhs);
-    setup_input_args(prhs[nrhs], A13, nrhs);
-    setup_input_args(prhs[nrhs], A14, nrhs);
-    setup_input_args(prhs[nrhs], A15, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-    setup_output_args(function_name, plhs[i], A2, i);
-    setup_output_args(function_name, plhs[i], A3, i);
-    setup_output_args(function_name, plhs[i], A4, i);
-    setup_output_args(function_name, plhs[i], A5, i);
-    setup_output_args(function_name, plhs[i], A6, i);
-    setup_output_args(function_name, plhs[i], A7, i);
-    setup_output_args(function_name, plhs[i], A8, i);
-    setup_output_args(function_name, plhs[i], A9, i);
-    setup_output_args(function_name, plhs[i], A10, i);
-    setup_output_args(function_name, plhs[i], A11, i);
-    setup_output_args(function_name, plhs[i], A12, i);
-    setup_output_args(function_name, plhs[i], A13, i);
-    setup_output_args(function_name, plhs[i], A14, i);
-    setup_output_args(function_name, plhs[i], A15, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
-
-template <
-    typename T1, 
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5,
-    typename T6,
-    typename T7,
-    typename T8,
-    typename T9,
-    typename T10,
-    typename T11,
-    typename T12,
-    typename T13,
-    typename T14,
-    typename T15,
-    typename T16
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4,
-    const T5& A5,
-    const T6& A6,
-    const T7& A7,
-    const T8& A8,
-    const T9& A9,
-    const T10& A10,
-    const T11& A11,
-    const T12& A12,
-    const T13& A13,
-    const T14& A14,
-    const T15& A15,
-    const T16& A16
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 16;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-    setup_input_args(prhs[nrhs], A2, nrhs);
-    setup_input_args(prhs[nrhs], A3, nrhs);
-    setup_input_args(prhs[nrhs], A4, nrhs);
-    setup_input_args(prhs[nrhs], A5, nrhs);
-    setup_input_args(prhs[nrhs], A6, nrhs);
-    setup_input_args(prhs[nrhs], A7, nrhs);
-    setup_input_args(prhs[nrhs], A8, nrhs);
-    setup_input_args(prhs[nrhs], A9, nrhs);
-    setup_input_args(prhs[nrhs], A10, nrhs);
-    setup_input_args(prhs[nrhs], A11, nrhs);
-    setup_input_args(prhs[nrhs], A12, nrhs);
-    setup_input_args(prhs[nrhs], A13, nrhs);
-    setup_input_args(prhs[nrhs], A14, nrhs);
-    setup_input_args(prhs[nrhs], A15, nrhs);
-    setup_input_args(prhs[nrhs], A16, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-    setup_output_args(function_name, plhs[i], A2, i);
-    setup_output_args(function_name, plhs[i], A3, i);
-    setup_output_args(function_name, plhs[i], A4, i);
-    setup_output_args(function_name, plhs[i], A5, i);
-    setup_output_args(function_name, plhs[i], A6, i);
-    setup_output_args(function_name, plhs[i], A7, i);
-    setup_output_args(function_name, plhs[i], A8, i);
-    setup_output_args(function_name, plhs[i], A9, i);
-    setup_output_args(function_name, plhs[i], A10, i);
-    setup_output_args(function_name, plhs[i], A11, i);
-    setup_output_args(function_name, plhs[i], A12, i);
-    setup_output_args(function_name, plhs[i], A13, i);
-    setup_output_args(function_name, plhs[i], A14, i);
-    setup_output_args(function_name, plhs[i], A15, i);
-    setup_output_args(function_name, plhs[i], A16, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
-
-template <
-    typename T1, 
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5,
-    typename T6,
-    typename T7,
-    typename T8,
-    typename T9,
-    typename T10,
-    typename T11,
-    typename T12,
-    typename T13,
-    typename T14,
-    typename T15,
-    typename T16,
-    typename T17
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4,
-    const T5& A5,
-    const T6& A6,
-    const T7& A7,
-    const T8& A8,
-    const T9& A9,
-    const T10& A10,
-    const T11& A11,
-    const T12& A12,
-    const T13& A13,
-    const T14& A14,
-    const T15& A15,
-    const T16& A16,
-    const T17& A17
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 17;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-    setup_input_args(prhs[nrhs], A2, nrhs);
-    setup_input_args(prhs[nrhs], A3, nrhs);
-    setup_input_args(prhs[nrhs], A4, nrhs);
-    setup_input_args(prhs[nrhs], A5, nrhs);
-    setup_input_args(prhs[nrhs], A6, nrhs);
-    setup_input_args(prhs[nrhs], A7, nrhs);
-    setup_input_args(prhs[nrhs], A8, nrhs);
-    setup_input_args(prhs[nrhs], A9, nrhs);
-    setup_input_args(prhs[nrhs], A10, nrhs);
-    setup_input_args(prhs[nrhs], A11, nrhs);
-    setup_input_args(prhs[nrhs], A12, nrhs);
-    setup_input_args(prhs[nrhs], A13, nrhs);
-    setup_input_args(prhs[nrhs], A14, nrhs);
-    setup_input_args(prhs[nrhs], A15, nrhs);
-    setup_input_args(prhs[nrhs], A16, nrhs);
-    setup_input_args(prhs[nrhs], A17, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-    setup_output_args(function_name, plhs[i], A2, i);
-    setup_output_args(function_name, plhs[i], A3, i);
-    setup_output_args(function_name, plhs[i], A4, i);
-    setup_output_args(function_name, plhs[i], A5, i);
-    setup_output_args(function_name, plhs[i], A6, i);
-    setup_output_args(function_name, plhs[i], A7, i);
-    setup_output_args(function_name, plhs[i], A8, i);
-    setup_output_args(function_name, plhs[i], A9, i);
-    setup_output_args(function_name, plhs[i], A10, i);
-    setup_output_args(function_name, plhs[i], A11, i);
-    setup_output_args(function_name, plhs[i], A12, i);
-    setup_output_args(function_name, plhs[i], A13, i);
-    setup_output_args(function_name, plhs[i], A14, i);
-    setup_output_args(function_name, plhs[i], A15, i);
-    setup_output_args(function_name, plhs[i], A16, i);
-    setup_output_args(function_name, plhs[i], A17, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
-
-template <
-    typename T1, 
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5,
-    typename T6,
-    typename T7,
-    typename T8,
-    typename T9,
-    typename T10,
-    typename T11,
-    typename T12,
-    typename T13,
-    typename T14,
-    typename T15,
-    typename T16,
-    typename T17,
-    typename T18
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4,
-    const T5& A5,
-    const T6& A6,
-    const T7& A7,
-    const T8& A8,
-    const T9& A9,
-    const T10& A10,
-    const T11& A11,
-    const T12& A12,
-    const T13& A13,
-    const T14& A14,
-    const T15& A15,
-    const T16& A16,
-    const T17& A17,
-    const T18& A18
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 18;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-    setup_input_args(prhs[nrhs], A2, nrhs);
-    setup_input_args(prhs[nrhs], A3, nrhs);
-    setup_input_args(prhs[nrhs], A4, nrhs);
-    setup_input_args(prhs[nrhs], A5, nrhs);
-    setup_input_args(prhs[nrhs], A6, nrhs);
-    setup_input_args(prhs[nrhs], A7, nrhs);
-    setup_input_args(prhs[nrhs], A8, nrhs);
-    setup_input_args(prhs[nrhs], A9, nrhs);
-    setup_input_args(prhs[nrhs], A10, nrhs);
-    setup_input_args(prhs[nrhs], A11, nrhs);
-    setup_input_args(prhs[nrhs], A12, nrhs);
-    setup_input_args(prhs[nrhs], A13, nrhs);
-    setup_input_args(prhs[nrhs], A14, nrhs);
-    setup_input_args(prhs[nrhs], A15, nrhs);
-    setup_input_args(prhs[nrhs], A16, nrhs);
-    setup_input_args(prhs[nrhs], A17, nrhs);
-    setup_input_args(prhs[nrhs], A18, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-    setup_output_args(function_name, plhs[i], A2, i);
-    setup_output_args(function_name, plhs[i], A3, i);
-    setup_output_args(function_name, plhs[i], A4, i);
-    setup_output_args(function_name, plhs[i], A5, i);
-    setup_output_args(function_name, plhs[i], A6, i);
-    setup_output_args(function_name, plhs[i], A7, i);
-    setup_output_args(function_name, plhs[i], A8, i);
-    setup_output_args(function_name, plhs[i], A9, i);
-    setup_output_args(function_name, plhs[i], A10, i);
-    setup_output_args(function_name, plhs[i], A11, i);
-    setup_output_args(function_name, plhs[i], A12, i);
-    setup_output_args(function_name, plhs[i], A13, i);
-    setup_output_args(function_name, plhs[i], A14, i);
-    setup_output_args(function_name, plhs[i], A15, i);
-    setup_output_args(function_name, plhs[i], A16, i);
-    setup_output_args(function_name, plhs[i], A17, i);
-    setup_output_args(function_name, plhs[i], A18, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
-
-template <
-    typename T1, 
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5,
-    typename T6,
-    typename T7,
-    typename T8,
-    typename T9,
-    typename T10,
-    typename T11,
-    typename T12,
-    typename T13,
-    typename T14,
-    typename T15,
-    typename T16,
-    typename T17,
-    typename T18,
-    typename T19
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4,
-    const T5& A5,
-    const T6& A6,
-    const T7& A7,
-    const T8& A8,
-    const T9& A9,
-    const T10& A10,
-    const T11& A11,
-    const T12& A12,
-    const T13& A13,
-    const T14& A14,
-    const T15& A15,
-    const T16& A16,
-    const T17& A17,
-    const T18& A18,
-    const T19& A19
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 19;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-    setup_input_args(prhs[nrhs], A2, nrhs);
-    setup_input_args(prhs[nrhs], A3, nrhs);
-    setup_input_args(prhs[nrhs], A4, nrhs);
-    setup_input_args(prhs[nrhs], A5, nrhs);
-    setup_input_args(prhs[nrhs], A6, nrhs);
-    setup_input_args(prhs[nrhs], A7, nrhs);
-    setup_input_args(prhs[nrhs], A8, nrhs);
-    setup_input_args(prhs[nrhs], A9, nrhs);
-    setup_input_args(prhs[nrhs], A10, nrhs);
-    setup_input_args(prhs[nrhs], A11, nrhs);
-    setup_input_args(prhs[nrhs], A12, nrhs);
-    setup_input_args(prhs[nrhs], A13, nrhs);
-    setup_input_args(prhs[nrhs], A14, nrhs);
-    setup_input_args(prhs[nrhs], A15, nrhs);
-    setup_input_args(prhs[nrhs], A16, nrhs);
-    setup_input_args(prhs[nrhs], A17, nrhs);
-    setup_input_args(prhs[nrhs], A18, nrhs);
-    setup_input_args(prhs[nrhs], A19, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-    setup_output_args(function_name, plhs[i], A2, i);
-    setup_output_args(function_name, plhs[i], A3, i);
-    setup_output_args(function_name, plhs[i], A4, i);
-    setup_output_args(function_name, plhs[i], A5, i);
-    setup_output_args(function_name, plhs[i], A6, i);
-    setup_output_args(function_name, plhs[i], A7, i);
-    setup_output_args(function_name, plhs[i], A8, i);
-    setup_output_args(function_name, plhs[i], A9, i);
-    setup_output_args(function_name, plhs[i], A10, i);
-    setup_output_args(function_name, plhs[i], A11, i);
-    setup_output_args(function_name, plhs[i], A12, i);
-    setup_output_args(function_name, plhs[i], A13, i);
-    setup_output_args(function_name, plhs[i], A14, i);
-    setup_output_args(function_name, plhs[i], A15, i);
-    setup_output_args(function_name, plhs[i], A16, i);
-    setup_output_args(function_name, plhs[i], A17, i);
-    setup_output_args(function_name, plhs[i], A18, i);
-    setup_output_args(function_name, plhs[i], A19, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
-
-template <
-    typename T1, 
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5,
-    typename T6,
-    typename T7,
-    typename T8,
-    typename T9,
-    typename T10,
-    typename T11,
-    typename T12,
-    typename T13,
-    typename T14,
-    typename T15,
-    typename T16,
-    typename T17,
-    typename T18,
-    typename T19,
-    typename T20
-    >
-void call_matlab (
-    const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4,
-    const T5& A5,
-    const T6& A6,
-    const T7& A7,
-    const T8& A8,
-    const T9& A9,
-    const T10& A10,
-    const T11& A11,
-    const T12& A12,
-    const T13& A13,
-    const T14& A14,
-    const T15& A15,
-    const T16& A16,
-    const T17& A17,
-    const T18& A18,
-    const T19& A19,
-    const T20& A20
-) 
-{
-    using namespace mex_binding;
-    const int num_args = 20;
-    mxArray* plhs[num_args] = {0};
-    mxArray* prhs[num_args] = {0};
-
-    int nrhs = 0;
-    setup_input_args(prhs[nrhs], A1, nrhs);
-    setup_input_args(prhs[nrhs], A2, nrhs);
-    setup_input_args(prhs[nrhs], A3, nrhs);
-    setup_input_args(prhs[nrhs], A4, nrhs);
-    setup_input_args(prhs[nrhs], A5, nrhs);
-    setup_input_args(prhs[nrhs], A6, nrhs);
-    setup_input_args(prhs[nrhs], A7, nrhs);
-    setup_input_args(prhs[nrhs], A8, nrhs);
-    setup_input_args(prhs[nrhs], A9, nrhs);
-    setup_input_args(prhs[nrhs], A10, nrhs);
-    setup_input_args(prhs[nrhs], A11, nrhs);
-    setup_input_args(prhs[nrhs], A12, nrhs);
-    setup_input_args(prhs[nrhs], A13, nrhs);
-    setup_input_args(prhs[nrhs], A14, nrhs);
-    setup_input_args(prhs[nrhs], A15, nrhs);
-    setup_input_args(prhs[nrhs], A16, nrhs);
-    setup_input_args(prhs[nrhs], A17, nrhs);
-    setup_input_args(prhs[nrhs], A18, nrhs);
-    setup_input_args(prhs[nrhs], A19, nrhs);
-    setup_input_args(prhs[nrhs], A20, nrhs);
-
-    const int nlhs = num_args - nrhs;
-    call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
-
-    int i = 0;
-    setup_output_args(function_name, plhs[i], A1, i);
-    setup_output_args(function_name, plhs[i], A2, i);
-    setup_output_args(function_name, plhs[i], A3, i);
-    setup_output_args(function_name, plhs[i], A4, i);
-    setup_output_args(function_name, plhs[i], A5, i);
-    setup_output_args(function_name, plhs[i], A6, i);
-    setup_output_args(function_name, plhs[i], A7, i);
-    setup_output_args(function_name, plhs[i], A8, i);
-    setup_output_args(function_name, plhs[i], A9, i);
-    setup_output_args(function_name, plhs[i], A10, i);
-    setup_output_args(function_name, plhs[i], A11, i);
-    setup_output_args(function_name, plhs[i], A12, i);
-    setup_output_args(function_name, plhs[i], A13, i);
-    setup_output_args(function_name, plhs[i], A14, i);
-    setup_output_args(function_name, plhs[i], A15, i);
-    setup_output_args(function_name, plhs[i], A16, i);
-    setup_output_args(function_name, plhs[i], A17, i);
-    setup_output_args(function_name, plhs[i], A18, i);
-    setup_output_args(function_name, plhs[i], A19, i);
-    setup_output_args(function_name, plhs[i], A20, i);
-
-    free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
-}
+
+    template <typename T1>
+    void free_callback_resources (
+        int nlhs,
+        mxArray* plhs[],
+        int nrhs,
+        mxArray* prhs[]
+    )
+    {
+        // free resources
+        for (int i = 0; i < nlhs; ++i)
+            mxDestroyArray(plhs[i]);
+
+        for (int i = 0; i < nrhs; ++i)
+        {
+            // don't call mxDestroyArray() on function handles (which should only ever be in prhs[0])
+            if (i == 0 && dlib::is_same_type<T1,function_handle>::value)
+                continue;
+            mxDestroyArray(prhs[i]);
+        }
+    }
+
+    template <
+        typename T1
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 1;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
+
+    template <
+        typename T1, 
+        typename T2
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1,
+        const T2& A2
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 2;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+        setup_input_args(prhs[nrhs], A2, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+        setup_output_args(function_name, plhs[i], A2, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
+
+    template <
+        typename T1, 
+        typename T2,
+        typename T3
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1,
+        const T2& A2,
+        const T3& A3
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 3;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+        setup_input_args(prhs[nrhs], A2, nrhs);
+        setup_input_args(prhs[nrhs], A3, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+        setup_output_args(function_name, plhs[i], A2, i);
+        setup_output_args(function_name, plhs[i], A3, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
+
+
+    template <
+        typename T1, 
+        typename T2,
+        typename T3,
+        typename T4
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1,
+        const T2& A2,
+        const T3& A3,
+        const T4& A4
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 4;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+        setup_input_args(prhs[nrhs], A2, nrhs);
+        setup_input_args(prhs[nrhs], A3, nrhs);
+        setup_input_args(prhs[nrhs], A4, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+        setup_output_args(function_name, plhs[i], A2, i);
+        setup_output_args(function_name, plhs[i], A3, i);
+        setup_output_args(function_name, plhs[i], A4, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
+
+
+    template <
+        typename T1, 
+        typename T2,
+        typename T3,
+        typename T4,
+        typename T5
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1,
+        const T2& A2,
+        const T3& A3,
+        const T4& A4,
+        const T5& A5
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 5;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+        setup_input_args(prhs[nrhs], A2, nrhs);
+        setup_input_args(prhs[nrhs], A3, nrhs);
+        setup_input_args(prhs[nrhs], A4, nrhs);
+        setup_input_args(prhs[nrhs], A5, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+        setup_output_args(function_name, plhs[i], A2, i);
+        setup_output_args(function_name, plhs[i], A3, i);
+        setup_output_args(function_name, plhs[i], A4, i);
+        setup_output_args(function_name, plhs[i], A5, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
+
+
+    template <
+        typename T1, 
+        typename T2,
+        typename T3,
+        typename T4,
+        typename T5,
+        typename T6
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1,
+        const T2& A2,
+        const T3& A3,
+        const T4& A4,
+        const T5& A5,
+        const T6& A6
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 6;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+        setup_input_args(prhs[nrhs], A2, nrhs);
+        setup_input_args(prhs[nrhs], A3, nrhs);
+        setup_input_args(prhs[nrhs], A4, nrhs);
+        setup_input_args(prhs[nrhs], A5, nrhs);
+        setup_input_args(prhs[nrhs], A6, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+        setup_output_args(function_name, plhs[i], A2, i);
+        setup_output_args(function_name, plhs[i], A3, i);
+        setup_output_args(function_name, plhs[i], A4, i);
+        setup_output_args(function_name, plhs[i], A5, i);
+        setup_output_args(function_name, plhs[i], A6, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
+
+
+    template <
+        typename T1, 
+        typename T2,
+        typename T3,
+        typename T4,
+        typename T5,
+        typename T6,
+        typename T7
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1,
+        const T2& A2,
+        const T3& A3,
+        const T4& A4,
+        const T5& A5,
+        const T6& A6,
+        const T7& A7
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 7;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+        setup_input_args(prhs[nrhs], A2, nrhs);
+        setup_input_args(prhs[nrhs], A3, nrhs);
+        setup_input_args(prhs[nrhs], A4, nrhs);
+        setup_input_args(prhs[nrhs], A5, nrhs);
+        setup_input_args(prhs[nrhs], A6, nrhs);
+        setup_input_args(prhs[nrhs], A7, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+        setup_output_args(function_name, plhs[i], A2, i);
+        setup_output_args(function_name, plhs[i], A3, i);
+        setup_output_args(function_name, plhs[i], A4, i);
+        setup_output_args(function_name, plhs[i], A5, i);
+        setup_output_args(function_name, plhs[i], A6, i);
+        setup_output_args(function_name, plhs[i], A7, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
+
+
+    template <
+        typename T1, 
+        typename T2,
+        typename T3,
+        typename T4,
+        typename T5,
+        typename T6,
+        typename T7,
+        typename T8
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1,
+        const T2& A2,
+        const T3& A3,
+        const T4& A4,
+        const T5& A5,
+        const T6& A6,
+        const T7& A7,
+        const T8& A8
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 8;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+        setup_input_args(prhs[nrhs], A2, nrhs);
+        setup_input_args(prhs[nrhs], A3, nrhs);
+        setup_input_args(prhs[nrhs], A4, nrhs);
+        setup_input_args(prhs[nrhs], A5, nrhs);
+        setup_input_args(prhs[nrhs], A6, nrhs);
+        setup_input_args(prhs[nrhs], A7, nrhs);
+        setup_input_args(prhs[nrhs], A8, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+        setup_output_args(function_name, plhs[i], A2, i);
+        setup_output_args(function_name, plhs[i], A3, i);
+        setup_output_args(function_name, plhs[i], A4, i);
+        setup_output_args(function_name, plhs[i], A5, i);
+        setup_output_args(function_name, plhs[i], A6, i);
+        setup_output_args(function_name, plhs[i], A7, i);
+        setup_output_args(function_name, plhs[i], A8, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
+
+
+
+    template <
+        typename T1, 
+        typename T2,
+        typename T3,
+        typename T4,
+        typename T5,
+        typename T6,
+        typename T7,
+        typename T8,
+        typename T9
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1,
+        const T2& A2,
+        const T3& A3,
+        const T4& A4,
+        const T5& A5,
+        const T6& A6,
+        const T7& A7,
+        const T8& A8,
+        const T9& A9
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 9;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+        setup_input_args(prhs[nrhs], A2, nrhs);
+        setup_input_args(prhs[nrhs], A3, nrhs);
+        setup_input_args(prhs[nrhs], A4, nrhs);
+        setup_input_args(prhs[nrhs], A5, nrhs);
+        setup_input_args(prhs[nrhs], A6, nrhs);
+        setup_input_args(prhs[nrhs], A7, nrhs);
+        setup_input_args(prhs[nrhs], A8, nrhs);
+        setup_input_args(prhs[nrhs], A9, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+        setup_output_args(function_name, plhs[i], A2, i);
+        setup_output_args(function_name, plhs[i], A3, i);
+        setup_output_args(function_name, plhs[i], A4, i);
+        setup_output_args(function_name, plhs[i], A5, i);
+        setup_output_args(function_name, plhs[i], A6, i);
+        setup_output_args(function_name, plhs[i], A7, i);
+        setup_output_args(function_name, plhs[i], A8, i);
+        setup_output_args(function_name, plhs[i], A9, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
+
+
+    template <
+        typename T1, 
+        typename T2,
+        typename T3,
+        typename T4,
+        typename T5,
+        typename T6,
+        typename T7,
+        typename T8,
+        typename T9,
+        typename T10
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1,
+        const T2& A2,
+        const T3& A3,
+        const T4& A4,
+        const T5& A5,
+        const T6& A6,
+        const T7& A7,
+        const T8& A8,
+        const T9& A9,
+        const T10& A10
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 10;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+        setup_input_args(prhs[nrhs], A2, nrhs);
+        setup_input_args(prhs[nrhs], A3, nrhs);
+        setup_input_args(prhs[nrhs], A4, nrhs);
+        setup_input_args(prhs[nrhs], A5, nrhs);
+        setup_input_args(prhs[nrhs], A6, nrhs);
+        setup_input_args(prhs[nrhs], A7, nrhs);
+        setup_input_args(prhs[nrhs], A8, nrhs);
+        setup_input_args(prhs[nrhs], A9, nrhs);
+        setup_input_args(prhs[nrhs], A10, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+        setup_output_args(function_name, plhs[i], A2, i);
+        setup_output_args(function_name, plhs[i], A3, i);
+        setup_output_args(function_name, plhs[i], A4, i);
+        setup_output_args(function_name, plhs[i], A5, i);
+        setup_output_args(function_name, plhs[i], A6, i);
+        setup_output_args(function_name, plhs[i], A7, i);
+        setup_output_args(function_name, plhs[i], A8, i);
+        setup_output_args(function_name, plhs[i], A9, i);
+        setup_output_args(function_name, plhs[i], A10, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
+
+    template <
+        typename T1, 
+        typename T2,
+        typename T3,
+        typename T4,
+        typename T5,
+        typename T6,
+        typename T7,
+        typename T8,
+        typename T9,
+        typename T10,
+        typename T11
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1,
+        const T2& A2,
+        const T3& A3,
+        const T4& A4,
+        const T5& A5,
+        const T6& A6,
+        const T7& A7,
+        const T8& A8,
+        const T9& A9,
+        const T10& A10,
+        const T11& A11
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 11;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+        setup_input_args(prhs[nrhs], A2, nrhs);
+        setup_input_args(prhs[nrhs], A3, nrhs);
+        setup_input_args(prhs[nrhs], A4, nrhs);
+        setup_input_args(prhs[nrhs], A5, nrhs);
+        setup_input_args(prhs[nrhs], A6, nrhs);
+        setup_input_args(prhs[nrhs], A7, nrhs);
+        setup_input_args(prhs[nrhs], A8, nrhs);
+        setup_input_args(prhs[nrhs], A9, nrhs);
+        setup_input_args(prhs[nrhs], A10, nrhs);
+        setup_input_args(prhs[nrhs], A11, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+        setup_output_args(function_name, plhs[i], A2, i);
+        setup_output_args(function_name, plhs[i], A3, i);
+        setup_output_args(function_name, plhs[i], A4, i);
+        setup_output_args(function_name, plhs[i], A5, i);
+        setup_output_args(function_name, plhs[i], A6, i);
+        setup_output_args(function_name, plhs[i], A7, i);
+        setup_output_args(function_name, plhs[i], A8, i);
+        setup_output_args(function_name, plhs[i], A9, i);
+        setup_output_args(function_name, plhs[i], A10, i);
+        setup_output_args(function_name, plhs[i], A11, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
+
+    template <
+        typename T1, 
+        typename T2,
+        typename T3,
+        typename T4,
+        typename T5,
+        typename T6,
+        typename T7,
+        typename T8,
+        typename T9,
+        typename T10,
+        typename T11,
+        typename T12
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1,
+        const T2& A2,
+        const T3& A3,
+        const T4& A4,
+        const T5& A5,
+        const T6& A6,
+        const T7& A7,
+        const T8& A8,
+        const T9& A9,
+        const T10& A10,
+        const T11& A11,
+        const T12& A12
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 12;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+        setup_input_args(prhs[nrhs], A2, nrhs);
+        setup_input_args(prhs[nrhs], A3, nrhs);
+        setup_input_args(prhs[nrhs], A4, nrhs);
+        setup_input_args(prhs[nrhs], A5, nrhs);
+        setup_input_args(prhs[nrhs], A6, nrhs);
+        setup_input_args(prhs[nrhs], A7, nrhs);
+        setup_input_args(prhs[nrhs], A8, nrhs);
+        setup_input_args(prhs[nrhs], A9, nrhs);
+        setup_input_args(prhs[nrhs], A10, nrhs);
+        setup_input_args(prhs[nrhs], A11, nrhs);
+        setup_input_args(prhs[nrhs], A12, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+        setup_output_args(function_name, plhs[i], A2, i);
+        setup_output_args(function_name, plhs[i], A3, i);
+        setup_output_args(function_name, plhs[i], A4, i);
+        setup_output_args(function_name, plhs[i], A5, i);
+        setup_output_args(function_name, plhs[i], A6, i);
+        setup_output_args(function_name, plhs[i], A7, i);
+        setup_output_args(function_name, plhs[i], A8, i);
+        setup_output_args(function_name, plhs[i], A9, i);
+        setup_output_args(function_name, plhs[i], A10, i);
+        setup_output_args(function_name, plhs[i], A11, i);
+        setup_output_args(function_name, plhs[i], A12, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
+
+    template <
+        typename T1, 
+        typename T2,
+        typename T3,
+        typename T4,
+        typename T5,
+        typename T6,
+        typename T7,
+        typename T8,
+        typename T9,
+        typename T10,
+        typename T11,
+        typename T12,
+        typename T13
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1,
+        const T2& A2,
+        const T3& A3,
+        const T4& A4,
+        const T5& A5,
+        const T6& A6,
+        const T7& A7,
+        const T8& A8,
+        const T9& A9,
+        const T10& A10,
+        const T11& A11,
+        const T12& A12,
+        const T13& A13
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 13;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+        setup_input_args(prhs[nrhs], A2, nrhs);
+        setup_input_args(prhs[nrhs], A3, nrhs);
+        setup_input_args(prhs[nrhs], A4, nrhs);
+        setup_input_args(prhs[nrhs], A5, nrhs);
+        setup_input_args(prhs[nrhs], A6, nrhs);
+        setup_input_args(prhs[nrhs], A7, nrhs);
+        setup_input_args(prhs[nrhs], A8, nrhs);
+        setup_input_args(prhs[nrhs], A9, nrhs);
+        setup_input_args(prhs[nrhs], A10, nrhs);
+        setup_input_args(prhs[nrhs], A11, nrhs);
+        setup_input_args(prhs[nrhs], A12, nrhs);
+        setup_input_args(prhs[nrhs], A13, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+        setup_output_args(function_name, plhs[i], A2, i);
+        setup_output_args(function_name, plhs[i], A3, i);
+        setup_output_args(function_name, plhs[i], A4, i);
+        setup_output_args(function_name, plhs[i], A5, i);
+        setup_output_args(function_name, plhs[i], A6, i);
+        setup_output_args(function_name, plhs[i], A7, i);
+        setup_output_args(function_name, plhs[i], A8, i);
+        setup_output_args(function_name, plhs[i], A9, i);
+        setup_output_args(function_name, plhs[i], A10, i);
+        setup_output_args(function_name, plhs[i], A11, i);
+        setup_output_args(function_name, plhs[i], A12, i);
+        setup_output_args(function_name, plhs[i], A13, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
+
+    template <
+        typename T1, 
+        typename T2,
+        typename T3,
+        typename T4,
+        typename T5,
+        typename T6,
+        typename T7,
+        typename T8,
+        typename T9,
+        typename T10,
+        typename T11,
+        typename T12,
+        typename T13,
+        typename T14
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1,
+        const T2& A2,
+        const T3& A3,
+        const T4& A4,
+        const T5& A5,
+        const T6& A6,
+        const T7& A7,
+        const T8& A8,
+        const T9& A9,
+        const T10& A10,
+        const T11& A11,
+        const T12& A12,
+        const T13& A13,
+        const T14& A14
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 14;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+        setup_input_args(prhs[nrhs], A2, nrhs);
+        setup_input_args(prhs[nrhs], A3, nrhs);
+        setup_input_args(prhs[nrhs], A4, nrhs);
+        setup_input_args(prhs[nrhs], A5, nrhs);
+        setup_input_args(prhs[nrhs], A6, nrhs);
+        setup_input_args(prhs[nrhs], A7, nrhs);
+        setup_input_args(prhs[nrhs], A8, nrhs);
+        setup_input_args(prhs[nrhs], A9, nrhs);
+        setup_input_args(prhs[nrhs], A10, nrhs);
+        setup_input_args(prhs[nrhs], A11, nrhs);
+        setup_input_args(prhs[nrhs], A12, nrhs);
+        setup_input_args(prhs[nrhs], A13, nrhs);
+        setup_input_args(prhs[nrhs], A14, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+        setup_output_args(function_name, plhs[i], A2, i);
+        setup_output_args(function_name, plhs[i], A3, i);
+        setup_output_args(function_name, plhs[i], A4, i);
+        setup_output_args(function_name, plhs[i], A5, i);
+        setup_output_args(function_name, plhs[i], A6, i);
+        setup_output_args(function_name, plhs[i], A7, i);
+        setup_output_args(function_name, plhs[i], A8, i);
+        setup_output_args(function_name, plhs[i], A9, i);
+        setup_output_args(function_name, plhs[i], A10, i);
+        setup_output_args(function_name, plhs[i], A11, i);
+        setup_output_args(function_name, plhs[i], A12, i);
+        setup_output_args(function_name, plhs[i], A13, i);
+        setup_output_args(function_name, plhs[i], A14, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
+
+    template <
+        typename T1, 
+        typename T2,
+        typename T3,
+        typename T4,
+        typename T5,
+        typename T6,
+        typename T7,
+        typename T8,
+        typename T9,
+        typename T10,
+        typename T11,
+        typename T12,
+        typename T13,
+        typename T14,
+        typename T15
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1,
+        const T2& A2,
+        const T3& A3,
+        const T4& A4,
+        const T5& A5,
+        const T6& A6,
+        const T7& A7,
+        const T8& A8,
+        const T9& A9,
+        const T10& A10,
+        const T11& A11,
+        const T12& A12,
+        const T13& A13,
+        const T14& A14,
+        const T15& A15
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 15;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+        setup_input_args(prhs[nrhs], A2, nrhs);
+        setup_input_args(prhs[nrhs], A3, nrhs);
+        setup_input_args(prhs[nrhs], A4, nrhs);
+        setup_input_args(prhs[nrhs], A5, nrhs);
+        setup_input_args(prhs[nrhs], A6, nrhs);
+        setup_input_args(prhs[nrhs], A7, nrhs);
+        setup_input_args(prhs[nrhs], A8, nrhs);
+        setup_input_args(prhs[nrhs], A9, nrhs);
+        setup_input_args(prhs[nrhs], A10, nrhs);
+        setup_input_args(prhs[nrhs], A11, nrhs);
+        setup_input_args(prhs[nrhs], A12, nrhs);
+        setup_input_args(prhs[nrhs], A13, nrhs);
+        setup_input_args(prhs[nrhs], A14, nrhs);
+        setup_input_args(prhs[nrhs], A15, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+        setup_output_args(function_name, plhs[i], A2, i);
+        setup_output_args(function_name, plhs[i], A3, i);
+        setup_output_args(function_name, plhs[i], A4, i);
+        setup_output_args(function_name, plhs[i], A5, i);
+        setup_output_args(function_name, plhs[i], A6, i);
+        setup_output_args(function_name, plhs[i], A7, i);
+        setup_output_args(function_name, plhs[i], A8, i);
+        setup_output_args(function_name, plhs[i], A9, i);
+        setup_output_args(function_name, plhs[i], A10, i);
+        setup_output_args(function_name, plhs[i], A11, i);
+        setup_output_args(function_name, plhs[i], A12, i);
+        setup_output_args(function_name, plhs[i], A13, i);
+        setup_output_args(function_name, plhs[i], A14, i);
+        setup_output_args(function_name, plhs[i], A15, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
+
+    template <
+        typename T1, 
+        typename T2,
+        typename T3,
+        typename T4,
+        typename T5,
+        typename T6,
+        typename T7,
+        typename T8,
+        typename T9,
+        typename T10,
+        typename T11,
+        typename T12,
+        typename T13,
+        typename T14,
+        typename T15,
+        typename T16
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1,
+        const T2& A2,
+        const T3& A3,
+        const T4& A4,
+        const T5& A5,
+        const T6& A6,
+        const T7& A7,
+        const T8& A8,
+        const T9& A9,
+        const T10& A10,
+        const T11& A11,
+        const T12& A12,
+        const T13& A13,
+        const T14& A14,
+        const T15& A15,
+        const T16& A16
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 16;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+        setup_input_args(prhs[nrhs], A2, nrhs);
+        setup_input_args(prhs[nrhs], A3, nrhs);
+        setup_input_args(prhs[nrhs], A4, nrhs);
+        setup_input_args(prhs[nrhs], A5, nrhs);
+        setup_input_args(prhs[nrhs], A6, nrhs);
+        setup_input_args(prhs[nrhs], A7, nrhs);
+        setup_input_args(prhs[nrhs], A8, nrhs);
+        setup_input_args(prhs[nrhs], A9, nrhs);
+        setup_input_args(prhs[nrhs], A10, nrhs);
+        setup_input_args(prhs[nrhs], A11, nrhs);
+        setup_input_args(prhs[nrhs], A12, nrhs);
+        setup_input_args(prhs[nrhs], A13, nrhs);
+        setup_input_args(prhs[nrhs], A14, nrhs);
+        setup_input_args(prhs[nrhs], A15, nrhs);
+        setup_input_args(prhs[nrhs], A16, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+        setup_output_args(function_name, plhs[i], A2, i);
+        setup_output_args(function_name, plhs[i], A3, i);
+        setup_output_args(function_name, plhs[i], A4, i);
+        setup_output_args(function_name, plhs[i], A5, i);
+        setup_output_args(function_name, plhs[i], A6, i);
+        setup_output_args(function_name, plhs[i], A7, i);
+        setup_output_args(function_name, plhs[i], A8, i);
+        setup_output_args(function_name, plhs[i], A9, i);
+        setup_output_args(function_name, plhs[i], A10, i);
+        setup_output_args(function_name, plhs[i], A11, i);
+        setup_output_args(function_name, plhs[i], A12, i);
+        setup_output_args(function_name, plhs[i], A13, i);
+        setup_output_args(function_name, plhs[i], A14, i);
+        setup_output_args(function_name, plhs[i], A15, i);
+        setup_output_args(function_name, plhs[i], A16, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
+
+    template <
+        typename T1, 
+        typename T2,
+        typename T3,
+        typename T4,
+        typename T5,
+        typename T6,
+        typename T7,
+        typename T8,
+        typename T9,
+        typename T10,
+        typename T11,
+        typename T12,
+        typename T13,
+        typename T14,
+        typename T15,
+        typename T16,
+        typename T17
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1,
+        const T2& A2,
+        const T3& A3,
+        const T4& A4,
+        const T5& A5,
+        const T6& A6,
+        const T7& A7,
+        const T8& A8,
+        const T9& A9,
+        const T10& A10,
+        const T11& A11,
+        const T12& A12,
+        const T13& A13,
+        const T14& A14,
+        const T15& A15,
+        const T16& A16,
+        const T17& A17
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 17;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+        setup_input_args(prhs[nrhs], A2, nrhs);
+        setup_input_args(prhs[nrhs], A3, nrhs);
+        setup_input_args(prhs[nrhs], A4, nrhs);
+        setup_input_args(prhs[nrhs], A5, nrhs);
+        setup_input_args(prhs[nrhs], A6, nrhs);
+        setup_input_args(prhs[nrhs], A7, nrhs);
+        setup_input_args(prhs[nrhs], A8, nrhs);
+        setup_input_args(prhs[nrhs], A9, nrhs);
+        setup_input_args(prhs[nrhs], A10, nrhs);
+        setup_input_args(prhs[nrhs], A11, nrhs);
+        setup_input_args(prhs[nrhs], A12, nrhs);
+        setup_input_args(prhs[nrhs], A13, nrhs);
+        setup_input_args(prhs[nrhs], A14, nrhs);
+        setup_input_args(prhs[nrhs], A15, nrhs);
+        setup_input_args(prhs[nrhs], A16, nrhs);
+        setup_input_args(prhs[nrhs], A17, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+        setup_output_args(function_name, plhs[i], A2, i);
+        setup_output_args(function_name, plhs[i], A3, i);
+        setup_output_args(function_name, plhs[i], A4, i);
+        setup_output_args(function_name, plhs[i], A5, i);
+        setup_output_args(function_name, plhs[i], A6, i);
+        setup_output_args(function_name, plhs[i], A7, i);
+        setup_output_args(function_name, plhs[i], A8, i);
+        setup_output_args(function_name, plhs[i], A9, i);
+        setup_output_args(function_name, plhs[i], A10, i);
+        setup_output_args(function_name, plhs[i], A11, i);
+        setup_output_args(function_name, plhs[i], A12, i);
+        setup_output_args(function_name, plhs[i], A13, i);
+        setup_output_args(function_name, plhs[i], A14, i);
+        setup_output_args(function_name, plhs[i], A15, i);
+        setup_output_args(function_name, plhs[i], A16, i);
+        setup_output_args(function_name, plhs[i], A17, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
+
+    template <
+        typename T1, typename T2, typename T3, typename T4, typename T5, typename T6,
+        typename T7, typename T8, typename T9, typename T10, typename T11, typename T12,
+        typename T13, typename T14, typename T15, typename T16, typename T17, typename T18
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+        const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const
+        T12& A12, const T13& A13, const T14& A14, const T15& A15, const T16& A16, const
+        T17& A17, const T18& A18
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 18;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+        setup_input_args(prhs[nrhs], A2, nrhs);
+        setup_input_args(prhs[nrhs], A3, nrhs);
+        setup_input_args(prhs[nrhs], A4, nrhs);
+        setup_input_args(prhs[nrhs], A5, nrhs);
+        setup_input_args(prhs[nrhs], A6, nrhs);
+        setup_input_args(prhs[nrhs], A7, nrhs);
+        setup_input_args(prhs[nrhs], A8, nrhs);
+        setup_input_args(prhs[nrhs], A9, nrhs);
+        setup_input_args(prhs[nrhs], A10, nrhs);
+        setup_input_args(prhs[nrhs], A11, nrhs);
+        setup_input_args(prhs[nrhs], A12, nrhs);
+        setup_input_args(prhs[nrhs], A13, nrhs);
+        setup_input_args(prhs[nrhs], A14, nrhs);
+        setup_input_args(prhs[nrhs], A15, nrhs);
+        setup_input_args(prhs[nrhs], A16, nrhs);
+        setup_input_args(prhs[nrhs], A17, nrhs);
+        setup_input_args(prhs[nrhs], A18, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+        setup_output_args(function_name, plhs[i], A2, i);
+        setup_output_args(function_name, plhs[i], A3, i);
+        setup_output_args(function_name, plhs[i], A4, i);
+        setup_output_args(function_name, plhs[i], A5, i);
+        setup_output_args(function_name, plhs[i], A6, i);
+        setup_output_args(function_name, plhs[i], A7, i);
+        setup_output_args(function_name, plhs[i], A8, i);
+        setup_output_args(function_name, plhs[i], A9, i);
+        setup_output_args(function_name, plhs[i], A10, i);
+        setup_output_args(function_name, plhs[i], A11, i);
+        setup_output_args(function_name, plhs[i], A12, i);
+        setup_output_args(function_name, plhs[i], A13, i);
+        setup_output_args(function_name, plhs[i], A14, i);
+        setup_output_args(function_name, plhs[i], A15, i);
+        setup_output_args(function_name, plhs[i], A16, i);
+        setup_output_args(function_name, plhs[i], A17, i);
+        setup_output_args(function_name, plhs[i], A18, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
+
+    template <
+        typename T1, typename T2, typename T3, typename T4, typename T5, typename T6,
+        typename T7, typename T8, typename T9, typename T10, typename T11, typename T12,
+        typename T13, typename T14, typename T15, typename T16, typename T17, typename T18,
+        typename T19
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+        const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const
+        T12& A12, const T13& A13, const T14& A14, const T15& A15, const T16& A16, const
+        T17& A17, const T18& A18, const T19& A19
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 19;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+        setup_input_args(prhs[nrhs], A2, nrhs);
+        setup_input_args(prhs[nrhs], A3, nrhs);
+        setup_input_args(prhs[nrhs], A4, nrhs);
+        setup_input_args(prhs[nrhs], A5, nrhs);
+        setup_input_args(prhs[nrhs], A6, nrhs);
+        setup_input_args(prhs[nrhs], A7, nrhs);
+        setup_input_args(prhs[nrhs], A8, nrhs);
+        setup_input_args(prhs[nrhs], A9, nrhs);
+        setup_input_args(prhs[nrhs], A10, nrhs);
+        setup_input_args(prhs[nrhs], A11, nrhs);
+        setup_input_args(prhs[nrhs], A12, nrhs);
+        setup_input_args(prhs[nrhs], A13, nrhs);
+        setup_input_args(prhs[nrhs], A14, nrhs);
+        setup_input_args(prhs[nrhs], A15, nrhs);
+        setup_input_args(prhs[nrhs], A16, nrhs);
+        setup_input_args(prhs[nrhs], A17, nrhs);
+        setup_input_args(prhs[nrhs], A18, nrhs);
+        setup_input_args(prhs[nrhs], A19, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+        setup_output_args(function_name, plhs[i], A2, i);
+        setup_output_args(function_name, plhs[i], A3, i);
+        setup_output_args(function_name, plhs[i], A4, i);
+        setup_output_args(function_name, plhs[i], A5, i);
+        setup_output_args(function_name, plhs[i], A6, i);
+        setup_output_args(function_name, plhs[i], A7, i);
+        setup_output_args(function_name, plhs[i], A8, i);
+        setup_output_args(function_name, plhs[i], A9, i);
+        setup_output_args(function_name, plhs[i], A10, i);
+        setup_output_args(function_name, plhs[i], A11, i);
+        setup_output_args(function_name, plhs[i], A12, i);
+        setup_output_args(function_name, plhs[i], A13, i);
+        setup_output_args(function_name, plhs[i], A14, i);
+        setup_output_args(function_name, plhs[i], A15, i);
+        setup_output_args(function_name, plhs[i], A16, i);
+        setup_output_args(function_name, plhs[i], A17, i);
+        setup_output_args(function_name, plhs[i], A18, i);
+        setup_output_args(function_name, plhs[i], A19, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
+
+    template <
+        typename T1, typename T2, typename T3, typename T4, typename T5, typename T6,
+        typename T7, typename T8, typename T9, typename T10, typename T11, typename T12,
+        typename T13, typename T14, typename T15, typename T16, typename T17, typename T18,
+        typename T19, typename T20
+        >
+    void call_matlab (
+        const std::string& function_name,
+        const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+        const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const
+        T12& A12, const T13& A13, const T14& A14, const T15& A15, const T16& A16, const
+        T17& A17, const T18& A18, const T19& A19, const T20& A20
+    ) 
+    {
+        using namespace mex_binding;
+        const int num_args = 20;
+        mxArray* plhs[num_args] = {0};
+        mxArray* prhs[num_args] = {0};
+
+        int nrhs = 0;
+        setup_input_args(prhs[nrhs], A1, nrhs);
+        setup_input_args(prhs[nrhs], A2, nrhs);
+        setup_input_args(prhs[nrhs], A3, nrhs);
+        setup_input_args(prhs[nrhs], A4, nrhs);
+        setup_input_args(prhs[nrhs], A5, nrhs);
+        setup_input_args(prhs[nrhs], A6, nrhs);
+        setup_input_args(prhs[nrhs], A7, nrhs);
+        setup_input_args(prhs[nrhs], A8, nrhs);
+        setup_input_args(prhs[nrhs], A9, nrhs);
+        setup_input_args(prhs[nrhs], A10, nrhs);
+        setup_input_args(prhs[nrhs], A11, nrhs);
+        setup_input_args(prhs[nrhs], A12, nrhs);
+        setup_input_args(prhs[nrhs], A13, nrhs);
+        setup_input_args(prhs[nrhs], A14, nrhs);
+        setup_input_args(prhs[nrhs], A15, nrhs);
+        setup_input_args(prhs[nrhs], A16, nrhs);
+        setup_input_args(prhs[nrhs], A17, nrhs);
+        setup_input_args(prhs[nrhs], A18, nrhs);
+        setup_input_args(prhs[nrhs], A19, nrhs);
+        setup_input_args(prhs[nrhs], A20, nrhs);
+
+        const int nlhs = num_args - nrhs;
+        call_matlab_for_real(nlhs,plhs,nrhs,prhs, function_name);
+
+        int i = 0;
+        setup_output_args(function_name, plhs[i], A1, i);
+        setup_output_args(function_name, plhs[i], A2, i);
+        setup_output_args(function_name, plhs[i], A3, i);
+        setup_output_args(function_name, plhs[i], A4, i);
+        setup_output_args(function_name, plhs[i], A5, i);
+        setup_output_args(function_name, plhs[i], A6, i);
+        setup_output_args(function_name, plhs[i], A7, i);
+        setup_output_args(function_name, plhs[i], A8, i);
+        setup_output_args(function_name, plhs[i], A9, i);
+        setup_output_args(function_name, plhs[i], A10, i);
+        setup_output_args(function_name, plhs[i], A11, i);
+        setup_output_args(function_name, plhs[i], A12, i);
+        setup_output_args(function_name, plhs[i], A13, i);
+        setup_output_args(function_name, plhs[i], A14, i);
+        setup_output_args(function_name, plhs[i], A15, i);
+        setup_output_args(function_name, plhs[i], A16, i);
+        setup_output_args(function_name, plhs[i], A17, i);
+        setup_output_args(function_name, plhs[i], A18, i);
+        setup_output_args(function_name, plhs[i], A19, i);
+        setup_output_args(function_name, plhs[i], A20, i);
+
+        free_callback_resources<T1>(nlhs,plhs,nrhs,prhs);
+    }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-template <typename T>
-matlab_struct::sub::operator T() const
-{
-    T item;
-    get(item);
-    return item;
-}
-
-template <typename T>
-void matlab_struct::sub::get(T& item) const
-{
-    if (struct_handle == 0)
-        throw dlib::error("Attempt to access data in an empty struct.");
-
-    mxArray* temp = mxGetFieldByNumber((const mxArray*)struct_handle, 0, field_idx);
-    if (temp == 0)
-        throw dlib::error("Attempt to access data in an empty struct.");
-
-    try
+    template <typename T>
+    matlab_struct::sub::operator T() const
     {
-        mex_binding::validate_and_populate_arg(0,temp,item);
+        T item;
+        get(item);
+        return item;
     }
-    catch(mex_binding::invalid_args_exception& e)
+
+    template <typename T>
+    void matlab_struct::sub::get(T& item) const
     {
-        std::ostringstream sout;
-        sout << "Struct field '" << mxGetFieldNameByNumber((const mxArray*)struct_handle, field_idx) << "' can't be interpreted as the requested type."
-             << endl << e.msg;
-        throw dlib::error(sout.str());
-    }
-}
-
-const matlab_struct::sub matlab_struct::
-operator[] (const std::string& name) const
-{
-    if (struct_handle == 0)
-        throw dlib::error("Struct does not have a field named '" + name + "'.");
-
-    matlab_struct::sub temp;
-    temp.struct_handle = struct_handle;
-    temp.field_idx = mxGetFieldNumber((const mxArray*)struct_handle, name.c_str());
-    if (temp.field_idx == -1 )
-        throw dlib::error("Struct does not have a field named '" + name + "'.");
-    return temp;
-}
-
-matlab_struct::sub matlab_struct::
-operator[] (const std::string& name) 
-{
-    if (struct_handle == 0)
-    {
-        // We make a struct from scratch and mark that we will free it unless it gets
-        // written back to matlab by assign_to_matlab().
-        mwSize dims[1] = {1};
-        const char* name_str = name.c_str();
-        struct_handle = mxCreateStructArray(1, dims, 1, &name_str);
-        should_free = true;
         if (struct_handle == 0)
-            throw dlib::error("Error creating struct from within mex function.");
-    }
+            throw dlib::error("Attempt to access data in an empty struct.");
 
+        mxArray* temp = mxGetFieldByNumber((const mxArray*)struct_handle, 0, field_idx);
+        if (temp == 0)
+            throw dlib::error("Attempt to access data in an empty struct.");
 
-    matlab_struct::sub temp;
-    temp.struct_handle = struct_handle;
-    if ((temp.field_idx=mxGetFieldNumber((mxArray*)struct_handle, name.c_str())) == -1)
-    {
-        if ((temp.field_idx=mxAddField((mxArray*)struct_handle, name.c_str())) == -1)
+        try
         {
-            throw dlib::error("Unable to add field '"+name + "' to struct.");
+            mex_binding::validate_and_populate_arg(0,temp,item);
+        }
+        catch(mex_binding::invalid_args_exception& e)
+        {
+            std::ostringstream sout;
+            sout << "Struct field '" << mxGetFieldNameByNumber((const mxArray*)struct_handle, field_idx) << "' can't be interpreted as the requested type."
+                << endl << e.msg;
+            throw dlib::error(sout.str());
         }
     }
-    return temp;
-}
 
-const matlab_struct::sub matlab_struct::sub::
-operator[] (const std::string& name) const
-{
-    if (struct_handle == 0)
-        throw dlib::error("Struct does not have a field named '" + name + "'.");
-
-    matlab_struct::sub temp;
-    temp.struct_handle = mxGetFieldByNumber((const mxArray*)struct_handle, 0, field_idx);
-    if (temp.struct_handle == 0)
-        throw dlib::error("Failure to get struct field while calling mxGetFieldByNumber()");
-
-    if (!mxIsStruct((const mxArray*)temp.struct_handle))
-        throw dlib::error("Struct sub-field element '"+name+"' is not another struct.");
-
-    temp.field_idx = mxGetFieldNumber((const mxArray*)temp.struct_handle, name.c_str());
-    if (temp.field_idx == -1 )
-        throw dlib::error("Struct does not have a field named '" + name + "'.");
-    return temp;
-}
-
-matlab_struct::sub matlab_struct::sub::
-operator[] (const std::string& name) 
-{
-    if (struct_handle == 0)
-        throw dlib::error("Struct does not have a field named '" + name + "'.");
-
-    matlab_struct::sub temp;
-    temp.struct_handle = mxGetFieldByNumber((const mxArray*)struct_handle, 0, field_idx);
-    // We are replacing this field with a struct if it exists and isn't already a struct
-    if (temp.struct_handle != 0 && !mxIsStruct((const mxArray*)temp.struct_handle))
+    const matlab_struct::sub matlab_struct::
+    operator[] (const std::string& name) const
     {
-        mxDestroyArray((mxArray*)temp.struct_handle);
-        temp.struct_handle = 0;
+        if (struct_handle == 0)
+            throw dlib::error("Struct does not have a field named '" + name + "'.");
+
+        matlab_struct::sub temp;
+        temp.struct_handle = struct_handle;
+        temp.field_idx = mxGetFieldNumber((const mxArray*)struct_handle, name.c_str());
+        if (temp.field_idx == -1 )
+            throw dlib::error("Struct does not have a field named '" + name + "'.");
+        return temp;
     }
-    if (temp.struct_handle == 0)
+
+    matlab_struct::sub matlab_struct::
+    operator[] (const std::string& name) 
     {
-        mwSize dims[1] = {1};
-        temp.struct_handle = mxCreateStructArray(1, dims, 0, 0);
+        if (struct_handle == 0)
+        {
+            // We make a struct from scratch and mark that we will free it unless it gets
+            // written back to matlab by assign_to_matlab().
+            mwSize dims[1] = {1};
+            const char* name_str = name.c_str();
+            struct_handle = mxCreateStructArray(1, dims, 1, &name_str);
+            should_free = true;
+            if (struct_handle == 0)
+                throw dlib::error("Error creating struct from within mex function.");
+        }
+
+
+        matlab_struct::sub temp;
+        temp.struct_handle = struct_handle;
+        if ((temp.field_idx=mxGetFieldNumber((mxArray*)struct_handle, name.c_str())) == -1)
+        {
+            if ((temp.field_idx=mxAddField((mxArray*)struct_handle, name.c_str())) == -1)
+            {
+                throw dlib::error("Unable to add field '"+name + "' to struct.");
+            }
+        }
+        return temp;
+    }
+
+    const matlab_struct::sub matlab_struct::sub::
+    operator[] (const std::string& name) const
+    {
+        if (struct_handle == 0)
+            throw dlib::error("Struct does not have a field named '" + name + "'.");
+
+        matlab_struct::sub temp;
+        temp.struct_handle = mxGetFieldByNumber((const mxArray*)struct_handle, 0, field_idx);
         if (temp.struct_handle == 0)
-            throw dlib::error("Failure to create new sub-struct field");
-        mxSetFieldByNumber((mxArray*)struct_handle, 0, field_idx, (mxArray*)temp.struct_handle);
+            throw dlib::error("Failure to get struct field while calling mxGetFieldByNumber()");
+
+        if (!mxIsStruct((const mxArray*)temp.struct_handle))
+            throw dlib::error("Struct sub-field element '"+name+"' is not another struct.");
+
+        temp.field_idx = mxGetFieldNumber((const mxArray*)temp.struct_handle, name.c_str());
+        if (temp.field_idx == -1 )
+            throw dlib::error("Struct does not have a field named '" + name + "'.");
+        return temp;
     }
 
-
-    if ((temp.field_idx=mxGetFieldNumber((mxArray*)temp.struct_handle, name.c_str())) == -1)
+    matlab_struct::sub matlab_struct::sub::
+    operator[] (const std::string& name) 
     {
-        if ((temp.field_idx=mxAddField((mxArray*)temp.struct_handle, name.c_str())) == -1)
+        if (struct_handle == 0)
+            throw dlib::error("Struct does not have a field named '" + name + "'.");
+
+        matlab_struct::sub temp;
+        temp.struct_handle = mxGetFieldByNumber((const mxArray*)struct_handle, 0, field_idx);
+        // We are replacing this field with a struct if it exists and isn't already a struct
+        if (temp.struct_handle != 0 && !mxIsStruct((const mxArray*)temp.struct_handle))
         {
-            throw dlib::error("Unable to add field '"+name + "' to struct.");
+            mxDestroyArray((mxArray*)temp.struct_handle);
+            temp.struct_handle = 0;
+        }
+        if (temp.struct_handle == 0)
+        {
+            mwSize dims[1] = {1};
+            temp.struct_handle = mxCreateStructArray(1, dims, 0, 0);
+            if (temp.struct_handle == 0)
+                throw dlib::error("Failure to create new sub-struct field");
+            mxSetFieldByNumber((mxArray*)struct_handle, 0, field_idx, (mxArray*)temp.struct_handle);
+        }
+
+
+        if ((temp.field_idx=mxGetFieldNumber((mxArray*)temp.struct_handle, name.c_str())) == -1)
+        {
+            if ((temp.field_idx=mxAddField((mxArray*)temp.struct_handle, name.c_str())) == -1)
+            {
+                throw dlib::error("Unable to add field '"+name + "' to struct.");
+            }
+        }
+        return temp;
+    }
+
+    bool matlab_struct::has_field (
+        const std::string& name
+    ) const
+    {
+        if (struct_handle == 0)
+            return false;
+        return mxGetFieldNumber((const mxArray*)struct_handle, name.c_str()) != -1;
+    }
+
+    bool matlab_struct::sub::has_field (
+        const std::string& name
+    ) const
+    {
+        if (struct_handle == 0)
+            return false;
+        mxArray* temp = mxGetFieldByNumber((const mxArray*)struct_handle, 0, field_idx);
+        if (temp == 0 || !mxIsStruct(temp))
+            return false;
+        return mxGetFieldNumber(temp, name.c_str()) != -1;
+    }
+
+    template <typename T>
+    matlab_struct::sub& matlab_struct::sub::operator= (
+        const T& new_val 
+    )
+    {
+        // Delete anything in the field before we overwrite it
+        mxArray* item = mxGetFieldByNumber((mxArray*)struct_handle, 0, field_idx);
+        if (item != 0)
+        {
+            mxDestroyArray((mxArray*)item);
+            item = 0;
+        }
+
+        // Now set the field
+        mex_binding::assign_to_matlab(item, new_val);
+        mxSetFieldByNumber((mxArray*)struct_handle, 0, field_idx, item);
+
+        return *this;
+    }
+
+    matlab_struct::
+    ~matlab_struct (
+    )
+    {
+        if (struct_handle && should_free)
+        {
+            mxDestroyArray((mxArray*)struct_handle);
+            struct_handle = 0;
         }
     }
-    return temp;
-}
-
-bool matlab_struct::has_field (
-    const std::string& name
-) const
-{
-    if (struct_handle == 0)
-        return false;
-    return mxGetFieldNumber((const mxArray*)struct_handle, name.c_str()) != -1;
-}
-
-bool matlab_struct::sub::has_field (
-    const std::string& name
-) const
-{
-    if (struct_handle == 0)
-        return false;
-    mxArray* temp = mxGetFieldByNumber((const mxArray*)struct_handle, 0, field_idx);
-    if (temp == 0 || !mxIsStruct(temp))
-        return false;
-    return mxGetFieldNumber(temp, name.c_str()) != -1;
-}
-
-template <typename T>
-matlab_struct::sub& matlab_struct::sub::operator= (
-    const T& new_val 
-)
-{
-    // Delete anything in the field before we overwrite it
-    mxArray* item = mxGetFieldByNumber((mxArray*)struct_handle, 0, field_idx);
-    if (item != 0)
-    {
-        mxDestroyArray((mxArray*)item);
-        item = 0;
-    }
-
-    // Now set the field
-    mex_binding::assign_to_matlab(item, new_val);
-    mxSetFieldByNumber((mxArray*)struct_handle, 0, field_idx, item);
-
-    return *this;
-}
-
-matlab_struct::
-~matlab_struct (
-)
-{
-    if (struct_handle && should_free)
-    {
-        mxDestroyArray((mxArray*)struct_handle);
-        struct_handle = 0;
-    }
-}
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-void call_matlab (
-    const function_handle& funct 
-)
-{
-    call_matlab("feval", funct);
-}
+    void call_matlab (
+        const function_handle& funct 
+    )
+    {
+        call_matlab("feval", funct);
+    }
 
-extern "C" bool utIsInterruptPending();
-void check_for_ctrl_c(
-)
-{
-    if (utIsInterruptPending())
-        throw mex_binding::user_hit_ctrl_c();
+    extern "C" bool utIsInterruptPending();
+    void check_for_matlab_ctrl_c(
+    )
+    {
+        if (utIsInterruptPending())
+            throw mex_binding::user_hit_ctrl_c();
+    }
 }
 
 // ----------------------------------------------------------------------------------------
