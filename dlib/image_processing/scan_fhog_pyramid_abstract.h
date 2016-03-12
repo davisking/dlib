@@ -166,7 +166,7 @@ namespace dlib
                   pretty much do whatever you want in terms of feature extraction so long as the following
                   conditions are met:
                     - #hog.size() == get_num_planes()
-                    - Each image plane in of #hog has the same dimensions.
+                    - Each image plane in #hog has the same dimensions.
                     - for all valid i, r, and c:
                         - #hog[i][r][c] == a feature value describing the image content centered at the 
                           following pixel location in img: 
