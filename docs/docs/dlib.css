@@ -20,9 +20,15 @@ body
 {
    margin:0px;
    background-color: #EDF3EE;
-   width:62.5em;  
+   width:62.0em;  
    margin-left: auto;
    margin-right: auto;
+   font-size: 17px;
+}
+
+h1,h2,h3
+{
+   line-height:1.2;
 }
 
 #page_header {
@@ -51,6 +57,7 @@ body
    background-color: white;
    border: 1px solid rgb(102,102,102);
    width: 100%;
+   line-height: 1.3em;
 }
 #main_text_title
 {
@@ -92,6 +99,7 @@ div.menu_footer {
 
 #bottom_content
 {
+   line-height: 1.3em;
 }
 
 /*  ============================================================= */
@@ -123,7 +131,7 @@ div.include_file_more_details_wrapper
 }
 div.include_file
 {
-   font-size: 1.8em;
+   font-size: 1.3em;
    font-weight: bold;
    font-family: monospace;
 
@@ -260,6 +268,15 @@ div.inc {
    border-left: black dotted 1px;
    border-right: black solid 2px;
    border-bottom: black solid 2px;
+}
+
+tt 
+{
+   padding: 0.3em;
+   font-size:13px;
+   font-family: monospace;
+   background: rgb(240,240,240);
+   color: black;
 }
 
 
