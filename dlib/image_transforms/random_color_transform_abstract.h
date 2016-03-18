@@ -71,7 +71,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-}
+    template <typename image_type>
+    void apply_random_color_offset (
+        image_type& img,
+        dlib::rand& rnd
+    );
+    /*!
+        ensures
+            - Picks a random color offset vector and adds it to the given image.  The offset
+              vector is selected using the method described in the paper:
+                Krizhevsky, Alex, Ilya Sutskever, and Geoffrey E. Hinton. "Imagenet
+                classification with deep convolutional neural networks." Advances in neural
+                information processing systems. 2012.
+              In particular, we sample an RGB value from the typical distribution of RGB
+              values, assuming it has a Gaussian distribution, and then divide it by 10.
+              This sampled RGB vector is added to each pixel of img.
+    !*/
+
+// ----------------------------------------------------------------------------------------
 
 #endif // DLIB_RANDOM_cOLOR_TRANSFORM_ABSTRACT_Hh_
 
