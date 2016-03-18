@@ -35,6 +35,19 @@ namespace dlib
             !*/
 
             rand (
+                time_t seed_value
+            );
+            /*!
+                ensures 
+                    - #*this is properly initialized
+                    - #get_seed() == cast_to_string(seed_value) 
+                    - This version of the constructor is equivalent to using
+                      the default constructor and then calling set_seed(cast_to_string(seed_value))
+                throws
+                    - std::bad_alloc
+            !*/
+
+            rand (
                 const std::string& seed_value
             );
             /*!
