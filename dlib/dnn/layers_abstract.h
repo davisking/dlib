@@ -30,7 +30,11 @@ namespace dlib
                                       \__ subnetwork for layer1 __/
 
                 Therefore, by "subnetwork" we mean the part of the network closer to the
-                input.  
+                input.
+
+                Note that there is no dlib::SUBNET type.  It is shown here purely to
+                document the interface layer objects expect to see when they interact
+                with a network.
         !*/
 
     public:
@@ -207,7 +211,7 @@ namespace dlib
                   Moreover, this was the most recent call to forward().  This means that
                   forward() is allowed to cache intermediate results so they can be used
                   during the backward computation.
-                - have_same_dimensions(gradient_input, computed_output)
+                - have_same_dimensions(gradient_input, computed_output) == true
                 - have_same_dimensions(sub.get_gradient_input(), sub.get_output()) == true
                 - have_same_dimensions(params_grad, get_layer_params()) == true
             ensures

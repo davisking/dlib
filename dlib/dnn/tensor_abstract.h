@@ -446,7 +446,7 @@ namespace dlib
         !*/
     };
 
-    void serialize(const tensor& item, std::ostream& out)
+    void serialize(const tensor& item, std::ostream& out);
     void deserialize(resizable_tensor& item, std::istream& in);
     /*!
         provides serialization support for tensor and resizable_tensor.  Note that you can
@@ -553,7 +553,7 @@ namespace dlib
         !*/
     };
 
-    void serialize(const alias_tensor& item, std::ostream& out)
+    void serialize(const alias_tensor& item, std::ostream& out);
     void deserialize(alias_tensor& item, std::istream& in);
     /*!
         provides serialization support for alias_tensor.  

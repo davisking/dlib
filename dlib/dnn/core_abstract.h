@@ -242,7 +242,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #layer_details() == layer_details_type(layer_det)
+                - #layer_details() == layer_det
                 - #subnet()        == subnet_type(args)
         !*/
 
@@ -562,7 +562,7 @@ namespace dlib
         ); 
         /*!
             ensures
-                - #loss_details() == loss_details_type(layer_det)
+                - #loss_details() == layer_det
                 - #subnet()       == subnet_type(args)
         !*/
 
@@ -573,7 +573,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #loss_details() == loss_details_type(layer_det)
+                - #loss_details() == layer_det
                 - #subnet()       == subnet_type(args)
         !*/
 
