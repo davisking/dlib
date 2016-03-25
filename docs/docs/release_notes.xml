@@ -12,12 +12,52 @@
 
 <current>
 New Features:
+   - Added random_color_transform and disturb_colors().
+   - Added a constructor for seeding rand with a time_t.
+   - Added apply_random_color_offset()
+   - Made load_image() support GIF files.
+   - Added subm_clipped()
+   - load_mnist_dataset()
+   - Added an option to solve the L2-loss version of the SVM objective function for svm_c_linear_dcd_trainer.
+   - Added the option to use the elastic net regularizer to the OCA solver.
+   - Added solve_qp_box_constrained()
+   - Added unserialize.
+   - MATLAB binding stuff
+      - link to MATLAB's intel MKL when used on linux
+      - struct support, more arguments (20 now instead of 10),
+      - in place operation.  Made column major matrices directly wrap matlab
+        matrix objects when used inside mex files.  This way, if you use
+        matrix_colmajor or fmatrix_colmajor in a mex file it will not do any
+        unnecessary copying or transposing.
+      - catch ctrl+c presses in MATLAB console.
+      - DLIB_ASSERTS won't kill the matlab process, just throw an exception
+      - Made cerr print in matlab as a red warning message.
+
+
+   - C++11 only tools
+      - Added log1pexp()
+      - Added running_gradient
+      - deep learning tools
+         - dnn_trainer
+         - cuDNN v4.0
+         - auto step size adjust and stopping condition.
+      - CUDA/tensor stuff
+         - gpu_data, tensor, alias tensors
       
 Non-Backwards Compatible Changes:
+   - Everything in dlib/matlab/call_matlab.h is now in the dlib namespace.
 
 Bug fixes:
+   - Fixed bug in 10 argument version of call_matlab() and also cleaned up a few
+   minor things.
+   - setup.py and cmake scripts work in a few more contexts.
+
 
 Other:
+   - Made cmake scripts uniformly require cmake version 2.8.4.
+   - C++11
+      - CMake scripts now enable C++11 by default
+      - Gave array2d and matrix move constructors and move assignment operators.
 
 </current>
 

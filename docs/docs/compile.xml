@@ -85,13 +85,13 @@ tell CMake which one you want it to use via the -G option.
            builds correctly.
         </p>
         <p>
-           Note also that if you want to work with jpeg/png files using dlib then you will
-           need to link your program with libjpeg and/or libpng.  You also need to tell dlib 
-           about this by defining the DLIB_JPEG_SUPPORT and DLIB_PNG_SUPPORT preprocessor directives.
-           How you "link to libjpeg/libpng" varies from platform to platform.  On UNIX machines you
-           usually just add a -ljpeg or -lpng switch to your compiler (after installing the libraries).
-           On windows it's less well defined.  So dlib comes with a copy of these libraries in the dlib/external
-           folder so that you can statically compile them into your application if no system wide version 
+           Note also that if you want to work with jpeg/png/gif files using dlib then you will
+           need to link your program with libjpeg, libpng, and/or libgif.  You also need to tell dlib 
+           about this by defining the DLIB_JPEG_SUPPORT, DLIB_PNG_SUPPORT, and DLIB_GIF_SUPPORT preprocessor directives.
+           How you "link to libjpeg/libpng/libgif" varies from platform to platform.  On UNIX machines you
+           usually just add a -ljpeg, -lpng, or -lgif switch to your compiler (after installing the libraries).
+           On windows it's less well defined.  So dlib comes with a copy of libjpeg and libpng in the dlib/external
+           folder so you can statically compile them into your application if no system wide version 
            is available on your machine.  If all this talk about linking is confusing to you then
            just use CMake.  It will set this all up for you.
         </p>

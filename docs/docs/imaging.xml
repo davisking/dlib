@@ -1081,11 +1081,13 @@
             This global function takes a file name, looks at its extension, and 
             then loads it into an <a href="containers.html#array2d">array2d</a> of 
             <a href="dlib/pixel.h.html">pixels</a> using the appropriate image 
-            loading routine.  The supported types are BMP, PNG, JPEG, and the dlib DNG file format. 
+            loading routine.  The supported types are BMP, PNG, JPEG, GIF, and the dlib DNG file format. 
 
             <p>
-               Note that you can only load PNG and JPEG files if you link against
-               libpng and libjpeg respectively.
+               Note that you can only load PNG, JPEG, and GIF files if you link against
+               libpng, libjpeg, and libgif respectively.  You will also need to #define
+               DLIB_PNG_SUPPORT, DLIB_JPEG_SUPPORT, and DLIB_GIF_SUPPORT.  Or use CMake and
+               it will do all this for you.
             </p>
          </description>
                                  
