@@ -196,6 +196,80 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename T
+        > 
+    size_t count_steps_without_decrease (
+        const T& container,
+        double probability_of_decrease = 0.51
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(0.5 < probability_of_decrease && probability_of_decrease < 1,
+            "\t size_t count_steps_without_decrease()"
+            << "\n\t probability_of_decrease: "<< probability_of_decrease 
+        );
+
+        running_gradient g;
+        size_t count = 0;
+        size_t j = 0;
+        for (auto i = container.rbegin(); i != container.rend(); ++i)
+        {
+            ++j;
+            g.add(*i);
+            if (g.current_n() > 2)
+            {
+                // Note that this only looks backwards because we are looping over the
+                // container backwards.  So here we are really checking if the gradient isn't
+                // decreasing.
+                double prob_decreasing = g.probability_gradient_greater_than(0);
+                // If we aren't confident things are decreasing.
+                if (prob_decreasing < probability_of_decrease)
+                    count = j;
+            }
+        }
+        return count;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        > 
+    size_t count_steps_without_increase (
+        const T& container,
+        double probability_of_increase = 0.51
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(0.5 < probability_of_increase && probability_of_increase < 1,
+            "\t size_t count_steps_without_increase()"
+            << "\n\t probability_of_increase: "<< probability_of_increase 
+        );
+
+        running_gradient g;
+        size_t count = 0;
+        size_t j = 0;
+        for (auto i = container.rbegin(); i != container.rend(); ++i)
+        {
+            ++j;
+            g.add(*i);
+            if (g.current_n() > 2)
+            {
+                // Note that this only looks backwards because we are looping over the
+                // container backwards.  So here we are really checking if the gradient isn't
+                // increasing.
+                double prob_increasing = g.probability_gradient_less_than(0);
+                // If we aren't confident things are increasing.
+                if (prob_increasing < probability_of_increase)
+                    count = j;
+            }
+        }
+        return count;
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_RuNNING_GRADIENT_Hh_

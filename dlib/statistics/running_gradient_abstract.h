@@ -155,6 +155,61 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename T
+        > 
+    size_t count_steps_without_decrease (
+        const T& container,
+        double probability_of_decrease = 0.51
+    );
+    /*!
+        requires
+            - container muse be a container of double values that can be enumerated with
+              .rbegin() and .rend().
+            - 0.5 < probability_of_decrease < 1
+        ensures
+            - If you think of the contents of container as a potentially noisy time series,
+              then this function returns a count of how long the time series has gone
+              without noticeably decreasing in value.  It does this by adding the
+              elements into a running_gradient object and counting how many elements,
+              starting with container.back(), that you need to examine before you are
+              confident that the series has been decreasing in value.  Here, "confident of
+              decrease" means that the probability of decrease is >= probability_of_decrease.  
+            - Setting probability_of_decrease to 0.51 means we count until we see even a
+              small hint of decrease, whereas a larger value of 0.99 would return a larger
+              count since it keeps going until it is nearly certain the time series is
+              decreasing.
+            - The max possible output from this function is container.size().
+    !*/
+
+    template <
+        typename T
+        > 
+    size_t count_steps_without_increase (
+        const T& container,
+        double probability_of_increase = 0.51
+    );
+    /*!
+        requires
+            - container muse be a container of double values that can be enumerated with
+              .rbegin() and .rend().
+            - 0.5 < probability_of_increase < 1
+        ensures
+            - If you think of the contents of container as a potentially noisy time series,
+              then this function returns a count of how long the time series has gone
+              without noticeably increasing in value.  It does this by adding the
+              elements into a running_gradient object and counting how many elements,
+              starting with container.back(), that you need to examine before you are
+              confident that the series has been increasing in value.  Here, "confident of
+              increase" means that the probability of increase is >= probability_of_increase.  
+            - Setting probability_of_increase to 0.51 means we count until we see even a
+              small hint of increase, whereas a larger value of 0.99 would return a larger
+              count since it keeps going until it is nearly certain the time series is
+              increasing.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_RuNNING_GRADIENT_ABSTRACT_Hh_
