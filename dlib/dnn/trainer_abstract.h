@@ -61,7 +61,7 @@ namespace dlib
                 - #get_mini_batch_size() == 128
                 - #get_step_size() == 1
                 - #get_min_step_size() == 1e-3
-                - #get_iterations_between_step_size_adjust() == 2000
+                - #get_iterations_without_progress_threshold() == 2000
                 - #get_step_size_shrink() == 0.1
         !*/
 
@@ -193,27 +193,30 @@ namespace dlib
                   training will terminate.
         !*/
 
-        void set_iterations_between_step_size_adjust (
-            unsigned long min_iter
+        void set_iterations_without_progress_threshold (
+            unsigned long thresh 
         );
         /*!
             ensures
-                - #get_iterations_between_step_size_adjust() == min_iter
+                - #get_iterations_without_progress_threshold() == thresh
         !*/
 
-        unsigned long get_iterations_between_step_size_adjust (
+        unsigned long get_iterations_without_progress_threshold (
         ) const;
         /*!
             ensures
                 - This object monitors the progress of training and estimates if the
-                  training error is being reduced.  It does this by looking at
-                  get_iterations_between_step_size_adjust() mini-batch results and applying
-                  the statistical test defined by the running_gradient object to see if the
-                  training error is getting smaller.  
+                  training error is being reduced.  It does this by looking at the previous
+                  get_iterations_without_progress_threshold() mini-batch results and
+                  applying the statistical test defined by the running_gradient object to
+                  see if the training error is getting smaller.  If it isn't being reduced
+                  then get_step_size() is made smaller by a factor of get_step_size_shrink().
 
-                  Therefore, get_iterations_between_step_size_adjust() should always be set
-                  to something sensibly large so that this test can be done with reasonably
-                  high confidence.
+                  Therefore, get_iterations_without_progress_threshold() should always be
+                  set to something sensibly large so that this test can be done with
+                  reasonably high confidence.  Think of this test as saying "if the loss
+                  hasn't been reduced for the previous get_iterations_without_progress_threshold() 
+                  then shrink the step size".
         !*/
 
         void set_step_size_shrink_amount (

@@ -142,7 +142,8 @@ namespace dlib
                     last_time = now_time;
                     std::cout << "step#: " << rpad(cast_to_string(train_one_step_calls),epoch_string_pad) << "  " 
                         << "step size: " << rpad(cast_to_string(step_size),ss_string_pad) << "  "
-                        << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) 
+                        << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad)  << "  "
+                        << "steps without apparent progress: " << steps_without_progress 
                         << std::endl;
                     clear_average_loss();
                 }
@@ -167,7 +168,8 @@ namespace dlib
                     last_time = now_time;
                     std::cout << "step#: " << rpad(cast_to_string(train_one_step_calls),epoch_string_pad) << "  " 
                         << "step size: " << rpad(cast_to_string(step_size),ss_string_pad) << "  "
-                        << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) 
+                        << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) << "  "
+                        << "steps without apparent progress: " << steps_without_progress 
                         << std::endl;
                     clear_average_loss();
                 }
@@ -207,7 +209,8 @@ namespace dlib
                             auto iter = epoch_iteration + epoch_pos/(double)data.size();
                             std::cout << "epoch: " << rpad(cast_to_string(iter),epoch_string_pad) << "  " 
                                 << "step size: " << rpad(cast_to_string(step_size),ss_string_pad) << "  "
-                                << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) 
+                                << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) << "  "
+                                << "steps without apparent progress: " << steps_without_progress 
                                 << std::endl;
                         }
                     }
@@ -229,7 +232,8 @@ namespace dlib
                     // are for full epoch status statements.
                     std::cout << "Epoch: " << rpad(cast_to_string(epoch_iteration+1),epoch_string_pad) << "  " 
                               << "step size: " << rpad(cast_to_string(step_size),ss_string_pad) << "  "
-                              << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) 
+                              << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) << "  "
+                              << "steps without apparent progress: " << steps_without_progress 
                               << std::endl;
                 }
             }
@@ -270,7 +274,8 @@ namespace dlib
                             auto iter = epoch_iteration + epoch_pos/(double)data.size();
                             std::cout << "epoch: " << rpad(cast_to_string(iter),epoch_string_pad) << "  " 
                                 << "step size: " << rpad(cast_to_string(step_size),ss_string_pad) << "  "
-                                << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) 
+                                << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) << "  "
+                                << "steps without apparent progress: " << steps_without_progress 
                                 << std::endl;
                         }
                     }
@@ -290,7 +295,8 @@ namespace dlib
                     // are for full epoch status statements.
                     std::cout << "Epoch: " << rpad(cast_to_string(epoch_iteration+1),epoch_string_pad) << "  " 
                               << "step size: " << rpad(cast_to_string(step_size),ss_string_pad) << "  "
-                              << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) 
+                              << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) << "  "
+                              << "steps without apparent progress: " << steps_without_progress 
                               << std::endl;
                 }
             }
@@ -359,17 +365,17 @@ namespace dlib
             return min_step_size;
         }
 
-        void set_iterations_between_step_size_adjust (
-            unsigned long min_iter
+        void set_iterations_without_progress_threshold (
+            unsigned long thresh 
         )
         {
-            iter_between_step_size_adjust = min_iter;
+            iter_without_progress_thresh = thresh;
         }
 
-        unsigned long get_iterations_between_step_size_adjust (
+        unsigned long get_iterations_without_progress_threshold (
         ) const
         {
-            return iter_between_step_size_adjust;
+            return iter_without_progress_thresh;
         }
 
         void set_step_size_shrink_amount (
@@ -396,15 +402,16 @@ namespace dlib
         void record_loss(double loss)
         {
             // Say that we will check if the gradient is bad 200 times during each
-            // iter_between_step_size_adjust interval of network updates.   This kind of
+            // iter_without_progress_thresh interval of network updates.   This kind of
             // budgeting causes our gradient checking to use a fixed amount of
             // computational resources, regardless of the size of
-            // iter_between_step_size_adjust.
+            // iter_without_progress_thresh.
             gradient_check_budget += 200;
 
             rs.add(loss);
             previous_loss_values.push_back(loss);
-            if (previous_loss_values.size() > iter_between_step_size_adjust)
+            // discard really old loss values.
+            while (previous_loss_values.size() > iter_without_progress_thresh)
                 previous_loss_values.pop_front();
         }
 
@@ -417,7 +424,7 @@ namespace dlib
 
         void run_update(job_t& next_job, const no_label_type&)
         {
-            no_label_type pick_wich_run_update;
+            no_label_type pick_which_run_update;
             double loss = net.update(next_job.t, make_sstack(solvers), step_size);
             record_loss(loss);
         }
@@ -427,26 +434,28 @@ namespace dlib
             // Make sure this thread uses the same cuda device as the thread that created
             // the dnn_trainer object.
             dlib::cuda::set_device(cuda_device_id);
-            label_type pick_wich_run_update;
+            label_type pick_which_run_update;
             job_t next_job;
             while(job_pipe.dequeue(next_job))
             {
                 // call net.update() but pick the right version for unsupervised or
                 // supervised training based on the type of label_type.
-                run_update(next_job, pick_wich_run_update);
+                run_update(next_job, pick_which_run_update);
 
                 // If we have been running for a while then check if the loss is still
                 // dropping.  If it isn't then we will reduce the step size.  Note that we
                 // have a "budget" that prevents us from calling
-                // probability_gradient_greater_than() every iteration.  We do this because
+                // count_steps_without_decrease() every iteration.  We do this because
                 // it can be expensive to compute when previous_loss_values is large.
-                if (previous_loss_values.size() >= iter_between_step_size_adjust && 
-                    gradient_check_budget > previous_loss_values.size())
+                if (gradient_check_budget > iter_without_progress_thresh)
                 {
                     gradient_check_budget = 0;
-                    if (probability_gradient_greater_than(previous_loss_values, 0) > 0.49)
+                    steps_without_progress = count_steps_without_decrease(previous_loss_values);
+                    if (steps_without_progress >= iter_without_progress_thresh)
                     {
+                        // optimization has flattened out, so drop the learning rate. 
                         step_size = step_size_shrink*step_size;
+                        steps_without_progress = 0;
                         previous_loss_values.clear();
                     }
                 }
@@ -475,7 +484,8 @@ namespace dlib
             cuda_device_id = dlib::cuda::get_device();
             step_size = 1;
             min_step_size = 1e-3;
-            iter_between_step_size_adjust = 2000;
+            iter_without_progress_thresh = 2000;
+            steps_without_progress = 0;
             step_size_shrink = 0.1;
             epoch_iteration = 0;
             epoch_pos = 0;
@@ -491,7 +501,7 @@ namespace dlib
         friend void serialize(const dnn_trainer& item, std::ostream& out)
         {
             item.wait_for_thread_to_pause();
-            int version = 4;
+            int version = 5;
             serialize(version, out);
 
             size_t nl = dnn_trainer::num_layers;
@@ -505,7 +515,8 @@ namespace dlib
             serialize(item.solvers, out);
             serialize(item.step_size.load(), out);
             serialize(item.min_step_size, out);
-            serialize(item.iter_between_step_size_adjust.load(), out);
+            serialize(item.iter_without_progress_thresh.load(), out);
+            serialize(item.steps_without_progress.load(), out);
             serialize(item.step_size_shrink.load(), out);
             serialize(item.epoch_iteration, out);
             serialize(item.epoch_pos, out);
@@ -516,7 +527,7 @@ namespace dlib
             item.wait_for_thread_to_pause();
             int version = 0;
             deserialize(version, in);
-            if (version != 4)
+            if (version != 5)
                 throw serialization_error("Unexpected version found while deserializing dlib::dnn_trainer.");
 
             size_t num_layers = 0;
@@ -540,7 +551,8 @@ namespace dlib
             deserialize(item.solvers, in);
             deserialize(dtemp, in); item.step_size = dtemp;
             deserialize(item.min_step_size, in);
-            deserialize(ltemp, in); item.iter_between_step_size_adjust = ltemp;
+            deserialize(ltemp, in); item.iter_without_progress_thresh = ltemp;
+            deserialize(ltemp, in); item.steps_without_progress = ltemp;
             deserialize(dtemp, in); item.step_size_shrink = dtemp;
             deserialize(item.epoch_iteration, in);
             deserialize(item.epoch_pos, in);
@@ -592,7 +604,8 @@ namespace dlib
         std::vector<solver_type> solvers;
         std::atomic<double> step_size;
         double min_step_size;
-        std::atomic<unsigned long> iter_between_step_size_adjust;
+        std::atomic<unsigned long> iter_without_progress_thresh;
+        std::atomic<unsigned long> steps_without_progress;
         std::atomic<double> step_size_shrink;
         std::chrono::time_point<std::chrono::system_clock> last_sync_time;
         std::string sync_filename;
