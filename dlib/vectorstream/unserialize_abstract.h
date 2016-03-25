@@ -8,7 +8,7 @@
 
 namespace dlib
 {
-    class unserialize : public std::iostream
+    class unserialize : public std::istream
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
