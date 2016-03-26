@@ -271,7 +271,8 @@ namespace dlib
         >
     matrix<unsigned char> draw_fhog(
         const dlib::array<array2d<T,mm1>,mm2>& hog,
-        const long cell_draw_size = 15
+        const long cell_draw_size = 15,
+        const float min_response_threshold = 0.0
     );
     /*!
         requires
@@ -285,6 +286,8 @@ namespace dlib
               then returned.
             - The size of the cells in the output image will be rendered as cell_draw_size 
               pixels wide and tall.
+            - HOG cells with a response value less than min_response_threshold are not
+              drawn.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -294,7 +297,8 @@ namespace dlib
         >
     matrix<unsigned char> draw_fhog (
         const std::vector<matrix<T> >& hog,
-        const long cell_draw_size = 15
+        const long cell_draw_size = 15,
+        const float min_response_threshold = 0.0
     );
     /*!
         requires
@@ -303,6 +307,8 @@ namespace dlib
         ensures
             - This function just converts the given hog object into an array<array2d<T>>
               and passes it to the above draw_fhog() routine and returns the results.
+            - HOG cells with a response value less than min_response_threshold are not
+              drawn.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -313,7 +319,8 @@ namespace dlib
         >
     matrix<unsigned char> draw_fhog(
         const array2d<matrix<T,31,1>,mm>& hog,
-        const long cell_draw_size = 15
+        const long cell_draw_size = 15,
+        const float min_response_threshold = 0.0
     );
     /*!
         requires
@@ -326,6 +333,8 @@ namespace dlib
               then returned.
             - The size of the cells in the output image will be rendered as cell_draw_size 
               pixels wide and tall.
+            - HOG cells with a response value less than min_response_threshold are not
+              drawn.
     !*/
 
 // ----------------------------------------------------------------------------------------
