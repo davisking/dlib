@@ -1058,7 +1058,8 @@ namespace dlib
         >
     matrix<unsigned char> draw_fhog(
         const dlib::array<array2d<T,mm1>,mm2>& hog,
-        const long cell_draw_size = 15
+        const long cell_draw_size = 15,
+        const float min_response_threshold = 0.0
     )
     {
         // make sure requires clause is not broken
@@ -1084,7 +1085,7 @@ namespace dlib
                     const float val = hog[d][r/cell_draw_size][c/cell_draw_size] +
                         hog[d+mbars.size()][r/cell_draw_size][c/cell_draw_size] +
                         hog[d+mbars.size()*2][r/cell_draw_size][c/cell_draw_size];
-                    if (val > 0)
+                    if (val > min_response_threshold)
                     {
                         set_subm(himg, r, c, cell_draw_size, cell_draw_size) += val*mbars[d%mbars.size()];
                     }
@@ -1106,7 +1107,8 @@ namespace dlib
         >
     matrix<unsigned char> draw_fhog (
         const std::vector<matrix<T> >& hog,
-        const long cell_draw_size = 15
+        const long cell_draw_size = 15,
+        const float min_response_threshold = 0.0
     )
     {
         // make sure requires clause is not broken
@@ -1131,7 +1133,7 @@ namespace dlib
                 }
             }
         }
-        return draw_fhog(temp,cell_draw_size);
+        return draw_fhog(temp,cell_draw_size, min_response_threshold);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1142,7 +1144,8 @@ namespace dlib
         >
     matrix<unsigned char> draw_fhog(
         const array2d<matrix<T,31,1>,mm>& hog,
-        const long cell_draw_size = 15
+        const long cell_draw_size = 15,
+        const float min_response_threshold = 0.0
     )
     {
         // make sure requires clause is not broken
@@ -1167,7 +1170,7 @@ namespace dlib
                     const float val = hog[r/cell_draw_size][c/cell_draw_size](d) +
                         hog[r/cell_draw_size][c/cell_draw_size](d+mbars.size()) +
                         hog[r/cell_draw_size][c/cell_draw_size](d+mbars.size()*2);
-                    if (val > 0)
+                    if (val > min_response_threshold)
                     {
                         set_subm(himg, r, c, cell_draw_size, cell_draw_size) += val*mbars[d%mbars.size()];
                     }
