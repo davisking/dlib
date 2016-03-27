@@ -1344,7 +1344,7 @@ namespace dlib
 
     template <
         size_t num,
-        template<typename> class LAYER, 
+        template<typename> class REPEATED_LAYER, 
         typename SUBNET
         >
     class repeat
@@ -1353,10 +1353,10 @@ namespace dlib
     public:
         typedef SUBNET subnet_type;
         typedef typename SUBNET::input_type input_type;
-        const static size_t num_layers = (LAYER<SUBNET>::num_layers-SUBNET::num_layers)*num + SUBNET::num_layers;
+        const static size_t num_layers = (REPEATED_LAYER<SUBNET>::num_layers-SUBNET::num_layers)*num + SUBNET::num_layers;
         const static unsigned int sample_expansion_factor = SUBNET::sample_expansion_factor;
 
-        typedef LAYER<impl::repeat_input_layer> repeated_layer_type;
+        typedef REPEATED_LAYER<impl::repeat_input_layer> repeated_layer_type;
 
         repeat(
         ) : 
@@ -1481,7 +1481,7 @@ namespace dlib
         template <typename solver_type>
         void update(const tensor& x, const tensor& gradient_input, sstack<solver_type> solvers, double step_size)
         {
-            const auto cnt = (LAYER<SUBNET>::num_layers-SUBNET::num_layers);
+            const auto cnt = (REPEATED_LAYER<SUBNET>::num_layers-SUBNET::num_layers);
             if (details.size() > 1)
             {
                 details[0].update(details[1].get_output(), gradient_input, solvers,step_size);
@@ -1565,10 +1565,10 @@ namespace dlib
 
     template <
         size_t num,
-        template<typename> class LAYER, 
+        template<typename> class REPEATED_LAYER, 
         typename SUBNET
         >
-    struct is_nonloss_layer_type<repeat<num,LAYER,SUBNET>> : std::true_type {};
+    struct is_nonloss_layer_type<repeat<num,REPEATED_LAYER,SUBNET>> : std::true_type {};
 
 // ----------------------------------------------------------------------------------------
 

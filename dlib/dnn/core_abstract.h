@@ -927,7 +927,7 @@ namespace dlib
 
     template <
         size_t num,
-        template<typename> class LAYER, 
+        template<typename> class REPEATED_LAYER, 
         typename SUBNET
         >
     class repeat 
@@ -936,11 +936,11 @@ namespace dlib
             REQUIREMENTS ON num
                 - num > 0
 
-            REQUIREMENTS ON LAYER
-                - LAYER must be a template that stacks more layers onto a deep neural
+            REQUIREMENTS ON REPEATED_LAYER
+                - REPEATED_LAYER must be a template that stacks more layers onto a deep neural
                   network.  For example, if net_type were a network without a loss layer,
                   then it should be legal to create a deeper network with a type of
-                  LAYER<net_type>.
+                  REPEATED_LAYER<net_type>.
 
             REQUIREMENTS ON SUBNET
                 - One of the following must be true:
@@ -951,8 +951,8 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object adds more layers to a deep neural network.  In particular, it
-                adds LAYER on top of SUBNET num times.  So for example, if num were 2 then
-                repeat<2,LAYER,SUBNET> would create a network equivalent to LAYER<LAYER<SUBNET>>.
+                adds REPEATED_LAYER on top of SUBNET num times.  So for example, if num were 2 then
+                repeat<2,REPEATED_LAYER,SUBNET> would create a network equivalent to REPEATED_LAYER<REPEATED_LAYER<SUBNET>>.
 
                 Also, this object provides an interface identical to the one defined by the
                 add_layer object except that we add the num_repetitions() and
@@ -964,9 +964,9 @@ namespace dlib
 
         typedef SUBNET subnet_type;
         typedef typename SUBNET::input_type input_type;
-        const static size_t num_layers = (LAYER<SUBNET>::num_layers-SUBNET::num_layers)*num + SUBNET::num_layers;
+        const static size_t num_layers = (REPEATED_LAYER<SUBNET>::num_layers-SUBNET::num_layers)*num + SUBNET::num_layers;
         const static unsigned int sample_expansion_factor = SUBNET::sample_expansion_factor;
-        typedef LAYER<an_unspecified_input_type> repeated_layer_type;
+        typedef REPEATED_LAYER<an_unspecified_input_type> repeated_layer_type;
 
         template <typename T, typename ...U>
         repeat(
@@ -975,8 +975,8 @@ namespace dlib
         );
         /*!
             ensures
-                - arg1 is used to initialize the num_repetitions() copies of LAYER inside
-                  this object.  That is, all the LAYER elements are initialized identically
+                - arg1 is used to initialize the num_repetitions() copies of REPEATED_LAYER inside
+                  this object.  That is, all the REPEATED_LAYER elements are initialized identically
                   by being given copies of arg1.
                 - The rest of the arguments to the constructor, i.e. args2, are passed to
                   SUBNET's constructor.  
@@ -986,7 +986,7 @@ namespace dlib
         ) const; 
         /*!
             ensures
-                - returns num (i.e. the number of times LAYER was stacked on top of SUBNET)
+                - returns num (i.e. the number of times REPEATED_LAYER was stacked on top of SUBNET)
         !*/
 
         const repeated_layer_type& get_repeated_layer (
@@ -996,10 +996,10 @@ namespace dlib
             requires
                 - i < num_repetitions()
             ensures
-                - returns a reference to the i-th instance of LAYER.  For example,
-                  get_repeated_layer(0) returns the instance of LAYER that is on the top of
+                - returns a reference to the i-th instance of REPEATED_LAYER.  For example,
+                  get_repeated_layer(0) returns the instance of REPEATED_LAYER that is on the top of
                   the network while get_repeated_layer(num_repetitions()-1) returns the
-                  instance of LAYER that is stacked immediately on top of SUBNET.
+                  instance of REPEATED_LAYER that is stacked immediately on top of SUBNET.
         !*/
 
         repeated_layer_type& get_repeated_layer (
@@ -1009,10 +1009,10 @@ namespace dlib
             requires
                 - i < num_repetitions()
             ensures
-                - returns a reference to the i-th instance of LAYER.  For example,
-                  get_repeated_layer(0) returns the instance of LAYER that is on the top of
+                - returns a reference to the i-th instance of REPEATED_LAYER.  For example,
+                  get_repeated_layer(0) returns the instance of REPEATED_LAYER that is on the top of
                   the network while get_repeated_layer(num_repetitions()-1) returns the
-                  instance of LAYER that is stacked immediately on top of SUBNET.
+                  instance of REPEATED_LAYER that is stacked immediately on top of SUBNET.
         !*/
 
         const subnet_type& subnet(
@@ -1020,7 +1020,7 @@ namespace dlib
         /*!
             ensures
                 - returns the SUBNET base network that repeat sits on top of.  If you want
-                  to access the LAYER components then you must use get_repeated_layer(). 
+                  to access the REPEATED_LAYER components then you must use get_repeated_layer(). 
         !*/
 
         subnet_type& subnet(
@@ -1028,7 +1028,7 @@ namespace dlib
         /*!
             ensures
                 - returns the SUBNET base network that repeat sits on top of.  If you want
-                  to access the LAYER components then you must use get_repeated_layer(). 
+                  to access the REPEATED_LAYER components then you must use get_repeated_layer(). 
         !*/
     };
 
