@@ -1580,7 +1580,7 @@ namespace dlib
     public:
         typedef INPUT_LAYER subnet_type;
         typedef typename subnet_type::input_type input_type;
-        const static size_t num_layers = 0;
+        const static size_t num_layers = 1;
         const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         static_assert(sample_expansion_factor >= 1,
             "The input layer can't produce fewer output tensors than there are inputs.");
