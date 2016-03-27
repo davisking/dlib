@@ -7,9 +7,10 @@
 using namespace std;
 using namespace dlib;
 
-template <typename T> using ares = relu<add_prev1<affine<con<relu<affine<con<tag1<T>>>>>>>>;
+// ----------------------------------------------------------------------------------------
 
 template <typename T> using res = relu<add_prev1<bn<con<relu<bn<con<tag1<T>>>>>>>>;
+
 std::tuple<relu_,add_prev1_,bn_,con_,relu_,bn_,con_> res_ (
     unsigned long outputs,
     unsigned long stride = 1
@@ -24,7 +25,10 @@ std::tuple<relu_,add_prev1_,bn_,con_,relu_,bn_,con_> res_ (
                            con_(outputs,3,3,stride,stride));
 }
 
- 
+template <typename T> using ares = relu<add_prev1<affine<con<relu<affine<con<tag1<T>>>>>>>>;
+
+// ----------------------------------------------------------------------------------------
+
 int main(int argc, char** argv) try
 {
     if (argc != 2)
@@ -87,6 +91,7 @@ int main(int argc, char** argv) try
 
     // You can access sub layers of the network like this:
     net.subnet().subnet().get_output();
+    layer<2>(net).get_output();
     layer<avg_pool>(net).get_output();
 
     net.clean();
