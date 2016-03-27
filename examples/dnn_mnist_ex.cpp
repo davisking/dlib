@@ -11,7 +11,6 @@
 #include <dlib/dnn.h>
 #include <iostream>
 #include <dlib/data_io.h>
-#include "dlib/time_this.h"
 
 using namespace std;
 using namespace dlib;
