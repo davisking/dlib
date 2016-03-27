@@ -1585,7 +1585,7 @@ namespace dlib
         static_assert(sample_expansion_factor >= 1,
             "The input layer can't produce fewer output tensors than there are inputs.");
 
-        add_tag_layer():gradient_input_is_stale(true),cached_output_ptr(nullptr) {}
+        add_tag_layer():cached_output_ptr(nullptr),gradient_input_is_stale(true) {}
 
         add_tag_layer(const add_tag_layer&) = default;
         add_tag_layer& operator=(const add_tag_layer&) = default;
