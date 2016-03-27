@@ -212,6 +212,30 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void compute_adam_update (
+        tensor& s,
+        tensor& m,
+        tensor& v,
+        const float t,
+        const float learning_rate,
+        const float weight_decay,
+        const float momentum1,
+        const float momentum2,
+        const tensor& params,
+        const tensor& params_grad
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::compute_adam_update(s, m, v, t, learning_rate, weight_decay, momentum1,
+            momentum2, params, params_grad);
+#else
+        cpu::compute_adam_update(s, m, v, t, learning_rate, weight_decay, momentum1,
+            momentum2, params, params_grad);
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void batch_normalize_inference (
         resizable_tensor& dest,
         const tensor& src,

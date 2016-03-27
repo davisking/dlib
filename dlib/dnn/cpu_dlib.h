@@ -103,6 +103,21 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
+        void compute_adam_update (
+            tensor& s,
+            tensor& m,
+            tensor& v,
+            const float t,
+            const float learning_rate,
+            const float weight_decay,
+            const float momentum1,
+            const float momentum2,
+            const tensor& params,
+            const tensor& params_grad
+        );
+
+    // -----------------------------------------------------------------------------------
+
         void batch_normalize_inference (
             resizable_tensor& dest,
             const tensor& src,

@@ -386,6 +386,59 @@ namespace dlib
             }
         }
 
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_compute_adam_update(
+            size_t n,
+            float* s,
+            float* m,
+            float* v,
+            const float alpha,
+            const float weight_decay,
+            const float momentum1,
+            const float momentum2,
+            const float* params,
+            const float* params_grad
+        )
+        {
+            const float eps = 1e-8;
+            // The loop is equivalent to doing this:
+            //   m = momentum1*m + (1-momentum1)    *   (weight_decay*params + params_grad);
+            //   v = momentum2*v + (1-momentum2)*squared(weight_decay*params + params_grad);
+            //   s = -alpha*m/(sqrt(v) + eps);
+            for (auto i : grid_stride_range(0, n))
+            {
+                float g = (weight_decay*params[i] + params_grad[i]);
+                m[i] = momentum1*m[i] + (1-momentum1)*g;
+                v[i] = momentum2*v[i] + (1-momentum2)*g*g;
+                s[i] = -alpha*m[i]/(std::sqrt(v[i]) + eps);
+            }
+        }
+
+        void compute_adam_update (
+            tensor& s,
+            tensor& m,
+            tensor& v,
+            const float t,
+            const float learning_rate,
+            const float weight_decay,
+            const float momentum1,
+            const float momentum2,
+            const tensor& params,
+            const tensor& params_grad
+        )
+        {
+            DLIB_CASSERT(s.size() == m.size() &&
+                         s.size() == v.size() &&
+                         s.size() == params.size() &&
+                         s.size() == params_grad.size(),"");
+            const float alpha = learning_rate*std::sqrt(1-std::pow(momentum2,t))/(1-std::pow(momentum1, t));
+
+            launch_kernel(_cuda_compute_adam_update,max_jobs(s.size()),
+                    s.size(), s.device(), m.device(), v.device(), alpha, weight_decay,
+                    momentum1, momentum2, params.device(), params_grad.device());
+        }
+
     // -----------------------------------------------------------------------------------
 
         __global__ void _cuda_affine_transform_conv(float* d, const float* s, size_t n, const float* A, const float* B, size_t bs, size_t ks)

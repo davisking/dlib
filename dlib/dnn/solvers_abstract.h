@@ -106,6 +106,52 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class adam
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the EXAMPLE_SOLVER interface defined above.  In
+                particular, it implements the ADAM parameter update method described in the
+                paper:
+                    Kingma, Diederik P., and Jimmy Ba Adam. "A method for stochastic
+                    optimization." International Conference on Learning Representation. 2015.
+        !*/
+
+    public:
+
+        adam(
+            float learning_rate = 0.001,
+            float weight_decay = 0.0005,
+            float momentum1 = 0.9, 
+            float momentum2 = 0.999 
+        ); 
+        /*!
+            requires
+                - learning_rate > 0
+                - weight_decay >= 0
+                - 0 <= momentum1 < 1
+                - 0 <= momentum2 < 1
+            ensures
+                - #get_learning_rate() == learning_rate
+                - #get_weight_decay()  == weight_decay 
+                - #get_momentum1()     == momentum1
+                - #get_momentum2()     == momentum2
+        !*/
+
+        float get_learning_rate () const; 
+        float get_weight_decay () const;
+        float get_momentum1 () const; 
+        float get_momentum2 () const; 
+    };
+
+    void serialize(const adam& item, std::ostream& out);
+    void deserialize(adam& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_SOLVERS_ABSTRACT_H_
