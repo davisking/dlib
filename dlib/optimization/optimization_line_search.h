@@ -127,7 +127,8 @@ namespace dlib
         double f0,
         double d0,
         double f1,
-        double d1
+        double d1,
+        double limit = 1
     )
     {
         const double n = 3*(f1 - f0) - 2*d0 - d1;
@@ -161,8 +162,8 @@ namespace dlib
         else
             x = x2;
 
-        // now make sure the minimum is within the allowed range of (0,1) 
-        return put_in_range(0,1,x);
+        // now make sure the minimum is within the allowed range of [0,limit] 
+        return put_in_range(0,limit,x);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -305,8 +306,9 @@ namespace dlib
         // the book Practical Methods of Optimization by R. Fletcher.   The sectioning 
         // phase is an implementation of 2.6.4 from the same book.
 
-        // tau1 > 1. Controls the alpha jump size during the search
-        const double tau1 = 9;
+        // 1 < tau1a < tau1b. Controls the alpha jump size during the search
+        const double tau1a = 2.0;
+        const double tau1b = 9;
 
         // it must be the case that 0 < tau2 < tau3 <= 1/2 for the algorithm to function
         // correctly but the specific values of tau2 and tau3 aren't super important.
@@ -390,34 +392,28 @@ namespace dlib
                 break;
             }
 
-            if (mu <= 2*alpha - last_alpha)
-            {
-                last_alpha = alpha;
-                alpha = mu;
-            }
+
+
+            const double temp = alpha;
+            // Pick a larger range [first, last].  We will pick the next alpha in that
+            // range.
+            double first = alpha + tau1a*(alpha - last_alpha);
+            double last;
+            if (mu > 0)
+                last = std::min(mu, alpha + tau1b*(alpha - last_alpha));
             else
-            {
-                const double temp = alpha;
-
-                double first = 2*alpha - last_alpha;
-                double last;
-                if (mu > 0)
-                    last = std::min(mu, alpha + tau1*(alpha - last_alpha));
-                else
-                    last = std::max(mu, alpha + tau1*(alpha - last_alpha));
+                last = std::max(mu, alpha + tau1b*(alpha - last_alpha));
 
 
-                // pick a point between first and last by doing some kind of interpolation
-                if (last_alpha < alpha)
-                    alpha = last_alpha + (alpha-last_alpha)*poly_min_extrap(last_val, last_val_der, val, val_der);
-                else
-                    alpha = alpha + (last_alpha-alpha)*poly_min_extrap(val, val_der, last_val, last_val_der);
+            // pick a point between first and last by doing some kind of interpolation
+            if (last_alpha < alpha)
+                alpha = last_alpha + (alpha-last_alpha)*poly_min_extrap(last_val, last_val_der, val, val_der, 1e10);
+            else
+                alpha = alpha + (last_alpha-alpha)*poly_min_extrap(val, val_der, last_val, last_val_der, 1e10);
 
-                alpha = put_in_range(first,last,alpha);
+            alpha = put_in_range(first,last,alpha);
 
-
-                last_alpha = temp;
-            }
+            last_alpha = temp;
 
             last_val = val;
             last_val_der = val_der;
@@ -460,6 +456,13 @@ namespace dlib
             else
             {
                 if (std::abs(val_der) <= thresh)
+                    return alpha;
+                // If we are optimizing a function that doesn't have continuous first
+                // derivatives then val_der might not ever go below thresh.  So check if it
+                // looks like the first derivative is discontinuous and stop if so.  The
+                // current alpha is plenty good enough in this case.
+                const double second_der = std::abs(a_val_der-b_val_der)/std::abs(a-b);
+                if (second_der > 1e5)
                     return alpha;
 
                 if ( (b-a)*val_der >= 0)
