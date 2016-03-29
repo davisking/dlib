@@ -306,8 +306,9 @@ namespace dlib
         // the book Practical Methods of Optimization by R. Fletcher.   The sectioning 
         // phase is an implementation of 2.6.4 from the same book.
 
-        // 1 < tau1a < tau1b. Controls the alpha jump size during the search
-        const double tau1a = 2.0;
+        // 1 <= tau1a < tau1b. Controls the alpha jump size during the bracketing phase of
+        // the search.
+        const double tau1a = 1.4;
         const double tau1b = 9;
 
         // it must be the case that 0 < tau2 < tau3 <= 1/2 for the algorithm to function
@@ -317,7 +318,7 @@ namespace dlib
 
 
         // Stop right away and return a step size of 0 if the gradient is 0 at the starting point
-        if (std::abs(d0) < std::numeric_limits<double>::epsilon())
+        if (std::abs(d0) <= std::abs(f0)*std::numeric_limits<double>::epsilon())
             return 0;
 
         // Stop right away if the current value is good enough according to min_f
@@ -397,12 +398,18 @@ namespace dlib
             const double temp = alpha;
             // Pick a larger range [first, last].  We will pick the next alpha in that
             // range.
-            double first = alpha + tau1a*(alpha - last_alpha);
-            double last;
+            double first, last;
             if (mu > 0)
-                last = std::min(mu, alpha + tau1b*(alpha - last_alpha));
+            {
+                first = std::min(mu, alpha + tau1a*(alpha - last_alpha));
+                last  = std::min(mu, alpha + tau1b*(alpha - last_alpha));
+            }
             else
-                last = std::max(mu, alpha + tau1b*(alpha - last_alpha));
+            {
+                first = std::max(mu, alpha + tau1a*(alpha - last_alpha));
+                last  = std::max(mu, alpha + tau1b*(alpha - last_alpha));
+            }
+            
 
 
             // pick a point between first and last by doing some kind of interpolation
@@ -462,7 +469,7 @@ namespace dlib
                 // looks like the first derivative is discontinuous and stop if so.  The
                 // current alpha is plenty good enough in this case.
                 const double second_der = std::abs(a_val_der-b_val_der)/std::abs(a-b);
-                if (second_der > 1e5)
+                if (std::abs(a-b) < 1e-8 && second_der > 1e7)
                     return alpha;
 
                 if ( (b-a)*val_der >= 0)
