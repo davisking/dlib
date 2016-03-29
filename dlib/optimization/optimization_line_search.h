@@ -453,6 +453,14 @@ namespace dlib
                 return b;
             }
 
+            // If alpha has basically become zero then just stop.  Think of it like this,
+            // if we take the largest possible alpha step will the objective function
+            // change at all?  If not then there isn't any point looking for a better
+            // alpha.
+            const double max_possible_alpha = std::max(std::abs(a),std::abs(b));
+            if (std::abs(max_possible_alpha*d0) <= std::abs(f0)*std::numeric_limits<double>::epsilon())
+                return alpha;
+
 
             if (val > f0 + rho*alpha*d0 || val >= a_val)
             {
@@ -463,13 +471,6 @@ namespace dlib
             else
             {
                 if (std::abs(val_der) <= thresh)
-                    return alpha;
-                // If we are optimizing a function that doesn't have continuous first
-                // derivatives then val_der might not ever go below thresh.  So check if it
-                // looks like the first derivative is discontinuous and stop if so.  The
-                // current alpha is plenty good enough in this case.
-                const double second_der = std::abs(a_val_der-b_val_der)/std::abs(a-b);
-                if (std::abs(a-b) < 1e-8 && second_der > 1e7)
                     return alpha;
 
                 if ( (b-a)*val_der >= 0)
