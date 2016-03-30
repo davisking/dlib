@@ -33,6 +33,7 @@ namespace dlib
             detection_window_size = 80*80;
             C = 1;
             epsilon = 0.01;
+            upsample_limit = 2;
         }
 
         bool be_verbose;
@@ -41,6 +42,7 @@ namespace dlib
         unsigned long detection_window_size;
         double C;
         double epsilon;
+        unsigned long upsample_limit;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -175,7 +177,7 @@ namespace dlib
         // upsample the images at most two times to help make the boxes obtainable.
         std::vector<std::vector<rectangle> > temp(boxes), removed;
         removed = remove_unobtainable_rectangles(trainer, images, temp);
-        while (impl::contains_any_boxes(removed) && upsampling_amount < 2)
+        while (impl::contains_any_boxes(removed) && upsampling_amount < options.upsample_limit)
         {
             ++upsampling_amount;
             if (options.be_verbose)
