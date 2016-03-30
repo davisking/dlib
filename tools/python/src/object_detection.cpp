@@ -159,7 +159,15 @@ solver more accurate but might take longer to train.")
                                      &type::num_threads,
 "train_simple_object_detector() will use this many threads of \n\
 execution.  Set this to the number of CPU cores on your machine to \n\
-obtain the fastest training speed.");
+obtain the fastest training speed.")
+        .add_property("upsample_limit", &type::upsample_limit,
+                                        &type::upsample_limit,
+"train_simple_object_detector() will upsample images if needed \n\
+no more than upsample_limit times. Value 0 will forbid trainer to \n\
+upsample any images. If trainer is unable to fit all boxes with \n\
+required upsample_limit, exception will be thrown. Higher values \n\
+of upsample_limit exponentially increases memory requiremens. \n\
+Values higher than 2 (default) are not recommended.");
     }
     {
     typedef simple_test_results type;
