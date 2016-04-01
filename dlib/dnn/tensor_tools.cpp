@@ -517,6 +517,36 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void prelu (
+        tensor& dest,
+        const tensor& src,
+        const tensor& param
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::prelu(dest, src, param);
+#else
+        cpu::prelu(dest, src, param);
+#endif
+    }
+
+    void prelu_gradient (
+        tensor& grad,
+        const tensor& src,
+        const tensor& gradient_input,
+        const tensor& param,
+        tensor& params_grad 
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::prelu_gradient(grad, src, gradient_input, param, params_grad);
+#else
+        cpu::prelu_gradient(grad, src, gradient_input, param, params_grad);
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void tanh (
         tensor& dest,
         const tensor& src

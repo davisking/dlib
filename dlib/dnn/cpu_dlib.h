@@ -235,6 +235,22 @@ namespace dlib
             const tensor& gradient_input
         );
 
+    // ----------------------------------------------------------------------------------------
+
+        void prelu (
+            tensor& dest,
+            const tensor& src,
+            const tensor& param
+        );
+
+        void prelu_gradient (
+            tensor& grad,
+            const tensor& src,
+            const tensor& gradient_input,
+            const tensor& param,
+            tensor& params_grad 
+        );
+
     // ------------------------------------------------------------------------------------
 
         void tanh (

@@ -1160,6 +1160,54 @@ namespace dlib
             }
         }
 
+    // ----------------------------------------------------------------------------------------
+
+        void prelu (
+            tensor& dest,
+            const tensor& src,
+            const tensor& param
+        )
+        {
+            const float p = param.host()[0];
+            const float* s = src.host();
+            float* d = dest.host();
+            for (size_t i = 0; i < dest.size(); ++i)
+            {
+                if (s[i] > 0)
+                    d[i] = s[i];
+                else
+                    d[i] = p*s[i];
+            }
+        }
+
+        void prelu_gradient (
+            tensor& grad,
+            const tensor& src,
+            const tensor& gradient_input,
+            const tensor& param,
+            tensor& params_grad 
+        )
+        {
+            const float p = param.host()[0];
+            const float* gi = gradient_input.host();
+            const float* s = src.host();
+            float* out = grad.host();
+            float pgrad = 0;
+            for (size_t i = 0; i < src.size(); ++i)
+            {
+                if (s[i] > 0)
+                {
+                    out[i] += gi[i];
+                }
+                else
+                {
+                    out[i] += p*gi[i];
+                    pgrad += gi[i]*s[i];
+                }
+            }
+            params_grad.host()[0] = pgrad;
+        }
+
     // ------------------------------------------------------------------------------------
 
         void tanh (

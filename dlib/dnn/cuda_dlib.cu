@@ -538,7 +538,69 @@ namespace dlib
             launch_kernel(_cuda_dot, max_jobs(a.size()), a.device(), b.device(), a.size(), result.device()+idx);
         }
 
-        // ----------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_prelu(const float* s, float* d, size_t n, const float* pp)
+        {
+            const float p = *pp;
+            for (auto i : grid_stride_range(0, n))
+            {
+                if (s[i] > 0)
+                    d[i] = s[i];
+                else
+                    d[i] = p*s[i];
+            }
+        }
+
+        void prelu (
+            tensor& dest,
+            const tensor& src,
+            const tensor& param
+        )
+        {
+            launch_kernel(_cuda_prelu, max_jobs(dest.size()), 
+                src.device(), dest.device(), src.size(), param.device());
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_prelu_gradient(float* out, const float* s, const float* gi, size_t n, const float* pp, float* ppgrad)
+        {
+            const float p = *pp;
+            float pgrad = 0;
+            for(auto i : grid_stride_range(0, n))
+            {
+                if (s[i] > 0)
+                {
+                    out[i] += gi[i];
+                }
+                else
+                {
+                    out[i] += p*gi[i];
+                    pgrad += gi[i]*s[i];
+                }
+            }
+
+            // Then do the warp reduce add thing to merge into one output value.
+            warp_reduce_atomic_add(*ppgrad, pgrad);
+        }
+
+        void prelu_gradient (
+            tensor& grad,
+            const tensor& src,
+            const tensor& gradient_input,
+            const tensor& param,
+            tensor& params_grad 
+        )
+        {
+            params_grad = 0;
+            launch_kernel(_cuda_prelu_gradient, max_jobs(grad.size()), 
+                grad.device(), src.device(), gradient_input.device(), grad.size(),
+                param.device(), params_grad.device());
+        }
+
+    // ----------------------------------------------------------------------------------------
+
     }
 }
 

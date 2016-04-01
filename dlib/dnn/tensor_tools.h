@@ -898,6 +898,48 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void prelu (
+        tensor& dest,
+        const tensor& src,
+        const tensor& param
+    );
+    /*!
+        requires
+            - have_same_dimensions(dest, src) == true
+            - param.size() == 1
+        ensures
+            - for all valid i:
+                - if (src.host()[i] > 0) then
+                    - #dest.host()[i] == src.host()[i]
+                - else
+                    - #dest.host()[i] == src.host()[i] * param.host()[0]
+            - This function supports in-place operation, i.e. having
+              is_same_object(dest, src)==true
+    !*/
+
+    void prelu_gradient (
+        tensor& grad,
+        const tensor& src,
+        const tensor& gradient_input,
+        const tensor& param,
+        tensor& params_grad 
+    );
+    /*!
+        requires
+            - have_same_dimensions(grad,src) == true 
+            - have_same_dimensions(grad,gradient_input) == true 
+            - param.size() == 1
+            - params_grad.size() == 1
+        ensures
+            - Recalling that dest is the output of prelu(dest,src,param) let 
+              f(src,param) == dot(gradient_input,dest)
+            - Then this function computes the gradient of f() with respect to src and
+              param.  It assigns the gradient with respect to param to #params_grad and
+              adds the gradient with respect to src to #grad.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     void tanh (
         tensor& dest,
         const tensor& src

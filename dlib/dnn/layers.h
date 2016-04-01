@@ -1121,6 +1121,73 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class prelu_
+    {
+    public:
+        explicit prelu_(
+            float initial_param_value_ = 0.25
+        ) : initial_param_value(initial_param_value_)
+        {
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& /*sub*/)
+        {
+            params.set_size(1);
+            params = initial_param_value;
+        }
+
+        template <typename SUBNET>
+        void forward(
+            const SUBNET& sub, 
+            resizable_tensor& data_output
+        )
+        {
+            data_output.copy_size(sub.get_output());
+            tt::prelu(data_output, sub.get_output(), params);
+        }
+
+        template <typename SUBNET>
+        void backward(
+            const tensor& gradient_input, 
+            SUBNET& sub, 
+            tensor& params_grad
+        )
+        {
+            tt::prelu_gradient(sub.get_gradient_input(), sub.get_output(), 
+                gradient_input, params, params_grad);
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const prelu_& item, std::ostream& out)
+        {
+            serialize("prelu_", out);
+            serialize(item.params, out);
+            serialize(item.initial_param_value, out);
+        }
+
+        friend void deserialize(prelu_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "prelu_")
+                throw serialization_error("Unexpected version found while deserializing dlib::prelu_.");
+            deserialize(item.params, in);
+            deserialize(item.initial_param_value, in);
+        }
+
+    private:
+        resizable_tensor params;
+        float initial_param_value;
+    };
+
+    template <typename SUBNET>
+    using prelu = add_layer<prelu_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class sig_
     {
     public:

@@ -1068,6 +1068,55 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class prelu_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
+                In particular, it defines a parametric rectified linear layer.  Therefore,
+                it passes its inputs through the function 
+                    f(x) = x>0 ? x : p*x 
+                where f() is applied pointwise across the input tensor and p is a scalar
+                parameter learned by this layer.
+
+
+                This is the layer type introduced in the paper:
+                    He, Kaiming, et al. "Delving deep into rectifiers: Surpassing
+                    human-level performance on imagenet classification." Proceedings of the
+                    IEEE International Conference on Computer Vision. 2015.
+        !*/
+
+    public:
+
+        explicit prelu_(
+            float initial_param_value = 0.25
+        );
+        /*!
+            ensures
+                - The p parameter will be initialized with initial_param_value.
+        !*/
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        void forward_inplace(const tensor& input, tensor& output);
+        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+        !*/
+    };
+
+    void serialize(const prelu_& item, std::ostream& out);
+    void deserialize(prelu_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
+    template <typename SUBNET>
+    using prelu = add_layer<prelu_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class sig_
     {
         /*!
