@@ -919,10 +919,9 @@ namespace dlib
         } 
 
         void backward_inplace(
-            const tensor& computed_output,
             const tensor& gradient_input, 
             tensor& data_grad, 
-            tensor& params_grad
+            tensor& /*params_grad*/
         )
         {
             auto g = gamma(params,0);
