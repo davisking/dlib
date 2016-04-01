@@ -1146,6 +1146,11 @@ namespace
         }
         {
             print_spinner();
+            prelu_ l;
+            DLIB_TEST_MSG(test_layer(l), test_layer(l));
+        }
+        {
+            print_spinner();
             sig_ l;
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
