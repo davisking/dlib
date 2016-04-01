@@ -927,26 +927,20 @@ namespace dlib
         {
             auto g = gamma(params,0);
             auto b = beta(params,gamma.size());
-            auto g_grad = gamma(params_grad,0);
-            auto b_grad = beta(params_grad,gamma.size());
 
             // We are computing the gradient of dot(gradient_input, computed_output*g + b)
             if (mode == FC_MODE)
             {
                 tt::multiply(data_grad, gradient_input, g);
-                tt::multiply(g_grad, gradient_input, computed_output);
-                tt::assign_bias_gradient(b_grad, gradient_input);
             }
             else
             {
                 tt::multiply_conv(data_grad, gradient_input, g);
-                tt::multiply_conv(g_grad, gradient_input, computed_output);
-                tt::assign_conv_bias_gradient(b_grad, gradient_input);
             }
         }
 
-        const tensor& get_layer_params() const { return params; }
-        tensor& get_layer_params() { return params; }
+        const tensor& get_layer_params() const { return empty_params; }
+        tensor& get_layer_params() { return empty_params; }
 
         friend void serialize(const affine_& item, std::ostream& out)
         {
@@ -983,7 +977,7 @@ namespace dlib
         }
 
     private:
-        resizable_tensor params; 
+        resizable_tensor params, empty_params; 
         alias_tensor gamma, beta;
         layer_mode mode;
     };

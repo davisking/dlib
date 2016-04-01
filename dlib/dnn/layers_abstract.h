@@ -751,6 +751,13 @@ namespace dlib
                 or
                     OUTPUT(n,k,r,c) == A(1,k,1,1)*INPUT(n,k,r,c)+B(1,k,1,1)
                 as appropriate.
+
+
+                Finally, note that the parameters of this layer are not learnable and
+                therefore not modified during network updates.  Instead, the layer will
+                perform the identity transformation unless it is initialized with a bn_
+                layer, in which case it will perform whatever transformation the bn_ layer
+                has learned.
         !*/
 
     public:
@@ -796,6 +803,8 @@ namespace dlib
         tensor& get_layer_params(); 
         /*!
             These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+            Also note that get_layer_params() always returns an empty tensor since there
+            are no learnable parameters in this object.
         !*/
     };
 
