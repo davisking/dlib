@@ -72,6 +72,18 @@ namespace dlib
             return w(0);
         }
 
+        double intercept (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 0,
+                "\t double running_gradient::intercept()"
+                << "\n\t You must add more values into this object before calling this function."
+                << "\n\t this: " << this
+                );
+
+            return w(1);
+        }
         double standard_error ( 
         ) const
         {

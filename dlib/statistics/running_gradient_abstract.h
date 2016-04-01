@@ -65,6 +65,19 @@ namespace dlib
                   of this line.
         !*/
 
+        double intercept (
+        ) const;
+        /*!
+            requires
+                - current_n() > 0
+            ensures
+                - This class fits a line to the time series data given to add().  This
+                  function returns the intercept of that line while gradient() returns the
+                  slope of that line.  This means that, for example, the next point that
+                  add() will see, as predicted by this best fit line, is the value
+                  intercept() + current_n()*gradient().
+        !*/
+
         double standard_error ( 
         ) const;
         /*!
