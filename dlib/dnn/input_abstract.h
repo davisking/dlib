@@ -152,6 +152,89 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class input_rgb_image
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This input layer works with RGB images of type matrix<rgb_pixel>.  It is
+                very similar to the dlib::input layer except that it allows you to subtract
+                the average color value from each color channel when convting an image to a
+                tensor.
+        !*/
+    public:
+        typedef matrix<rgb_pixel> input_type;
+        const static unsigned int sample_expansion_factor = 1;
+
+        input_rgb_image (
+        );
+        /*!
+            ensures
+                - #get_avg_red()   == 122.782
+                - #get_avg_green() == 117.001
+                - #get_avg_blue()  == 104.298
+        !*/
+
+        input_rgb_image (
+            float avg_red,
+            float avg_green,
+            float avg_blue
+        ); 
+        /*!
+            ensures
+                - #get_avg_red() == avg_red
+                - #get_avg_green() == avg_green
+                - #get_avg_blue() == avg_blue
+        !*/
+
+        float get_avg_red(
+        ) const;
+        /*!
+            ensures
+                - returns the value subtracted from the red color channel.
+        !*/
+
+        float get_avg_green(
+        ) const;
+        /*!
+            ensures
+                - returns the value subtracted from the green color channel.
+        !*/
+
+        float get_avg_blue(
+        ) const;
+        /*!
+            ensures
+                - returns the value subtracted from the blue color channel.
+        !*/
+
+        template <typename input_iterator>
+        void to_tensor (
+            input_iterator ibegin,
+            input_iterator iend,
+            resizable_tensor& data
+        ) const;
+        /*!
+            requires
+                - [ibegin, iend) is an iterator range over input_type objects.
+                - std::distance(ibegin,iend) > 0
+                - The input range should contain images that all have the same
+                  dimensions.
+            ensures
+                - Converts the iterator range into a tensor and stores it into #data.  In
+                  particular, if the input images have R rows, C columns then we will have:
+                    - #data.num_samples() == std::distance(ibegin,iend)
+                    - #data.nr() == R
+                    - #data.nc() == C
+                    - #data.k() == 3
+                  Moreover, each color channel is normalized by having its average value
+                  subtracted (accroding to get_avg_red(), get_avg_green(), or
+                  get_avg_blue()) and then is divided by 256.0.
+        !*/
+    };
+
+    void serialize(const input_rgb_image& item, std::ostream& out);
+    void deserialize(input_rgb_image& item, std::istream& in);
+
 }
 
 #endif // DLIB_DNn_INPUT_ABSTRACT_H_
