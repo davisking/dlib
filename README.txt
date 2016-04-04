@@ -41,11 +41,13 @@ in dlib/LICENSE.txt.  The long and short of the license is that you can use
 dlib however you like, even in closed source commercial software.
 
 Dlib Sponsors:
-  This research is based upon work supported by the Office of the Director of
-  National Intelligence (ODNI), Intelligence Advanced Research Projects Activity (IARPA)
-  under contract number 2014-14071600010. The views and conclusions contained
-  herein are those of the authors and should not be interpreted as necessarily representing
-  the official policies or endorsements, either expressed or implied, of ODNI, IARPA, or the
-  U.S. Government.  The U.S. Government is authorized to reproduce and distribute reprints
-  for Governmental purpose notwithstanding any copyright annotation thereon.
+  This research is based in part upon work supported by the Office of the
+  Director of National Intelligence (ODNI), Intelligence Advanced Research
+  Projects Activity (IARPA) under contract number 2014-14071600010. The
+  views and conclusions contained herein are those of the authors and
+  should not be interpreted as necessarily representing the official policies
+  or endorsements, either expressed or implied, of ODNI, IARPA, or the U.S.
+  Government.  The U.S. Government is authorized to reproduce and distribute
+  reprints for Governmental purpose notwithstanding any copyright annotation
+  thereon.
 
