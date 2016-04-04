@@ -47,7 +47,5 @@ Dlib Sponsors:
   views and conclusions contained herein are those of the authors and
   should not be interpreted as necessarily representing the official policies
   or endorsements, either expressed or implied, of ODNI, IARPA, or the U.S.
-  Government.  The U.S. Government is authorized to reproduce and distribute
-  reprints for Governmental purpose notwithstanding any copyright annotation
-  thereon.
+  Government.  
 
