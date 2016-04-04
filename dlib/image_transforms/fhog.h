@@ -21,16 +21,16 @@ namespace dlib
 
     namespace impl_fhog
     {
-        template <typename image_type>
+        template <typename image_type, typename T>
         inline typename dlib::enable_if_c<pixel_traits<typename image_type::pixel_type>::rgb>::type get_gradient (
             const int r,
             const int c,
             const image_type& img,
-            matrix<double,2,1>& grad,
-            double& len
+            matrix<T,2,1>& grad,
+            T& len
         )
         {
-            matrix<double,2,1> grad2, grad3;
+            matrix<T, 2, 1> grad2, grad3;
             // get the red gradient
             grad(0) = (int)img[r][c+1].red-(int)img[r][c-1].red; 
             grad(1) = (int)img[r+1][c].red-(int)img[r-1][c].red;
@@ -39,12 +39,12 @@ namespace dlib
             // get the green gradient
             grad2(0) = (int)img[r][c+1].green-(int)img[r][c-1].green; 
             grad2(1) = (int)img[r+1][c].green-(int)img[r-1][c].green;
-            double v2 = length_squared(grad2);
+            T v2 = length_squared(grad2);
 
             // get the blue gradient
             grad3(0) = (int)img[r][c+1].blue-(int)img[r][c-1].blue; 
             grad3(1) = (int)img[r+1][c].blue-(int)img[r-1][c].blue;
-            double v3 = length_squared(grad3);
+            T v3 = length_squared(grad3);
 
             // pick color with strongest gradient
             if (v2 > len) 
@@ -144,13 +144,13 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        template <typename image_type>
+        template <typename image_type, typename T>
         inline typename dlib::disable_if_c<pixel_traits<typename image_type::pixel_type>::rgb>::type get_gradient (
             const int r,
             const int c,
             const image_type& img,
-            matrix<double,2,1>& grad,
-            double& len
+            matrix<T, 2, 1>& grad,
+            T& len
         )
         {
             grad(0) = (int)get_pixel_intensity(img[r][c+1])-(int)get_pixel_intensity(img[r][c-1]); 
@@ -200,7 +200,7 @@ namespace dlib
             int o,
             int x, 
             int y,
-            const double& value
+            const T& value
         )
         {
             hog[o][y][x] = value;
@@ -255,7 +255,7 @@ namespace dlib
             int o,
             int x, 
             int y,
-            const double& value
+            const T& value
         )
         {
             hog[y][x](o) = value;
@@ -336,7 +336,7 @@ namespace dlib
 
 
             // unit vectors used to compute gradient orientation
-            matrix<double,2,1> directions[9];
+            matrix<float,2,1> directions[9];
             directions[0] =  1.0000, 0.0000; 
             directions[1] =  0.9397, 0.3420;
             directions[2] =  0.7660, 0.6428;
@@ -417,16 +417,16 @@ namespace dlib
                 // Now process the right columns that don't fit into simd registers.
                 for (; x < visible_nc; x++) 
                 {
-                    matrix<double,2,1> grad;
-                    double v;
+                    matrix<float,2,1> grad;
+                    float v;
                     get_gradient(y,x,img,grad,v);
 
                     // snap to one of 18 orientations
-                    double best_dot = 0;
+                    float best_dot = 0;
                     int best_o = 0;
                     for (int o = 0; o < 9; o++) 
                     {
-                        const double dot = dlib::dot(directions[o], grad); 
+                        const float dot = dlib::dot(directions[o], grad);
                         if (dot > best_dot) 
                         {
                             best_dot = dot;
@@ -444,7 +444,7 @@ namespace dlib
                 }
             }
 
-            const double eps = 0.0001;
+            const float eps = 0.0001;
             // compute features
             for (int y = 0; y < hog_nr; y++) 
             {
@@ -572,7 +572,7 @@ namespace dlib
             }
 
             // unit vectors used to compute gradient orientation
-            matrix<double,2,1> directions[9];
+            matrix<float,2,1> directions[9];
             directions[0] =  1.0000, 0.0000; 
             directions[1] =  0.9397, 0.3420;
             directions[2] =  0.7660, 0.6428;
@@ -586,8 +586,8 @@ namespace dlib
 
 
             // First we allocate memory for caching orientation histograms & their norms.
-            const int cells_nr = (int)((double)img.nr()/(double)cell_size + 0.5);
-            const int cells_nc = (int)((double)img.nc()/(double)cell_size + 0.5);
+            const int cells_nr = (int)((float)img.nr()/(float)cell_size + 0.5);
+            const int cells_nc = (int)((float)img.nc()/(float)cell_size + 0.5);
 
             if (cells_nr == 0 || cells_nc == 0)
             {
@@ -629,10 +629,10 @@ namespace dlib
             // First populate the gradient histograms
             for (int y = 1; y < visible_nr; y++) 
             {
-                const double yp = ((double)y+0.5)/(double)cell_size - 0.5;
+                const float yp = ((float)y+0.5)/(float)cell_size - 0.5;
                 const int iyp = (int)std::floor(yp);
-                const double vy0 = yp-iyp;
-                const double vy1 = 1.0-vy0;
+                const float vy0 = yp - iyp;
+                const float vy1 = 1.0 - vy0;
                 int x;
                 for (x = 1; x < visible_nc-3; x+=4) 
                 {
@@ -708,16 +708,16 @@ namespace dlib
                 // Now process the right columns that don't fit into simd registers.
                 for (; x < visible_nc; x++) 
                 {
-                    matrix<double,2,1> grad;
-                    double v;
+                    matrix<float, 2, 1> grad;
+					float v;
                     get_gradient(y,x,img,grad,v);
 
                     // snap to one of 18 orientations
-                    double best_dot = 0;
+                    float best_dot = 0;
                     int best_o = 0;
                     for (int o = 0; o < 9; o++) 
                     {
-                        const double dot = dlib::dot(directions[o], grad); 
+                        const float dot = dlib::dot(directions[o], grad);
                         if (dot > best_dot) 
                         {
                             best_dot = dot;
@@ -732,10 +732,10 @@ namespace dlib
 
                     v = std::sqrt(v);
                     // add to 4 histograms around pixel using bilinear interpolation
-                    const double xp = ((double)x+0.5)/(double)cell_size - 0.5;
+                    const float xp = ((double)x + 0.5) / (double)cell_size - 0.5;
                     const int ixp = (int)std::floor(xp);
-                    const double vx0 = xp-ixp;
-                    const double vx1 = 1.0-vx0;
+                    const float vx0 = xp - ixp;
+                    const float vx1 = 1.0 - vx0;
 
                     hist[iyp+1][ixp+1](best_o) += vy1*vx1*v;
                     hist[iyp+1+1][ixp+1](best_o) += vy0*vx1*v;
@@ -756,7 +756,7 @@ namespace dlib
                 }
             }
 
-            const double eps = 0.0001;
+            const float eps = 0.0001;
             // compute features
             for (int y = 0; y < hog_nr; y++) 
             {
@@ -930,14 +930,14 @@ namespace dlib
     template <
         typename image_type
         >
-    matrix<double,0,1> extract_fhog_features(
+    matrix<float,0,1> extract_fhog_features(
         const image_type& img, 
         int cell_size = 8,
         int filter_rows_padding = 1,
         int filter_cols_padding = 1
     )
     {
-        matrix<double,0,1> feats;
+        matrix<float, 0, 1> feats;
         extract_fhog_features(img, feats, cell_size, filter_rows_padding, filter_cols_padding);
         return feats;
     }
@@ -1093,7 +1093,7 @@ namespace dlib
             }
         }
 
-        const double thresh = mean(himg) + 4*stddev(himg);
+        const float thresh = mean(himg) + 4 * stddev(himg);
         if (thresh != 0)
             return matrix_cast<unsigned char>(upperbound(round(himg*255/thresh),255));
         else
@@ -1178,7 +1178,7 @@ namespace dlib
             }
         }
 
-        const double thresh = mean(himg) + 4*stddev(himg);
+        const float thresh = mean(himg) + 4 * stddev(himg);
         if (thresh != 0)
             return matrix_cast<unsigned char>(upperbound(round(himg*255/thresh),255));
         else
