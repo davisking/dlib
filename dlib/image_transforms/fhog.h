@@ -709,7 +709,7 @@ namespace dlib
                 for (; x < visible_nc; x++) 
                 {
                     matrix<float, 2, 1> grad;
-					float v;
+                    float v;
                     get_gradient(y,x,img,grad,v);
 
                     // snap to one of 18 orientations
