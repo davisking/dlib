@@ -188,6 +188,7 @@ namespace dlib
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
             void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_persistent()       {DLIB_CASSERT(false, "This function should never be called."); }
 #endif
 
         private:
@@ -257,6 +258,7 @@ namespace dlib
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
             void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_persistent()       {DLIB_CASSERT(false, "This function should never be called."); }
 #endif
 
         private:
@@ -338,6 +340,7 @@ namespace dlib
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
             void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_persistent()       {DLIB_CASSERT(false, "This function should never be called."); }
 #endif
 
         private:
@@ -422,6 +425,7 @@ namespace dlib
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
             void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_persistent()       {DLIB_CASSERT(false, "This function should never be called."); }
 #endif
 
         private:
@@ -508,6 +512,7 @@ namespace dlib
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
             void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_persistent()       {DLIB_CASSERT(false, "This function should never be called."); }
 #endif
         private:
             T* data;
@@ -630,6 +635,7 @@ namespace dlib
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
             void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_persistent()       {DLIB_CASSERT(false, "This function should never be called."); }
 #endif
 
         private:
@@ -699,6 +705,7 @@ namespace dlib
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
             void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_persistent()       {DLIB_CASSERT(false, "This function should never be called."); }
 #endif
 
         private:
@@ -780,6 +787,7 @@ namespace dlib
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
             void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_persistent()       {DLIB_CASSERT(false, "This function should never be called."); }
 #endif
 
         private:
@@ -864,6 +872,7 @@ namespace dlib
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
             void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_persistent()       {DLIB_CASSERT(false, "This function should never be called."); }
 #endif
 
         private:
@@ -930,6 +939,7 @@ namespace dlib
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
             void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_persistent()       {DLIB_CASSERT(false, "This function should never be called."); }
 #endif
 
             long nr (
@@ -1030,6 +1040,10 @@ namespace dlib
             {
                 DLIB_CASSERT(mem == 0,"You can't convert a persistent matlab array to non-persistent.");
                 make_persistent = false;
+            }
+            bool _private_is_persistent()
+            {
+                return make_persistent;
             }
 
             void swap(
@@ -1152,6 +1166,10 @@ namespace dlib
             {
                 DLIB_CASSERT(mem == 0,"You can't convert a persistent matlab array to non-persistent.");
                 make_persistent = false;
+            }
+            bool _private_is_persistent()
+            {
+                return make_persistent;
             }
 
             void swap(

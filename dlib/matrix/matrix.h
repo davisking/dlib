@@ -1114,14 +1114,42 @@ namespace dlib
 #ifdef DLIB_HAS_RVALUE_REFERENCES
         matrix(matrix&& item)
         {
+        #ifdef MATLAB_MEX_FILE
+            // You can't move memory around when compiled in a matlab mex file and the
+            // different locations have different persistence settings.
+            if (data._private_is_persistent() == item.data._private_is_persistent())
+            {
+                swap(item);
+            }
+            else
+            {
+                data.set_size(item.nr(),item.nc());
+                matrix_assign(*this, item);
+            }
+        #else
             swap(item);
+        #endif
         }
 
         matrix& operator= (
             matrix&& rhs
         )
         {
+        #ifdef MATLAB_MEX_FILE
+            // You can't move memory around when compiled in a matlab mex file and the
+            // different locations have different persistence settings.
+            if (data._private_is_persistent() == rhs.data._private_is_persistent())
+            {
+                swap(rhs);
+            }
+            else
+            {
+                data.set_size(rhs.nr(),rhs.nc());
+                matrix_assign(*this, rhs);
+            }
+        #else
             swap(rhs);
+        #endif
             return *this;
         }
 #endif
