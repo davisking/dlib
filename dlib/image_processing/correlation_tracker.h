@@ -123,12 +123,12 @@ namespace dlib
         double update_noscale(
             const image_type& img,
             const drectangle& guess
-            )
+        )
         {
             DLIB_CASSERT(get_position().is_empty() == false,
                 "\t double correlation_tracker::update()"
                 << "\n\t You must call start_track() first before calling update()."
-                );
+            );
 
 
             const point_transform_affine tform = make_chip(img, guess, F);
@@ -138,36 +138,36 @@ namespace dlib
             // use the current filter to predict the object's location
             G = 0;
             for (unsigned long i = 0; i < F.size(); ++i)
-                G += pointwise_multiply(F[i], conj(A[i]));
-            G = pointwise_multiply(G, reciprocal(B + get_regularizer_space()));
+                G += pointwise_multiply(F[i],conj(A[i]));
+            G = pointwise_multiply(G, reciprocal(B+get_regularizer_space()));
             ifft_inplace(G);
-            const dlib::vector<double, 2> pp = max_point_interpolated(real(G));
+            const dlib::vector<double,2> pp = max_point_interpolated(real(G));
 
 
             // Compute the peak to side lobe ratio.
             const point p = pp;
             running_stats<double> rs;
-            const rectangle peak = centered_rect(p, 8, 8);
+            const rectangle peak = centered_rect(p, 8,8);
             for (long r = 0; r < G.nr(); ++r)
             {
                 for (long c = 0; c < G.nc(); ++c)
                 {
-                    if (!peak.contains(point(c, r)))
-                        rs.add(G(r, c).real());
+                    if (!peak.contains(point(c,r)))
+                        rs.add(G(r,c).real());
                 }
             }
-            const double psr = (G(p.y(), p.x()).real() - rs.mean()) / rs.stddev();
+            const double psr = (G(p.y(),p.x()).real()-rs.mean())/rs.stddev();
 
             // update the position of the object
-            position = translate_rect(guess, tform(pp) - center(guess));
+            position = translate_rect(guess, tform(pp)-center(guess));
 
             // now update the position filters
             make_target_location_image(pp, G);
-            B *= (1 - get_nu_space());
+            B *= (1-get_nu_space());
             for (unsigned long i = 0; i < F.size(); ++i)
             {
-                A[i] = get_nu_space()*pointwise_multiply(G, F[i]) + (1 - get_nu_space())*A[i];
-                B += get_nu_space()*(squared(real(F[i])) + squared(imag(F[i])));
+                A[i] = get_nu_space()*pointwise_multiply(G, F[i]) + (1-get_nu_space())*A[i];
+                B += get_nu_space()*(squared(real(F[i]))+squared(imag(F[i])));
             }
 
             return psr;
