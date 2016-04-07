@@ -1,4 +1,4 @@
-// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+// Copyright (C) 2016  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #include "tester.h"
@@ -60,18 +60,21 @@ namespace
             {
                 std::istringstream sin(frames[i]());
                 load_bmp(img, sin);
+
                 double res = tracker.update(img);
                 double correct_res = correct_update_results[i];
                 double res_diff = abs(correct_res - res);
-                // small error possible due to rounding and different optimization options
+
                 drectangle pos = tracker.get_position();
                 drectangle correct_pos = correct_rects[i];
                 drectangle pos_intresect = pos.intersect(correct_pos);
                 double pos_area = pos.area();
                 double intersect_area = pos_intresect.area();
                 double rect_confidence = intersect_area / pos_area;
+                
                 dlog << LINFO << "Frame #" << i << " res: " << res << " correct res: " << correct_res << " pos: " << pos
                     << " correct pos: " << correct_pos << " rect confidence: " << rect_confidence;
+                
                 // small error possible due to rounding and different optimization options
                 DLIB_TEST(res_diff <= 1);
                 DLIB_TEST(rect_confidence >= 0.99);
