@@ -183,7 +183,7 @@ namespace
             DLIB_TEST(is_running() == false);
         }
 
-        ~test4_c2() throw (std::exception)
+        ~test4_c2()
         {
             DLIB_TEST(number_of_threads_registered() == 2);
             DLIB_TEST(number_of_threads_alive() == 2);
