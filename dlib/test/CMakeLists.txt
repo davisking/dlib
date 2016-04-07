@@ -33,6 +33,7 @@ set (tests
    conditioning_class_c.cpp
    conditioning_class.cpp
    config_reader.cpp
+   corellation_tracker.cpp
    crc32.cpp
    create_iris_datafile.cpp
    data_io.cpp
