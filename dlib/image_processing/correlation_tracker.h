@@ -19,8 +19,18 @@ namespace dlib
     {
     public:
 
-        correlation_tracker (
+        correlation_tracker (unsigned long filter_size = 128/2, // must be a power of 2
+            unsigned long num_scale_levels = 32, // must be a power of 2
+            unsigned long scale_window_size = 23,
+            double regularizer_space = 0.001,
+            double nu_space = 0.025,
+            double regularizer_scale = 0.001,
+            double nu_scale = 0.025
         ) 
+            : filter_size(filter_size), num_scale_levels(num_scale_levels), 
+            scale_window_size(scale_window_size),
+            regularizer_space(regularizer_space), nu_space(nu_space), 
+            regularizer_scale(regularizer_scale), nu_scale(nu_scale)
         {
             // Create the cosine mask used for space filtering.
             mask = make_cosine_mask();
@@ -78,23 +88,23 @@ namespace dlib
 
 
         unsigned long get_filter_size (
-        ) const { return 128/2; } // must be power of 2
+        ) const { return filter_size; } // must be power of 2
 
         unsigned long get_num_scale_levels(
-        ) const { return 32; }  // must be power of 2
+        ) const { return num_scale_levels; }  // must be power of 2
 
         unsigned long get_scale_window_size (
-        ) const { return 23; }
+        ) const { return scale_window_size; }
 
         double get_regularizer_space (
-        ) const { return 0.001; }
+        ) const { return regularizer_space; }
         inline double get_nu_space (
-        ) const { return 0.025;}
+        ) const { return nu_space;}
 
         double get_regularizer_scale (
-        ) const { return 0.001; }
+        ) const { return regularizer_scale; }
         double get_nu_scale (
-        ) const { return 0.025;}
+        ) const { return nu_scale;}
 
         drectangle get_position (
         ) const 
@@ -108,16 +118,17 @@ namespace dlib
             return 1.020;
         }
 
+
         template <typename image_type>
-        double update (
+        double update_noscale(
             const image_type& img,
             const drectangle& guess
-        )
+            )
         {
             DLIB_CASSERT(get_position().is_empty() == false,
                 "\t double correlation_tracker::update()"
                 << "\n\t You must call start_track() first before calling update()."
-            );
+                );
 
 
             const point_transform_affine tform = make_chip(img, guess, F);
@@ -125,42 +136,50 @@ namespace dlib
                 fft_inplace(F[i]);
 
             // use the current filter to predict the object's location
-            G = 0; 
+            G = 0;
             for (unsigned long i = 0; i < F.size(); ++i)
-                G += pointwise_multiply(F[i],conj(A[i]));
-            G = pointwise_multiply(G, reciprocal(B+get_regularizer_space()));
+                G += pointwise_multiply(F[i], conj(A[i]));
+            G = pointwise_multiply(G, reciprocal(B + get_regularizer_space()));
             ifft_inplace(G);
-            const dlib::vector<double,2> pp = max_point_interpolated(real(G));
+            const dlib::vector<double, 2> pp = max_point_interpolated(real(G));
 
 
             // Compute the peak to side lobe ratio.
             const point p = pp;
             running_stats<double> rs;
-            const rectangle peak = centered_rect(p, 8,8);
+            const rectangle peak = centered_rect(p, 8, 8);
             for (long r = 0; r < G.nr(); ++r)
             {
                 for (long c = 0; c < G.nc(); ++c)
                 {
-                    if (!peak.contains(point(c,r)))
-                        rs.add(G(r,c).real());
+                    if (!peak.contains(point(c, r)))
+                        rs.add(G(r, c).real());
                 }
             }
-            const double psr = (G(p.y(),p.x()).real()-rs.mean())/rs.stddev();
-
+            const double psr = (G(p.y(), p.x()).real() - rs.mean()) / rs.stddev();
 
             // update the position of the object
-            position = translate_rect(guess,tform(pp)-center(guess));
+            position = translate_rect(guess, tform(pp) - center(guess));
 
             // now update the position filters
             make_target_location_image(pp, G);
-            B *= (1-get_nu_space());
+            B *= (1 - get_nu_space());
             for (unsigned long i = 0; i < F.size(); ++i)
             {
-                A[i] = get_nu_space()*pointwise_multiply(G, F[i]) + (1-get_nu_space())*A[i];
-                B += get_nu_space()*(squared(real(F[i]))+squared(imag(F[i])));
+                A[i] = get_nu_space()*pointwise_multiply(G, F[i]) + (1 - get_nu_space())*A[i];
+                B += get_nu_space()*(squared(real(F[i])) + squared(imag(F[i])));
             }
 
+            return psr;
+        }
 
+        template <typename image_type>
+        double update (
+            const image_type& img,
+            const drectangle& guess
+        )
+        {
+            double psr = update_noscale(img, guess);
 
             // Now predict the scale change
             make_scale_space(img, Fs);
@@ -192,9 +211,17 @@ namespace dlib
         }
 
         template <typename image_type>
-        double update (
+        double update_noscale (
             const image_type& img
         )
+        {
+            return update_noscale(img, get_position());
+        }
+
+        template <typename image_type>
+        double update(
+            const image_type& img
+            )
         {
             return update(img, get_position());
         }
@@ -361,6 +388,14 @@ namespace dlib
         // here just so we can void reallocating them over and over.
         matrix<std::complex<double> > G;
         matrix<std::complex<double>,0,1> Gs;
+
+        unsigned long filter_size;
+        unsigned long num_scale_levels;
+        unsigned long scale_window_size;
+        double regularizer_space;
+        double nu_space;
+        double regularizer_scale;
+        double nu_scale;
     };
 }
 
