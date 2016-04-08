@@ -22,7 +22,7 @@
                 #define DLIB_HAVE_AVX
             #endif
         #endif
-        #if defined(_M_IX86_FP) && _M_IX86_FP >= 2 && !defined(DLIB_HAVE_SSE2)
+        #if (defined( _M_X64) || defined(_M_IX86_FP) && _M_IX86_FP >= 2) && !defined(DLIB_HAVE_SSE2)
             #define DLIB_HAVE_SSE2
         #endif
     #else
