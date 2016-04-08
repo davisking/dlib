@@ -237,6 +237,19 @@ namespace dlib
 
         template <typename ...T>
         add_layer(
+            T&& ...args
+        );
+        /*!
+            ensures
+                - This version of the constructor is only called if layer_details_type
+                  can't be constructed from the first thing in args.  In this case, the
+                  args are simply passed on to the sub layers in their entirety.
+                - #layer_details() == layer_details_type()
+                - #subnet()        == subnet_type(args)
+        !*/
+
+        template <typename ...T>
+        add_layer(
             layer_details_type&& layer_det, 
             T&& ...args
         );

@@ -589,6 +589,25 @@ namespace dlib
                 subnetwork->disable_output_and_gradient_getters();
         }
 
+        template <typename T, typename ...U>
+        struct details_constructable_from : public std::is_constructible<LAYER_DETAILS,T> {};
+
+        template <
+            typename ...T,
+            typename = typename std::enable_if<!details_constructable_from<T...>::value>::type
+            >
+        add_layer(
+            T&& ...args
+        ) : 
+            subnetwork(new subnet_type(std::forward<T>(args)...)),
+            this_layer_setup_called(false),
+            gradient_input_is_stale(true),
+            get_output_and_gradient_input_disabled(false)
+        {
+            if (this_layer_operates_inplace())
+                subnetwork->disable_output_and_gradient_getters();
+        }
+
         template <typename ...T>
         add_layer(
             LAYER_DETAILS&& layer_det, 
