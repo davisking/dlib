@@ -590,7 +590,16 @@ namespace dlib
         }
 
         template <typename T, typename ...U>
-        struct details_constructable_from : public std::is_constructible<LAYER_DETAILS,T> {};
+        struct details_constructable_from 
+        {
+            const static bool value = std::is_constructible<LAYER_DETAILS,T>::value;
+        };
+        template <typename ...T, typename ...U>
+        struct details_constructable_from<std::tuple<T...>,U...>
+        {
+            // just say true so that the constructor below never activates for tuple types.
+            const static bool value = true;
+        };
 
         template <
             typename ...T,
