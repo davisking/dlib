@@ -25,10 +25,23 @@ namespace dlib
 
     public:
 
-        correlation_tracker (
+        explicit correlation_tracker (unsigned long filter_size = 6, 
+            unsigned long num_scale_levels = 5, 
+            unsigned long scale_window_size = 23,
+            double regularizer_space = 0.001,
+            double nu_space = 0.025,
+            double regularizer_scale = 0.001,
+            double nu_scale = 0.025,
+            double scale_pyramid_alpha = 1.020
         );
         /*!
+            requires
+                - p.is_empty() == false
             ensures
+                - Initializes correlation_tracker. Higher value of filter_size and 
+                  num_scale_levels increases tracking precision but requires more CPU 
+                  for processing. Recommended values for filter_size = 5-7, 
+                  default = 6, for num_scale_levels = 4-6, default = 5
                 - #get_position().is_empty() == true
         !*/
 
@@ -61,6 +74,32 @@ namespace dlib
         template <
             typename image_type
             >
+        double update_noscale (
+            const image_type& img,
+            const drectangle& guess
+        );
+        /*!
+            requires
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+                - get_position().is_empty() == false
+                  (i.e. you must have started tracking by calling start_track())
+            ensures
+                - When searching for the object in img, we search in the area around the
+                  provided guess. This function only tracks object position without trying
+                  to track the scale
+                - #get_position() == the new predicted location of the object in img.  This
+                  location will be a copy of guess that has been translated and NOT scaled
+                  appropriately based on the content of img so that it, hopefully, bounds
+                  the object in img.
+                - Returns the peak to side-lobe ratio.  This is a number that measures how
+                  confident the tracker is that the object is inside #get_position().
+                  Larger values indicate higher confidence.
+        !*/
+
+        template <
+            typename image_type
+            >
         double update (
             const image_type& img,
             const drectangle& guess
@@ -83,6 +122,21 @@ namespace dlib
                   Larger values indicate higher confidence.
         !*/
 
+        template <
+            typename image_type
+            >
+        double update_noscale (
+            const image_type& img
+        );
+        /*!
+            requires
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+                - get_position().is_empty() == false
+                  (i.e. you must have started tracking by calling start_track())
+            ensures
+                - performs: return update_noscale(img, get_position())
+        !*/
         template <
             typename image_type
             >
