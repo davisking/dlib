@@ -40,8 +40,8 @@ namespace dlib
             ensures
                 - Initializes correlation_tracker. Higher value of filter_size and 
                   num_scale_levels increases tracking precision but requires more CPU 
-                  for processing. Recommended values for filter_size = 32-256, 
-                  default = 128, for num_scale_levels = 16-64, default = 32
+                  for processing. Recommended values for filter_size = 5-7, 
+                  default = 6, for num_scale_levels = 4-6, default = 5
                 - #get_position().is_empty() == true
         !*/
 
