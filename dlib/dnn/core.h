@@ -562,8 +562,8 @@ namespace dlib
         add_layer(
             const add_layer<T,U,E>& item
         ) :
-            subnetwork(new subnet_type(item.subnet())),
             details(item.layer_details()), 
+            subnetwork(new subnet_type(item.subnet())),
             this_layer_setup_called(item.this_layer_setup_called),
             gradient_input_is_stale(item.gradient_input_is_stale),
             get_output_and_gradient_input_disabled(item.get_output_and_gradient_input_disabled),
