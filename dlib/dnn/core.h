@@ -590,20 +590,24 @@ namespace dlib
         }
 
         template <typename T, typename ...U>
-        struct details_constructable_from 
+        struct disable_forwarding_constr 
         {
             const static bool value = std::is_constructible<LAYER_DETAILS,T>::value;
         };
         template <typename ...T, typename ...U>
-        struct details_constructable_from<std::tuple<T...>,U...>
+        struct disable_forwarding_constr<std::tuple<T...>,U...>
         {
-            // just say true so that the constructor below never activates for tuple types.
+            const static bool value = true;
+        };
+        template <typename ...T>
+        struct disable_forwarding_constr<add_layer<T...>>
+        {
             const static bool value = true;
         };
 
         template <
             typename ...T,
-            typename = typename std::enable_if<!details_constructable_from<T...>::value>::type
+            typename = typename std::enable_if<!disable_forwarding_constr<typename std::remove_reference<T>::type...>::value>::type
             >
         add_layer(
             T&& ...args
