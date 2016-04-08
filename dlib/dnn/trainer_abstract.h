@@ -34,6 +34,10 @@ namespace dlib
                 training data and it will output a new network instance that has hopefully
                 learned something useful from your training data.
 
+                If you are compiling with CUDA then this object will use the GPU that is
+                currently selected (i.e. the one indicated by cudaGetDevice()) when
+                dnn_trainer is constructed.  It will continue to use that device even if
+                you later change it by a call to cudaSetDevice().
         !*/
 
     public:
