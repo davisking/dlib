@@ -5,6 +5,38 @@
 
 #include "tensor_tools.h"
 #include "../string.h"
+#include <atomic>
+
+namespace dlib
+{
+    namespace
+    {
+        std::atomic<bool>& dnn_prefer_fastest_algo (
+        )
+        {
+            static std::atomic<bool> var(true);
+            return var;
+        }
+    }
+
+    bool dnn_prefer_fastest_algorithms (
+    )
+    {
+        return dnn_prefer_fastest_algo();
+    }
+
+    void set_dnn_prefer_fastest_algorithms(
+    )
+    {
+        dnn_prefer_fastest_algo() = true;
+    }
+
+    void set_dnn_prefer_smallest_algorithms(
+    )
+    {
+        dnn_prefer_fastest_algo() = false;
+    }
+}
 
 namespace dlib { namespace tt
 {

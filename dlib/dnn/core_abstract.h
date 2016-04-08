@@ -69,6 +69,31 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    bool dnn_prefer_fastest_algorithms(
+    );
+    /*!
+        ensures
+            - If dlib should prefer to use fast algorithms rather than ones that use less
+              RAM then this function returns true and false otherwise.
+            - On program startup this function will default to true.
+    !*/
+
+    void set_dnn_prefer_fastest_algorithms(
+    );
+    /*!
+        ensures
+            - #dnn_prefer_fastest_algorithms() == true
+    !*/
+
+    void set_dnn_prefer_smallest_algorithms(
+    );
+    /*!
+        ensures
+            - #dnn_prefer_fastest_algorithms() == false 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename T
         >

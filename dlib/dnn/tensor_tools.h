@@ -11,6 +11,13 @@
 #include "cuda_dlib.h"
 #include "../rand.h"
 
+namespace dlib
+{
+    bool dnn_prefer_fastest_algorithms();
+    void set_dnn_prefer_fastest_algorithms();
+    void set_dnn_prefer_smallest_algorithms();
+}
+
 namespace dlib { namespace tt
 {
 

@@ -13,6 +13,7 @@
 #include "cuda_utils.h"
 #include "cpu_dlib.h"
 #include "cuda_dlib.h"
+#include "tensor_tools.h"
 
 static const char* cudnn_get_error_string(cudnnStatus_t s)
 {
@@ -773,7 +774,7 @@ namespace dlib
                         (const cudnnFilterDescriptor_t)filter_handle,
                         (const cudnnConvolutionDescriptor_t)conv_handle,
                         descriptor(dest_desc),
-                        CUDNN_CONVOLUTION_FWD_PREFER_FASTEST, // or CUDNN_CONVOLUTION_FWD_NO_WORKSPACE,
+                        dnn_prefer_fastest_algorithms()?CUDNN_CONVOLUTION_FWD_PREFER_FASTEST:CUDNN_CONVOLUTION_FWD_NO_WORKSPACE,
                         std::numeric_limits<size_t>::max(),
                         &forward_best_algo));
                 forward_algo = forward_best_algo;
@@ -797,7 +798,7 @@ namespace dlib
                         descriptor(dest_desc),
                         (const cudnnConvolutionDescriptor_t)conv_handle,
                         descriptor(data),
-                        CUDNN_CONVOLUTION_BWD_DATA_PREFER_FASTEST,
+                        dnn_prefer_fastest_algorithms()?CUDNN_CONVOLUTION_BWD_DATA_PREFER_FASTEST:CUDNN_CONVOLUTION_BWD_DATA_NO_WORKSPACE,
                         std::numeric_limits<size_t>::max(),
                         &backward_data_best_algo));
                 backward_data_algo = backward_data_best_algo;
@@ -821,7 +822,7 @@ namespace dlib
                         descriptor(dest_desc),
                         (const cudnnConvolutionDescriptor_t)conv_handle,
                         (const cudnnFilterDescriptor_t)filter_handle,
-                        CUDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST,
+                        dnn_prefer_fastest_algorithms()?CUDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST:CUDNN_CONVOLUTION_BWD_FILTER_NO_WORKSPACE,
                         std::numeric_limits<size_t>::max(),
                         &backward_filters_best_algo));
                 backward_filters_algo = backward_filters_best_algo;
