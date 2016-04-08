@@ -25,18 +25,17 @@ namespace dlib
 
     public:
 
-        correlation_tracker (unsigned long filter_size = 128 / 2, 
-            unsigned long num_scale_levels = 32, 
+        explicit correlation_tracker (unsigned long filter_size = 6, 
+            unsigned long num_scale_levels = 5, 
             unsigned long scale_window_size = 23,
             double regularizer_space = 0.001,
             double nu_space = 0.025,
             double regularizer_scale = 0.001,
-            double nu_scale = 0.025
+            double nu_scale = 0.025,
+            double scale_pyramid_alpha = 1.020
         );
         /*!
             requires
-                - filter_size should be a power of 2
-                - num_scale_levels should be a power of 2
                 - p.is_empty() == false
             ensures
                 - Initializes correlation_tracker. Higher value of filter_size and 

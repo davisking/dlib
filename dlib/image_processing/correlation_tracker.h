@@ -19,18 +19,20 @@ namespace dlib
     {
     public:
 
-        correlation_tracker (unsigned long filter_size = 128/2, // must be a power of 2
-            unsigned long num_scale_levels = 32, // must be a power of 2
+        explicit correlation_tracker (unsigned long filter_size = 6, 
+            unsigned long num_scale_levels = 5, 
             unsigned long scale_window_size = 23,
             double regularizer_space = 0.001,
             double nu_space = 0.025,
             double regularizer_scale = 0.001,
-            double nu_scale = 0.025
+            double nu_scale = 0.025,
+            double scale_pyramid_alpha = 1.020
         ) 
-            : filter_size(filter_size), num_scale_levels(num_scale_levels), 
+            : filter_size(1 << filter_size), num_scale_levels(1 << num_scale_levels),
             scale_window_size(scale_window_size),
             regularizer_space(regularizer_space), nu_space(nu_space), 
-            regularizer_scale(regularizer_scale), nu_scale(nu_scale)
+            regularizer_scale(regularizer_scale), nu_scale(nu_scale),
+            scale_pyramid_alpha(scale_pyramid_alpha)
         {
             // Create the cosine mask used for space filtering.
             mask = make_cosine_mask();
@@ -88,10 +90,10 @@ namespace dlib
 
 
         unsigned long get_filter_size (
-        ) const { return filter_size; } // must be power of 2
+        ) const { return filter_size; } 
 
         unsigned long get_num_scale_levels(
-        ) const { return num_scale_levels; }  // must be power of 2
+        ) const { return num_scale_levels; }  
 
         unsigned long get_scale_window_size (
         ) const { return scale_window_size; }
@@ -113,10 +115,7 @@ namespace dlib
         }
 
         double get_scale_pyramid_alpha (
-        ) const
-        {
-            return 1.020;
-        }
+        ) const { return scale_pyramid_alpha; }
 
 
         template <typename image_type>
@@ -396,6 +395,7 @@ namespace dlib
         double nu_space;
         double regularizer_scale;
         double nu_scale;
+        double scale_pyramid_alpha;
     };
 }
 
