@@ -13,15 +13,26 @@ public:
     testme(testme&&) = default;
     testme(const testme&) = delete;
 
+
+    template <typename T>
+    auto auto_return(T f) -> decltype(f(4)) { return f(4); }
+
+    template <typename T>
+    auto auto_return(T f) -> decltype(f()) { return f(); }
+
+    int returnint() { return 0; }
+
     void dostuff()
     {
-        thread_local stuff1 = 999;
+        thread_local int stuff1 = 999;
         auto x = 4;
 
         decltype(x) asdf = 9;
 
-        auto f = [](){ cout << "in a lambda!" << endl; };
+        auto f = []() { cout << "in a lambda!" << endl; };
         f();
+
+        auto_return(returnint);
     }
 
     template <typename ...T>
@@ -30,6 +41,8 @@ public:
     )
     {
     }
+
+
 
     std::shared_ptr<int> asdf;
 };

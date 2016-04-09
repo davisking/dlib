@@ -24,7 +24,7 @@ include(${dlib_path}/add_global_compiler_switch.cmake)
 # Now turn on the appropriate compiler switch to enable C++11 if you have a
 # C++11 compiler.  In CMake 3.1 there is a simple flag you can set, but earlier
 # verions of CMake are not so convenient.
-if (CMAKE_VERSION VERSION_LESS "3.1")
+if (CMAKE_VERSION VERSION_LESS "3.1.2")
    if(CMAKE_COMPILER_IS_GNUCXX)
       execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
       if (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
@@ -61,6 +61,7 @@ else()
        ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_delegating_constructors;" AND
        ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_thread_local;" AND
        ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_constexpr;" AND
+       ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_decltype_incomplete_return_types;" AND
        ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_auto_type;")
 
       set(COMPILER_CAN_DO_CPP_11 1)
