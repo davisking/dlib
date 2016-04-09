@@ -272,7 +272,7 @@ namespace
         dlog << LINFO << "true alpha: "<< trans(true_alpha);
 
         dlog << LINFO << "alpha error: "<< max(abs(alpha-true_alpha));
-        DLIB_TEST(max(abs(alpha-true_alpha)) < 1e-9);
+        DLIB_TEST_MSG(max(abs(alpha-true_alpha)) < 1e-8, max(abs(alpha-true_alpha)));
     }
 
     void test_qp4_test6()
