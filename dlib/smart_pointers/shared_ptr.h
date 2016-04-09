@@ -12,7 +12,8 @@
 
 // Don't warn about the use of std::auto_ptr in this file.  There is a pragma at the end of
 // this file that re-enables the warning.
-#if defined(__GNUC__) && ((__GNUC__ >= 4 && __GNUC_MINOR__ >= 6) || (__GNUC__ > 4))
+#if (defined(__GNUC__) && ((__GNUC__ >= 4 && __GNUC_MINOR__ >= 6) || (__GNUC__ > 4))) || \
+    (defined(__clang__) && ((__clang_major__ >= 3 && __clang_minor__ >= 4)))
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
@@ -527,7 +528,8 @@ namespace dlib
 
 }
 
-#if defined(__GNUC__) && ((__GNUC__ >= 4 && __GNUC_MINOR__ >= 6) || (__GNUC__ > 4))
+#if (defined(__GNUC__) && ((__GNUC__ >= 4 && __GNUC_MINOR__ >= 6) || (__GNUC__ > 4))) || \
+    (defined(__clang__) && ((__clang_major__ >= 3 && __clang_minor__ >= 4)))
 #pragma GCC diagnostic pop
 #endif
 
