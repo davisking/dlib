@@ -19,31 +19,25 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        long _num_filters,
+        long _nr,
+        long _nc,
+        int _stride_y,
+        int _stride_x
+        >
     class con_
     {
     public:
 
-        con_ (
-        ) : 
-            _num_filters(1),
-            _nr(3),
-            _nc(3),
-            _stride_y(1),
-            _stride_x(1)
-        {}
+        static_assert(_num_filters > 0, "The number of filters must be > 0");
+        static_assert(_nr > 0, "The number of rows in a filter must be > 0");
+        static_assert(_nc > 0, "The number of columns in a filter must be > 0");
+        static_assert(_stride_y > 0, "The filter stride must be > 0");
+        static_assert(_stride_x > 0, "The filter stride must be > 0");
 
         con_(
-            long num_filters_,
-            long nr_,
-            long nc_,
-            int stride_y_ = 1,
-            int stride_x_ = 1
-        ) : 
-            _num_filters(num_filters_), 
-            _nr(nr_),
-            _nc(nc_),
-            _stride_y(stride_y_),
-            _stride_x(stride_x_)
+        )  
         {}
 
         long num_filters() const { return _num_filters; }
@@ -56,11 +50,6 @@ namespace dlib
             const con_& item
         ) : 
             params(item.params),
-            _num_filters(item._num_filters), 
-            _nr(item._nr),
-            _nc(item._nc),
-            _stride_y(item._stride_y),
-            _stride_x(item._stride_x),
             filters(item.filters),
             biases(item.biases)
         {
@@ -78,11 +67,6 @@ namespace dlib
             // this->conv is non-copyable and basically stateless, so we have to write our
             // own copy to avoid trying to copy it and getting an error.
             params = item.params;
-            _num_filters = item._num_filters;
-            _nr = item._nr;
-            _nc = item._nc;
-            _stride_y = item._stride_y;
-            _stride_x = item._stride_x;
             filters = item.filters;
             biases = item.biases;
             return *this;
@@ -135,11 +119,11 @@ namespace dlib
         {
             serialize("con_", out);
             serialize(item.params, out);
-            serialize(item._num_filters, out);
-            serialize(item._nr, out);
-            serialize(item._nc, out);
-            serialize(item._stride_y, out);
-            serialize(item._stride_x, out);
+            serialize(_num_filters, out);
+            serialize(_nr, out);
+            serialize(_nc, out);
+            serialize(_stride_y, out);
+            serialize(_stride_x, out);
             serialize(item.filters, out);
             serialize(item.biases, out);
         }
@@ -151,57 +135,66 @@ namespace dlib
             if (version != "con_")
                 throw serialization_error("Unexpected version found while deserializing dlib::con_.");
             deserialize(item.params, in);
-            deserialize(item._num_filters, in);
-            deserialize(item._nr, in);
-            deserialize(item._nc, in);
-            deserialize(item._stride_y, in);
-            deserialize(item._stride_x, in);
+
+
+            long num_filters;
+            long nr;
+            long nc;
+            int stride_y;
+            int stride_x;
+            deserialize(num_filters, in);
+            deserialize(nr, in);
+            deserialize(nc, in);
+            deserialize(stride_y, in);
+            deserialize(stride_x, in);
             deserialize(item.filters, in);
             deserialize(item.biases, in);
+
+            if (num_filters != _num_filters) throw serialization_error("Wrong num_filters found while deserializing dlib::con_");
+            if (nr != _nr) throw serialization_error("Wrong nr found while deserializing dlib::con_");
+            if (nc != _nc) throw serialization_error("Wrong nc found while deserializing dlib::con_");
+            if (stride_y != _stride_y) throw serialization_error("Wrong stride_y found while deserializing dlib::con_");
+            if (stride_x != _stride_x) throw serialization_error("Wrong stride_x found while deserializing dlib::con_");
         }
 
     private:
 
         resizable_tensor params;
-        long _num_filters;
-        long _nr;
-        long _nc;
-        int _stride_y;
-        int _stride_x;
         alias_tensor filters, biases;
 
         tt::tensor_conv conv;
 
     };
 
-    template <typename SUBNET>
-    using con = add_layer<con_, SUBNET>;
+    template <
+        long num_filters,
+        long nr,
+        long nc,
+        int stride_y,
+        int stride_x,
+        typename SUBNET
+        >
+    using con = add_layer<con_<num_filters,nr,nc,stride_y,stride_x>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        long _nr,
+        long _nc,
+        int _stride_y,
+        int _stride_x
+        >
     class max_pool_
     {
+        static_assert(_nr > 0, "The number of rows in a filter must be > 0");
+        static_assert(_nc > 0, "The number of columns in a filter must be > 0");
+        static_assert(_stride_y > 0, "The filter stride must be > 0");
+        static_assert(_stride_x > 0, "The filter stride must be > 0");
     public:
 
-        max_pool_ (
-        ) : 
-            _nr(3),
-            _nc(3),
-            _stride_y(1),
-            _stride_x(1)
-        {}
 
         max_pool_(
-            long nr_,
-            long nc_,
-            int stride_y_ = 1,
-            int stride_x_ = 1
-        ) : 
-            _nr(nr_),
-            _nc(nc_),
-            _stride_y(stride_y_),
-            _stride_x(stride_x_)
-        {}
+        ) {}
 
         long nr() const { return _nr; }
         long nc() const { return _nc; }
@@ -209,12 +202,8 @@ namespace dlib
         long stride_x() const { return _stride_x; }
 
         max_pool_ (
-            const max_pool_& item
-        ) : 
-            _nr(item._nr),
-            _nc(item._nc),
-            _stride_y(item._stride_y),
-            _stride_x(item._stride_x)
+            const max_pool_& 
+        )  
         {
             // this->mp is non-copyable so we have to write our own copy to avoid trying to
             // copy it and getting an error.
@@ -230,11 +219,6 @@ namespace dlib
 
             // this->mp is non-copyable so we have to write our own copy to avoid trying to
             // copy it and getting an error.
-            _nr = item._nr;
-            _nc = item._nc;
-            _stride_y = item._stride_y;
-            _stride_x = item._stride_x;
-
             mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x);
             return *this;
         }
@@ -263,10 +247,10 @@ namespace dlib
         friend void serialize(const max_pool_& item, std::ostream& out)
         {
             serialize("max_pool_", out);
-            serialize(item._nr, out);
-            serialize(item._nc, out);
-            serialize(item._stride_y, out);
-            serialize(item._stride_x, out);
+            serialize(_nr, out);
+            serialize(_nc, out);
+            serialize(_stride_y, out);
+            serialize(_stride_x, out);
         }
 
         friend void deserialize(max_pool_& item, std::istream& in)
@@ -275,53 +259,58 @@ namespace dlib
             deserialize(version, in);
             if (version != "max_pool_")
                 throw serialization_error("Unexpected version found while deserializing dlib::max_pool_.");
-            deserialize(item._nr, in);
-            deserialize(item._nc, in);
-            deserialize(item._stride_y, in);
-            deserialize(item._stride_x, in);
 
-            item.mp.setup_max_pooling(item._nr, item._nc, item._stride_y, item._stride_x);
+            item.mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x);
+
+            long nr;
+            long nc;
+            int stride_y;
+            int stride_x;
+
+            deserialize(nr, in);
+            deserialize(nc, in);
+            deserialize(stride_y, in);
+            deserialize(stride_x, in);
+            if (_nr != nr) throw serialization_error("Wrong nr found while deserializing dlib::max_pool_");
+            if (_nc != nc) throw serialization_error("Wrong nc found while deserializing dlib::max_pool_");
+            if (_stride_y != stride_y) throw serialization_error("Wrong stride_y found while deserializing dlib::max_pool_");
+            if (_stride_x != stride_x) throw serialization_error("Wrong stride_x found while deserializing dlib::max_pool_");
         }
 
     private:
 
-        long _nr;
-        long _nc;
-        int _stride_y;
-        int _stride_x;
 
         tt::pooling mp;
         resizable_tensor params;
     };
 
-    template <typename SUBNET>
-    using max_pool = add_layer<max_pool_, SUBNET>;
+    template <
+        long nr,
+        long nc,
+        int stride_y,
+        int stride_x,
+        typename SUBNET
+        >
+    using max_pool = add_layer<max_pool_<nr,nc,stride_y,stride_x>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        long _nr,
+        long _nc,
+        int _stride_y,
+        int _stride_x
+        >
     class avg_pool_
     {
     public:
-
-        avg_pool_ (
-        ) : 
-            _nr(3),
-            _nc(3),
-            _stride_y(1),
-            _stride_x(1)
-        {}
+        static_assert(_nr > 0, "The number of rows in a filter must be > 0");
+        static_assert(_nc > 0, "The number of columns in a filter must be > 0");
+        static_assert(_stride_y > 0, "The filter stride must be > 0");
+        static_assert(_stride_x > 0, "The filter stride must be > 0");
 
         avg_pool_(
-            long nr_,
-            long nc_,
-            int stride_y_ = 1,
-            int stride_x_ = 1
-        ) : 
-            _nr(nr_),
-            _nc(nc_),
-            _stride_y(stride_y_),
-            _stride_x(stride_x_)
-        {}
+        ) {}
 
         long nr() const { return _nr; }
         long nc() const { return _nc; }
@@ -329,12 +318,8 @@ namespace dlib
         long stride_x() const { return _stride_x; }
 
         avg_pool_ (
-            const avg_pool_& item
-        ) : 
-            _nr(item._nr),
-            _nc(item._nc),
-            _stride_y(item._stride_y),
-            _stride_x(item._stride_x)
+            const avg_pool_& 
+        )  
         {
             // this->ap is non-copyable so we have to write our own copy to avoid trying to
             // copy it and getting an error.
@@ -350,11 +335,6 @@ namespace dlib
 
             // this->ap is non-copyable so we have to write our own copy to avoid trying to
             // copy it and getting an error.
-            _nr = item._nr;
-            _nc = item._nc;
-            _stride_y = item._stride_y;
-            _stride_x = item._stride_x;
-
             ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x);
             return *this;
         }
@@ -383,10 +363,10 @@ namespace dlib
         friend void serialize(const avg_pool_& item, std::ostream& out)
         {
             serialize("avg_pool_", out);
-            serialize(item._nr, out);
-            serialize(item._nc, out);
-            serialize(item._stride_y, out);
-            serialize(item._stride_x, out);
+            serialize(_nr, out);
+            serialize(_nc, out);
+            serialize(_stride_y, out);
+            serialize(_stride_x, out);
         }
 
         friend void deserialize(avg_pool_& item, std::istream& in)
@@ -395,27 +375,38 @@ namespace dlib
             deserialize(version, in);
             if (version != "avg_pool_")
                 throw serialization_error("Unexpected version found while deserializing dlib::avg_pool_.");
-            deserialize(item._nr, in);
-            deserialize(item._nc, in);
-            deserialize(item._stride_y, in);
-            deserialize(item._stride_x, in);
 
-            item.ap.setup_avg_pooling(item._nr, item._nc, item._stride_y, item._stride_x);
+            item.ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x);
+
+            long nr;
+            long nc;
+            int stride_y;
+            int stride_x;
+
+            deserialize(nr, in);
+            deserialize(nc, in);
+            deserialize(stride_y, in);
+            deserialize(stride_x, in);
+            if (_nr != nr) throw serialization_error("Wrong nr found while deserializing dlib::avg_pool_");
+            if (_nc != nc) throw serialization_error("Wrong nc found while deserializing dlib::avg_pool_");
+            if (_stride_y != stride_y) throw serialization_error("Wrong stride_y found while deserializing dlib::avg_pool_");
+            if (_stride_x != stride_x) throw serialization_error("Wrong stride_x found while deserializing dlib::avg_pool_");
         }
 
     private:
-
-        long _nr;
-        long _nc;
-        int _stride_y;
-        int _stride_x;
 
         tt::pooling ap;
         resizable_tensor params;
     };
 
-    template <typename SUBNET>
-    using avg_pool = add_layer<avg_pool_, SUBNET>;
+    template <
+        long nr,
+        long nc,
+        int stride_y,
+        int stride_x,
+        typename SUBNET
+        >
+    using avg_pool = add_layer<avg_pool_<nr,nc,stride_y,stride_x>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -425,16 +416,16 @@ namespace dlib
         FC_MODE = 1
     };
 
+    template <
+        layer_mode mode
+        >
     class bn_
     {
     public:
-        bn_() : num_updates(0), running_stats_window_size(1000), mode(FC_MODE)
+        bn_() : num_updates(0), running_stats_window_size(1000)
         {}
 
-        explicit bn_(layer_mode mode_) : num_updates(0), running_stats_window_size(1000), mode(mode_)
-        {}
-
-        bn_(layer_mode mode_, unsigned long window_size) : num_updates(0), running_stats_window_size(window_size), mode(mode_)
+        explicit bn_(unsigned long window_size) : num_updates(0), running_stats_window_size(window_size)
         {}
 
         layer_mode get_mode() const { return mode; }
@@ -519,7 +510,7 @@ namespace dlib
             serialize(item.running_invstds, out);
             serialize(item.num_updates, out);
             serialize(item.running_stats_window_size, out);
-            serialize((int)item.mode, out);
+            serialize((int)mode, out);
         }
 
         friend void deserialize(bn_& item, std::istream& in)
@@ -537,13 +528,14 @@ namespace dlib
             deserialize(item.running_invstds, in);
             deserialize(item.num_updates, in);
             deserialize(item.running_stats_window_size, in);
-            int mode;
-            deserialize(mode, in);
-            item.mode = (layer_mode)mode;
+            int _mode;
+            deserialize(_mode, in);
+            if (mode != (layer_mode)_mode) throw serialization_error("Wrong mode found while deserializing dlib::bn_");
         }
 
     private:
 
+        template < layer_mode Mode >
         friend class affine_;
 
         resizable_tensor params;
@@ -552,32 +544,41 @@ namespace dlib
         resizable_tensor invstds, running_invstds;
         unsigned long num_updates;
         unsigned long running_stats_window_size;
-        layer_mode mode;
     };
 
     template <typename SUBNET>
-    using bn = add_layer<bn_, SUBNET>;
+    using bn_con = add_layer<bn_<CONV_MODE>, SUBNET>;
+    template <typename SUBNET>
+    using bn_fc = add_layer<bn_<FC_MODE>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
-    enum fc_bias_mode{
+    enum fc_bias_mode
+    {
         FC_HAS_BIAS = 0,
         FC_NO_BIAS = 1
     };
 
+    struct num_fc_outputs
+    {
+        num_fc_outputs(unsigned long n) : num_outputs(n) {}
+        unsigned long num_outputs;
+    };
+
+    template <
+        unsigned long num_outputs_,
+        fc_bias_mode bias_mode
+        >
     class fc_
     {
+        static_assert(num_outputs_ > 0, "The number of outputs from a fc_ layer must be > 0");
+
     public:
-        fc_() : num_outputs(1), num_inputs(0), bias_mode(FC_HAS_BIAS)
+        fc_() : num_outputs(num_outputs_), num_inputs(0)
         {
         }
 
-        explicit fc_(
-            unsigned long num_outputs_, 
-            fc_bias_mode mode = FC_HAS_BIAS
-        ) : num_outputs(num_outputs_), num_inputs(0), bias_mode(mode)
-        {
-        }
+        fc_(num_fc_outputs o) : num_outputs(o.num_outputs), num_inputs(0) {}
 
         unsigned long get_num_outputs (
         ) const { return num_outputs; }
@@ -651,7 +652,7 @@ namespace dlib
             serialize(item.params, out);
             serialize(item.weights, out);
             serialize(item.biases, out);
-            serialize((int)item.bias_mode, out);
+            serialize((int)bias_mode, out);
         }
 
         friend void deserialize(fc_& item, std::istream& in)
@@ -660,6 +661,7 @@ namespace dlib
             deserialize(version, in);
             if (version != "fc_")
                 throw serialization_error("Unexpected version found while deserializing dlib::fc_.");
+
             deserialize(item.num_outputs, in);
             deserialize(item.num_inputs, in);
             deserialize(item.params, in);
@@ -667,7 +669,7 @@ namespace dlib
             deserialize(item.biases, in);
             int bmode = 0;
             deserialize(bmode, in);
-            item.bias_mode = (fc_bias_mode)bmode;
+            if (bias_mode != (fc_bias_mode)bmode) throw serialization_error("Wrong fc_bias_mode found while deserializing dlib::fc_");
         }
 
     private:
@@ -676,11 +678,14 @@ namespace dlib
         unsigned long num_inputs;
         resizable_tensor params;
         alias_tensor weights, biases;
-        fc_bias_mode bias_mode;
     };
 
-    template <typename SUBNET>
-    using fc = add_layer<fc_, SUBNET>;
+    template <
+        unsigned long num_outputs,
+        fc_bias_mode bias_mode,
+        typename SUBNET
+        >
+    using fc = add_layer<fc_<num_outputs,bias_mode>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -849,27 +854,22 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        layer_mode mode
+        >
     class affine_
     {
     public:
         affine_(
-        ) : mode(FC_MODE)
-        {
-        }
-
-        explicit affine_(
-            layer_mode mode_
-        ) : mode(mode_)
-        {
-        }
+        ) 
+        {}
 
         affine_(
-            const bn_& item
+            const bn_<mode>& item
         )
         {
             gamma = item.gamma;
             beta = item.beta;
-            mode = item.mode;
 
             params.copy_size(item.params);
 
@@ -959,7 +959,7 @@ namespace dlib
                 // Since we can build an affine_ from a bn_ we check if that's what is in
                 // the stream and if so then just convert it right here.
                 unserialize sin(version, in);
-                bn_ temp;
+                bn_<mode> temp;
                 deserialize(temp, sin);
                 item = temp;
                 return;
@@ -970,19 +970,20 @@ namespace dlib
             deserialize(item.params, in);
             deserialize(item.gamma, in);
             deserialize(item.beta, in);
-            int mode;
-            deserialize(mode, in);
-            item.mode = (layer_mode)mode;
+            int _mode;
+            deserialize(_mode, in);
+            if (mode != (layer_mode)_mode) throw serialization_error("Wrong mode found while deserializing dlib::affine_");
         }
 
     private:
         resizable_tensor params, empty_params; 
         alias_tensor gamma, beta;
-        layer_mode mode;
     };
 
     template <typename SUBNET>
-    using affine = add_layer<affine_, SUBNET>;
+    using affine_con = add_layer<affine_<CONV_MODE>, SUBNET>;
+    template <typename SUBNET>
+    using affine_fc = add_layer<affine_<FC_MODE>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -1128,6 +1129,9 @@ namespace dlib
         ) : initial_param_value(initial_param_value_)
         {
         }
+
+        float get_initial_param_value (
+        ) const { return initial_param_value; }
 
         template <typename SUBNET>
         void setup (const SUBNET& /*sub*/)

@@ -15,6 +15,7 @@
 using namespace std;
 using namespace dlib;
  
+
 int main(int argc, char** argv) try
 {
     if (argc != 2)
@@ -23,6 +24,8 @@ int main(int argc, char** argv) try
         return 1;
     }
 
+
+
     std::vector<matrix<unsigned char>> training_images;
     std::vector<unsigned long> training_labels;
     std::vector<matrix<unsigned char>> testing_images;
@@ -30,22 +33,18 @@ int main(int argc, char** argv) try
     load_mnist_dataset(argv[1], training_images, training_labels, testing_images, testing_labels);
 
 
-    typedef loss_multiclass_log<fc<relu<fc<relu<fc<max_pool<relu<con<max_pool<relu<con<
-                               input<matrix<unsigned char>>>>>>>>>>>>>> net_type;
+    using net_type = loss_multiclass_log<
+                                fc<10,FC_HAS_BIAS,
+                                relu<fc<84,FC_HAS_BIAS,
+                                relu<fc<120,FC_HAS_BIAS,
+                                max_pool<2,2,2,2,relu<con<16,5,5,1,1,
+                                max_pool<2,2,2,2,relu<con<6,5,5,1,1,
+                                input<matrix<unsigned char>>>>>>>>>>>>>>;
 
-    net_type net(fc_(10),
-                 relu_(),
-                 fc_(84),
-                 relu_(),
-                 fc_(120),
-                 max_pool_(2,2,2,2),
-                 relu_(),
-                 con_(16,5,5),
-                 max_pool_(2,2,2,2),
-                 relu_(),
-                 con_(6,5,5));
 
-    dnn_trainer<net_type> trainer(net,sgd(0.1));
+    net_type net;
+
+    dnn_trainer<net_type> trainer(net,sgd(0.01));
     trainer.set_mini_batch_size(128);
     trainer.be_verbose();
     trainer.set_synchronization_file("mnist_sync", std::chrono::seconds(20));

@@ -1076,67 +1076,67 @@ namespace
         }
         {
             print_spinner();
-            max_pool_ l;
+            max_pool_<3,3,1,1> l;
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {
             print_spinner();
-            avg_pool_ l;
+            avg_pool_<3,3,1,1> l;
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {
             print_spinner();
-            affine_ l(CONV_MODE);
+            affine_<CONV_MODE> l;
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {
             print_spinner();
-            affine_ l(FC_MODE);
+            affine_<FC_MODE> l;
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {
             print_spinner();
-            bn_ l(CONV_MODE);
+            bn_<CONV_MODE> l;
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {
             print_spinner();
-            bn_ l(FC_MODE);
+            bn_<FC_MODE> l;
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {
             print_spinner();
-            con_ l(3,3,3,2,2);
+            con_<3,3,3,2,2> l;
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {
             print_spinner();
-            con_ l(3,3,3,1,1);
+            con_<3,3,3,1,1>l;
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {
             print_spinner();
-            con_ l(3,3,2,1,1);
+            con_<3,3,2,1,1> l;
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {
             print_spinner();
-            con_ l(2,1,1,1,1);
+            con_<2,1,1,1,1> l;
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {
             print_spinner();
-            fc_ l;
+            fc_<1,FC_HAS_BIAS> l;
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {
             print_spinner();
-            fc_ l(5,FC_HAS_BIAS);
+            fc_<5,FC_HAS_BIAS> l;
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {
             print_spinner();
-            fc_ l(5,FC_NO_BIAS);
+            fc_<5,FC_NO_BIAS> l;
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {
@@ -1168,29 +1168,16 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T> using rcon = max_pool<relu<bn<con<T>>>>;
-    std::tuple<max_pool_,relu_,bn_,con_> rcon_ (unsigned long n) 
-    {
-        return std::make_tuple(max_pool_(2,2,2,2),relu_(),bn_(CONV_MODE),con_(n,5,5));
-    }
-
-    template <typename T> using rfc = relu<bn<fc<T>>>;
-    std::tuple<relu_,bn_,fc_> rfc_ (unsigned long n) 
-    {
-        return std::make_tuple(relu_(),bn_(),fc_(n));
-    }
+    template <unsigned long n, typename SUBNET> using rcon = max_pool<2,2,2,2,relu<bn_con<con<n,5,5,1,1,SUBNET>>>>;
+    template <unsigned long n, typename SUBNET> using rfc = relu<bn_fc<fc<n,FC_HAS_BIAS,SUBNET>>>;
 
     void test_tagging(
     )
     {
-        typedef loss_multiclass_log<rfc<skip1<rfc<rfc<tag1<rcon<rcon<input<matrix<unsigned char>>>>>>>>>> net_type;
+        typedef loss_multiclass_log<rfc<10,skip1<rfc<84,rfc<120,tag1<rcon<16,rcon<6,input<matrix<unsigned char>>>>>>>>>> net_type;
 
-        net_type net(rfc_(10),
-            rfc_(84),
-            rfc_(120),
-            rcon_(16),
-            rcon_(6)
-        );
+        net_type net;
+        net_type net2(num_fc_outputs(4));
 
         DLIB_TEST(layer<tag1>(net).num_layers == 8);
         DLIB_TEST(layer<skip1>(net).num_layers == 8+3+3);

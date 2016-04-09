@@ -322,14 +322,28 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    enum fc_bias_mode{
+    enum fc_bias_mode
+    {
         FC_HAS_BIAS = 0,
         FC_NO_BIAS = 1
     };
 
+    struct num_fc_outputs
+    {
+        num_fc_outputs(unsigned long n) : num_outputs(n) {}
+        unsigned long num_outputs;
+    };
+
+    template <
+        unsigned long num_outputs,
+        fc_bias_mode bias_mode
+        >
     class fc_
     {
         /*!
+            REQUIREMENTS ON num_outputs
+                num_outputs > 0
+
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_LAYER_ interface defined above.
                 In particular, it defines a fully connected layer that takes an input
@@ -337,24 +351,13 @@ namespace dlib
         !*/
 
     public:
+
         fc_(
         );
         /*!
             ensures
-                - #get_num_outputs() == 1
-                - #get_bias_mode() == FC_HAS_BIAS
-        !*/
-
-        explicit fc_(
-            unsigned long num_outputs,
-            fc_bias_mode mode = FC_HAS_BIAS
-        );
-        /*!
-            requires
-                - num_outputs > 0
-            ensures
                 - #get_num_outputs() == num_outputs
-                - #get_bias_mode() == mode
+                - #get_bias_mode() == bias_mode 
         !*/
 
         unsigned long get_num_outputs (
@@ -385,22 +388,37 @@ namespace dlib
         /*!
             These functions are implemented as described in the EXAMPLE_LAYER_ interface.
         !*/
+
+        friend void serialize(const fc_& item, std::ostream& out);
+        friend void deserialize(fc_& item, std::istream& in);
+        /*!
+            provides serialization support  
+        !*/
     };
 
-    void serialize(const fc_& item, std::ostream& out);
-    void deserialize(fc_& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
 
-    template <typename SUBNET>
-    using fc = add_layer<fc_, SUBNET>;
+    template <
+        unsigned long num_outputs,
+        fc_bias_mode bias_mode,
+        typename SUBNET
+        >
+    using fc = add_layer<fc_<num_outputs,bias_mode>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        long _num_filters,
+        long _nr,
+        long _nc,
+        int _stride_y,
+        int _stride_x
+        >
     class con_
     {
         /*!
+            REQUIREMENTS ON TEMPLATE ARGUMENTS
+                All of them must be > 0.
+
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_LAYER_ interface defined above.
                 In particular, it defines a convolution layer that takes an input tensor
@@ -420,33 +438,11 @@ namespace dlib
         );
         /*!
             ensures
-                - #num_filters() == 1
-                - #nr() == 3
-                - #nc() == 3
-                - #stride_y() == 1
-                - #stride_x() == 1
-        !*/
-
-        con_(
-            long num_filters_,
-            long nr_,
-            long nc_,
-            int stride_y_ = 1,
-            int stride_x_ = 1
-        );
-        /*!
-            requires
-                - num_filters_ > 0
-                - nr_ > 0
-                - nc_ > 0
-                - stride_y_ > 0
-                - stride_x_ > 0
-            ensures
-                - #num_filters() == num_filters_ 
-                - #nr() == nr_
-                - #nc() == nc_
-                - #stride_y() == stride_y_
-                - #stride_x() == stride_x_
+                - #num_filters() == _num_filters
+                - #nr() == _nr
+                - #nc() == _nc
+                - #stride_y() == _stride_y
+                - #stride_x() == _stride_x
         !*/
 
         long num_filters(
@@ -498,16 +494,24 @@ namespace dlib
         /*!
             These functions are implemented as described in the EXAMPLE_LAYER_ interface.
         !*/
+
+        friend void serialize(const con_& item, std::ostream& out);
+        friend void deserialize(con_& item, std::istream& in);
+        /*!
+            provides serialization support  
+        !*/
+
     };
 
-    void serialize(const con_& item, std::ostream& out);
-    void deserialize(con_& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
-
-    template <typename SUBNET>
-    using con = add_layer<con_, SUBNET>;
+    template <
+        long num_filters,
+        long nr,
+        long nc,
+        int stride_y,
+        int stride_x,
+        typename SUBNET
+        >
+    using con = add_layer<con_<num_filters,nr,nc,stride_y,stride_x>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -631,6 +635,9 @@ namespace dlib
         FC_MODE = 1    // fully connected mode
     };
 
+    template <
+        layer_mode mode
+        >
     class bn_
     {
         /*!
@@ -663,17 +670,17 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_mode() == FC_MODE
+                - #get_mode() == mode
                 - get_running_stats_window_size() == 1000
         !*/
 
         explicit bn_(
-            layer_mode mode
+            unsigned long window_size
         );
         /*!
             ensures
                 - #get_mode() == mode 
-                - get_running_stats_window_size() == 1000
+                - get_running_stats_window_size() == window_size
         !*/
 
         layer_mode get_mode(
@@ -713,19 +720,25 @@ namespace dlib
         /*!
             These functions are implemented as described in the EXAMPLE_LAYER_ interface.
         !*/
+
+        friend void serialize(const bn_& item, std::ostream& out);
+        friend void deserialize(bn_& item, std::istream& in);
+        /*!
+            provides serialization support  
+        !*/
+
     };
 
-    void serialize(const bn_& item, std::ostream& out);
-    void deserialize(bn_& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
-
     template <typename SUBNET>
-    using bn = add_layer<bn_, SUBNET>;
+    using bn_con = add_layer<bn_<CONV_MODE>, SUBNET>;
+    template <typename SUBNET>
+    using bn_fc = add_layer<bn_<FC_MODE>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        layer_mode mode
+        >
     class affine_
     {
         /*!
@@ -766,11 +779,11 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_mode() == FC_MODE
+                - #get_mode() == mode
         !*/
 
         affine_(
-            const bn_& layer
+            const bn_<mode>& layer
         );
         /*!
             ensures
@@ -779,14 +792,6 @@ namespace dlib
                   finish training a network with bn_ layers because the affine_ layer will
                   execute faster.  
                 - #get_mode() == layer.get_mode()
-        !*/
-
-        explicit affine_(
-            layer_mode mode
-        );
-        /*!
-            ensures
-                - #get_mode() == mode 
         !*/
 
         layer_mode get_mode(
@@ -806,22 +811,33 @@ namespace dlib
             Also note that get_layer_params() always returns an empty tensor since there
             are no learnable parameters in this object.
         !*/
+
+        friend void serialize(const affine_& item, std::ostream& out);
+        friend void deserialize(affine_& item, std::istream& in);
+        /*!
+            provides serialization support  
+        !*/
     };
 
-    void serialize(const affine_& item, std::ostream& out);
-    void deserialize(affine_& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
-
     template <typename SUBNET>
-    using affine = add_layer<affine_, SUBNET>;
+    using affine_con = add_layer<affine_<CONV_MODE>, SUBNET>;
+    template <typename SUBNET>
+    using affine_fc = add_layer<affine_<FC_MODE>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        long _nr,
+        long _nc,
+        int _stride_y,
+        int _stride_x
+        >
     class max_pool_
     {
         /*!
+            REQUIREMENTS ON TEMPLATE ARGUMENTS
+                All of them must be > 0.
+
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_LAYER_ interface defined above.
                 In particular, it defines a max pooling layer that takes an input tensor
@@ -849,24 +865,10 @@ namespace dlib
         );
         /*!
             ensures
-                - #nr() == 3
-                - #nc() == 3
-                - #stride_y() == 1
-                - #stride_x() == 1
-        !*/
-
-        max_pool_(
-            long nr_,
-            long nc_,
-            int stride_y_ = 1,
-            int stride_x_ = 1
-        ); 
-        /*!
-            ensures
-                - #nr() == nr_ 
-                - #nc() == nc_ 
-                - #stride_y() == stride_y_
-                - #stride_x() == stride_x_
+                - #nr() == _nr
+                - #nc() == _nc
+                - #stride_y() == _stride_y
+                - #stride_x() == _stride_x
         !*/
 
         long nr(
@@ -911,22 +913,37 @@ namespace dlib
             Note that this layer doesn't have any parameters, so the tensor returned by
             get_layer_params() is always empty.
         !*/
+
+        friend void serialize(const max_pool_& item, std::ostream& out);
+        friend void deserialize(max_pool_& item, std::istream& in);
+        /*!
+            provides serialization support  
+        !*/
     };
 
-    void serialize(const max_pool_& item, std::ostream& out);
-    void deserialize(max_pool_& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
-
-    template <typename SUBNET>
-    using max_pool = add_layer<max_pool_, SUBNET>;
+    template <
+        long nr,
+        long nc,
+        int stride_y,
+        int stride_x,
+        typename SUBNET
+        >
+    using max_pool = add_layer<max_pool_<nr,nc,stride_y,stride_x>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        long _nr,
+        long _nc,
+        int _stride_y,
+        int _stride_x
+        >
     class avg_pool_
     {
         /*!
+            REQUIREMENTS ON TEMPLATE ARGUMENTS
+                All of them must be > 0.
+
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_LAYER_ interface defined above.
                 In particular, it defines an average pooling layer that takes an input tensor
@@ -954,24 +971,10 @@ namespace dlib
         );
         /*!
             ensures
-                - #nr() == 3
-                - #nc() == 3
-                - #stride_y() == 1
-                - #stride_x() == 1
-        !*/
-
-        avg_pool_(
-            long nr_,
-            long nc_,
-            int stride_y_ = 1,
-            int stride_x_ = 1
-        ); 
-        /*!
-            ensures
-                - #nr() == nr_ 
-                - #nc() == nc_ 
-                - #stride_y() == stride_y_
-                - #stride_x() == stride_x_
+                - #nr() == _nr
+                - #nc() == _nc
+                - #stride_y() == _stride_y
+                - #stride_x() == _stride_x
         !*/
 
         long nr(
@@ -1016,16 +1019,22 @@ namespace dlib
             Note that this layer doesn't have any parameters, so the tensor returned by
             get_layer_params() is always empty.
         !*/
+
+        friend void serialize(const avg_pool_& item, std::ostream& out);
+        friend void deserialize(avg_pool_& item, std::istream& in);
+        /*!
+            provides serialization support  
+        !*/
     };
 
-    void serialize(const avg_pool_& item, std::ostream& out);
-    void deserialize(avg_pool_& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
-
-    template <typename SUBNET>
-    using avg_pool = add_layer<avg_pool_, SUBNET>;
+    template <
+        long nr,
+        long nc,
+        int stride_y,
+        int stride_x,
+        typename SUBNET
+        >
+    using avg_pool = add_layer<avg_pool_<nr,nc,stride_y,stride_x>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -1094,6 +1103,14 @@ namespace dlib
         /*!
             ensures
                 - The p parameter will be initialized with initial_param_value.
+                - #get_initial_param_value() == initial_param_value.
+        !*/
+
+        float get_initial_param_value (
+        ) const;
+        /*!
+            ensures
+                - returns the initial value of the prelu parameter. 
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
