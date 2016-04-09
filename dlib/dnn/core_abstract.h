@@ -963,6 +963,17 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    template <typename ...T>
+    decorator_repeat_group<T...> repeat_group (
+        T&& ...args
+    );
+    /*!
+        ensures
+            - Decorates a group of variables.  This is essentially like std::make_tuple()
+              except it's only purpose is to group variables together so they can be passed
+              to the repeat object's constructor.
+    !*/
+
     template <
         size_t num,
         template<typename> class REPEATED_LAYER, 
@@ -1016,6 +1027,20 @@ namespace dlib
                 - arg1 is used to initialize the num_repetitions() copies of REPEATED_LAYER inside
                   this object.  That is, all the REPEATED_LAYER elements are initialized identically
                   by being given copies of arg1.
+                - The rest of the arguments to the constructor, i.e. args2, are passed to
+                  SUBNET's constructor.  
+        !*/
+
+        template <typename ...T, typename ...U>
+        repeat(
+            decorator_repeat_group<T...>&& arg1,
+            U ...args2
+        );
+        /*!
+            ensures
+                - arg1 is used to initialize the num_repetitions() copies of REPEATED_LAYER inside
+                  this object.  That is, all the REPEATED_LAYER elements are initialized identically
+                  by being given copies of an undecorated arg1.
                 - The rest of the arguments to the constructor, i.e. args2, are passed to
                   SUBNET's constructor.  
         !*/

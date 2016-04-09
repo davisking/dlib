@@ -597,6 +597,16 @@ namespace dlib
         template <typename ...T, typename ...U>
         struct disable_forwarding_constr<std::tuple<T...>,U...>
         {
+            const static bool value = disable_forwarding_constr<typename std::remove_reference<T>::type...>::value;
+        };
+        template <typename T, typename ...U>
+        struct disable_forwarding_constr<std::tuple<T>,U...>
+        {
+            const static bool value = disable_forwarding_constr<typename std::remove_reference<T>::type>::value;
+        };
+        template <typename ...U>
+        struct disable_forwarding_constr<std::tuple<>,U...>
+        {
             const static bool value = true;
         };
         template <typename ...T>
@@ -657,6 +667,10 @@ namespace dlib
             const std::tuple<LD,U...>& layer_det, 
             T&& ...args
         ) : add_layer(layer_det,args...) { }
+
+        add_layer (
+            std::tuple<>
+        ) : add_layer() {}
 
         template <typename ...T>
         add_layer(
@@ -1374,6 +1388,23 @@ namespace dlib
         };
     }
 
+    template <typename ...T>
+    struct decorator_repeat_group
+    {
+        decorator_repeat_group(
+            T&& ...args
+        ) : data(std::forward<T>(args)...) {}
+
+        std::tuple<T...> data;
+    };
+    template <typename ...T>
+    decorator_repeat_group<T...> repeat_group (
+        T&& ...args
+    )
+    {
+        return decorator_repeat_group<T...>(std::forward<T>(args)...);
+    }
+
     template <
         size_t num,
         template<typename> class REPEATED_LAYER, 
@@ -1436,6 +1467,16 @@ namespace dlib
             U ...args2
         ): 
             details(num, std::move(arg1)),
+            subnetwork(std::move(args2)...)
+        {
+        }
+
+        template <typename ...T, typename ...U>
+        repeat(
+            decorator_repeat_group<T...>&& arg1,
+            U ...args2
+        ): 
+            details(num, arg1.data),
             subnetwork(std::move(args2)...)
         {
         }
