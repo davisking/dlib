@@ -20,7 +20,7 @@ public:
     template <typename T>
     auto auto_return(T f) -> decltype(f()) { return f(); }
 
-    int returnint() { return 0; }
+    static int returnint() { return 0; }
 
     void dostuff()
     {
