@@ -14,17 +14,17 @@ namespace
     using namespace test;
     using namespace dlib;
     using namespace std;
-    dlib::logger dlog("test.corellation_tracker");
+    dlib::logger dlog("test.correlation_tracker");
 
 
-    class corellation_tracker_tester : public tester
+    class correlation_tracker_tester : public tester
     {
     public:
-		corellation_tracker_tester(
+		correlation_tracker_tester(
         ) :
             tester (
-                "test_corellation_tracker",       // the command line argument name for this test
-                "Run tests on the corellation_tracker functions.", // the command line argument description
+                "test_correlation_tracker",       // the command line argument name for this test
+                "Run tests on the correlation_tracker functions.", // the command line argument description
                 0                     // the number of command line arguments for this test
             )
         {
@@ -946,7 +946,7 @@ namespace
 
     };
 
-    corellation_tracker_tester a;
+    correlation_tracker_tester a;
 
 // ----------------------------------------------------------------------------------------
 
