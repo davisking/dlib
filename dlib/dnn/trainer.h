@@ -315,7 +315,7 @@ namespace dlib
             time_between_syncs = time_between_syncs_;
 
             // check if the sync file already exists, if it does we should load it.
-            std::ifstream fin(filename, std::ios::binary);
+            std::ifstream fin(sync_filename, std::ios::binary);
             if (fin)
                 deserialize(*this, fin);
         }
@@ -571,18 +571,17 @@ namespace dlib
             if (std::chrono::system_clock::now() - last_sync_time > time_between_syncs ||
                 do_it_now)
             {
-                // save our state to a temp file
-                std::string tempfile = sync_filename + ".tmp";
-                std::ofstream fout(tempfile, std::ios::binary);
-                // compact network before saving to disk.
                 wait_for_thread_to_pause();
+
+                // compact network before saving to disk.
                 this->net.clean(); 
-                serialize(*this, fout);
-                fout.close();
+
+                // save our state to a temp file
+                const std::string tempfile = sync_filename + ".tmp";
+                serialize(tempfile) << *this;
 
                 // Now that we know the state is safely saved to disk, delete the old sync
                 // file and move the .tmp file to it.
-                std::remove(sync_filename.c_str());
                 std::rename(tempfile.c_str(), sync_filename.c_str());
 
                 last_sync_time = std::chrono::system_clock::now();
