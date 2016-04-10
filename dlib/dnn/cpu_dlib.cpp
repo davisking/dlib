@@ -466,7 +466,7 @@ namespace dlib
             const tensor& gamma, 
             const tensor& beta,
             const tensor& running_means,
-            const tensor& running_invstds
+            const tensor& running_variances
         )
         {
             DLIB_CASSERT(
@@ -476,7 +476,7 @@ namespace dlib
                 gamma.k()  == src.k() &&
                 have_same_dimensions(gamma, beta) &&
                 have_same_dimensions(gamma, running_means) &&
-                have_same_dimensions(gamma, running_invstds), 
+                have_same_dimensions(gamma, running_variances), 
                 "\ngamma.num_samples(): " << gamma.num_samples() << 
                 "\ngamma.k():  " << gamma.k() << 
                 "\ngamma.nr(): " << gamma.nr() << 
@@ -489,10 +489,10 @@ namespace dlib
                 "\nrunning_means.k():   " << running_means.k() << 
                 "\nrunning_means.nr():  " << running_means.nr() << 
                 "\nrunning_means.nc():  " << running_means.nc() << 
-                "\nrunning_invstds.num_samples(): " << running_invstds.num_samples() << 
-                "\nrunning_invstds.k():   " << running_invstds.k() << 
-                "\nrunning_invstds.nr():  " << running_invstds.nr() << 
-                "\nrunning_invstds.nc():  " << running_invstds.nc() << 
+                "\nrunning_variances.num_samples(): " << running_variances.num_samples() << 
+                "\nrunning_variances.k():   " << running_variances.k() << 
+                "\nrunning_variances.nr():  " << running_variances.nr() << 
+                "\nrunning_variances.nc():  " << running_variances.nc() << 
                 "\nsrc.k():   " << src.k() << 
                 "\nsrc.nr():  " << src.nr() << 
                 "\nsrc.nc():  " << src.nc() 
@@ -504,14 +504,14 @@ namespace dlib
             auto g = gamma.host();
             auto b = beta.host();
             auto m = running_means.host();
-            auto i = running_invstds.host();
+            auto v = running_variances.host();
 
             const long num = src.k()*src.nr()*src.nc();
             for (long n = 0; n < src.num_samples(); ++n)
             {
                 for (long k = 0; k < num; ++k)
                 {
-                    *d = g[k]*(*s - m[k])/std::sqrt(i[k]+dlib::tt::BATCH_NORM_EPS) + b[k];
+                    *d = g[k]*(*s - m[k])/std::sqrt(v[k]+dlib::tt::BATCH_NORM_EPS) + b[k];
                     ++d;
                     ++s;
                 }
@@ -524,7 +524,7 @@ namespace dlib
             resizable_tensor& invstds,
             const double averaging_factor,
             resizable_tensor& running_means,
-            resizable_tensor& running_invstds,
+            resizable_tensor& running_variances,
             const tensor& src,
             const tensor& gamma, 
             const tensor& beta 
@@ -532,7 +532,7 @@ namespace dlib
         {
             DLIB_CASSERT(0 <= averaging_factor && averaging_factor <= 1, "averaging_factor: " << averaging_factor);
             DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_means,means),"");
-            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_invstds,invstds),"");
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_variances,invstds),"");
             DLIB_CASSERT(
                 src.num_samples() > 1 &&
                 gamma.num_samples() == 1 && 
@@ -580,8 +580,9 @@ namespace dlib
             invstds.host(); means.host();
 
             // compute variances 
-            running_invstds.copy_size(invstds);
-            auto rvar = running_invstds.host();
+            running_variances.copy_size(invstds);
+            auto rvar = running_variances.host();
+            // This scale makes the running variances unbiased.
             const double scale = (src.num_samples())/(src.num_samples()-1.0);
             for (long i = 0; i < num; ++i)
             {
@@ -718,7 +719,7 @@ namespace dlib
             const tensor& gamma, 
             const tensor& beta,
             const tensor& running_means,
-            const tensor& running_invstds
+            const tensor& running_variances
         )
         {
             DLIB_CASSERT(
@@ -728,7 +729,7 @@ namespace dlib
                 gamma.k()  == src.k() &&
                 have_same_dimensions(gamma, beta) &&
                 have_same_dimensions(gamma, running_means) &&
-                have_same_dimensions(gamma, running_invstds), 
+                have_same_dimensions(gamma, running_variances), 
                 "\ngamma.num_samples(): " << gamma.num_samples() << 
                 "\ngamma.k():  " << gamma.k() << 
                 "\ngamma.nr(): " << gamma.nr() << 
@@ -741,10 +742,10 @@ namespace dlib
                 "\nrunning_means.k():   " << running_means.k() << 
                 "\nrunning_means.nr():  " << running_means.nr() << 
                 "\nrunning_means.nc():  " << running_means.nc() << 
-                "\nrunning_invstds.num_samples(): " << running_invstds.num_samples() << 
-                "\nrunning_invstds.k():   " << running_invstds.k() << 
-                "\nrunning_invstds.nr():  " << running_invstds.nr() << 
-                "\nrunning_invstds.nc():  " << running_invstds.nc() << 
+                "\nrunning_variances.num_samples(): " << running_variances.num_samples() << 
+                "\nrunning_variances.k():   " << running_variances.k() << 
+                "\nrunning_variances.nr():  " << running_variances.nr() << 
+                "\nrunning_variances.nc():  " << running_variances.nc() << 
                 "\nsrc.k():   " << src.k() << 
                 "\nsrc.nr():  " << src.nr() << 
                 "\nsrc.nc():  " << src.nc() 
@@ -756,14 +757,14 @@ namespace dlib
             auto g = gamma.host();
             auto b = beta.host();
             auto m = running_means.host();
-            auto i = running_invstds.host();
+            auto v = running_variances.host();
 
             const long num = src.nr()*src.nc();
             for (long n = 0; n < src.num_samples(); ++n)
             {
                 for (long k = 0; k < src.k(); ++k)
                 {
-                    const float invstd = 1.0f/std::sqrt(i[k] + dlib::tt::BATCH_NORM_EPS);
+                    const float invstd = 1.0f/std::sqrt(v[k] + dlib::tt::BATCH_NORM_EPS);
                     for (long j = 0; j < num; ++j)
                     {
                         *d = g[k]*(*s - m[k])*invstd + b[k];
@@ -780,7 +781,7 @@ namespace dlib
             resizable_tensor& invstds,
             const double averaging_factor,
             resizable_tensor& running_means,
-            resizable_tensor& running_invstds,
+            resizable_tensor& running_variances,
             const tensor& src,
             const tensor& gamma, 
             const tensor& beta 
@@ -788,7 +789,7 @@ namespace dlib
         {
             DLIB_CASSERT(0 <= averaging_factor && averaging_factor <= 1, "averaging_factor: " << averaging_factor);
             DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_means,means),"");
-            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_invstds,invstds),"");
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_variances,invstds),"");
             DLIB_CASSERT(
                 src.num_samples() > 1 &&
                 gamma.num_samples() == 1 && 
@@ -844,8 +845,9 @@ namespace dlib
 
             p_src = src.host();
             // compute variances 
-            running_invstds.copy_size(invstds);
-            auto rvar = running_invstds.host();
+            running_variances.copy_size(invstds);
+            auto rvar = running_variances.host();
+            // This scale makes the running variances unbiased.
             const double scale = (src.num_samples()*num)/(src.num_samples()*num-1.0);
             for (long k = 0; k < src.k(); ++k)
             {

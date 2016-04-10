@@ -294,7 +294,7 @@ namespace dlib { namespace tt
         const tensor& gamma, 
         const tensor& beta,
         const tensor& running_means,
-        const tensor& running_invstds
+        const tensor& running_variances
     );
     /*!
         requires
@@ -304,12 +304,12 @@ namespace dlib { namespace tt
             - gamma.k()  == src.k()
             - have_same_dimensions(gamma, beta) 
             - have_same_dimensions(gamma, running_means) 
-            - have_same_dimensions(gamma, running_invstds)
+            - have_same_dimensions(gamma, running_variances)
         ensures
-            - Just linearly transforms src as a call to batch_normalize() would if the resulting
-              means and invstds were running_means and running_invstds.  That is, this function 
-              performs: 
-                dest = gamma*(src-running_means)*running_invstds + beta
+            - Linearly transforms src as a call to batch_normalize() would if src had means
+              and variances as given by running_means and running_variances.  That is, this
+              function performs: 
+                dest = gamma*(src-running_means)/sqrt(running_variances+BATCH_NORM_EPS) + beta
               Note that it does it in a pointwise fashion over the samples in src.
     !*/
 
@@ -319,7 +319,7 @@ namespace dlib { namespace tt
         resizable_tensor& invstds,
         const double averaging_factor,
         resizable_tensor& running_means,
-        resizable_tensor& running_invstds,
+        resizable_tensor& running_variances,
         const tensor& src,
         const tensor& gamma, 
         const tensor& beta 
@@ -335,7 +335,7 @@ namespace dlib { namespace tt
             - 0 <= averaging_factor <= 1
             - if (averaging_factor != 1)
                 - have_same_dimensions(running_means, means) == true
-                - have_same_dimensions(running_invstds, invstds) == true
+                - have_same_dimensions(running_variances, invstds) == true
         ensures
             - have_same_dimensions(#dest, src) == true
             - #means.num_samples() == 1
@@ -347,7 +347,7 @@ namespace dlib { namespace tt
             - #means == the mean values of the contents of src.
             - #invstds == 1/(the standard deviation values of the contents of src).
             - #running_means = (1-averaging_factor)*mat(#running_means) + averaging_factor*mat(#means);
-            - #running_invstds = (1-averaging_factor)*mat(#running_invstds) + averaging_factor*mat(#invstds);
+            - #running_variances = (1-averaging_factor)*mat(#running_variances) + averaging_factor*(variance of contents of src);
     !*/
 
     void batch_normalize_gradient (
@@ -391,7 +391,7 @@ namespace dlib { namespace tt
         const tensor& gamma, 
         const tensor& beta,
         const tensor& running_means,
-        const tensor& running_invstds
+        const tensor& running_variances
     );
     /*!
         requires
@@ -401,13 +401,13 @@ namespace dlib { namespace tt
             - gamma.k()  == src.k()
             - have_same_dimensions(gamma, beta) 
             - have_same_dimensions(gamma, running_means) 
-            - have_same_dimensions(gamma, running_invstds)
+            - have_same_dimensions(gamma, running_variances)
         ensures
-            - Just linearly transforms src as a call to batch_normalize_conv() would if the resulting
-              means and invstds were running_means and running_invstds.  That is, this function 
-              performs: 
-                dest = gamma*(src-running_means)*running_invstds + beta
-              Note that it does it in a pointwise fashion over the samples, rows, and
+            - Linearly transforms src as a call to batch_normalize_conv() would if src had
+              means and variances as given by running_means and running_variances.  That
+              is, this function performs: 
+                dest = gamma*(src-running_means)/sqrt(running_variances+BATCH_NORM_EPS) + beta
+              Note that it does this in a pointwise fashion over the samples, rows, and
               columns in src.
     !*/
 
@@ -417,7 +417,7 @@ namespace dlib { namespace tt
         resizable_tensor& invstds,
         const double averaging_factor,
         resizable_tensor& running_means,
-        resizable_tensor& running_invstds,
+        resizable_tensor& running_variances,
         const tensor& src,
         const tensor& gamma, 
         const tensor& beta 
@@ -431,7 +431,7 @@ namespace dlib { namespace tt
             - 0 <= averaging_factor <= 1
             - if (averaging_factor != 1)
                 - have_same_dimensions(running_means, means) == true
-                - have_same_dimensions(running_invstds, invstds) == true
+                - have_same_dimensions(running_variances, invstds) == true
         ensures
             - have_same_dimensions(#dest, src) == true
             - #means.num_samples()==means.nr()==means.nc() == 1
@@ -441,7 +441,7 @@ namespace dlib { namespace tt
             - #means == the mean values of the contents of src.
             - #invstds == 1/(the standard deviation values of the contents of src).
             - #running_means = (1-averaging_factor)*mat(#running_means) + averaging_factor*mat(#means);
-            - #running_invstds = (1-averaging_factor)*mat(#running_invstds) + averaging_factor*mat(#invstds);
+            - #running_variances = (1-averaging_factor)*mat(#running_variances) + averaging_factor*(variance of contents of src);
     !*/
 
     void batch_normalize_conv_gradient (

@@ -274,13 +274,13 @@ namespace dlib { namespace tt
         const tensor& gamma, 
         const tensor& beta,
         const tensor& running_means,
-        const tensor& running_invstds
+        const tensor& running_variances
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::batch_normalize_inference(dest,src,gamma,beta,running_means,running_invstds);
+        cuda::batch_normalize_inference(dest,src,gamma,beta,running_means,running_variances);
 #else
-        cpu::batch_normalize_inference(dest,src,gamma,beta,running_means,running_invstds);
+        cpu::batch_normalize_inference(dest,src,gamma,beta,running_means,running_variances);
 #endif
     }
 
@@ -290,16 +290,16 @@ namespace dlib { namespace tt
         resizable_tensor& vars,
         const double averaging_factor,
         resizable_tensor& running_means,
-        resizable_tensor& running_invstds,
+        resizable_tensor& running_variances,
         const tensor& src,
         const tensor& gamma, 
         const tensor& beta 
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::batch_normalize(dest,means,vars,averaging_factor,running_means,running_invstds,src,gamma,beta);
+        cuda::batch_normalize(dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
 #else
-        cpu::batch_normalize(dest,means,vars,averaging_factor,running_means,running_invstds,src,gamma,beta);
+        cpu::batch_normalize(dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
 #endif
     }
 
@@ -330,13 +330,13 @@ namespace dlib { namespace tt
         const tensor& gamma, 
         const tensor& beta,
         const tensor& running_means,
-        const tensor& running_invstds
+        const tensor& running_variances
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::batch_normalize_conv_inference(dest,src,gamma,beta,running_means,running_invstds);
+        cuda::batch_normalize_conv_inference(dest,src,gamma,beta,running_means,running_variances);
 #else
-        cpu::batch_normalize_conv_inference(dest,src,gamma,beta,running_means,running_invstds);
+        cpu::batch_normalize_conv_inference(dest,src,gamma,beta,running_means,running_variances);
 #endif
     }
 
@@ -346,16 +346,16 @@ namespace dlib { namespace tt
         resizable_tensor& vars,
         const double averaging_factor,
         resizable_tensor& running_means,
-        resizable_tensor& running_invstds,
+        resizable_tensor& running_variances,
         const tensor& src,
         const tensor& gamma, 
         const tensor& beta 
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::batch_normalize_conv(dest,means,vars,averaging_factor,running_means,running_invstds,src,gamma,beta);
+        cuda::batch_normalize_conv(dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
 #else
-        cpu::batch_normalize_conv(dest,means,vars,averaging_factor,running_means,running_invstds,src,gamma,beta);
+        cpu::batch_normalize_conv(dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
 #endif
     }
 

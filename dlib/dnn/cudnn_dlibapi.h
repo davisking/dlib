@@ -140,7 +140,7 @@ namespace dlib
             const tensor& gamma, 
             const tensor& beta,
             const tensor& running_means,
-            const tensor& running_invstds
+            const tensor& running_variances
         );
 
         void batch_normalize (
@@ -149,7 +149,7 @@ namespace dlib
             resizable_tensor& invstds,
             const double averaging_factor,
             resizable_tensor& running_means,
-            resizable_tensor& running_invstds,
+            resizable_tensor& running_variances,
             const tensor& src,
             const tensor& gamma, 
             const tensor& beta 
@@ -174,7 +174,7 @@ namespace dlib
             const tensor& gamma, 
             const tensor& beta,
             const tensor& running_means,
-            const tensor& running_invstds
+            const tensor& running_variances
         );
 
         void batch_normalize_conv (
@@ -183,7 +183,7 @@ namespace dlib
             resizable_tensor& invstds,
             const double averaging_factor,
             resizable_tensor& running_means,
-            resizable_tensor& running_invstds,
+            resizable_tensor& running_variances,
             const tensor& src,
             const tensor& gamma, 
             const tensor& beta 

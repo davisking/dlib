@@ -453,9 +453,9 @@ namespace dlib
             beta(params,gamma.size()) = 0;
 
             running_means.copy_size(gamma(params,0));
-            running_invstds.copy_size(gamma(params,0));
+            running_variances.copy_size(gamma(params,0));
             running_means = 0;
-            running_invstds = 1;
+            running_variances = 1;
             num_updates = 0;
         }
 
@@ -470,16 +470,16 @@ namespace dlib
                 if (num_updates <running_stats_window_size)
                     ++num_updates;
                 if (mode == FC_MODE)
-                    tt::batch_normalize(output, means, invstds, decay, running_means, running_invstds, sub.get_output(), g, b);
+                    tt::batch_normalize(output, means, invstds, decay, running_means, running_variances, sub.get_output(), g, b);
                 else 
-                    tt::batch_normalize_conv(output, means, invstds, decay, running_means, running_invstds, sub.get_output(), g, b);
+                    tt::batch_normalize_conv(output, means, invstds, decay, running_means, running_variances, sub.get_output(), g, b);
             }
             else // we are running in testing mode so we just linearly scale the input tensor.
             {
                 if (mode == FC_MODE)
-                    tt::batch_normalize_inference(output, sub.get_output(), g, b, running_means, running_invstds);
+                    tt::batch_normalize_inference(output, sub.get_output(), g, b, running_means, running_variances);
                 else
-                    tt::batch_normalize_conv_inference(output, sub.get_output(), g, b, running_means, running_invstds);
+                    tt::batch_normalize_conv_inference(output, sub.get_output(), g, b, running_means, running_variances);
             }
         } 
 
@@ -510,7 +510,7 @@ namespace dlib
             serialize(item.means, out);
             serialize(item.invstds, out);
             serialize(item.running_means, out);
-            serialize(item.running_invstds, out);
+            serialize(item.running_variances, out);
             serialize(item.num_updates, out);
             serialize(item.running_stats_window_size, out);
         }
@@ -539,7 +539,7 @@ namespace dlib
             deserialize(item.means, in);
             deserialize(item.invstds, in);
             deserialize(item.running_means, in);
-            deserialize(item.running_invstds, in);
+            deserialize(item.running_variances, in);
             deserialize(item.num_updates, in);
             deserialize(item.running_stats_window_size, in);
 
@@ -551,9 +551,9 @@ namespace dlib
                 deserialize(_mode, in);
                 if (mode != (layer_mode)_mode) throw serialization_error("Wrong mode found while deserializing dlib::bn_");
 
-                // We also need to flip the running_invstds around since the previous
+                // We also need to flip the running_variances around since the previous
                 // format saved the inverse standard deviations instead of variances.
-                item.running_invstds = 1.0f/squared(mat(item.running_invstds)) - tt::BATCH_NORM_EPS;
+                item.running_variances = 1.0f/squared(mat(item.running_variances)) - tt::BATCH_NORM_EPS;
             }
         }
 
@@ -564,7 +564,7 @@ namespace dlib
         resizable_tensor params;
         alias_tensor gamma, beta;
         resizable_tensor means, running_means;
-        resizable_tensor invstds, running_invstds;
+        resizable_tensor invstds, running_variances;
         unsigned long num_updates;
         unsigned long running_stats_window_size;
     };
@@ -911,7 +911,7 @@ namespace dlib
             auto sg = gamma(temp,0);
             auto sb = beta(temp,gamma.size());
 
-            g = pointwise_multiply(mat(sg), 1.0f/sqrt(mat(item.running_invstds)+tt::BATCH_NORM_EPS));
+            g = pointwise_multiply(mat(sg), 1.0f/sqrt(mat(item.running_variances)+tt::BATCH_NORM_EPS));
             b = mat(sb) - pointwise_multiply(mat(g), mat(item.running_means));
         }
 

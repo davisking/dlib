@@ -164,12 +164,12 @@ namespace
         beta = 0;
 
         resizable_tensor running_means;
-        resizable_tensor running_invstds;
-        batch_normalize(dest, means, vars, 1, running_means, running_invstds, src, gamma, beta);
+        resizable_tensor running_variances;
+        batch_normalize(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
         const double scale = (src.num_samples())/(src.num_samples()-1.0);
         // Turn back into biased variance estimate because that's how batch_normalize() works, so if we want to match it this is necessary.
-        running_invstds = mat(running_invstds)/scale; 
-        batch_normalize_inference(dest2, src, gamma, beta, running_means, running_invstds);
+        running_variances = mat(running_variances)/scale; 
+        batch_normalize_inference(dest2, src, gamma, beta, running_means, running_variances);
         DLIB_TEST_MSG(max(abs(mat(dest2)-mat(dest))) < 1e-5, max(abs(mat(dest2)-mat(dest))));
 
 
@@ -177,7 +177,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = src.host()[idx];
                 src.host()[idx] += eps;
-                batch_normalize(dest, means, vars, 1, running_means, running_invstds, src, gamma, beta);
+                batch_normalize(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 src.host()[idx] = old;
                 return result;
@@ -189,7 +189,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = gamma.host()[idx];
                 gamma.host()[idx] += eps;
-                batch_normalize(dest, means, vars, 1, running_means, running_invstds, src, gamma, beta);
+                batch_normalize(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 gamma.host()[idx] = old;
                 return result;
@@ -201,7 +201,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = beta.host()[idx];
                 beta.host()[idx] += eps;
-                batch_normalize(dest, means, vars, 1, running_means, running_invstds, src, gamma, beta);
+                batch_normalize(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 beta.host()[idx] = old;
                 return result;
@@ -247,13 +247,13 @@ namespace
         beta = 0;
 
         resizable_tensor running_means;
-        resizable_tensor running_invstds;
-        batch_normalize_conv(dest, means, vars, 1, running_means, running_invstds, src, gamma, beta);
+        resizable_tensor running_variances;
+        batch_normalize_conv(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
         const double scale = (src.num_samples()*src.nr()*src.nc())/(src.num_samples()*src.nr()*src.nc()-1.0);
         // Turn back into biased variance estimate because that's how
         // batch_normalize_conv() works, so if we want to match it this is necessary.
-        running_invstds = mat(running_invstds)/scale; 
-        batch_normalize_conv_inference(dest2, src, gamma, beta, running_means, running_invstds);
+        running_variances = mat(running_variances)/scale; 
+        batch_normalize_conv_inference(dest2, src, gamma, beta, running_means, running_variances);
         DLIB_TEST(max(abs(mat(dest2)-mat(dest))) < 1e-5);
 
 
@@ -261,7 +261,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = src.host()[idx];
                 src.host()[idx] += eps;
-                batch_normalize_conv(dest, means, vars, 1, running_means, running_invstds, src, gamma, beta);
+                batch_normalize_conv(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 src.host()[idx] = old;
                 return result;
@@ -273,7 +273,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = gamma.host()[idx];
                 gamma.host()[idx] += eps;
-                batch_normalize_conv(dest, means, vars, 1, running_means, running_invstds, src, gamma, beta);
+                batch_normalize_conv(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 gamma.host()[idx] = old;
                 return result;
@@ -285,7 +285,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = beta.host()[idx];
                 beta.host()[idx] += eps;
-                batch_normalize_conv(dest, means, vars, 1, running_means, running_invstds, src, gamma, beta);
+                batch_normalize_conv(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 beta.host()[idx] = old;
                 return result;
@@ -775,7 +775,7 @@ namespace
         resizable_tensor means, means2;
         resizable_tensor invstds, invstds2;
         resizable_tensor running_means, running_means2;
-        resizable_tensor running_invstds, running_invstds2;
+        resizable_tensor running_variances, running_variances2;
         resizable_tensor src(64,20,100,100);
         resizable_tensor gamma(1,20,100,100);
         resizable_tensor beta(1,20,100,100);
@@ -785,20 +785,20 @@ namespace
         rnd.fill_uniform(src);
 
 
-        cpu::batch_normalize(dest, means, invstds, 1, running_means, running_invstds, src, gamma, beta);
-        cuda::batch_normalize(dest2,means2,invstds2, 1, running_means2, running_invstds2, src, gamma, beta);
+        cpu::batch_normalize(dest, means, invstds, 1, running_means, running_variances, src, gamma, beta);
+        cuda::batch_normalize(dest2,means2,invstds2, 1, running_means2, running_variances2, src, gamma, beta);
 
         dlog << LINFO << "dest error:    "<< max(abs(mat(dest) -mat(dest2)));
         dlog << LINFO << "means error:   "<< max(abs(mat(means) -mat(means2)));
         dlog << LINFO << "invstds error: "<< max(abs(mat(invstds) -mat(invstds2)));
         dlog << LINFO << "running_means error:   "<< max(abs(mat(running_means) -mat(running_means2)));
-        dlog << LINFO << "running_invstds error: "<< max(abs(mat(running_invstds) -mat(running_invstds2)));
+        dlog << LINFO << "running_variances error: "<< max(abs(mat(running_variances) -mat(running_variances2)));
 
         DLIB_TEST(max(abs(mat(dest) -mat(dest2))) < 1e-4);
         DLIB_TEST(max(abs(mat(means) -mat(means2))) < 1e-4);
         DLIB_TEST(max(abs(mat(invstds) -mat(invstds2))) < 1e-4);
         DLIB_TEST(max(abs(mat(running_means) -mat(running_means2))) < 1e-4);
-        DLIB_TEST(max(abs(mat(running_invstds) -mat(running_invstds2))) < 1e-4);
+        DLIB_TEST(max(abs(mat(running_variances) -mat(running_variances2))) < 1e-4);
 
 
         // now check that the gradients match as well
@@ -830,7 +830,7 @@ namespace
         resizable_tensor means, means2;
         resizable_tensor invstds, invstds2;
         resizable_tensor running_means, running_means2;
-        resizable_tensor running_invstds, running_invstds2;
+        resizable_tensor running_variances, running_variances2;
         resizable_tensor src(2,8,10,9);
         resizable_tensor gamma(1,8);
         resizable_tensor beta(1,8);
@@ -839,20 +839,20 @@ namespace
         tt::tensor_rand rnd;
         rnd.fill_uniform(src);
 
-        cpu::batch_normalize_conv(dest,means,invstds,1,running_means,running_invstds, src, gamma, beta);
-        cuda::batch_normalize_conv(dest2,means2,invstds2,1,running_means2,running_invstds2, src, gamma, beta);
+        cpu::batch_normalize_conv(dest,means,invstds,1,running_means,running_variances, src, gamma, beta);
+        cuda::batch_normalize_conv(dest2,means2,invstds2,1,running_means2,running_variances2, src, gamma, beta);
 
         dlog << LINFO << "dest error:    "<< max(abs(mat(dest) -mat(dest2)));
         dlog << LINFO << "means error:   "<< max(abs(mat(means) -mat(means2)));
         dlog << LINFO << "invstds error: "<< max(abs(mat(invstds) -mat(invstds2)));
         dlog << LINFO << "running_means error:   "<< max(abs(mat(running_means) -mat(running_means2)));
-        dlog << LINFO << "running_invstds error: "<< max(abs(mat(running_invstds) -mat(running_invstds2)));
+        dlog << LINFO << "running_variances error: "<< max(abs(mat(running_variances) -mat(running_variances2)));
 
         DLIB_TEST(max(abs(mat(dest) -mat(dest2))) < 1e-4);
         DLIB_TEST(max(abs(mat(means) -mat(means2))) < 1e-4);
         DLIB_TEST(max(abs(mat(invstds) -mat(invstds2))) < 1e-4);
         DLIB_TEST(max(abs(mat(running_means) -mat(running_means2))) < 1e-4);
-        DLIB_TEST(max(abs(mat(running_invstds) -mat(running_invstds2))) < 1e-4);
+        DLIB_TEST(max(abs(mat(running_variances) -mat(running_variances2))) < 1e-4);
 
         resizable_tensor gradient_input;
         resizable_tensor src_grad, gamma_grad, beta_grad;

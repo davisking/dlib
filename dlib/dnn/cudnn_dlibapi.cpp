@@ -343,7 +343,7 @@ namespace dlib
             const tensor& gamma, 
             const tensor& beta,
             const tensor& running_means,
-            const tensor& running_invstds
+            const tensor& running_variances
         )
         {
             DLIB_CASSERT(
@@ -353,7 +353,7 @@ namespace dlib
                 gamma.k()  == src.k() &&
                 have_same_dimensions(gamma, beta) &&
                 have_same_dimensions(gamma, running_means) &&
-                have_same_dimensions(gamma, running_invstds), 
+                have_same_dimensions(gamma, running_variances), 
                 "\ngamma.num_samples(): " << gamma.num_samples() << 
                 "\ngamma.k():  " << gamma.k() << 
                 "\ngamma.nr(): " << gamma.nr() << 
@@ -366,10 +366,10 @@ namespace dlib
                 "\nrunning_means.k():   " << running_means.k() << 
                 "\nrunning_means.nr():  " << running_means.nr() << 
                 "\nrunning_means.nc():  " << running_means.nc() << 
-                "\nrunning_invstds.num_samples(): " << running_invstds.num_samples() << 
-                "\nrunning_invstds.k():   " << running_invstds.k() << 
-                "\nrunning_invstds.nr():  " << running_invstds.nr() << 
-                "\nrunning_invstds.nc():  " << running_invstds.nc() << 
+                "\nrunning_variances.num_samples(): " << running_variances.num_samples() << 
+                "\nrunning_variances.k():   " << running_variances.k() << 
+                "\nrunning_variances.nr():  " << running_variances.nr() << 
+                "\nrunning_variances.nc():  " << running_variances.nc() << 
                 "\nsrc.k():   " << src.k() << 
                 "\nsrc.nr():  " << src.nr() << 
                 "\nsrc.nc():  " << src.nc() 
@@ -392,7 +392,7 @@ namespace dlib
                                 gamma.device(),
                                 beta.device(),
                                 running_means.device(),
-                                running_invstds.device(),
+                                running_variances.device(),
                                 dlib::tt::BATCH_NORM_EPS));
         }
 
@@ -402,7 +402,7 @@ namespace dlib
             resizable_tensor& invstds,
             const double averaging_factor,
             resizable_tensor& running_means,
-            resizable_tensor& running_invstds,
+            resizable_tensor& running_variances,
             const tensor& src,
             const tensor& gamma, 
             const tensor& beta 
@@ -410,7 +410,7 @@ namespace dlib
         {
             DLIB_CASSERT(0 <= averaging_factor && averaging_factor <= 1, "averaging_factor: " << averaging_factor);
             DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_means,means),"");
-            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_invstds,invstds),"");
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_variances,invstds),"");
             DLIB_CASSERT(
                 src.num_samples() > 1 &&
                 gamma.num_samples() == 1 && 
@@ -438,7 +438,7 @@ namespace dlib
             means.set_size(1, src.k(), src.nr(), src.nc());
             invstds.copy_size(means);
             running_means.copy_size(means);
-            running_invstds.copy_size(means);
+            running_variances.copy_size(means);
 
             CHECK_CUDNN(cudnnBatchNormalizationForwardTraining(
                                 context(),
@@ -454,7 +454,7 @@ namespace dlib
                                 beta.device(),
                                 averaging_factor,
                                 running_means.device(),
-                                running_invstds.device(),
+                                running_variances.device(),
                                 dlib::tt::BATCH_NORM_EPS,
                                 means.device(),
                                 invstds.device()));
@@ -516,7 +516,7 @@ namespace dlib
             const tensor& gamma, 
             const tensor& beta,
             const tensor& running_means,
-            const tensor& running_invstds
+            const tensor& running_variances
         )
         {
             DLIB_CASSERT(
@@ -526,7 +526,7 @@ namespace dlib
                 gamma.k()  == src.k() &&
                 have_same_dimensions(gamma, beta) &&
                 have_same_dimensions(gamma, running_means) &&
-                have_same_dimensions(gamma, running_invstds), 
+                have_same_dimensions(gamma, running_variances), 
                 "\ngamma.num_samples(): " << gamma.num_samples() << 
                 "\ngamma.k():  " << gamma.k() << 
                 "\ngamma.nr(): " << gamma.nr() << 
@@ -539,10 +539,10 @@ namespace dlib
                 "\nrunning_means.k():   " << running_means.k() << 
                 "\nrunning_means.nr():  " << running_means.nr() << 
                 "\nrunning_means.nc():  " << running_means.nc() << 
-                "\nrunning_invstds.num_samples(): " << running_invstds.num_samples() << 
-                "\nrunning_invstds.k():   " << running_invstds.k() << 
-                "\nrunning_invstds.nr():  " << running_invstds.nr() << 
-                "\nrunning_invstds.nc():  " << running_invstds.nc() << 
+                "\nrunning_variances.num_samples(): " << running_variances.num_samples() << 
+                "\nrunning_variances.k():   " << running_variances.k() << 
+                "\nrunning_variances.nr():  " << running_variances.nr() << 
+                "\nrunning_variances.nc():  " << running_variances.nc() << 
                 "\nsrc.k():   " << src.k() << 
                 "\nsrc.nr():  " << src.nr() << 
                 "\nsrc.nc():  " << src.nc() 
@@ -565,7 +565,7 @@ namespace dlib
                                 gamma.device(),
                                 beta.device(),
                                 running_means.device(),
-                                running_invstds.device(),
+                                running_variances.device(),
                                 dlib::tt::BATCH_NORM_EPS));
         }
 
@@ -575,7 +575,7 @@ namespace dlib
             resizable_tensor& invstds,
             const double averaging_factor,
             resizable_tensor& running_means,
-            resizable_tensor& running_invstds,
+            resizable_tensor& running_variances,
             const tensor& src,
             const tensor& gamma, 
             const tensor& beta 
@@ -583,7 +583,7 @@ namespace dlib
         {
             DLIB_CASSERT(0 <= averaging_factor && averaging_factor <= 1, "averaging_factor: " << averaging_factor);
             DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_means,means),"");
-            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_invstds,invstds),"");
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_variances,invstds),"");
             DLIB_CASSERT(
                 src.num_samples() > 1 &&
                 gamma.num_samples() == 1 && 
@@ -612,7 +612,7 @@ namespace dlib
             means.set_size(1, src.k());
             invstds.copy_size(means);
             running_means.copy_size(means);
-            running_invstds.copy_size(means);
+            running_variances.copy_size(means);
 
             CHECK_CUDNN(cudnnBatchNormalizationForwardTraining(
                                 context(),
@@ -628,7 +628,7 @@ namespace dlib
                                 beta.device(),
                                 averaging_factor,
                                 running_means.device(),
-                                running_invstds.device(),
+                                running_variances.device(),
                                 dlib::tt::BATCH_NORM_EPS,
                                 means.device(),
                                 invstds.device()));
