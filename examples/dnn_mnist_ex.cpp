@@ -34,9 +34,9 @@ int main(int argc, char** argv) try
 
 
     using net_type = loss_multiclass_log<
-                                fc<10,FC_HAS_BIAS,
-                                relu<fc<84,FC_HAS_BIAS,
-                                relu<fc<120,FC_HAS_BIAS,
+                                fc<10,
+                                relu<fc<84,
+                                relu<fc<120,
                                 max_pool<2,2,2,2,relu<con<16,5,5,1,1,
                                 max_pool<2,2,2,2,relu<con<6,5,5,1,1,
                                 input<matrix<unsigned char>>>>>>>>>>>>>>;

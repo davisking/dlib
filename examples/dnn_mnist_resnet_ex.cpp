@@ -43,7 +43,7 @@ int main(int argc, char** argv) try
     set_dnn_prefer_smallest_algorithms();
 
     const unsigned long number_of_classes = 10;
-    typedef loss_multiclass_log<fc<number_of_classes,FC_HAS_BIAS,
+    typedef loss_multiclass_log<fc<number_of_classes,
                                 avg_pool<11,11,11,11,
                                 res<res<res<res_down<
                                 repeat<9,res, // repeat this layer 9 times
@@ -62,7 +62,7 @@ int main(int argc, char** argv) try
 
     // Let's imagine we wanted to replace some of the relu layers with prelu layers.  We
     // might do it like this:
-    typedef loss_multiclass_log<fc<number_of_classes,FC_HAS_BIAS,
+    typedef loss_multiclass_log<fc<number_of_classes,
                                 avg_pool<11,11,11,11,
                                 pres<res<res<res_down< // 2 prelu layers here
                                 tag4<repeat<9,pres,    // 9 groups, each containing 2 prelu layers  
@@ -76,7 +76,7 @@ int main(int argc, char** argv) try
     net_type2 pnet(prelu_(0.2),  
                    prelu_(0.2),
                    repeat_group(prelu_(0.3),prelu_(0.4)) // Initialize all the prelu instances in the repeat 
-                                                       // layer.  repeat_group() is needed to group the things 
+                                                         // layer.  repeat_group() is needed to group the things 
                                                        // that are part of repeat's block.
                    );
     // As you can see, a network will greedily assign things given to its constructor to
@@ -144,7 +144,7 @@ int main(int argc, char** argv) try
 
 
 
-    typedef loss_multiclass_log<fc<number_of_classes,FC_HAS_BIAS,
+    typedef loss_multiclass_log<fc<number_of_classes,
                                 avg_pool<11,11,11,11,
                                 ares<ares<ares<ares_down<
                                 repeat<9,res,
