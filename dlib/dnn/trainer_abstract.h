@@ -286,7 +286,7 @@ namespace dlib
                   The goal of training is to find the network parameters that minimize
                   get_net().compute_loss(data.begin(), data.end(), labels.begin()). 
                 - The optimizer will run until get_step_size() < get_min_step_size() or
-                  get_max_num_epochs() training epochs have been executes. 
+                  get_max_num_epochs() training epochs have been executed. 
                 - Each layer in the network will be optimized by its corresponding solver
                   in get_solvers().  
                 - Each call to train DOES NOT reinitialize the state of get_net() or
@@ -311,7 +311,7 @@ namespace dlib
                   The goal of training is to find the network parameters that minimize
                   get_net().compute_loss(data.begin(), data.end()). 
                 - The optimizer will run until get_step_size() < get_min_step_size() or
-                  get_max_num_epochs() training epochs have been executes. 
+                  get_max_num_epochs() training epochs have been executed. 
                 - Each layer in the network will be optimized by its corresponding solver
                   in get_solvers().  
                 - Each call to train DOES NOT reinitialize the state of get_net() or

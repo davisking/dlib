@@ -323,7 +323,7 @@ namespace dlib
                 - sub.get_output().nc() == 1
                 - sub.get_output().num_samples() == input_tensor.num_samples()
             and the output label is the predicted class for each classified object.  The number
-            of possible output classes is sub.get_output().k()+1.
+            of possible output classes is sub.get_output().k().
         !*/
 
         template <
