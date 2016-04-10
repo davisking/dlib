@@ -1176,7 +1176,7 @@ namespace
 // ----------------------------------------------------------------------------------------
 
     template <unsigned long n, typename SUBNET> using rcon = max_pool<2,2,2,2,relu<bn_con<con<n,5,5,1,1,SUBNET>>>>;
-    template <unsigned long n, typename SUBNET> using rfc = relu<bn_fc<fc<n,FC_HAS_BIAS,SUBNET>>>;
+    template <unsigned long n, typename SUBNET> using rfc = relu<bn_fc<fc<n,SUBNET>>>;
 
     void test_tagging(
     )
@@ -1190,6 +1190,8 @@ namespace
         DLIB_TEST(layer<skip1>(net).num_layers == 8+3+3);
         DLIB_TEST(&layer<skip1>(net).get_output() == &layer<tag1>(net).get_output());
         DLIB_TEST(&layer<skip1>(net).get_output() != &layer<tag1>(net).subnet().subnet().get_output());
+        DLIB_TEST(net.subnet().subnet().subnet().layer_details().get_num_outputs() == 10);
+        DLIB_TEST(net2.subnet().subnet().subnet().layer_details().get_num_outputs() == 4);
     }
 
 // ----------------------------------------------------------------------------------------

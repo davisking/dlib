@@ -396,13 +396,17 @@ namespace dlib
         !*/
     };
 
+    template <
+        unsigned long num_outputs,
+        typename SUBNET
+        >
+    using fc = add_layer<fc_<num_outputs,FC_HAS_BIAS>, SUBNET>;
 
     template <
         unsigned long num_outputs,
-        fc_bias_mode bias_mode,
         typename SUBNET
         >
-    using fc = add_layer<fc_<num_outputs,bias_mode>, SUBNET>;
+    using fc_no_bias = add_layer<fc_<num_outputs,FC_NO_BIAS>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
