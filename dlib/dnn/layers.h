@@ -133,7 +133,7 @@ namespace dlib
             std::string version;
             deserialize(version, in);
             if (version != "con_")
-                throw serialization_error("Unexpected version found while deserializing dlib::con_.");
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::con_.");
             deserialize(item.params, in);
 
 
@@ -258,7 +258,7 @@ namespace dlib
             std::string version;
             deserialize(version, in);
             if (version != "max_pool_")
-                throw serialization_error("Unexpected version found while deserializing dlib::max_pool_.");
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::max_pool_.");
 
             item.mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x);
 
@@ -374,7 +374,7 @@ namespace dlib
             std::string version;
             deserialize(version, in);
             if (version != "avg_pool_")
-                throw serialization_error("Unexpected version found while deserializing dlib::avg_pool_.");
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::avg_pool_.");
 
             item.ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x);
 
@@ -500,7 +500,10 @@ namespace dlib
 
         friend void serialize(const bn_& item, std::ostream& out)
         {
-            serialize("bn_", out);
+            if (mode == CONV_MODE)
+                serialize("bn_con", out);
+            else // if FC_MODE
+                serialize("bn_fc", out);
             serialize(item.params, out);
             serialize(item.gamma, out);
             serialize(item.beta, out);
@@ -510,7 +513,6 @@ namespace dlib
             serialize(item.running_invstds, out);
             serialize(item.num_updates, out);
             serialize(item.running_stats_window_size, out);
-            serialize((int)mode, out);
         }
 
         friend void deserialize(bn_& item, std::istream& in)
@@ -518,7 +520,19 @@ namespace dlib
             std::string version;
             deserialize(version, in);
             if (version != "bn_")
-                throw serialization_error("Unexpected version found while deserializing dlib::bn_.");
+            {
+                if (mode == CONV_MODE) 
+                {
+                    if (version != "bn_con")
+                        throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::bn_.");
+                }
+                else // must be in FC_MODE
+                {
+                    if (version != "bn_fc")
+                        throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::bn_.");
+                }
+            }
+
             deserialize(item.params, in);
             deserialize(item.gamma, in);
             deserialize(item.beta, in);
@@ -528,14 +542,23 @@ namespace dlib
             deserialize(item.running_invstds, in);
             deserialize(item.num_updates, in);
             deserialize(item.running_stats_window_size, in);
-            int _mode;
-            deserialize(_mode, in);
-            if (mode != (layer_mode)_mode) throw serialization_error("Wrong mode found while deserializing dlib::bn_");
+
+            // if this is the older "bn_" version then check its saved mode value and make
+            // sure it is the one we are really using.  
+            if (version == "bn_")
+            {
+                int _mode;
+                deserialize(_mode, in);
+                if (mode != (layer_mode)_mode) throw serialization_error("Wrong mode found while deserializing dlib::bn_");
+
+                // We also need to flip the running_invstds around since the previous
+                // format saved the inverse standard deviations instead of variances.
+                item.running_invstds = 1.0f/squared(mat(item.running_invstds)) - tt::BATCH_NORM_EPS;
+            }
         }
 
     private:
 
-        template < layer_mode Mode >
         friend class affine_;
 
         resizable_tensor params;
@@ -660,7 +683,7 @@ namespace dlib
             std::string version;
             deserialize(version, in);
             if (version != "fc_")
-                throw serialization_error("Unexpected version found while deserializing dlib::fc_.");
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::fc_.");
 
             deserialize(item.num_outputs, in);
             deserialize(item.num_inputs, in);
@@ -760,7 +783,7 @@ namespace dlib
             std::string version;
             deserialize(version, in);
             if (version != "dropout_")
-                throw serialization_error("Unexpected version found while deserializing dlib::dropout_.");
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::dropout_.");
             deserialize(item.drop_rate, in);
             deserialize(item.mask, in);
         }
@@ -840,7 +863,7 @@ namespace dlib
             }
 
             if (version != "multiply_")
-                throw serialization_error("Unexpected version found while deserializing dlib::multiply_.");
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::multiply_.");
             deserialize(item.val, in);
         }
 
@@ -854,22 +877,30 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        layer_mode mode
-        >
     class affine_
     {
     public:
         affine_(
-        ) 
-        {}
+        ) : mode(FC_MODE)
+        {
+        }
 
         affine_(
-            const bn_<mode>& item
+            layer_mode mode_
+        ) : mode(mode_)
+        {
+        }
+
+        template <
+            layer_mode bnmode
+            >
+        affine_(
+            const bn_<bnmode>& item
         )
         {
             gamma = item.gamma;
             beta = item.beta;
+            mode = bnmode;
 
             params.copy_size(item.params);
 
@@ -880,7 +911,7 @@ namespace dlib
             auto sg = gamma(temp,0);
             auto sb = beta(temp,gamma.size());
 
-            g = pointwise_multiply(mat(sg), mat(item.running_invstds));
+            g = pointwise_multiply(mat(sg), 1.0f/sqrt(mat(item.running_invstds)+tt::BATCH_NORM_EPS));
             b = mat(sb) - pointwise_multiply(mat(g), mat(item.running_means));
         }
 
@@ -954,36 +985,45 @@ namespace dlib
         {
             std::string version;
             deserialize(version, in);
-            if (version == "bn_")
+            if (version == "bn_con")
             {
                 // Since we can build an affine_ from a bn_ we check if that's what is in
                 // the stream and if so then just convert it right here.
                 unserialize sin(version, in);
-                bn_<mode> temp;
+                bn_<CONV_MODE> temp;
+                deserialize(temp, sin);
+                item = temp;
+                return;
+            }
+            else if (version == "bn_fc")
+            {
+                // Since we can build an affine_ from a bn_ we check if that's what is in
+                // the stream and if so then just convert it right here.
+                unserialize sin(version, in);
+                bn_<FC_MODE> temp;
                 deserialize(temp, sin);
                 item = temp;
                 return;
             }
 
             if (version != "affine_")
-                throw serialization_error("Unexpected version found while deserializing dlib::affine_.");
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::affine_.");
             deserialize(item.params, in);
             deserialize(item.gamma, in);
             deserialize(item.beta, in);
-            int _mode;
-            deserialize(_mode, in);
-            if (mode != (layer_mode)_mode) throw serialization_error("Wrong mode found while deserializing dlib::affine_");
+            int mode;
+            deserialize(mode, in);
+            item.mode = (layer_mode)mode;
         }
 
     private:
         resizable_tensor params, empty_params; 
         alias_tensor gamma, beta;
+        layer_mode mode;
     };
 
     template <typename SUBNET>
-    using affine_con = add_layer<affine_<CONV_MODE>, SUBNET>;
-    template <typename SUBNET>
-    using affine_fc = add_layer<affine_<FC_MODE>, SUBNET>;
+    using affine = add_layer<affine_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -1031,7 +1071,7 @@ namespace dlib
             std::string version;
             deserialize(version, in);
             if (version != "add_prev_")
-                throw serialization_error("Unexpected version found while deserializing dlib::add_prev_.");
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::add_prev_.");
         }
 
     private:
@@ -1108,7 +1148,7 @@ namespace dlib
             std::string version;
             deserialize(version, in);
             if (version != "relu_")
-                throw serialization_error("Unexpected version found while deserializing dlib::relu_.");
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::relu_.");
         }
 
     private:
@@ -1176,7 +1216,7 @@ namespace dlib
             std::string version;
             deserialize(version, in);
             if (version != "prelu_")
-                throw serialization_error("Unexpected version found while deserializing dlib::prelu_.");
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::prelu_.");
             deserialize(item.params, in);
             deserialize(item.initial_param_value, in);
         }
@@ -1231,7 +1271,7 @@ namespace dlib
             std::string version;
             deserialize(version, in);
             if (version != "sig_")
-                throw serialization_error("Unexpected version found while deserializing dlib::sig_.");
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::sig_.");
         }
 
     private:
@@ -1284,7 +1324,7 @@ namespace dlib
             std::string version;
             deserialize(version, in);
             if (version != "htan_")
-                throw serialization_error("Unexpected version found while deserializing dlib::htan_.");
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::htan_.");
         }
 
     private:
@@ -1337,7 +1377,7 @@ namespace dlib
             std::string version;
             deserialize(version, in);
             if (version != "softmax_")
-                throw serialization_error("Unexpected version found while deserializing dlib::softmax_.");
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::softmax_.");
         }
 
     private:

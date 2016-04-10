@@ -445,7 +445,7 @@ if (NOT TARGET dlib)
 
 
       if (DLIB_USE_CUDA)
-         find_package(CUDA 7.0)
+         find_package(CUDA 7.5)
 
 
          if (CUDA_FOUND AND COMPILER_CAN_DO_CPP_11)
@@ -505,7 +505,7 @@ if (NOT TARGET dlib)
             set(DLIB_USE_CUDA OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
             toggle_preprocessor_switch(DLIB_USE_CUDA)
             if (NOT cudnn OR NOT cudnn_include OR NOT cudnn_test_compile_worked)
-               message(STATUS "*** cuDNN V4.0 OR GREATER NOT FOUND.  DLIB WILL NOT USE CUDA. ***")
+               message(STATUS "*** cuDNN V5.0 OR GREATER NOT FOUND.  DLIB WILL NOT USE CUDA. ***")
                message(STATUS "*** If you have cuDNN then set CMAKE_PREFIX_PATH to include cuDNN's folder.")
             endif()
             if (NOT COMPILER_CAN_DO_CPP_11)

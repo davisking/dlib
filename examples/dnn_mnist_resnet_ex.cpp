@@ -13,7 +13,7 @@ template <int stride, typename SUBNET>
 using base_res  = relu<add_prev1<    bn_con<con<8,3,3,1,1,relu<    bn_con<con<8,3,3,stride,stride,tag1<SUBNET>>>>>>>>;
 
 template <int stride, typename SUBNET> 
-using base_ares = relu<add_prev1<affine_con<con<8,3,3,1,1,relu<affine_con<con<8,3,3,stride,stride,tag1<SUBNET>>>>>>>>;
+using base_ares = relu<add_prev1<affine<con<8,3,3,1,1,relu<affine<con<8,3,3,stride,stride,tag1<SUBNET>>>>>>>>;
 
 template <typename SUBNET> using res       = base_res<1,SUBNET>;
 template <typename SUBNET> using res_down  = base_res<2,SUBNET>;

@@ -736,9 +736,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        layer_mode mode
-        >
     class affine_
     {
         /*!
@@ -779,9 +776,20 @@ namespace dlib
         );
         /*!
             ensures
+                - #get_mode() == FC_MODE 
+        !*/
+
+        affine_(
+            layer_mode mode
+        );
+        /*!
+            ensures
                 - #get_mode() == mode
         !*/
 
+        template <
+            layer_mode mode
+            >
         affine_(
             const bn_<mode>& layer
         );
@@ -812,17 +820,16 @@ namespace dlib
             are no learnable parameters in this object.
         !*/
 
-        friend void serialize(const affine_& item, std::ostream& out);
-        friend void deserialize(affine_& item, std::istream& in);
-        /*!
-            provides serialization support  
-        !*/
     };
 
+    void serialize(const affine_& item, std::ostream& out);
+    void deserialize(affine_& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
     template <typename SUBNET>
-    using affine_con = add_layer<affine_<CONV_MODE>, SUBNET>;
-    template <typename SUBNET>
-    using affine_fc = add_layer<affine_<FC_MODE>, SUBNET>;
+    using affine = add_layer<affine_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

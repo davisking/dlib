@@ -114,6 +114,57 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        class cudnn_activation_descriptor
+        {
+        public:
+            // not copyable 
+            cudnn_activation_descriptor(const cudnn_activation_descriptor&) = delete;
+            cudnn_activation_descriptor& operator=(const cudnn_activation_descriptor&) = delete;
+
+            cudnn_activation_descriptor(
+                cudnnActivationMode_t mode,
+                cudnnNanPropagation_t reluNanOpt,
+                double reluCeiling
+            )
+            {
+                CHECK_CUDNN(cudnnCreateActivationDescriptor(&handle));
+                CHECK_CUDNN(cudnnSetActivationDescriptor(handle, mode, reluNanOpt, reluCeiling));
+            }
+
+            ~cudnn_activation_descriptor()
+            {
+                cudnnDestroyActivationDescriptor(handle);
+            }
+
+            cudnnActivationDescriptor_t get_handle (
+            ) 
+            { 
+                return handle; 
+            }
+        private:
+            cudnnActivationDescriptor_t handle;
+        };
+
+        static cudnnActivationDescriptor_t relu_activation_descriptor()
+        {
+            thread_local cudnn_activation_descriptor des(CUDNN_ACTIVATION_RELU, CUDNN_PROPAGATE_NAN,0);
+            return des.get_handle();
+        }
+
+        static cudnnActivationDescriptor_t sigmoid_activation_descriptor()
+        {
+            thread_local cudnn_activation_descriptor des(CUDNN_ACTIVATION_SIGMOID, CUDNN_PROPAGATE_NAN,0);
+            return des.get_handle();
+        }
+
+        static cudnnActivationDescriptor_t tanh_activation_descriptor()
+        {
+            thread_local cudnn_activation_descriptor des(CUDNN_ACTIVATION_TANH, CUDNN_PROPAGATE_NAN,0);
+            return des.get_handle();
+        }
+
+    // ------------------------------------------------------------------------------------
+
         tensor_descriptor::
         tensor_descriptor(
         ) : handle(nullptr)
@@ -223,7 +274,7 @@ namespace dlib
                 return;
             }
 
-            CHECK_CUDNN(cudnnAddTensor_v3(context(),
+            CHECK_CUDNN(cudnnAddTensor(context(),
                                     &alpha,
                                     descriptor(src),
                                     src.device(),
@@ -342,7 +393,7 @@ namespace dlib
                                 beta.device(),
                                 running_means.device(),
                                 running_invstds.device(),
-                                dlib::cpu::BATCH_NORM_EPS));
+                                dlib::tt::BATCH_NORM_EPS));
         }
 
         void batch_normalize (
@@ -404,7 +455,7 @@ namespace dlib
                                 averaging_factor,
                                 running_means.device(),
                                 running_invstds.device(),
-                                dlib::cpu::BATCH_NORM_EPS,
+                                dlib::tt::BATCH_NORM_EPS,
                                 means.device(),
                                 invstds.device()));
         }
@@ -452,7 +503,7 @@ namespace dlib
                                 gamma.device(),
                                 gamma_grad.device(),
                                 beta_grad.device(),
-                                dlib::cpu::BATCH_NORM_EPS,
+                                dlib::tt::BATCH_NORM_EPS,
                                 means.device(),
                                 invstds.device()));
         }
@@ -515,7 +566,7 @@ namespace dlib
                                 beta.device(),
                                 running_means.device(),
                                 running_invstds.device(),
-                                dlib::cpu::BATCH_NORM_EPS));
+                                dlib::tt::BATCH_NORM_EPS));
         }
 
         void batch_normalize_conv (
@@ -578,7 +629,7 @@ namespace dlib
                                 averaging_factor,
                                 running_means.device(),
                                 running_invstds.device(),
-                                dlib::cpu::BATCH_NORM_EPS,
+                                dlib::tt::BATCH_NORM_EPS,
                                 means.device(),
                                 invstds.device()));
         }
@@ -625,7 +676,7 @@ namespace dlib
                                 gamma.device(),
                                 gamma_grad.device(),
                                 beta_grad.device(),
-                                dlib::cpu::BATCH_NORM_EPS,
+                                dlib::tt::BATCH_NORM_EPS,
                                 means.device(),
                                 invstds.device()));
         }
@@ -739,6 +790,7 @@ namespace dlib
                 CHECK_CUDNN(cudnnCreateFilterDescriptor((cudnnFilterDescriptor_t*)&filter_handle));
                 CHECK_CUDNN(cudnnSetFilter4dDescriptor((cudnnFilterDescriptor_t)filter_handle, 
                                                  CUDNN_DATA_FLOAT, 
+                                                 CUDNN_TENSOR_NCHW,
                                                  filters.num_samples(),
                                                  filters.k(),
                                                  filters.nr(),
@@ -900,7 +952,7 @@ namespace dlib
             const float beta = 1;
 
 
-            CHECK_CUDNN(cudnnConvolutionBackwardData_v3(context(),
+            CHECK_CUDNN(cudnnConvolutionBackwardData(context(),
                                                   &alpha,
                                                   (const cudnnFilterDescriptor_t)filter_handle,
                                                   filters.device(),
@@ -924,7 +976,7 @@ namespace dlib
         {
             const float alpha = 1;
             const float beta = 0;
-            CHECK_CUDNN(cudnnConvolutionBackwardFilter_v3(context(),
+            CHECK_CUDNN(cudnnConvolutionBackwardFilter(context(),
                                                     &alpha,
                                                     descriptor(data),
                                                     data.device(),
@@ -1020,6 +1072,7 @@ namespace dlib
 
                 CHECK_CUDNN(cudnnSetPooling2dDescriptor(poolingDesc,
                                                 (cudnnPoolingMode_t)pooling_mode,
+                                                CUDNN_PROPAGATE_NAN,
                                                 window_height,
                                                 window_width,
                                                 window_height/2,
@@ -1176,7 +1229,7 @@ namespace dlib
             const float alpha = 1;
             const float beta = 0;
             CHECK_CUDNN(cudnnActivationForward(context(),
-                                         CUDNN_ACTIVATION_SIGMOID,
+                                         sigmoid_activation_descriptor(),
                                          &alpha,
                                          descriptor(src),
                                          src.device(),
@@ -1200,7 +1253,7 @@ namespace dlib
             const float alpha = 1;
             const float beta = 0;
             CHECK_CUDNN(cudnnActivationBackward(context(),
-                                          CUDNN_ACTIVATION_SIGMOID,
+                                          sigmoid_activation_descriptor(),
                                           &alpha,
                                           descriptor(dest),
                                           dest.device(),
@@ -1227,7 +1280,7 @@ namespace dlib
             const float alpha = 1;
             const float beta = 0;
             CHECK_CUDNN(cudnnActivationForward(context(),
-                                         CUDNN_ACTIVATION_RELU,
+                                         relu_activation_descriptor(),
                                          &alpha,
                                          descriptor(src),
                                          src.device(),
@@ -1251,7 +1304,7 @@ namespace dlib
             const float alpha = 1;
             const float beta = 0;
             CHECK_CUDNN(cudnnActivationBackward(context(),
-                                          CUDNN_ACTIVATION_RELU,
+                                          relu_activation_descriptor(),
                                           &alpha,
                                           descriptor(dest),
                                           dest.device(),
@@ -1278,7 +1331,7 @@ namespace dlib
             const float alpha = 1;
             const float beta = 0;
             CHECK_CUDNN(cudnnActivationForward(context(),
-                                         CUDNN_ACTIVATION_TANH,
+                                         tanh_activation_descriptor(),
                                          &alpha,
                                          descriptor(src),
                                          src.device(),
@@ -1302,7 +1355,7 @@ namespace dlib
             const float alpha = 1;
             const float beta = 0;
             CHECK_CUDNN(cudnnActivationBackward(context(),
-                                          CUDNN_ACTIVATION_TANH,
+                                          tanh_activation_descriptor(),
                                           &alpha,
                                           descriptor(dest),
                                           dest.device(),

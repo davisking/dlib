@@ -166,8 +166,11 @@ namespace
         resizable_tensor running_means;
         resizable_tensor running_invstds;
         batch_normalize(dest, means, vars, 1, running_means, running_invstds, src, gamma, beta);
+        const double scale = (src.num_samples())/(src.num_samples()-1.0);
+        // Turn back into biased variance estimate because that's how batch_normalize() works, so if we want to match it this is necessary.
+        running_invstds = mat(running_invstds)/scale; 
         batch_normalize_inference(dest2, src, gamma, beta, running_means, running_invstds);
-        DLIB_TEST(max(abs(mat(dest2)-mat(dest))) < 1e-5);
+        DLIB_TEST_MSG(max(abs(mat(dest2)-mat(dest))) < 1e-5, max(abs(mat(dest2)-mat(dest))));
 
 
         auto grad_src = [&](long idx) {
@@ -246,6 +249,10 @@ namespace
         resizable_tensor running_means;
         resizable_tensor running_invstds;
         batch_normalize_conv(dest, means, vars, 1, running_means, running_invstds, src, gamma, beta);
+        const double scale = (src.num_samples()*src.nr()*src.nc())/(src.num_samples()*src.nr()*src.nc()-1.0);
+        // Turn back into biased variance estimate because that's how
+        // batch_normalize_conv() works, so if we want to match it this is necessary.
+        running_invstds = mat(running_invstds)/scale; 
         batch_normalize_conv_inference(dest2, src, gamma, beta, running_means, running_invstds);
         DLIB_TEST(max(abs(mat(dest2)-mat(dest))) < 1e-5);
 
@@ -1086,12 +1093,12 @@ namespace
         }
         {
             print_spinner();
-            affine_<CONV_MODE> l;
+            affine_ l(CONV_MODE);
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {
             print_spinner();
-            affine_<FC_MODE> l;
+            affine_ l(FC_MODE);
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {

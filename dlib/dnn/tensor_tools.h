@@ -286,6 +286,8 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    const double BATCH_NORM_EPS = 0.00001;
+
     void batch_normalize_inference (
         resizable_tensor& dest,
         const tensor& src,

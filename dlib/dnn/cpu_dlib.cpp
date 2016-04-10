@@ -6,6 +6,7 @@
 // This file contains CPU implementations of the GPU based functions in cuda_dlib.h
 
 #include "cpu_dlib.h"
+#include "tensor_tools.h"
 
 namespace dlib
 {
@@ -510,7 +511,7 @@ namespace dlib
             {
                 for (long k = 0; k < num; ++k)
                 {
-                    *d = g[k]*(*s - m[k])*i[k] + b[k];
+                    *d = g[k]*(*s - m[k])/std::sqrt(i[k]+dlib::tt::BATCH_NORM_EPS) + b[k];
                     ++d;
                     ++s;
                 }
@@ -579,10 +580,18 @@ namespace dlib
             invstds.host(); means.host();
 
             // compute variances 
+            running_invstds.copy_size(invstds);
+            auto rvar = running_invstds.host();
+            const double scale = (src.num_samples())/(src.num_samples()-1.0);
             for (long i = 0; i < num; ++i)
             {
                 auto actual_var = p_invstds[i] - p_means[i]*p_means[i];
-                p_invstds[i] = 1.0f/std::sqrt(actual_var+BATCH_NORM_EPS);
+                if (averaging_factor == 1)
+                    rvar[i] = scale*actual_var;
+                else
+                    rvar[i] = (1-averaging_factor)*rvar[i] + scale*averaging_factor*actual_var;
+
+                p_invstds[i] = 1.0f/std::sqrt(actual_var + dlib::tt::BATCH_NORM_EPS);
             }
 
             p_src = src.host();
@@ -600,19 +609,12 @@ namespace dlib
                 }
             }
 
-            // now keep track of the running means and invstds
+            // now keep track of the running means 
             running_means.copy_size(means);
-            running_invstds.copy_size(invstds);
             if (averaging_factor != 1)
-            {
                 running_means = (1-averaging_factor)*mat(running_means) + averaging_factor*mat(means);
-                running_invstds = (1-averaging_factor)*mat(running_invstds) + averaging_factor*mat(invstds);
-            }
             else
-            {
                 running_means = means;
-                running_invstds = invstds;
-            }
         }
 
         void batch_normalize_gradient (
@@ -761,9 +763,10 @@ namespace dlib
             {
                 for (long k = 0; k < src.k(); ++k)
                 {
+                    const float invstd = 1.0f/std::sqrt(i[k] + dlib::tt::BATCH_NORM_EPS);
                     for (long j = 0; j < num; ++j)
                     {
-                        *d = g[k]*(*s - m[k])*i[k] + b[k];
+                        *d = g[k]*(*s - m[k])*invstd + b[k];
                         ++d;
                         ++s;
                     }
@@ -841,10 +844,18 @@ namespace dlib
 
             p_src = src.host();
             // compute variances 
+            running_invstds.copy_size(invstds);
+            auto rvar = running_invstds.host();
+            const double scale = (src.num_samples()*num)/(src.num_samples()*num-1.0);
             for (long k = 0; k < src.k(); ++k)
             {
                 float actual_var = p_invstds[k] - p_means[k]*p_means[k];
-                p_invstds[k] = 1.0f/std::sqrt(actual_var + BATCH_NORM_EPS);
+                if (averaging_factor == 1)
+                    rvar[k] = scale*actual_var;
+                else
+                    rvar[k] = (1-averaging_factor)*rvar[k] + scale*averaging_factor*actual_var;
+
+                p_invstds[k] = 1.0f/std::sqrt(actual_var + dlib::tt::BATCH_NORM_EPS);
             }
 
             p_src = src.host();
@@ -863,19 +874,12 @@ namespace dlib
                 }
             }
 
-            // now keep track of the running means and invstds
+            // now keep track of the running means 
             running_means.copy_size(means);
-            running_invstds.copy_size(invstds);
             if (averaging_factor != 1)
-            {
                 running_means = (1-averaging_factor)*mat(running_means) + averaging_factor*mat(means);
-                running_invstds = (1-averaging_factor)*mat(running_invstds) + averaging_factor*mat(invstds);
-            }
             else
-            {
                 running_means = means;
-                running_invstds = invstds;
-            }
         }
 
         void batch_normalize_conv_gradient(
