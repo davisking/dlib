@@ -561,7 +561,6 @@ namespace dlib
             for (int y = 1; y < visible_nr; y++) 
             {
                 int x;
-#ifdef DLIB_HAVE_AVX
                 for (x = 1; x < visible_nc - 7; x += 8)
                 {
                     // v will be the length of the gradient vectors.
@@ -607,46 +606,6 @@ namespace dlib
                     angle[y][x + 6] = _best_o[6];
                     angle[y][x + 7] = _best_o[7];
                 }
-#else//DLIB_HAVE_AVX
-                for (x = 1; x < visible_nc-3; x+=4) 
-                {
-                    // v will be the length of the gradient vectors.
-                    simd4f grad_x, grad_y, v;
-                    get_gradient(y,x,img,grad_x,grad_y,v);
-
-                    float _vv[4];
-                    v.store(_vv);
-
-                    // Now snap the gradient to one of 18 orientations
-                    simd4f best_dot = 0;
-                    simd4f best_o = 0;
-                    for (int o = 0; o < 9; o++) 
-                    {
-                        simd4f dot = grad_x*directions[o](0) + grad_y*directions[o](1);
-                        simd4f_bool cmp = dot>best_dot;
-                        best_dot = select(cmp,dot,best_dot); 
-                        dot *= -1;
-                        best_o = select(cmp,o,best_o);
-
-                        cmp = dot>best_dot;
-                        best_dot = select(cmp,dot,best_dot);
-                        best_o = select(cmp,o+9,best_o);
-                    }
-
-                    int32 _best_o[4]; simd4i(best_o).store(_best_o);
-
-                    norm[y][x+0] = _vv[0];
-                    norm[y][x+1] = _vv[1];
-                    norm[y][x+2] = _vv[2];
-                    norm[y][x+3] = _vv[3];
-
-                    angle[y][x+0] = _best_o[0];
-                    angle[y][x+1] = _best_o[1];
-                    angle[y][x+2] = _best_o[2];
-                    angle[y][x+3] = _best_o[3];
-
-                }
-#endif//DLIB_HAVE_AVX
                 // Now process the right columns that don't fit into simd registers.
                 for (; x < visible_nc; x++) 
                 {
@@ -867,7 +826,6 @@ namespace dlib
                 const float vy0 = yp - iyp;
                 const float vy1 = 1.0 - vy0;
                 int x;
-#ifdef DLIB_HAVE_AVX
                 for (x = 1; x < visible_nc - 7; x += 8)
                 {
                     simd8f xx(x, x + 1, x + 2, x + 3, x + 4, x + 5, x + 6, x + 7);
@@ -959,79 +917,6 @@ namespace dlib
                     hist[iyp + 1][_ixp[7] + 1](_best_o[7]) += _v10[7];
                     hist[iyp + 1 + 1][_ixp[7] + 1](_best_o[7]) += _v00[7];
                 }
-#else//DLIB_HAVE_AVX
-                for (x = 1; x < visible_nc - 3; x += 4)
-                {
-                    simd4f xx(x,x+1,x+2,x+3);
-                    // v will be the length of the gradient vectors.
-                    simd4f grad_x, grad_y, v;
-                    get_gradient(y,x,img,grad_x,grad_y,v);
-
-                    // We will use bilinear interpolation to add into the histogram bins.
-                    // So first we precompute the values needed to determine how much each
-                    // pixel votes into each bin.
-                    simd4f xp = (xx+0.5)/(float)cell_size + 0.5;
-                    simd4i ixp = simd4i(xp);
-                    simd4f vx0 = xp-ixp;
-                    simd4f vx1 = 1.0f-vx0;
-
-                    v = sqrt(v);
-
-                    // Now snap the gradient to one of 18 orientations
-                    simd4f best_dot = 0;
-                    simd4f best_o = 0;
-                    for (int o = 0; o < 9; o++) 
-                    {
-                        simd4f dot = grad_x*directions[o](0) + grad_y*directions[o](1);
-                        simd4f_bool cmp = dot>best_dot;
-                        best_dot = select(cmp,dot,best_dot); 
-                        dot *= -1;
-                        best_o = select(cmp,o,best_o);
-
-                        cmp = dot>best_dot;
-                        best_dot = select(cmp,dot,best_dot);
-                        best_o = select(cmp,o+9,best_o);
-                    }
-
-
-                    // Add the gradient magnitude, v, to 4 histograms around pixel using
-                    // bilinear interpolation.
-                    vx1 *= v;
-                    vx0 *= v;
-                    // The amounts for each bin
-                    simd4f v11 = vy1*vx1;
-                    simd4f v01 = vy0*vx1;
-                    simd4f v10 = vy1*vx0;
-                    simd4f v00 = vy0*vx0;
-
-                    int32 _best_o[4]; simd4i(best_o).store(_best_o);
-                    int32 _ixp[4];    ixp.store(_ixp);
-                    float _v11[4];    v11.store(_v11);
-                    float _v01[4];    v01.store(_v01);
-                    float _v10[4];    v10.store(_v10);
-                    float _v00[4];    v00.store(_v00);
-
-                    hist[iyp+1]  [_ixp[0]  ](_best_o[0]) += _v11[0];
-                    hist[iyp+1+1][_ixp[0]  ](_best_o[0]) += _v01[0];
-                    hist[iyp+1]  [_ixp[0]+1](_best_o[0]) += _v10[0];
-                    hist[iyp+1+1][_ixp[0]+1](_best_o[0]) += _v00[0];
-
-                    hist[iyp+1]  [_ixp[1]  ](_best_o[1]) += _v11[1];
-                    hist[iyp+1+1][_ixp[1]  ](_best_o[1]) += _v01[1];
-                    hist[iyp+1]  [_ixp[1]+1](_best_o[1]) += _v10[1];
-                    hist[iyp+1+1][_ixp[1]+1](_best_o[1]) += _v00[1];
-
-                    hist[iyp+1]  [_ixp[2]  ](_best_o[2]) += _v11[2];
-                    hist[iyp+1+1][_ixp[2]  ](_best_o[2]) += _v01[2];
-                    hist[iyp+1]  [_ixp[2]+1](_best_o[2]) += _v10[2];
-                    hist[iyp+1+1][_ixp[2]+1](_best_o[2]) += _v00[2];
-
-                    hist[iyp+1]  [_ixp[3]  ](_best_o[3]) += _v11[3];
-                    hist[iyp+1+1][_ixp[3]  ](_best_o[3]) += _v01[3];
-                    hist[iyp+1]  [_ixp[3]+1](_best_o[3]) += _v10[3];
-                    hist[iyp+1+1][_ixp[3]+1](_best_o[3]) += _v00[3];
-                }
-#endif//DLIB_HAVE_AVX
                 // Now process the right columns that don't fit into simd registers.
                 for (; x < visible_nc; x++) 
                 {
