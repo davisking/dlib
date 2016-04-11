@@ -142,7 +142,140 @@ namespace dlib
             len = select(cmp,tlen,blen);
         }
 
-    // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
+
+        template <typename image_type>
+        inline typename dlib::enable_if_c<pixel_traits<typename image_type::pixel_type>::rgb>::type get_gradient(
+            const int r,
+            const int c,
+            const image_type& img,
+            simd8f& grad_x,
+            simd8f& grad_y,
+            simd8f& len
+            )
+        {
+            simd8i rleft((int)img[r][c - 1].red,
+                (int)img[r][c].red,
+                (int)img[r][c + 1].red,
+                (int)img[r][c + 2].red,
+                (int)img[r][c + 3].red,
+                (int)img[r][c + 4].red,
+                (int)img[r][c + 5].red,
+                (int)img[r][c + 6].red);
+            simd8i rright((int)img[r][c + 1].red,
+                (int)img[r][c + 2].red,
+                (int)img[r][c + 3].red,
+                (int)img[r][c + 4].red,
+                (int)img[r][c + 5].red,
+                (int)img[r][c + 6].red,
+                (int)img[r][c + 7].red,
+                (int)img[r][c + 8].red);
+            simd8i rtop((int)img[r - 1][c].red,
+                (int)img[r - 1][c + 1].red,
+                (int)img[r - 1][c + 2].red,
+                (int)img[r - 1][c + 3].red,
+                (int)img[r - 1][c + 4].red,
+                (int)img[r - 1][c + 5].red,
+                (int)img[r - 1][c + 6].red,
+                (int)img[r - 1][c + 7].red);
+            simd8i rbottom((int)img[r + 1][c].red,
+                (int)img[r + 1][c + 1].red,
+                (int)img[r + 1][c + 2].red,
+                (int)img[r + 1][c + 3].red,
+                (int)img[r + 1][c + 4].red,
+                (int)img[r + 1][c + 5].red,
+                (int)img[r + 1][c + 6].red,
+                (int)img[r + 1][c + 7].red);
+
+            simd8i gleft((int)img[r][c - 1].green,
+                (int)img[r][c].green,
+                (int)img[r][c + 1].green,
+                (int)img[r][c + 2].green,
+                (int)img[r][c + 3].green,
+                (int)img[r][c + 4].green,
+                (int)img[r][c + 5].green,
+                (int)img[r][c + 6].green);
+            simd8i gright((int)img[r][c + 1].green,
+                (int)img[r][c + 2].green,
+                (int)img[r][c + 3].green,
+                (int)img[r][c + 4].green,
+                (int)img[r][c + 5].green,
+                (int)img[r][c + 6].green,
+                (int)img[r][c + 7].green,
+                (int)img[r][c + 8].green);
+            simd8i gtop((int)img[r - 1][c].green,
+                (int)img[r - 1][c + 1].green,
+                (int)img[r - 1][c + 2].green,
+                (int)img[r - 1][c + 3].green,
+                (int)img[r - 1][c + 4].green,
+                (int)img[r - 1][c + 5].green,
+                (int)img[r - 1][c + 6].green,
+                (int)img[r - 1][c + 7].green);
+            simd8i gbottom((int)img[r + 1][c].green,
+                (int)img[r + 1][c + 1].green,
+                (int)img[r + 1][c + 2].green,
+                (int)img[r + 1][c + 3].green,
+                (int)img[r + 1][c + 4].green,
+                (int)img[r + 1][c + 5].green,
+                (int)img[r + 1][c + 6].green,
+                (int)img[r + 1][c + 7].green);
+
+            simd8i bleft((int)img[r][c - 1].blue,
+                (int)img[r][c].blue,
+                (int)img[r][c + 1].blue,
+                (int)img[r][c + 2].blue,
+                (int)img[r][c + 3].blue,
+                (int)img[r][c + 4].blue,
+                (int)img[r][c + 5].blue,
+                (int)img[r][c + 6].blue);
+            simd8i bright((int)img[r][c + 1].blue,
+                (int)img[r][c + 2].blue,
+                (int)img[r][c + 3].blue,
+                (int)img[r][c + 4].blue,
+                (int)img[r][c + 5].blue,
+                (int)img[r][c + 6].blue,
+                (int)img[r][c + 7].blue,
+                (int)img[r][c + 8].blue);
+            simd8i btop((int)img[r - 1][c].blue,
+                (int)img[r - 1][c + 1].blue,
+                (int)img[r - 1][c + 2].blue,
+                (int)img[r - 1][c + 3].blue,
+                (int)img[r - 1][c + 4].blue,
+                (int)img[r - 1][c + 5].blue,
+                (int)img[r - 1][c + 6].blue,
+                (int)img[r - 1][c + 7].blue);
+            simd8i bbottom((int)img[r + 1][c].blue,
+                (int)img[r + 1][c + 1].blue,
+                (int)img[r + 1][c + 2].blue,
+                (int)img[r + 1][c + 3].blue,
+                (int)img[r + 1][c + 4].blue,
+                (int)img[r + 1][c + 5].blue,
+                (int)img[r + 1][c + 6].blue,
+                (int)img[r + 1][c + 7].blue);
+
+            simd8i grad_x_red = rright - rleft;
+            simd8i grad_y_red = rbottom - rtop;
+            simd8i grad_x_green = gright - gleft;
+            simd8i grad_y_green = gbottom - gtop;
+            simd8i grad_x_blue = bright - bleft;
+            simd8i grad_y_blue = bbottom - btop;
+
+            simd8i rlen = grad_x_red*grad_x_red + grad_y_red*grad_y_red;
+            simd8i glen = grad_x_green*grad_x_green + grad_y_green*grad_y_green;
+            simd8i blen = grad_x_blue*grad_x_blue + grad_y_blue*grad_y_blue;
+
+            simd8i cmp = rlen > glen;
+            simd8i tgrad_x = select(cmp, grad_x_red, grad_x_green);
+            simd8i tgrad_y = select(cmp, grad_y_red, grad_y_green);
+            simd8i tlen = select(cmp, rlen, glen);
+
+            cmp = tlen > blen;
+            grad_x = select(cmp, tgrad_x, grad_x_blue);
+            grad_y = select(cmp, tgrad_y, grad_y_blue);
+            len = select(cmp, tlen, blen);
+        }
+        
+        // ------------------------------------------------------------------------------------
 
         template <typename image_type, typename T>
         inline typename dlib::disable_if_c<pixel_traits<typename image_type::pixel_type>::rgb>::type get_gradient (
@@ -192,7 +325,59 @@ namespace dlib
             len = (grad_x*grad_x + grad_y*grad_y);
         }
 
-    // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
+
+        template <typename image_type>
+        inline typename dlib::disable_if_c<pixel_traits<typename image_type::pixel_type>::rgb>::type get_gradient(
+            int r,
+            int c,
+            const image_type& img,
+            simd8f& grad_x,
+            simd8f& grad_y,
+            simd8f& len
+            )
+        {
+            simd8i left((int)get_pixel_intensity(img[r][c - 1]),
+                (int)get_pixel_intensity(img[r][c]),
+                (int)get_pixel_intensity(img[r][c + 1]),
+                (int)get_pixel_intensity(img[r][c + 2]),
+                (int)get_pixel_intensity(img[r][c + 3]),
+                (int)get_pixel_intensity(img[r][c + 4]),
+                (int)get_pixel_intensity(img[r][c + 5]),
+                (int)get_pixel_intensity(img[r][c + 6]));
+            simd8i right((int)get_pixel_intensity(img[r][c + 1]),
+                (int)get_pixel_intensity(img[r][c + 2]),
+                (int)get_pixel_intensity(img[r][c + 3]),
+                (int)get_pixel_intensity(img[r][c + 4]),
+                (int)get_pixel_intensity(img[r][c + 5]),
+                (int)get_pixel_intensity(img[r][c + 6]),
+                (int)get_pixel_intensity(img[r][c + 7]),
+                (int)get_pixel_intensity(img[r][c + 8]));
+
+            simd8i top((int)get_pixel_intensity(img[r - 1][c]),
+                (int)get_pixel_intensity(img[r - 1][c + 1]),
+                (int)get_pixel_intensity(img[r - 1][c + 2]),
+                (int)get_pixel_intensity(img[r - 1][c + 3]),
+                (int)get_pixel_intensity(img[r - 1][c + 4]),
+                (int)get_pixel_intensity(img[r - 1][c + 5]),
+                (int)get_pixel_intensity(img[r - 1][c + 6]),
+                (int)get_pixel_intensity(img[r - 1][c + 7]));
+            simd8i bottom((int)get_pixel_intensity(img[r + 1][c]),
+                (int)get_pixel_intensity(img[r + 1][c + 1]),
+                (int)get_pixel_intensity(img[r + 1][c + 2]),
+                (int)get_pixel_intensity(img[r + 1][c + 3]),
+                (int)get_pixel_intensity(img[r + 1][c + 4]),
+                (int)get_pixel_intensity(img[r + 1][c + 5]),
+                (int)get_pixel_intensity(img[r + 1][c + 6]),
+                (int)get_pixel_intensity(img[r + 1][c + 7]));
+
+            grad_x = right - left;
+            grad_y = bottom - top;
+
+            len = (grad_x*grad_x + grad_y*grad_y);
+        }
+        
+        // ------------------------------------------------------------------------------------
 
         template <typename T, typename mm1, typename mm2>
         inline void set_hog (
@@ -376,43 +561,50 @@ namespace dlib
             for (int y = 1; y < visible_nr; y++) 
             {
                 int x;
-                for (x = 1; x < visible_nc-3; x+=4) 
+                for (x = 1; x < visible_nc - 7; x += 8)
                 {
                     // v will be the length of the gradient vectors.
-                    simd4f grad_x, grad_y, v;
-                    get_gradient(y,x,img,grad_x,grad_y,v);
+                    simd8f grad_x, grad_y, v;
+                    get_gradient(y, x, img, grad_x, grad_y, v);
 
                     float _vv[4];
                     v.store(_vv);
 
                     // Now snap the gradient to one of 18 orientations
-                    simd4f best_dot = 0;
-                    simd4f best_o = 0;
-                    for (int o = 0; o < 9; o++) 
+                    simd8f best_dot = 0;
+                    simd8f best_o = 0;
+                    for (int o = 0; o < 9; o++)
                     {
-                        simd4f dot = grad_x*directions[o](0) + grad_y*directions[o](1);
-                        simd4f_bool cmp = dot>best_dot;
-                        best_dot = select(cmp,dot,best_dot); 
+                        simd8f dot = grad_x*directions[o](0) + grad_y*directions[o](1);
+                        simd8f_bool cmp = dot>best_dot;
+                        best_dot = select(cmp, dot, best_dot);
                         dot *= -1;
-                        best_o = select(cmp,o,best_o);
+                        best_o = select(cmp, o, best_o);
 
-                        cmp = dot>best_dot;
-                        best_dot = select(cmp,dot,best_dot);
-                        best_o = select(cmp,o+9,best_o);
+                        cmp = dot > best_dot;
+                        best_dot = select(cmp, dot, best_dot);
+                        best_o = select(cmp, o + 9, best_o);
                     }
 
-                    int32 _best_o[4]; simd4i(best_o).store(_best_o);
+                    int32 _best_o[8]; simd8i(best_o).store(_best_o);
 
-                    norm[y][x+0] = _vv[0];
-                    norm[y][x+1] = _vv[1];
-                    norm[y][x+2] = _vv[2];
-                    norm[y][x+3] = _vv[3];
+                    norm[y][x + 0] = _vv[0];
+                    norm[y][x + 1] = _vv[1];
+                    norm[y][x + 2] = _vv[2];
+                    norm[y][x + 3] = _vv[3];
+                    norm[y][x + 4] = _vv[4];
+                    norm[y][x + 5] = _vv[5];
+                    norm[y][x + 6] = _vv[6];
+                    norm[y][x + 7] = _vv[7];
 
-                    angle[y][x+0] = _best_o[0];
-                    angle[y][x+1] = _best_o[1];
-                    angle[y][x+2] = _best_o[2];
-                    angle[y][x+3] = _best_o[3];
-
+                    angle[y][x + 0] = _best_o[0];
+                    angle[y][x + 1] = _best_o[1];
+                    angle[y][x + 2] = _best_o[2];
+                    angle[y][x + 3] = _best_o[3];
+                    angle[y][x + 4] = _best_o[4];
+                    angle[y][x + 5] = _best_o[5];
+                    angle[y][x + 6] = _best_o[6];
+                    angle[y][x + 7] = _best_o[7];
                 }
                 // Now process the right columns that don't fit into simd registers.
                 for (; x < visible_nc; x++) 
@@ -634,37 +826,37 @@ namespace dlib
                 const float vy0 = yp - iyp;
                 const float vy1 = 1.0 - vy0;
                 int x;
-                for (x = 1; x < visible_nc-3; x+=4) 
+                for (x = 1; x < visible_nc - 7; x += 8)
                 {
-                    simd4f xx(x,x+1,x+2,x+3);
+                    simd8f xx(x, x + 1, x + 2, x + 3, x + 4, x + 5, x + 6, x + 7);
                     // v will be the length of the gradient vectors.
-                    simd4f grad_x, grad_y, v;
-                    get_gradient(y,x,img,grad_x,grad_y,v);
+                    simd8f grad_x, grad_y, v;
+                    get_gradient(y, x, img, grad_x, grad_y, v);
 
                     // We will use bilinear interpolation to add into the histogram bins.
                     // So first we precompute the values needed to determine how much each
                     // pixel votes into each bin.
-                    simd4f xp = (xx+0.5)/(float)cell_size + 0.5;
-                    simd4i ixp = simd4i(xp);
-                    simd4f vx0 = xp-ixp;
-                    simd4f vx1 = 1.0f-vx0;
+                    simd8f xp = (xx + 0.5) / (float)cell_size + 0.5;
+                    simd8i ixp = simd8i(xp);
+                    simd8f vx0 = xp - ixp;
+                    simd8f vx1 = 1.0f - vx0;
 
                     v = sqrt(v);
 
                     // Now snap the gradient to one of 18 orientations
-                    simd4f best_dot = 0;
-                    simd4f best_o = 0;
-                    for (int o = 0; o < 9; o++) 
+                    simd8f best_dot = 0;
+                    simd8f best_o = 0;
+                    for (int o = 0; o < 9; o++)
                     {
-                        simd4f dot = grad_x*directions[o](0) + grad_y*directions[o](1);
-                        simd4f_bool cmp = dot>best_dot;
-                        best_dot = select(cmp,dot,best_dot); 
+                        simd8f dot = grad_x*directions[o](0) + grad_y*directions[o](1);
+                        simd8f_bool cmp = dot>best_dot;
+                        best_dot = select(cmp, dot, best_dot);
                         dot *= -1;
-                        best_o = select(cmp,o,best_o);
+                        best_o = select(cmp, o, best_o);
 
-                        cmp = dot>best_dot;
-                        best_dot = select(cmp,dot,best_dot);
-                        best_o = select(cmp,o+9,best_o);
+                        cmp = dot > best_dot;
+                        best_dot = select(cmp, dot, best_dot);
+                        best_o = select(cmp, o + 9, best_o);
                     }
 
 
@@ -673,37 +865,57 @@ namespace dlib
                     vx1 *= v;
                     vx0 *= v;
                     // The amounts for each bin
-                    simd4f v11 = vy1*vx1;
-                    simd4f v01 = vy0*vx1;
-                    simd4f v10 = vy1*vx0;
-                    simd4f v00 = vy0*vx0;
+                    simd8f v11 = vy1*vx1;
+                    simd8f v01 = vy0*vx1;
+                    simd8f v10 = vy1*vx0;
+                    simd8f v00 = vy0*vx0;
 
-                    int32 _best_o[4]; simd4i(best_o).store(_best_o);
-                    int32 _ixp[4];    ixp.store(_ixp);
-                    float _v11[4];    v11.store(_v11);
-                    float _v01[4];    v01.store(_v01);
-                    float _v10[4];    v10.store(_v10);
-                    float _v00[4];    v00.store(_v00);
+                    int32 _best_o[8]; simd8i(best_o).store(_best_o);
+                    int32 _ixp[8];    ixp.store(_ixp);
+                    float _v11[8];    v11.store(_v11);
+                    float _v01[8];    v01.store(_v01);
+                    float _v10[8];    v10.store(_v10);
+                    float _v00[8];    v00.store(_v00);
 
-                    hist[iyp+1]  [_ixp[0]  ](_best_o[0]) += _v11[0];
-                    hist[iyp+1+1][_ixp[0]  ](_best_o[0]) += _v01[0];
-                    hist[iyp+1]  [_ixp[0]+1](_best_o[0]) += _v10[0];
-                    hist[iyp+1+1][_ixp[0]+1](_best_o[0]) += _v00[0];
+                    hist[iyp + 1][_ixp[0]](_best_o[0]) += _v11[0];
+                    hist[iyp + 1 + 1][_ixp[0]](_best_o[0]) += _v01[0];
+                    hist[iyp + 1][_ixp[0] + 1](_best_o[0]) += _v10[0];
+                    hist[iyp + 1 + 1][_ixp[0] + 1](_best_o[0]) += _v00[0];
 
-                    hist[iyp+1]  [_ixp[1]  ](_best_o[1]) += _v11[1];
-                    hist[iyp+1+1][_ixp[1]  ](_best_o[1]) += _v01[1];
-                    hist[iyp+1]  [_ixp[1]+1](_best_o[1]) += _v10[1];
-                    hist[iyp+1+1][_ixp[1]+1](_best_o[1]) += _v00[1];
+                    hist[iyp + 1][_ixp[1]](_best_o[1]) += _v11[1];
+                    hist[iyp + 1 + 1][_ixp[1]](_best_o[1]) += _v01[1];
+                    hist[iyp + 1][_ixp[1] + 1](_best_o[1]) += _v10[1];
+                    hist[iyp + 1 + 1][_ixp[1] + 1](_best_o[1]) += _v00[1];
 
-                    hist[iyp+1]  [_ixp[2]  ](_best_o[2]) += _v11[2];
-                    hist[iyp+1+1][_ixp[2]  ](_best_o[2]) += _v01[2];
-                    hist[iyp+1]  [_ixp[2]+1](_best_o[2]) += _v10[2];
-                    hist[iyp+1+1][_ixp[2]+1](_best_o[2]) += _v00[2];
+                    hist[iyp + 1][_ixp[2]](_best_o[2]) += _v11[2];
+                    hist[iyp + 1 + 1][_ixp[2]](_best_o[2]) += _v01[2];
+                    hist[iyp + 1][_ixp[2] + 1](_best_o[2]) += _v10[2];
+                    hist[iyp + 1 + 1][_ixp[2] + 1](_best_o[2]) += _v00[2];
 
-                    hist[iyp+1]  [_ixp[3]  ](_best_o[3]) += _v11[3];
-                    hist[iyp+1+1][_ixp[3]  ](_best_o[3]) += _v01[3];
-                    hist[iyp+1]  [_ixp[3]+1](_best_o[3]) += _v10[3];
-                    hist[iyp+1+1][_ixp[3]+1](_best_o[3]) += _v00[3];
+                    hist[iyp + 1][_ixp[3]](_best_o[3]) += _v11[3];
+                    hist[iyp + 1 + 1][_ixp[3]](_best_o[3]) += _v01[3];
+                    hist[iyp + 1][_ixp[3] + 1](_best_o[3]) += _v10[3];
+                    hist[iyp + 1 + 1][_ixp[3] + 1](_best_o[3]) += _v00[3];
+
+                    hist[iyp + 1][_ixp[4]](_best_o[4]) += _v11[4];
+                    hist[iyp + 1 + 1][_ixp[4]](_best_o[4]) += _v01[4];
+                    hist[iyp + 1][_ixp[4] + 1](_best_o[4]) += _v10[4];
+                    hist[iyp + 1 + 1][_ixp[4] + 1](_best_o[4]) += _v00[4];
+
+                    hist[iyp + 1][_ixp[5]](_best_o[5]) += _v11[5];
+                    hist[iyp + 1 + 1][_ixp[5]](_best_o[5]) += _v01[5];
+                    hist[iyp + 1][_ixp[5] + 1](_best_o[5]) += _v10[5];
+                    hist[iyp + 1 + 1][_ixp[5] + 1](_best_o[5]) += _v00[5];
+
+                    hist[iyp + 1][_ixp[6]](_best_o[6]) += _v11[6];
+                    hist[iyp + 1 + 1][_ixp[6]](_best_o[6]) += _v01[6];
+                    hist[iyp + 1][_ixp[6] + 1](_best_o[6]) += _v10[6];
+                    hist[iyp + 1 + 1][_ixp[6] + 1](_best_o[6]) += _v00[6];
+
+                    hist[iyp + 1][_ixp[7]](_best_o[7]) += _v11[7];
+                    hist[iyp + 1 + 1][_ixp[7]](_best_o[7]) += _v01[7];
+                    hist[iyp + 1][_ixp[7] + 1](_best_o[7]) += _v10[7];
+                    hist[iyp + 1 + 1][_ixp[7] + 1](_best_o[7]) += _v00[7];
                 }
                 // Now process the right columns that don't fit into simd registers.
                 for (; x < visible_nc; x++) 
