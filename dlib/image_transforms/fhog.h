@@ -567,7 +567,7 @@ namespace dlib
                     simd8f grad_x, grad_y, v;
                     get_gradient(y, x, img, grad_x, grad_y, v);
 
-                    float _vv[4];
+                    float _vv[8];
                     v.store(_vv);
 
                     // Now snap the gradient to one of 18 orientations
