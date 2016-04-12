@@ -344,6 +344,15 @@ namespace mex_binding
 // -------------------------------------------------------
 
     template <typename T>
+    void validate_and_populate_arg (
+        long arg_idx,
+        const mxArray *prhs,
+        T& arg
+    ); 
+
+// -------------------------------------------------------
+
+    template <typename T>
     struct is_column_major_matrix : public default_is_kind_value {};
 
     template <
@@ -1076,22 +1085,6 @@ namespace mex_binding
     }
 
     template <typename T>
-    typename dlib::enable_if<is_array_type<T> >::type assign_to_matlab(
-        mxArray*& plhs,
-        const T& item
-    ) 
-    {
-        mwSize dims[1] = {item.size()};
-        plhs = mxCreateCellArray(1,dims);
-        for (unsigned long i = 0; i < item.size(); ++i)
-        {
-            mxArray* next = 0;
-            assign_to_matlab(next, item[i]);
-            mxSetCell(plhs, i, next);
-        }
-    }
-
-    template <typename T>
     typename dlib::disable_if_c<is_matrix<T>::value || is_array_type<T>::value || 
                                 is_same_type<T,function_handle>::value>::type assign_to_matlab(
         mxArray*& plhs,
@@ -1115,6 +1108,22 @@ namespace mex_binding
         const function_handle& h
     )
     {
+    }
+
+    template <typename T>
+    typename dlib::enable_if<is_array_type<T> >::type assign_to_matlab(
+        mxArray*& plhs,
+        const T& item
+    ) 
+    {
+        mwSize dims[1] = {item.size()};
+        plhs = mxCreateCellArray(1,dims);
+        for (unsigned long i = 0; i < item.size(); ++i)
+        {
+            mxArray* next = 0;
+            assign_to_matlab(next, item[i]);
+            mxSetCell(plhs, i, next);
+        }
     }
 
 // ----------------------------------------------------------------------------------------
