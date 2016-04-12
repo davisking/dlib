@@ -57,9 +57,9 @@ int main(int argc, char** argv) try
     // even define your own types by creating custom input layers.
     //
     // Then the middle layers define the computation the network will do to transform the
-    // input into whatever we want.  Here we run the image through multiple convolutions, ReLU
-    // units, max pooling operations, and then finally a fully connected layer that converts
-    // the whole thing into just 10 numbers.  
+    // input into whatever we want.  Here we run the image through multiple convolutions,
+    // ReLU units, max pooling operations, and then finally a fully connected layer that
+    // converts the whole thing into just 10 numbers.  
     // 
     // Finally, the loss layer defines the relationship between the network outputs, our 10
     // numbers, and the labels in our dataset.  Since we selected loss_multiclass_log it
