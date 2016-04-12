@@ -207,7 +207,7 @@ int main(int argc, char** argv) try
     // For example, the loop below stream MNIST data to out trainer.
     std::vector<matrix<unsigned char>> mini_batch_samples;
     std::vector<unsigned long> mini_batch_labels; 
-    dlib::rand rnd;
+    dlib::rand rnd(time(0));
     // Loop until the trainer's automatic shrinking has shrunk the step size by
     // 1e-3.  For the default shrinks amount of 0.1 this means stop after it
     // shrinks it 3 times.
