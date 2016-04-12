@@ -78,6 +78,8 @@ namespace dlib
                   Recall that the dnn_trainer doesn't contain the net_type object but
                   simply holds a reference to an external network which was provided to the
                   dnn_trainer's constructor.
+                - This function blocks until all threads inside the dnn_trainer have
+                  stopped touching the net. 
         !*/
 
         void set_solver (
@@ -170,10 +172,16 @@ namespace dlib
                 - During each training step, a solver tells us how to modify the parameters
                   of each layer in the network.  It does this by outputting a step vector,
                   that when added to the parameters, will hopefully result in improved
-                  network performance.  In our case, at during each step, we multiply the
-                  step vector from the solver by get_step_size() before adding it to the
+                  network performance.  In our case, at each step, we multiply the step
+                  vector from the solver by get_step_size() before adding it to the
                   parameters.  Therefore, get_step_size() controls the "learning rate" used
-                  during training. 
+                  during training.  
+
+                  It should be emphasized that this learning rate applied by dnn_trainer is
+                  independent from any learning rate scheduling a solver might itself apply
+                  to the step vector it outputs.  That is, the dnn_trainer doesn't know
+                  what the solver is doing.  It just takes the output from a solver and
+                  multiplies it by get_step_size() before applying the step vector.
         !*/
 
         void set_min_step_size (
@@ -219,7 +227,7 @@ namespace dlib
                   Therefore, get_iterations_without_progress_threshold() should always be
                   set to something sensibly large so that this test can be done with
                   reasonably high confidence.  Think of this test as saying "if the loss
-                  hasn't been reduced for the previous get_iterations_without_progress_threshold() 
+                  hasn't decreased for the previous get_iterations_without_progress_threshold() 
                   then shrink the step size".
         !*/
 
@@ -239,6 +247,8 @@ namespace dlib
             ensures
                 - Whenever the training routine thinks it isn't making progress anymore it
                   will reduce get_step_size() by multiplying it by get_step_size_shrink().
+                - You can disable the automatic step size reduction by setting
+                  get_step_size_shrink() to 1.
         !*/
 
         void be_verbose (
@@ -342,6 +352,10 @@ namespace dlib
                   all the training data into RAM.  Otherwise, these training methods are
                   equivalent.
                 - You can observe the current average loss value by calling get_average_loss().
+                - The network training will happen in another thread.  Therefore, after
+                  calling this function you should call get_net() before you touch the net
+                  object from the calling thread to ensure no other threads are still
+                  accessing the network.
         !*/
 
         void train_one_step (
@@ -360,6 +374,10 @@ namespace dlib
                   training data into RAM.  Otherwise, these training methods are
                   equivalent.
                 - You can observe the current average loss value by calling get_average_loss().
+                - The network training will happen in another thread.  Therefore, after
+                  calling this function you should call get_net() before you touch the net
+                  object from the calling thread to ensure no other threads are still
+                  accessing the network.
         !*/
 
         double get_average_loss (
@@ -369,6 +387,9 @@ namespace dlib
                 - returns the average loss value observed during previous calls to
                   train_one_step() or train().  That is, the average output of
                   net_type::update() during the previous mini-batch updates.
+                - Note that, if be_verbose() has been called, then this object will
+                  automatically call clear_average_loss() periodically when it logs the
+                  loss to the console.
         !*/
 
         void clear_average_loss (

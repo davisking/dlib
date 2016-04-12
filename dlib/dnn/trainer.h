@@ -447,7 +447,7 @@ namespace dlib
                 // have a "budget" that prevents us from calling
                 // count_steps_without_decrease() every iteration.  We do this because
                 // it can be expensive to compute when previous_loss_values is large.
-                if (gradient_check_budget > iter_without_progress_thresh)
+                if (gradient_check_budget > iter_without_progress_thresh && step_size_shrink != 1)
                 {
                     gradient_check_budget = 0;
                     steps_without_progress = count_steps_without_decrease(previous_loss_values);
