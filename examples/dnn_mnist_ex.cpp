@@ -39,8 +39,8 @@ int main(int argc, char** argv) try
 
 
     // MNIST is broken into two parts, a training set of 60000 images and a test set of
-    // 10000 images.  Each image is labeled so we know what hand written digit is depicted. 
-    // These next statements load the dataset into memory.
+    // 10000 images.  Each image is labeled so that we know what hand written digit is
+    // depicted.  These next statements load the dataset into memory.
     std::vector<matrix<unsigned char>> training_images;
     std::vector<unsigned long>         training_labels;
     std::vector<matrix<unsigned char>> testing_images;
@@ -64,8 +64,8 @@ int main(int argc, char** argv) try
     // Finally, the loss layer defines the relationship between the network outputs, our 10
     // numbers, and the labels in our dataset.  Since we selected loss_multiclass_log it
     // means we want to do multiclass classification with our network.   Moreover, the
-    // number of network outputs (i.e. 10) is the number of possible labels and whichever
-    // network output is biggest is the predicted label.  So for example, if the first
+    // number of network outputs (i.e. 10) is the number of possible labels.  Whichever
+    // network output is largest is the predicted label.  So for example, if the first
     // network output is largest then the predicted digit is 0, if the last network output
     // is largest then the predicted digit is 9.  
     using net_type = loss_multiclass_log<
@@ -99,18 +99,18 @@ int main(int argc, char** argv) try
     trainer.set_synchronization_file("mnist_sync", std::chrono::seconds(20));
     // Finally, this line begins training.  By default, it runs SGD with our specified step
     // size until the loss stops decreasing.  Then it reduces the step size by a factor of
-    // 10 and continues running until loss stops decreasing again.  It will reduce the step
-    // size 3 times and then terminate.  For a longer discussion see the documentation for
-    // the dnn_trainer object.
+    // 10 and continues running until the loss stops decreasing again.  It will reduce the
+    // step size 3 times and then terminate.  For a longer discussion, see the documentation
+    // of the dnn_trainer object.
     trainer.train(training_images, training_labels);
 
     // At this point our net object should have learned how to classify MNIST images.  But
     // before we try it out let's save it to disk.  Note that, since the trainer has been
     // running images through the network, net will have a bunch of state in it related to
-    // the last image it processed (e.g. outputs from each layer).  Since we don't care
-    // about saving that kind of stuff to disk we can tell the network to forget about that
-    // kind of transient data so that our file will be smaller.  We do this by "cleaning"
-    // the network before saving it.
+    // the last batch of images it processed (e.g. outputs from each layer).  Since we
+    // don't care about saving that kind of stuff to disk we can tell the network to forget
+    // about that kind of transient data so that our file will be smaller.  We do this by
+    // "cleaning" the network before saving it.
     net.clean();
     serialize("mnist_network.dat") << net;
 
