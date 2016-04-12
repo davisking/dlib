@@ -63,8 +63,8 @@ using net_type = loss_multiclass_log<fc<number_of_classes,
                             repeat<9,res, // repeat this layer 9 times
                             res_down<
                             res<
-                            input<matrix<unsigned char>
-                            >>>>>>>>>>>;
+                            input<matrix<unsigned char>>
+                            >>>>>>>>>>;
 
 
 // And finally, let's define a residual network building block that uses
@@ -116,8 +116,8 @@ int main(int argc, char** argv) try
                                 tag4<repeat<9,pres,    // 9 groups, each containing 2 prelu layers  
                                 res_down<
                                 res<
-                                input<matrix<unsigned char>
-                                >>>>>>>>>>>>;
+                                input<matrix<unsigned char>>
+                                >>>>>>>>>>>;
 
     // prelu layers have a floating point parameter.  If you want to set it to
     // something other than its default value you can do so like this:
@@ -251,8 +251,8 @@ int main(int argc, char** argv) try
                                 repeat<9,res,
                                 ares_down<
                                 ares<
-                                input<matrix<unsigned char>
-                                >>>>>>>>>>>;
+                                input<matrix<unsigned char>>
+                                >>>>>>>>>>;
     // Then we can simply assign our trained net to our testing net.
     test_net_type tnet = net;
     // Or if you only had a file with your trained network you could deserialize
