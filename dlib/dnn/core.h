@@ -42,7 +42,7 @@ namespace dlib
     
 // ----------------------------------------------------------------------------------------
 
-    // Tell us if T is one of the special layer types (i.e. add_layer, add_tag_layer, or
+    // Tell us if T is one of the special layer types (i.e. add_layer, repeat, add_tag_layer, or
     // add_skip_layer).
     template <typename T> struct is_nonloss_layer_type : std::false_type {};
     // Tell us if T is an instance of add_loss_layer.
@@ -1330,7 +1330,7 @@ namespace dlib
         template <size_t N, template<typename> class L, typename S>
         friend class repeat;
 
-        // You woudln't put a tag on a layer if you didn't want to access its forward
+        // You wouldn't put a tag on a layer if you didn't want to access its forward
         // outputs.  So this is always true.
         bool this_layer_requires_forward_output(
         ) { return true; } 
