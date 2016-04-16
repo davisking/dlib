@@ -37,12 +37,12 @@ namespace dlib
 
         typedef typename net_type::label_type label_type;
         typedef typename net_type::input_type input_type;
-        const static size_t num_layers = net_type::num_layers;
+        const static size_t num_computational_layers = net_type::num_computational_layers;
 
         dnn_trainer() = delete;
         dnn_trainer(const dnn_trainer&) = delete;
 
-        explicit dnn_trainer(net_type& net_) : job_pipe(0), net(net_), solvers(num_layers)
+        explicit dnn_trainer(net_type& net_) : job_pipe(0), net(net_), solvers(num_computational_layers)
         {
             init();
         }
@@ -50,7 +50,7 @@ namespace dlib
         dnn_trainer(
             net_type& net_, 
             const solver_type& solver_
-        ) : job_pipe(0), net(net_), solvers(num_layers, solver_) 
+        ) : job_pipe(0), net(net_), solvers(num_computational_layers, solver_) 
         {
             init();
         }
@@ -75,7 +75,7 @@ namespace dlib
         ) 
         { 
             wait_for_thread_to_pause();
-            solvers = std::vector<solver_type>(num_layers, solver_); 
+            solvers = std::vector<solver_type>(num_computational_layers, solver_); 
         }
 
         unsigned long get_mini_batch_size (
@@ -504,7 +504,7 @@ namespace dlib
             int version = 5;
             serialize(version, out);
 
-            size_t nl = dnn_trainer::num_layers;
+            size_t nl = dnn_trainer::num_computational_layers;
             serialize(nl, out);
             serialize(item.rs, out);
             serialize(item.previous_loss_values, out);
@@ -530,14 +530,14 @@ namespace dlib
             if (version != 5)
                 throw serialization_error("Unexpected version found while deserializing dlib::dnn_trainer.");
 
-            size_t num_layers = 0;
-            deserialize(num_layers, in);
-            if (num_layers != dnn_trainer::num_layers)
+            size_t num_computational_layers = 0;
+            deserialize(num_computational_layers, in);
+            if (num_computational_layers != dnn_trainer::num_computational_layers)
             {
                 std::ostringstream sout;
                 sout << "Error deserializing dlib::dnn_trainer.  The saved sync file is for a network with " << std::endl;
-                sout << "a different number of layers.  We expected the number of layers to be " << dnn_trainer::num_layers << " but" << std::endl;
-                sout << "instead the file contains " << num_layers << " layers." << std::endl;
+                sout << "a different number of layers.  We expected the number of layers to be " << dnn_trainer::num_computational_layers << " but" << std::endl;
+                sout << "instead the file contains " << num_computational_layers << " computational layers." << std::endl;
                 throw serialization_error(sout.str());
             }
 

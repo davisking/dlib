@@ -122,7 +122,7 @@ int main(int argc, char** argv) try
     // prelu layers have a floating point parameter.  If you want to set it to
     // something other than its default value you can do so like this:
     net_type2 pnet(prelu_(0.2),  
-                   prelu_(0.2),
+                   prelu_(0.25),
                    repeat_group(prelu_(0.3),prelu_(0.4)) // Initialize all the prelu instances in the repeat 
                                                          // layer.  repeat_group() is needed to group the 
                                                          // things that are part of repeat's block.
@@ -132,59 +132,72 @@ int main(int argc, char** argv) try
     // order the layers are defined, but it will skip layers where the
     // assignment doesn't make sense.  
 
-    // The API shown above lets you modify layers at construction time.  But
-    // what about after that?  There are a number of ways to access layers
-    // inside a net object.
+    // Now let's print the details of the pnet to the screen and inspect it.
+    cout << "The pnet has " << pnet.num_layers << " layers in it." << endl;
+    cout << pnet << endl;
+    // These print statements will output this (I've truncated it since it's
+    // long, but you get the idea):
+    /*
+        The pnet has 125 layers in it.
+        layer<0>      loss_multiclass_log
+        layer<1>      fc       (num_outputs=10)
+        layer<2>      avg_pool (nr=11, nc=11, stride_y=11, _stride_x=11)
+        layer<3>      prelu    (initial_param_value=0.2)
+        layer<4>      add_prev
+        layer<5>      bn_con
+        layer<6>      con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1)
+        layer<7>      prelu    (initial_param_value=0.25)
+        layer<8>      bn_con
+        layer<9>      con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1)
+        layer<10>     tag1
+        ...
+        layer<33>     con      (num_filters=8, nr=3, nc=3, stride_y=2, stride_x=2)
+        layer<34>     tag1
+        layer<35>     tag4
+        layer<36>     prelu    (initial_param_value=0.3)
+        layer<37>     add_prev
+        layer<38>     bn_con
+        ...
+        layer<114>    con      (num_filters=8, nr=3, nc=3, stride_y=2, stride_x=2)
+        layer<115>    tag1
+        layer<116>    relu
+        layer<117>    add_prev
+        layer<118>    bn_con
+        layer<119>    con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1)
+        layer<120>    relu
+        layer<121>    bn_con
+        layer<122>    con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1)
+        layer<123>    tag1
+        layer<124>    input<matrix>
+    */
 
-    // You can access sub layers of the network like this to get their output
-    // tensors.  The following 3 statements are all equivalent and access the
-    // same layer's output.
-    pnet.subnet().subnet().subnet().get_output();
+    // Now that we know the index numbers for each layer, we can access them
+    // individually using layer<index>(pnet).  For example, to access the output
+    // tensor for the first prelu layer we can say:
     layer<3>(pnet).get_output();
-    layer<prelu>(pnet).get_output(); 
-    // Similarly, to get access to the prelu_ object that defines the layer's
-    // behavior we can say:
-    pnet.subnet().subnet().subnet().layer_details();
-    // or 
-    layer<prelu>(pnet).layer_details(); 
-    // So for example, to print the prelu parameter:
-    cout << "first prelu layer's initial param value: "
-         << pnet.subnet().subnet().subnet().layer_details().get_initial_param_value() << endl;
+    // Or to print the prelu parameter for layer 7 we can say:
+    cout << "prelu param: "<< layer<7>(pnet).layer_details().get_initial_param_value() << endl;
 
-    // From this it should be clear that layer() is a general tool for accessing
-    // sub layers.  It makes repeated calls to subnet() so you don't have to.
-    // One of it's most important uses is to access tagged layers.  For example,
-    // to access the first tag1 layer we can say:
+    // We can also access layers by their type.  This next statement finds the
+    // first tag1 layer in pnet, and is therefore equivalent to calling
+    // layer<10>(pnet):
     layer<tag1>(pnet);
-    // To further illustrate the use of layer(), let's loop over the repeated
-    // prelu layers and print out their parameters.  But first, let's grab a
-    // reference to the repeat layer.  Since we tagged the repeat layer we can
-    // access it using the layer() method.  layer<tag4>(pnet) returns the tag4
-    // layer, but we want the repeat layer right after it so we can give an
-    // integer as the second argument and it will jump that many layers down the
-    // network.  In our case we need to jump just 1 layer down to get to repeat. 
-    auto&& repeat_layer = layer<tag4,1>(pnet);
-    for (size_t i = 0; i < repeat_layer.num_repetitions(); ++i)
-    {
-        // The repeat layer just instantiates the network block a bunch of
-        // times.  get_repeated_layer() allows us to grab each of these
-        // instances.
-        auto&& repeated_layer = repeat_layer.get_repeated_layer(i);
-        // Now that we have the i-th layer inside our repeat layer we can look
-        // at its properties.  Recall that we repeated the "pres" network block,
-        // which is itself a network with a bunch of layers.  So we can again
-        // use layer() to jump to the prelu layers we are interested in like so:
-        prelu_ prelu1 = layer<prelu>(repeated_layer).layer_details();
-        prelu_ prelu2 = layer<prelu>(repeated_layer.subnet()).layer_details();
-        cout << "first prelu layer parameter value: "<< prelu1.get_initial_param_value() << endl;;
-        cout << "second prelu layer parameter value: "<< prelu2.get_initial_param_value() << endl;;
-    }
+    // The tag layers don't do anything at all and exist simply so you can tag
+    // parts of your network and access them by layer<tag>().  You can also
+    // index relative to a tag.  So for example, to access the layer immediately
+    // after tag4 you can say:
+    layer<tag4,1>(pnet); // Equivalent to layer<35+1>(pnet).
 
-    
+    // Or to access the layer 2 layers after tag4:
+    layer<tag4,2>(pnet);
+    // Tagging is a very useful tool for making complex network structures.  For
+    // example, the add_prev1 layer is implemented internally by using a call to
+    // layer<tag1>().
 
 
-    // Ok, so that's enough talk about defining networks.  Let's talk about
-    // training networks!
+
+    // Ok, that's enough talk about defining and inspecting networks.  Let's
+    // talk about training networks!
 
     // The dnn_trainer will use SGD by default, but you can tell it to use
     // different solvers like adam.  

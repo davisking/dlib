@@ -157,6 +157,20 @@ namespace dlib
             if (stride_x != _stride_x) throw serialization_error("Wrong stride_x found while deserializing dlib::con_");
         }
 
+
+        friend std::ostream& operator<<(std::ostream& out, const con_& item)
+        {
+            out << "con\t ("
+                << "num_filters="<<_num_filters
+                << ", nr="<<_nr
+                << ", nc="<<_nc
+                << ", stride_y="<<_stride_y
+                << ", stride_x="<<_stride_x
+                << ")";
+            return out;
+        }
+
+
     private:
 
         resizable_tensor params;
@@ -277,6 +291,18 @@ namespace dlib
             if (_stride_x != stride_x) throw serialization_error("Wrong stride_x found while deserializing dlib::max_pool_");
         }
 
+        friend std::ostream& operator<<(std::ostream& out, const max_pool_& item)
+        {
+            out << "max_pool ("
+                << "nr="<<_nr
+                << ", nc="<<_nc
+                << ", stride_y="<<_stride_y
+                << ", stride_x="<<_stride_x
+                << ")";
+            return out;
+        }
+
+
     private:
 
 
@@ -393,6 +419,16 @@ namespace dlib
             if (_stride_x != stride_x) throw serialization_error("Wrong stride_x found while deserializing dlib::avg_pool_");
         }
 
+        friend std::ostream& operator<<(std::ostream& out, const avg_pool_& item)
+        {
+            out << "avg_pool ("
+                << "nr="<<_nr
+                << ", nc="<<_nc
+                << ", stride_y="<<_stride_y
+                << ", stride_x="<<_stride_x
+                << ")";
+            return out;
+        }
     private:
 
         tt::pooling ap;
@@ -557,6 +593,15 @@ namespace dlib
             }
         }
 
+        friend std::ostream& operator<<(std::ostream& out, const bn_& item)
+        {
+            if (mode == CONV_MODE)
+                out << "bn_con";
+            else
+                out << "bn_fc";
+            return out;
+        }
+
     private:
 
         friend class affine_;
@@ -695,6 +740,23 @@ namespace dlib
             if (bias_mode != (fc_bias_mode)bmode) throw serialization_error("Wrong fc_bias_mode found while deserializing dlib::fc_");
         }
 
+        friend std::ostream& operator<<(std::ostream& out, const fc_& item)
+        {
+            if (bias_mode == FC_HAS_BIAS)
+            {
+                out << "fc\t ("
+                    << "num_outputs="<<item.num_outputs
+                    << ")";
+            }
+            else
+            {
+                out << "fc_no_bias ("
+                    << "num_outputs="<<item.num_outputs
+                    << ")";
+            }
+            return out;
+        }
+
     private:
 
         unsigned long num_outputs;
@@ -793,6 +855,14 @@ namespace dlib
             deserialize(item.mask, in);
         }
 
+        friend std::ostream& operator<<(std::ostream& out, const dropout_& item)
+        {
+            out << "dropout\t ("
+                << "drop_rate="<<item.drop_rate
+                << ")";
+            return out;
+        }
+
     private:
         float drop_rate;
         resizable_tensor mask;
@@ -870,6 +940,14 @@ namespace dlib
             if (version != "multiply_")
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::multiply_.");
             deserialize(item.val, in);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const multiply_& item)
+        {
+            out << "multiply ("
+                << "val="<<item.val
+                << ")";
+            return out;
         }
 
     private:
@@ -1021,6 +1099,12 @@ namespace dlib
             item.mode = (layer_mode)mode;
         }
 
+        friend std::ostream& operator<<(std::ostream& out, const affine_& )
+        {
+            out << "affine";
+            return out;
+        }
+
     private:
         resizable_tensor params, empty_params; 
         alias_tensor gamma, beta;
@@ -1078,6 +1162,13 @@ namespace dlib
             if (version != "add_prev_")
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::add_prev_.");
         }
+
+        friend std::ostream& operator<<(std::ostream& out, const add_prev_& item)
+        {
+            out << "add_prev";
+            return out;
+        }
+
 
     private:
         resizable_tensor params;
@@ -1156,6 +1247,13 @@ namespace dlib
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::relu_.");
         }
 
+        friend std::ostream& operator<<(std::ostream& out, const relu_& )
+        {
+            out << "relu";
+            return out;
+        }
+
+
     private:
         resizable_tensor params;
     };
@@ -1226,6 +1324,14 @@ namespace dlib
             deserialize(item.initial_param_value, in);
         }
 
+        friend std::ostream& operator<<(std::ostream& out, const prelu_& item)
+        {
+            out << "prelu\t ("
+                << "initial_param_value="<<item.initial_param_value
+                << ")";
+            return out;
+        }
+
     private:
         resizable_tensor params;
         float initial_param_value;
@@ -1278,6 +1384,13 @@ namespace dlib
             if (version != "sig_")
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::sig_.");
         }
+
+        friend std::ostream& operator<<(std::ostream& out, const sig_& )
+        {
+            out << "sig";
+            return out;
+        }
+
 
     private:
         resizable_tensor params;
@@ -1332,6 +1445,13 @@ namespace dlib
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::htan_.");
         }
 
+        friend std::ostream& operator<<(std::ostream& out, const htan_& )
+        {
+            out << "htan";
+            return out;
+        }
+
+
     private:
         resizable_tensor params;
     };
@@ -1383,6 +1503,12 @@ namespace dlib
             deserialize(version, in);
             if (version != "softmax_")
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::softmax_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const softmax_& )
+        {
+            out << "softmax";
+            return out;
         }
 
     private:

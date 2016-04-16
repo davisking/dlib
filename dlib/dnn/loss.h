@@ -100,6 +100,12 @@ namespace dlib
                 throw serialization_error("Unexpected version found while deserializing dlib::loss_binary_hinge_.");
         }
 
+        friend std::ostream& operator<<(std::ostream& out, const loss_binary_hinge_& )
+        {
+            out << "loss_binary_hinge";
+            return out;
+        }
+
     };
 
     template <typename SUBNET>
@@ -201,6 +207,12 @@ namespace dlib
             deserialize(version, in);
             if (version != "loss_binary_log_")
                 throw serialization_error("Unexpected version found while deserializing dlib::loss_binary_log_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const loss_binary_log_& )
+        {
+            out << "loss_binary_log";
+            return out;
         }
 
     };
@@ -306,6 +318,13 @@ namespace dlib
             if (version != "loss_multiclass_log_")
                 throw serialization_error("Unexpected version found while deserializing dlib::loss_multiclass_log_.");
         }
+
+        friend std::ostream& operator<<(std::ostream& out, const loss_multiclass_log_& )
+        {
+            out << "loss_multiclass_log";
+            return out;
+        }
+
 
     };
 

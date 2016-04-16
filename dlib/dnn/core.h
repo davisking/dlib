@@ -17,11 +17,47 @@
 #include <cmath>
 #include <vector>
 #include "tensor_tools.h"
+#include <type_traits>
 
 
 
 namespace dlib
 {
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        class repeat_input_layer 
+        {
+            /*!
+                None of the declarations in this object are really used. The only reason it
+                exists is to allow the repeat object to use a special input layer in its
+                internal networks which will cause add_tag_layer objects that happen to be
+                right at the input to not create copies of their input tensors.  So
+                introducing the repeat_input_layer object allows us to optimize the
+                implementation of add_tag_layer for a special case that arises when it's
+                used in the context of the repeat layer.
+            !*/
+        public:
+            typedef int input_type;
+            const static unsigned int sample_expansion_factor = 1;
+
+            template <typename input_iterator>
+            void to_tensor (
+                input_iterator ,
+                input_iterator ,
+                resizable_tensor& 
+            ) const
+            {
+                DLIB_CASSERT(false,"This function should never be called");
+            }
+
+            friend void serialize(const repeat_input_layer&, std::ostream&){}
+            friend void deserialize(repeat_input_layer&, std::istream&){}
+            friend std::ostream& operator<<(std::ostream& out, const repeat_input_layer&) { out << "FUCK"; return out; }
+        };
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -459,7 +495,7 @@ namespace dlib
             subnet_wrapper& operator=(const subnet_wrapper&) = delete;
 
             typedef T wrapped_type;
-            const static size_t num_layers = T::num_layers;
+            const static size_t num_computational_layers = T::num_computational_layers;
 
             subnet_wrapper(T& l_) : l(l_),subnetwork(l.subnet()) {}
 
@@ -483,7 +519,7 @@ namespace dlib
             subnet_wrapper& operator=(const subnet_wrapper&) = delete;
 
             typedef T wrapped_type;
-            const static size_t num_layers = T::num_layers;
+            const static size_t num_computational_layers = T::num_computational_layers;
 
             subnet_wrapper(T& l_) : l(l_),subnetwork(l.subnet()) {}
 
@@ -516,6 +552,7 @@ namespace dlib
         typedef SUBNET subnet_type;
         typedef typename subnet_type::input_type input_type;
         const static size_t num_layers = subnet_type::num_layers + 1;
+        const static size_t num_computational_layers = subnet_type::num_computational_layers + 1;
         const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
 
         add_layer(
@@ -776,7 +813,7 @@ namespace dlib
         template <typename solver_type>
         void update(const tensor& x, const tensor& gradient_input, sstack<solver_type> solvers, double step_size)
         {
-            DLIB_CASSERT(solvers.size()>=num_layers,"");
+            DLIB_CASSERT(solvers.size()>=num_computational_layers,"");
             dimpl::subnet_wrapper<subnet_type> wsub(*subnetwork);
             params_grad.copy_size(details.get_layer_params());
             impl::call_layer_backward(details, private_get_output(),
@@ -834,6 +871,18 @@ namespace dlib
             deserialize(item.get_output_and_gradient_input_disabled, in);
             deserialize(item.x_grad, in);
             deserialize(item.cached_output, in);
+        }
+
+        friend std::ostream& operator<< (std::ostream& out, const add_layer& item)
+        {
+            item.print(out, 0);
+            return out;
+        }
+
+        void print (std::ostream& out, unsigned long idx=0) const
+        {
+            out << "layer<" << idx << ">\t" << layer_details() << "\n";
+            subnet().print(out, idx+1);
         }
 
     private:
@@ -895,7 +944,8 @@ namespace dlib
         typedef INPUT_LAYER subnet_type;
         typedef typename INPUT_LAYER::input_type input_type;
         const static unsigned int sample_expansion_factor = INPUT_LAYER::sample_expansion_factor;
-        const static size_t num_layers = 1;
+        const static size_t num_layers = 2;
+        const static size_t num_computational_layers = 1;
         static_assert(sample_expansion_factor >= 1,
             "The input layer can't produce fewer output tensors than there are inputs.");
 
@@ -1077,7 +1127,7 @@ namespace dlib
         template <typename solver_type>
         void update(const tensor& x, const tensor& gradient_input, sstack<solver_type> solvers, double step_size)
         {
-            DLIB_CASSERT(solvers.size()>=num_layers,"");
+            DLIB_CASSERT(solvers.size()>=num_computational_layers,"");
             // make sure grad_final is initialized to 0
             if (!have_same_dimensions(x, grad_final))
                 grad_final.copy_size(x);
@@ -1141,6 +1191,21 @@ namespace dlib
             deserialize(item.x_grad, in);
             deserialize(item.cached_output, in);
             deserialize(item.grad_final, in);
+        }
+
+        friend std::ostream& operator<< (std::ostream& out, const add_layer& item)
+        {
+            item.print(out, 0);
+            return out;
+        }
+
+        void print (std::ostream& out, unsigned long idx=0) const
+        {
+            out << "layer<" << idx << ">\t" << layer_details() << "\n";
+            // Don't print the repeat_input_layer since it doesn't exist from the user's
+            // point of view.  It's just an artifact of how repeat<> works.
+            if (!std::is_same<subnet_type, impl::repeat_input_layer>::value)
+                out << "layer<" << idx+1 << ">\t" << subnet() << "\n";
         }
 
     private:
@@ -1217,7 +1282,8 @@ namespace dlib
     public:
         typedef SUBNET subnet_type;
         typedef typename subnet_type::input_type input_type;
-        const static size_t num_layers = subnet_type::num_layers;
+        const static size_t num_layers = subnet_type::num_layers + 1;
+        const static size_t num_computational_layers = subnet_type::num_computational_layers;
         const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         static_assert(sample_expansion_factor >= 1,
             "The input layer can't produce fewer output tensors than there are inputs.");
@@ -1317,6 +1383,18 @@ namespace dlib
             deserialize(item.subnetwork, in);
         }
 
+        friend std::ostream& operator<< (std::ostream& out, const add_tag_layer& item)
+        {
+            item.print(out, 0);
+            return out;
+        }
+
+        void print (std::ostream& out, unsigned long idx=0) const
+        {
+            out << "layer<" << idx << ">\ttag" << ID << "\n";
+            subnet().print(out, idx+1);
+        }
+
     private:
 
         template <typename T, typename U, typename E>
@@ -1356,38 +1434,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    namespace impl
-    {
-        class repeat_input_layer 
-        {
-            /*!
-                None of the declarations in this object are really used. The only reason it
-                exists is to allow the repeat object to use a special input layer in its
-                internal networks which will cause add_tag_layer objects that happen to be
-                right at the input to not create copies of their input tensors.  So
-                introducing the repeat_input_layer object allows us to optimize the
-                implementation of add_tag_layer for a special case that arises when it's
-                used in the context of the repeat layer.
-            !*/
-        public:
-            typedef int input_type;
-            const static unsigned int sample_expansion_factor = 1;
-
-            template <typename input_iterator>
-            void to_tensor (
-                input_iterator ,
-                input_iterator ,
-                resizable_tensor& 
-            ) const
-            {
-                DLIB_CASSERT(false,"This function should never be called");
-            }
-
-            friend void serialize(const repeat_input_layer&, std::ostream&){}
-            friend void deserialize(repeat_input_layer&, std::istream&){}
-        };
-    }
-
     template <typename ...T>
     struct decorator_repeat_group
     {
@@ -1416,7 +1462,14 @@ namespace dlib
     public:
         typedef SUBNET subnet_type;
         typedef typename SUBNET::input_type input_type;
-        const static size_t num_layers = (REPEATED_LAYER<SUBNET>::num_layers-SUBNET::num_layers)*num + SUBNET::num_layers;
+        const static size_t comp_layers_in_each_group = (REPEATED_LAYER<SUBNET>::num_computational_layers-SUBNET::num_computational_layers);
+        const static size_t comp_layers_in_repeated_group = comp_layers_in_each_group*num;
+        const static size_t num_computational_layers = comp_layers_in_repeated_group + SUBNET::num_computational_layers;
+
+        const static size_t layers_in_each_group = (REPEATED_LAYER<SUBNET>::num_layers-SUBNET::num_layers);
+        const static size_t layers_in_repeated_group = layers_in_each_group*num;
+        const static size_t num_layers = subnet_type::num_layers + layers_in_repeated_group;
+
         const static unsigned int sample_expansion_factor = SUBNET::sample_expansion_factor;
 
         typedef REPEATED_LAYER<impl::repeat_input_layer> repeated_layer_type;
@@ -1554,7 +1607,7 @@ namespace dlib
         template <typename solver_type>
         void update(const tensor& x, const tensor& gradient_input, sstack<solver_type> solvers, double step_size)
         {
-            const auto cnt = (REPEATED_LAYER<SUBNET>::num_layers-SUBNET::num_layers);
+            const auto cnt = (REPEATED_LAYER<SUBNET>::num_computational_layers-SUBNET::num_computational_layers);
             if (details.size() > 1)
             {
                 details[0].update(details[1].get_output(), gradient_input, solvers,step_size);
@@ -1602,7 +1655,23 @@ namespace dlib
             deserialize(item.subnetwork, in);
         }
 
+        friend std::ostream& operator<< (std::ostream& out, const repeat& item)
+        {
+            item.print(out, 0);
+            return out;
+        }
+
+        void print (std::ostream& out, unsigned long idx=0) const
+        {
+            for (size_t i = 0; i < num_repetitions(); ++i)
+            {
+                get_repeated_layer(i).print(out, idx);
+                idx += layers_in_each_group;
+            }
+            subnet().print(out, idx);
+        }
     private:
+
 
         template <typename T, typename U, typename E>
         friend class add_layer;
@@ -1653,7 +1722,10 @@ namespace dlib
     public:
         typedef INPUT_LAYER subnet_type;
         typedef typename subnet_type::input_type input_type;
-        const static size_t num_layers = 1;
+        // This layer counts as a computational layer because it copies and stores the
+        // inputs.
+        const static size_t num_computational_layers = 1;
+        const static size_t num_layers = 2;
         const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         static_assert(sample_expansion_factor >= 1,
             "The input layer can't produce fewer output tensors than there are inputs.");
@@ -1809,6 +1881,21 @@ namespace dlib
             item.cached_output_ptr = nullptr;
         }
 
+        friend std::ostream& operator<< (std::ostream& out, const add_tag_layer& item)
+        {
+            item.print(out, 0);
+            return out;
+        }
+
+        void print (std::ostream& out, unsigned long idx=0) const
+        {
+            out << "layer<"<<idx << ">\ttag" << ID << "\n";
+            // Don't print the repeat_input_layer since it doesn't exist from the user's
+            // point of view.  It's just an artifact of how repeat<> works.
+            if (!std::is_same<subnet_type, impl::repeat_input_layer>::value)
+                out << "layer<"<< idx+1 << ">\t" << subnet() << "\n";
+        }
+
     private:
 
         template <typename T, typename U, typename E>
@@ -1905,8 +1992,9 @@ namespace dlib
         typedef LOSS_DETAILS loss_details_type;
         typedef SUBNET subnet_type;
         typedef typename subnet_type::input_type input_type;
-        // Note that the loss layer doesn't count as an additional layer.
-        const static size_t num_layers = subnet_type::num_layers;
+        const static size_t num_layers = subnet_type::num_layers + 1;
+        // Note that the loss layer doesn't count as an additional computational layer.
+        const static size_t num_computational_layers = subnet_type::num_computational_layers;
         const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         typedef typename get_loss_layer_label_type<LOSS_DETAILS>::type label_type;
 
@@ -2137,7 +2225,20 @@ namespace dlib
             deserialize(item.subnetwork, in);
         }
 
+        friend std::ostream& operator<< (std::ostream& out, const add_loss_layer& item)
+        {
+            item.print(out, 0);
+            return out;
+        }
+
+        void print (std::ostream& out, unsigned long idx=0) const
+        {
+            out << "layer<" << idx << ">\t" << loss_details() << "\n";
+            subnet().print(out, idx+1);
+        }
+
     private:
+
 
         void swap(add_loss_layer& item)
         {
@@ -2164,9 +2265,10 @@ namespace dlib
 
     namespace impl
     {
-        template <unsigned int i, typename T>
+        template <unsigned int i, typename T, typename enabled = void>
         struct layer_helper
         {
+            static_assert(i < T::num_layers, "Call to layer() attempted to access non-existing layer in neural network.");
             static T& makeT();
             using next_type = typename std::remove_reference<decltype(makeT().subnet())>::type;
             using type = typename layer_helper<i-1,next_type>::type;
@@ -2175,8 +2277,51 @@ namespace dlib
                 return layer_helper<i-1,next_type>::layer(n.subnet());
             }
         };
+        template <
+            unsigned int i,
+            size_t N, template<typename> class L, typename S
+        >
+        struct layer_helper<i,repeat<N,L,S>, typename std::enable_if<(i!=0&&i>=repeat<N,L,S>::layers_in_repeated_group)>::type>
+        {
+            const static size_t layers_in_repeated_group = repeat<N,L,S>::layers_in_repeated_group;
+
+            static repeat<N,L,S>& makeT();
+            using next_type = typename std::remove_reference<decltype(makeT().subnet())>::type;
+            using type = typename layer_helper<i-layers_in_repeated_group,next_type>::type;
+            static type& layer(repeat<N,L,S>& n)
+            {
+                return layer_helper<i-layers_in_repeated_group,next_type>::layer(n.subnet());
+            }
+        };
+        template <
+            unsigned int i,
+            size_t N, template<typename> class L, typename S
+        >
+        struct layer_helper<i,repeat<N,L,S>, typename std::enable_if<(i!=0&&i<repeat<N,L,S>::layers_in_repeated_group)>::type>
+        {
+            const static size_t layers_in_each_group = repeat<N,L,S>::layers_in_each_group;
+            typedef typename repeat<N,L,S>::repeated_layer_type repeated_layer_type;
+            using next_type = repeated_layer_type;
+            using type = typename layer_helper<i%layers_in_each_group,next_type>::type;
+            static type& layer(repeat<N,L,S>& n)
+            {
+                return layer_helper<i%layers_in_each_group,next_type>::layer(n.get_repeated_layer(i/layers_in_each_group));
+            }
+        };
+        template <
+            size_t N, template<typename> class L, typename S
+        >
+        struct layer_helper<0,repeat<N,L,S>, void>
+        {
+            typedef typename repeat<N,L,S>::repeated_layer_type repeated_layer_type;
+            using type = repeated_layer_type;
+            static type& layer(repeat<N,L,S>& n)
+            {
+                return n.get_repeated_layer(0);
+            }
+        };
         template <typename T>
-        struct layer_helper<0,T>
+        struct layer_helper<0,T,void>
         {
             using type = T;
             static type& layer(T& n)
@@ -2258,7 +2403,8 @@ namespace dlib
     public:
         typedef SUBNET subnet_type;
         typedef typename subnet_type::input_type input_type;
-        const static size_t num_layers = subnet_type::num_layers;
+        const static size_t num_layers = subnet_type::num_layers + 1;
+        const static size_t num_computational_layers = subnet_type::num_computational_layers;
         const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         static_assert(sample_expansion_factor >= 1,
             "The input layer can't produce fewer output tensors than there are inputs.");
@@ -2374,7 +2520,20 @@ namespace dlib
             deserialize(item.subnetwork, in);
         }
 
+        friend std::ostream& operator<< (std::ostream& out, const add_skip_layer& item)
+        {
+            item.print(out, 0);
+            return out;
+        }
+
+        void print (std::ostream& out, unsigned long idx=0) const
+        {
+            out << "layer<" << idx << ">\tskip\n";
+            subnet().print(out, idx+1);
+        }
+
     private:
+
 
         template <typename T, typename U, typename E>
         friend class add_layer;

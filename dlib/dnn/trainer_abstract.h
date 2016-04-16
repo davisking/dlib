@@ -44,7 +44,7 @@ namespace dlib
 
         typedef typename net_type::label_type label_type;
         typedef typename net_type::input_type input_type;
-        const static size_t num_layers = net_type::num_layers;
+        const static size_t num_computational_layers = net_type::num_computational_layers;
 
         dnn_trainer() = delete;
         dnn_trainer(const dnn_trainer&) = delete;
@@ -110,9 +110,9 @@ namespace dlib
                   get_solvers()[0], the second layer's solver is
                   get_solvers()[1], and so on.
                 - It should be noted that you should never change the number of elements in
-                  the vector returned by get_solvers() (i.e. don't do something that
-                  changes get_solvers().size()).  It will be set to net_type::num_layers by
-                  this object and you should leave it at that.  The non-const version of
+                  the vector returned by get_solvers() (i.e. don't do something that changes 
+                  get_solvers().size()).  It will be set to net_type::num_computational_layers 
+                  by this object and you should leave it at that.  The non-const version of
                   get_solvers() is provided only so you can tweak the parameters of a
                   particular solver.
         !*/

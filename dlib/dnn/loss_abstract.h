@@ -125,6 +125,11 @@ namespace dlib
         !*/
     };
 
+    std::ostream& operator<<(std::ostream& out, const EXAMPLE_LOSS_LAYER_& item);
+    /*!
+        print a string describing this layer.
+    !*/
+
     void serialize(const EXAMPLE_LOSS_LAYER_& item, std::ostream& out);
     void deserialize(EXAMPLE_LOSS_LAYER_& item, std::istream& in);
     /*!
@@ -200,12 +205,6 @@ namespace dlib
 
     };
 
-    void serialize(const loss_binary_hinge_& item, std::ostream& out);
-    void deserialize(loss_binary_hinge_& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
-
     template <typename SUBNET>
     using loss_binary_hinge = add_loss_layer<loss_binary_hinge_, SUBNET>;
 
@@ -271,12 +270,6 @@ namespace dlib
         !*/
 
     };
-
-    void serialize(const loss_binary_log_& item, std::ostream& out);
-    void deserialize(loss_binary_log_& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
 
     template <typename SUBNET>
     using loss_binary_log = add_loss_layer<loss_binary_log_, SUBNET>;
@@ -345,12 +338,6 @@ namespace dlib
         !*/
 
     };
-
-    void serialize(const loss_multiclass_log_& item, std::ostream& out);
-    void deserialize(loss_multiclass_log_& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
 
     template <typename SUBNET>
     using loss_multiclass_log = add_loss_layer<loss_multiclass_log_, SUBNET>;

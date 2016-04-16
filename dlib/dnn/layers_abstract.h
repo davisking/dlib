@@ -306,6 +306,11 @@ namespace dlib
 
     };
 
+    std::ostream& operator<<(std::ostream& out, const EXAMPLE_COMPUTATIONAL_LAYER_& item);
+    /*!
+        print a string describing this layer.
+    !*/
+
     void serialize(const EXAMPLE_COMPUTATIONAL_LAYER_& item, std::ostream& out);
     void deserialize(EXAMPLE_COMPUTATIONAL_LAYER_& item, std::istream& in);
     /*!
@@ -390,11 +395,6 @@ namespace dlib
             These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
 
-        friend void serialize(const fc_& item, std::ostream& out);
-        friend void deserialize(fc_& item, std::istream& in);
-        /*!
-            provides serialization support  
-        !*/
     };
 
     template <
@@ -500,12 +500,6 @@ namespace dlib
             These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
 
-        friend void serialize(const con_& item, std::ostream& out);
-        friend void deserialize(con_& item, std::istream& in);
-        /*!
-            provides serialization support  
-        !*/
-
     };
 
     template <
@@ -565,12 +559,6 @@ namespace dlib
         !*/
     };
 
-    void serialize(const dropout_& item, std::ostream& out);
-    void deserialize(dropout_& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
-
     template <typename SUBNET>
     using dropout = add_layer<dropout_, SUBNET>;
 
@@ -622,12 +610,6 @@ namespace dlib
             These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
     };
-
-    void serialize(const multiply_& item, std::ostream& out);
-    void deserialize(multiply_& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
 
     template <typename SUBNET>
     using multiply = add_layer<multiply_, SUBNET>;
@@ -725,13 +707,6 @@ namespace dlib
         /*!
             These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
-
-        friend void serialize(const bn_& item, std::ostream& out);
-        friend void deserialize(bn_& item, std::istream& in);
-        /*!
-            provides serialization support  
-        !*/
-
     };
 
     template <typename SUBNET>
@@ -829,12 +804,6 @@ namespace dlib
 
     };
 
-    void serialize(const affine_& item, std::ostream& out);
-    void deserialize(affine_& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
-
     template <typename SUBNET>
     using affine = add_layer<affine_, SUBNET>;
 
@@ -926,12 +895,6 @@ namespace dlib
             These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ 
             interface.  Note that this layer doesn't have any parameters, so the tensor
             returned by get_layer_params() is always empty.
-        !*/
-
-        friend void serialize(const max_pool_& item, std::ostream& out);
-        friend void deserialize(max_pool_& item, std::istream& in);
-        /*!
-            provides serialization support  
         !*/
     };
 
@@ -1034,11 +997,6 @@ namespace dlib
             returned by get_layer_params() is always empty.
         !*/
 
-        friend void serialize(const avg_pool_& item, std::ostream& out);
-        friend void deserialize(avg_pool_& item, std::istream& in);
-        /*!
-            provides serialization support  
-        !*/
     };
 
     template <
@@ -1079,12 +1037,6 @@ namespace dlib
             returned by get_layer_params() is always empty.
         !*/
     };
-
-    void serialize(const relu_& item, std::ostream& out);
-    void deserialize(relu_& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
 
     template <typename SUBNET>
     using relu = add_layer<relu_, SUBNET>;
@@ -1137,12 +1089,6 @@ namespace dlib
         !*/
     };
 
-    void serialize(const prelu_& item, std::ostream& out);
-    void deserialize(prelu_& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
-
     template <typename SUBNET>
     using prelu = add_layer<prelu_, SUBNET>;
 
@@ -1176,12 +1122,6 @@ namespace dlib
         !*/
     };
 
-    void serialize(const sig_& item, std::ostream& out);
-    void deserialize(sig_& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
-
     template <typename SUBNET>
     using sig = add_layer<sig_, SUBNET>;
 
@@ -1214,12 +1154,6 @@ namespace dlib
             returned by get_layer_params() is always empty.
         !*/
     };
-
-    void serialize(const htan_& item, std::ostream& out);
-    void deserialize(htan_& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
 
     template <typename SUBNET>
     using htan = add_layer<htan_, SUBNET>;
@@ -1262,12 +1196,6 @@ namespace dlib
         !*/
     };
 
-    void serialize(const softmax_& item, std::ostream& out);
-    void deserialize(softmax_& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
-
     template <typename SUBNET>
     using softmax = add_layer<softmax_, SUBNET>;
 
@@ -1307,11 +1235,6 @@ namespace dlib
         !*/
     };
 
-    void serialize(const add_prev_& item, std::ostream& out);
-    void deserialize(add_prev_& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
 
     template <
         template<typename> class tag,

@@ -205,8 +205,12 @@ namespace dlib
         typedef SUBNET subnet_type;
         typedef typename subnet_type::input_type input_type;
         const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
-        // If SUBNET is an input layer then num_layers == 1, otherwise it has the
-        // definition shown here:
+        // num_computational_layers will always give the number of layers in the network
+        // that transform tensors (i.e. layers defined by something that implements the
+        // EXAMPLE_COMPUTATIONAL_LAYER_ interface).  This is all the layers except for
+        // loss, tag, and skip layers.
+        const static size_t num_computational_layers = subnet_type::num_computational_layers + 1;
+        // num_layers counts all the layers in the network regardless of their type.  
         const static size_t num_layers = subnet_type::num_layers + 1;
 
         add_layer(
@@ -444,7 +448,7 @@ namespace dlib
                 - The given solvers have only ever been used with this network.  That
                   is, if you want to call update() on some other neural network object then
                   you must NOT reuse the same solvers object.
-                - solvers.size() >= num_layers
+                - solvers.size() >= num_computational_layers
                 - 0 < step_size <= 1
             ensures
                 - Back propagates the error gradient, get_gradient_input(), through this
@@ -473,7 +477,7 @@ namespace dlib
                 - The given solvers have only ever been used with this network.  That
                   is, if you want to call update() on some other neural network object then
                   you must NOT reuse the same solvers object.
-                - solvers.size() >= num_layers
+                - solvers.size() >= num_computational_layers
                 - 0 < step_size <= 1
             ensures
                 - This function is identical to the version of update() defined immediately
@@ -508,9 +512,15 @@ namespace dlib
 
     };
 
-    template <typename T, typename U>, 
+    template <typename T, typename U> 
+    std::ostream& operator<<(std::ostream& out, const add_layer<T,U>& item);
+    /*!
+        prints the network architecture to the given output stream.
+    !*/
+
+    template <typename T, typename U> 
     void serialize(const add_layer<T,U>& item, std::ostream& out);
-    template <typename T, typename U>, 
+    template <typename T, typename U> 
     void deserialize(add_layer<T,U>& item, std::istream& in);
     /*!
         provides serialization support  
@@ -555,9 +565,8 @@ namespace dlib
         typedef LOSS_DETAILS loss_details_type;
         typedef SUBNET subnet_type;
         typedef typename subnet_type::input_type input_type;
-        // Note that the loss layer doesn't count as an additional layer since it doesn't
-        // have any learnable parameters.  
-        const static size_t num_layers = subnet_type::num_layers;
+        const static size_t num_computational_layers = subnet_type::num_computational_layers;
+        const static size_t num_layers = subnet_type::num_layers + 1;
         const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         // If LOSS_DETAILS is an unsupervised loss then label_type==no_label_type.
         // Otherwise it is defined as follows:
@@ -838,7 +847,7 @@ namespace dlib
                 - The given solvers have only ever been used with this network.  That
                   is, if you want to call update() on some other neural network object then
                   you must NOT reuse the same solvers object.
-                - solvers.size() >= num_layers
+                - solvers.size() >= num_computational_layers
                 - 0 < step_size <= 1
             ensures
                 - runs x through the network, compares the output to the expected output
@@ -870,7 +879,7 @@ namespace dlib
                 - The given solvers have only ever been used with this network.  That
                   is, if you want to call update() on some other neural network object then
                   you must NOT reuse the same solvers object.
-                - solvers.size() >= num_layers
+                - solvers.size() >= num_computational_layers
                 - 0 < step_size <= 1
             ensures
                 - runs [ibegin,iend) through the network, compares the output to the
@@ -901,7 +910,7 @@ namespace dlib
                 - The given solvers have only ever been used with this network.  That
                   is, if you want to call update() on some other neural network object then
                   you must NOT reuse the same solvers object.
-                - solvers.size() >= num_layers
+                - solvers.size() >= num_computational_layers
                 - 0 < step_size <= 1
             ensures
                 - runs x through the network and updates the network parameters by
@@ -928,7 +937,7 @@ namespace dlib
                 - The given solvers have only ever been used with this network.  That
                   is, if you want to call update() on some other neural network object then
                   you must NOT reuse the same solvers object.
-                - solvers.size() >= num_layers
+                - solvers.size() >= num_computational_layers
                 - 0 < step_size <= 1
             ensures
                 - runs [ibegin,iend) through the network and updates the network parameters
@@ -951,9 +960,15 @@ namespace dlib
         !*/
     };
 
-    template <typename T, typename U>, 
+    template <typename T, typename U> 
+    std::ostream& operator<<(std::ostream& out, const add_loss_layer<T,U>& item);
+    /*!
+        prints the network architecture to the given output stream.
+    !*/
+
+    template <typename T, typename U> 
     void serialize(const add_loss_layer<T,U>& item, std::ostream& out);
-    template <typename T, typename U>, 
+    template <typename T, typename U> 
     void deserialize(add_loss_layer<T,U>& item, std::istream& in);
     /*!
         provides serialization support  
@@ -1013,6 +1028,7 @@ namespace dlib
 
         typedef SUBNET subnet_type;
         typedef typename SUBNET::input_type input_type;
+        const static size_t num_computational_layers = (REPEATED_LAYER<SUBNET>::num_computational_layers-SUBNET::num_computational_layers)*num + SUBNET::num_computational_layers;
         const static size_t num_layers = (REPEATED_LAYER<SUBNET>::num_layers-SUBNET::num_layers)*num + SUBNET::num_layers;
         const static unsigned int sample_expansion_factor = SUBNET::sample_expansion_factor;
         typedef REPEATED_LAYER<an_unspecified_input_type> repeated_layer_type;
@@ -1095,6 +1111,20 @@ namespace dlib
         !*/
     };
 
+    template < size_t num, template<typename> class T, typename U >
+    std::ostream& operator<<(std::ostream& out, const repeat<num,T,U>& item);
+    /*!
+        prints the network architecture to the given output stream.
+    !*/
+
+    template < size_t num, template<typename> class T, typename U >
+    void serialize(const repeat<num,T,U>& item, std::ostream& out);
+    template < size_t num, template<typename> class T, typename U >
+    void deserialize(repeat<num,T,U>& item, std::istream& in);
+    /*!
+        provides serialization support  
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -1124,9 +1154,15 @@ namespace dlib
         !*/
     };
 
-    template <unsigned long ID, typename U>, 
+    template <unsigned long ID, typename U> 
+    std::ostream& operator<<(std::ostream& out, const add_tag_layer<ID,U>& item);
+    /*!
+        prints the network architecture to the given output stream.
+    !*/
+
+    template <unsigned long ID, typename U> 
     void serialize(const add_tag_layer<ID,U>& item, std::ostream& out);
-    template <unsigned long ID, typename U>, 
+    template <unsigned long ID, typename U> 
     void deserialize(add_tag_layer<ID,U>& item, std::istream& in);
     /*!
         provides serialization support  
@@ -1169,6 +1205,12 @@ namespace dlib
     };
 
     template <template<typename> class T, typename U>
+    std::ostream& operator<<(std::ostream& out, const add_skip_layer<T,U>& item);
+    /*!
+        prints the network architecture to the given output stream.
+    !*/
+
+    template <template<typename> class T, typename U>
     void serialize(const add_skip_layer<T,U>& item, std::ostream& out);
     template <template<typename> class T, typename U>
     void deserialize(add_skip_layer<T,U>& item, std::istream& in);
@@ -1200,9 +1242,15 @@ namespace dlib
         requires
             - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
               add_tag_layer.
+            - i < net_type::num_layers
         ensures
-            - This function chains together i calls to n.subnet() and returns the
-              result.  So for example:
+            - This function allows you to access any layer in a network by its layer index
+              i.  Therefore, it will walk i steps down the network and return the layer
+              object there.  Since networks can be big, the best way to find layer index
+              numbers is to print a network to the screen since the print out will include
+              indexes for each layer.
+            - In general, this function chains together i calls to n.subnet() and returns
+              the result.  So for example:
                 - if (i == 0)
                     - returns n
                 - else if (i == 1)
@@ -1213,6 +1261,10 @@ namespace dlib
                     - returns n.subnet().subnet().subnet()
                 - else
                     - etc.
+              Except that when it hits a repeat layer it recurses into the repeated layers
+              contained inside.  That is, if the layer index indicates a layer in a repeat
+              object this function will make the appropriate call to get_repeated_layer()
+              and do the right thing.
     !*/
 
     template <

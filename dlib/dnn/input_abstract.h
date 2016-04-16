@@ -86,6 +86,11 @@ namespace dlib
         !*/
     };
 
+    std::ostream& operator<<(std::ostream& out, const EXAMPLE_INPUT_LAYER& item);
+    /*!
+        print a string describing this layer.
+    !*/
+
     void serialize(const EXAMPLE_INPUT_LAYER& item, std::ostream& out);
     void deserialize(EXAMPLE_INPUT_LAYER& item, std::istream& in);
     /*!
@@ -142,14 +147,6 @@ namespace dlib
         !*/
     };
 
-    template <typename T>
-    void serialize(const input<T>& item, std::ostream& out);
-    template <typename T>
-    void deserialize(input<T>& item, std::istream& in);
-    /*!
-        provides serialization support  
-    !*/
-
 // ----------------------------------------------------------------------------------------
 
     class input_rgb_image
@@ -158,8 +155,8 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This input layer works with RGB images of type matrix<rgb_pixel>.  It is
                 very similar to the dlib::input layer except that it allows you to subtract
-                the average color value from each color channel when convting an image to a
-                tensor.
+                the average color value from each color channel when converting an image to
+                a tensor.
         !*/
     public:
         typedef matrix<rgb_pixel> input_type;
@@ -227,13 +224,10 @@ namespace dlib
                     - #data.nc() == C
                     - #data.k() == 3
                   Moreover, each color channel is normalized by having its average value
-                  subtracted (accroding to get_avg_red(), get_avg_green(), or
+                  subtracted (according to get_avg_red(), get_avg_green(), or
                   get_avg_blue()) and then is divided by 256.0.
         !*/
     };
-
-    void serialize(const input_rgb_image& item, std::ostream& out);
-    void deserialize(input_rgb_image& item, std::istream& in);
 
 }
 

@@ -119,6 +119,12 @@ namespace dlib
             deserialize(item.avg_blue, in);
         }
 
+        friend std::ostream& operator<<(std::ostream& out, const input_rgb_image& item)
+        {
+            out << "input_rgb_image("<<item.avg_red<<","<<item.avg_green<<","<<item.avg_blue<<")";
+            return out;
+        }
+
     private:
         float avg_red;
         float avg_green;
@@ -201,6 +207,12 @@ namespace dlib
                 throw serialization_error("Unexpected version found while deserializing dlib::input.");
         }
 
+        friend std::ostream& operator<<(std::ostream& out, const input& item)
+        {
+            out << "input<matrix>";
+            return out;
+        }
+
     };
 
 // ----------------------------------------------------------------------------------------
@@ -276,6 +288,11 @@ namespace dlib
             deserialize(version, in);
             if (version != "input<array2d>")
                 throw serialization_error("Unexpected version found while deserializing dlib::input.");
+        }
+        friend std::ostream& operator<<(std::ostream& out, const input& item)
+        {
+            out << "input<array2d>";
+            return out;
         }
 
     };

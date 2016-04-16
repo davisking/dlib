@@ -1190,8 +1190,10 @@ namespace
         net_type net;
         net_type net2(num_fc_outputs(4));
 
-        DLIB_TEST(layer<tag1>(net).num_layers == 8);
-        DLIB_TEST(layer<skip1>(net).num_layers == 8+3+3);
+        DLIB_TEST(layer<tag1>(net).num_computational_layers == 8);
+        DLIB_TEST(layer<skip1>(net).num_computational_layers == 8+3+3);
+        DLIB_TEST(layer<tag1>(net).num_layers == 10);
+        DLIB_TEST(layer<skip1>(net).num_layers == 10+3+3+1);
         DLIB_TEST(&layer<skip1>(net).get_output() == &layer<tag1>(net).get_output());
         DLIB_TEST(&layer<skip1>(net).get_output() != &layer<tag1>(net).subnet().subnet().get_output());
         DLIB_TEST(net.subnet().subnet().subnet().layer_details().get_num_outputs() == 10);
