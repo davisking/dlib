@@ -316,7 +316,7 @@ namespace dlib
     // easily composed.  Moreover, the convention is that the layer class ends with an _
     // while the add_layer template has the same name but without the trailing _.
     template <typename SUBNET>
-    using EXAMPLE_LAYER = add_layer<EXAMPLE_COMPUTATIONAL_LAYER_, SUBNET>;
+    using EXAMPLE_COMPUTATIONAL_LAYER = add_layer<EXAMPLE_COMPUTATIONAL_LAYER_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
