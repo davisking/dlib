@@ -86,21 +86,21 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class EXAMPLE_LAYER_
+    class EXAMPLE_COMPUTATIONAL_LAYER_
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                Each layer in a deep neural network can be thought of as a function,
-                f(data,parameters), that takes in a data tensor, some parameters, and
-                produces an output tensor.  You create an entire deep network by composing
-                these functions.  Importantly, you are able to use a wide range of
-                different functions to accommodate the task you are trying to accomplish.
-                Therefore, dlib includes a number of common layer types but if you want to
-                define your own then you simply implement a class with the same interface
-                as EXAMPLE_LAYER_.
+                Each computational layer in a deep neural network can be thought of as a
+                function, f(data,parameters), that takes in a data tensor, some parameters,
+                and produces an output tensor.  You create an entire deep network by
+                composing these functions.  Importantly, you are able to use a wide range
+                of different functions to accommodate the task you are trying to
+                accomplish.  Therefore, dlib includes a number of common layer types but if
+                you want to define your own then you simply implement a class with the same
+                interface as EXAMPLE_COMPUTATIONAL_LAYER_.
 
-                Note that there is no dlib::EXAMPLE_LAYER_ type.  It is shown here purely
-                to document the interface that a layer object must implement.
+                Note that there is no dlib::EXAMPLE_COMPUTATIONAL_LAYER_ type.  It is shown
+                here purely to document the interface that a layer object must implement.
 
                 The central work of defining a layer is implementing the forward and backward
                 methods.  When you do this you have four options:
@@ -127,7 +127,7 @@ namespace dlib
 
     public:
 
-        EXAMPLE_LAYER_(
+        EXAMPLE_COMPUTATIONAL_LAYER_(
         );
         /*!
             ensures
@@ -136,15 +136,15 @@ namespace dlib
                   layer objects be default constructable. 
         !*/
 
-        EXAMPLE_LAYER_ (
-            const EXAMPLE_LAYER_& item
+        EXAMPLE_COMPUTATIONAL_LAYER_ (
+            const EXAMPLE_COMPUTATIONAL_LAYER_& item
         );
         /*!
             ensures
-                - EXAMPLE_LAYER_ objects are copy constructable
+                - EXAMPLE_COMPUTATIONAL_LAYER_ objects are copy constructable
         !*/
 
-        EXAMPLE_LAYER_(
+        EXAMPLE_COMPUTATIONAL_LAYER_(
             const some_other_layer_type& item
         );
         /*!
@@ -306,8 +306,8 @@ namespace dlib
 
     };
 
-    void serialize(const EXAMPLE_LAYER_& item, std::ostream& out);
-    void deserialize(EXAMPLE_LAYER_& item, std::istream& in);
+    void serialize(const EXAMPLE_COMPUTATIONAL_LAYER_& item, std::ostream& out);
+    void deserialize(EXAMPLE_COMPUTATIONAL_LAYER_& item, std::istream& in);
     /*!
         provides serialization support  
     !*/
@@ -316,7 +316,7 @@ namespace dlib
     // easily composed.  Moreover, the convention is that the layer class ends with an _
     // while the add_layer template has the same name but without the trailing _.
     template <typename SUBNET>
-    using EXAMPLE_LAYER = add_layer<EXAMPLE_LAYER_, SUBNET>;
+    using EXAMPLE_LAYER = add_layer<EXAMPLE_COMPUTATIONAL_LAYER_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -345,9 +345,10 @@ namespace dlib
                 num_outputs > 0
 
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
-                In particular, it defines a fully connected layer that takes an input
-                tensor and multiplies it by a weight matrix and outputs the results.
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a fully connected layer that
+                takes an input tensor and multiplies it by a weight matrix and outputs the
+                results.
         !*/
 
     public:
@@ -386,7 +387,7 @@ namespace dlib
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
-            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
 
         friend void serialize(const fc_& item, std::ostream& out);
@@ -424,10 +425,10 @@ namespace dlib
                 All of them must be > 0.
 
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
-                In particular, it defines a convolution layer that takes an input tensor
-                (nominally representing an image) and convolves it with a set of filters
-                and then outputs the results. 
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a convolution layer that takes an
+                input tensor (nominally representing an image) and convolves it with a set
+                of filters and then outputs the results. 
 
                 The dimensions of the tensors output by this layer are as follows (letting
                 IN be the input tensor and OUT the output tensor):
@@ -496,7 +497,7 @@ namespace dlib
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
-            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
 
         friend void serialize(const con_& item, std::ostream& out);
@@ -523,11 +524,11 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
-                In particular, it defines a dropout layer.  Therefore, it passes its inputs
-                through the stochastic function f(x) which outputs either 0 or x.  The
-                probability of 0 being output is given by the drop_rate argument to this
-                object's constructor.
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a dropout layer.  Therefore, it
+                passes its inputs through the stochastic function f(x) which outputs either
+                0 or x.  The probability of 0 being output is given by the drop_rate
+                argument to this object's constructor.
 
                 Note that, after you finish training a network with dropout, it is a good
                 idea to replace each dropout_ layer with a multiply_ layer because the
@@ -560,7 +561,7 @@ namespace dlib
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
-            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
     };
 
@@ -579,10 +580,10 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
-                In particular, it defines a basic layer that just multiplies its input
-                tensor with a constant value and returns the result.  It therefore has no
-                learnable parameters.
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a basic layer that just
+                multiplies its input tensor with a constant value and returns the result.
+                It therefore has no learnable parameters.
         !*/
 
     public:
@@ -618,7 +619,7 @@ namespace dlib
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
-            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
     };
 
@@ -646,9 +647,9 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
-                In particular, it defines a batch normalization layer that implements the
-                method described in the paper: 
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a batch normalization layer that
+                implements the method described in the paper: 
                     Batch Normalization: Accelerating Deep Network Training by Reducing
                     Internal Covariate Shift by Sergey Ioffe and Christian Szegedy
                 
@@ -722,7 +723,7 @@ namespace dlib
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
-            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
 
         friend void serialize(const bn_& item, std::ostream& out);
@@ -744,10 +745,11 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
-                In particular, it applies a simple pointwise linear transformation to an
-                input tensor.  You can think of it as having two parameter tensors, A and
-                B.  If the input tensor is called INPUT then the output of this layer is:
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it applies a simple pointwise linear
+                transformation to an input tensor.  You can think of it as having two
+                parameter tensors, A and B.  If the input tensor is called INPUT then the
+                output of this layer is:
                     A*INPUT+B
                 where all operations are performed element wise and each sample in the
                 INPUT tensor is processed separately.
@@ -819,9 +821,10 @@ namespace dlib
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
-            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
-            Also note that get_layer_params() always returns an empty tensor since there
-            are no learnable parameters in this object.
+            These functions are implemented as described in the
+            EXAMPLE_COMPUTATIONAL_LAYER_ interface.  Also note that get_layer_params()
+            always returns an empty tensor since there are no learnable parameters in this
+            object.
         !*/
 
     };
@@ -850,11 +853,11 @@ namespace dlib
                 All of them must be > 0.
 
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
-                In particular, it defines a max pooling layer that takes an input tensor
-                and downsamples it.  It does this by sliding a window over the images in an
-                input tensor and outputting, for each channel, the maximum element within
-                the window.  
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a max pooling layer that takes an
+                input tensor and downsamples it.  It does this by sliding a window over the
+                images in an input tensor and outputting, for each channel, the maximum
+                element within the window.  
 
                 To be precise, if we call the input tensor IN and the output tensor OUT,
                 then OUT is defined as follows:
@@ -920,9 +923,9 @@ namespace dlib
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
-            These functions are implemented as described in the EXAMPLE_LAYER_ interface. 
-            Note that this layer doesn't have any parameters, so the tensor returned by
-            get_layer_params() is always empty.
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ 
+            interface.  Note that this layer doesn't have any parameters, so the tensor
+            returned by get_layer_params() is always empty.
         !*/
 
         friend void serialize(const max_pool_& item, std::ostream& out);
@@ -956,11 +959,11 @@ namespace dlib
                 All of them must be > 0.
 
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
-                In particular, it defines an average pooling layer that takes an input tensor
-                and downsamples it.  It does this by sliding a window over the images in an
-                input tensor and outputting, for each channel, the average element within
-                the window.  
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines an average pooling layer that
+                takes an input tensor and downsamples it.  It does this by sliding a window
+                over the images in an input tensor and outputting, for each channel, the
+                average element within the window.  
 
                 To be precise, if we call the input tensor IN and the output tensor OUT,
                 then OUT is defined as follows:
@@ -1026,9 +1029,9 @@ namespace dlib
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
-            These functions are implemented as described in the EXAMPLE_LAYER_ interface. 
-            Note that this layer doesn't have any parameters, so the tensor returned by
-            get_layer_params() is always empty.
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ 
+            interface.  Note that this layer doesn't have any parameters, so the tensor
+            returned by get_layer_params() is always empty.
         !*/
 
         friend void serialize(const avg_pool_& item, std::ostream& out);
@@ -1053,9 +1056,9 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
-                In particular, it defines a rectified linear layer.  Therefore, it passes
-                its inputs through the function 
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a rectified linear layer.
+                Therefore, it passes its inputs through the function 
                     f(x)=max(x,0) 
                 where f() is applied pointwise across the input tensor.
         !*/
@@ -1071,9 +1074,9 @@ namespace dlib
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
-            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
-            Note that this layer doesn't have any parameters, so the tensor returned by
-            get_layer_params() is always empty.
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ 
+            interface.  Note that this layer doesn't have any parameters, so the tensor
+            returned by get_layer_params() is always empty.
         !*/
     };
 
@@ -1092,9 +1095,9 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
-                In particular, it defines a parametric rectified linear layer.  Therefore,
-                it passes its inputs through the function 
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a parametric rectified linear
+                layer.  Therefore, it passes its inputs through the function 
                     f(x) = x>0 ? x : p*x 
                 where f() is applied pointwise across the input tensor and p is a scalar
                 parameter learned by this layer.
@@ -1130,7 +1133,7 @@ namespace dlib
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
-            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
     };
 
@@ -1149,9 +1152,9 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
-                In particular, it defines a sigmoid layer.  Therefore, it passes its inputs
-                through the function 
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a sigmoid layer.  Therefore, it
+                passes its inputs through the function 
                     f(x)=1/(1+exp(-x)) 
                 where f() is applied pointwise across the input tensor.
         !*/
@@ -1167,9 +1170,9 @@ namespace dlib
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
-            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
-            Note that this layer doesn't have any parameters, so the tensor returned by
-            get_layer_params() is always empty.
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ 
+            interface.  Note that this layer doesn't have any parameters, so the tensor
+            returned by get_layer_params() is always empty.
         !*/
     };
 
@@ -1188,9 +1191,9 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
-                In particular, it defines a hyperbolic tangent layer.  Therefore, it passes
-                its inputs through the function 
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a hyperbolic tangent layer.
+                Therefore, it passes its inputs through the function 
                     f(x)=std::tanh(x)
                 where f() is applied pointwise across the input tensor.
         !*/
@@ -1206,9 +1209,9 @@ namespace dlib
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
-            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
-            Note that this layer doesn't have any parameters, so the tensor returned by
-            get_layer_params() is always empty.
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ 
+            interface.  Note that this layer doesn't have any parameters, so the tensor
+            returned by get_layer_params() is always empty.
         !*/
     };
 
@@ -1227,9 +1230,9 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
-                In particular, it defines a softmax layer.  To be precise, we define the
-                softmax function s(x) as:
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a softmax layer.  To be precise,
+                we define the softmax function s(x) as:
                     s(x) == exp(x)/sum(exp(x)) 
                 where x is a vector.  Then this layer treats its input tensor as a
                 collection of multi-channel images and applies s() to each spatial location
@@ -1253,9 +1256,9 @@ namespace dlib
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
-            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
-            Note that this layer doesn't have any parameters, so the tensor returned by
-            get_layer_params() is always empty.
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ 
+            interface.  Note that this layer doesn't have any parameters, so the tensor
+            returned by get_layer_params() is always empty.
         !*/
     };
 
@@ -1277,10 +1280,11 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the EXAMPLE_LAYER_ interface defined above.
-                This layer simply adds the output of two previous layers.  In particular,
-                it adds the tensor from its immediate predecessor layer, sub.get_output(),
-                with the tensor from a deeper layer, layer<tag>(sub).get_output().
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  This layer simply adds the output of two previous layers.
+                In particular, it adds the tensor from its immediate predecessor layer,
+                sub.get_output(), with the tensor from a deeper layer,
+                layer<tag>(sub).get_output().
 
                 Therefore, you supply a tag via add_prev_'s template argument that tells it
                 what layer to add to the output of the previous layer.  The result of this
@@ -1299,7 +1303,7 @@ namespace dlib
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
-            These functions are implemented as described in the EXAMPLE_LAYER_ interface.
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
     };
 

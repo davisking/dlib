@@ -181,8 +181,8 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON LAYER_DETAILS
-                - Must be a type that implements the EXAMPLE_LAYER_ interface defined in
-                  layers_abstract.h
+                - Must be a type that implements the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                  defined in layers_abstract.h
 
             REQUIREMENTS ON SUBNET
                 - One of the following must be true:
@@ -1272,9 +1272,9 @@ namespace dlib
     );
     /*!
         ensures
-            - Checks if l correctly implements the EXAMPLE_LAYER_ interface defined in
-              layers_abstract.h.  Importantly, it computes numerical approximations to the
-              gradients and compares them to the outputs of the layer.  
+            - Checks if l correctly implements the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+              defined in layers_abstract.h.  Importantly, it computes numerical approximations 
+              to the gradients and compares them to the outputs of the layer.  
             - The results of the testing are returned.  In particular, if the returned object
               is RESULT then we will have:
                 - RESULT.was_good == false if and only if the layer failed the testing.
