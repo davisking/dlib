@@ -168,7 +168,7 @@ namespace dlib
         inline int get_device (
         ){ return 0; }
 
-        int get_num_devices (
+        inline int get_num_devices (
         ) { return 1; }
 
 #endif // DLIB_USE_CUDA
