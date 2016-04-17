@@ -410,33 +410,53 @@ namespace dlib
         /*!
             ensures
                 - returns the error gradient for this network.  That is, this is the error
-                  gradient that this network will use to update itself when update() is
-                  called.  Therefore, when performing back propagation, layers that sit on
-                  top of this network layer write their back propagated error gradients
-                  into get_gradient_input().  Or to put it another way, during back
-                  propagation, layers take the contents of their get_gradient_input() and
-                  back propagate it through themselves and store the results into their
-                  subnetwork's get_gradient_input().
+                  gradient that this network will use to compute parameter gradients when
+                  back_propagate_error() is called.  Therefore, when performing back
+                  propagation, layers that sit on top of this network layer write their
+                  back-propagated error gradients into get_gradient_input().  Or to put it
+                  another way, during back-propagation, layers take the contents of their
+                  get_gradient_input() and back-propagate it through themselves and store
+                  the result into their subnetwork's get_gradient_input().
 
                   This means you should consider get_gradient_input() as an input to the
-                  update() method.  
+                  back_propagate_error() method.  
         !*/
 
         const tensor& get_final_data_gradient(
         ) const;
         /*!
             ensures
-                - if update() has been called to back-propagate a gradient through this
-                  network then you can call get_final_data_gradient() to obtain the last
-                  gradient computed.  That is, this function returns the gradient of the
-                  network with respect to its inputs.
+                - if back_propagate_error() has been called to back-propagate a gradient
+                  through this network then you can call get_final_data_gradient() to
+                  obtain the last data gradient computed.  That is, this function returns
+                  the gradient of the network with respect to its inputs.
+                - Note that there is only one "final data gradient" for an entire network,
+                  not one per layer, since there is only one input to the entire network.
         !*/
 
-        template <typename solver_type>
-        void update(
-            const tensor& x, 
-            sstack<solver_type> solvers,
-            double step_size
+        const tensor& get_parameter_gradient(
+        ) const; 
+        /*!
+            ensures
+                - if back_propagate_error() has been called then you can call
+                  get_parameter_gradient() to find the gradient of this layer's parameters.
+                  When we update the parameters by calling update_parameters(), it will use
+                  the gradient in get_parameter_gradient() to perform the update.
+                  Therefore, you should consider get_parameter_gradient() as an input to
+                  update_parameters().
+        !*/
+
+        tensor& get_parameter_gradient (
+        ); 
+        /*!
+            ensures
+                - returns a non-const reference to the tensor returned by the above
+                  get_parameter_gradient() method.  You could use this method to modify the
+                  parameter gradient in some way before invoking update_parameters().
+        !*/
+
+        void back_propagate_error(
+            const tensor& x
         );
         /*!
             requires
@@ -445,28 +465,21 @@ namespace dlib
                   subsequently modified in any way.
                 - get_gradient_input() has been set equal to the gradient of this network's
                   output with respect to some loss function.
-                - The given solvers have only ever been used with this network.  That
-                  is, if you want to call update() on some other neural network object then
-                  you must NOT reuse the same solvers object.
-                - solvers.size() >= num_computational_layers
-                - 0 < step_size <= 1
             ensures
                 - Back propagates the error gradient, get_gradient_input(), through this
-                  network and uses the provided solvers to update the network parameters.
-                - The parameter delta vector output by the solvers is multiplied by
-                  step_size before being added to the parameters.
+                  network and computes parameter and data gradients, via backpropagation.
+                  Specifically, this function populates get_final_data_gradient() and also,
+                  for each layer, the tensor returned by get_parameter_gradient().
                 - All elements of #get_gradient_input() are set to 0. 
-                - have_same_dimensions(#get_final_data_gradient(), x) == true
+                - have_same_dimensions(#get_final_data_gradient(), x) == true.
+                - have_same_dimensions(#get_parameter_gradient(), layer_details().get_layer_params()) == true.
                 - #get_final_data_gradient() contains the gradient of the network with
                   respect to x.
         !*/
 
-        template <typename solver_type>
-        void update(
+        void back_propagate_error(
             const tensor& x, 
-            const tensor& gradient_input,
-            sstack<solver_type> solvers,
-            double step_size
+            const tensor& gradient_input
         );
         /*!
             requires
@@ -474,25 +487,43 @@ namespace dlib
                   Moreover, this was the most recent call to forward() and x has not been
                   subsequently modified in any way.
                 - have_same_dimensions(gradient_input, get_output()) == true
-                - The given solvers have only ever been used with this network.  That
-                  is, if you want to call update() on some other neural network object then
-                  you must NOT reuse the same solvers object.
+            ensures
+                - This function is identical to the version of back_propagate_error()
+                  defined immediately above except that it back-propagates gradient_input
+                  through the network instead of get_gradient_input().  Therefore, this
+                  version of back_propagate_error() is equivalent to performing:
+                    get_gradient_input() = gradient_input;
+                    back_propagate_error(x);
+                  Except that calling back_propagate_error(x,gradient_input) avoids the
+                  copy and is therefore slightly more efficient.
+                - All elements of #get_gradient_input() are set to 0. 
+                - have_same_dimensions(#get_final_data_gradient(), x) == true.
+                - have_same_dimensions(#get_parameter_gradient(), layer_details().get_layer_params()) == true.
+                - #get_final_data_gradient() contains the gradient of the network with
+                  respect to x.
+        !*/
+
+        template <typename solver_type>
+        void update_parameters(
+            sstack<solver_type> solvers, 
+            double step_size
+        );
+        /*!
+            requires
+                - solver_type is an implementation of the EXAMPLE_SOLVER interface defined
+                  in solvers_abstract.h
+                - back_propagate_error() has been called.
+                - The given solvers have only ever been used with this network.  That is,
+                  if you want to call update_parameters() on some other neural network
+                  object then you must NOT reuse the same solvers object.
                 - solvers.size() >= num_computational_layers
                 - 0 < step_size <= 1
             ensures
-                - This function is identical to the version of update() defined immediately
-                  above except that it back-propagates gradient_input through the network
-                  instead of get_gradient_input().  Therefore, this version of update is
-                  equivalent to performing:
-                    get_gradient_input() = gradient_input;
-                    update(x,solvers);
-                  Except that calling update(x,gradient_input,solvers) avoids the copy
-                  and is therefore slightly more efficient.
-                - The parameter delta vector output by the solvers is multiplied by
-                  step_size before being added to the parameters.
-                - All elements of #get_gradient_input() are set to 0. 
-                - #get_final_data_gradient() contains the gradient of the network with
-                  respect to x.
+                - Updates all the parameters in the network.  In particular, we pass each
+                  layer's parameter gradient (i.e. the tensor returned by the layer's
+                  get_parameter_gradient() member) through that layer's corresponding
+                  solver object.  This produces a parameter delta vector and we add
+                  step_size times that vector to the layer's parameters.
         !*/
 
         void clean(
@@ -831,12 +862,10 @@ namespace dlib
 
     // -------------
 
-        template <typename label_iterator, typename solver_type>
-        double update (
+        template <typename label_iterator>
+        double compute_parameter_gradients (
             const tensor& x,
-            label_iterator lbegin,
-            sstack<solver_type> solvers,
-            double step_size
+            label_iterator lbegin
         );
         /*!
             requires
@@ -844,31 +873,22 @@ namespace dlib
                 - x.num_samples() > 0
                 - lbegin == iterator pointing to the start of a range of
                   x.num_samples()/sample_expansion_factor label_type elements.
-                - The given solvers have only ever been used with this network.  That
-                  is, if you want to call update() on some other neural network object then
-                  you must NOT reuse the same solvers object.
-                - solvers.size() >= num_computational_layers
-                - 0 < step_size <= 1
             ensures
                 - runs x through the network, compares the output to the expected output
-                  pointed to by lbegin, and updates the network parameters via
-                  backpropagation.
+                  pointed to by lbegin, and computes parameter and data gradients with
+                  respect to the loss, via backpropagation.  Specifically, this function
+                  updates get_final_data_gradient() and also, for each layer, the tensor
+                  returned by get_parameter_gradient().
                 - for all valid k:
                     - the expected label of the kth sample in x is *(lbegin+k/sample_expansion_factor).
-                - The provided solvers are used to update the parameters in each layer of
-                  the network.
-                - The parameter delta vector output by the solvers is multiplied by
-                  step_size before being added to the parameters.
                 - returns compute_loss(x,lbegin)
         !*/
 
-        template <typename input_iterator, typename label_iterator, typename solver_type>
-        double update (
+        template <typename input_iterator, typename label_iterator>
+        double compute_parameter_gradients (
             input_iterator ibegin,
             input_iterator iend,
-            label_iterator lbegin,
-            sstack<solver_type> solvers,
-            double step_size
+            label_iterator lbegin
         );
         /*!
             requires
@@ -876,77 +896,72 @@ namespace dlib
                 - std::distance(ibegin,iend) > 0
                 - lbegin == iterator pointing to the start of a range of
                   std::distance(ibegin,iend) label_type elements.
-                - The given solvers have only ever been used with this network.  That
-                  is, if you want to call update() on some other neural network object then
-                  you must NOT reuse the same solvers object.
-                - solvers.size() >= num_computational_layers
-                - 0 < step_size <= 1
             ensures
                 - runs [ibegin,iend) through the network, compares the output to the
-                  expected output pointed to by lbegin, and updates the network parameters
-                  via backpropagation.
+                  expected output pointed to by lbegin, and computes parameter and data
+                  gradients with respect to the loss, via backpropagation.  Specifically,
+                  this function updates get_final_data_gradient() and also, for each layer,
+                  the tensor returned by get_parameter_gradient().
                 - for all valid k:
                     - the expected label of *(ibegin+k) is *(lbegin+k).
-                - The provided solvers are used to update the parameters in each layer of
-                  the network.
-                - The parameter delta vector output by the solvers is multiplied by
-                  step_size before being added to the parameters.
                 - returns compute_loss(ibegin,iend,lbegin)
         !*/
 
-    // -------------
-
-        template <typename solver_type>
-        double update (
-            const tensor& x,
-            sstack<solver_type> solvers,
-            double step_size
+        double compute_parameter_gradients (
+            const tensor& x
         );
         /*!
             requires
                 - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
                 - x.num_samples()%sample_expansion_factor == 0
                 - x.num_samples() > 0
-                - The given solvers have only ever been used with this network.  That
-                  is, if you want to call update() on some other neural network object then
-                  you must NOT reuse the same solvers object.
-                - solvers.size() >= num_computational_layers
-                - 0 < step_size <= 1
             ensures
-                - runs x through the network and updates the network parameters by
-                  back-propagating the loss gradient through the network.
-                - The provided solvers are used to update the parameters in each layer of
-                  the network.
-                - The parameter delta vector output by the solvers is multiplied by
-                  step_size before being added to the parameters.
+                - runs x through the network and computes parameter and data gradients with
+                  respect to the loss, via backpropagation.  Specifically, this function
+                  updates get_final_data_gradient() and also, for each layer, the tensor
+                  returned by get_parameter_gradient().
                 - returns compute_loss(x)
         !*/
 
-        template <typename input_iterator, typename solver_type>
-        double update (
+        template <typename input_iterator>
+        double compute_parameter_gradients (
             input_iterator ibegin,
-            input_iterator iend,
-            sstack<solver_type> solvers,
-            double step_size
+            input_iterator iend
         );
         /*!
             requires
                 - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
                 - [ibegin, iend) is an iterator range over input_type objects.
                 - std::distance(ibegin,iend) > 0
+            ensures
+                - runs [ibegin,iend) through the network and computes parameter and data
+                  gradients with respect to the loss, via backpropagation.  Specifically,
+                  this function updates get_final_data_gradient() and also, for each layer,
+                  the tensor returned by get_parameter_gradient().
+                - returns compute_loss(ibegin,iend)
+        !*/
+
+        template <typename solver_type>
+        void update_parameters (
+            sstack<solver_type> solvers,
+            double step_size
+        );
+        /*!
+            requires
+                - solver_type is an implementation of the EXAMPLE_SOLVER interface defined
+                  in solvers_abstract.h
+                - compute_parameter_gradients() has been called.
                 - The given solvers have only ever been used with this network.  That
-                  is, if you want to call update() on some other neural network object then
-                  you must NOT reuse the same solvers object.
+                  is, if you want to call update_parameters() on some other neural network
+                  object then you must NOT reuse the same solvers object.
                 - solvers.size() >= num_computational_layers
                 - 0 < step_size <= 1
             ensures
-                - runs [ibegin,iend) through the network and updates the network parameters
-                  by back-propagating the loss gradient through the network.
-                - The provided solvers are used to update the parameters in each layer of
-                  the network.
-                - The parameter delta vector output by the solvers is multiplied by
-                  step_size before being added to the parameters.
-                - returns compute_loss(ibegin,iend)
+                - Updates all the parameters in the network.  In particular, we pass each
+                  layer's parameter gradient (i.e. the tensor returned by the layer's
+                  get_parameter_gradient() member) through that layer's corresponding
+                  solver object.  This produces a parameter delta vector and we add
+                  step_size times that vector to the layer's parameters.
         !*/
 
     // -------------

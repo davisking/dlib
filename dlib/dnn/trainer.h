@@ -418,14 +418,16 @@ namespace dlib
         template <typename T>
         void run_update(job_t& next_job, const T&)
         {
-            double loss = net.update(next_job.t, next_job.labels.begin(), make_sstack(solvers),step_size);
+            double loss = net.compute_parameter_gradients(next_job.t, next_job.labels.begin());
+            net.update_parameters(make_sstack(solvers),step_size);
             record_loss(loss);
         }
 
         void run_update(job_t& next_job, const no_label_type&)
         {
             no_label_type pick_which_run_update;
-            double loss = net.update(next_job.t, make_sstack(solvers), step_size);
+            double loss = net.compute_parameter_gradients(next_job.t);
+            net.update_parameters(make_sstack(solvers), step_size);
             record_loss(loss);
         }
 
@@ -438,8 +440,9 @@ namespace dlib
             job_t next_job;
             while(job_pipe.dequeue(next_job))
             {
-                // call net.update() but pick the right version for unsupervised or
-                // supervised training based on the type of label_type.
+                // call net.compute_parameter_gradients() and net.update_parameters() but
+                // pick the right version for unsupervised or supervised training based on
+                // the type of label_type.
                 run_update(next_job, pick_which_run_update);
 
                 // If we have been running for a while then check if the loss is still
