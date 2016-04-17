@@ -83,6 +83,8 @@ namespace dlib
     template <typename T> struct is_nonloss_layer_type : std::false_type {};
     // Tell us if T is an instance of add_loss_layer.
     template <typename T> struct is_loss_layer_type : std::false_type {};
+    // Tell us if T is an instance of add_layer
+    template <typename T> struct is_add_layer : std::false_type {};
 
     namespace impl
     {
@@ -540,6 +542,7 @@ namespace dlib
     template <typename LAYER_DETAILS, typename SUBNET, typename enabled = void>
     class add_layer;
 
+
     template <typename T, typename U>
     struct is_nonloss_layer_type<add_layer<T,U>> : std::true_type {};
 
@@ -946,6 +949,15 @@ namespace dlib
         resizable_tensor temp_tensor;
 
     };
+
+    template <typename T, typename U, typename E>
+    struct is_add_layer<add_layer<T,U,E>> : std::true_type {};
+    template <typename T, typename U, typename E>
+    struct is_add_layer<const add_layer<T,U,E>> : std::true_type {};
+    template <typename T, typename U, typename E>
+    struct is_add_layer<add_layer<T,U,E>&> : std::true_type {};
+    template <typename T, typename U, typename E>
+    struct is_add_layer<const add_layer<T,U,E>&> : std::true_type {};
 
 // ----------------------------------------------------------------------------------------
 
@@ -2968,6 +2980,73 @@ namespace dlib
         // However, if none of the step sizes worked then try this one and probably result
         // in returning an error.
         return impl_test_layer(l, 0.01);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        template <size_t i, size_t num>
+        struct vlp_loop
+        {
+            template <typename T, typename U>
+            static typename std::enable_if<!is_add_layer<U>::value>::type invoke_functor(T&& , size_t& , U&& )
+            {
+                // intentionally left empty
+            }
+
+            template <typename T, typename U>
+            static typename std::enable_if<is_add_layer<U>::value>::type invoke_functor(T&& v , size_t& comp_i, U&& l )
+            {
+                v(comp_i, l.layer_details().get_layer_params());
+                ++comp_i;
+            }
+
+            template <
+                typename net_type,
+                typename visitor
+                >
+            static void visit(
+                size_t comp_i,
+                net_type& net,
+                visitor&& v
+            )
+            {
+                invoke_functor(v, comp_i, layer<i>(net));
+                vlp_loop<i+1, num>::visit(comp_i, net,v);
+            }
+        };
+
+        template <size_t num>
+        struct vlp_loop<num,num>
+        {
+            template <
+                typename net_type,
+                typename visitor
+                >
+            static void visit(
+                size_t,
+                net_type&,
+                visitor&& 
+            )
+            {
+                // Base case of recursion.  Don't do anything.
+            }
+        };
+
+    }
+
+    template <
+        typename net_type,
+        typename visitor
+        >
+    void visit_layer_parameters(
+        net_type& net,
+        visitor v
+    )
+    {
+        size_t comp_i = 0;
+        impl::vlp_loop<0, net_type::num_layers>::visit(comp_i, net, v);
     }
 
 // ----------------------------------------------------------------------------------------
