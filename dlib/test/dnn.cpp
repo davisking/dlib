@@ -517,8 +517,8 @@ namespace
 
             resizable_tensor data(prnd.get_random_32bit_number()%5+1,
                 prnd.get_random_32bit_number()%5+1,
-                prnd.get_random_32bit_number()%30+1,
-                prnd.get_random_32bit_number()%30+1
+                prnd.get_random_32bit_number()%25+1,
+                prnd.get_random_32bit_number()%25+1
             );
             resizable_tensor filters(
                 prnd.get_random_32bit_number()%5+1,
