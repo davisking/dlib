@@ -539,7 +539,7 @@ namespace dlib
             {
                 std::ostringstream sout;
                 sout << "Error deserializing dlib::dnn_trainer.  The saved sync file is for a network with " << std::endl;
-                sout << "a different number of layers.  We expected the number of layers to be " << dnn_trainer::num_computational_layers << " but" << std::endl;
+                sout << "a different number of layers.  We expected the number of computational layers to be " << dnn_trainer::num_computational_layers << " but" << std::endl;
                 sout << "instead the file contains " << num_computational_layers << " computational layers." << std::endl;
                 throw serialization_error(sout.str());
             }
