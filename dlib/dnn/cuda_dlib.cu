@@ -27,6 +27,14 @@ namespace dlib
             return dev;
         }
 
+        int get_num_devices (
+        )
+        {
+            int num_devices;
+            CHECK_CUDA(cudaGetDeviceCount(&num_devices));
+            return num_devices;
+        }
+
     // -----------------------------------------------------------------------------------
 
         __global__ void _cuda_multiply1(float* d, const float* s1, const float* s2, size_t n)

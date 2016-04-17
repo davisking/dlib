@@ -22,6 +22,9 @@ namespace dlib
         int get_device (
         );
 
+        int get_num_devices (
+        );
+
     // -----------------------------------------------------------------------------------
 
         void multiply (
@@ -164,6 +167,9 @@ namespace dlib
 
         inline int get_device (
         ){ return 0; }
+
+        int get_num_devices (
+        ) { return 1; }
 
 #endif // DLIB_USE_CUDA
 
