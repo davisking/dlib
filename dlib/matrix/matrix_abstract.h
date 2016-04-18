@@ -494,6 +494,19 @@ namespace dlib
                 - returns *this
         !*/
 
+        matrix& operator=(
+            const std::initializer_list<T>& l
+        );
+        /*!
+            requires
+                - This matrix is capable of having a size() == l.size().  Therefore, if
+                  NR*NC != 0 then l.size() must equal NR*NC.  Alternatively, if NR or NC is
+                  != 0 then l.size() must be a multiple of the non-zero NR or NC.
+            ensures
+                - Assigns the contents of l to *this by performing: matrix(l).swap(*this)
+                - returns *this
+        !*/
+
         template <typename EXP>
         matrix& operator= (
             const matrix_exp<EXP>& m

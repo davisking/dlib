@@ -1163,6 +1163,12 @@ namespace dlib
 
         }
 
+        matrix& operator=(const std::initializer_list<T>& l)
+        {
+            matrix temp(l);
+            temp.swap(*this);
+            return *this;
+        }
 
         matrix(matrix&& item)
         {
