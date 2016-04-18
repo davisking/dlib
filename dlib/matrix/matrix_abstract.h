@@ -336,6 +336,30 @@ namespace dlib
                 - #aliases(*this) == true
                 - #ref().aliases(*this) == true
         !*/
+        
+        matrix(
+            const std::initializer_list<T>& l
+        );
+        /*!
+            requires
+                - This matrix is capable of having a size() == l.size().  Therefore, if
+                  NR*NC != 0 then l.size() must equal NR*NC.  Alternatively, if NR or NC is
+                  != 0 then l.size() must be a multiple of the non-zero NR or NC.
+            ensures
+                - #size() == l.size()
+                - The contents of l are enumerated and read into the matrix in row major order.
+                - if (NR != 0) then
+                    - #nr() == NR
+                    - #nc() == l.size()/NR
+                - if (NC != 0) then
+                    - #nr() == l.size()/NC
+                    - #nc() == NC
+                - if (NR*NC==0) then
+                    - #nr() == l.size()
+                    - #nc() == 1
+                - #aliases(*this) == true
+                - #ref().aliases(*this) == true
+        !*/
 
         T& operator() (
             long r, 

@@ -16,6 +16,9 @@
 #include "matrix_assign_fwd.h"
 #include "matrix_op.h"
 #include <utility>
+#ifdef DLIB_HAS_RVALUE_REFERENCES
+#include <initializer_list>
+#endif
 
 #ifdef MATLAB_MEX_FILE
 #include <mex.h>
@@ -1112,6 +1115,55 @@ namespace dlib
         }
 
 #ifdef DLIB_HAS_RVALUE_REFERENCES
+        matrix(const std::initializer_list<T>& l)
+        {
+            if (NR*NC != 0)
+            {
+                DLIB_ASSERT(l.size() == NR*NC, 
+                    "\t matrix::matrix(const std::initializer_list& l)"
+                    << "\n\t You are trying to initialize a statically sized matrix with a list that doesn't have a matching size."
+                    << "\n\t l.size(): "<< l.size()
+                    << "\n\t NR*NC:    "<< NR*NC);
+
+                data.set_size(NR, NC);
+            }
+            else if (NR!=0) 
+            {
+                DLIB_ASSERT(l.size()%NR == 0, 
+                    "\t matrix::matrix(const std::initializer_list& l)"
+                    << "\n\t You are trying to initialize a statically sized matrix with a list that doesn't have a compatible size."
+                    << "\n\t l.size(): "<< l.size()
+                    << "\n\t NR:       "<< NR);
+
+                if (l.size() != 0)
+                    data.set_size(NR, l.size()/NR);
+            }
+            else if (NC!=0) 
+            {
+                DLIB_ASSERT(l.size()%NC == 0, 
+                    "\t matrix::matrix(const std::initializer_list& l)"
+                    << "\n\t You are trying to initialize a statically sized matrix with a list that doesn't have a compatible size."
+                    << "\n\t l.size(): "<< l.size()
+                    << "\n\t NC:       "<< NC);
+
+                if (l.size() != 0)
+                    data.set_size(l.size()/NC, NC);
+            }
+            else if (l.size() != 0)
+            {
+                data.set_size(l.size(),1);
+            }
+
+            if (l.size() != 0)
+            {
+                T* d = &data(0,0);
+                for (auto&& v : l)
+                    *d++ = v;
+            }
+
+        }
+
+
         matrix(matrix&& item)
         {
         #ifdef MATLAB_MEX_FILE
