@@ -202,12 +202,12 @@ int main(int argc, char** argv) try
 
     // The dnn_trainer will use SGD by default, but you can tell it to use
     // different solvers like adam.  
-    //dnn_trainer<net_type,adam> trainer(net,adam(0.001));
+    dnn_trainer<net_type,adam> trainer(net,adam(0.001));
     // Also, if you have multiple graphics cards you can tell the trainer to use
     // them together to make the training faster.  For example, replacing the
     // above constructor call with this one would cause it to use GPU cards 0
     // and 1.
-    dnn_trainer<net_type,adam> trainer(net,adam(0.001), {0,1});
+    //dnn_trainer<net_type,adam> trainer(net,adam(0.001), {0,1});
 
     trainer.be_verbose();
     trainer.set_synchronization_file("mnist_resnet_sync", std::chrono::seconds(100));
