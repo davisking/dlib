@@ -162,8 +162,11 @@ namespace dlib
 #else // if DLIB_USE_CUDA NOT DEFINED
 
         inline void set_device (
-            int 
-        ){}
+            int id
+        )
+        {
+            DLIB_CASSERT(id == 0, "dlib::cuda::set_device(id) called with an invalid device id.");
+        }
 
         inline int get_device (
         ){ return 0; }
