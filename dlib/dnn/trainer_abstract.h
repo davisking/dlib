@@ -48,12 +48,17 @@ namespace dlib
 
         dnn_trainer() = delete;
         dnn_trainer(const dnn_trainer&) = delete;
+        dnn_trainer& operator=(const dnn_trainer&) = delete;
 
         dnn_trainer(
             net_type& net, 
-            const solver_type& solver = solver_type()
+            const solver_type& solver = solver_type(),
+            const std::vector<int>& cuda_extra_devices = {}
         ); 
         /*!
+            requires
+                - for all valid i:
+                    - 0 <= cuda_extra_devices[i] < dlib::cuda::get_num_devices()
             ensures
                 - &#get_net() == &net 
                   (i.e. The dnn_trainer holds a reference to net, it does not copy it.
@@ -67,6 +72,13 @@ namespace dlib
                 - #get_min_step_size() == 1e-3
                 - #get_iterations_without_progress_threshold() == 2000
                 - #get_step_size_shrink() == 0.1
+                - if (cuda_extra_devices.size() > 0) then
+                    - This object will use multiple graphics cards to run the learning
+                      algorithms.  In particular, it will always use whatever device is
+                      currently selected on the calling thread (the device indicated by
+                      cudaGetDevice()).  In addition, you can ask to use additional
+                      devices, which you do by putting their device numbers into
+                      cuda_extra_devices.
         !*/
 
        net_type& get_net (
@@ -82,15 +94,6 @@ namespace dlib
                   stopped touching the net. 
         !*/
 
-        void set_solver (
-            const solver_type& solver
-        );
-        /*!
-            ensures
-                - assigns solver to all the solvers in this object. I.e.  solver will be
-                  assigned to each element in get_solvers(). 
-        !*/
-
         const std::vector<solver_type>& get_solvers (
         ) const; 
         /*!
@@ -99,22 +102,6 @@ namespace dlib
                   get_net().  In particular, the first layer's solver is
                   get_solvers()[0], the second layer's solver is
                   get_solvers()[1], and so on.
-        !*/
-
-        std::vector<solver_type>& get_solvers (
-        ); 
-        /*!
-            ensures
-                - returns the solvers used to optimize each layer of the neural network
-                  get_net().  In particular, the first layer's solver is
-                  get_solvers()[0], the second layer's solver is
-                  get_solvers()[1], and so on.
-                - It should be noted that you should never change the number of elements in
-                  the vector returned by get_solvers() (i.e. don't do something that changes 
-                  get_solvers().size()).  It will be set to net_type::num_computational_layers 
-                  by this object and you should leave it at that.  The non-const version of
-                  get_solvers() is provided only so you can tweak the parameters of a
-                  particular solver.
         !*/
 
         unsigned long get_mini_batch_size (
@@ -289,6 +276,7 @@ namespace dlib
         /*!
             requires
                 - data.size() == labels.size()
+                - data.size() > 0
                 - net_type uses a supervised loss.  
                   i.e. net_type::label_type != no_label_type.
             ensures
@@ -314,6 +302,7 @@ namespace dlib
         );
         /*!
             requires 
+                - data.size() > 0
                 - net_type uses an unsupervised loss.  
                   i.e. net_type::label_type == no_label_type.
             ensures
@@ -341,6 +330,7 @@ namespace dlib
         /*!
             requires
                 - data.size() == labels.size()
+                - data.size() > 0
                 - net_type uses a supervised loss.  
                   i.e. net_type::label_type != no_label_type.
             ensures
@@ -363,6 +353,7 @@ namespace dlib
         );
         /*!
             requires
+                - data.size() > 0
                 - net_type uses an unsupervised loss.  
                   i.e. net_type::label_type == no_label_type.
             ensures
