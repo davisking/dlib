@@ -155,6 +155,7 @@ if (COMPILER_CAN_DO_CPP_11)
    set(tests ${tests}
       dnn.cpp
       cublas.cpp
+      find_optimal_parameters.cpp
       )
 endif()
 
