@@ -1350,6 +1350,40 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename net_type,
+        typename visitor
+        >
+    void visit_layer_parameter_gradients(
+        net_type& net,
+        visitor v
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - v is a function object with a signature equivalent to: 
+                v(size_t idx, tensor& t)
+        ensures
+            - Loops over all the computational layers (i.e. layers with parameters, as
+              opposed to loss, tag, or input layers) in net and passes their parameter
+              gradients to v().  To be specific, this function essentially performs the
+              following:
+
+                size_t computational_layer_idx = 0;
+                for (size_t i = 0; i < net_type::num_layers; ++i)
+                {
+                    if (layer<i>(net) is a computational layer)
+                    {
+                        v(computational_layer_idx, layer<i>(net).get_parameter_gradient());
+                        ++computational_layer_idx;
+                    }
+                }
+            - When v() is called, the first argument is always < net_type::num_computational_layers.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     struct layer_test_results
     {
         std::string log;

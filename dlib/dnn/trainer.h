@@ -501,9 +501,12 @@ namespace dlib
             std::vector<std::future<double>> losses(devices.size());
             std::vector<std::future<void>> update_futs(devices.size());
             std::vector<matrix<float>> param_buffer(net_type::num_computational_layers);
+            std::vector<matrix<float>> param_grad_buffer(net_type::num_computational_layers);
 
+            size_t iteration = 0;
             while(job_pipe.dequeue(next_job))
             {
+                ++iteration;
                 // Call compute_parameter_gradients() and update_parameters() but pick the
                 // right version for unsupervised or supervised training based on the type
                 // of label_type.
@@ -517,27 +520,56 @@ namespace dlib
                 // gradient updates between devices.  So we do that now.
                 if (devices.size() > 1)
                 {
-                    for (auto&& p : param_buffer)
+                    for (auto&& p : param_grad_buffer)
                         p = 0;
                     // now average all the parameter gradients
                     for (size_t i = 0; i < devices.size(); ++i)
                     {
-                        visit_layer_parameters(devices[i]->net, [&param_buffer](size_t j, tensor& t) { 
+                        visit_layer_parameter_gradients(devices[i]->net, [&param_grad_buffer](size_t j, tensor& t) { 
                             if (t.size() != 0)
-                                param_buffer[j] += mat(t);
+                            param_grad_buffer[j] += mat(t);
                         });
                     }
                     // and then assign the parameter gradients back to all the networks
                     const float scale = 1.0f/devices.size();
                     for (size_t i = 0; i < devices.size(); ++i)
                     {
-                        visit_layer_parameters(devices[i]->net, [scale,&param_buffer](size_t j, tensor& t) { 
+                        visit_layer_parameter_gradients(devices[i]->net, [scale,&param_grad_buffer](size_t j, tensor& t) { 
                             if (t.size() != 0)
                             {
-                                t = param_buffer[j]*scale;
+                                t = param_grad_buffer[j]*scale;
                                 t.async_copy_to_device();
                             }
                         });
+                    }
+
+                    // Evey now and then force all the parameters to be the same just to
+                    // make sure they aren't drifting apart due to any non-deterministic
+                    // behavior on the GPU.
+                    if (iteration%5000 == 1)
+                    {
+                        for (auto&& p : param_buffer)
+                            p = 0;
+                        // now average all the parameters
+                        for (size_t i = 0; i < devices.size(); ++i)
+                        {
+                            visit_layer_parameters(devices[i]->net, [&param_buffer](size_t j, tensor& t) { 
+                                if (t.size() != 0)
+                                param_buffer[j] += mat(t);
+                            });
+                        }
+                        // and then assign the parameters back to all the networks.
+                        const float scale = 1.0f/devices.size();
+                        for (size_t i = 0; i < devices.size(); ++i)
+                        {
+                            visit_layer_parameters(devices[i]->net, [scale,&param_buffer](size_t j, tensor& t) { 
+                                if (t.size() != 0)
+                                {
+                                    t = param_buffer[j]*scale;
+                                    t.async_copy_to_device();
+                                }
+                            });
+                        }
                     }
                 }
 

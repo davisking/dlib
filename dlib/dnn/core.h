@@ -3051,6 +3051,73 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        template <size_t i, size_t num>
+        struct vlpg_loop
+        {
+            template <typename T, typename U>
+            static typename std::enable_if<!is_add_layer<U>::value>::type invoke_functor(T&& , size_t& , U&& )
+            {
+                // intentionally left empty
+            }
+
+            template <typename T, typename U>
+            static typename std::enable_if<is_add_layer<U>::value>::type invoke_functor(T&& v , size_t& comp_i, U&& l )
+            {
+                v(comp_i, l.get_parameter_gradient());
+                ++comp_i;
+            }
+
+            template <
+                typename net_type,
+                typename visitor
+                >
+            static void visit(
+                size_t comp_i,
+                net_type& net,
+                visitor&& v
+            )
+            {
+                invoke_functor(v, comp_i, layer<i>(net));
+                vlpg_loop<i+1, num>::visit(comp_i, net,v);
+            }
+        };
+
+        template <size_t num>
+        struct vlpg_loop<num,num>
+        {
+            template <
+                typename net_type,
+                typename visitor
+                >
+            static void visit(
+                size_t,
+                net_type&,
+                visitor&& 
+            )
+            {
+                // Base case of recursion.  Don't do anything.
+            }
+        };
+
+    }
+
+    template <
+        typename net_type,
+        typename visitor
+        >
+    void visit_layer_parameter_gradients(
+        net_type& net,
+        visitor v
+    )
+    {
+        size_t comp_i = 0;
+        impl::vlpg_loop<0, net_type::num_layers>::visit(comp_i, net, v);
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_CORE_H_
