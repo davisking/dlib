@@ -4506,6 +4506,9 @@ void mexFunction( int nlhs, mxArray *plhs[],
 #endif
 
     mex_binding::call_mex_function(mex_function, nlhs, plhs, nrhs, prhs);
+
+    cout << flush;
+    cerr << flush;
 }
 
 // ----------------------------------------------------------------------------------------
