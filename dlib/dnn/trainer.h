@@ -736,6 +736,7 @@ namespace dlib
 
                 // Now that we know the state is safely saved to disk, delete the old sync
                 // file and move the .tmp file to it.
+                std::remove(sync_filename.c_str());
                 std::rename(tempfile.c_str(), sync_filename.c_str());
 
                 last_sync_time = std::chrono::system_clock::now();
