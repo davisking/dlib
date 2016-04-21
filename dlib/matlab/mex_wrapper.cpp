@@ -1044,9 +1044,20 @@ namespace mex_binding
         matrix_colmajor& item
     )
     {
-        // Don't need to do a copy if it's this kind of matrix since we can just
-        // pull the underlying mxArray out directly and thus avoid a copy.
-        plhs = item._private_release_mxArray();
+        if(!item._private_is_persistent())
+        {
+            // Don't need to do a copy if it's this kind of matrix since we can just
+            // pull the underlying mxArray out directly and thus avoid a copy.
+            plhs = item._private_release_mxArray();
+        }
+        else
+        {
+            plhs = mxCreateDoubleMatrix(item.nr(),
+                                        item.nc(),
+                                        mxREAL);
+            if (item.size() != 0)
+                memcpy(mxGetPr(plhs), &item(0,0), item.size()*sizeof(double));
+        }
     }
 
     void assign_to_matlab(
@@ -1054,9 +1065,21 @@ namespace mex_binding
         fmatrix_colmajor& item
     )
     {
-        // Don't need to do a copy if it's this kind of matrix since we can just
-        // pull the underlying mxArray out directly and thus avoid a copy.
-        plhs = item._private_release_mxArray();
+        if(!item._private_is_persistent())
+        {
+            // Don't need to do a copy if it's this kind of matrix since we can just
+            // pull the underlying mxArray out directly and thus avoid a copy.
+            plhs = item._private_release_mxArray();
+        }
+        else
+        {
+            plhs = mxCreateNumericMatrix(item.nr(),
+                                         item.nc(),
+                                         mxSINGLE_CLASS,
+                                         mxREAL);
+            if (item.size() != 0)
+                memcpy(mxGetPr(plhs), &item(0,0), item.size()*sizeof(float));
+        }
     }
 
     void assign_to_matlab(
