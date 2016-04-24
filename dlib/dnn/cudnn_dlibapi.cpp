@@ -36,7 +36,7 @@ static const char* cudnn_get_error_string(cudnnStatus_t s)
 
 // Check the return value of a call to the cuDNN runtime for an error condition.
 #define CHECK_CUDNN(call)                                                      \
-{                                                                              \
+do{                                                                              \
     const cudnnStatus_t error = call;                                         \
     if (error != CUDNN_STATUS_SUCCESS)                                        \
     {                                                                          \
@@ -45,7 +45,7 @@ static const char* cudnn_get_error_string(cudnnStatus_t s)
         sout << "code: " << error << ", reason: " << cudnn_get_error_string(error);\
         throw dlib::cudnn_error(sout.str());                            \
     }                                                                          \
-}
+}while(false)
 
 
 namespace dlib

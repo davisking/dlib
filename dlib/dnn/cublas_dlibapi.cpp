@@ -25,7 +25,7 @@ static const char* cublas_get_error_string(cublasStatus_t s)
 
 // Check the return value of a call to the cuBLAS runtime for an error condition.
 #define CHECK_CUBLAS(call)                                                      \
-{                                                                              \
+do{                                                                              \
     const cublasStatus_t error = call;                                         \
     if (error != CUBLAS_STATUS_SUCCESS)                                        \
     {                                                                          \
@@ -34,7 +34,7 @@ static const char* cublas_get_error_string(cublasStatus_t s)
         sout << "code: " << error << ", reason: " << cublas_get_error_string(error);\
         throw dlib::cublas_error(sout.str());                            \
     }                                                                          \
-}
+}while(false)
 
 namespace dlib
 {
