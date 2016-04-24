@@ -300,6 +300,22 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    void memcpy (
+        tensor& dest, 
+        const tensor& src
+    );
+    /*!
+        requires
+            - dest.size() == src.size()
+        ensures
+            - Copies the data in src to dest.  If the device data is current on both src
+              and dest then the copy will happen entirely on the device side.
+            - It doesn't matter what GPU device is selected by cudaSetDevice().  You can
+              always copy tensor objects to and from each other regardless.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp mat (
         const tensor& t,
         long nr,

@@ -440,6 +440,50 @@ namespace
         }
 
         {
+            resizable_tensor A, B, truth;
+            A.set_size(2,3,4,5);
+            truth.copy_size(A);
+            B.copy_size(A);
+
+            A = 4;
+            B = 1;
+            truth = 1;
+            DLIB_TEST(max(abs(mat(B)- mat(truth))) < 1e-5);
+            memcpy(A, truth);
+            DLIB_TEST(max(abs(mat(A)- mat(truth))) < 1e-5);
+
+            A = 4;
+            A.host();
+            B.host();
+            memcpy(A, truth);
+            DLIB_TEST(max(abs(mat(A)- mat(truth))) < 1e-5);
+
+            A = 4;
+            A.device();
+            B.host();
+            memcpy(A, truth);
+            DLIB_TEST(max(abs(mat(A)- mat(truth))) < 1e-5);
+
+            A = 4;
+            A.device();
+            B.device();
+            memcpy(A, truth);
+            DLIB_TEST(max(abs(mat(A)- mat(truth))) < 1e-5);
+
+            A = 4;
+            A.host();
+            B.device();
+            memcpy(A, truth);
+            DLIB_TEST(max(abs(mat(A)- mat(truth))) < 1e-5);
+
+            A = 4;
+            A.host_write_only();
+            B.device();
+            memcpy(A, truth);
+            DLIB_TEST(max(abs(mat(A)- mat(truth))) < 1e-5);
+        }
+
+        {
             resizable_tensor A, B;
             A.set_size(2,3,4,5);
             B.set_size(2,3,4,5);

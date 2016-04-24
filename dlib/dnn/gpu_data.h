@@ -5,6 +5,7 @@
 
 #include "gpu_data_abstract.h"
 #include <memory>
+#include <cstring>
 #include "cuda_errors.h"
 #include "../serialize.h"
 
@@ -201,6 +202,18 @@ namespace dlib
         for (size_t i = 0; i < item.size(); ++i)
             deserialize(data[i], in);
     }
+
+#ifdef DLIB_USE_CUDA
+    void memcpy (gpu_data& dest, const gpu_data& src);
+#else
+    inline void memcpy (gpu_data& dest, const gpu_data& src)
+    {
+        DLIB_CASSERT(dest.size() == src.size(), "");
+        if (src.size() == 0)
+            return;
+        std::memcpy(dest.host_write_only(), src.host(), sizeof(float)*src.size());
+    }
+#endif
 
 // ----------------------------------------------------------------------------------------
 

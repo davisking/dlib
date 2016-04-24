@@ -158,6 +158,15 @@ namespace dlib
         ) const = 0; 
 #endif
 
+        friend void memcpy (
+            tensor& dest, 
+            const tensor& src
+        )
+        {
+            memcpy(dest.data(), src.data());
+        }
+
+
     protected:
 
         friend class alias_tensor;
