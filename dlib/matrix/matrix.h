@@ -1347,6 +1347,11 @@ namespace dlib
         {
             data._private_mark_non_persistent();
         }
+
+        bool _private_is_persistent()
+        {
+            return data._private_is_persistent();
+        }
 #endif
 
         void set_size (
