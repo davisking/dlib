@@ -24,7 +24,7 @@ static const char* curand_get_error_string(curandStatus_t s)
 
 // Check the return value of a call to the cuDNN runtime for an error condition.
 #define CHECK_CURAND(call)                                                      \
-{                                                                              \
+do{                                                                              \
     const curandStatus_t error = call;                                         \
     if (error != CURAND_STATUS_SUCCESS)                                        \
     {                                                                          \
@@ -33,7 +33,7 @@ static const char* curand_get_error_string(curandStatus_t s)
         sout << "code: " << error << ", reason: " << curand_get_error_string(error);\
         throw dlib::curand_error(sout.str());                            \
     }                                                                          \
-}
+}while(false)
 
 namespace dlib
 {

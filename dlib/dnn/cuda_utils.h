@@ -15,7 +15,7 @@
 
 // Check the return value of a call to the CUDA runtime for an error condition.
 #define CHECK_CUDA(call)                                                       \
-{                                                                              \
+do{                                                                              \
     const cudaError_t error = call;                                            \
     if (error != cudaSuccess)                                                  \
     {                                                                          \
@@ -24,7 +24,7 @@
         sout << "code: " << error << ", reason: " << cudaGetErrorString(error);\
         throw dlib::cuda_error(sout.str());                                          \
     }                                                                          \
-}
+}while(false)
 
 // ----------------------------------------------------------------------------------------
 

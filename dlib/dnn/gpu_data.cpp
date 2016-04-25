@@ -10,10 +10,33 @@
 #include "gpu_data.h"
 #include <iostream>
 #include "cuda_utils.h"
+#include <cstring>
 
 
 namespace dlib
 {
+
+// ----------------------------------------------------------------------------------------
+
+    void memcpy (
+        gpu_data& dest, 
+        const gpu_data& src
+    )
+    {
+        DLIB_CASSERT(dest.size() == src.size(), "");
+        if (src.size() == 0)
+            return;
+
+        // copy the memory efficiently based on which copy is current in each object.
+        if (dest.device_ready() && src.device_ready())
+            CHECK_CUDA(cudaMemcpy(dest.device(), src.device(),          src.size()*sizeof(float), cudaMemcpyDeviceToDevice));
+        else if (!dest.device_ready() && src.device_ready())
+            CHECK_CUDA(cudaMemcpy(dest.host_write_only(), src.device(), src.size()*sizeof(float), cudaMemcpyDeviceToHost));
+        else if (dest.device_ready() && !src.device_ready())
+            CHECK_CUDA(cudaMemcpy(dest.device(), src.host(),            src.size()*sizeof(float), cudaMemcpyHostToDevice));
+        else 
+            CHECK_CUDA(cudaMemcpy(dest.host_write_only(), src.host(),   src.size()*sizeof(float), cudaMemcpyHostToHost));
+    }
 
 // ----------------------------------------------------------------------------------------
 

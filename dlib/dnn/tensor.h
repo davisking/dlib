@@ -55,7 +55,7 @@ namespace dlib
         tensor& operator= (float val)
         {
 #ifdef DLIB_USE_CUDA
-            // If you are using CUDA then presumably you will be mostly using tensor's on
+            // If you are using CUDA then presumably you will be mostly using tensors on
             // the GPU.  So unless you seem to be actively working with the host side's
             // data then we do this initialization on the device side since this avoids a
             // host to device transfer that would likely immediately follow.
@@ -157,6 +157,15 @@ namespace dlib
         virtual const cuda::tensor_descriptor& get_cudnn_tensor_descriptor (
         ) const = 0; 
 #endif
+
+        friend void memcpy (
+            tensor& dest, 
+            const tensor& src
+        )
+        {
+            memcpy(dest.data(), src.data());
+        }
+
 
     protected:
 

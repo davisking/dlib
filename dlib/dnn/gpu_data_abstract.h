@@ -208,6 +208,21 @@ namespace dlib
         provides serialization support
     !*/
 
+    void memcpy (
+        gpu_data& dest, 
+        const gpu_data& src
+    );
+    /*!
+        requires
+            - dest.size() == src.size()
+        ensures
+            - Copies the data in src to dest.  If the device data is current (i.e.
+              device_ready()==true) on both src and dest then the copy will happen entirely
+              on the device side.
+            - It doesn't matter what GPU device is selected by cudaSetDevice().  You can
+              always copy gpu_data objects to and from each other regardless.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
 }
