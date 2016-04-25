@@ -458,6 +458,7 @@ namespace
             memcpy(A, truth);
             DLIB_TEST(max(abs(mat(A)- mat(truth))) < 1e-5);
 
+#ifdef DLIB_USE_CUDA
             A = 4;
             A.device();
             B.host();
@@ -481,6 +482,7 @@ namespace
             B.device();
             memcpy(A, truth);
             DLIB_TEST(max(abs(mat(A)- mat(truth))) < 1e-5);
+#endif
         }
 
         {
