@@ -95,7 +95,7 @@ namespace
             double lasso_budget = sum(abs(w));
             double eps = 0.0000001;
 
-            dlib::elastic_net solver(X,Y);
+            dlib::elastic_net solver(X*trans(X),X*Y);
             solver.set_epsilon(eps);
 
 

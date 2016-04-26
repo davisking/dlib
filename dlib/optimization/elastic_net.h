@@ -17,13 +17,16 @@ namespace dlib
 
         template <typename EXP>
         explicit elastic_net(
-            const matrix_exp<EXP>& X_
+            const matrix_exp<EXP>& XX
         ) : eps(1e-5), max_iterations(50000), verbose(false)
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(X_.size() > 0,
-                "\t elastic_net::elastic_net(X)"
-                << " \n\t X can't be empty"
+            DLIB_ASSERT(XX.size() > 0 &&
+                        XX.nr() == XX.nc(),
+                "\t elastic_net::elastic_net(XX)"
+                << " \n\t XX must be a non-empty square matrix."
+                << " \n\t XX.nr():   " << XX.nr() 
+                << " \n\t XX.nc():   " << XX.nc() 
                 << " \n\t this: " << this
                 );
 
@@ -32,13 +35,11 @@ namespace dlib
             // rows then we can get rid of them by doing some SVD magic.  Doing this doesn't
             // make the final results of anything change but makes all the matrices have
             // dimensions that are X.nr() in size, which can be much smaller.
-            matrix<double> XX;
-            XX = X_*trans(X_);
             matrix<double,0,1> s;
             svd3(XX,u,eig_vals,eig_vects);
             s = sqrt(eig_vals);
             X = eig_vects*diagm(s);
-            u = trans(X_)*tmp(eig_vects*inv(diagm(s)));
+            u = eig_vects*inv(diagm(s));
 
 
 
@@ -65,46 +66,48 @@ namespace dlib
 
         template <typename EXP1, typename EXP2>
         elastic_net(
-            const matrix_exp<EXP1>& X_,
-            const matrix_exp<EXP2>& Y_
-        ) : elastic_net(X_)
+            const matrix_exp<EXP1>& XX,
+            const matrix_exp<EXP2>& XY
+        ) : elastic_net(XX)
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(X_.size() > 0 && 
-                        is_col_vector(Y_) && 
-                        X_.nc() == Y_.size() ,
-                "\t elastic_net::elastic_net(X,Y)"
+            DLIB_ASSERT(XX.size() > 0 && 
+                        XX.nr() == XX.nc() &&
+                        is_col_vector(XY) && 
+                        XX.nc() == XY.size() ,
+                "\t elastic_net::elastic_net(XX,XY)"
                 << " \n\t Invalid inputs were given to this function."
-                << " \n\t X_.size(): " << X_.size() 
-                << " \n\t is_col_vector(Y_): " << is_col_vector(Y_) 
-                << " \n\t X_.nc():   " << X_.nc() 
-                << " \n\t Y_.size(): " << Y_.size() 
+                << " \n\t XX.size(): " << XX.size() 
+                << " \n\t is_col_vector(XY): " << is_col_vector(XY) 
+                << " \n\t XX.nr():   " << XX.nr() 
+                << " \n\t XX.nc():   " << XX.nc() 
+                << " \n\t XY.size(): " << XY.size() 
                 << " \n\t this: " << this
                 );
 
-            set_y(Y_);
+            set_xy(XY);
         }
 
         long size (
         ) const { return u.nr(); }
 
         template <typename EXP>
-        void set_y(
-            const matrix_exp<EXP>& Y_
+        void set_xy(
+            const matrix_exp<EXP>& XY
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(is_col_vector(Y_) && 
-                        Y_.size() == size(),
+            DLIB_ASSERT(is_col_vector(XY) && 
+                        XY.size() == size(),
                 "\t void elastic_net::set_y(Y)"
                 << " \n\t Invalid inputs were given to this function."
-                << " \n\t is_col_vector(Y_): " << is_col_vector(Y_) 
+                << " \n\t is_col_vector(XY): " << is_col_vector(XY) 
                 << " \n\t size():    " << size() 
-                << " \n\t Y_.size(): " << Y_.size() 
+                << " \n\t XY.size(): " << XY.size() 
                 << " \n\t this: " << this
                 );
 
-            Y = trans(u)*Y_;
+            Y = trans(u)*XY;
             // We can use the ynorm after it has been projected because the only place Y
             // appears in the algorithm is in terms of dot products with w and x vectors.
             // But those vectors are always in the span of X and therefore we only see the

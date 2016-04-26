@@ -44,52 +44,61 @@ namespace dlib
 
         template <typename EXP>
         explicit elastic_net(
-            const matrix_exp<EXP>& X
+            const matrix_exp<EXP>& XX
         ); 
         /*!
             requires
-                - X.size() != 0
+                - XX.size() != 0
+                - XX.nr() == XX.nc()
             ensures
                 - #get_epsilon() == 1e-5
                 - #get_max_iterations() == 50000
-                - this object will not be verbose unless be_verbose() is called
-                - #size() == X.nc()
+                - This object will not be verbose unless be_verbose() is called.
+                - #size() == XX.nc()
                 - #have_target_values() == false
+                - We interpret XX as trans(X)*X where X is as defined in the objective
+                  function discussed above in WHAT THIS OBJECT REPRESENTS.
         !*/
 
         template <typename EXP1, typename EXP2>
         elastic_net(
-            const matrix_exp<EXP1>& X,
-            const matrix_exp<EXP2>& Y
+            const matrix_exp<EXP1>& XX,
+            const matrix_exp<EXP2>& XY
         ); 
         /*!
             requires
-                - X.size() != 0
-                - is_col_vector(Y)
-                - X.nc() == Y.size()
+                - XX.size() != 0
+                - XX.nr() == XX.nc()
+                - is_col_vector(XY)
+                - XX.nc() == Y.size()
             ensures
-                - constructs this object by calling the elastic_net(X) constructor and then
-                  calling this->set_y(Y).
+                - constructs this object by calling the elastic_net(XX) constructor and
+                  then calling this->set_xy(XY).
                 - #have_target_values() == true 
+                - We interpret XX as trans(X)*X where X is as defined in the objective
+                  function discussed above in WHAT THIS OBJECT REPRESENTS.  Similarly, XY
+                  should be trans(X)*Y.
         !*/
 
         long size (
         ) const; 
         /*!
             ensures
-                - returns the number of samples loaded into this object.  
+                - returns the dimensionality of the data loaded into this object.  That is,
+                  how many elements are in the optimal w vector?  This function returns
+                  that number.
         !*/
 
         bool have_target_values (
         ) const;
         /*!
             ensures
-                - returns true if set_y() has been called and false otherwise.
+                - returns true if set_xy() has been called and false otherwise.
         !*/
 
         template <typename EXP>
-        void set_y(
-            const matrix_exp<EXP>& Y
+        void set_xy(
+            const matrix_exp<EXP>& XY
         );
         /*!
             requires
@@ -97,8 +106,9 @@ namespace dlib
                 - Y.size() == size()
             ensures
                 - #have_target_values() == true
-                - Sets the target values, the Y variable in the objective function, to the
-                  given Y.
+                - Sets the target values of the regression.  Note that we expect the given
+                  matrix, XY, to be equal to trans(X)*Y, where X and Y have the definitions
+                  discussed above in WHAT THIS OBJECT REPRESENTS.
         !*/
 
         void set_epsilon(
@@ -164,6 +174,7 @@ namespace dlib
             ensures
                 - Solves the optimization problem described in the WHAT THIS OBJECT
                   REPRESENTS section above and returns the optimal w.
+                - The returned vector has size() elements.
                 - if (lasso_budget == infinity) then
                     - The lasso constraint is ignored 
         !*/
