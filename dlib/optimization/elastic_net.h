@@ -32,14 +32,15 @@ namespace dlib
             // rows then we can get rid of them by doing some SVD magic.  Doing this doesn't
             // make the final results of anything change but makes all the matrices have
             // dimensions that are X.nr() in size, which can be much smaller.
+            matrix<double> XX;
+            XX = X_*trans(X_);
             matrix<double,0,1> s;
-            svd3(trans(X_),u,s,eig_vects);
+            svd3(XX,u,eig_vals,eig_vects);
+            s = sqrt(eig_vals);
             X = eig_vects*diagm(s);
+            u = trans(X_)*tmp(eig_vects*inv(diagm(s)));
 
 
-            // Later on, we will use the eigenvalues of X*trans(X) to compute the solution
-            // without lasso.  So we save them here.
-            eig_vals = squared(s);
 
             samples.resize(X.nr()*2);
 
@@ -103,8 +104,13 @@ namespace dlib
                 << " \n\t this: " << this
                 );
 
-            ynorm = length_squared(Y_); 
             Y = trans(u)*Y_;
+            // We can use the ynorm after it has been projected because the only place Y
+            // appears in the algorithm is in terms of dot products with w and x vectors.
+            // But those vectors are always in the span of X and therefore we only see the
+            // part of the norm of Y that is in the span of X (and hence u since u and X
+            // have the same span by construction)
+            ynorm = length_squared(Y); 
             xdoty = X*Y;
             eig_vects_xdoty = trans(eig_vects)*xdoty;
 
