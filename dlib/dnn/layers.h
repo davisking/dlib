@@ -80,7 +80,7 @@ namespace dlib
             // allocate params for the filters and also for the filter bias values.
             params.set_size(num_inputs*_num_filters + _num_filters);
 
-            dlib::rand rnd("con_"+cast_to_string(num_outputs+num_inputs));
+            dlib::rand rnd(std::rand());
             randomize_parameters(params, num_inputs+num_outputs, rnd);
 
             filters = alias_tensor(_num_filters, sub.get_output().k(), _nr, _nc);
@@ -663,7 +663,7 @@ namespace dlib
             else
                 params.set_size(num_inputs, num_outputs);
 
-            dlib::rand rnd("fc_"+cast_to_string(num_outputs));
+            dlib::rand rnd(std::rand());
             randomize_parameters(params, num_inputs+num_outputs, rnd);
 
             weights = alias_tensor(num_inputs, num_outputs);
