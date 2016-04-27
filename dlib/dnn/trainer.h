@@ -513,8 +513,10 @@ namespace dlib
                 for (size_t i = 0; i < devices.size(); ++i)
                     losses[i] = std::async(std::launch::async,[&,i](){ return compute_parameter_gradients(i, next_job, pick_which_run_update); });
                 // aggregate loss values from all the network computations.
+                double theloss = 0;
                 for (auto&& loss : losses)
-                    record_loss(loss.get());
+                    theloss += loss.get();
+                record_loss(theloss/losses.size());
 
                 // Now, if there is more than one active device we need to synchronize the
                 // gradient updates between devices.  So we do that now.
