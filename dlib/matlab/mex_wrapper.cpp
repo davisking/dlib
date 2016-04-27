@@ -2928,7 +2928,13 @@ namespace mex_binding
             setp(&buf[0], &buf[0] + buf.size()-2);
 
             // make cout send data to mex_streambuf
-            std::cout.rdbuf(this);
+            oldbuf = std::cout.rdbuf(this);
+        }
+
+        ~mex_streambuf()
+        {
+            // put cout back to the way we found it before running our mex function.
+            std::cout.rdbuf(oldbuf);
         }
 
 
@@ -2964,6 +2970,7 @@ namespace mex_binding
 
     private:
         std::vector<char> buf;
+        std::streambuf* oldbuf;
 
     };
 
@@ -2978,9 +2985,14 @@ namespace mex_binding
             setp(&buf[0], &buf[0] + buf.size()-2);
 
             // make cout send data to mex_warn_streambuf
-            std::cerr.rdbuf(this);
+            oldbuf = std::cerr.rdbuf(this);
         }
 
+        ~mex_warn_streambuf()
+        {
+            // put cerr back to the way we found it before running our mex function.
+            std::cerr.rdbuf(oldbuf);
+        }
 
     protected:
 
@@ -3014,6 +3026,7 @@ namespace mex_binding
 
     private:
         std::vector<char> buf;
+        std::streambuf* oldbuf;
 
     };
 
@@ -4523,9 +4536,9 @@ void mexFunction( int nlhs, mxArray *plhs[],
     // Only remap cout and cerr if we aren't using octave since octave already does this.
 #if !defined(OCTAVE_IMPORT) && !defined(OCTAVE_API)
     // make it so cout prints to mexPrintf()
-    static mex_binding::mex_streambuf sb;
+    mex_binding::mex_streambuf sb;
     // make it so cerr prints to mexWarnMsgTxt()
-    static mex_binding::mex_warn_streambuf wsb;
+    mex_binding::mex_warn_streambuf wsb;
 #endif
 
     mex_binding::call_mex_function(mex_function, nlhs, plhs, nrhs, prhs);
