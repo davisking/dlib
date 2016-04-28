@@ -56,11 +56,25 @@ namespace dlib
 
         void affine_transform(
             tensor& dest,
+            const tensor& src,
+            const float A
+        );
+
+        void affine_transform(
+            tensor& dest,
             const tensor& src1,
             const tensor& src2,
             const float A,
             const float B,
             const float C
+        );
+
+        void affine_transform(
+            tensor& dest,
+            const tensor& src1,
+            const tensor& src2,
+            const float A,
+            const float B
         );
 
         void affine_transform(

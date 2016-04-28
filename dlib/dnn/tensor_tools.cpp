@@ -178,6 +178,19 @@ namespace dlib { namespace tt
 
     void affine_transform(
         tensor& dest,
+        const tensor& src,
+        const float A
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::affine_transform(dest,src,A);
+#else
+        cpu::affine_transform(dest,src,A,0);
+#endif
+    }
+
+    void affine_transform(
+        tensor& dest,
         const tensor& src1,
         const tensor& src2,
         const float A,
@@ -189,6 +202,21 @@ namespace dlib { namespace tt
         cuda::affine_transform(dest,src1,src2,A,B,C);
 #else
         cpu::affine_transform(dest,src1,src2,A,B,C);
+#endif
+    }
+
+    void affine_transform(
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2,
+        const float A,
+        const float B
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::affine_transform(dest,src1,src2,A,B);
+#else
+        cpu::affine_transform(dest,src1,src2,A,B,0);
 #endif
     }
 

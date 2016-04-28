@@ -267,6 +267,16 @@ namespace dlib
                 launch_kernel(_cuda_affine_transform1_0,max_jobs(dest.size()),dest.device(), src.device(), src.size(), A);
         }
 
+        void affine_transform(
+            tensor& dest,
+            const tensor& src,
+            const float A
+        )
+        {
+            DLIB_CASSERT(dest.size()==src.size(),"");
+            launch_kernel(_cuda_affine_transform1_0,max_jobs(dest.size()),dest.device(), src.device(), src.size(), A);
+        }
+
     // ----------------------------------------------------------------------------------------
 
         __global__ void _cuda_affine_transform4(float* d, const float* s1, const float* s2, size_t n, float A, float B, float C)
@@ -300,6 +310,19 @@ namespace dlib
                 launch_kernel(_cuda_affine_transform4,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), dest.size(), A, B, C);
             else
                 launch_kernel(_cuda_affine_transform4_0,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), dest.size(), A, B);
+        }
+
+        void affine_transform(
+            tensor& dest,
+            const tensor& src1,
+            const tensor& src2,
+            const float A,
+            const float B
+        )
+        {
+            DLIB_CASSERT(dest.size()==src1.size(),"");
+            DLIB_CASSERT(dest.size()==src2.size(),"");
+            launch_kernel(_cuda_affine_transform4_0,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), dest.size(), A, B);
         }
 
     // ----------------------------------------------------------------------------------------
