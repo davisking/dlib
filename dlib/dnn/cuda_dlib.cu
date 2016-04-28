@@ -35,6 +35,64 @@ namespace dlib
             return num_devices;
         }
 
+        bool can_access_peer (int device_id, int peer_device_id)
+        {
+            int can_access;
+            CHECK_CUDA(cudaDeviceCanAccessPeer(&can_access, device_id, peer_device_id));
+            return can_access;
+        }
+        bool can_access_peer (const tensor& device, const tensor& peer_device)
+        {
+            return can_access_peer(device.device_id(), peer_device.device_id());
+        }
+
+        void device_synchronize (int dev) 
+        { 
+            raii_set_device set_dev(dev);
+            CHECK_CUDA(cudaDeviceSynchronize());
+        }
+        void device_synchronize (const tensor& dev) { device_synchronize(dev.device_id()); }
+
+        enable_peer_access::
+        enable_peer_access(
+            int device_id,
+            int peer_device_id
+        ) : call_disable(false), device_id(device_id), peer_device_id(peer_device_id)
+        {
+            raii_set_device set_dev(device_id);
+
+            auto err = cudaDeviceEnablePeerAccess(peer_device_id, 0);
+            if (err == cudaSuccess)
+            {
+                call_disable = true;
+            }
+            else if (err == cudaErrorPeerAccessAlreadyEnabled)
+            {
+                // call cudaGetLastError() to dispose of this error since we don't
+                // care.
+                auto err2 = cudaGetLastError();
+                if (err2 != cudaErrorPeerAccessAlreadyEnabled)
+                    CHECK_CUDA(err2);
+            }
+            else
+            {
+                CHECK_CUDA(err);
+            }
+        }
+
+
+        enable_peer_access::
+        ~enable_peer_access() noexcept(false)
+        {
+            if (call_disable)
+            {
+                raii_set_device set_dev(device_id);
+                CHECK_CUDA(cudaDeviceDisablePeerAccess(peer_device_id));
+            }
+        }
+
+    // -----------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------
 
         __global__ void _cuda_multiply1(float* d, const float* s1, const float* s2, size_t n)

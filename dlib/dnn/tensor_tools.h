@@ -10,6 +10,7 @@
 #include "cpu_dlib.h"
 #include "cuda_dlib.h"
 #include "../rand.h"
+#include <memory>
 
 namespace dlib
 {
@@ -1007,6 +1008,139 @@ namespace dlib { namespace tt
             - This function supports in-place operation, i.e. having
               is_same_object(grad, gradient_input)==true
     !*/
+
+// ----------------------------------------------------------------------------------------
+
+    class multi_device_tensor_averager
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for very quickly averaging a bunch of tensors
+                together.
+        !*/
+    public:
+
+        multi_device_tensor_averager(const multi_device_tensor_averager&) = delete;
+        multi_device_tensor_averager& operator=(const multi_device_tensor_averager&) = delete;
+
+        multi_device_tensor_averager() = default;
+
+        void set(
+            std::vector<tensor*> items
+        )
+        /*!
+            requires
+                - All the tensors in items are the same size
+            ensures
+                - When you call average() we will average the tensors in items.
+        !*/
+        {
+            using namespace ::dlib::cuda;
+            accessible_groups.clear();
+            epa.clear();
+            if (items.size() < 1)
+                return;
+
+            scale = 1.0/items.size();
+
+            // split item into groups of accessible devices
+            std::vector<tensor*> group, unused;
+            while(items.size() > 0)
+            {
+                group.push_back(items[0]);
+                for(size_t i = 1; i < items.size(); ++i)
+                {
+                    if (can_access_peer(*items[0], *items[i]))
+                        group.push_back(items[i]);
+                    else
+                        unused.push_back(items[i]);
+                }
+                accessible_groups.push_back(group);
+                unused.swap(items);
+                unused.clear();
+                group.clear();
+            }
+            for (auto&& g : accessible_groups)
+            {
+                for (size_t i = 1; i < g.size(); ++i)
+                {
+                    epa.emplace_back(new enable_peer_access(*g[0], *g[i]));
+                }
+            }
+
+            // If there are multiple groups then we need to use the accum_buffer space
+            // when talking across groups.  So allocate that buffer now.
+            if (accessible_groups.size() > 1)
+            {
+                raii_set_device set_dev(*accessible_groups[0][0]);
+                accum_buffer.copy_size(*accessible_groups[0][0]);
+            }
+        }
+
+        void average()
+        /*!
+            requires
+                - All the devices have stopped writing to the tensors given to set().  So
+                  you should probably call cudaDeviceSynchronize() on each of the relevant
+                  devices before calling average().
+            ensures
+                - Computes the average of all the tensors given to set() and then sets them
+                  all equal to the average.
+        !*/
+        {
+            using namespace ::dlib::cuda;
+
+
+            // First we average things within each group
+            for (auto&& g : accessible_groups)
+            {
+                raii_set_device set_dev(*g[0]);
+                if (g.size() == 1)
+                    tt::affine_transform(*g[0], *g[0], scale);
+                else 
+                    tt::affine_transform(*g[0], *g[0], *g[1], scale, scale);
+
+                for (size_t i = 2; i < g.size(); ++i)
+                    tt::affine_transform(*g[0], *g[0], *g[i], 1, scale);
+            }
+
+            if (accessible_groups.size() > 1)
+            {
+                tensor& total_avg = *accessible_groups[0][0];
+                raii_set_device set_dev(total_avg);
+                // now we need to average things across groups
+                for (size_t i = 1; i < accessible_groups.size(); ++i)
+                {
+                    memcpy(accum_buffer, *accessible_groups[i][0]);
+                    tt::add(total_avg, total_avg, accum_buffer);
+                }
+
+                // Now total_avg has the final average in it.  So we need to send
+                // copies of it back to each of the groups.
+                for (size_t i = 1; i < accessible_groups.size(); ++i)
+                {
+                    memcpy(*accessible_groups[i][0], total_avg);
+                }
+            }
+
+
+            // Now propagate averages back out to each element using point to point
+            // communication inside a group.
+            for (auto&& g : accessible_groups)
+            {
+                raii_set_device set_dev(*g[0]);
+                for (size_t i = 1; i < g.size(); ++i)
+                    memcpy(*g[i], *g[0]); 
+            }
+        }
+
+    private:
+        std::vector<std::unique_ptr<::dlib::cuda::enable_peer_access>> epa;
+        std::vector<std::vector<tensor*>> accessible_groups;
+        float scale;
+
+        resizable_tensor accum_buffer;
+    };
 
 // ----------------------------------------------------------------------------------------
 

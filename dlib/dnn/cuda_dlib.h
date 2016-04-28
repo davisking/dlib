@@ -11,8 +11,6 @@ namespace dlib
     namespace cuda 
     {
 
-#ifdef DLIB_USE_CUDA
-
     // ----------------------------------------------------------------------------------------
 
         void set_device (
@@ -24,6 +22,82 @@ namespace dlib
 
         int get_num_devices (
         );
+
+        bool can_access_peer (int device_id, int peer_device_id);
+        bool can_access_peer (const tensor& device, const tensor& peer_device);
+
+        void device_synchronize (int dev);
+        void device_synchronize (const tensor& dev);
+
+
+        class raii_set_device
+        {
+        public:
+            raii_set_device() = delete;
+            raii_set_device(const raii_set_device&) = delete;
+            raii_set_device& operator=(const raii_set_device&) = delete;
+
+            raii_set_device(int dev)
+            {
+                prev_dev = get_device();
+                set_device(dev);
+            }
+
+            raii_set_device(const tensor& dev)
+            {
+                prev_dev = get_device();
+                set_device(dev.device_id());
+            }
+
+            void operator() (int dev)
+            {
+                set_device(dev);
+            }
+
+            void operator() (const tensor& dev)
+            {
+                set_device(dev.device_id());
+            }
+
+            ~raii_set_device() noexcept(false)
+            {
+                set_device(prev_dev);
+            }
+
+        private:
+            int prev_dev;
+        };
+
+
+#ifdef DLIB_USE_CUDA
+
+        class enable_peer_access
+        {
+        public:
+
+            enable_peer_access() = delete;
+            enable_peer_access(const enable_peer_access&) = delete;
+            enable_peer_access& operator=(const enable_peer_access&) = delete;
+
+            enable_peer_access(
+                int device_id,
+                int peer_device_id
+            );
+
+            enable_peer_access(
+                const tensor& device,
+                const tensor& peer_device
+            ) : enable_peer_access(device.device_id(), peer_device.device_id())
+            {}
+
+            ~enable_peer_access() noexcept(false);
+
+        private:
+
+            bool call_disable;
+            int device_id;
+            int peer_device_id;
+        };
 
     // -----------------------------------------------------------------------------------
 
@@ -187,6 +261,24 @@ namespace dlib
 
         inline int get_num_devices (
         ) { return 1; }
+
+        inline bool can_access_peer (int device_id, int peer_device_id)
+        { return false; }
+        inline bool can_access_peer (const tensor& device, const tensor& peer_device)
+        { return false; }
+
+        inline void device_synchronize (int ){}
+        inline void device_synchronize (const tensor& ){}
+
+        class enable_peer_access
+        {
+        public:
+            enable_peer_access() = delete;
+            enable_peer_access(const enable_peer_access&) = delete;
+            enable_peer_access& operator=(const enable_peer_access&) = delete;
+            enable_peer_access( int, int ){}
+            enable_peer_access( const tensor&, const tensor& ) {}
+        };
 
 #endif // DLIB_USE_CUDA
 
