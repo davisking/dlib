@@ -40,7 +40,7 @@ namespace dlib
     public:
 
         gpu_data(
-        ) : data_size(0), host_current(true), device_current(true),have_active_transfer(false),device_in_use(false)
+        ) : data_size(0), host_current(true), device_current(true),have_active_transfer(false),device_in_use(false), the_device_id(0)
         {
         }
 
@@ -52,6 +52,7 @@ namespace dlib
         gpu_data(gpu_data&& item) : gpu_data() { swap(item); }
         gpu_data& operator=(gpu_data&& item) { swap(item); return *this; }
 
+        int device_id() const { return the_device_id; }
 
 #ifdef DLIB_USE_CUDA
         void async_copy_to_device() const; 
@@ -153,6 +154,7 @@ namespace dlib
             std::swap(data_host, item.data_host);
             std::swap(data_device, item.data_device);
             std::swap(cuda_stream, item.cuda_stream);
+            std::swap(the_device_id, item.the_device_id);
         }
 
     private:
@@ -177,6 +179,7 @@ namespace dlib
         std::shared_ptr<float> data_host;
         std::shared_ptr<float> data_device;
         std::shared_ptr<void> cuda_stream;
+        int the_device_id;
     };
 
     inline void serialize(const gpu_data& item, std::ostream& out)

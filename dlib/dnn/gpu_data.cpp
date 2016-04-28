@@ -136,6 +136,8 @@ namespace dlib
 
             try
             {
+                CHECK_CUDA(cudaGetDevice(&the_device_id));
+
                 void* data;
                 CHECK_CUDA(cudaMallocHost(&data, new_size*sizeof(float)));
                 // Note that we don't throw exceptions since the free calls are invariably

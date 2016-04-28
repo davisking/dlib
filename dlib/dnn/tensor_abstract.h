@@ -187,6 +187,15 @@ namespace dlib
                   every memory location in the returned memory block.  
         !*/
 
+        int device_id(
+        ) const; 
+        /*!
+            ensures
+                - returns the ID of the CUDA device that allocated this memory. I.e. the
+                  number returned by cudaGetDevice() when the memory was allocated.
+                - If CUDA is not being used then this function always returns 0.
+        !*/
+
         tensor& operator= (
             float val
         );

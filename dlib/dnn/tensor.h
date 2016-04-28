@@ -52,6 +52,8 @@ namespace dlib
         virtual float*       device() = 0;
         virtual float*       device_write_only() = 0;
 
+        int device_id() const { return data().device_id(); }
+
         tensor& operator= (float val)
         {
 #ifdef DLIB_USE_CUDA

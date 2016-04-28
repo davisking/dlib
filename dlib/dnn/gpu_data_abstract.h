@@ -45,6 +45,7 @@ namespace dlib
                 - #device() == nullptr 
                 - #host_ready() == true
                 - #device_ready() == true
+                - #device_id() == 0
         !*/
 
         // This object is not copyable, however, it is movable.
@@ -53,6 +54,14 @@ namespace dlib
         gpu_data(gpu_data&& item);
         gpu_data& operator=(gpu_data&& item);
 
+        int device_id(
+        ) const; 
+        /*!
+            ensures
+                - returns the ID of the CUDA device that allocated this memory. I.e. the
+                  number returned by cudaGetDevice() when the memory was allocated.
+                - If CUDA is not being used then this function always returns 0.
+        !*/
 
         void async_copy_to_device(
         ); 
