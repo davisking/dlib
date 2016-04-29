@@ -10,6 +10,7 @@
 #include "../geometry.h"
 #include "../pixel.h"
 #include "../console_progress_indicator.h"
+#include "../statistics.h"
 #include <utility>
 
 namespace dlib
