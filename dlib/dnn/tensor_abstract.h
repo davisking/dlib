@@ -321,6 +321,7 @@ namespace dlib
               and dest then the copy will happen entirely on the device side.
             - It doesn't matter what GPU device is selected by cudaSetDevice().  You can
               always copy tensor objects to and from each other regardless.
+            - This function blocks until the copy has completed.
     !*/
 
 // ----------------------------------------------------------------------------------------

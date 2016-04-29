@@ -230,6 +230,7 @@ namespace dlib
               on the device side.
             - It doesn't matter what GPU device is selected by cudaSetDevice().  You can
               always copy gpu_data objects to and from each other regardless.
+            - This function blocks until the copy has completed.
     !*/
 
 // ----------------------------------------------------------------------------------------
