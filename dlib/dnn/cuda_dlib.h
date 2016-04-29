@@ -262,9 +262,9 @@ namespace dlib
         inline int get_num_devices (
         ) { return 1; }
 
-        inline bool can_access_peer (int device_id, int peer_device_id)
+        inline bool can_access_peer (int , int )
         { return false; }
-        inline bool can_access_peer (const tensor& device, const tensor& peer_device)
+        inline bool can_access_peer (const tensor& , const tensor& )
         { return false; }
 
         inline void device_synchronize (int ){}
