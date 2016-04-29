@@ -56,7 +56,9 @@ template <typename SUBNET> using ares_down = base_ares<2,SUBNET>;
 // Now that we have these convenient aliases, we can define a residual network
 // without a lot of typing.  Note the use of a repeat layer.  This special layer
 // type allows us to type repeat<9,res<SUBNET>> instead of
-// res<res<res<res<res<res<res<res<res<SUBNET>>>>>>>>>.
+// res<res<res<res<res<res<res<res<res<SUBNET>>>>>>>>>.  It will also prevent
+// the compiler from complaining about super deep template nesting when creating
+// large networks.
 const unsigned long number_of_classes = 10;
 using net_type = loss_multiclass_log<fc<number_of_classes,
                             avg_pool<11,11,11,11,
