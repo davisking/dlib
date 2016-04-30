@@ -1069,6 +1069,16 @@ namespace dlib { namespace tt
             }
         }
 
+        size_t num_device_groups(
+        ) const { return accessible_groups.size(); }
+        /*!
+            ensures
+                - The devices given to set() are grouped together when they can directly
+                  access each other using GPUDirect.  This function returns the number of
+                  such groups.  For example, if all devices can directly access each other
+                  then the number of groups is 1.
+        !*/
+
         void average()
         /*!
             requires
