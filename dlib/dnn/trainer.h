@@ -501,28 +501,12 @@ namespace dlib
             std::vector<std::future<double>> losses(devices.size());
             std::vector<std::future<void>> update_futs(devices.size());
 
-            std::vector<tt::multi_device_tensor_averager> averagers(net_type::num_computational_layers);
-            if (devices.size() > 1)
-            {
-                // setup the averagers to point to the tensors in the networks.
-                std::vector<std::vector<tensor*>> all_tensors(devices.size());
-                for (size_t i = 0; i < all_tensors.size(); ++i)
-                {
-                    all_tensors[i].resize(net_type::num_computational_layers);
-                    visit_layer_parameter_gradients(devices[i]->net, [&](size_t j, tensor& t){
-                        all_tensors[i][j] = &t;
-                    });
-                }
-                // Now set each averager to average the tensors at the same layer in each
-                // network.
-                for (size_t i = 0; i < net_type::num_computational_layers; ++i)
-                {
-                    std::vector<tensor*> temp(all_tensors.size());
-                    for (size_t j = 0; j < all_tensors.size(); ++j)
-                        temp[j] = all_tensors[j][i];
-                    averagers[i].set(temp);
-                }
-            }
+            std::vector<tt::multi_device_tensor_averager> averagers;
+            // An array of all the parameter tensors in the first network.  We will
+            // periodically copy these tensors to all the other devices to make sure the
+            // different GPUs don't go out of sync.
+            std::vector<tensor*> reference_params;
+            visit_layer_parameters(devices[0]->net, [&](size_t, tensor& t) { reference_params.push_back(&t); });
 
 
             size_t iteration = 0;
@@ -544,48 +528,41 @@ namespace dlib
                 // gradient updates between devices.  So we do that now.
                 if (devices.size() > 1)
                 {
+                    // if this is the first iteration then we need to setup the averagers.
+                    // We can't do this outside the loop because the tensors that get
+                    // averaged need to be allocated to their devices before we call set()
+                    // so that the averagers can determine how best to average them.
+                    if (averagers.size() == 0)
+                    {
+                        averagers = std::vector<tt::multi_device_tensor_averager>(net_type::num_computational_layers);
+                        // setup the averagers to point to the tensors in the networks.
+                        std::vector<std::vector<tensor*>> all_tensors(devices.size());
+                        for (size_t i = 0; i < all_tensors.size(); ++i)
+                        {
+                            all_tensors[i].resize(net_type::num_computational_layers);
+                            visit_layer_parameter_gradients(devices[i]->net, [&](size_t j, tensor& t){
+                                all_tensors[i][j] = &t;
+                            });
+                        }
+                        // Now set each averager to average the tensors at the same layer in each
+                        // network.
+                        for (size_t i = 0; i < net_type::num_computational_layers; ++i)
+                        {
+                            std::vector<tensor*> temp(all_tensors.size());
+                            for (size_t j = 0; j < all_tensors.size(); ++j)
+                                temp[j] = all_tensors[j][i];
+                            // ignore layers that don't have parameters
+                            if (temp[0]->size() != 0)
+                                averagers[i].set(temp);
+                        }
+                    }
+
+
                     for (auto&& d : devices)
                         cuda::device_synchronize(d->device_id);
 
                     for (auto&& avg : averagers)
                         avg.average();
-
-                    /*
-                    for (auto&& d : devices)
-                        cuda::device_synchronize(d->device_id);
-                    */
-
-
-                    // Evey now and then force all the parameters to be the same just to
-                    // make sure they aren't drifting apart due to any non-deterministic
-                    // behavior on the GPU.
-                    /*
-                    if (iteration%5000 == 1)
-                    {
-                        for (auto&& p : param_buffer)
-                            p = 0;
-                        // now average all the parameters
-                        for (size_t i = 0; i < devices.size(); ++i)
-                        {
-                            visit_layer_parameters(devices[i]->net, [&param_buffer](size_t j, tensor& t) { 
-                                if (t.size() != 0)
-                                param_buffer[j] += mat(t);
-                            });
-                        }
-                        // and then assign the parameters back to all the networks.
-                        const float scale = 1.0f/devices.size();
-                        for (size_t i = 0; i < devices.size(); ++i)
-                        {
-                            visit_layer_parameters(devices[i]->net, [scale,&param_buffer](size_t j, tensor& t) { 
-                                if (t.size() != 0)
-                                {
-                                    t = param_buffer[j]*scale;
-                                    t.async_copy_to_device();
-                                }
-                            });
-                        }
-                    }
-                    */
                 }
 
 
@@ -596,6 +573,23 @@ namespace dlib
                 for (auto&& f : update_futs)
                     f.wait();
 
+
+                // Evey now and then force all the parameters to be the same just to make
+                // sure they aren't drifting apart due to any non-deterministic behavior on
+                // the GPU.  It's also important to do this on the first iteration because
+                // the different networks may be initialized differently when tensor data
+                // is first passed through them.  So this code block deals with these
+                // issues.
+                if (devices.size() > 1 && iteration%2000 == 1)
+                {
+                    for (size_t i = 1; i < devices.size(); ++i)
+                    {
+                        visit_layer_parameters(devices[i]->net, [&](size_t j, tensor& t) 
+                        { 
+                            memcpy(t, *reference_params[j]);
+                        });
+                    }
+                }
 
                 // If we have been running for a while then check if the loss is still
                 // dropping.  If it isn't then we will reduce the step size.  Note that we
