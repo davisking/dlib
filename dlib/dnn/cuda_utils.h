@@ -167,6 +167,8 @@ namespace dlib
                   launch_kernel().  
         !*/
         {
+            if (m.num == 0)
+                return;
             int num_blocks, num_threads;
             CHECK_CUDA(cudaOccupancyMaxPotentialBlockSize(&num_blocks,&num_threads,K));
             // Check if the job is really small and we don't really need to launch a kernel
