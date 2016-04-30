@@ -1033,6 +1033,9 @@ namespace dlib { namespace tt
                 - All the tensors in items are the same size
             ensures
                 - When you call average() we will average the tensors in items.
+                - It's important that the tensors already be allocated to their devices
+                  before you call set().  This is because set() will setup the types of
+                  between device transfers now and use them when you call average().  
         !*/
         {
             using namespace ::dlib::cuda;
