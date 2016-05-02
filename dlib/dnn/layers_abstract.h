@@ -836,10 +836,10 @@ namespace dlib
                     - OUT.nc() == 1+(IN.nc()-nc()%2)/stride_x()
                     - for all valid s, k, r, and c:
                         - image_plane(OUT,s,k)(r,c) == max(subm_clipped(image_plane(IN,s,k),
-                                                                        r*stride_y(),
-                                                                        c*stride_x(),
-                                                                        nr(),
-                                                                        nc()))
+                                                                  centered_rect(r*stride_y(),
+                                                                                c*stride_x(),
+                                                                                nr(),
+                                                                                nc())))
         !*/
 
     public:
@@ -936,10 +936,10 @@ namespace dlib
                     - OUT.nc() == 1+(IN.nc()-nc()%2)/stride_x()
                     - for all valid s, k, r, and c:
                         - image_plane(OUT,s,k)(r,c) == mean(subm_clipped(image_plane(IN,s,k),
-                                                                        r*stride_y(),
-                                                                        c*stride_x(),
-                                                                        nr(),
-                                                                        nc()))
+                                                                  centered_rect(r*stride_y(),
+                                                                                c*stride_x(),
+                                                                                nr(),
+                                                                                nc()))
         !*/
 
     public:
