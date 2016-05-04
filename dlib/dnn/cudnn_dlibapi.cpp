@@ -737,6 +737,8 @@ namespace dlib
 
             stride_y = 0;
             stride_x = 0;
+            padding_y = 0;
+            padding_x = 0;
             data_num_samples = 0;
             data_k = 0;
             data_nr = 0;
@@ -752,7 +754,9 @@ namespace dlib
             const tensor& data,
             const tensor& filters,
             int stride_y_,
-            int stride_x_
+            int stride_x_,
+            int padding_y_,
+            int padding_x_
         ) 
         {
             DLIB_CASSERT(data.k() == filters.k(),"");
@@ -761,6 +765,8 @@ namespace dlib
             // anything.
             if (stride_y_ == stride_y && 
                 stride_x_ == stride_x &&
+                padding_y_ == padding_y && 
+                padding_x_ == padding_x &&
                 data_num_samples == data.num_samples() &&
                 data_k == data.k() &&
                 data_nr == data.nr() &&
@@ -778,6 +784,8 @@ namespace dlib
             {
                 stride_y = stride_y_;
                 stride_x = stride_x_;
+                padding_y = padding_y_;
+                padding_x = padding_x_;
                 data_num_samples = data.num_samples();
                 data_k = data.k();
                 data_nr = data.nr();
@@ -798,8 +806,8 @@ namespace dlib
 
                 CHECK_CUDNN(cudnnCreateConvolutionDescriptor((cudnnConvolutionDescriptor_t*)&conv_handle));
                 CHECK_CUDNN(cudnnSetConvolution2dDescriptor((cudnnConvolutionDescriptor_t)conv_handle,
-                        filters.nr()/2, // vertical padding
-                        filters.nc()/2, // horizontal padding
+                        padding_y, // vertical padding
+                        padding_x, // horizontal padding
                         stride_y,
                         stride_x,
                         1, 1, // must be 1,1
@@ -907,22 +915,31 @@ namespace dlib
             const tensor& data,
             const tensor& filters,
             int stride_y,
-            int stride_x
+            int stride_x,
+            int padding_y,
+            int padding_x
         )
         {
             DLIB_CASSERT(is_same_object(output,data) == false,"");
             DLIB_CASSERT(is_same_object(output,filters) == false,"");
             DLIB_CASSERT(filters.k() == data.k(),"");
             DLIB_CASSERT(stride_y > 0 && stride_x > 0,"");
+            DLIB_CASSERT(filters.nr() <= data.nr() + 2*padding_y,
+                "Filter windows must be small enough to fit into the padded image.");
+            DLIB_CASSERT(filters.nc() <= data.nc() + 2*padding_x,
+                "Filter windows must be small enough to fit into the padded image.");
 
-            setup(data,filters,stride_y,stride_x);
+
+            setup(data,filters,stride_y,stride_x,padding_y,padding_x);
 
             output.set_size(out_num_samples, out_k, out_nr, out_nc);
 
             DLIB_ASSERT(output.num_samples() == data.num_samples(),out_num_samples << "  " << data.num_samples());
             DLIB_ASSERT(output.k() == filters.num_samples(),"");
-            DLIB_ASSERT(output.nr() == 1+(data.nr()-filters.nr()%2)/stride_y,"");
-            DLIB_ASSERT(output.nc() == 1+(data.nc()-filters.nc()%2)/stride_x,output.nc() << "  " <<1+(data.nc()-1)/stride_x << " : " << data.nc() << "  " << stride_x);
+            DLIB_ASSERT(output.nr() == 1+(data.nr()+2*padding_y-filters.nr())/stride_y,"");
+            DLIB_ASSERT(output.nc() == 1+(data.nc()+2*padding_x-filters.nc())/stride_x,"");
+
+
 
             const float alpha = 1;
             const float beta = 0;
@@ -995,7 +1012,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         pooling::pooling (
-        ) : handle(nullptr),window_height(0),window_width(0),stride_y(0),stride_x(0)
+        ) : handle(nullptr),window_height(0),window_width(0),stride_y(0),stride_x(0),padding_y(0), padding_x(0)
         {
         }
 
@@ -1016,6 +1033,8 @@ namespace dlib
             window_width = 0;
             stride_y = 0;
             stride_x = 0;
+            padding_y = 0;
+            padding_x = 0;
         }
 
         void pooling::
@@ -1023,10 +1042,12 @@ namespace dlib
             int window_height_,
             int window_width_,
             int stride_y_,
-            int stride_x_
+            int stride_x_,
+            int padding_y_,
+            int padding_x_ 
         )
         {
-            setup(window_height_, window_width_, stride_y_, stride_x_, CUDNN_POOLING_MAX);
+            setup(window_height_, window_width_, stride_y_, stride_x_, padding_y_, padding_x_, CUDNN_POOLING_MAX);
             do_max_pooling = true;
         }
 
@@ -1035,10 +1056,12 @@ namespace dlib
             int window_height_,
             int window_width_,
             int stride_y_,
-            int stride_x_
+            int stride_x_,
+            int padding_y_,
+            int padding_x_
         )
         {
-            setup(window_height_, window_width_, stride_y_, stride_x_, CUDNN_POOLING_AVERAGE_COUNT_EXCLUDE_PADDING);
+            setup(window_height_, window_width_, stride_y_, stride_x_, padding_y_, padding_x_, CUDNN_POOLING_AVERAGE_COUNT_EXCLUDE_PADDING);
             do_max_pooling = false;
         }
 
@@ -1048,13 +1071,31 @@ namespace dlib
             int window_width_,
             int stride_y_,
             int stride_x_,
+            int padding_y_,
+            int padding_x_,
             int pooling_mode
         )
         {
+            DLIB_CASSERT (window_height_ > 0 && window_width_ > 0 && 
+                          stride_y_ > 0 && stride_x_ > 0 , 
+                          "window_height_: " << window_height_ 
+                          << "\t\n window_width_: " << window_width_ 
+                          << "\t\n stride_y_: " << stride_y_ 
+                          << "\t\n stride_x_: " << stride_x_ );
+            DLIB_CASSERT( 0 <= padding_y_ && padding_y_ < window_height_ && 
+                          0 <= padding_x_ && padding_x_ < window_width_,
+                          "window_height_: " << window_height_ 
+                          << "\t\n window_width_: " << window_width_ 
+                          << "\t\n padding_y_: " << padding_y_ 
+                          << "\t\n padding_x_: " << padding_x_ );
+
             if (window_height == window_height_ &&
                 window_width  == window_width_ &&
                 stride_y == stride_y_ &&
-                stride_x == stride_x_ )
+                stride_x == stride_x_ && 
+                padding_y == padding_y_ &&
+                padding_x == padding_x_
+                )
             {
                 return;
             }
@@ -1066,6 +1107,8 @@ namespace dlib
                 window_width = window_width_;
                 stride_x = stride_x_;
                 stride_y = stride_y_;
+                padding_y  = padding_y_;
+                padding_x  = padding_x_;
                 cudnnPoolingDescriptor_t poolingDesc;
                 CHECK_CUDNN(cudnnCreatePoolingDescriptor(&poolingDesc));
                 handle = poolingDesc;
@@ -1075,8 +1118,8 @@ namespace dlib
                                                 CUDNN_PROPAGATE_NAN,
                                                 window_height,
                                                 window_width,
-                                                window_height/2,
-                                                window_width/2,  
+                                                padding_y,
+                                                padding_x,  
                                                 stride_y,
                                                 stride_x));
             }
@@ -1093,6 +1136,10 @@ namespace dlib
             const tensor& src
         )
         {
+            DLIB_CASSERT(window_width  <= src.nc() + 2*padding_x,
+                "Pooling windows must be small enough to fit into the padded image.");
+            DLIB_CASSERT(window_height <= src.nr() + 2*padding_y,
+                "Pooling windows must be small enough to fit into the padded image.");
             const float alpha = 1;
             const float beta = 0;
             int outN;
@@ -1111,14 +1158,16 @@ namespace dlib
 
             DLIB_CASSERT(dest.num_samples() == src.num_samples(),"");
             DLIB_CASSERT(dest.k() == src.k(),"");
-            DLIB_CASSERT(dest.nr() == 1+(src.nr()-window_height%2)/stride_y, 
-                "\n stride_y: " << stride_y  <<
+            DLIB_CASSERT(dest.nr() == 1 + (src.nr() + 2*padding_y - window_height)/stride_y, 
+                "\n stride_y:  " << stride_y  <<
+                "\n padding_y: " << padding_y  <<
                 "\n window_height: " << window_height  <<
                 "\n src.nr(): " << src.nr()  <<
                 "\n dest.nr(): " << dest.nr()  <<
                 "\n src.nr()/stride_y: " <<  src.nr()/stride_y); 
-            DLIB_CASSERT(dest.nc() == 1+(src.nc()-window_width%2)/stride_x, 
-                "\n stride_x: " << stride_x  <<
+            DLIB_CASSERT(dest.nc() == 1 + (src.nc() + 2*padding_x - window_width)/stride_x, 
+                "\n stride_x:  " << stride_x  <<
+                "\n padding_x: " << padding_x  <<
                 "\n window_width: " << window_width  <<
                 "\n src.nc(): " << src.nc()  <<
                 "\n dest.nc(): " << dest.nc()  <<

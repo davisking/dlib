@@ -1245,7 +1245,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         pooling::pooling (
-        ) : window_height(0),window_width(0),stride_y(0),stride_x(0),do_max_pooling(true)
+        ) : window_height(0),window_width(0),stride_y(0),stride_x(0),padding_y(0),padding_x(0),do_max_pooling(true)
         {
         }
 
@@ -1257,6 +1257,8 @@ namespace dlib
             window_width = 0;
             stride_y = 0;
             stride_x = 0;
+            padding_y = 0;
+            padding_x = 0;
         }
 
         void pooling::
@@ -1264,18 +1266,24 @@ namespace dlib
             int window_height_,
             int window_width_,
             int stride_y_,
-            int stride_x_
+            int stride_x_,
+            int padding_y_,
+            int padding_x_
         )
         {
             DLIB_CASSERT(window_width_ > 0,"");
             DLIB_CASSERT(window_height_ > 0,"");
             DLIB_CASSERT(stride_y_ > 0,"");
             DLIB_CASSERT(stride_x_ > 0,"");
+            DLIB_CASSERT(0 <= padding_y_ && padding_y_ < window_height_,"");
+            DLIB_CASSERT(0 <= padding_x_ && padding_x_ < window_width_, "");
 
             window_height = window_height_;
             window_width = window_width_;
             stride_y = stride_y_;
             stride_x = stride_x_;
+            padding_y = padding_y_;
+            padding_x = padding_x_;
             do_max_pooling = true;
         }
 
@@ -1284,18 +1292,24 @@ namespace dlib
             int window_height_,
             int window_width_,
             int stride_y_,
-            int stride_x_
+            int stride_x_,
+            int padding_y_,
+            int padding_x_
         )
         {
             DLIB_CASSERT(window_width_ > 0,"");
             DLIB_CASSERT(window_height_ > 0,"");
             DLIB_CASSERT(stride_y_ > 0,"");
             DLIB_CASSERT(stride_x_ > 0,"");
+            DLIB_CASSERT(0 <= padding_y_ && padding_y_ < window_height_,"");
+            DLIB_CASSERT(0 <= padding_x_ && padding_x_ < window_width_, "");
 
             window_height = window_height_;
             window_width = window_width_;
             stride_y = stride_y_;
             stride_x = stride_x_;
+            padding_y = padding_y_;
+            padding_x = padding_x_;
             do_max_pooling = false;
         }
 
@@ -1309,12 +1323,18 @@ namespace dlib
             DLIB_CASSERT(window_height > 0,"");
             DLIB_CASSERT(stride_y > 0,"");
             DLIB_CASSERT(stride_x > 0,"");
+            DLIB_CASSERT(0 <= padding_y && padding_y < window_height,"");
+            DLIB_CASSERT(0 <= padding_x && padding_x < window_width, "");
+            DLIB_CASSERT(window_width  <= src.nc() + 2*padding_x,
+                "Pooling windows must be small enough to fit into the padded image.");
+            DLIB_CASSERT(window_height <= src.nr() + 2*padding_y,
+                "Pooling windows must be small enough to fit into the padded image.");
 
             dest.set_size(
                  src.num_samples(),
                  src.k(),
-                 1+(src.nr()-window_height%2)/stride_y,
-                 1+(src.nc()-window_width%2)/stride_x
+                 1+(src.nr()+2*padding_y-window_height)/stride_y,
+                 1+(src.nc()+2*padding_x-window_width)/stride_x
                 );
 
             if (src.size() == 0)
@@ -1326,6 +1346,8 @@ namespace dlib
 
             auto d = dest.host();
             auto s = src.host();
+            const long x_offset = window_width/2 - padding_x;
+            const long y_offset = window_height/2 - padding_y;
             if (does_max_pooling())
             {
                 for (long n = 0; n < dest.num_samples(); ++n)
@@ -1339,8 +1361,8 @@ namespace dlib
                         {
                             for (long c = 0; c < dest.nc(); ++c)
                             {
-                                auto win = centered_rect(c*stride_x,
-                                    r*stride_y,
+                                auto win = centered_rect(c*stride_x+x_offset,
+                                    r*stride_y+y_offset,
                                     window_width,
                                     window_height);
                                 dimg[r*dest.nc() + c] = max(subm_clipped(simg,win));
@@ -1362,8 +1384,8 @@ namespace dlib
                         {
                             for (long c = 0; c < dest.nc(); ++c)
                             {
-                                auto win = centered_rect(c*stride_x,
-                                    r*stride_y,
+                                auto win = centered_rect(c*stride_x+x_offset,
+                                    r*stride_y+y_offset,
                                     window_width,
                                     window_height);
                                 dimg[r*dest.nc() + c] = mean(subm_clipped(simg,win));
@@ -1395,6 +1417,8 @@ namespace dlib
             auto gi = gradient_input.host();
             auto g = grad.host();
             auto s = src.host();
+            const long x_offset = window_width/2 - padding_x;
+            const long y_offset = window_height/2 - padding_y;
             if (does_max_pooling())
             {
                 for (long n = 0; n < dest.num_samples(); ++n)
@@ -1410,8 +1434,8 @@ namespace dlib
                         {
                             for (long c = 0; c < dest.nc(); ++c)
                             {
-                                auto win = centered_rect(c*stride_x,
-                                    r*stride_y,
+                                auto win = centered_rect(c*stride_x+x_offset,
+                                    r*stride_y+y_offset,
                                     window_width,
                                     window_height).intersect(imgbox);
                                 auto p = max_point(subm(simg,win))+win.tl_corner();
@@ -1436,8 +1460,8 @@ namespace dlib
                         {
                             for (long c = 0; c < dest.nc(); ++c)
                             {
-                                auto win = centered_rect(c*stride_x,
-                                    r*stride_y,
+                                auto win = centered_rect(c*stride_x+x_offset,
+                                    r*stride_y+y_offset,
                                     window_width,
                                     window_height).intersect(imgbox);
                                 const float delta = giimg[r*dest.nc()+c]/win.area();
@@ -1467,14 +1491,16 @@ namespace dlib
             long filter_nr,
             long filter_nc,
             long stride_y,
-            long stride_x
+            long stride_x,
+            long padding_y,
+            long padding_x
         )
         {
             const auto d = data.host() + data.k()*data.nr()*data.nc()*n;
             const rectangle boundary = get_rect(data);
 
-            const long out_nr = 1+(data.nr()-filter_nr%2)/stride_y;
-            const long out_nc = 1+(data.nc()-filter_nc%2)/stride_x;
+            const long out_nr = 1+(data.nr()+2*padding_y-filter_nr)/stride_y;
+            const long out_nc = 1+(data.nc()+2*padding_x-filter_nc)/stride_x;
 
             output.set_size(out_nr*out_nc, 
                             data.k()*filter_nr*filter_nc);
@@ -1483,9 +1509,9 @@ namespace dlib
 
             // now fill in the Toeplitz output matrix for the n-th sample in data.  
             size_t cnt = 0;
-            for (long r = -(1-filter_nr%2); r < data.nr(); r+=stride_y)
+            for (long r = filter_nr-1-padding_y; r-padding_y < data.nr(); r+=stride_y)
             {
-                for (long c = -(1-filter_nc%2); c < data.nc(); c+=stride_x)
+                for (long c = filter_nc-1-padding_x; c-padding_x < data.nc(); c+=stride_x)
                 {
                     for (long k = 0; k < data.k(); ++k)
                     {
@@ -1493,9 +1519,9 @@ namespace dlib
                         {
                             for (long x = 0; x < filter_nc; ++x)
                             {
-                                DLIB_CASSERT(cnt < output.size(),"");
-                                long xx = c-x+filter_nc/2;
-                                long yy = r-y+filter_nr/2;
+                                DLIB_ASSERT(cnt < output.size(),"");
+                                long xx = c-x;
+                                long yy = r-y;
                                 if (boundary.contains(xx,yy))
                                     *t = d[(k*data.nr() + yy)*data.nc() + xx];
                                 else
@@ -1516,7 +1542,9 @@ namespace dlib
             long filter_nr,
             long filter_nc,
             long stride_y,
-            long stride_x
+            long stride_x,
+            long padding_y,
+            long padding_x
         )
         {
             const auto d = data.host() + data.k()*data.nr()*data.nc()*n;
@@ -1526,9 +1554,9 @@ namespace dlib
             const float* t = &output(0,0);
 
             // now fill in the Toeplitz output matrix for the n-th sample in data.  
-            for (long r = -(1-filter_nr%2); r < data.nr(); r+=stride_y)
+            for (long r = filter_nr-1-padding_y; r-padding_y < data.nr(); r+=stride_y)
             {
-                for (long c = -(1-filter_nc%2); c < data.nc(); c+=stride_x)
+                for (long c = filter_nc-1-padding_x; c-padding_x < data.nc(); c+=stride_x)
                 {
                     for (long k = 0; k < data.k(); ++k)
                     {
@@ -1536,8 +1564,8 @@ namespace dlib
                         {
                             for (long x = 0; x < filter_nc; ++x)
                             {
-                                long xx = c-x+filter_nc/2;
-                                long yy = r-y+filter_nr/2;
+                                long xx = c-x;
+                                long yy = r-y;
                                 if (boundary.contains(xx,yy))
                                     d[(k*data.nr() + yy)*data.nc() + xx] += *t;
                                 ++t;
@@ -1553,28 +1581,38 @@ namespace dlib
             const tensor& data,
             const tensor& filters,
             int stride_y,
-            int stride_x
+            int stride_x,
+            int padding_y,
+            int padding_x
         )
         {
             DLIB_CASSERT(is_same_object(output,data) == false,"");
             DLIB_CASSERT(is_same_object(output,filters) == false,"");
             DLIB_CASSERT(filters.k() == data.k(),"");
             DLIB_CASSERT(stride_y > 0 && stride_x > 0,"");
+            DLIB_CASSERT(0 <= padding_y && padding_y < filters.nr(),"");
+            DLIB_CASSERT(0 <= padding_x && padding_x < filters.nc(),"");
+            DLIB_CASSERT(filters.nr() <= data.nr() + 2*padding_y,
+                "Filter windows must be small enough to fit into the padded image.");
+            DLIB_CASSERT(filters.nc() <= data.nc() + 2*padding_x,
+                "Filter windows must be small enough to fit into the padded image.");
 
             output.set_size(data.num_samples(),
                             filters.num_samples(),
-                            1+(data.nr()-filters.nr()%2)/stride_y,
-                            1+(data.nc()-filters.nc()%2)/stride_x);
+                            1+(data.nr()+2*padding_y-filters.nr())/stride_y,
+                            1+(data.nc()+2*padding_x-filters.nc())/stride_x);
 
             matrix<float> temp;
             for (long n = 0; n < data.num_samples(); ++n)
             {
-                img2col(temp, data, n, filters.nr(), filters.nc(), stride_y, stride_x);
+                img2col(temp, data, n, filters.nr(), filters.nc(), stride_y, stride_x, padding_y, padding_x);
                 output.set_sample(n, mat(filters)*trans(temp));
             }
 
             last_stride_y = stride_y;
             last_stride_x = stride_x;
+            last_padding_y = padding_y;
+            last_padding_x = padding_x;
         }
 
     // ------------------------------------------------------------------------------------
@@ -1595,7 +1633,7 @@ namespace dlib
                                     
 
                 temp = trans(gi)*mat(filters);
-                col2img(temp, data_gradient, n, filters.nr(), filters.nc(), last_stride_y, last_stride_x);
+                col2img(temp, data_gradient, n, filters.nr(), filters.nc(), last_stride_y, last_stride_x, last_padding_y, last_padding_x);
             }
         }
 
@@ -1616,7 +1654,7 @@ namespace dlib
                               gradient_input.nr()*gradient_input.nc());
 
 
-                img2col(temp, data, n, filters_gradient.nr(), filters_gradient.nc(), last_stride_y, last_stride_x);
+                img2col(temp, data, n, filters_gradient.nr(), filters_gradient.nc(), last_stride_y, last_stride_x, last_padding_y, last_padding_x);
                 if (n == 0)
                     filters_gradient = gi*temp;
                 else

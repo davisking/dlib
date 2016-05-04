@@ -279,14 +279,18 @@ namespace dlib
                 int window_height,
                 int window_width,
                 int stride_y,
-                int stride_x
+                int stride_x,
+                int padding_y,
+                int padding_x
             );
 
             void setup_avg_pooling(
                 int window_height,
                 int window_width,
                 int stride_y,
-                int stride_x
+                int stride_x,
+                int padding_y,
+                int padding_x
             );
 
             bool does_max_pooling(
@@ -309,6 +313,8 @@ namespace dlib
             int window_width;
             int stride_y;
             int stride_x;
+            int padding_y;
+            int padding_x;
             bool do_max_pooling;
 
         };
@@ -331,7 +337,9 @@ namespace dlib
                 const tensor& data,
                 const tensor& filters,
                 int stride_y,
-                int stride_x
+                int stride_x,
+                int padding_y,
+                int padding_x
             );
 
             void get_gradient_for_data (
@@ -350,6 +358,8 @@ namespace dlib
 
             long last_stride_y;
             long last_stride_x;
+            long last_padding_y;
+            long last_padding_x;
         };
 
     // -----------------------------------------------------------------------------------

@@ -583,12 +583,19 @@ namespace
 
             const int stride_y = prnd.get_random_32bit_number()%5+1;
             const int stride_x = prnd.get_random_32bit_number()%5+1;
-            conv1(output1, data, filters, stride_y,stride_x);
-
-            conv2(output2, data, filters, stride_y,stride_x);
-
+            int padding_y = prnd.get_random_32bit_number()%(filters.nr()/2+1);
+            int padding_x = prnd.get_random_32bit_number()%(filters.nc()/2+1);
+            if (!(filters.nr() <= data.nr() + 2*padding_y))
+                padding_y = (filters.nr()-data.nr()+1)/2;
+            if (!(filters.nc() <= data.nc() + 2*padding_x))
+                padding_x = (filters.nc()-data.nc()+1)/2;
+            conv1(output1, data, filters, stride_y,stride_x, padding_y, padding_x);
+            conv2(output2, data, filters, stride_y,stride_x, padding_y, padding_x);
             dlog << LINFO << "forward error: "<< max(abs(mat(output1)-mat(output2)));
-            DLIB_TEST(max(abs(mat(output1)-mat(output2))) < 1e-3);
+            DLIB_TEST_MSG(max(abs(mat(output1)-mat(output2))) < 1e-3, max(abs(mat(output1)-mat(output2)))
+                 <<"\n\t padding_y: "<< padding_y 
+                 <<"\n\t padding_x: "<< padding_x 
+                 );
 
 
 
@@ -621,7 +628,7 @@ namespace
             conv2.get_gradient_for_filters(gi, data, filter_gradient2);
 
             dlog << LINFO << "filter gradient error: "<< max(abs(mat(filter_gradient1)-mat(filter_gradient2)));
-            DLIB_TEST(max(abs(mat(filter_gradient1)-mat(filter_gradient2))) < 1e-3);
+            DLIB_TEST_MSG(max(abs(mat(filter_gradient1)-mat(filter_gradient2))) < 1e-3, max(abs(mat(filter_gradient1)-mat(filter_gradient2))));
         }
     }
 
@@ -1026,12 +1033,14 @@ namespace
         const int window_height,
         const int window_width,
         const int stride_y,
-        const int stride_x 
+        const int stride_x,
+        const int padding_y,
+        const int padding_x
     )
     {
         print_spinner();
         resizable_tensor A, B, gradient_input;
-        A.set_size(2,2,16,7);
+        A.set_size(4,5,16,7);
         B.copy_size(A);
         gradient_input.copy_size(A);
 
@@ -1043,14 +1052,18 @@ namespace
 
         tt::pooling mp;
 
-        mp.setup_max_pooling(window_height,window_width,stride_y,stride_x);
+        mp.setup_max_pooling(window_height,window_width,stride_y,stride_x,padding_y,padding_x);
         mp(A, B);
 
         // make sure max pooling does what it's spec says it should.
         DLIB_TEST( A.num_samples() == B.num_samples());
         DLIB_TEST( A.k() == B.k());
-        DLIB_TEST( A.nr() == 1+(B.nr()-window_height%2)/stride_y);
-        DLIB_TEST( A.nc() == 1+(B.nc()-window_width%2)/stride_x);
+
+        DLIB_TEST( A.nr() == 1+(B.nr()+2*padding_y-window_height)/stride_y);
+        DLIB_TEST( A.nc() == 1+(B.nc()+2*padding_x-window_width)/stride_x);
+
+        const long x_offset = window_width/2 - padding_x;
+        const long y_offset = window_height/2 - padding_y;
         for (long s = 0; s < A.num_samples(); ++s)
         {
             for (long k = 0; k < A.k(); ++k)
@@ -1059,11 +1072,15 @@ namespace
                 {
                     for (long c = 0; c < A.nc(); ++c)
                     {
-                        DLIB_TEST(image_plane(A,s,k)(r,c) == max(subm_clipped(image_plane(B,s,k),
-                                    centered_rect(c*stride_x,
-                                                  r*stride_y,
+                        DLIB_TEST_MSG(image_plane(A,s,k)(r,c) == max(subm_clipped(image_plane(B,s,k),
+                                    centered_rect(c*stride_x+x_offset,
+                                                  r*stride_y+y_offset,
                                                   window_width,
-                                                  window_height))));
+                                                  window_height))), 
+                                                  "padding: "<< padding_x << "  " << padding_y 
+                                                  << " window size: " << window_width << " " << window_height 
+                                                  << " stride: " << stride_x << " " << stride_y
+                                                  );
                     }
                 }
             }
@@ -1076,12 +1093,14 @@ namespace
         const int window_height,
         const int window_width,
         const int stride_y,
-        const int stride_x 
+        const int stride_x,
+        const int padding_y,
+        const int padding_x
     )
     {
         print_spinner();
         resizable_tensor A, B, gradient_input;
-        A.set_size(2,2,16,7);
+        A.set_size(4,5,16,7);
         B.copy_size(A);
         gradient_input.copy_size(A);
 
@@ -1093,14 +1112,17 @@ namespace
 
         tt::pooling mp;
 
-        mp.setup_avg_pooling(window_height,window_width,stride_y,stride_x);
+        mp.setup_avg_pooling(window_height,window_width,stride_y,stride_x,padding_y,padding_x);
         mp(A, B);
 
         // make sure avg pooling does what it's spec says it should.
         DLIB_TEST( A.num_samples() == B.num_samples());
         DLIB_TEST( A.k() == B.k());
-        DLIB_TEST( A.nr() == 1+(B.nr()-window_height%2)/stride_y);
-        DLIB_TEST( A.nc() == 1+(B.nc()-window_width%2)/stride_x);
+        DLIB_TEST( A.nr() == 1+(B.nr()+2*padding_y-window_height)/stride_y);
+        DLIB_TEST( A.nc() == 1+(B.nc()+2*padding_x-window_width)/stride_x);
+
+        const long x_offset = window_width/2 - padding_x;
+        const long y_offset = window_height/2 - padding_y;
         for (long s = 0; s < A.num_samples(); ++s)
         {
             for (long k = 0; k < A.k(); ++k)
@@ -1110,8 +1132,8 @@ namespace
                     for (long c = 0; c < A.nc(); ++c)
                     {
                         float expected = mean(subm_clipped(image_plane(B,s,k),
-                                            centered_rect(c*stride_x,
-                                                        r*stride_y,
+                                            centered_rect(c*stride_x+x_offset,
+                                                        r*stride_y+y_offset,
                                                         window_width,
                                                         window_height)));
                         float err = abs(image_plane(A,s,k)(r,c) - expected);
@@ -1275,17 +1297,30 @@ namespace
             test_add();
             compare_adam();
 #endif
-            test_max_pool(1,1,2,3);
-            test_max_pool(3,3,1,1);
-            test_max_pool(3,3,2,2);
-            test_max_pool(2,2,2,2);
-            test_max_pool(4,5,3,1);
-            test_avg_pool(1,1,2,3);
-            test_avg_pool(3,3,1,1);
-            test_avg_pool(3,3,2,2);
-            test_avg_pool(2,2,2,2);
-            test_avg_pool(4,5,3,1);
-            test_avg_pool(100,100,100,100);
+            test_max_pool(1,1,2,3,0,0);
+            test_max_pool(3,3,1,1,0,0);
+            test_max_pool(3,3,2,2,0,0);
+            test_max_pool(2,2,2,2,0,0);
+            test_max_pool(4,5,3,1,0,0);
+            test_avg_pool(1,1,2,3,0,0);
+            test_avg_pool(3,3,1,1,0,0);
+            test_avg_pool(3,3,2,2,0,0);
+            test_avg_pool(2,2,2,2,0,0);
+            test_avg_pool(4,5,3,1,0,0);
+            test_avg_pool(4,4,2,2,0,0);
+            test_avg_pool(4,5,40,50,0,0);
+            test_max_pool(2,2,2,3,1,1);
+            test_max_pool(3,3,1,1,1,1);
+            test_max_pool(3,3,2,2,2,1);
+            test_max_pool(2,2,2,2,1,0);
+            test_max_pool(4,5,3,1,2,3);
+            test_avg_pool(1,1,2,3,0,0);
+            test_avg_pool(3,3,1,1,1,2);
+            test_avg_pool(3,3,2,2,2,1);
+            test_avg_pool(2,2,2,2,1,0);
+            test_avg_pool(4,5,3,1,2,4);
+            test_avg_pool(4,4,2,2,1,3);
+            test_avg_pool(4,5,40,50,0,1);
             test_tanh();
             test_softmax();
             test_sigmoid();

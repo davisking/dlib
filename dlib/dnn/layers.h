@@ -97,7 +97,10 @@ namespace dlib
                 sub.get_output(),
                 filters(params,0),
                 _stride_y,
-                _stride_x);
+                _stride_x,
+                _nr/2,
+                _nc/2
+                );
 
             tt::add(1,output,1,biases(params,filters.size()));
         } 
@@ -221,7 +224,7 @@ namespace dlib
         {
             // this->mp is non-copyable so we have to write our own copy to avoid trying to
             // copy it and getting an error.
-            mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x);
+            mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x, _nr/2, _nc/2);
         }
 
         max_pool_& operator= (
@@ -233,14 +236,14 @@ namespace dlib
 
             // this->mp is non-copyable so we have to write our own copy to avoid trying to
             // copy it and getting an error.
-            mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x);
+            mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x, _nr/2, _nc/2);
             return *this;
         }
 
         template <typename SUBNET>
         void setup (const SUBNET& /*sub*/)
         {
-            mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x);
+            mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x, _nr/2, _nc/2);
         }
 
         template <typename SUBNET>
@@ -274,7 +277,7 @@ namespace dlib
             if (version != "max_pool_")
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::max_pool_.");
 
-            item.mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x);
+            item.mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x, _nr/2, _nc/2);
 
             long nr;
             long nc;
@@ -349,7 +352,7 @@ namespace dlib
         {
             // this->ap is non-copyable so we have to write our own copy to avoid trying to
             // copy it and getting an error.
-            ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x);
+            ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x, _nr/2, _nc/2);
         }
 
         avg_pool_& operator= (
@@ -361,14 +364,14 @@ namespace dlib
 
             // this->ap is non-copyable so we have to write our own copy to avoid trying to
             // copy it and getting an error.
-            ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x);
+            ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x, _nr/2, _nc/2);
             return *this;
         }
 
         template <typename SUBNET>
         void setup (const SUBNET& /*sub*/)
         {
-            ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x);
+            ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x, _nr/2, _nc/2);
         }
 
         template <typename SUBNET>
@@ -402,7 +405,7 @@ namespace dlib
             if (version != "avg_pool_")
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::avg_pool_.");
 
-            item.ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x);
+            item.ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x, _nr/2, _nc/2);
 
             long nr;
             long nc;

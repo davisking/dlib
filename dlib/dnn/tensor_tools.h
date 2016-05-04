@@ -639,22 +639,28 @@ namespace dlib { namespace tt
             const tensor& data,
             const tensor& filters,
             int stride_y,
-            int stride_x
-        ) { impl(output,data,filters,stride_y,stride_x); }
+            int stride_x,
+            int padding_y,
+            int padding_x
+        ) { impl(output,data,filters,stride_y,stride_x,padding_y,padding_x); }
         /*!
             requires
                 - stride_y > 0
                 - stride_x > 0
+                - 0 <= padding_y < filters.nr()
+                - 0 <= padding_x < filters.nc()
                 - is_same_object(output,data) == false
                 - is_same_object(output,filters) == false
                 - filters.k() == data.k()
+                - filters.nr() <= src.nr() + 2*padding_y
+                - filters.nc() <= src.nc() + 2*padding_x
             ensures
                 - convolves filters over data.  
                 - filters contains filters.num_samples() filters. 
                 - #output.num_samples() == data.num_samples()
                 - #output.k() == filters.num_samples()
-                - #output.nr() == 1+(data.nr()-filters.nr()%2)/stride_y
-                - #output.nc() == 1+(data.nc()-filters.nc()%2)/stride_x
+                - #output.nr() == 1+(data.nr() + 2*padding_y - filters.nr())/stride_y
+                - #output.nc() == 1+(data.nc() + 2*padding_x - filters.nc())/stride_x
         !*/
 
         void get_gradient_for_data (
@@ -732,14 +738,18 @@ namespace dlib { namespace tt
             int window_height,
             int window_width,
             int stride_y,
-            int stride_x
-        ) { impl.setup_max_pooling(window_height, window_width, stride_y, stride_x); }
+            int stride_x,
+            int padding_y,
+            int padding_x
+        ) { impl.setup_max_pooling(window_height, window_width, stride_y, stride_x, padding_y, padding_x); }
         /*!
             requires
                 - window_height > 0
                 - window_width > 0
                 - stride_y > 0
                 - stride_x > 0
+                - 0 <= padding_y < window_height
+                - 0 <= padding_x < window_width
             ensures
                 - When you call operator() it will do max pooling with the given
                   parameters.
@@ -749,14 +759,18 @@ namespace dlib { namespace tt
             int window_height,
             int window_width,
             int stride_y,
-            int stride_x
-        ) { impl.setup_avg_pooling(window_height, window_width, stride_y, stride_x); }
+            int stride_x,
+            int padding_y,
+            int padding_x
+        ) { impl.setup_avg_pooling(window_height, window_width, stride_y, stride_x, padding_y, padding_x); }
         /*!
             requires
                 - window_height > 0
                 - window_width > 0
                 - stride_y > 0
                 - stride_x > 0
+                - 0 <= padding_y < window_height
+                - 0 <= padding_x < window_width
             ensures
                 - When you call operator() it will do average pooling with the given
                   parameters.
@@ -773,24 +787,22 @@ namespace dlib { namespace tt
             requires
                 - is_same_object(dest,src) == false
                 - either setup_max_pooling() or setup_avg_pooling() has been called.
+                - window_width  <= src.nc() + 2*padding_x
+                - window_height <= src.nr() + 2*padding_y
             ensures
                 - #dest.num_samples() == src.num_samples()
                 - #dest.k() == src.k()
-                - #dest.nr() == 1+(src.nr()-window_height%2)/stride_y
-                - #dest.nc() == 1+(src.nc()-window_width%2)/stride_x
+                - #dest.nr() == 1 + (src.nr() + 2*padding_y - window_height)/stride_y
+                - #dest.nc() == 1 + (src.nc() + 2*padding_x - window_width)/stride_x
+                - WINDOW == centered_rect(x*stride + window_width/2 - padding_x,
+                                          y*stride + window_height/2 - padding_y,
+                                          window_width,
+                                          window_height)
                 - for all valid s, k, r, and c:
                     - if (does_max_pooling()) then
-                        - image_plane(#dest,s,k)(r,c) == max(subm_clipped(image_plane(src,s,k),
-                                                                      centered_rect(c*stride_x,
-                                                                                    r*stride_y,
-                                                                                    window_width,
-                                                                                    window_height)))
+                        - image_plane(#dest,s,k)(r,c) == max(subm_clipped(image_plane(src,s,k),WINDOW(c,r)))
                     - else
-                        - image_plane(#dest,s,k)(r,c) == mean(subm_clipped(image_plane(src,s,k),
-                                                                      centered_rect(c*stride_x,
-                                                                                    r*stride_y,
-                                                                                    window_width,
-                                                                                    window_height)))
+                        - image_plane(#dest,s,k)(r,c) == mean(subm_clipped(image_plane(src,s,k),WINDOW(c,r)))
         !*/
 
         void get_gradient(
