@@ -1193,7 +1193,7 @@ namespace
         }
         {
             print_spinner();
-            fc_<5,FC_NO_BIAS> l;
+            fc_<4,FC_NO_BIAS> l;
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {
