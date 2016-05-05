@@ -164,8 +164,8 @@ namespace
 
             DLIB_TEST(df.number_of_classes() == 3);
 
-            DLIB_TEST(df(samples[0])  == labels[0])
-            DLIB_TEST(df(samples[90])  == labels[90])
+            DLIB_TEST(df(samples[0])  == labels[0]);
+            DLIB_TEST(df(samples[90])  == labels[90]);
 
 
             one_vs_all_decision_function<ova_trainer, 
@@ -184,8 +184,8 @@ namespace
             deserialize(df3, fin);
 
 
-            DLIB_TEST(df3(samples[0])  == labels[0])
-            DLIB_TEST(df3(samples[90])  == labels[90])
+            DLIB_TEST(df3(samples[0])  == labels[0]);
+            DLIB_TEST(df3(samples[90])  == labels[90]);
             res = test_multiclass_decision_function(df3, samples, labels);
 
             DLIB_TEST(res == ans);
@@ -240,8 +240,8 @@ namespace
 
             DLIB_TEST(df.number_of_classes() == 3);
 
-            DLIB_TEST(df(samples[0])  == labels[0])
-            DLIB_TEST(df(samples[90])  == labels[90])
+            DLIB_TEST(df(samples[0])  == labels[0]);
+            DLIB_TEST(df(samples[90])  == labels[90]);
 
 
             one_vs_all_decision_function<ova_trainer, 
@@ -260,8 +260,8 @@ namespace
             deserialize(df3, fin);
 
 
-            DLIB_TEST(df3(samples[0])  == labels[0])
-            DLIB_TEST(df3(samples[90])  == labels[90])
+            DLIB_TEST(df3(samples[0])  == labels[0]);
+            DLIB_TEST(df3(samples[90])  == labels[90]);
             res = test_multiclass_decision_function(df3, samples, labels);
 
             DLIB_TEST(res == ans);

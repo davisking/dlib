@@ -226,10 +226,10 @@ namespace
             DLIB_TEST(p11.unique() == false);
 
             // now p11, p2, and p22 all reference the same thing and the rest are null
-            DLIB_TEST_MSG((p11 < p2) == false,"")
-                DLIB_TEST_MSG((p2 < p11) == false,"")
+            DLIB_TEST_MSG((p11 < p2) == false,"");
+            DLIB_TEST_MSG((p2 < p11) == false,"");
 
-                DLIB_TEST(get_deleter<D>(p4) == 0);
+            DLIB_TEST(get_deleter<D>(p4) == 0);
             p4 = p2;
             DLIB_TEST(get_deleter<D>(p4) != 0);
             DLIB_TEST(get_deleter<D>(p4) == get_deleter<D>(p2));

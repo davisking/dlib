@@ -832,9 +832,9 @@ namespace
             DLIB_TEST(join_rows(a,a) == b);
             DLIB_TEST(join_rows(a,abs(a)) == b);
             DLIB_TEST(join_cols(trans(a), trans(a)) == trans(b));
-            DLIB_TEST(join_cols(a,a) == c)
-            DLIB_TEST(join_cols(a,abs(a)) == c)
-            DLIB_TEST(join_rows(trans(a),trans(a)) == trans(c))
+            DLIB_TEST(join_cols(a,a) == c);
+            DLIB_TEST(join_cols(a,abs(a)) == c);
+            DLIB_TEST(join_rows(trans(a),trans(a)) == trans(c));
         }
 
         {
@@ -856,9 +856,9 @@ namespace
             DLIB_TEST(join_rows(a,a) == b);
             DLIB_TEST(join_rows(a,abs(a)) == b);
             DLIB_TEST(join_cols(trans(a), trans(a)) == trans(b));
-            DLIB_TEST(join_cols(a,a) == c)
-            DLIB_TEST(join_cols(a,abs(a)) == c)
-            DLIB_TEST(join_rows(trans(a),trans(a)) == trans(c))
+            DLIB_TEST(join_cols(a,a) == c);
+            DLIB_TEST(join_cols(a,abs(a)) == c);
+            DLIB_TEST(join_rows(trans(a),trans(a)) == trans(c));
         }
 
         {
@@ -883,9 +883,9 @@ namespace
             DLIB_TEST(join_rows(a,a2) == b);
             DLIB_TEST(join_rows(a2,a) == b);
             DLIB_TEST(join_cols(trans(a2), trans(a)) == trans(b));
-            DLIB_TEST(join_cols(a2,a) == c)
-            DLIB_TEST(join_cols(a,a2) == c)
-            DLIB_TEST(join_rows(trans(a2),trans(a)) == trans(c))
+            DLIB_TEST(join_cols(a2,a) == c);
+            DLIB_TEST(join_cols(a,a2) == c);
+            DLIB_TEST(join_rows(trans(a2),trans(a)) == trans(c));
         }
 
         {
