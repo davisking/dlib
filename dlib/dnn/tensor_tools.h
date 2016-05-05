@@ -794,8 +794,8 @@ namespace dlib { namespace tt
                 - #dest.k() == src.k()
                 - #dest.nr() == 1 + (src.nr() + 2*padding_y - window_height)/stride_y
                 - #dest.nc() == 1 + (src.nc() + 2*padding_x - window_width)/stride_x
-                - WINDOW == centered_rect(x*stride + window_width/2 - padding_x,
-                                          y*stride + window_height/2 - padding_y,
+                - WINDOW == centered_rect(x*stride_x + window_width/2 - padding_x,
+                                          y*stride_y + window_height/2 - padding_y,
                                           window_width,
                                           window_height)
                 - for all valid s, k, r, and c:
