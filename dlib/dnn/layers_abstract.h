@@ -416,13 +416,18 @@ namespace dlib
         long _nr,
         long _nc,
         int _stride_y,
-        int _stride_x
+        int _stride_x,
+        int _padding_y = _stride_y!=1? 0 : _nr/2,
+        int _padding_x = _stride_x!=1? 0 : _nc/2
         >
     class con_
     {
         /*!
             REQUIREMENTS ON TEMPLATE ARGUMENTS
                 All of them must be > 0.
+                Also, we require that:
+                    - 0 <= _padding_y && _padding_y < _nr
+                    - 0 <= _padding_x && _padding_x < _nc
 
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
@@ -434,8 +439,8 @@ namespace dlib
                 IN be the input tensor and OUT the output tensor):
                     - OUT.num_samples() == IN.num_samples()
                     - OUT.k()  == num_filters()
-                    - OUT.nr() == 1+(IN.nr()-nr()%2)/stride_y()
-                    - OUT.nc() == 1+(IN.nc()-nc()%2)/stride_x()
+                    - OUT.nr() == 1+(IN.nr() + 2*padding_y() - nr())/stride_y()
+                    - OUT.nc() == 1+(IN.nc() + 2*padding_x() - nc())/stride_x()
         !*/
 
     public:
@@ -448,6 +453,8 @@ namespace dlib
                 - #nc() == _nc
                 - #stride_y() == _stride_y
                 - #stride_x() == _stride_x
+                - #padding_y() == _padding_y
+                - #padding_x() == _padding_x
         !*/
 
         long num_filters(
@@ -489,6 +496,22 @@ namespace dlib
                 - returns the horizontal stride used when convolving the filters over an
                   image.  That is, each filter will be moved stride_x() pixels right at a
                   time when it moves over the image.
+        !*/
+
+        long padding_y(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of pixels of zero padding added to the top and bottom
+                  sides of the image.
+        !*/
+
+        long padding_x(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of pixels of zero padding added to the left and right 
+                  sides of the image.
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
@@ -813,13 +836,18 @@ namespace dlib
         long _nr,
         long _nc,
         int _stride_y,
-        int _stride_x
+        int _stride_x,
+        int _padding_y = _stride_y!=1? 0 : _nr/2,
+        int _padding_x = _stride_x!=1? 0 : _nc/2
         >
     class max_pool_
     {
         /*!
             REQUIREMENTS ON TEMPLATE ARGUMENTS
                 All of them must be > 0.
+                Also, we require that:
+                    - 0 <= _padding_y && _padding_y < _nr
+                    - 0 <= _padding_x && _padding_x < _nc
 
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
@@ -832,14 +860,14 @@ namespace dlib
                 then OUT is defined as follows:
                     - OUT.num_samples() == IN.num_samples()
                     - OUT.k()  == IN.k()
-                    - OUT.nr() == 1+(IN.nr()-nr()%2)/stride_y()
-                    - OUT.nc() == 1+(IN.nc()-nc()%2)/stride_x()
+                    - OUT.nr() == 1+(IN.nr() + 2*padding_y() - nr())/stride_y()
+                    - OUT.nc() == 1+(IN.nc() + 2*padding_x() - nc())/stride_x()
                     - for all valid s, k, r, and c:
                         - image_plane(OUT,s,k)(r,c) == max(subm_clipped(image_plane(IN,s,k),
-                                                                  centered_rect(r*stride_y(),
-                                                                                c*stride_x(),
-                                                                                nr(),
-                                                                                nc())))
+                                                                  centered_rect(x*stride_x() + nc()/2 - padding_x(),
+                                                                                y*stride_y() + nr()/2 - padding_y(),
+                                                                                nc(),
+                                                                                nr())))
         !*/
 
     public:
@@ -852,6 +880,8 @@ namespace dlib
                 - #nc() == _nc
                 - #stride_y() == _stride_y
                 - #stride_x() == _stride_x
+                - #padding_y() == _padding_y
+                - #padding_x() == _padding_x
         !*/
 
         long nr(
@@ -886,6 +916,22 @@ namespace dlib
                   at a time when it moves over the image.
         !*/
 
+        long padding_y(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of pixels of zero padding added to the top and bottom
+                  sides of the image.
+        !*/
+
+        long padding_x(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of pixels of zero padding added to the left and right 
+                  sides of the image.
+        !*/
+
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& computed_output, const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
@@ -913,13 +959,18 @@ namespace dlib
         long _nr,
         long _nc,
         int _stride_y,
-        int _stride_x
+        int _stride_x,
+        int _padding_y = _stride_y!=1? 0 : _nr/2,
+        int _padding_x = _stride_x!=1? 0 : _nc/2
         >
     class avg_pool_
     {
         /*!
             REQUIREMENTS ON TEMPLATE ARGUMENTS
                 All of them must be > 0.
+                Also, we require that:
+                    - 0 <= _padding_y && _padding_y < _nr
+                    - 0 <= _padding_x && _padding_x < _nc
 
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
@@ -934,12 +985,14 @@ namespace dlib
                     - OUT.k()  == IN.k()
                     - OUT.nr() == 1+(IN.nr()-nr()%2)/stride_y()
                     - OUT.nc() == 1+(IN.nc()-nc()%2)/stride_x()
+                    - OUT.nr() == 1+(IN.nr() + 2*padding_y() - nr())/stride_y()
+                    - OUT.nc() == 1+(IN.nc() + 2*padding_x() - nc())/stride_x()
                     - for all valid s, k, r, and c:
                         - image_plane(OUT,s,k)(r,c) == mean(subm_clipped(image_plane(IN,s,k),
-                                                                  centered_rect(r*stride_y(),
-                                                                                c*stride_x(),
-                                                                                nr(),
-                                                                                nc()))
+                                                                  centered_rect(x*stride_x() + nc()/2 - padding_x(),
+                                                                                y*stride_y() + nr()/2 - padding_y(),
+                                                                                nc(),
+                                                                                nr())))
         !*/
 
     public:
@@ -952,6 +1005,8 @@ namespace dlib
                 - #nc() == _nc
                 - #stride_y() == _stride_y
                 - #stride_x() == _stride_x
+                - #padding_y() == _padding_y
+                - #padding_x() == _padding_x
         !*/
 
         long nr(
@@ -984,6 +1039,22 @@ namespace dlib
                 - returns the horizontal stride used when scanning the pooling window
                   over an image.  That is, each window will be moved stride_x() pixels down
                   at a time when it moves over the image.
+        !*/
+
+        long padding_y(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of pixels of zero padding added to the top and bottom
+                  sides of the image.
+        !*/
+
+        long padding_x(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of pixels of zero padding added to the left and right 
+                  sides of the image.
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);

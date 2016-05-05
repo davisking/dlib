@@ -1185,7 +1185,7 @@ namespace
         }
         {
             print_spinner();
-            con_<3,3,3,2,2> l;
+            con_<3,2,2,2,2> l;
             DLIB_TEST_MSG(test_layer(l), test_layer(l));
         }
         {

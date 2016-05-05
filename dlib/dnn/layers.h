@@ -24,7 +24,9 @@ namespace dlib
         long _nr,
         long _nc,
         int _stride_y,
-        int _stride_x
+        int _stride_x,
+        int _padding_y = _stride_y!=1? 0 : _nr/2,
+        int _padding_x = _stride_x!=1? 0 : _nc/2
         >
     class con_
     {
@@ -35,9 +37,13 @@ namespace dlib
         static_assert(_nc > 0, "The number of columns in a filter must be > 0");
         static_assert(_stride_y > 0, "The filter stride must be > 0");
         static_assert(_stride_x > 0, "The filter stride must be > 0");
+        static_assert(0 <= _padding_y && _padding_y < _nr, "The padding must be smaller than the filter size.");
+        static_assert(0 <= _padding_x && _padding_x < _nc, "The padding must be smaller than the filter size.");
 
         con_(
-        )  
+        ) : 
+            padding_y_(_padding_y),
+            padding_x_(_padding_x)
         {}
 
         long num_filters() const { return _num_filters; }
@@ -45,13 +51,17 @@ namespace dlib
         long nc() const { return _nc; }
         long stride_y() const { return _stride_y; }
         long stride_x() const { return _stride_x; }
+        long padding_y() const { return padding_y_; }
+        long padding_x() const { return padding_x_; }
 
         con_ (
             const con_& item
         ) : 
             params(item.params),
             filters(item.filters),
-            biases(item.biases)
+            biases(item.biases),
+            padding_y_(item.padding_y_),
+            padding_x_(item.padding_x_)
         {
             // this->conv is non-copyable and basically stateless, so we have to write our
             // own copy to avoid trying to copy it and getting an error.
@@ -69,6 +79,8 @@ namespace dlib
             params = item.params;
             filters = item.filters;
             biases = item.biases;
+            padding_y_ = item.padding_y_;
+            padding_x_ = item.padding_x_;
             return *this;
         }
 
@@ -98,8 +110,8 @@ namespace dlib
                 filters(params,0),
                 _stride_y,
                 _stride_x,
-                _nr/2,
-                _nc/2
+                padding_y_,
+                padding_x_
                 );
 
             tt::add(1,output,1,biases(params,filters.size()));
@@ -120,13 +132,15 @@ namespace dlib
 
         friend void serialize(const con_& item, std::ostream& out)
         {
-            serialize("con_", out);
+            serialize("con_2", out);
             serialize(item.params, out);
             serialize(_num_filters, out);
             serialize(_nr, out);
             serialize(_nc, out);
             serialize(_stride_y, out);
             serialize(_stride_x, out);
+            serialize(item.padding_y_, out);
+            serialize(item.padding_x_, out);
             serialize(item.filters, out);
             serialize(item.biases, out);
         }
@@ -135,23 +149,44 @@ namespace dlib
         {
             std::string version;
             deserialize(version, in);
-            if (version != "con_")
-                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::con_.");
-            deserialize(item.params, in);
-
-
             long num_filters;
             long nr;
             long nc;
             int stride_y;
             int stride_x;
-            deserialize(num_filters, in);
-            deserialize(nr, in);
-            deserialize(nc, in);
-            deserialize(stride_y, in);
-            deserialize(stride_x, in);
-            deserialize(item.filters, in);
-            deserialize(item.biases, in);
+            if (version == "con_")
+            {
+                deserialize(item.params, in);
+                deserialize(num_filters, in);
+                deserialize(nr, in);
+                deserialize(nc, in);
+                deserialize(stride_y, in);
+                deserialize(stride_x, in);
+                deserialize(item.filters, in);
+                deserialize(item.biases, in);
+                item.padding_y_ = nr/2;
+                item.padding_x_ = nc/2;
+            }
+            else if (version == "con_2")
+            {
+                deserialize(item.params, in);
+                deserialize(num_filters, in);
+                deserialize(nr, in);
+                deserialize(nc, in);
+                deserialize(stride_y, in);
+                deserialize(stride_x, in);
+                deserialize(item.padding_y_, in);
+                deserialize(item.padding_x_, in);
+                deserialize(item.filters, in);
+                deserialize(item.biases, in);
+
+                if (item.padding_y_ != _padding_y) throw serialization_error("Wrong padding_y found while deserializing dlib::con_");
+                if (item.padding_x_ != _padding_x) throw serialization_error("Wrong padding_x found while deserializing dlib::con_");
+            }
+            else
+            {
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::con_.");
+            }
 
             if (num_filters != _num_filters) throw serialization_error("Wrong num_filters found while deserializing dlib::con_");
             if (nr != _nr) throw serialization_error("Wrong nr found while deserializing dlib::con_");
@@ -169,6 +204,8 @@ namespace dlib
                 << ", nc="<<_nc
                 << ", stride_y="<<_stride_y
                 << ", stride_x="<<_stride_x
+                << ", padding_y="<<item.padding_y_
+                << ", padding_x="<<item.padding_x_
                 << ")";
             return out;
         }
@@ -180,6 +217,11 @@ namespace dlib
         alias_tensor filters, biases;
 
         tt::tensor_conv conv;
+
+        // These are here only because older versions of con (which you might encounter
+        // serialized to disk) used different padding settings.
+        int padding_y_;
+        int padding_x_;
 
     };
 
@@ -199,7 +241,9 @@ namespace dlib
         long _nr,
         long _nc,
         int _stride_y,
-        int _stride_x
+        int _stride_x,
+        int _padding_y = _stride_y!=1? 0 : _nr/2,
+        int _padding_x = _stride_x!=1? 0 : _nc/2
         >
     class max_pool_
     {
@@ -207,24 +251,33 @@ namespace dlib
         static_assert(_nc > 0, "The number of columns in a filter must be > 0");
         static_assert(_stride_y > 0, "The filter stride must be > 0");
         static_assert(_stride_x > 0, "The filter stride must be > 0");
+        static_assert(0 <= _padding_y && _padding_y < _nr, "The padding must be smaller than the filter size.");
+        static_assert(0 <= _padding_x && _padding_x < _nc, "The padding must be smaller than the filter size.");
     public:
 
 
         max_pool_(
-        ) {}
+        ) :
+            padding_y_(_padding_y),
+            padding_x_(_padding_x)
+        {}
 
         long nr() const { return _nr; }
         long nc() const { return _nc; }
         long stride_y() const { return _stride_y; }
         long stride_x() const { return _stride_x; }
+        long padding_y() const { return padding_y_; }
+        long padding_x() const { return padding_x_; }
 
         max_pool_ (
-            const max_pool_& 
-        )  
+            const max_pool_& item
+        )  :
+            padding_y_(item.padding_y_),
+            padding_x_(item.padding_x_)
         {
             // this->mp is non-copyable so we have to write our own copy to avoid trying to
             // copy it and getting an error.
-            mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x, _nr/2, _nc/2);
+            mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x, padding_y_, padding_x_);
         }
 
         max_pool_& operator= (
@@ -234,16 +287,19 @@ namespace dlib
             if (this == &item)
                 return *this;
 
+            padding_y_ = item.padding_y_;
+            padding_x_ = item.padding_x_;
+
             // this->mp is non-copyable so we have to write our own copy to avoid trying to
             // copy it and getting an error.
-            mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x, _nr/2, _nc/2);
+            mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x, padding_y_, padding_x_);
             return *this;
         }
 
         template <typename SUBNET>
         void setup (const SUBNET& /*sub*/)
         {
-            mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x, _nr/2, _nc/2);
+            mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x, padding_y_, padding_x_);
         }
 
         template <typename SUBNET>
@@ -263,35 +319,55 @@ namespace dlib
 
         friend void serialize(const max_pool_& item, std::ostream& out)
         {
-            serialize("max_pool_", out);
+            serialize("max_pool_2", out);
             serialize(_nr, out);
             serialize(_nc, out);
             serialize(_stride_y, out);
             serialize(_stride_x, out);
+            serialize(item.padding_y_, out);
+            serialize(item.padding_x_, out);
         }
 
         friend void deserialize(max_pool_& item, std::istream& in)
         {
             std::string version;
             deserialize(version, in);
-            if (version != "max_pool_")
-                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::max_pool_.");
-
-            item.mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x, _nr/2, _nc/2);
-
             long nr;
             long nc;
             int stride_y;
             int stride_x;
+            if (version == "max_pool_")
+            {
+                deserialize(nr, in);
+                deserialize(nc, in);
+                deserialize(stride_y, in);
+                deserialize(stride_x, in);
+                item.padding_y_ = nr/2;
+                item.padding_x_ = nc/2;
+            }
+            else if (version == "max_pool_2")
+            {
+                deserialize(nr, in);
+                deserialize(nc, in);
+                deserialize(stride_y, in);
+                deserialize(stride_x, in);
+                deserialize(item.padding_y_, in);
+                deserialize(item.padding_x_, in);
+                if (item.padding_y_ != _padding_y) throw serialization_error("Wrong padding_y found while deserializing dlib::max_pool_");
+                if (item.padding_x_ != _padding_x) throw serialization_error("Wrong padding_x found while deserializing dlib::max_pool_");
+            }
+            else
+            {
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::max_pool_.");
+            }
 
-            deserialize(nr, in);
-            deserialize(nc, in);
-            deserialize(stride_y, in);
-            deserialize(stride_x, in);
             if (_nr != nr) throw serialization_error("Wrong nr found while deserializing dlib::max_pool_");
             if (_nc != nc) throw serialization_error("Wrong nc found while deserializing dlib::max_pool_");
             if (_stride_y != stride_y) throw serialization_error("Wrong stride_y found while deserializing dlib::max_pool_");
             if (_stride_x != stride_x) throw serialization_error("Wrong stride_x found while deserializing dlib::max_pool_");
+
+            item.mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x, item.padding_y_, item.padding_x_);
+
         }
 
         friend std::ostream& operator<<(std::ostream& out, const max_pool_& item)
@@ -301,6 +377,8 @@ namespace dlib
                 << ", nc="<<_nc
                 << ", stride_y="<<_stride_y
                 << ", stride_x="<<_stride_x
+                << ", padding_y="<<item.padding_y_
+                << ", padding_x="<<item.padding_x_
                 << ")";
             return out;
         }
@@ -311,6 +389,9 @@ namespace dlib
 
         tt::pooling mp;
         resizable_tensor params;
+
+        int padding_y_;
+        int padding_x_;
     };
 
     template <
@@ -328,7 +409,9 @@ namespace dlib
         long _nr,
         long _nc,
         int _stride_y,
-        int _stride_x
+        int _stride_x,
+        int _padding_y = _stride_y!=1? 0 : _nr/2,
+        int _padding_x = _stride_x!=1? 0 : _nc/2
         >
     class avg_pool_
     {
@@ -337,22 +420,31 @@ namespace dlib
         static_assert(_nc > 0, "The number of columns in a filter must be > 0");
         static_assert(_stride_y > 0, "The filter stride must be > 0");
         static_assert(_stride_x > 0, "The filter stride must be > 0");
+        static_assert(0 <= _padding_y && _padding_y < _nr, "The padding must be smaller than the filter size.");
+        static_assert(0 <= _padding_x && _padding_x < _nc, "The padding must be smaller than the filter size.");
 
         avg_pool_(
-        ) {}
+        ) :
+            padding_y_(_padding_y),
+            padding_x_(_padding_x)
+        {}
 
         long nr() const { return _nr; }
         long nc() const { return _nc; }
         long stride_y() const { return _stride_y; }
         long stride_x() const { return _stride_x; }
+        long padding_y() const { return padding_y_; }
+        long padding_x() const { return padding_x_; }
 
         avg_pool_ (
-            const avg_pool_& 
-        )  
+            const avg_pool_& item
+        )  :
+            padding_y_(item.padding_y_),
+            padding_x_(item.padding_x_)
         {
             // this->ap is non-copyable so we have to write our own copy to avoid trying to
             // copy it and getting an error.
-            ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x, _nr/2, _nc/2);
+            ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x, padding_y_, padding_x_);
         }
 
         avg_pool_& operator= (
@@ -362,16 +454,19 @@ namespace dlib
             if (this == &item)
                 return *this;
 
+            padding_y_ = item.padding_y_;
+            padding_x_ = item.padding_x_;
+
             // this->ap is non-copyable so we have to write our own copy to avoid trying to
             // copy it and getting an error.
-            ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x, _nr/2, _nc/2);
+            ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x, padding_y_, padding_x_);
             return *this;
         }
 
         template <typename SUBNET>
         void setup (const SUBNET& /*sub*/)
         {
-            ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x, _nr/2, _nc/2);
+            ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x, padding_y_, padding_x_);
         }
 
         template <typename SUBNET>
@@ -391,35 +486,55 @@ namespace dlib
 
         friend void serialize(const avg_pool_& item, std::ostream& out)
         {
-            serialize("avg_pool_", out);
+            serialize("avg_pool_2", out);
             serialize(_nr, out);
             serialize(_nc, out);
             serialize(_stride_y, out);
             serialize(_stride_x, out);
+            serialize(item.padding_y_, out);
+            serialize(item.padding_x_, out);
         }
 
         friend void deserialize(avg_pool_& item, std::istream& in)
         {
             std::string version;
             deserialize(version, in);
-            if (version != "avg_pool_")
-                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::avg_pool_.");
-
-            item.ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x, _nr/2, _nc/2);
 
             long nr;
             long nc;
             int stride_y;
             int stride_x;
+            if (version == "avg_pool_")
+            {
+                deserialize(nr, in);
+                deserialize(nc, in);
+                deserialize(stride_y, in);
+                deserialize(stride_x, in);
+                item.padding_y_ = nr/2;
+                item.padding_x_ = nc/2;
+            }
+            else if (version == "avg_pool_2")
+            {
+                deserialize(nr, in);
+                deserialize(nc, in);
+                deserialize(stride_y, in);
+                deserialize(stride_x, in);
+                deserialize(item.padding_y_, in);
+                deserialize(item.padding_x_, in);
+                if (item.padding_y_ != _padding_y) throw serialization_error("Wrong padding_y found while deserializing dlib::avg_pool_");
+                if (item.padding_x_ != _padding_x) throw serialization_error("Wrong padding_x found while deserializing dlib::avg_pool_");
+            }
+            else
+            {
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::avg_pool_.");
+            }
 
-            deserialize(nr, in);
-            deserialize(nc, in);
-            deserialize(stride_y, in);
-            deserialize(stride_x, in);
             if (_nr != nr) throw serialization_error("Wrong nr found while deserializing dlib::avg_pool_");
             if (_nc != nc) throw serialization_error("Wrong nc found while deserializing dlib::avg_pool_");
             if (_stride_y != stride_y) throw serialization_error("Wrong stride_y found while deserializing dlib::avg_pool_");
             if (_stride_x != stride_x) throw serialization_error("Wrong stride_x found while deserializing dlib::avg_pool_");
+
+            item.ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x, item.padding_y_, item.padding_x_);
         }
 
         friend std::ostream& operator<<(std::ostream& out, const avg_pool_& item)
@@ -429,6 +544,8 @@ namespace dlib
                 << ", nc="<<_nc
                 << ", stride_y="<<_stride_y
                 << ", stride_x="<<_stride_x
+                << ", padding_y="<<item.padding_y_
+                << ", padding_x="<<item.padding_x_
                 << ")";
             return out;
         }
@@ -436,6 +553,9 @@ namespace dlib
 
         tt::pooling ap;
         resizable_tensor params;
+
+        int padding_y_;
+        int padding_x_;
     };
 
     template <
