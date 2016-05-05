@@ -924,10 +924,18 @@ namespace dlib
             DLIB_CASSERT(is_same_object(output,filters) == false,"");
             DLIB_CASSERT(filters.k() == data.k(),"");
             DLIB_CASSERT(stride_y > 0 && stride_x > 0,"");
-            DLIB_CASSERT(filters.nr() <= data.nr() + 2*padding_y,
-                "Filter windows must be small enough to fit into the padded image.");
             DLIB_CASSERT(filters.nc() <= data.nc() + 2*padding_x,
-                "Filter windows must be small enough to fit into the padded image.");
+                "Filter windows must be small enough to fit into the padded image."
+                << "\n\t filters.nc(): " << filters.nc() 
+                << "\n\t data.nc():  " << data.nc() 
+                << "\n\t padding_x: " << padding_x 
+                );
+            DLIB_CASSERT(filters.nr() <= data.nr() + 2*padding_y,
+                "Filter windows must be small enough to fit into the padded image."
+                << "\n\t filters.nr(): " << filters.nr() 
+                << "\n\t data.nr():  " << data.nr() 
+                << "\n\t padding_y: " << padding_y 
+                );
 
 
             setup(data,filters,stride_y,stride_x,padding_y,padding_x);
@@ -1137,9 +1145,17 @@ namespace dlib
         )
         {
             DLIB_CASSERT(window_width  <= src.nc() + 2*padding_x,
-                "Pooling windows must be small enough to fit into the padded image.");
+                "Pooling windows must be small enough to fit into the padded image."
+                << "\n\t window_width: " << window_width 
+                << "\n\t src.nc():  " << src.nc() 
+                << "\n\t padding_x: " << padding_x 
+                );
             DLIB_CASSERT(window_height <= src.nr() + 2*padding_y,
-                "Pooling windows must be small enough to fit into the padded image.");
+                "Pooling windows must be small enough to fit into the padded image."
+                << "\n\t window_height: " << window_height 
+                << "\n\t src.nr():  " << src.nr() 
+                << "\n\t padding_y: " << padding_y 
+                );
             const float alpha = 1;
             const float beta = 0;
             int outN;
