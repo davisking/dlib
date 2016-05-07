@@ -61,7 +61,7 @@ template <typename SUBNET> using ares_down = base_ares<2,SUBNET>;
 // large networks.
 const unsigned long number_of_classes = 10;
 using net_type = loss_multiclass_log<fc<number_of_classes,
-                            avg_pool<6,6,11,11,
+                            avg_pool_everything<
                             res<res<res<res_down<
                             repeat<9,res, // repeat this layer 9 times
                             res_down<
@@ -114,7 +114,7 @@ int main(int argc, char** argv) try
     // Now, let's imagine we wanted to replace some of the relu layers with
     // prelu layers.  We might do it like this:
     using net_type2 = loss_multiclass_log<fc<number_of_classes,
-                                avg_pool<6,6,11,11,
+                                avg_pool_everything<
                                 pres<res<res<res_down< // 2 prelu layers here
                                 tag4<repeat<9,pres,    // 9 groups, each containing 2 prelu layers  
                                 res_down<
@@ -144,7 +144,7 @@ int main(int argc, char** argv) try
         The pnet has 125 layers in it.
         layer<0>      loss_multiclass_log
         layer<1>      fc       (num_outputs=10)
-        layer<2>      avg_pool (nr=6, nc=6, stride_y=11, _stride_x=11)
+        layer<2>      avg_pool (nr=0, nc=0, stride_y=1, stride_x=1, padding_y=0, padding_x=0)
         layer<3>      prelu    (initial_param_value=0.2)
         layer<4>      add_prev
         layer<5>      bn_con
@@ -268,7 +268,7 @@ int main(int argc, char** argv) try
     // making a network type which is identical to net_type but with the batch
     // normalization layers replaced with affine.  For example:
     using test_net_type = loss_multiclass_log<fc<number_of_classes,
-                                avg_pool<6,6,11,11,
+                                avg_pool_everything<
                                 ares<ares<ares<ares_down<
                                 repeat<9,res,
                                 ares_down<
