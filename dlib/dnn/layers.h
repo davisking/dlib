@@ -247,12 +247,14 @@ namespace dlib
         >
     class max_pool_
     {
-        static_assert(_nr > 0, "The number of rows in a filter must be > 0");
-        static_assert(_nc > 0, "The number of columns in a filter must be > 0");
+        static_assert(_nr >= 0, "The number of rows in a filter must be >= 0");
+        static_assert(_nc >= 0, "The number of columns in a filter must be >= 0");
         static_assert(_stride_y > 0, "The filter stride must be > 0");
         static_assert(_stride_x > 0, "The filter stride must be > 0");
-        static_assert(0 <= _padding_y && _padding_y < _nr, "The padding must be smaller than the filter size.");
-        static_assert(0 <= _padding_x && _padding_x < _nc, "The padding must be smaller than the filter size.");
+        static_assert(0 <= _padding_y && (_nr==0 && _padding_y == 0 || _nr!=0 && _padding_y < _nr), 
+            "The padding must be smaller than the filter size, unless the filters size is 0.");
+        static_assert(0 <= _padding_x && (_nc==0 && _padding_x == 0 || _nc!=0 && _padding_x < _nc), 
+            "The padding must be smaller than the filter size, unless the filters size is 0.");
     public:
 
 
@@ -277,7 +279,6 @@ namespace dlib
         {
             // this->mp is non-copyable so we have to write our own copy to avoid trying to
             // copy it and getting an error.
-            mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x, padding_y_, padding_x_);
         }
 
         max_pool_& operator= (
@@ -292,25 +293,31 @@ namespace dlib
 
             // this->mp is non-copyable so we have to write our own copy to avoid trying to
             // copy it and getting an error.
-            mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x, padding_y_, padding_x_);
             return *this;
         }
 
         template <typename SUBNET>
         void setup (const SUBNET& /*sub*/)
         {
-            mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x, padding_y_, padding_x_);
         }
 
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
         {
+            mp.setup_avg_pooling(_nr!=0?_nr:sub.get_output().nr(), 
+                                 _nc!=0?_nc:sub.get_output().nc(),
+                                 _stride_y, _stride_x, padding_y_, padding_x_);
+
             mp(output, sub.get_output());
         } 
 
         template <typename SUBNET>
         void backward(const tensor& computed_output, const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
         {
+            mp.setup_avg_pooling(_nr!=0?_nr:sub.get_output().nr(), 
+                                 _nc!=0?_nc:sub.get_output().nc(),
+                                 _stride_y, _stride_x, padding_y_, padding_x_);
+
             mp.get_gradient(gradient_input, computed_output, sub.get_output(), sub.get_gradient_input());
         }
 
@@ -365,9 +372,6 @@ namespace dlib
             if (_nc != nc) throw serialization_error("Wrong nc found while deserializing dlib::max_pool_");
             if (_stride_y != stride_y) throw serialization_error("Wrong stride_y found while deserializing dlib::max_pool_");
             if (_stride_x != stride_x) throw serialization_error("Wrong stride_x found while deserializing dlib::max_pool_");
-
-            item.mp.setup_max_pooling(_nr, _nc, _stride_y, _stride_x, item.padding_y_, item.padding_x_);
-
         }
 
         friend std::ostream& operator<<(std::ostream& out, const max_pool_& item)
@@ -403,6 +407,11 @@ namespace dlib
         >
     using max_pool = add_layer<max_pool_<nr,nc,stride_y,stride_x>, SUBNET>;
 
+    template <
+        typename SUBNET
+        >
+    using max_pool_everything = add_layer<max_pool_<0,0,1,1>, SUBNET>;
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -416,12 +425,14 @@ namespace dlib
     class avg_pool_
     {
     public:
-        static_assert(_nr > 0, "The number of rows in a filter must be > 0");
-        static_assert(_nc > 0, "The number of columns in a filter must be > 0");
+        static_assert(_nr >= 0, "The number of rows in a filter must be >= 0");
+        static_assert(_nc >= 0, "The number of columns in a filter must be >= 0");
         static_assert(_stride_y > 0, "The filter stride must be > 0");
         static_assert(_stride_x > 0, "The filter stride must be > 0");
-        static_assert(0 <= _padding_y && _padding_y < _nr, "The padding must be smaller than the filter size.");
-        static_assert(0 <= _padding_x && _padding_x < _nc, "The padding must be smaller than the filter size.");
+        static_assert(0 <= _padding_y && (_nr==0 && _padding_y == 0 || _nr!=0 && _padding_y < _nr), 
+            "The padding must be smaller than the filter size, unless the filters size is 0.");
+        static_assert(0 <= _padding_x && (_nc==0 && _padding_x == 0 || _nc!=0 && _padding_x < _nc), 
+            "The padding must be smaller than the filter size, unless the filters size is 0.");
 
         avg_pool_(
         ) :
@@ -444,7 +455,6 @@ namespace dlib
         {
             // this->ap is non-copyable so we have to write our own copy to avoid trying to
             // copy it and getting an error.
-            ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x, padding_y_, padding_x_);
         }
 
         avg_pool_& operator= (
@@ -459,25 +469,31 @@ namespace dlib
 
             // this->ap is non-copyable so we have to write our own copy to avoid trying to
             // copy it and getting an error.
-            ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x, padding_y_, padding_x_);
             return *this;
         }
 
         template <typename SUBNET>
         void setup (const SUBNET& /*sub*/)
         {
-            ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x, padding_y_, padding_x_);
         }
 
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
         {
+            ap.setup_avg_pooling(_nr!=0?_nr:sub.get_output().nr(), 
+                                 _nc!=0?_nc:sub.get_output().nc(),
+                                 _stride_y, _stride_x, padding_y_, padding_x_);
+
             ap(output, sub.get_output());
         } 
 
         template <typename SUBNET>
         void backward(const tensor& computed_output, const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
         {
+            ap.setup_avg_pooling(_nr!=0?_nr:sub.get_output().nr(), 
+                                 _nc!=0?_nc:sub.get_output().nc(),
+                                 _stride_y, _stride_x, padding_y_, padding_x_);
+
             ap.get_gradient(gradient_input, computed_output, sub.get_output(), sub.get_gradient_input());
         }
 
@@ -533,8 +549,6 @@ namespace dlib
             if (_nc != nc) throw serialization_error("Wrong nc found while deserializing dlib::avg_pool_");
             if (_stride_y != stride_y) throw serialization_error("Wrong stride_y found while deserializing dlib::avg_pool_");
             if (_stride_x != stride_x) throw serialization_error("Wrong stride_x found while deserializing dlib::avg_pool_");
-
-            item.ap.setup_avg_pooling(_nr, _nc, _stride_y, _stride_x, item.padding_y_, item.padding_x_);
         }
 
         friend std::ostream& operator<<(std::ostream& out, const avg_pool_& item)
@@ -566,6 +580,11 @@ namespace dlib
         typename SUBNET
         >
     using avg_pool = add_layer<avg_pool_<nr,nc,stride_y,stride_x>, SUBNET>;
+
+    template <
+        typename SUBNET
+        >
+    using avg_pool_everything = add_layer<avg_pool_<0,0,1,1>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

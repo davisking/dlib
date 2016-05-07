@@ -844,10 +844,20 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON TEMPLATE ARGUMENTS
-                All of them must be > 0.
-                Also, we require that:
-                    - 0 <= _padding_y && _padding_y < _nr
-                    - 0 <= _padding_x && _padding_x < _nc
+                - _nr >= 0
+                - _nc >= 0
+                - _stride_y > 0
+                - _stride_x > 0
+                - _padding_y >= 0
+                - _padding_x >= 0
+                - if (_nr != 0) then
+                    - _padding_y < _nr
+                - else
+                    - _padding_y == 0
+                - if (_nc != 0) then
+                    - _padding_x < _nr
+                - else
+                    - _padding_x == 0
 
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
@@ -856,18 +866,21 @@ namespace dlib
                 images in an input tensor and outputting, for each channel, the maximum
                 element within the window.  
 
-                To be precise, if we call the input tensor IN and the output tensor OUT,
-                then OUT is defined as follows:
+                If _nr == 0 then it means the filter size covers all the rows in the input
+                tensor, similarly for the _nc parameter.  To be precise, if we call the
+                input tensor IN and the output tensor OUT, then OUT is defined as follows:
+                    - let FILT_NR == (nr()==0) ? IN.nr() : nr()
+                    - let FILT_NC == (nc()==0) ? IN.nc() : nc()
                     - OUT.num_samples() == IN.num_samples()
                     - OUT.k()  == IN.k()
-                    - OUT.nr() == 1+(IN.nr() + 2*padding_y() - nr())/stride_y()
-                    - OUT.nc() == 1+(IN.nc() + 2*padding_x() - nc())/stride_x()
+                    - OUT.nr() == 1+(IN.nr() + 2*padding_y() - FILT_NR)/stride_y()
+                    - OUT.nc() == 1+(IN.nc() + 2*padding_x() - FILT_NC)/stride_x()
                     - for all valid s, k, r, and c:
                         - image_plane(OUT,s,k)(r,c) == max(subm_clipped(image_plane(IN,s,k),
-                                                                  centered_rect(x*stride_x() + nc()/2 - padding_x(),
-                                                                                y*stride_y() + nr()/2 - padding_y(),
-                                                                                nc(),
-                                                                                nr())))
+                                                                  centered_rect(x*stride_x() + FILT_NC/2 - padding_x(),
+                                                                                y*stride_y() + FILT_NR/2 - padding_y(),
+                                                                                FILT_NC,
+                                                                                FILT_NR)))
         !*/
 
     public:
@@ -888,14 +901,16 @@ namespace dlib
         ) const; 
         /*!
             ensures
-                - returns the number of rows in the max pooling window.
+                - returns the number of rows in the pooling window or 0 if the window size
+                  is "the entire input tensor".
         !*/
 
         long nc(
         ) const;
         /*!
             ensures
-                - returns the number of columns in the max pooling window.
+                - returns the number of rows in the pooling window or 0 if the window size
+                  is "the entire input tensor".
         !*/
 
         long stride_y(
@@ -953,6 +968,11 @@ namespace dlib
         >
     using max_pool = add_layer<max_pool_<nr,nc,stride_y,stride_x>, SUBNET>;
 
+    template <
+        typename SUBNET
+        >
+    using max_pool_everything = add_layer<max_pool_<0,0,1,1>, SUBNET>;
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -967,10 +987,20 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON TEMPLATE ARGUMENTS
-                All of them must be > 0.
-                Also, we require that:
-                    - 0 <= _padding_y && _padding_y < _nr
-                    - 0 <= _padding_x && _padding_x < _nc
+                - _nr >= 0
+                - _nc >= 0
+                - _stride_y > 0
+                - _stride_x > 0
+                - _padding_y >= 0
+                - _padding_x >= 0
+                - if (_nr != 0) then
+                    - _padding_y < _nr
+                - else
+                    - _padding_y == 0
+                - if (_nc != 0) then
+                    - _padding_x < _nr
+                - else
+                    - _padding_x == 0
 
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
@@ -979,20 +1009,21 @@ namespace dlib
                 over the images in an input tensor and outputting, for each channel, the
                 average element within the window.  
 
-                To be precise, if we call the input tensor IN and the output tensor OUT,
-                then OUT is defined as follows:
+                If _nr == 0 then it means the filter size covers all the rows in the input
+                tensor, similarly for the _nc parameter.  To be precise, if we call the
+                input tensor IN and the output tensor OUT, then OUT is defined as follows:
+                    - let FILT_NR == (nr()==0) ? IN.nr() : nr()
+                    - let FILT_NC == (nc()==0) ? IN.nc() : nc()
                     - OUT.num_samples() == IN.num_samples()
                     - OUT.k()  == IN.k()
-                    - OUT.nr() == 1+(IN.nr()-nr()%2)/stride_y()
-                    - OUT.nc() == 1+(IN.nc()-nc()%2)/stride_x()
-                    - OUT.nr() == 1+(IN.nr() + 2*padding_y() - nr())/stride_y()
-                    - OUT.nc() == 1+(IN.nc() + 2*padding_x() - nc())/stride_x()
+                    - OUT.nr() == 1+(IN.nr() + 2*padding_y() - FILT_NR)/stride_y()
+                    - OUT.nc() == 1+(IN.nc() + 2*padding_x() - FILT_NC)/stride_x()
                     - for all valid s, k, r, and c:
                         - image_plane(OUT,s,k)(r,c) == mean(subm_clipped(image_plane(IN,s,k),
-                                                                  centered_rect(x*stride_x() + nc()/2 - padding_x(),
-                                                                                y*stride_y() + nr()/2 - padding_y(),
-                                                                                nc(),
-                                                                                nr())))
+                                                                  centered_rect(x*stride_x() + FILT_NC/2 - padding_x(),
+                                                                                y*stride_y() + FILT_NR/2 - padding_y(),
+                                                                                FILT_NC,
+                                                                                FILT_NR)))
         !*/
 
     public:
@@ -1013,14 +1044,16 @@ namespace dlib
         ) const; 
         /*!
             ensures
-                - returns the number of rows in the pooling window.
+                - returns the number of rows in the pooling window or 0 if the window size
+                  is "the entire input tensor".
         !*/
 
         long nc(
         ) const;
         /*!
             ensures
-                - returns the number of columns in the pooling window.
+                - returns the number of rows in the pooling window or 0 if the window size
+                  is "the entire input tensor".
         !*/
 
         long stride_y(
@@ -1078,6 +1111,11 @@ namespace dlib
         typename SUBNET
         >
     using avg_pool = add_layer<avg_pool_<nr,nc,stride_y,stride_x>, SUBNET>;
+
+    template <
+        typename SUBNET
+        >
+    using avg_pool_everything = add_layer<avg_pool_<0,0,1,1>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
