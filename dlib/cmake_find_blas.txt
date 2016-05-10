@@ -40,6 +40,20 @@ if (UNIX)
         return()
     endif()
 
+    # First, search for libraries via pkg-config, which is the cleanest path
+    find_package(PkgConfig)
+    pkg_check_modules(BLAS_REFERENCE cblas)
+    pkg_check_modules(LAPACK_REFERENCE lapack)
+    if (BLAS_REFERENCE_FOUND AND LAPACK_REFERENCE_FOUND)
+        set(blas_libraries "${BLAS_REFERENCE_LDFLAGS}")
+        set(lapack_libraries "${LAPACK_REFERENCE_LDFLAGS}")
+        set(blas_found 1)
+        set(lapack_found 1)
+        set(REQUIRES_LIBS "${REQUIRES_LIBS} cblas lapack")
+        message(STATUS "Found BLAS and LAPACK via pkg-config")
+        return()
+    endif()
+
     include(CheckTypeSize)
     check_type_size( "void*" SIZE_OF_VOID_PTR)
 
