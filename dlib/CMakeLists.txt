@@ -79,6 +79,7 @@ if (NOT TARGET dlib)
    set (DLIB_LINK_WITH_SQLITE3_STR
    "Disable this if you don't want to link against sqlite3" )
    #set (DLIB_USE_FFTW_STR "Disable this if you don't want to link against fftw" )
+   set (LIB_INSTALL_DIR lib CACHE STRING "Install location of libraries (e.g. lib32 or lib64 for multilib installations)")
 
    option(DLIB_ISO_CPP_ONLY ${DLIB_ISO_CPP_ONLY_STR} OFF)
    toggle_preprocessor_switch(DLIB_ISO_CPP_ONLY)
@@ -308,6 +309,7 @@ if (NOT TARGET dlib)
          if (PNG_FOUND AND LIBPNG_IS_GOOD)
             include_directories(${PNG_INCLUDE_DIR})
             set (dlib_needed_libraries ${dlib_needed_libraries} ${PNG_LIBRARY})
+            set(REQUIRES_LIBS " libpng")
          else()
             # If we can't find libpng then statically compile it in.
             include_directories(external/libpng external/zlib)
@@ -343,6 +345,7 @@ if (NOT TARGET dlib)
                external/zlib/uncompr.c
                external/zlib/zutil.c
                )
+            set(REQUIRES_LIBS "")
          endif()
          set(source_files ${source_files}
             image_loader/png_loader.cpp
@@ -575,8 +578,8 @@ if (NOT TARGET dlib)
            install(TARGETS dlib dlib_shared
                    EXPORT dlib 
                    RUNTIME DESTINATION bin # Windows (including cygwin) considers .dll to be runtime artifacts
-                   LIBRARY DESTINATION lib
-                   ARCHIVE DESTINATION lib)
+                   LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
+                   ARCHIVE DESTINATION "${LIB_INSTALL_DIR}")
        else()
            install(TARGETS dlib
                    EXPORT dlib 
@@ -601,7 +604,7 @@ if (NOT TARGET dlib)
 
        ## Config.cmake generation and installation
 
-       set(ConfigPackageLocation lib/cmake/dlib)
+       set(ConfigPackageLocation "${LIB_INSTALL_DIR}/cmake/dlib")
        install(EXPORT dlib
             NAMESPACE dlib::
             DESTINATION ${ConfigPackageLocation})
@@ -620,6 +623,13 @@ if (NOT TARGET dlib)
                     "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" 
                     "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake" 
                DESTINATION ${ConfigPackageLocation})
+
+       ## dlib-1.pc generation and installation
+
+       configure_file("dlib.pc.in" "dlib-1.pc" @ONLY)
+       install(FILES "${CMAKE_CURRENT_BINARY_DIR}/dlib-1.pc"
+           DESTINATION "${LIB_INSTALL_DIR}/pkgconfig")
+
    endif()
 
 endif()

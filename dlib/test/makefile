@@ -5,14 +5,15 @@
 TARGET = dtest 
 
 # these are the compile time flags passed to gcc
-CFLAGS = -ggdb  -DDEBUG -DDLIB_NO_GUI_SUPPORT  -I ../..  -Wall
+CXXFLAGS ?= -ggdb -Wall
+CPPFLAGS ?= -DDEBUG -DDLIB_NO_GUI_SUPPORT -I../..
 
 # These are the link time flags passed to gcc
 LFLAGS = -lpthread   -lnsl 
 
 # The name of the compiler.  If you only have one version of
 # gcc installed then you probably want to change this to just g++ 
-CC = nice g++
+CXX ?= nice g++
 
 ####################################################
 ####################################################
@@ -165,12 +166,8 @@ OBJ = $(TMP:.c=.o)
 
 $(TARGET): $(OBJ) 
 	@echo Linking $@
-	@$(CC) $(OBJ) $(LFLAGS) -o $@
+	@$(CXX) $(LDFLAGS) $(OBJ) $(LFLAGS) -o $@
 	@echo Build Complete
-
-.cpp.o: $<
-	@echo Compiling $<
-	@$(CC) -c $(CFLAGS) $< -o $@
 
 clean:
 	@rm -f $(OBJ) $(TARGET)
