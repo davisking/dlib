@@ -251,9 +251,9 @@ namespace dlib
         static_assert(_nc >= 0, "The number of columns in a filter must be >= 0");
         static_assert(_stride_y > 0, "The filter stride must be > 0");
         static_assert(_stride_x > 0, "The filter stride must be > 0");
-        static_assert(0 <= _padding_y && (_nr==0 && _padding_y == 0 || _nr!=0 && _padding_y < _nr), 
+        static_assert(0 <= _padding_y && ((_nr==0 && _padding_y == 0) || (_nr!=0 && _padding_y < _nr)), 
             "The padding must be smaller than the filter size, unless the filters size is 0.");
-        static_assert(0 <= _padding_x && (_nc==0 && _padding_x == 0 || _nc!=0 && _padding_x < _nc), 
+        static_assert(0 <= _padding_x && ((_nc==0 && _padding_x == 0) || (_nc!=0 && _padding_x < _nc)), 
             "The padding must be smaller than the filter size, unless the filters size is 0.");
     public:
 
@@ -429,9 +429,9 @@ namespace dlib
         static_assert(_nc >= 0, "The number of columns in a filter must be >= 0");
         static_assert(_stride_y > 0, "The filter stride must be > 0");
         static_assert(_stride_x > 0, "The filter stride must be > 0");
-        static_assert(0 <= _padding_y && (_nr==0 && _padding_y == 0 || _nr!=0 && _padding_y < _nr), 
+        static_assert(0 <= _padding_y && ((_nr==0 && _padding_y == 0) || (_nr!=0 && _padding_y < _nr)), 
             "The padding must be smaller than the filter size, unless the filters size is 0.");
-        static_assert(0 <= _padding_x && (_nc==0 && _padding_x == 0 || _nc!=0 && _padding_x < _nc), 
+        static_assert(0 <= _padding_x && ((_nc==0 && _padding_x == 0) || (_nc!=0 && _padding_x < _nc)), 
             "The padding must be smaller than the filter size, unless the filters size is 0.");
 
         avg_pool_(
