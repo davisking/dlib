@@ -304,7 +304,7 @@ namespace dlib
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
         {
-            mp.setup_avg_pooling(_nr!=0?_nr:sub.get_output().nr(), 
+            mp.setup_max_pooling(_nr!=0?_nr:sub.get_output().nr(), 
                                  _nc!=0?_nc:sub.get_output().nc(),
                                  _stride_y, _stride_x, padding_y_, padding_x_);
 
@@ -314,7 +314,7 @@ namespace dlib
         template <typename SUBNET>
         void backward(const tensor& computed_output, const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
         {
-            mp.setup_avg_pooling(_nr!=0?_nr:sub.get_output().nr(), 
+            mp.setup_max_pooling(_nr!=0?_nr:sub.get_output().nr(), 
                                  _nc!=0?_nc:sub.get_output().nc(),
                                  _stride_y, _stride_x, padding_y_, padding_x_);
 
