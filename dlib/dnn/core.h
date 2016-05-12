@@ -1026,6 +1026,15 @@ namespace dlib
         {}
 
         add_layer(
+            const INPUT_LAYER& il 
+        ) : 
+            input_layer(il), 
+            this_layer_setup_called(false),
+            gradient_input_is_stale(true),
+            get_output_and_gradient_input_disabled(false)
+        {}
+
+        add_layer(
             LAYER_DETAILS&& layer_det
         ) : 
             details(std::move(layer_det)), 
