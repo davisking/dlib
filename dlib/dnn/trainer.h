@@ -854,7 +854,7 @@ namespace dlib
         std::string sync_filename;
         std::chrono::seconds time_between_syncs;
         unsigned long epoch_iteration;
-        unsigned long epoch_pos;
+        size_t epoch_pos;
         std::chrono::time_point<std::chrono::system_clock> last_time;
         unsigned long long train_one_step_calls;
         unsigned long gradient_check_budget;
