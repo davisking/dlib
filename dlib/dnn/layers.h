@@ -927,7 +927,8 @@ namespace dlib
         explicit dropout_(
             float drop_rate_ = 0.5
         ) :
-            drop_rate(drop_rate_)
+            drop_rate(drop_rate_),
+            rnd(std::rand())
         {
             DLIB_CASSERT(0 <= drop_rate && drop_rate <= 1,"");
         }
@@ -936,7 +937,7 @@ namespace dlib
         // is non-copyable.
         dropout_(
             const dropout_& item
-        ) : drop_rate(item.drop_rate), mask(item.mask)
+        ) : drop_rate(item.drop_rate), mask(item.mask), rnd(std::rand())
         {}
 
         dropout_& operator= (
