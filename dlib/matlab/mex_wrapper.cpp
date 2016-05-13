@@ -2951,6 +2951,8 @@ namespace mex_binding
                 mexPrintf("%s",&buf[0]);
                 mexEvalString("drawnow"); // flush print to screen
                 pbump(-num);
+
+                check_for_matlab_ctrl_c();
             }
             return 0;
         }
@@ -3007,6 +3009,8 @@ namespace mex_binding
                 mexWarnMsgTxt(&buf[0]);
                 mexEvalString("drawnow"); // flush print to screen
                 pbump(-num);
+
+                check_for_matlab_ctrl_c();
             }
             return 0;
         }
