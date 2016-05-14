@@ -122,7 +122,34 @@ namespace dlib
             }
         }
 
+        __global__ void _cuda_multiply1_add_to(float* d, const float* s1, const float* s2, size_t n)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                d[i] += s1[i]*s2[i];
+            }
+        }
+        __global__ void _cuda_multiply2_add_to(float* d, const float* s1, const float* s2, 
+                                       size_t n, size_t s1_n, size_t s2_n, size_t max_size)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                for (size_t j = i; j < max_size; j += n)
+                    d[i] += s1[j%s1_n]*s2[j%s2_n];
+            }
+        }
+
+        __global__ void _cuda_multiply3_add_to(float* d, const float* s1, const float* s2, 
+                                       size_t n, size_t s1_n, size_t s2_n)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                d[i] += s1[i%s1_n]*s2[i%s2_n];
+            }
+        }
+
         void multiply (
+            bool add_to,
             tensor& dest,
             const tensor& src1,
             const tensor& src2
@@ -146,17 +173,28 @@ namespace dlib
             const auto s2 = src2.host();
             if (dest.size() == src1.size() && src1.size() == src2.size())
             {
-                launch_kernel(_cuda_multiply1,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), src1.size());
+                if (add_to)
+                    launch_kernel(_cuda_multiply1_add_to,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), src1.size());
+                else
+                    launch_kernel(_cuda_multiply1,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), src1.size());
             }
             else if (dest.num_samples() == 1)
             {
-                launch_kernel(_cuda_multiply2,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), 
-                                             dest.size(), src1.size(), src2.size(), max_size);
+                if (add_to)
+                    launch_kernel(_cuda_multiply2_add_to,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), 
+                                                dest.size(), src1.size(), src2.size(), max_size);
+                else
+                    launch_kernel(_cuda_multiply2,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), 
+                                                dest.size(), src1.size(), src2.size(), max_size);
             }
             else
             {
-                launch_kernel(_cuda_multiply3,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), 
-                                             dest.size(), src1.size(), src2.size());
+                if (add_to)
+                    launch_kernel(_cuda_multiply3_add_to,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), 
+                                                dest.size(), src1.size(), src2.size());
+                else
+                    launch_kernel(_cuda_multiply3,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), 
+                                                dest.size(), src1.size(), src2.size());
             }
         }
 
@@ -191,8 +229,33 @@ namespace dlib
             }
         }
 
+        __global__ void _cuda_multiply_conv_add_to(float* d, const float* s1, size_t n, const float* s2, size_t bs, size_t ks)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                auto k = (i/bs)%ks;
+                d[i] += s1[i]*s2[k];
+            }
+        }
+
+        __global__ void _cuda_multiply_conv2_add_to(float* d, const float* s1, size_t n, const float* s2, size_t bs, size_t ks)
+        {
+            // loop over all the image planes
+            for (auto i : grid_stride_range_y(0, n))
+            {
+                // sum all the elements in the i-th image plane
+                float temp = 0;
+                for (auto j : grid_stride_range(i*bs, (i+1)*bs))
+                    temp += s1[j]*s2[j];
+                auto k = i%ks;
+                // and store the sum into d[k]
+                warp_reduce_atomic_add(d[k], temp);
+            }
+        }
+
 
         void multiply_conv (
+            bool add_to,
             tensor& dest,
             const tensor& src1,
             const tensor& src2
@@ -204,8 +267,12 @@ namespace dlib
                 if (dest.size() == 0)
                     return;
 
-                launch_kernel(_cuda_multiply_conv,max_jobs(dest.size()),
-                    dest.device(), src1.device(), src1.size(), src2.device(), src1.nr()*src1.nc(), src1.k());
+                if (add_to)
+                    launch_kernel(_cuda_multiply_conv_add_to,max_jobs(dest.size()),
+                        dest.device(), src1.device(), src1.size(), src2.device(), src1.nr()*src1.nc(), src1.k());
+                else
+                    launch_kernel(_cuda_multiply_conv,max_jobs(dest.size()),
+                        dest.device(), src1.device(), src1.size(), src2.device(), src1.nr()*src1.nc(), src1.k());
             }
             else
             {
@@ -216,8 +283,12 @@ namespace dlib
 
                 dim3 blocks(10,1);
                 dim3 threads(32,32); // x size must be 32 because we are using warp_reduce_atomic_add() in the kernel.
-                _cuda_multiply_conv2<<<blocks,threads>>>(
-                    dest.device(), src1.device(), src1.num_samples()*src1.k(), src2.device(), src1.nr()*src1.nc(), src1.k());
+                if (add_to)
+                    _cuda_multiply_conv2_add_to<<<blocks,threads>>>(
+                        dest.device(), src1.device(), src1.num_samples()*src1.k(), src2.device(), src1.nr()*src1.nc(), src1.k());
+                else
+                    _cuda_multiply_conv2<<<blocks,threads>>>(
+                        dest.device(), src1.device(), src1.num_samples()*src1.k(), src2.device(), src1.nr()*src1.nc(), src1.k());
             }
 
         }

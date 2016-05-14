@@ -101,6 +101,7 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void multiply (
+        bool add_to,
         tensor& dest,
         const tensor& src1,
         const tensor& src2
@@ -124,9 +125,12 @@ namespace dlib { namespace tt
               Second, if dest.num_samples()==1, then after the pointwise multiplication of
               src1 with src2, the result has its samples summed to produce an output tensor
               with num_samples()==1 which is then assigned to #dest.
+            - if (add_to) then
+                - Instead of assigning the result to dest, this function adds the result to dest.
     !*/
 
     void multiply_conv (
+        bool add_to,
         tensor& dest,
         const tensor& src1,
         const tensor& src2
@@ -152,6 +156,8 @@ namespace dlib { namespace tt
                     #dest(n,k,r,c) == src1(n,k,r,c)*src2(k)
                 - else
                     #dest(k) == sum over {n,r,c} of src1(n,k,r,c)*src2(n,k,r,c)
+            - if (add_to) then
+                - Instead of assigning the result to dest, this function adds the result to dest.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -865,11 +871,13 @@ namespace dlib { namespace tt
         requires
             - have_same_dimensions(dest,gradient_input) == true 
             - have_same_dimensions(dest,grad) == true 
-            - is_same_object(grad, dest)==false
         ensures
             - We interpret dest as the output of softmax(dest,SRC) for some SRC tensor.
-              Then let f(SRC) == dot(gradient_input,dest) Then this function computes the
-              gradient of f() with respect to SRC and adds it to grad.
+              Then let f(SRC) == dot(gradient_input,dest).  Then this function computes the
+              gradient of f() with respect to SRC and stores it to grad.  Moreover, if
+              is_same_object(grad,gradient_input)==true then the output is assigned to
+              grad, replacing its previous contents.  Otherwise the output is added to
+              grad.
             - This function supports in-place operation, i.e. having
               is_same_object(grad, gradient_input)==true
     !*/
@@ -899,12 +907,13 @@ namespace dlib { namespace tt
         requires
             - have_same_dimensions(dest,gradient_input) == true 
             - have_same_dimensions(dest,grad) == true 
-            - is_same_object(grad,dest) == false
         ensures
             - Recalling that dest is the output of sigmoid(dest,SRC) for some SRC tensor,
-              let f(SRC) == dot(gradient_input,dest)
-            - Then this function computes the gradient of f() with respect to SRC and
-              assigns it to grad.
+              let f(SRC) == dot(gradient_input,dest).  Then this function computes the
+              gradient of f() with respect to SRC and stores it to grad.  Moreover, if
+              is_same_object(grad,gradient_input)==true then the output is assigned to
+              grad, replacing its previous contents.  Otherwise the output is added to
+              grad.
             - This function supports in-place operation, i.e. having
               is_same_object(grad, gradient_input)==true
     !*/
@@ -934,12 +943,13 @@ namespace dlib { namespace tt
         requires
             - have_same_dimensions(dest,gradient_input) == true 
             - have_same_dimensions(dest,grad) == true 
-            - is_same_object(grad,dest) == false
         ensures
             - Recalling that dest is the output of relu(dest,SRC) for some SRC tensor,
-              let f(SRC) == dot(gradient_input,dest)
-            - Then this function computes the gradient of f() with respect to SRC and
-              assigns it to grad.
+              let f(SRC) == dot(gradient_input,dest).  Then this function computes the
+              gradient of f() with respect to SRC and stores it to grad.  Moreover, if
+              is_same_object(grad,gradient_input)==true then the output is assigned to
+              grad, replacing its previous contents.  Otherwise the output is added to
+              grad.
             - This function supports in-place operation, i.e. having
               is_same_object(grad, gradient_input)==true
     !*/
@@ -978,6 +988,7 @@ namespace dlib { namespace tt
             - have_same_dimensions(grad,gradient_input) == true 
             - param.size() == 1
             - params_grad.size() == 1
+            - is_same_object(grad, gradient_input) == false
         ensures
             - Recalling that dest is the output of prelu(dest,src,param) let 
               f(src,param) == dot(gradient_input,dest)
@@ -1011,12 +1022,13 @@ namespace dlib { namespace tt
         requires
             - have_same_dimensions(dest,gradient_input) == true 
             - have_same_dimensions(dest,grad) == true 
-            - is_same_object(grad,dest) == false
         ensures
             - Recalling that dest is the output of tanh(dest,SRC) for some SRC tensor,
-              let f(SRC) == dot(gradient_input,dest)
-            - Then this function computes the gradient of f() with respect to SRC and
-              assigns it to grad.
+              let f(SRC) == dot(gradient_input,dest).  Then this function computes the
+              gradient of f() with respect to SRC and stores it to grad.  Moreover, if
+              is_same_object(grad,gradient_input)==true then the output is assigned to
+              grad, replacing its previous contents.  Otherwise the output is added to
+              grad.
             - This function supports in-place operation, i.e. having
               is_same_object(grad, gradient_input)==true
     !*/

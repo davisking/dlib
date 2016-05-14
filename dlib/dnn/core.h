@@ -2849,8 +2849,11 @@ namespace dlib
                 resizable_tensor params_grad1, params_grad2, data_grad1, data_grad2;
                 params_grad1 = params_grad;
                 params_grad2 = params_grad;
-                // Now call backward() and make sure it works as well.
-                subnetwork2.get_gradient_input() = 9999;
+                // Now call backward() and make sure it works as well.  Recall that when an
+                // in-place layer works in-place it assigns to it's outputs but when it's
+                // not running in-place it adds.  So we initialize to a non-zero value to
+                // check that this is the behavior that really executes.
+                subnetwork2.get_gradient_input() = 9;
                 impl::call_layer_backward(ll, ip_out, input_grad, subnetwork2, params_grad1);
                 data_grad1 = subnetwork2.get_gradient_input();
 
@@ -2868,7 +2871,7 @@ namespace dlib
                         return layer_test_results(sout.str()); 
                     }
                 }
-                const auto backward_data_error = max(abs(mat(data_grad1) - mat(data_grad2)));
+                const auto backward_data_error = max(abs(mat(data_grad1)-9 - mat(data_grad2)));
                 if (backward_data_error > 0.00001)
                 {
                     using namespace std;
@@ -2934,8 +2937,7 @@ namespace dlib
                 // compare it to the one output by the layer and make sure they match.
                 double reference_derivative = (dot(out2,input_grad)-dot(out3, input_grad))/(2*eps);
                 double output_derivative = subnetwork.get_gradient_input_element(i);
-                if (!impl::is_inplace_layer(l,subnetwork))
-                    output_derivative -= initial_gradient_input[i];
+                output_derivative -= initial_gradient_input[i];
                 double relative_error;
                 if (reference_derivative != 0)
                     relative_error = (reference_derivative - output_derivative)/(reference_derivative);

@@ -1265,7 +1265,7 @@ namespace dlib
                 return;
 
             const float alpha = 1;
-            const float beta = 0;
+            const float beta = is_same_object(grad,gradient_input) ? 0 : 1;
             CHECK_CUDNN(cudnnSoftmaxBackward(context(),
                                       CUDNN_SOFTMAX_ACCURATE,
                                       CUDNN_SOFTMAX_MODE_CHANNEL,
@@ -1316,7 +1316,7 @@ namespace dlib
                 return;
 
             const float alpha = 1;
-            const float beta = 0;
+            const float beta = is_same_object(grad,gradient_input) ? 0 : 1;
             CHECK_CUDNN(cudnnActivationBackward(context(),
                                           sigmoid_activation_descriptor(),
                                           &alpha,
@@ -1367,7 +1367,7 @@ namespace dlib
                 return;
 
             const float alpha = 1;
-            const float beta = 0;
+            const float beta = is_same_object(grad,gradient_input) ? 0 : 1;
             CHECK_CUDNN(cudnnActivationBackward(context(),
                                           relu_activation_descriptor(),
                                           &alpha,
@@ -1418,7 +1418,7 @@ namespace dlib
                 return;
 
             const float alpha = 1;
-            const float beta = 0;
+            const float beta = is_same_object(grad,gradient_input) ? 0 : 1;
             CHECK_CUDNN(cudnnActivationBackward(context(),
                                           tanh_activation_descriptor(),
                                           &alpha,

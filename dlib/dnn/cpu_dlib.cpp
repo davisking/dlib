@@ -16,6 +16,7 @@ namespace dlib
     // -----------------------------------------------------------------------------------
 
         void multiply (
+            bool add_to,
             tensor& dest,
             const tensor& src1,
             const tensor& src2
@@ -38,24 +39,44 @@ namespace dlib
             const auto s2 = src2.host();
             if (dest.size() == src1.size() && src1.size() == src2.size())
             {
-                for (size_t i = 0; i < src1.size(); ++i)
-                    d[i] = s1[i]*s2[i];
+                if (add_to)
+                {
+                    for (size_t i = 0; i < src1.size(); ++i)
+                        d[i] += s1[i]*s2[i];
+                }
+                else
+                {
+                    for (size_t i = 0; i < src1.size(); ++i)
+                        d[i] = s1[i]*s2[i];
+                }
             }
             else if (dest.num_samples() == 1)
             {
-                for (size_t i = 0; i < dest.size(); ++i)
-                    d[i] = 0;
+                if (!add_to)
+                {
+                    for (size_t i = 0; i < dest.size(); ++i)
+                        d[i] = 0;
+                }
                 for (size_t i = 0; i < max_size; ++i)
                     d[i%dest.size()] += s1[i%src1.size()]*s2[i%src2.size()];
             }
             else
             {
-                for (size_t i = 0; i < max_size; ++i)
-                    d[i] = s1[i%src1.size()]*s2[i%src2.size()];
+                if (add_to)
+                {
+                    for (size_t i = 0; i < max_size; ++i)
+                        d[i] += s1[i%src1.size()]*s2[i%src2.size()];
+                }
+                else
+                {
+                    for (size_t i = 0; i < max_size; ++i)
+                        d[i] = s1[i%src1.size()]*s2[i%src2.size()];
+                }
             }
         }
 
         void multiply_conv (
+            bool add_to,
             tensor& dest,
             const tensor& src1,
             const tensor& src2
@@ -68,15 +89,34 @@ namespace dlib
             {
                 DLIB_CASSERT(src2.num_samples() == 1 && src2.nr() == 1 && src2.nc() == 1 && src2.k() == src1.k(),"");
 
-                for (long n = 0; n < dest.num_samples(); ++n)
+                if (add_to)
                 {
-                    for (long k = 0; k < dest.k(); ++k)
+                    for (long n = 0; n < dest.num_samples(); ++n)
                     {
-                        for (long r = 0; r < dest.nr(); ++r)
+                        for (long k = 0; k < dest.k(); ++k)
                         {
-                            for (long c = 0; c < dest.nc(); ++c)
+                            for (long r = 0; r < dest.nr(); ++r)
                             {
-                                *d++ = (*s1++)*s2[k];
+                                for (long c = 0; c < dest.nc(); ++c)
+                                {
+                                    *d++ += (*s1++)*s2[k];
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    for (long n = 0; n < dest.num_samples(); ++n)
+                    {
+                        for (long k = 0; k < dest.k(); ++k)
+                        {
+                            for (long r = 0; r < dest.nr(); ++r)
+                            {
+                                for (long c = 0; c < dest.nc(); ++c)
+                                {
+                                    *d++ = (*s1++)*s2[k];
+                                }
                             }
                         }
                     }
@@ -87,8 +127,11 @@ namespace dlib
                 DLIB_CASSERT(have_same_dimensions(src1,src2),"");
                 DLIB_CASSERT(dest.num_samples() == 1 && dest.nr() == 1 && dest.nc() == 1 && dest.k() == src1.k(),"");
 
-                for (long k = 0; k < src1.k(); ++k)
-                    d[k] = 0;
+                if (!add_to)
+                {
+                    for (long k = 0; k < src1.k(); ++k)
+                        d[k] = 0;
+                }
 
                 for (long n = 0; n < src1.num_samples(); ++n)
                 {
@@ -1105,8 +1148,16 @@ namespace dlib
                         float temp = 0;
                         for (long k = 0; k < grad.k(); ++k)
                             temp += -d3[k*num]*in3[k*num];
-                        for (long k = 0; k < grad.k(); ++k)
-                            g3[k*num] = d3[k*num]*(temp+in3[k*num]);
+                        if (is_same_object(gradient_input, grad))
+                        {
+                            for (long k = 0; k < grad.k(); ++k)
+                                g3[k*num] = d3[k*num]*(temp+in3[k*num]);
+                        }
+                        else
+                        {
+                            for (long k = 0; k < grad.k(); ++k)
+                                g3[k*num] += d3[k*num]*(temp+in3[k*num]);
+                        }
                     }
                 }
             }
@@ -1134,8 +1185,16 @@ namespace dlib
             const auto g = grad.host();
             const auto d = dest.host();
             const auto in = gradient_input.host();
-            for (size_t i = 0; i < dest.size(); ++i)
-                g[i] = in[i]*d[i]*(1-d[i]);
+            if (is_same_object(gradient_input, grad))
+            {
+                for (size_t i = 0; i < dest.size(); ++i)
+                    g[i] = in[i]*d[i]*(1-d[i]);
+            }
+            else
+            {
+                for (size_t i = 0; i < dest.size(); ++i)
+                    g[i] += in[i]*d[i]*(1-d[i]);
+            }
         }
 
     // ------------------------------------------------------------------------------------
@@ -1157,12 +1216,23 @@ namespace dlib
             const float* gi = gradient_input.host();
             const float* in = dest.host();
             float* out = grad.host();
-            for (size_t i = 0; i < dest.size(); ++i)
+            if (is_same_object(grad, gradient_input))
             {
-                if (in[i] > 0)
-                    out[i] = gi[i];
-                else
-                    out[i] = 0;
+                for (size_t i = 0; i < dest.size(); ++i)
+                {
+                    if (in[i] > 0)
+                        out[i] = gi[i];
+                    else
+                        out[i] = 0;
+                }
+            }
+            else
+            {
+                for (size_t i = 0; i < dest.size(); ++i)
+                {
+                    if (in[i] > 0)
+                        out[i] += gi[i];
+                }
             }
         }
 
@@ -1194,6 +1264,7 @@ namespace dlib
             tensor& params_grad 
         )
         {
+            DLIB_CASSERT(is_same_object(grad, gradient_input) == false,"");
             const float p = param.host()[0];
             const float* gi = gradient_input.host();
             const float* s = src.host();
@@ -1236,8 +1307,16 @@ namespace dlib
             const auto g = grad.host();
             const auto d = dest.host();
             const auto in = gradient_input.host();
-            for (size_t i = 0; i < dest.size(); ++i)
-                g[i] = in[i]*(1-d[i]*d[i]);
+            if (is_same_object(grad, gradient_input))
+            {
+                for (size_t i = 0; i < dest.size(); ++i)
+                    g[i] = in[i]*(1-d[i]*d[i]);
+            }
+            else
+            {
+                for (size_t i = 0; i < dest.size(); ++i)
+                    g[i] += in[i]*(1-d[i]*d[i]);
+            }
         }
 
     // ------------------------------------------------------------------------------------

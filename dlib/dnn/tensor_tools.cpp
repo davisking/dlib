@@ -127,6 +127,7 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void multiply (
+        bool add_to,
         tensor& dest,
         const tensor& src1,
         const tensor& src2
@@ -140,23 +141,24 @@ namespace dlib { namespace tt
                     (src1.num_samples()==1 || src1.num_samples()==MD) &&
                     (src2.num_samples()==1 || src2.num_samples()==MD) ,"");
 #ifdef DLIB_USE_CUDA
-        cuda::multiply(dest, src1, src2);
+        cuda::multiply(add_to, dest, src1, src2);
 #else
-        cpu::multiply(dest, src1, src2);
+        cpu::multiply(add_to, dest, src1, src2);
 #endif
 
     }
 
     void multiply_conv (
+        bool add_to,
         tensor& dest,
         const tensor& src1,
         const tensor& src2
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::multiply_conv(dest, src1, src2);
+        cuda::multiply_conv(add_to, dest, src1, src2);
 #else
-        cpu::multiply_conv(dest, src1, src2);
+        cpu::multiply_conv(add_to, dest, src1, src2);
 #endif
     }
 

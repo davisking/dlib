@@ -287,7 +287,10 @@ namespace dlib
                       to data_input. 
                   Finally, backward_inplace() outputs these gradients by performing:
                     - params_grad = PARAMETER_GRADIENT 
-                    - data_grad = DATA_GRADIENT
+                    - if (is_same_object(gradient_input, data_grad)) then
+                        - data_grad = DATA_GRADIENT
+                    - else
+                        - data_grad += DATA_GRADIENT
         !*/
 
         const tensor& get_layer_params(

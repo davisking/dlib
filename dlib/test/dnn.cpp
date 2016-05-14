@@ -362,7 +362,10 @@ namespace
         DLIB_TEST(max(abs(truth3-mat(dest))) < 1e-5);
 
         matrix<float> truth4 = pointwise_multiply(mat(A), mat(B));
-        tt::multiply(A, A, B);
+        tt::multiply(false, A, A, B);
+        DLIB_TEST(max(abs(truth4-mat(A))) < 1e-5);
+        truth4 = pointwise_multiply(mat(A), mat(B)) + mat(A);
+        tt::multiply(true, A, A, B);
         DLIB_TEST(max(abs(truth4-mat(A))) < 1e-5);
 
         matrix<float> truth5 = mat(B) > 0.1;
@@ -418,25 +421,34 @@ namespace
 
             dest.set_size(1,4);
 
-            tt::multiply(dest, A, B);
+            tt::multiply(false, dest, A, B);
             DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(mat(A),mat(B))))) < 1e-6); 
 
             A.set_size(1,4);
             rnd.fill_uniform(A);
             matrix<float> AA = join_cols(mat(A),mat(A)); AA = join_cols(mat(A),AA);
 
-            tt::multiply(dest, A, B);
+            tt::multiply(false, dest, A, B);
             DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6); 
 
-            tt::multiply(dest, B, A);
+            tt::multiply(false, dest, B, A);
             DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6); 
+            matrix<float> prevdest = mat(dest);
+            tt::multiply(true, dest, B, A);
+            DLIB_TEST(max(abs(mat(dest)-prevdest-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6); 
 
             dest.set_size(3,4);
-            tt::multiply(dest, B, A);
+            tt::multiply(false, dest, B, A);
             DLIB_TEST(max(abs(mat(dest)-pointwise_multiply(AA,mat(B)))) < 1e-6); 
+            prevdest = mat(dest);
+            tt::multiply(true, dest, B, A);
+            DLIB_TEST(max(abs(mat(dest)-prevdest-pointwise_multiply(AA,mat(B)))) < 1e-6); 
 
-            tt::multiply(dest, A, B);
+            tt::multiply(false, dest, A, B);
             DLIB_TEST(max(abs(mat(dest)-pointwise_multiply(AA,mat(B)))) < 1e-6); 
+            prevdest = mat(dest);
+            tt::multiply(true, dest, B, A);
+            DLIB_TEST(max(abs(mat(dest)-prevdest-pointwise_multiply(AA,mat(B)))) < 1e-6); 
         }
 
         {
@@ -731,8 +743,11 @@ namespace
         rnd.fill_uniform(dest);
         rnd.fill_uniform(src);
         dest2 = dest; src2 = src;
-        cuda::multiply(dest, dest, src);
-        cpu::multiply(dest2, dest2, src2);
+        cuda::multiply(false, dest, dest, src);
+        cpu::multiply(false, dest2, dest2, src2);
+        DLIB_TEST(equal(mat(dest),mat(dest2)));
+        cuda::multiply(true, dest, dest, src);
+        cpu::multiply(true, dest2, dest2, src2);
         DLIB_TEST(equal(mat(dest),mat(dest2)));
 
 
@@ -801,24 +816,30 @@ namespace
 
             dest.set_size(1,4);
 
-            cuda::multiply(dest, A, B);
+            cuda::multiply(false, dest, A, B);
             DLIB_TEST_MSG(max(abs(mat(dest)-sum_rows(pointwise_multiply(mat(A),mat(B))))) < 1e-6, max(abs(mat(dest)-sum_rows(pointwise_multiply(mat(A),mat(B)))))); 
 
             A.set_size(1,4);
             rnd.fill_uniform(A);
             matrix<float> AA = join_cols(mat(A),mat(A)); AA = join_cols(mat(A),AA);
 
-            cuda::multiply(dest, A, B);
+            cuda::multiply(false, dest, A, B);
             DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6); 
 
-            cuda::multiply(dest, B, A);
+            cuda::multiply(false, dest, B, A);
             DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6); 
+            matrix<float> prevdest = mat(dest);
+            cuda::multiply(true, dest, B, A);
+            DLIB_TEST(max(abs(mat(dest)-prevdest-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6); 
 
             dest.set_size(3,4);
-            cuda::multiply(dest, B, A);
+            cuda::multiply(false, dest, B, A);
             DLIB_TEST(max(abs(mat(dest)-pointwise_multiply(AA,mat(B)))) < 1e-6); 
+            prevdest = mat(dest);
+            cuda::multiply(true, dest, B, A);
+            DLIB_TEST(max(abs(mat(dest)-prevdest-pointwise_multiply(AA,mat(B)))) < 1e-6); 
 
-            cuda::multiply(dest, A, B);
+            cuda::multiply(false, dest, A, B);
             DLIB_TEST(max(abs(mat(dest)-pointwise_multiply(AA,mat(B)))) < 1e-6); 
         }
     }
@@ -955,8 +976,11 @@ namespace
             trand.fill_uniform(src1);
             trand.fill_uniform(src2);
 
-            cpu::multiply_conv(dest1, src1, src2);
-            cuda::multiply_conv(dest2, src1, src2);
+            cpu::multiply_conv(false, dest1, src1, src2);
+            cuda::multiply_conv(false, dest2, src1, src2);
+            DLIB_TEST(max(abs(mat(dest1)-mat(dest2))) < 1e-5);
+            cpu::multiply_conv(true, dest1, src1, src2);
+            cuda::multiply_conv(true, dest2, src1, src2);
             DLIB_TEST(max(abs(mat(dest1)-mat(dest2))) < 1e-5);
 
 
@@ -968,12 +992,19 @@ namespace
             trand.fill_uniform(dest2);
             trand.fill_uniform(src1);
             trand.fill_uniform(src2);
-            cpu::multiply_conv(dest1, src1, src2);
-            cuda::multiply_conv(dest2, src1, src2);
-            const float scale = max(abs(mat(dest1)));
-            const float scalem = mean(abs(mat(dest1)));
+            cpu::multiply_conv(false, dest1, src1, src2);
+            cuda::multiply_conv(false, dest2, src1, src2);
+            float scale = max(abs(mat(dest1)));
+            float scalem = mean(abs(mat(dest1)));
             DLIB_TEST_MSG(max(abs(mat(dest1)-mat(dest2)))/scale < 1e-4 , max(abs(mat(dest1)-mat(dest2)))/scale);
             DLIB_TEST_MSG(mean(abs(mat(dest1)-mat(dest2)))/scalem < 1e-5 , mean(abs(mat(dest1)-mat(dest2)))/scalem);
+            matrix<float> prevd2 = mat(dest2);
+            cpu::multiply_conv(false, dest1, src1, src2);
+            cuda::multiply_conv(true, dest2, src1, src2);
+            scale = max(abs(mat(dest1)));
+            scalem = mean(abs(mat(dest1)));
+            DLIB_TEST_MSG(max(abs(mat(dest1)-mat(dest2)+prevd2))/scale < 1e-4 , max(abs(mat(dest1)-mat(dest2)+prevd2))/scale);
+            DLIB_TEST_MSG(mean(abs(mat(dest1)-mat(dest2)+prevd2))/scalem < 1e-5 , mean(abs(mat(dest1)-mat(dest2)+prevd2))/scalem);
         }
 
         for (int iter = 0; iter < 100; ++iter)

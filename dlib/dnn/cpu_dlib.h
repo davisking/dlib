@@ -16,12 +16,14 @@ namespace dlib
     // -----------------------------------------------------------------------------------
 
         void multiply (
+            bool add_to,
             tensor& dest,
             const tensor& src1,
             const tensor& src2
         );
 
         void multiply_conv (
+            bool add_to,
             tensor& dest,
             const tensor& src1,
             const tensor& src2

@@ -966,7 +966,7 @@ namespace dlib
             mask.copy_size(input);
             rnd.fill_uniform(mask);
             tt::threshold(mask, drop_rate);
-            tt::multiply(output, input, mask);
+            tt::multiply(false, output, input, mask);
         } 
 
         void backward_inplace(
@@ -975,7 +975,10 @@ namespace dlib
             tensor& /*params_grad*/
         )
         {
-            tt::multiply(data_grad, mask, gradient_input);
+            if (is_same_object(gradient_input, data_grad))
+                tt::multiply(false, data_grad, mask, gradient_input);
+            else
+                tt::multiply(true, data_grad, mask, gradient_input);
         }
 
         const tensor& get_layer_params() const { return params; }
@@ -1044,7 +1047,7 @@ namespace dlib
 
         void forward_inplace(const tensor& input, tensor& output)
         {
-            tt::affine_transform(output, input, val, 0);
+            tt::affine_transform(output, input, val);
         } 
 
         void backward_inplace(
@@ -1053,7 +1056,10 @@ namespace dlib
             tensor& /*params_grad*/
         )
         {
-            tt::affine_transform(data_grad, gradient_input, val, 0);
+            if (is_same_object(gradient_input, data_grad))
+                tt::affine_transform(data_grad, gradient_input, val);
+            else
+                tt::affine_transform(data_grad, data_grad, gradient_input, 1, val);
         }
 
         const tensor& get_layer_params() const { return params; }
@@ -1187,11 +1193,17 @@ namespace dlib
             // We are computing the gradient of dot(gradient_input, computed_output*g + b)
             if (mode == FC_MODE)
             {
-                tt::multiply(data_grad, gradient_input, g);
+                if (is_same_object(gradient_input, data_grad))
+                    tt::multiply(false, data_grad, gradient_input, g);
+                else
+                    tt::multiply(true, data_grad, gradient_input, g);
             }
             else
             {
-                tt::multiply_conv(data_grad, gradient_input, g);
+                if (is_same_object(gradient_input, data_grad))
+                    tt::multiply_conv(false, data_grad, gradient_input, g);
+                else
+                    tt::multiply_conv(true, data_grad, gradient_input, g);
             }
         }
 
