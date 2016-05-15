@@ -72,6 +72,7 @@ namespace dlib
                 - #get_min_learning_rate() == 1e-5
                 - #get_iterations_without_progress_threshold() == 2000
                 - #get_learning_rate_shrink() == 0.1
+                - #get_learning_rate_schedule().size() == 0
                 - if (cuda_extra_devices.size() > 0) then
                     - This object will use multiple graphics cards to run the learning
                       algorithms.  In particular, it will always use whatever device is
@@ -152,6 +153,7 @@ namespace dlib
                 - lr > 0
             ensures
                 - #get_learning_rate() == lr
+                - #get_learning_rate_schedule().size() == 0
                 - This function blocks until all threads inside the dnn_trainer have
                   stopped touching the net. 
         !*/
@@ -164,7 +166,9 @@ namespace dlib
                   of each layer in the network.  It does this by outputting a step vector
                   that, when added to the parameters, will hopefully result in improved
                   network performance.  The learning rate is one of the inputs to the
-                  solver and influences the size of this step vector.
+                  solver and influences the size of this step vector.  This function
+                  returns the current learning rate, that is, the learning rate that will
+                  be used during the next training step.
         !*/
 
         void set_min_learning_rate (
@@ -175,6 +179,9 @@ namespace dlib
                 - lr > 0
             ensures
                 - #get_min_learning_rate() == lr
+                - #get_learning_rate_schedule().size() == 0
+                - This function blocks until all threads inside the dnn_trainer have
+                  stopped touching the net. 
         !*/
 
         double get_min_learning_rate (
@@ -191,12 +198,49 @@ namespace dlib
                   learning rate will drop infinitely close to 0 if you run long enough.
         !*/
 
+        template <typename EXP>
+        void set_learning_rate_schedule (
+            const matrix_exp<EXP>& schedule
+        );
+        /*!
+            requires
+                - schedule.size() > 0
+                - min(schedule) > 0
+            ensures
+                - #get_learning_rate_schedule() == reshape_to_column_vector(schedule)
+                - #get_learning_rate() == schedule(0,0)
+                - #get_min_learning_rate() == min(schedule)
+                - #set_learning_rate_shrink_amount() == 1
+        !*/
+
+        const matrix<double,0,1>& get_learning_rate_schedule (
+        ) const;
+        /*!
+            ensures
+                - if (this function returns a non-empty matrix) then
+                    - This trainer will use an explicit learning rate schedule defined by
+                      the learning rate values in get_learning_rate_schedule().  For
+                      example, if get_learning_rate_schedule() returned {0.1, 0.09, 0.08,
+                      0.07, 0.6} then the first training mini-batch would use a learning
+                      rate of 0.1, then the next training mini-batch uses 0.09, and then
+                      0.8, and so on until the end of the schedule is reached.  
+                      
+                      If you continue to run training after the end of the schedule has
+                      been reached then the learning rate will be fixed to 0.99 times the
+                      final value.  So in our example, eventually the learning rate would
+                      be fixed to 0.99*0.6.  This allows you to test if we have reached the
+                      end of the schedule by checking if get_learning_rate() >= 0.6.
+        !*/
+
         void set_iterations_without_progress_threshold (
             unsigned long thresh 
         );
         /*!
             ensures
                 - #get_iterations_without_progress_threshold() == thresh
+                - #get_learning_rate_schedule().size() == 0
+                - This function blocks until all threads inside the dnn_trainer have
+                  stopped touching the net. 
         !*/
 
         unsigned long get_iterations_without_progress_threshold (
@@ -225,6 +269,9 @@ namespace dlib
                 - 0 < shrink && shrink <= 1
             ensures
                 - #get_learning_rate_shrink() == shrink
+                - #get_learning_rate_schedule().size() == 0
+                - This function blocks until all threads inside the dnn_trainer have
+                  stopped touching the net. 
         !*/
 
         double get_learning_rate_shrink (
