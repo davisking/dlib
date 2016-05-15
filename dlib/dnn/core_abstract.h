@@ -506,7 +506,7 @@ namespace dlib
         template <typename solver_type>
         void update_parameters(
             sstack<solver_type> solvers, 
-            double step_size
+            double learning_rate
         );
         /*!
             requires
@@ -517,13 +517,14 @@ namespace dlib
                   if you want to call update_parameters() on some other neural network
                   object then you must NOT reuse the same solvers object.
                 - solvers.size() >= num_computational_layers
-                - 0 < step_size <= 1
+                - 0 < learning_rate <= 1
             ensures
                 - Updates all the parameters in the network.  In particular, we pass each
                   layer's parameter gradient (i.e. the tensor returned by the layer's
                   get_parameter_gradient() member) through that layer's corresponding
-                  solver object.  This produces a parameter delta vector and we add
-                  step_size times that vector to the layer's parameters.
+                  solver object.  This produces a parameter delta vector which we add to
+                  the layer's parameters.
+                - The solvers use the given learning rate.
         !*/
 
         void clean(
@@ -944,7 +945,7 @@ namespace dlib
         template <typename solver_type>
         void update_parameters (
             sstack<solver_type> solvers,
-            double step_size
+            double learning_rate
         );
         /*!
             requires
@@ -955,13 +956,14 @@ namespace dlib
                   is, if you want to call update_parameters() on some other neural network
                   object then you must NOT reuse the same solvers object.
                 - solvers.size() >= num_computational_layers
-                - 0 < step_size <= 1
+                - 0 < learning_rate <= 1
             ensures
                 - Updates all the parameters in the network.  In particular, we pass each
                   layer's parameter gradient (i.e. the tensor returned by the layer's
                   get_parameter_gradient() member) through that layer's corresponding
-                  solver object.  This produces a parameter delta vector and we add
-                  step_size times that vector to the layer's parameters.
+                  solver object.  This produces a parameter delta vector which we add to
+                  the layer's parameters.
+                - The solvers use the given learning rate.
         !*/
 
     // -------------

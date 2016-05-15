@@ -68,10 +68,10 @@ namespace dlib
                   provided solver instance.
                 - #get_max_num_epochs() == 10000
                 - #get_mini_batch_size() == 128
-                - #get_step_size() == 1
-                - #get_min_step_size() == 1e-3
+                - #get_learning_rate() == 1e-2 
+                - #get_min_learning_rate() == 1e-5
                 - #get_iterations_without_progress_threshold() == 2000
-                - #get_step_size_shrink() == 0.1
+                - #get_learning_rate_shrink() == 0.1
                 - if (cuda_extra_devices.size() > 0) then
                     - This object will use multiple graphics cards to run the learning
                       algorithms.  In particular, it will always use whatever device is
@@ -102,6 +102,8 @@ namespace dlib
                   get_net().  In particular, the first layer's solver is
                   get_solvers()[0], the second layer's solver is
                   get_solvers()[1], and so on.
+                - This function blocks until all threads inside the dnn_trainer have
+                  stopped touching the net. 
         !*/
 
         unsigned long get_mini_batch_size (
@@ -142,54 +144,51 @@ namespace dlib
                 - #get_max_num_epochs() == num
         !*/
 
-        void set_step_size (
-            double ss
+        void set_learning_rate (
+            double lr
         );
         /*!
             requires
-                - ss > 0
+                - lr > 0
             ensures
-                - #get_step_size() == ss
+                - #get_learning_rate() == lr
+                - This function blocks until all threads inside the dnn_trainer have
+                  stopped touching the net. 
         !*/
 
-        double get_step_size(
+        double get_learning_rate(
         ) const;
         /*!
             ensures
                 - During each training step, a solver tells us how to modify the parameters
-                  of each layer in the network.  It does this by outputting a step vector,
-                  that when added to the parameters, will hopefully result in improved
-                  network performance.  In our case, at each step, we multiply the step
-                  vector from the solver by get_step_size() before adding it to the
-                  parameters.  Therefore, get_step_size() controls the "learning rate" used
-                  during training.  
-
-                  It should be emphasized that this learning rate applied by dnn_trainer is
-                  independent from any learning rate scheduling a solver might itself apply
-                  to the step vector it outputs.  That is, the dnn_trainer doesn't know
-                  what the solver is doing.  It just takes the output from a solver and
-                  multiplies it by get_step_size() before applying the step vector.
+                  of each layer in the network.  It does this by outputting a step vector
+                  that, when added to the parameters, will hopefully result in improved
+                  network performance.  The learning rate is one of the inputs to the
+                  solver and influences the size of this step vector.
         !*/
 
-        void set_min_step_size (
-            double ss
+        void set_min_learning_rate (
+            double lr
         );
         /*!
             requires
-                - ss > 0
+                - lr > 0
             ensures
-                - #get_min_step_size() == ss
+                - #get_min_learning_rate() == lr
         !*/
 
-        double get_min_step_size (
+        double get_min_learning_rate (
         ) const;
         /*!
             ensures
-                - During training, this object will test if progress is still being made
-                  and if it isn't then it will reduce get_step_size() by setting it to
-                  get_step_size()*get_step_size_shrink().  However, it will not reduce it
-                  below get_min_step_size().  Once this minimum step size is crossed the
-                  training will terminate.
+                - During training via this->train(), this object will test if progress is
+                  still being made and if it isn't then it will reduce get_learning_rate()
+                  by setting it to get_learning_rate()*get_learning_rate_shrink().
+                  However, it will not reduce it below get_min_learning_rate().  Once this
+                  minimum learning rate is crossed the training will terminate.
+                - get_min_learning_rate() doesn't apply if you are using train_one_step().  
+                  You can keep calling train_one_step() as many times as you want and the
+                  learning rate will drop infinitely close to 0 if you run long enough.
         !*/
 
         void set_iterations_without_progress_threshold (
@@ -209,33 +208,33 @@ namespace dlib
                   get_iterations_without_progress_threshold() mini-batch results and
                   applying the statistical test defined by the running_gradient object to
                   see if the training error is getting smaller.  If it isn't being reduced
-                  then get_step_size() is made smaller by a factor of get_step_size_shrink().
+                  then get_learning_rate() is made smaller by a factor of get_learning_rate_shrink().
 
                   Therefore, get_iterations_without_progress_threshold() should always be
                   set to something sensibly large so that this test can be done with
                   reasonably high confidence.  Think of this test as saying "if the loss
                   hasn't decreased for the previous get_iterations_without_progress_threshold() 
-                  then shrink the step size".
+                  then shrink the learning rate".
         !*/
 
-        void set_step_size_shrink_amount (
+        void set_learning_rate_shrink_amount (
             double shrink
         );
         /*!
             requires
                 - 0 < shrink && shrink <= 1
             ensures
-                - #get_step_size_shrink() == shrink
+                - #get_learning_rate_shrink() == shrink
         !*/
 
-        double get_step_size_shrink (
+        double get_learning_rate_shrink (
         ) const;
         /*!
             ensures
                 - Whenever the training routine thinks it isn't making progress anymore it
-                  will reduce get_step_size() by multiplying it by get_step_size_shrink().
-                - You can disable the automatic step size reduction by setting
-                  get_step_size_shrink() to 1.
+                  will reduce get_learning_rate() by multiplying it by get_learning_rate_shrink().
+                - You can disable the automatic learning rate reduction by setting
+                  get_learning_rate_shrink() to 1.
         !*/
 
         void be_verbose (
@@ -283,8 +282,8 @@ namespace dlib
                 - Trains a supervised neural network based on the given training data.
                   The goal of training is to find the network parameters that minimize
                   get_net().compute_loss(data.begin(), data.end(), labels.begin()). 
-                - The optimizer will run until get_step_size() < get_min_step_size() or
-                  get_max_num_epochs() training epochs have been executed. 
+                - The optimizer will run until get_learning_rate() < get_min_learning_rate() 
+                  or get_max_num_epochs() training epochs have been executed. 
                 - Each layer in the network will be optimized by its corresponding solver
                   in get_solvers().  
                 - Each call to train DOES NOT reinitialize the state of get_net() or
@@ -309,8 +308,8 @@ namespace dlib
                 - Trains an unsupervised neural network based on the given training data.
                   The goal of training is to find the network parameters that minimize
                   get_net().compute_loss(data.begin(), data.end()). 
-                - The optimizer will run until get_step_size() < get_min_step_size() or
-                  get_max_num_epochs() training epochs have been executed. 
+                - The optimizer will run until get_learning_rate() < get_min_learning_rate() 
+                  or get_max_num_epochs() training epochs have been executed. 
                 - Each layer in the network will be optimized by its corresponding solver
                   in get_solvers().  
                 - Each call to train DOES NOT reinitialize the state of get_net() or
@@ -381,6 +380,8 @@ namespace dlib
                 - Note that, if be_verbose() has been called, then this object will
                   automatically call clear_average_loss() periodically when it logs the
                   loss to the console.
+                - This function blocks until all threads inside the dnn_trainer have
+                  stopped touching the net. 
         !*/
 
         void clear_average_loss (
@@ -393,6 +394,8 @@ namespace dlib
                   applied during training.  Calling clear_average_loss() resets the
                   running_stats object so it forgets about all previous loss values
                   observed.
+                - This function blocks until all threads inside the dnn_trainer have
+                  stopped touching the net. 
         !*/
 
     };

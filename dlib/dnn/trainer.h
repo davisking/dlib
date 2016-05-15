@@ -193,7 +193,7 @@ namespace dlib
                 {
                     last_time = now_time;
                     std::cout << "step#: " << rpad(cast_to_string(train_one_step_calls),epoch_string_pad) << "  " 
-                        << "step size: " << rpad(cast_to_string(step_size),ss_string_pad) << "  "
+                        << "learning rate: " << rpad(cast_to_string(learning_rate),lr_string_pad) << "  "
                         << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad)  << "  "
                         << "steps without apparent progress: " << steps_without_progress 
                         << std::endl;
@@ -219,7 +219,7 @@ namespace dlib
                 {
                     last_time = now_time;
                     std::cout << "step#: " << rpad(cast_to_string(train_one_step_calls),epoch_string_pad) << "  " 
-                        << "step size: " << rpad(cast_to_string(step_size),ss_string_pad) << "  "
+                        << "learning rate: " << rpad(cast_to_string(learning_rate),lr_string_pad) << "  "
                         << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) << "  "
                         << "steps without apparent progress: " << steps_without_progress 
                         << std::endl;
@@ -243,13 +243,13 @@ namespace dlib
             // instead use class members is so we can include the state of the loops in the
             // stuff written by sync_to_disk()
             for (; 
-                epoch_iteration < max_num_epochs && step_size >= min_step_size; 
+                epoch_iteration < max_num_epochs && learning_rate >= min_learning_rate; 
                 ++epoch_iteration)
             {
                 using namespace std::chrono;
                 last_time = system_clock::now();
                 clear_average_loss();
-                for (; epoch_pos < data.size() && step_size >= min_step_size; epoch_pos += mini_batch_size)
+                for (; epoch_pos < data.size() && learning_rate >= min_learning_rate; epoch_pos += mini_batch_size)
                 {
                     if (verbose)
                     {
@@ -259,7 +259,7 @@ namespace dlib
                             last_time = now_time;
                             auto iter = epoch_iteration + epoch_pos/(double)data.size();
                             std::cout << "epoch: " << rpad(cast_to_string(iter),epoch_string_pad) << "  " 
-                                << "step size: " << rpad(cast_to_string(step_size),ss_string_pad) << "  "
+                                << "learning rate: " << rpad(cast_to_string(learning_rate),lr_string_pad) << "  "
                                 << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) << "  "
                                 << "steps without apparent progress: " << steps_without_progress 
                                 << std::endl;
@@ -279,7 +279,7 @@ namespace dlib
                     // Capitalize the E in Epoch so it's easy to grep out the lines that
                     // are for full epoch status statements.
                     std::cout << "Epoch: " << rpad(cast_to_string(epoch_iteration+1),epoch_string_pad) << "  " 
-                              << "step size: " << rpad(cast_to_string(step_size),ss_string_pad) << "  "
+                              << "learning rate: " << rpad(cast_to_string(learning_rate),lr_string_pad) << "  "
                               << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) << "  "
                               << "steps without apparent progress: " << steps_without_progress 
                               << std::endl;
@@ -305,13 +305,13 @@ namespace dlib
             // instead use class members is so we can include the state of the loops in the
             // stuff written by sync_to_disk()
             for (; 
-                epoch_iteration < max_num_epochs && step_size >= min_step_size; 
+                epoch_iteration < max_num_epochs && learning_rate >= min_learning_rate; 
                 ++epoch_iteration)
             {
                 using namespace std::chrono;
                 last_time = system_clock::now();
                 clear_average_loss();
-                for (; epoch_pos < data.size() && step_size >= min_step_size; epoch_pos += mini_batch_size)
+                for (; epoch_pos < data.size() && learning_rate >= min_learning_rate; epoch_pos += mini_batch_size)
                 {
                     if (verbose)
                     {
@@ -321,7 +321,7 @@ namespace dlib
                             last_time = now_time;
                             auto iter = epoch_iteration + epoch_pos/(double)data.size();
                             std::cout << "epoch: " << rpad(cast_to_string(iter),epoch_string_pad) << "  " 
-                                << "step size: " << rpad(cast_to_string(step_size),ss_string_pad) << "  "
+                                << "learning rate: " << rpad(cast_to_string(learning_rate),lr_string_pad) << "  "
                                 << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) << "  "
                                 << "steps without apparent progress: " << steps_without_progress 
                                 << std::endl;
@@ -340,7 +340,7 @@ namespace dlib
                     // Capitalize the E in Epoch so it's easy to grep out the lines that
                     // are for full epoch status statements.
                     std::cout << "Epoch: " << rpad(cast_to_string(epoch_iteration+1),epoch_string_pad) << "  " 
-                              << "step size: " << rpad(cast_to_string(step_size),ss_string_pad) << "  "
+                              << "learning rate: " << rpad(cast_to_string(learning_rate),lr_string_pad) << "  "
                               << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) << "  "
                               << "steps without apparent progress: " << steps_without_progress 
                               << std::endl;
@@ -380,35 +380,35 @@ namespace dlib
             rs.clear();
         }
 
-        void set_step_size (
-            double ss
+        void set_learning_rate (
+            double lr
         )
         {
-            DLIB_CASSERT(ss > 0,"");
+            DLIB_CASSERT(lr > 0,"");
             wait_for_thread_to_pause();
-            if (step_size != ss)
+            if (learning_rate != lr)
                 previous_loss_values.clear();
-            step_size = ss;
+            learning_rate = lr;
         }
 
-        double get_step_size(
+        double get_learning_rate(
         ) const 
         {
-            return step_size;
+            return learning_rate;
         }
 
-        void set_min_step_size (
-            double ss
+        void set_min_learning_rate (
+            double lr
         )
         {
-            DLIB_CASSERT(ss > 0,"");
-            min_step_size = ss;
+            DLIB_CASSERT(lr > 0,"");
+            min_learning_rate = lr;
         }
 
-        double get_min_step_size (
+        double get_min_learning_rate (
         ) const
         {
-            return min_step_size;
+            return min_learning_rate;
         }
 
         void set_iterations_without_progress_threshold (
@@ -424,18 +424,18 @@ namespace dlib
             return iter_without_progress_thresh;
         }
 
-        void set_step_size_shrink_amount (
+        void set_learning_rate_shrink_amount (
             double shrink
         )
         {
             DLIB_CASSERT(0 < shrink && shrink <= 1,"");
-            step_size_shrink = shrink;
+            learning_rate_shrink = shrink;
         }
 
-        double get_step_size_shrink (
+        double get_learning_rate_shrink (
         ) const
         {
-            return step_size_shrink;
+            return learning_rate_shrink;
         }
 
     private:
@@ -490,7 +490,7 @@ namespace dlib
         {
             auto&& dev = *devices[device];
             dlib::cuda::set_device(dev.device_id);
-            dev.net.update_parameters(make_sstack(dev.solvers), step_size);
+            dev.net.update_parameters(make_sstack(dev.solvers), learning_rate);
         }
 
         void thread() try
@@ -592,18 +592,18 @@ namespace dlib
                 }
 
                 // If we have been running for a while then check if the loss is still
-                // dropping.  If it isn't then we will reduce the step size.  Note that we
+                // dropping.  If it isn't then we will reduce the learning rate.  Note that we
                 // have a "budget" that prevents us from calling
                 // count_steps_without_decrease() every iteration.  We do this because
                 // it can be expensive to compute when previous_loss_values is large.
-                if (gradient_check_budget > iter_without_progress_thresh && step_size_shrink != 1)
+                if (gradient_check_budget > iter_without_progress_thresh && learning_rate_shrink != 1)
                 {
                     gradient_check_budget = 0;
                     steps_without_progress = count_steps_without_decrease(previous_loss_values);
                     if (steps_without_progress >= iter_without_progress_thresh)
                     {
                         // optimization has flattened out, so drop the learning rate. 
-                        step_size = step_size_shrink*step_size;
+                        learning_rate = learning_rate_shrink*learning_rate;
                         steps_without_progress = 0;
                         previous_loss_values.clear();
                     }
@@ -623,18 +623,18 @@ namespace dlib
 
         const static long string_pad = 10;
         const static long epoch_string_pad = 4;
-        const static long ss_string_pad = 4;
+        const static long lr_string_pad = 4;
 
         void init()
         {
             max_num_epochs = 10000;
             mini_batch_size = 128;
             verbose = false;
-            step_size = 1;
-            min_step_size = 1e-3;
+            learning_rate = 1e-2;
+            min_learning_rate = 1e-5;
             iter_without_progress_thresh = 2000;
             steps_without_progress = 0;
-            step_size_shrink = 0.1;
+            learning_rate_shrink = 0.1;
             epoch_iteration = 0;
             epoch_pos = 0;
             train_one_step_calls = 0;
@@ -661,11 +661,11 @@ namespace dlib
             serialize(item.verbose, out);
             serialize(item.net, out);
             serialize(item.devices[0]->solvers, out);
-            serialize(item.step_size.load(), out);
-            serialize(item.min_step_size, out);
+            serialize(item.learning_rate.load(), out);
+            serialize(item.min_learning_rate, out);
             serialize(item.iter_without_progress_thresh.load(), out);
             serialize(item.steps_without_progress.load(), out);
-            serialize(item.step_size_shrink.load(), out);
+            serialize(item.learning_rate_shrink.load(), out);
             serialize(item.epoch_iteration, out);
             serialize(item.epoch_pos, out);
             serialize(item.train_one_step_calls, out);
@@ -697,11 +697,11 @@ namespace dlib
             deserialize(item.verbose, in);
             deserialize(item.net, in);
             deserialize(item.devices[0]->solvers, in);
-            deserialize(dtemp, in); item.step_size = dtemp;
-            deserialize(item.min_step_size, in);
+            deserialize(dtemp, in); item.learning_rate = dtemp;
+            deserialize(item.min_learning_rate, in);
             deserialize(ltemp, in); item.iter_without_progress_thresh = ltemp;
             deserialize(ltemp, in); item.steps_without_progress = ltemp;
-            deserialize(dtemp, in); item.step_size_shrink = dtemp;
+            deserialize(dtemp, in); item.learning_rate_shrink = dtemp;
             deserialize(item.epoch_iteration, in);
             deserialize(item.epoch_pos, in);
             deserialize(item.train_one_step_calls, in);
@@ -845,11 +845,11 @@ namespace dlib
         size_t mini_batch_size;
         bool verbose;
         net_type& net;
-        std::atomic<double> step_size;
-        double min_step_size;
+        std::atomic<double> learning_rate;
+        double min_learning_rate;
         std::atomic<unsigned long> iter_without_progress_thresh;
         std::atomic<unsigned long> steps_without_progress;
-        std::atomic<double> step_size_shrink;
+        std::atomic<double> learning_rate_shrink;
         std::chrono::time_point<std::chrono::system_clock> last_sync_time;
         std::string sync_filename;
         std::chrono::seconds time_between_syncs;
