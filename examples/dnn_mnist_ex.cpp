@@ -89,7 +89,9 @@ int main(int argc, char** argv) try
     net_type net;
     // And then train it using the MNIST data.  The code below uses mini-batch stochastic
     // gradient descent with an initial learning rate of 0.01 to accomplish this.
-    dnn_trainer<net_type> trainer(net,sgd(0.01));
+    dnn_trainer<net_type> trainer(net);
+    trainer.set_learning_rate(0.01);
+    trainer.set_min_learning_rate(0.00001);
     trainer.set_mini_batch_size(128);
     trainer.be_verbose();
     // Since DNN training can take a long time, we can ask the trainer to save its state to
@@ -97,11 +99,11 @@ int main(int argc, char** argv) try
     // start it again it will begin where it left off rather than restarting the training
     // from scratch.  
     trainer.set_synchronization_file("mnist_sync", std::chrono::seconds(20));
-    // Finally, this line begins training.  By default, it runs SGD with our specified step
-    // size until the loss stops decreasing.  Then it reduces the step size by a factor of
-    // 10 and continues running until the loss stops decreasing again.  It will reduce the
-    // step size 3 times and then terminate.  For a longer discussion, see the documentation
-    // of the dnn_trainer object.
+    // Finally, this line begins training.  By default, it runs SGD with our specified
+    // learning rate until the loss stops decreasing.  Then it reduces the learning rate by
+    // a factor of 10 and continues running until the loss stops decreasing again.  It will
+    // keep doing this until the learning rate has dropped below the min learning rate
+    // defined above or the maximum number of epochs as been executed (defaulted to 10000). 
     trainer.train(training_images, training_labels);
 
     // At this point our net object should have learned how to classify MNIST images.  But

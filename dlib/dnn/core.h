@@ -825,16 +825,16 @@ namespace dlib
         }
 
         template <typename solver_type>
-        void update_parameters(sstack<solver_type> solvers, double step_size)
+        void update_parameters(sstack<solver_type> solvers, double learning_rate)
         {
             DLIB_CASSERT(solvers.size()>=num_computational_layers,"");
             // Don't try to adjust the parameters if this layer doesn't have any.
             if (params_grad.size() != 0)
             {
-                const tensor& step = solvers.top()(details.get_layer_params(), static_cast<const tensor&>(params_grad));
-                tt::add(1,details.get_layer_params(), step_size, step);
+                const tensor& step = solvers.top()(learning_rate, details, static_cast<const tensor&>(params_grad));
+                tt::add(details.get_layer_params(), details.get_layer_params(), step);
             }
-            subnetwork->update_parameters(solvers.pop(), step_size);
+            subnetwork->update_parameters(solvers.pop(), learning_rate);
         }
 
         const tensor& get_parameter_gradient(
@@ -1175,13 +1175,14 @@ namespace dlib
         }
 
         template <typename solver_type>
-        void update_parameters(sstack<solver_type> solvers, double step_size)
+        void update_parameters(sstack<solver_type> solvers, double learning_rate)
         {
             DLIB_CASSERT(solvers.size()>=num_computational_layers,"");
             // Don't try to adjust the parameters if this layer doesn't have any.
-            if (params_grad.size() != 0) {
-                const tensor& step = solvers.top()(details.get_layer_params(), static_cast<const tensor&>(params_grad));
-                tt::add(1,details.get_layer_params(), step_size, step);
+            if (params_grad.size() != 0) 
+            {
+                const tensor& step = solvers.top()(learning_rate, details, static_cast<const tensor&>(params_grad));
+                tt::add(details.get_layer_params(), details.get_layer_params(), step);
             }
         }
 
@@ -1401,9 +1402,9 @@ namespace dlib
         }
 
         template <typename solver_type>
-        void update_parameters(sstack<solver_type> solvers, double step_size)
+        void update_parameters(sstack<solver_type> solvers, double learning_rate)
         {
-            subnetwork.update_parameters(solvers, step_size);
+            subnetwork.update_parameters(solvers, learning_rate);
         }
 
         const tensor& get_parameter_gradient(
@@ -1687,11 +1688,11 @@ namespace dlib
         }
 
         template <typename solver_type>
-        void update_parameters(sstack<solver_type> solvers, double step_size)
+        void update_parameters(sstack<solver_type> solvers, double learning_rate)
         {
             for (size_t i = 0; i < details.size(); ++i)
-                details[i].update_parameters(solvers.pop(comp_layers_in_each_group*i),step_size);
-            subnetwork.update_parameters(solvers.pop(comp_layers_in_each_group*details.size()),step_size);
+                details[i].update_parameters(solvers.pop(comp_layers_in_each_group*i),learning_rate);
+            subnetwork.update_parameters(solvers.pop(comp_layers_in_each_group*details.size()),learning_rate);
         }
 
         const subnet_type& subnet() const { return subnetwork; }
@@ -1905,7 +1906,7 @@ namespace dlib
         }
 
         template <typename solver_type>
-        void update_parameters(sstack<solver_type> /*solvers*/, double /*step_size*/)
+        void update_parameters(sstack<solver_type> /*solvers*/, double /*learning_rate*/)
         {
             // nothing to do
         }
@@ -2248,10 +2249,10 @@ namespace dlib
         template <typename solver_type>
         void update_parameters (
             sstack<solver_type> solvers,
-            double step_size
+            double learning_rate
         )
         {
-            subnetwork.update_parameters(solvers, step_size);
+            subnetwork.update_parameters(solvers, learning_rate);
         }
 
         const subnet_type& subnet() const { return subnetwork; }
@@ -2542,9 +2543,9 @@ namespace dlib
         }
 
         template <typename solver_type>
-        void update_parameters(sstack<solver_type> solvers, double step_size)
+        void update_parameters(sstack<solver_type> solvers, double learning_rate)
         {
-            subnetwork.update_parameters(solvers, step_size);
+            subnetwork.update_parameters(solvers, learning_rate);
         }
 
         const tensor& get_parameter_gradient(

@@ -14,14 +14,17 @@ namespace dlib
     public:
 
         sgd(
-            float learning_rate_ = 0.01,
-            float weight_decay_ = 0.0005,
-            float momentum_ = 0.9 
+            float weight_decay_,
+            float momentum_ 
         ) 
         { 
             weight_decay = weight_decay_;
-            learning_rate = learning_rate_;
             momentum = momentum_;
+        }
+
+        sgd(
+        ) : sgd(0.0005, 0.9) 
+        { 
         }
 
         float get_momentum (
@@ -30,14 +33,15 @@ namespace dlib
         float get_weight_decay (
         ) const { return weight_decay; }
 
-        float get_learning_rate (
-        ) const { return learning_rate; }
-
+        template <typename layer_type> 
         const tensor& operator() (
-            const tensor& params,
+            const float learning_rate,
+            const layer_type& l,
             const tensor& params_grad
         )
         {
+            const tensor& params = l.get_layer_params();
+
             DLIB_CASSERT(params.size() != 0,"");
             if (v.size() == 0)
             {
@@ -54,10 +58,9 @@ namespace dlib
 
         friend void serialize(const sgd& item, std::ostream& out)
         {
-            serialize("sgd", out);
+            serialize("sgd2", out);
             serialize(item.v, out);
             serialize(item.weight_decay, out);
-            serialize(item.learning_rate, out);
             serialize(item.momentum, out);
         }
 
@@ -65,18 +68,16 @@ namespace dlib
         {
             std::string version;
             deserialize(version, in);
-            if (version != "sgd")
+            if (version != "sgd2")
                 throw serialization_error("Unexpected version found while deserializing dlib::sgd.");
             deserialize(item.v, in);
             deserialize(item.weight_decay, in);
-            deserialize(item.learning_rate, in);
             deserialize(item.momentum, in);
         }
 
     private:
         resizable_tensor v;
         float weight_decay;
-        float learning_rate;
         float momentum;
     };
 
@@ -87,18 +88,20 @@ namespace dlib
     public:
 
         adam(
-            float learning_rate_ = 0.001,
-            float weight_decay_ = 0.0005,
-            float momentum1_ = 0.9, 
-            float momentum2_ = 0.999 
+            float weight_decay_,
+            float momentum1_, 
+            float momentum2_
         ) 
         { 
             weight_decay = weight_decay_;
-            learning_rate = learning_rate_;
             momentum1 = momentum1_;
             momentum2 = momentum2_;
             t = 0;
         }
+
+        adam(
+        ) : adam(0.0005, 0.9, 0.999) 
+        {}
 
         float get_momentum1 (
         ) const { return momentum1; }
@@ -109,14 +112,14 @@ namespace dlib
         float get_weight_decay (
         ) const { return weight_decay; }
 
-        float get_learning_rate (
-        ) const { return learning_rate; }
-
+        template <typename layer_type>
         const tensor& operator() (
-            const tensor& params,
+            const float learning_rate,
+            const layer_type& l,
             const tensor& params_grad
         )
         {
+            const tensor& params = l.get_layer_params();
             DLIB_CASSERT(params.size() != 0,"");
             if (v.size() == 0)
             {
@@ -136,12 +139,11 @@ namespace dlib
 
         friend void serialize(const adam& item, std::ostream& out)
         {
-            serialize("adam", out);
+            serialize("adam2", out);
             serialize(item.m, out);
             serialize(item.v, out);
             serialize(item.s, out);
             serialize(item.weight_decay, out);
-            serialize(item.learning_rate, out);
             serialize(item.momentum1, out);
             serialize(item.momentum2, out);
             serialize(item.t, out);
@@ -151,13 +153,12 @@ namespace dlib
         {
             std::string version;
             deserialize(version, in);
-            if (version != "adam")
+            if (version != "adam2")
                 throw serialization_error("Unexpected version found while deserializing dlib::adam.");
             deserialize(item.m, in);
             deserialize(item.v, in);
             deserialize(item.s, in);
             deserialize(item.weight_decay, in);
-            deserialize(item.learning_rate, in);
             deserialize(item.momentum1, in);
             deserialize(item.momentum2, in);
             deserialize(item.t, in);
@@ -168,7 +169,6 @@ namespace dlib
         resizable_tensor v;
         resizable_tensor s;
         float weight_decay;
-        float learning_rate;
         float momentum1;
         float momentum2;
         float t;

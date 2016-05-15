@@ -33,23 +33,27 @@ using namespace dlib;
 // It exists solely so other layers can refer to it.  In this case, the
 // add_prev1 layer looks for the tag1 layer and will take the tag1 output and
 // add it to the input of the add_prev1 layer.  This combination allows us to
-// implement skip and residual style networks.  
-template <int stride, typename SUBNET> 
-using base_res  = relu<add_prev1<bn_con<con<8,3,3,1,1,relu<bn_con<con<8,3,3,stride,stride,tag1<SUBNET>>>>>>>>;
+// implement skip and residual style networks.  We have also made base_res
+// parameterized by BN, which will let us insert different batch normalization
+// layers.
+template <template <typename> class BN, typename SUBNET> 
+using base_res  = relu<add_prev1<BN<con<8,3,3,1,1,relu<BN<con<8,3,3,1,1,tag1<SUBNET>>>>>>>>;
 
-// Let's also define the same block but with all the batch normalization layers
-// replaced with affine transform layers.  We will use this type of construction
-// when testing our networks.
-template <int stride, typename SUBNET> 
-using base_ares = relu<add_prev1<affine<con<8,3,3,1,1,relu<affine<con<8,3,3,stride,stride,tag1<SUBNET>>>>>>>>;
+// We also want a residual block that begins by doing downsampling.  We can
+// reuse base_res to define it like this:
+template <template <typename> class BN, typename SUBNET> 
+using base_res_down  = base_res<BN,avg_pool<1,1,2,2,SUBNET>>;
 
-// And of course we can define more alias templates based on previously defined
-// alias templates.  The _down versions downsample the inputs by a factor of 2
-// while the res and ares layer types don't.
-template <typename SUBNET> using res       = base_res<1,SUBNET>;
-template <typename SUBNET> using res_down  = base_res<2,SUBNET>;
-template <typename SUBNET> using ares      = base_ares<1,SUBNET>;
-template <typename SUBNET> using ares_down = base_ares<2,SUBNET>;
+// Now we can define 4 different residual blocks we will use in this example.
+// The first two are non-downsampling residual blocks while the last two
+// downsample.  Also, res and res_down use batch normalization while ares and
+// ares_down have had the batch normalization replaced with simple affine
+// layers.  We will use the affine version of the layers when testing our
+// networks.
+template <typename SUBNET> using res       = base_res<bn_con,SUBNET>;
+template <typename SUBNET> using ares      = base_res<affine,SUBNET>;
+template <typename SUBNET> using res_down  = base_res_down<bn_con,SUBNET>;
+template <typename SUBNET> using ares_down = base_res_down<affine,SUBNET>;
 
 
 
@@ -141,37 +145,39 @@ int main(int argc, char** argv) try
     // These print statements will output this (I've truncated it since it's
     // long, but you get the idea):
     /*
-        The pnet has 125 layers in it.
-        layer<0>      loss_multiclass_log
-        layer<1>      fc       (num_outputs=10)
-        layer<2>      avg_pool (nr=0, nc=0, stride_y=1, stride_x=1, padding_y=0, padding_x=0)
-        layer<3>      prelu    (initial_param_value=0.2)
-        layer<4>      add_prev
-        layer<5>      bn_con
-        layer<6>      con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1)
-        layer<7>      prelu    (initial_param_value=0.25)
-        layer<8>      bn_con
-        layer<9>      con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1)
-        layer<10>     tag1
+        The pnet has 127 layers in it.
+        layer<0>    loss_multiclass_log
+        layer<1>    fc       (num_outputs=10)
+        layer<2>    avg_pool (nr=0, nc=0, stride_y=1, stride_x=1, padding_y=0, padding_x=0)
+        layer<3>    prelu    (initial_param_value=0.2)
+        layer<4>    add_prev
+        layer<5>    bn_con
+        layer<6>    con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1)
+        layer<7>    prelu    (initial_param_value=0.25)
+        layer<8>    bn_con
+        layer<9>    con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1)
+        layer<10>   tag1
         ...
-        layer<33>     con      (num_filters=8, nr=3, nc=3, stride_y=2, stride_x=2)
-        layer<34>     tag1
-        layer<35>     tag4
-        layer<36>     prelu    (initial_param_value=0.3)
-        layer<37>     add_prev
-        layer<38>     bn_con
+        layer<33>   con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1)
+        layer<34>   tag1
+        layer<35>   avg_pool (nr=1, nc=1, stride_y=2, stride_x=2, padding_y=0, padding_x=0)
+        layer<36>   tag4
+        layer<37>   prelu    (initial_param_value=0.3)
+        layer<38>   add_prev
+        layer<39>   bn_con
         ...
-        layer<114>    con      (num_filters=8, nr=3, nc=3, stride_y=2, stride_x=2)
-        layer<115>    tag1
-        layer<116>    relu
-        layer<117>    add_prev
-        layer<118>    bn_con
-        layer<119>    con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1)
-        layer<120>    relu
-        layer<121>    bn_con
-        layer<122>    con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1)
-        layer<123>    tag1
-        layer<124>    input<matrix>
+        layer<115>  con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1)
+        layer<116>  tag1
+        layer<117>  avg_pool (nr=1, nc=1, stride_y=2, stride_x=2, padding_y=0, padding_x=0)
+        layer<118>  relu
+        layer<119>  add_prev
+        layer<120>  bn_con
+        layer<121>  con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1)
+        layer<122>  relu
+        layer<123>  bn_con
+        layer<124>  con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1)
+        layer<125>  tag1
+        layer<126>  input<matrix>
     */
 
     // Now that we know the index numbers for each layer, we can access them
@@ -189,7 +195,7 @@ int main(int argc, char** argv) try
     // parts of your network and access them by layer<tag>().  You can also
     // index relative to a tag.  So for example, to access the layer immediately
     // after tag4 you can say:
-    layer<tag4,1>(pnet); // Equivalent to layer<35+1>(pnet).
+    layer<tag4,1>(pnet); // Equivalent to layer<36+1>(pnet).
 
     // Or to access the layer 2 layers after tag4:
     layer<tag4,2>(pnet);
@@ -203,23 +209,26 @@ int main(int argc, char** argv) try
     // talk about training networks!
 
     // The dnn_trainer will use SGD by default, but you can tell it to use
-    // different solvers like adam.  
-    dnn_trainer<net_type,adam> trainer(net,adam(0.001));
+    // different solvers like adam with a weight decay of 0.0005 and the given
+    // momentum parameters. 
+    dnn_trainer<net_type,adam> trainer(net,adam(0.0005, 0.9, 0.999));
     // Also, if you have multiple graphics cards you can tell the trainer to use
     // them together to make the training faster.  For example, replacing the
     // above constructor call with this one would cause it to use GPU cards 0
     // and 1.
-    //dnn_trainer<net_type,adam> trainer(net,adam(0.001), {0,1});
+    //dnn_trainer<net_type,adam> trainer(net,adam(0.0005, 0.9, 0.999), {0,1});
 
     trainer.be_verbose();
     trainer.set_synchronization_file("mnist_resnet_sync", std::chrono::seconds(100));
     // While the trainer is running it keeps an eye on the training error.  If
     // it looks like the error hasn't decreased for the last 2000 iterations it
-    // will automatically reduce the step size by 0.1.  You can change these
+    // will automatically reduce the learning rate by 0.1.  You can change these
     // default parameters to some other values by calling these functions.  Or
-    // disable them entirely by setting the shrink amount to 1.
+    // disable the automatic shrinking entirely by setting the shrink amount to 1.
     trainer.set_iterations_without_progress_threshold(2000);
-    trainer.set_step_size_shrink_amount(0.1);
+    trainer.set_learning_rate_shrink_amount(0.1);
+    // The learning rate will start at 1e-3.
+    trainer.set_learning_rate(1e-3);
 
 
     // Now, what if your training dataset is so big it doesn't fit in RAM?  You
@@ -230,10 +239,10 @@ int main(int argc, char** argv) try
     std::vector<matrix<unsigned char>> mini_batch_samples;
     std::vector<unsigned long> mini_batch_labels; 
     dlib::rand rnd(time(0));
-    // Loop until the trainer's automatic shrinking has shrunk the step size by
-    // 1e-3.  For the default shrinks amount of 0.1 this means stop after it
-    // shrinks it 3 times.
-    while(trainer.get_step_size() >= 1e-3)
+    // Loop until the trainer's automatic shrinking has shrunk the learning rate to 1e-6.
+    // Given our settings, this means it will stop training after it has shrunk the
+    // learning rate 3 times.
+    while(trainer.get_learning_rate() >= 1e-6)
     {
         mini_batch_samples.clear();
         mini_batch_labels.clear();
