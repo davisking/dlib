@@ -97,7 +97,9 @@ int main(int argc, char** argv) try
     // Since DNN training can take a long time, we can ask the trainer to save its state to
     // a file named "mnist_sync" every 20 seconds.  This way, if we kill this program and
     // start it again it will begin where it left off rather than restarting the training
-    // from scratch.  
+    // from scratch.  This is because, when the program restarts, this call to
+    // set_synchronization_file() will automatically reload the settings from mnist_sync if
+    // the file exists.
     trainer.set_synchronization_file("mnist_sync", std::chrono::seconds(20));
     // Finally, this line begins training.  By default, it runs SGD with our specified
     // learning rate until the loss stops decreasing.  Then it reduces the learning rate by
