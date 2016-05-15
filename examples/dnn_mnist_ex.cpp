@@ -117,6 +117,8 @@ int main(int argc, char** argv) try
     // "cleaning" the network before saving it.
     net.clean();
     serialize("mnist_network.dat") << net;
+    // Now if we later wanted to recall the network from disk we can simply say:
+    // deserialize("mnist_network.dat") >> net;
 
 
     // Now let's run the training images through the network.  This statement runs all the
