@@ -79,7 +79,6 @@ if (NOT TARGET dlib)
    set (DLIB_LINK_WITH_SQLITE3_STR
    "Disable this if you don't want to link against sqlite3" )
    #set (DLIB_USE_FFTW_STR "Disable this if you don't want to link against fftw" )
-   set (LIB_INSTALL_DIR lib CACHE STRING "Install location of libraries (e.g. lib32 or lib64 for multilib installations)")
 
    option(DLIB_ISO_CPP_ONLY ${DLIB_ISO_CPP_ONLY_STR} OFF)
    toggle_preprocessor_switch(DLIB_ISO_CPP_ONLY)
@@ -570,6 +569,7 @@ if (NOT TARGET dlib)
 
    # Install the library
    if (NOT DLIB_IN_PROJECT_BUILD)
+       set (LIB_INSTALL_DIR lib CACHE STRING "Install location of libraries (e.g. lib32 or lib64 for multilib installations)")
        cmake_minimum_required(VERSION 2.8.8)
        if(UNIX)
            set_target_properties(dlib_shared PROPERTIES
