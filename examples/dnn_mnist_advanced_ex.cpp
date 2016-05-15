@@ -224,9 +224,9 @@ int main(int argc, char** argv) try
     // it looks like the error hasn't decreased for the last 2000 iterations it
     // will automatically reduce the learning rate by 0.1.  You can change these
     // default parameters to some other values by calling these functions.  Or
-    // disable the automatic shrinking entirely by setting the shrink amount to 1.
+    // disable the automatic shrinking entirely by setting the shrink factor to 1.
     trainer.set_iterations_without_progress_threshold(2000);
-    trainer.set_learning_rate_shrink_amount(0.1);
+    trainer.set_learning_rate_shrink_factor(0.1);
     // The learning rate will start at 1e-3.
     trainer.set_learning_rate(1e-3);
 

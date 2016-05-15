@@ -71,7 +71,7 @@ namespace dlib
                 - #get_learning_rate() == 1e-2 
                 - #get_min_learning_rate() == 1e-5
                 - #get_iterations_without_progress_threshold() == 2000
-                - #get_learning_rate_shrink() == 0.1
+                - #get_learning_rate_shrink_factor() == 0.1
                 - #get_learning_rate_schedule().size() == 0
                 - if (cuda_extra_devices.size() > 0) then
                     - This object will use multiple graphics cards to run the learning
@@ -190,7 +190,7 @@ namespace dlib
             ensures
                 - During training via this->train(), this object will test if progress is
                   still being made and if it isn't then it will reduce get_learning_rate()
-                  by setting it to get_learning_rate()*get_learning_rate_shrink().
+                  by setting it to get_learning_rate()*get_learning_rate_shrink_factor().
                   However, it will not reduce it below get_min_learning_rate().  Once this
                   minimum learning rate is crossed the training will terminate.
                 - get_min_learning_rate() doesn't apply if you are using train_one_step().  
@@ -210,7 +210,7 @@ namespace dlib
                 - #get_learning_rate_schedule() == reshape_to_column_vector(schedule)
                 - #get_learning_rate() == schedule(0,0)
                 - #get_min_learning_rate() == min(schedule)
-                - #set_learning_rate_shrink_amount() == 1
+                - #set_learning_rate_shrink_factor() == 1
         !*/
 
         const matrix<double,0,1>& get_learning_rate_schedule (
@@ -230,6 +230,17 @@ namespace dlib
                       final value.  So in our example, eventually the learning rate would
                       be fixed to 0.99*0.6.  This allows you to test if we have reached the
                       end of the schedule by checking if get_learning_rate() >= 0.6.
+        !*/
+
+        unsigned long get_steps_without_progress (
+        ) const;
+        /*!
+            ensures
+                - if (get_learning_rate_shrink_factor() != 1) then
+                    - returns an estimate of how many mini-batches have executed without us
+                      observing a statistically significant decrease in the training error.
+                - else
+                    - returns 0
         !*/
 
         void set_iterations_without_progress_threshold (
@@ -252,7 +263,7 @@ namespace dlib
                   get_iterations_without_progress_threshold() mini-batch results and
                   applying the statistical test defined by the running_gradient object to
                   see if the training error is getting smaller.  If it isn't being reduced
-                  then get_learning_rate() is made smaller by a factor of get_learning_rate_shrink().
+                  then get_learning_rate() is made smaller by a factor of get_learning_rate_shrink_factor().
 
                   Therefore, get_iterations_without_progress_threshold() should always be
                   set to something sensibly large so that this test can be done with
@@ -261,27 +272,27 @@ namespace dlib
                   then shrink the learning rate".
         !*/
 
-        void set_learning_rate_shrink_amount (
+        void set_learning_rate_shrink_factor (
             double shrink
         );
         /*!
             requires
                 - 0 < shrink && shrink <= 1
             ensures
-                - #get_learning_rate_shrink() == shrink
+                - #get_learning_rate_shrink_factor() == shrink
                 - #get_learning_rate_schedule().size() == 0
                 - This function blocks until all threads inside the dnn_trainer have
                   stopped touching the net. 
         !*/
 
-        double get_learning_rate_shrink (
+        double get_learning_rate_shrink_factor (
         ) const;
         /*!
             ensures
                 - Whenever the training routine thinks it isn't making progress anymore it
-                  will reduce get_learning_rate() by multiplying it by get_learning_rate_shrink().
+                  will reduce get_learning_rate() by multiplying it by get_learning_rate_shrink_factor().
                 - You can disable the automatic learning rate reduction by setting
-                  get_learning_rate_shrink() to 1.
+                  get_learning_rate_shrink_factor() to 1.
         !*/
 
         void be_verbose (

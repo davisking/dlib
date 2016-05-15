@@ -417,7 +417,7 @@ namespace dlib
             DLIB_CASSERT(min(schedule) > 0,"");
             set_learning_rate(schedule(0,0));
             set_min_learning_rate(min(schedule));
-            set_learning_rate_shrink_amount(1);
+            set_learning_rate_shrink_factor(1);
             lr_schedule = matrix_cast<double>(reshape_to_column_vector(schedule));
             lr_schedule_pos = 0;
         }
@@ -443,7 +443,13 @@ namespace dlib
             return iter_without_progress_thresh;
         }
 
-        void set_learning_rate_shrink_amount (
+        unsigned long get_steps_without_progress (
+        ) const
+        {
+            return steps_without_progress;
+        }
+
+        void set_learning_rate_shrink_factor (
             double shrink
         )
         {
@@ -451,9 +457,10 @@ namespace dlib
             wait_for_thread_to_pause();
             lr_schedule.set_size(0);
             learning_rate_shrink = shrink;
+            steps_without_progress = 0;
         }
 
-        double get_learning_rate_shrink (
+        double get_learning_rate_shrink_factor (
         ) const
         {
             return learning_rate_shrink;
