@@ -33,7 +33,8 @@ namespace dlib
                 Finally, note that there are two broad flavors of loss layer, supervised
                 and unsupervised.  The EXAMPLE_LOSS_LAYER_ as shown here is a supervised
                 layer.  To make an unsupervised loss you simply leave out the label_type
-                typedef, to_label(), and the truth iterator argument to compute_loss().
+                typedef, to_label(), and the truth iterator argument to
+                compute_loss_value_and_gradient().
         !*/
 
     public:
@@ -90,7 +91,7 @@ namespace dlib
             typename const_label_iterator,
             typename SUBNET
             >
-        double compute_loss (
+        double compute_loss_value_and_gradient (
             const tensor& input_tensor,
             const_label_iterator truth, 
             SUBNET& sub
@@ -116,9 +117,10 @@ namespace dlib
                 - This function computes a loss function that describes how well the output
                   of sub matches the expected labels given by truth.  Let's write the loss
                   function as L(input_tensor, truth, sub).  
-                - Then compute_loss() computes the gradient of L() with respect to the
-                  outputs in sub.  Specifically, compute_loss() assigns the gradients into
-                  sub by performing the following tensor assignments, for all valid i: 
+                - Then compute_loss_value_and_gradient() computes the gradient of L() with
+                  respect to the outputs in sub.  Specifically, compute_loss_value_and_gradient() 
+                  assigns the gradients into sub by performing the following tensor
+                  assignments, for all valid i: 
                     - layer<i>(sub).get_gradient_input() = the gradient of
                       L(input_tensor,truth,sub) with respect to layer<i>(sub).get_output().
                 - returns L(input_tensor,truth,sub)
@@ -188,14 +190,14 @@ namespace dlib
             typename const_label_iterator,
             typename SUBNET
             >
-        double compute_loss (
+        double compute_loss_value_and_gradient (
             const tensor& input_tensor,
             const_label_iterator truth, 
             SUBNET& sub
         ) const;
         /*!
-            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss() except
-            it has the additional calling requirements that: 
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient() 
+            except it has the additional calling requirements that: 
                 - sub.get_output().nr() == 1
                 - sub.get_output().nc() == 1
                 - sub.get_output().k() == 1
@@ -254,14 +256,14 @@ namespace dlib
             typename const_label_iterator,
             typename SUBNET
             >
-        double compute_loss (
+        double compute_loss_value_and_gradient (
             const tensor& input_tensor,
             const_label_iterator truth, 
             SUBNET& sub
         ) const;
         /*!
-            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss() except
-            it has the additional calling requirements that: 
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient() 
+            except it has the additional calling requirements that: 
                 - sub.get_output().nr() == 1
                 - sub.get_output().nc() == 1
                 - sub.get_output().k() == 1
@@ -323,14 +325,14 @@ namespace dlib
             typename const_label_iterator,
             typename SUBNET
             >
-        double compute_loss (
+        double compute_loss_value_and_gradient (
             const tensor& input_tensor,
             const_label_iterator truth, 
             SUBNET& sub
         ) const;
         /*!
-            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss() except
-            it has the additional calling requirements that: 
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient() 
+            except it has the additional calling requirements that: 
                 - sub.get_output().nr() == 1
                 - sub.get_output().nc() == 1
                 - sub.get_output().num_samples() == input_tensor.num_samples()

@@ -47,7 +47,7 @@ namespace dlib
             typename const_label_iterator,
             typename SUBNET
             >
-        double compute_loss (
+        double compute_loss_value_and_gradient (
             const tensor& input_tensor,
             const_label_iterator truth, 
             SUBNET& sub
@@ -148,7 +148,7 @@ namespace dlib
             typename const_label_iterator,
             typename SUBNET
             >
-        double compute_loss (
+        double compute_loss_value_and_gradient (
             const tensor& input_tensor,
             const_label_iterator truth, 
             SUBNET& sub
@@ -259,7 +259,7 @@ namespace dlib
             typename const_label_iterator,
             typename SUBNET
             >
-        double compute_loss (
+        double compute_loss_value_and_gradient (
             const tensor& input_tensor,
             const_label_iterator truth, 
             SUBNET& sub

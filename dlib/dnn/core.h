@@ -2171,7 +2171,7 @@ namespace dlib
         {
             subnetwork.forward(x);
             dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
-            return loss.compute_loss(x, lbegin, wsub);
+            return loss.compute_loss_value_and_gradient(x, lbegin, wsub);
         }
 
         template <typename input_iterator, typename label_iterator>
@@ -2191,7 +2191,7 @@ namespace dlib
         {
             subnetwork.forward(x);
             dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
-            return loss.compute_loss(x, wsub);
+            return loss.compute_loss_value_and_gradient(x, wsub);
         }
 
         template <typename input_iterator>
@@ -2212,7 +2212,7 @@ namespace dlib
         {
             subnetwork.forward(x);
             dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
-            double l = loss.compute_loss(x, lbegin, wsub);
+            double l = loss.compute_loss_value_and_gradient(x, lbegin, wsub);
             subnetwork.back_propagate_error(x);
             return l;
         }
@@ -2232,7 +2232,7 @@ namespace dlib
         {
             subnetwork.forward(x);
             dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
-            double l = loss.compute_loss(x, wsub);
+            double l = loss.compute_loss_value_and_gradient(x, wsub);
             subnetwork.back_propagate_error(x);
             return l;
         }
