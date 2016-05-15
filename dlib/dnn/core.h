@@ -57,6 +57,27 @@ namespace dlib
             friend void deserialize(repeat_input_layer&, std::istream&){}
             friend std::ostream& operator<<(std::ostream& out, const repeat_input_layer&) { out << "FUCK"; return out; }
         };
+
+        inline std::string tensor_to_str (
+            const tensor& t,
+            int& min_length 
+        ) 
+        {
+            if (t.size() == 0)
+                return "";
+
+            std::ostringstream sout;
+            sout << "output size=(num:"<<  t.num_samples() << ", ";
+            sout << "k:" << t.k() << ",";
+            while (sout.tellp() < 28) sout << " ";
+            sout << "nr:" << t.nr() << ",";
+            while (sout.tellp() < 28+8) sout << " ";
+            sout << "nc:" << t.nc() << ")";
+            while (sout.tellp() < min_length) sout << " ";
+            min_length = sout.tellp();
+            sout << "\t";
+            return sout.str();
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -892,14 +913,15 @@ namespace dlib
 
         friend std::ostream& operator<< (std::ostream& out, const add_layer& item)
         {
-            item.print(out, 0);
+            int min_length = 0;
+            item.print(out, 0, min_length);
             return out;
         }
 
-        void print (std::ostream& out, unsigned long idx=0) const
+        void print (std::ostream& out, unsigned long idx, int& min_length) const
         {
-            out << "layer<" << idx << ">\t" << layer_details() << "\n";
-            subnet().print(out, idx+1);
+            out << "layer<" << idx << ">\t" << impl::tensor_to_str(private_get_output(), min_length) << layer_details() << "\n";
+            subnet().print(out, idx+1, min_length);
         }
 
     private:
@@ -1240,13 +1262,15 @@ namespace dlib
 
         friend std::ostream& operator<< (std::ostream& out, const add_layer& item)
         {
-            item.print(out, 0);
+            int min_length = 0;
+            item.print(out, 0, min_length);
             return out;
         }
 
-        void print (std::ostream& out, unsigned long idx=0) const
+        void print (std::ostream& out, unsigned long idx, int& min_length) const
         {
-            out << "layer<" << idx << ">\t" << layer_details() << "\n";
+            out << "layer<" << idx << ">\t" << impl::tensor_to_str(private_get_output(), min_length) << layer_details() << "\n";
+
             // Don't print the repeat_input_layer since it doesn't exist from the user's
             // point of view.  It's just an artifact of how repeat<> works.
             if (!std::is_same<subnet_type, impl::repeat_input_layer>::value)
@@ -1439,14 +1463,15 @@ namespace dlib
 
         friend std::ostream& operator<< (std::ostream& out, const add_tag_layer& item)
         {
-            item.print(out, 0);
+            int min_length = 0;
+            item.print(out, 0, min_length);
             return out;
         }
 
-        void print (std::ostream& out, unsigned long idx=0) const
+        void print (std::ostream& out, unsigned long idx, int& min_length) const
         {
-            out << "layer<" << idx << ">\ttag" << ID << "\n";
-            subnet().print(out, idx+1);
+            out << "layer<" << idx << ">\t" << impl::tensor_to_str(private_get_output(), min_length) << "tag" << ID << "\n";
+            subnet().print(out, idx+1, min_length);
         }
 
     private:
@@ -1726,18 +1751,19 @@ namespace dlib
 
         friend std::ostream& operator<< (std::ostream& out, const repeat& item)
         {
-            item.print(out, 0);
+            int min_length = 0;
+            item.print(out, 0, min_length);
             return out;
         }
 
-        void print (std::ostream& out, unsigned long idx=0) const
+        void print (std::ostream& out, unsigned long idx, int& min_length) const
         {
             for (size_t i = 0; i < num_repetitions(); ++i)
             {
-                get_repeated_layer(i).print(out, idx);
+                get_repeated_layer(i).print(out, idx, min_length);
                 idx += layers_in_each_group;
             }
-            subnet().print(out, idx);
+            subnet().print(out, idx, min_length);
         }
     private:
 
@@ -1946,13 +1972,14 @@ namespace dlib
 
         friend std::ostream& operator<< (std::ostream& out, const add_tag_layer& item)
         {
-            item.print(out, 0);
+            int min_length = 0;
+            item.print(out, 0, min_length);
             return out;
         }
 
-        void print (std::ostream& out, unsigned long idx=0) const
+        void print (std::ostream& out, unsigned long idx, int& min_length) const
         {
-            out << "layer<"<<idx << ">\ttag" << ID << "\n";
+            out << "layer<"<<idx << ">\t"<<impl::tensor_to_str(private_get_output(), min_length)<< "tag" << ID << "\n";
             // Don't print the repeat_input_layer since it doesn't exist from the user's
             // point of view.  It's just an artifact of how repeat<> works.
             if (!std::is_same<subnet_type, impl::repeat_input_layer>::value)
@@ -2287,14 +2314,15 @@ namespace dlib
 
         friend std::ostream& operator<< (std::ostream& out, const add_loss_layer& item)
         {
-            item.print(out, 0);
+            int min_length = 0;
+            item.print(out, 0, min_length);
             return out;
         }
 
-        void print (std::ostream& out, unsigned long idx=0) const
+        void print (std::ostream& out, unsigned long idx, int& min_length) const
         {
             out << "layer<" << idx << ">\t" << loss_details() << "\n";
-            subnet().print(out, idx+1);
+            subnet().print(out, idx+1, min_length);
         }
 
     private:
@@ -2588,14 +2616,15 @@ namespace dlib
 
         friend std::ostream& operator<< (std::ostream& out, const add_skip_layer& item)
         {
-            item.print(out, 0);
+            int min_length = 0;
+            item.print(out, 0, min_length);
             return out;
         }
 
-        void print (std::ostream& out, unsigned long idx=0) const
+        void print (std::ostream& out, unsigned long idx, int& min_length) const
         {
-            out << "layer<" << idx << ">\tskip\n";
-            subnet().print(out, idx+1);
+            out << "layer<" << idx << ">\t"<<impl::tensor_to_str(private_get_output(), min_length) <<"skip\n";
+            subnet().print(out, idx+1, min_length);
         }
 
     private:
