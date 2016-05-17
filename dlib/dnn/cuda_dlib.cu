@@ -761,6 +761,56 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        void concat_depth(
+            tensor& dest,
+            size_t sample_offset,
+            const tensor& src
+        )
+        {
+            const size_t dest_sample_size = static_cast<size_t>(dest.nc() * dest.nr() * dest.k());
+            const size_t src_sample_size = static_cast<size_t>(src.nc() * src.nr() * src.k());
+
+            DLIB_CASSERT(dest.num_samples() == src.num_samples() &&
+                         dest.nc() == src.nc() && dest.nr() == src.nr(), "All sources should fit into dest tensor size");
+            DLIB_CASSERT(dest_sample_size >= src_sample_size + sample_offset, "Not enough space in dest tensor");
+
+            float* dest_p = dest.device_write_only() + sample_offset;
+            const float* src_p = src.device();
+
+            for (unsigned long i = 0; i < src.num_samples(); ++i)
+            {
+                CHECK_CUDA(cudaMemcpy(dest_p, src_p, src_sample_size * sizeof(float), cudaMemcpyDeviceToDevice));
+
+                dest_p += dest_sample_size;
+                src_p  += src_sample_size;
+            }
+        }
+
+        void split_depth(
+            tensor& dest,
+            size_t sample_offset,
+            const tensor& src
+        )
+        {
+            const size_t dest_sample_size = static_cast<size_t>(dest.nc() * dest.nr() * dest.k());
+            const size_t src_sample_size = static_cast<size_t>(src.nc() * src.nr() * src.k());
+
+            DLIB_CASSERT(dest.num_samples() == src.num_samples() &&
+                         dest.nc() == src.nc() && dest.nr() == src.nr(),
+                         "All sources should fit into dest tensor size");
+            DLIB_CASSERT(dest_sample_size <= src_sample_size - sample_offset, "Not enough space in dest tensor");
+
+            float *dest_p = dest.device_write_only();
+            const float *src_p = src.device() + sample_offset;
+
+            for (unsigned long i = 0; i < src.num_samples(); ++i) {
+                CHECK_CUDA(cudaMemcpy(dest_p, src_p, dest_sample_size * sizeof(float), cudaMemcpyDeviceToDevice));
+                dest_p += dest_sample_size;
+                src_p += src_sample_size;
+            }
+        }
+    // ----------------------------------------------------------------------------------------
+
     }
 }
 

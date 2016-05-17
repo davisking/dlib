@@ -244,6 +244,17 @@ namespace dlib
             tensor& params_grad 
         );
 
+        void concat_depth(
+                tensor& dest,
+                size_t sample_offset,
+                const tensor& src
+        );
+
+        void split_depth(
+                tensor& dest,
+                size_t sample_offset,
+                const tensor& src
+        );
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
