@@ -451,7 +451,7 @@ namespace dlib
                 parent.widgets.destroy(z_order_value);
 
             // now add this drawable to its new z order
-            sod = parent.widgets[order];                
+            sod = parent.widgets[order];
             if (sod == 0)
             {
                 // this drawable is the first widget at this z order so we need

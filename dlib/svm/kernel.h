@@ -45,7 +45,7 @@ namespace dlib
             const sample_type& a,
             const sample_type& b
         ) const
-        { 
+        {
             const scalar_type d = trans(a-b)*(a-b);
             return std::exp(-gamma*d);
         }
@@ -79,8 +79,8 @@ namespace dlib
             serialize(item.gamma, out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type radial_basis_kernel"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type radial_basis_kernel");
         }
     }
 
@@ -89,7 +89,7 @@ namespace dlib
         >
     void deserialize (
         radial_basis_kernel<T>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         typedef typename T::type scalar_type;
@@ -98,13 +98,13 @@ namespace dlib
             deserialize(const_cast<scalar_type&>(item.gamma), in);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while deserializing object of type radial_basis_kernel"); 
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type radial_basis_kernel");
         }
     }
 
     template <
-        typename T 
+        typename T
         >
     struct kernel_derivative<radial_basis_kernel<T> >
     {
@@ -154,7 +154,7 @@ namespace dlib
             const sample_type& a,
             const sample_type& b
         ) const
-        { 
+        {
             return std::pow(gamma*(trans(a)*b) + coef, degree);
         }
 
@@ -191,8 +191,8 @@ namespace dlib
             serialize(item.degree, out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type polynomial_kernel"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type polynomial_kernel");
         }
     }
 
@@ -201,7 +201,7 @@ namespace dlib
         >
     void deserialize (
         polynomial_kernel<T>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         typedef typename T::type scalar_type;
@@ -212,13 +212,13 @@ namespace dlib
             deserialize(const_cast<scalar_type&>(item.degree), in);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while deserializing object of type polynomial_kernel"); 
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type polynomial_kernel");
         }
     }
 
     template <
-        typename T 
+        typename T
         >
     struct kernel_derivative<polynomial_kernel<T> >
     {
@@ -267,7 +267,7 @@ namespace dlib
             const sample_type& a,
             const sample_type& b
         ) const
-        { 
+        {
             return std::tanh(gamma*(trans(a)*b) + coef);
         }
 
@@ -302,8 +302,8 @@ namespace dlib
             serialize(item.coef, out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type sigmoid_kernel"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type sigmoid_kernel");
         }
     }
 
@@ -312,7 +312,7 @@ namespace dlib
         >
     void deserialize (
         sigmoid_kernel<T>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         typedef typename T::type scalar_type;
@@ -322,13 +322,13 @@ namespace dlib
             deserialize(const_cast<scalar_type&>(item.coef), in);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while deserializing object of type sigmoid_kernel"); 
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type sigmoid_kernel");
         }
     }
 
     template <
-        typename T 
+        typename T
         >
     struct kernel_derivative<sigmoid_kernel<T> >
     {
@@ -365,12 +365,12 @@ namespace dlib
             const sample_type& a,
             const sample_type& b
         ) const
-        { 
+        {
             return trans(a)*b;
         }
 
         bool operator== (
-            const linear_kernel& 
+            const linear_kernel&
         ) const
         {
             return true;
@@ -382,7 +382,7 @@ namespace dlib
         >
     void serialize (
         const linear_kernel<T>& ,
-        std::ostream& 
+        std::ostream&
     ){}
 
     template <
@@ -390,11 +390,11 @@ namespace dlib
         >
     void deserialize (
         linear_kernel<T>& ,
-        std::istream&  
+        std::istream&
     ){}
 
     template <
-        typename T 
+        typename T
         >
     struct kernel_derivative<linear_kernel<T> >
     {
@@ -425,7 +425,7 @@ namespace dlib
             const sample_type& a,
             const sample_type& b
         ) const
-        { 
+        {
             scalar_type temp = 0;
             for (long i = 0; i < a.size(); ++i)
             {
@@ -435,7 +435,7 @@ namespace dlib
         }
 
         bool operator== (
-            const histogram_intersection_kernel& 
+            const histogram_intersection_kernel&
         ) const
         {
             return true;
@@ -447,7 +447,7 @@ namespace dlib
         >
     void serialize (
         const histogram_intersection_kernel<T>& ,
-        std::ostream& 
+        std::ostream&
     ){}
 
     template <
@@ -455,7 +455,7 @@ namespace dlib
         >
     void deserialize (
         histogram_intersection_kernel<T>& ,
-        std::istream&  
+        std::istream&
     ){}
 
 // ----------------------------------------------------------------------------------------
@@ -481,7 +481,7 @@ namespace dlib
             const sample_type& a,
             const sample_type& b
         ) const
-        { 
+        {
             return kernel(a,b) + offset;
         }
 
@@ -516,8 +516,8 @@ namespace dlib
             serialize(item.kernel, out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type offset_kernel"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type offset_kernel");
         }
     }
 
@@ -526,7 +526,7 @@ namespace dlib
         >
     void deserialize (
         offset_kernel<T>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         typedef typename offset_kernel<T>::scalar_type scalar_type;
@@ -536,13 +536,13 @@ namespace dlib
             deserialize(const_cast<T&>(item.kernel), in);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while deserializing object of type offset_kernel"); 
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type offset_kernel");
         }
     }
 
     template <
-        typename T 
+        typename T
         >
     struct kernel_derivative<offset_kernel<T> >
     {

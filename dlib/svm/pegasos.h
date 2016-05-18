@@ -18,7 +18,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename K 
+        typename K
         >
     class svm_pegasos
     {
@@ -49,7 +49,7 @@ namespace dlib
         }
 
         svm_pegasos (
-            const kernel_type& kernel_, 
+            const kernel_type& kernel_,
             const scalar_type& lambda_,
             const scalar_type& tolerance_,
             unsigned long max_num_sv
@@ -67,8 +67,8 @@ namespace dlib
             DLIB_ASSERT(lambda_ > 0 && tolerance > 0 && max_num_sv > 0,
                         "\tsvm_pegasos::svm_pegasos(kernel,lambda,tolerance)"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t lambda_: " << lambda_ 
-                        << "\n\t max_num_sv: " << max_num_sv 
+                        << "\n\t lambda_: " << lambda_
+                        << "\n\t max_num_sv: " << max_num_sv
             );
         }
 
@@ -96,9 +96,9 @@ namespace dlib
             DLIB_ASSERT(max_num_sv > 0,
                         "\tvoid svm_pegasos::set_max_num_sv(max_num_sv)"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t max_num_sv: " << max_num_sv 
+                        << "\n\t max_num_sv: " << max_num_sv
             );
-            max_sv = max_num_sv; 
+            max_sv = max_num_sv;
             clear();
         }
 
@@ -116,7 +116,7 @@ namespace dlib
             DLIB_ASSERT(0 < tol,
                         "\tvoid svm_pegasos::set_tolerance(tol)"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t tol: " << tol 
+                        << "\n\t tol: " << tol
             );
             tolerance = tol;
             clear();
@@ -130,7 +130,7 @@ namespace dlib
             DLIB_ASSERT(0 < lambda_,
                         "\tvoid svm_pegasos::set_lambda(lambda_)"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t lambda_: " << lambda_ 
+                        << "\n\t lambda_: " << lambda_
             );
             lambda_c1 = lambda_;
             lambda_c2 = lambda_;
@@ -147,7 +147,7 @@ namespace dlib
             DLIB_ASSERT(0 < lambda_,
                         "\tvoid svm_pegasos::set_lambda_class1(lambda_)"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t lambda_: " << lambda_ 
+                        << "\n\t lambda_: " << lambda_
             );
             lambda_c1 = lambda_;
             max_wnorm = 1/std::sqrt(std::min(lambda_c1, lambda_c2));
@@ -162,7 +162,7 @@ namespace dlib
             DLIB_ASSERT(0 < lambda_,
                         "\tvoid svm_pegasos::set_lambda_class2(lambda_)"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t lambda_: " << lambda_ 
+                        << "\n\t lambda_: " << lambda_
             );
             lambda_c2 = lambda_;
             max_wnorm = 1/std::sqrt(std::min(lambda_c1, lambda_c2));
@@ -202,7 +202,7 @@ namespace dlib
         scalar_type train (
             const sample_type& x,
             const scalar_type& y
-        ) 
+        )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(y == -1 || y == 1,
@@ -307,7 +307,7 @@ namespace dlib
     }; // end of class svm_pegasos
 
     template <
-        typename K 
+        typename K
         >
     void swap (
         svm_pegasos<K>& a,
@@ -338,7 +338,7 @@ namespace dlib
     template <
         typename trainer_type
         >
-    class batch_trainer 
+    class batch_trainer
     {
 
     // ------------------------------------------------------------------------------------
@@ -347,7 +347,7 @@ namespace dlib
             typename K,
             typename sample_vector_type
             >
-        class caching_kernel 
+        class caching_kernel
         {
         public:
             typedef typename K::scalar_type scalar_type;
@@ -361,7 +361,7 @@ namespace dlib
                 const K& kern,
                 const sample_vector_type& samps,
                 long cache_size_
-            ) : real_kernel(kern), samples(&samps), counter(0)  
+            ) : real_kernel(kern), samples(&samps), counter(0)
             {
                 cache_size = std::min<long>(cache_size_, samps.size());
 
@@ -381,7 +381,7 @@ namespace dlib
                 const sample_type& a,
                 const sample_type& b
             )  const
-            { 
+            {
                 // rebuild the cache every so often
                 if (counter > counter_threshold )
                 {
@@ -452,10 +452,10 @@ namespace dlib
 
             struct cache_type
             {
-                matrix<scalar_type> kernel;  
+                matrix<scalar_type> kernel;
 
                 std::vector<long> sample_location; // where in the cache a sample is.  -1 means not in cache
-                std::vector<std::pair<long,long> > frequency_of_use;  
+                std::vector<std::pair<long,long> > frequency_of_use;
             };
 
             const sample_vector_type* samples;
@@ -485,7 +485,7 @@ namespace dlib
         }
 
         batch_trainer (
-            const trainer_type& trainer_, 
+            const trainer_type& trainer_,
             const scalar_type min_learning_rate_,
             bool verbose_,
             bool use_cache_,
@@ -502,15 +502,15 @@ namespace dlib
                         cache_size_ > 0,
                         "\tbatch_trainer::batch_trainer()"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t min_learning_rate_: " << min_learning_rate_ 
-                        << "\n\t cache_size_: " << cache_size_ 
+                        << "\n\t min_learning_rate_: " << min_learning_rate_
+                        << "\n\t cache_size_: " << cache_size_
             );
             
             trainer.clear();
         }
 
         const scalar_type get_min_learning_rate (
-        ) const 
+        ) const
         {
             return min_learning_rate;
         }
@@ -559,7 +559,7 @@ namespace dlib
                 {
                     if ( (count&0x7FF) == 0)
                     {
-                        std::cout << "\rbatch_trainer(): Percent complete: " 
+                        std::cout << "\rbatch_trainer(): Percent complete: "
                                   << 100*min_learning_rate/cur_learning_rate << "             " << std::flush;
                     }
                     ++count;
@@ -615,7 +615,7 @@ namespace dlib
                 {
                     if ( (count&0x7FF) == 0)
                     {
-                        std::cout << "\rbatch_trainer(): Percent complete: " 
+                        std::cout << "\rbatch_trainer(): Percent complete: "
                                   << 100*min_learning_rate/cur_learning_rate << "             " << std::flush;
                     }
                     ++count;

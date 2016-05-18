@@ -54,11 +54,11 @@ namespace dlib
         iterator iterator_of_worst (
             iterator begin,
             const iterator& end
-        ) 
+        )
         /*!
             ensures
-                - returns an iterator that points to the element in the given range 
-                  that has the biggest distance 
+                - returns an iterator that points to the element in the given range
+                  that has the biggest distance
         !*/
         {
             double dist = begin->distance();
@@ -100,8 +100,8 @@ namespace dlib
             "\t void find_percent_shortest_edges_randomly()"
             << "\n\t Invalid inputs were given to this function."
             << "\n\t samples.size(): " << samples.size()
-            << "\n\t percent:        " << percent 
-            << "\n\t num:            " << num 
+            << "\n\t percent:        " << percent
+            << "\n\t num:            " << num
             );
 
         out.clear();
@@ -168,8 +168,8 @@ namespace dlib
             "\t void find_approximate_k_nearest_neighbors()"
             << "\n\t Invalid inputs were given to this function."
             << "\n\t samples.size(): " << samples.size()
-            << "\n\t k:              " << k  
-            << "\n\t num:            " << num 
+            << "\n\t k:              " << k
+            << "\n\t num:            " << num
             );
 
         out.clear();
@@ -215,7 +215,7 @@ namespace dlib
         while (itr != edges.end())
         {
             // first find the bounding range for all the edges connected to node itr->index1()
-            beg = itr; 
+            beg = itr;
             while (itr != edges.end() && itr->index1() == beg->index1())
                 ++itr;
 
@@ -266,7 +266,7 @@ namespace dlib
             "\t void find_k_nearest_neighbors()"
             << "\n\t Invalid inputs were given to this function."
             << "\n\t samples.size(): " << samples.size()
-            << "\n\t k:              " << k 
+            << "\n\t k:              " << k
             );
 
         out.clear();
@@ -280,7 +280,7 @@ namespace dlib
         std::vector<sample_pair> edges;
 
         // Initialize all the edges to an edge with an invalid index
-        edges.resize(samples.size()*k, 
+        edges.resize(samples.size()*k,
                      sample_pair(samples.size(),samples.size(),std::numeric_limits<double>::infinity()));
 
         // Hold the length for the longest edge for each node.  Initially they are all infinity.
@@ -326,7 +326,7 @@ namespace dlib
         // sort the edges so that duplicate edges will be adjacent
         std::sort(edges.begin(), edges.end(), &order_by_index<sample_pair>);
 
-        // if the first edge is valid 
+        // if the first edge is valid
         if (edges[0].index1() < samples.size())
         {
             // now put edges into out while avoiding duplicates and any remaining invalid edges.
@@ -375,7 +375,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename vector_type 
+        typename vector_type
         >
     typename enable_if_c<(is_same_type<sample_pair, typename vector_type::value_type>::value ||
                           is_same_type<ordered_sample_pair, typename vector_type::value_type>::value),
@@ -458,14 +458,14 @@ namespace dlib
         >
     void remove_percent_longest_edges (
         vector_type& pairs,
-        double percent 
+        double percent
     )
     {
         // make sure requires clause is not broken
         DLIB_ASSERT( 0 <= percent && percent < 1,
             "\t void remove_percent_longest_edges()"
             << "\n\t Invalid inputs were given to this function."
-            << "\n\t percent:        " << percent 
+            << "\n\t percent:        " << percent
             );
 
         typedef typename vector_type::value_type T;
@@ -487,14 +487,14 @@ namespace dlib
         >
     void remove_percent_shortest_edges (
         vector_type& pairs,
-        double percent 
+        double percent
     )
     {
         // make sure requires clause is not broken
         DLIB_ASSERT( 0 <= percent && percent < 1,
             "\t void remove_percent_shortest_edges()"
             << "\n\t Invalid inputs were given to this function."
-            << "\n\t percent:        " << percent 
+            << "\n\t percent:        " << percent
             );
 
         typedef typename vector_type::value_type T;
@@ -529,7 +529,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename alloc1, 
+        typename alloc1,
         typename alloc2
         >
     void find_neighbor_ranges (
@@ -566,7 +566,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename alloc1, 
+        typename alloc1,
         typename alloc2
         >
     void convert_unordered_to_ordered (

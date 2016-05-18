@@ -34,9 +34,9 @@ namespace dlib
             - returns the number of clusters found.
             - #labels.size() == max_index_plus_one(edges)
             - for all valid i:
-                - #labels[i] == the cluster ID of the node with index i in the graph.  
+                - #labels[i] == the cluster ID of the node with index i in the graph.
                 - 0 <= #labels[i] < the number of clusters found
-                  (i.e. cluster IDs are assigned contiguously and start at 0) 
+                  (i.e. cluster IDs are assigned contiguously and start at 0)
             - Duplicate edges are interpreted as if there had been just one edge with a
               distance value equal to the sum of all the duplicate edge's distance values.
             - The algorithm performs exactly num_iterations passes over the graph before
@@ -58,7 +58,7 @@ namespace dlib
               ordered_sample_pairs.  Therefore, this is simply a convenience routine.  In
               particular, it is implemented by transforming the given edges into
               ordered_sample_pairs and then calling the chinese_whispers() routine defined
-              above.  
+              above.
     !*/
 
 // ----------------------------------------------------------------------------------------

@@ -15,7 +15,7 @@ namespace dlib
         typename entropy_decoder,
         typename cc
         >
-    class entropy_decoder_model_kernel_1 
+    class entropy_decoder_model_kernel_1
     {
         /*!
             REQUIREMENTS ON cc
@@ -29,8 +29,8 @@ namespace dlib
                 &get_entropy_decoder() == coder
                 &order_0.get_global_state() == &gs
 
-                This is an order-0 model. The last symbol in the order-0 context is 
-                an escape into the order minus 1 context.           
+                This is an order-0 model. The last symbol in the order-0 context is
+                an escape into the order minus 1 context.
         !*/
 
     public:
@@ -67,7 +67,7 @@ namespace dlib
         entropy_decoder_model_kernel_1(entropy_decoder_model_kernel_1<alphabet_size,entropy_decoder,cc>&);        // copy constructor
         entropy_decoder_model_kernel_1<alphabet_size,entropy_decoder,cc>& operator=(entropy_decoder_model_kernel_1<alphabet_size,entropy_decoder,cc>&);    // assignment operator
 
-    };   
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -83,7 +83,7 @@ namespace dlib
     entropy_decoder_model_kernel_1<alphabet_size,entropy_decoder,cc>::
     entropy_decoder_model_kernel_1 (
         entropy_decoder& coder_
-    ) : 
+    ) :
         coder(coder_),
         order_0(gs)
     {

@@ -10,7 +10,7 @@
 namespace dlib
 {
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     class sockstreambuf : public std::streambuf
     {
@@ -23,9 +23,9 @@ namespace dlib
                 For a sockstreambuf EOF is when the connection has closed or otherwise
                 returned some kind of error.
 
-                Also note that any data written to the streambuf may be buffered 
-                internally.  So if you need to ensure that data is actually sent then you 
-                should flush the stream.  
+                Also note that any data written to the streambuf may be buffered
+                internally.  So if you need to ensure that data is actually sent then you
+                should flush the stream.
 
                 A read operation is guaranteed to block until the number of bytes
                 requested has arrived on the connection.  It will never keep blocking
@@ -78,9 +78,9 @@ namespace dlib
             requires
                 - get_connection() object has not been deleted
             ensures
-                - sockstream buffer is destructed but the connection object will 
-                  NOT be closed.  
-                - Any buffered data is flushed to the connection. 
+                - sockstream buffer is destructed but the connection object will
+                  NOT be closed.
+                - Any buffered data is flushed to the connection.
         !*/
 
         connection* get_connection (
@@ -103,7 +103,7 @@ namespace dlib
         /*!
             ensures
                 - This function returns true if this object will flush its output buffer
-                  to the network socket before performing any network read.   
+                  to the network socket before performing any network read.
                 - if (flushes_output_on_read() == true)
                     - It is not safe to make concurrent read and write calls to this object.
         !*/
@@ -117,7 +117,7 @@ namespace dlib
 
     };
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
 }
 

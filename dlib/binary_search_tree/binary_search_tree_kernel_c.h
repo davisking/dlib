@@ -8,7 +8,7 @@
 #include "../algs.h"
 #include "../assert.h"
 
-namespace dlib 
+namespace dlib
 {
 
     template <
@@ -85,8 +85,8 @@ namespace dlib
         typename bst_base
         >
     inline void swap (
-        binary_search_tree_kernel_c<bst_base>& a, 
-        binary_search_tree_kernel_c<bst_base>& b 
+        binary_search_tree_kernel_c<bst_base>& a,
+        binary_search_tree_kernel_c<bst_base>& b
     ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
@@ -130,7 +130,7 @@ namespace dlib
             "\tvoid binary_search_tree::destroy"
             << "\n\tthe element must be in the tree for it to be removed"
             << "\n\tthis:    " << this
-            << "\n\t&d:      " << &d 
+            << "\n\t&d:      " << &d
             );
 
         bst_base::destroy(d);
@@ -155,7 +155,7 @@ namespace dlib
             "\tvoid binary_search_tree::remove"
             << "\n\tthe element must be in the tree for it to be removed"
             << "\n\tthis:       " << this
-            << "\n\t&d:         " << &d 
+            << "\n\t&d:         " << &d
             << "\n\t&d_copy:    " << &d_copy
             << "\n\t&r:         " << &r
             );
@@ -174,7 +174,7 @@ namespace dlib
         range& r
     )
     {
-        DLIB_CASSERT(this->size() != 0 && 
+        DLIB_CASSERT(this->size() != 0 &&
             (static_cast<const void*>(&d) != static_cast<void*>(&r)),
             "\tvoid binary_search_tree::remove_any"
             << "\n\ttree must not be empty if something is going to be removed"
@@ -197,7 +197,7 @@ namespace dlib
         range& r
     )
     {
-        DLIB_CASSERT(this->size() > 0, 
+        DLIB_CASSERT(this->size() > 0,
             "\tvoid binary_search_tree::remove_last_in_order()"
             << "\n\tyou can't remove an element if it doesn't exist"
             << "\n\tthis: " << this
@@ -215,7 +215,7 @@ namespace dlib
     remove_current_element (
         domain& d,
         range& r
-    ) 
+    )
     {
         DLIB_CASSERT(this->current_element_valid() == true,
             "\tvoid binary_search_tree::remove_current_element()"

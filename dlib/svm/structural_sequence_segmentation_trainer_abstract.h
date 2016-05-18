@@ -17,7 +17,7 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON feature_extractor
-                It must be an object that implements an interface compatible with 
+                It must be an object that implements an interface compatible with
                 the example_feature_extractor defined in dlib/svm/sequence_segmenter_abstract.h.
 
             WHAT THIS OBJECT REPRESENTS
@@ -27,7 +27,7 @@ namespace dlib
                 sequences.
 
                 This object internally uses the structural_sequence_labeling_trainer to
-                solve the learning problem.  
+                solve the learning problem.
         !*/
 
     public:
@@ -63,7 +63,7 @@ namespace dlib
                 - #get_max_iterations() == 10000
                 - #get_num_threads() == 2
                 - #get_max_cache_size() == 40
-                - #get_feature_extractor() == fe 
+                - #get_feature_extractor() == fe
                 - #get_loss_per_missed_segment() == 1
                 - #get_loss_per_false_alarm() == 1
         !*/
@@ -87,7 +87,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the number of threads used during training.  You should 
+                - returns the number of threads used during training.  You should
                   usually set this equal to the number of processing cores on your
                   machine.
         !*/
@@ -103,12 +103,12 @@ namespace dlib
         !*/
 
         double get_epsilon (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the error epsilon that determines when training should stop.
-                  Smaller values may result in a more accurate solution but take longer 
-                  to train.  You can think of this epsilon value as saying "solve the 
+                  Smaller values may result in a more accurate solution but take longer
+                  to train.  You can think of this epsilon value as saying "solve the
                   optimization problem until the average number of segmentation mistakes
                   per training sample is within epsilon of its optimal value".
         !*/
@@ -122,7 +122,7 @@ namespace dlib
         !*/
 
         unsigned long get_max_iterations (
-        ); 
+        );
         /*!
             ensures
                 - returns the maximum number of iterations the SVM optimizer is allowed to
@@ -145,7 +145,7 @@ namespace dlib
                   each training sample, over and over.  To speed this up, it is possible to
                   cache the results of these segmenter invocations.  This function returns
                   the number of cache elements per training sample kept in the cache.  Note
-                  that a value of 0 means caching is not used at all.  
+                  that a value of 0 means caching is not used at all.
         !*/
 
         void be_verbose (
@@ -168,14 +168,14 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_oca() == item 
+                - #get_oca() == item
         !*/
 
         const oca get_oca (
         ) const;
         /*!
             ensures
-                - returns a copy of the optimizer used to solve the structural SVM problem.  
+                - returns a copy of the optimizer used to solve the structural SVM problem.
         !*/
 
         void set_c (
@@ -197,7 +197,7 @@ namespace dlib
                   minimize the loss) or allowing more errors but hopefully improving the
                   generalization of the resulting sequence labeler.  Larger values
                   encourage exact fitting while smaller values of C may encourage better
-                  generalization. 
+                  generalization.
         !*/
 
         void set_loss_per_missed_segment (

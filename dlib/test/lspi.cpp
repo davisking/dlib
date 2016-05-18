@@ -7,7 +7,7 @@
 #include <sstream>
 #include <ctime>
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -27,14 +27,14 @@ namespace
         matrix<double,8,1> offset;
         chain_model()
         {
-            offset = 
+            offset =
                 2.048 ,
                 2.56 ,
                 2.048 ,
                 3.2 ,
                 2.56 ,
                 4 ,
-                3.2, 
+                3.2,
                 5 ;
             if (!have_prior)
                 offset = 0;
@@ -42,12 +42,12 @@ namespace
         }
 
         unsigned long num_features(
-        ) const 
+        ) const
         {
             if (have_prior)
-                return num_states*2 + 1; 
+                return num_states*2 + 1;
             else
-                return num_states*2; 
+                return num_states*2;
         }
 
         action_type find_best_action (

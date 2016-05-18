@@ -32,12 +32,12 @@ namespace dlib
                 The particular algorithm used to solve it is described in the paper:
                     Zhou, Quan, et al. "A reduction of the elastic net to support vector
                     machines with an application to gpu computing." arXiv preprint
-                    arXiv:1409.1976 (2014).  APA 
+                    arXiv:1409.1976 (2014).  APA
 
                 And for the SVM solver sub-component we use the algorithm from:
                     Hsieh, Cho-Jui, et al. "A dual coordinate descent method for large-scale
                     linear SVM." Proceedings of the 25th international conference on Machine
-                    learning. ACM, 2008. 
+                    learning. ACM, 2008.
         !*/
 
     public:
@@ -45,7 +45,7 @@ namespace dlib
         template <typename EXP>
         explicit elastic_net(
             const matrix_exp<EXP>& XX
-        ); 
+        );
         /*!
             requires
                 - XX.size() != 0
@@ -64,7 +64,7 @@ namespace dlib
         elastic_net(
             const matrix_exp<EXP1>& XX,
             const matrix_exp<EXP2>& XY
-        ); 
+        );
         /*!
             requires
                 - XX.size() != 0
@@ -74,14 +74,14 @@ namespace dlib
             ensures
                 - constructs this object by calling the elastic_net(XX) constructor and
                   then calling this->set_xy(XY).
-                - #have_target_values() == true 
+                - #have_target_values() == true
                 - We interpret XX as trans(X)*X where X is as defined in the objective
                   function discussed above in WHAT THIS OBJECT REPRESENTS.  Similarly, XY
                   should be trans(X)*Y.
         !*/
 
         long size (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the dimensionality of the data loaded into this object.  That is,
@@ -127,11 +127,11 @@ namespace dlib
             ensures
                 - returns the error epsilon that determines when the solver should stop.
                   Smaller values may result in a more accurate solution but take longer to
-                  execute.  
+                  execute.
         !*/
 
         unsigned long get_max_iterations (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the maximum number of iterations the optimizer is allowed to run
@@ -150,7 +150,7 @@ namespace dlib
         );
         /*!
             ensures
-                - This object will print status messages to standard out so that a 
+                - This object will print status messages to standard out so that a
                   user can observe the progress of the algorithm.
         !*/
 
@@ -176,7 +176,7 @@ namespace dlib
                   REPRESENTS section above and returns the optimal w.
                 - The returned vector has size() elements.
                 - if (lasso_budget == infinity) then
-                    - The lasso constraint is ignored 
+                    - The lasso constraint is ignored
         !*/
 
     };

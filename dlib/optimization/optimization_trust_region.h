@@ -16,7 +16,7 @@ namespace dlib
         typename EXP2,
         typename T, long NR, long NC, typename MM, typename L
         >
-    unsigned long solve_trust_region_subproblem ( 
+    unsigned long solve_trust_region_subproblem (
         const matrix_exp<EXP1>& B,
         const matrix_exp<EXP2>& g,
         const typename EXP1::type radius,
@@ -37,15 +37,15 @@ namespace dlib
             << "\n\t invalid arguments were given to this function"
             << "\n\t B.nr():            " << B.nr()
             << "\n\t B.nc():            " << B.nc()
-            << "\n\t is_col_vector(g):  " << is_col_vector(g) 
-            << "\n\t g.size():          " << g.size() 
+            << "\n\t is_col_vector(g):  " << is_col_vector(g)
+            << "\n\t g.size():          " << g.size()
             );
         DLIB_ASSERT(radius > 0 && eps > 0 && max_iter > 0,
             "\t unsigned long solve_trust_region_subproblem()"
             << "\n\t invalid arguments were given to this function"
             << "\n\t radius:   " << radius
-            << "\n\t eps:      " << eps 
-            << "\n\t max_iter: " << max_iter 
+            << "\n\t eps:      " << eps
+            << "\n\t max_iter: " << max_iter
             );
 
 
@@ -63,19 +63,19 @@ namespace dlib
         T lambda = 0;
 
         // We need to put a bracket around lambda.  It can't go below 0.  We
-        // can get an upper bound using Gershgorin disks.  
+        // can get an upper bound using Gershgorin disks.
         // This number is a lower bound on the eigenvalues in BB
         const T BB_min_eigenvalue = min(diag(BB) - (sum_cols(abs(BB)) - abs(diag(BB))));
 
         const T g_norm = length(gg);
 
         T lambda_min = 0;
-        T lambda_max = put_in_range(0, 
-                                    std::numeric_limits<T>::max(), 
+        T lambda_max = put_in_range(0,
+                                    std::numeric_limits<T>::max(),
                                     g_norm/radius - BB_min_eigenvalue);
 
 
-        // If we can tell that the minimum is at 0 then don't do anything.  Just return the answer. 
+        // If we can tell that the minimum is at 0 then don't do anything.  Just return the answer.
         if (g_norm < numeric_eps && BB_min_eigenvalue > numeric_eps)
         {
             return 0;
@@ -89,7 +89,7 @@ namespace dlib
         {
             R = chol(BB + lambda*identity_matrix<T>(BB.nr()));
 
-            // if the cholesky decomposition doesn't exist. 
+            // if the cholesky decomposition doesn't exist.
             if (R(R.nr()-1, R.nc()-1) <= 0)
             {
                 // If B is indefinite and g is equal to 0 then we should
@@ -136,7 +136,7 @@ namespace dlib
             }
             const T p_norm = length(p);
 
-            // check if we are done.  
+            // check if we are done.
             if (lambda == 0)
             {
                 if (p_norm < radius)
@@ -221,7 +221,7 @@ namespace dlib
             return max_iter;
         }
 
-        // if we get this far it means we didn't converge to eps accuracy. 
+        // if we get this far it means we didn't converge to eps accuracy.
         return max_iter+1;
     }
 
@@ -233,21 +233,21 @@ namespace dlib
         >
     double find_min_trust_region (
         stop_strategy_type stop_strategy,
-        const funct_model& model, 
-        typename funct_model::column_vector& x, 
+        const funct_model& model,
+        typename funct_model::column_vector& x,
         double radius = 1
     )
     {
         /*
             This is an implementation of algorithm 4.1(Trust Region)
-            from the book Numerical Optimization by Nocedal and Wright.  
+            from the book Numerical Optimization by Nocedal and Wright.
         */
 
         // make sure requires clause is not broken
         DLIB_ASSERT(is_col_vector(x) && radius > 0,
             "\t double find_min_trust_region()"
             << "\n\t invalid arguments were given to this function"
-            << "\n\t is_col_vector(x): " << is_col_vector(x) 
+            << "\n\t is_col_vector(x): " << is_col_vector(x)
             << "\n\t radius:           " << radius
             );
 
@@ -275,8 +275,8 @@ namespace dlib
             const unsigned long iter = solve_trust_region_subproblem(h,
                                                                      g,
                                                                      radius,
-                                                                     p, 
-                                                                     0.1, 
+                                                                     p,
+                                                                     0.1,
                                                                      20);
 
 
@@ -306,7 +306,7 @@ namespace dlib
             }
             else
             {
-                // if rho > 0.75 and we are being checked by the radius 
+                // if rho > 0.75 and we are being checked by the radius
                 if (rho > 0.75 && iter > 1)
                 {
                     radius = std::min<type>(1000,  2*radius);
@@ -336,7 +336,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename funct_model>
-    struct negate_tr_model 
+    struct negate_tr_model
     {
         negate_tr_model( const funct_model& m) : model(m) {}
 
@@ -356,7 +356,7 @@ namespace dlib
             const T& x,
             T& d,
             U& h
-        ) const 
+        ) const
         {
             model.get_derivative_and_hessian(x,d,h);
             d = -d;
@@ -373,8 +373,8 @@ namespace dlib
         >
     double find_max_trust_region (
         stop_strategy_type stop_strategy,
-        const funct_model& model, 
-        typename funct_model::column_vector& x, 
+        const funct_model& model,
+        typename funct_model::column_vector& x,
         double radius = 1
     )
     {
@@ -382,7 +382,7 @@ namespace dlib
         DLIB_ASSERT(is_col_vector(x) && radius > 0,
             "\t double find_max_trust_region()"
             << "\n\t invalid arguments were given to this function"
-            << "\n\t is_col_vector(x): " << is_col_vector(x) 
+            << "\n\t is_col_vector(x): " << is_col_vector(x)
             << "\n\t radius:           " << radius
             );
 

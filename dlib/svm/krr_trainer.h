@@ -17,7 +17,7 @@
 namespace dlib
 {
     template <
-        typename K 
+        typename K
         >
     class krr_trainer
     {
@@ -91,8 +91,8 @@ namespace dlib
             DLIB_ASSERT(basis_samples.size() > 0 && is_vector(mat(basis_samples)),
                 "\tvoid krr_trainer::set_basis(basis_samples)"
                 << "\n\t You have to give a non-empty set of basis_samples and it must be a vector"
-                << "\n\t basis_samples.size():                       " << basis_samples.size() 
-                << "\n\t is_vector(mat(basis_samples)): " << is_vector(mat(basis_samples)) 
+                << "\n\t basis_samples.size():                       " << basis_samples.size()
+                << "\n\t is_vector(mat(basis_samples)): " << is_vector(mat(basis_samples))
                 << "\n\t this: " << this
                 );
 
@@ -128,7 +128,7 @@ namespace dlib
             DLIB_ASSERT(max_basis_size_ > 0,
                 "\t void krr_trainer::set_max_basis_size()"
                 << "\n\t max_basis_size_ must be greater than 0"
-                << "\n\t max_basis_size_: " << max_basis_size_ 
+                << "\n\t max_basis_size_: " << max_basis_size_
                 << "\n\t this:            " << this
                 );
 
@@ -136,7 +136,7 @@ namespace dlib
         }
 
         void set_lambda (
-            scalar_type lambda_ 
+            scalar_type lambda_
         )
         {
             // make sure requires clause is not broken
@@ -165,9 +165,9 @@ namespace dlib
             DLIB_ASSERT(is_vector(lambdas) && lambdas.size() > 0 && min(lambdas) > 0,
                 "\t void krr_trainer::set_search_lambdas()"
                 << "\n\t lambdas must be a non-empty vector of values"
-                << "\n\t is_vector(lambdas): " << is_vector(lambdas) 
+                << "\n\t is_vector(lambdas): " << is_vector(lambdas)
                 << "\n\t lambdas.size():     " << lambdas.size()
-                << "\n\t min(lambdas):       " << min(lambdas) 
+                << "\n\t min(lambdas):       " << min(lambdas)
                 << "\n\t this:   " << this
                 );
 
@@ -216,7 +216,7 @@ namespace dlib
             const in_sample_vector_type& x,
             const in_scalar_vector_type& y,
             std::vector<scalar_type>& loo_values,
-            scalar_type& lambda_used 
+            scalar_type& lambda_used
         ) const
         {
             return do_train(mat(x), mat(y), true, loo_values, lambda_used);
@@ -243,8 +243,8 @@ namespace dlib
                 << "\n\t invalid inputs were given to this function"
                 << "\n\t is_vector(x): " << is_vector(x)
                 << "\n\t is_vector(y): " << is_vector(y)
-                << "\n\t x.size():     " << x.size() 
-                << "\n\t y.size():     " << y.size() 
+                << "\n\t x.size():     " << x.size()
+                << "\n\t y.size():     " << y.size()
                 );
 
 #ifdef ENABLE_ASSERTS
@@ -283,7 +283,7 @@ namespace dlib
 
             running_stats<scalar_type> rs;
 
-            // Now we project all the x samples into kernel space using our EKM 
+            // Now we project all the x samples into kernel space using our EKM
             matrix<column_matrix_type,0,1,mem_manager_type > proj_x;
             proj_x.set_size(x.size());
             for (long i = 0; i < proj_x.size(); ++i)
@@ -319,7 +319,7 @@ namespace dlib
             // convert the linear decision function into a kernelized one.
             decision_function<kernel_type> df;
             df = ekm.convert_to_decision_function(lin_df.basis_vectors(0));
-            df.b = lin_df.b; 
+            df.b = lin_df.b;
 
             // If we used an automatically derived basis then there isn't any point in
             // keeping the ekm around.  So free its memory.
@@ -341,8 +341,8 @@ namespace dlib
                 - get_lambda() == trainer.get_lambda()
                 - get_kernel() == kern
                 - get_max_basis_size() == max_basis_size
-                - will_use_regression_loss_for_loo_cv() == trainer.will_use_regression_loss_for_loo_cv() 
-                - get_search_lambdas() == trainer.get_search_lambdas() 
+                - will_use_regression_loss_for_loo_cv() == trainer.will_use_regression_loss_for_loo_cv()
+                - get_search_lambdas() == trainer.get_search_lambdas()
 
                 - basis_loaded() == (basis.size() != 0)
         !*/
@@ -357,9 +357,9 @@ namespace dlib
 
         matrix<sample_type,0,1,mem_manager_type> basis;
         mutable empirical_kernel_map<kernel_type> ekm;
-        mutable bool ekm_stale; 
+        mutable bool ekm_stale;
 
-    }; 
+    };
 
 }
 

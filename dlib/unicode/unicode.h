@@ -19,7 +19,7 @@ namespace dlib
     typedef uint32 unichar;
 
 #if defined(__GNUC__) && __GNUC__ < 4 && __GNUC_MINOR__ < 4
-    struct unichar_traits 
+    struct unichar_traits
     {
         typedef dlib::unichar    char_type;
         typedef dlib::unichar    int_type;
@@ -30,7 +30,7 @@ namespace dlib
         static void assign(char_type& c1, const char_type& c2) { c1 = c2; }
         static bool eq(const char_type& c1, const char_type& c2) { return c1 == c2; }
         static bool lt(const char_type& c1, const char_type& c2) { return c1 < c2; }
-        static int compare(const char_type* s1, const char_type* s2, size_t n) 
+        static int compare(const char_type* s1, const char_type* s2, size_t n)
         {
             for (size_t i = 0; i < n; ++i)
             {
@@ -85,7 +85,7 @@ namespace dlib
         }
 
 
-        static int_type not_eof(const int_type& c) 
+        static int_type not_eof(const int_type& c)
         {
             if (!eq_int_type(c,eof()))
                 return to_int_type(c);
@@ -152,7 +152,7 @@ namespace dlib
                 if ( val == EOF )
                     return -1;
                 
-                ch[1] = zero_extend_cast<unichar>(val); 
+                ch[1] = zero_extend_cast<unichar>(val);
                 if ( ( ch[1] & ~0x3F ) != 0x80 )
                     return -1; // invalid tail
                 if ( ( ch[0] & ~0x01 ) == 0xC0 )
@@ -169,7 +169,7 @@ namespace dlib
                     val = in.get();
                     if ( val == EOF )
                         return -1;
-                    ch[n] = zero_extend_cast<unichar>(val); 
+                    ch[n] = zero_extend_cast<unichar>(val);
                     if ( ( ch[n] & ~0x3F ) != 0x80 )
                         return -1; // invalid tail
                     ch[n] &= 0x3F;
@@ -193,7 +193,7 @@ namespace dlib
                     val = in.get();
                     if ( val == EOF )
                         return -1;
-                    ch[n] = zero_extend_cast<unichar>(val); 
+                    ch[n] = zero_extend_cast<unichar>(val);
                     if ( ( ch[n] & ~0x3F ) != 0x80 )
                         return -1; // invalid tail
                     ch[n] &= 0x3F;
@@ -222,8 +222,8 @@ namespace dlib
             ) :
                 fin(fin_)
             {
-                this->setg(in_buffer+max_putback, 
-                     in_buffer+max_putback, 
+                this->setg(in_buffer+max_putback,
+                     in_buffer+max_putback,
                      in_buffer+max_putback);
             }
 
@@ -232,7 +232,7 @@ namespace dlib
             typedef typename std::basic_streambuf<charT>::int_type int_type;
 
             // input functions
-            int_type underflow( 
+            int_type underflow(
             )
             {
                 if (this->gptr() < this->egptr())
@@ -545,8 +545,8 @@ namespace dlib
 
         basic_utf8_ifstream (
             const char* file_name,
-            std::ios_base::openmode mode = std::ios::in 
-        ) : 
+            std::ios_base::openmode mode = std::ios::in
+        ) :
             std::basic_istream<charT>(&buf),
             buf(fin)
         {
@@ -557,8 +557,8 @@ namespace dlib
 
         basic_utf8_ifstream (
             const std::string& file_name,
-            std::ios_base::openmode mode = std::ios::in 
-        ) : 
+            std::ios_base::openmode mode = std::ios::in
+        ) :
             std::basic_istream<charT>(&buf),
             buf(fin)
         {
@@ -569,7 +569,7 @@ namespace dlib
 
         void open(
             const std::string& file_name,
-            std::ios_base::openmode mode = std::ios::in 
+            std::ios_base::openmode mode = std::ios::in
         )
         {
             open(file_name.c_str(),mode);
@@ -577,7 +577,7 @@ namespace dlib
 
         void open (
             const char* file_name,
-            std::ios_base::openmode mode = std::ios::in 
+            std::ios_base::openmode mode = std::ios::in
         )
         {
             fin.close();

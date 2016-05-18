@@ -10,7 +10,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace std;
@@ -28,9 +28,9 @@ namespace
             - set is an implementation of set/set_compare_abstract.h and
               is instantiated with int
         ensures
-            - runs tests on set for compliance with the specs 
+            - runs tests on set for compliance with the specs
     !*/
-    {        
+    {
 
 
         srand(static_cast<unsigned int>(time(0)));
@@ -184,7 +184,7 @@ namespace
                 DLIB_TEST(test2.element() == test2.element());
                 DLIB_TEST(test2.element() == test2.element());
                 DLIB_TEST(a < test2.element());
-                a = test2.element();                
+                a = test2.element();
                 ++count;
             }
             DLIB_TEST(test2.size() == 10000);
@@ -287,7 +287,7 @@ namespace
                     DLIB_TEST(test2.element() == test2.element());
                     DLIB_TEST(test2.element() == test2.element());
                     DLIB_TEST(a <= test2.element());
-                    a = test2.element();                
+                    a = test2.element();
                     ++count;
                 }
 
@@ -315,7 +315,7 @@ namespace
                     test.add(a);
             }
 
-            count = 0; 
+            count = 0;
             a = -1;
             while (test.move_next())
             {
@@ -329,7 +329,7 @@ namespace
 
             test.reset();
 
-            count = 0; 
+            count = 0;
             a = -1;
             while (test.move_next())
             {
@@ -356,7 +356,7 @@ namespace
             int a = 3, b = 3;
             test.add(a);
             test2.add(b);
-            test.move_next();                
+            test.move_next();
             DLIB_TEST(test == test2);
             DLIB_TEST(test.at_start() && test2.at_start());
             test.move_next();
@@ -373,10 +373,10 @@ namespace
             test2.move_next();
             DLIB_TEST((test == test2) == false);
             DLIB_TEST(test.at_start() && test2.at_start());
-            test2.move_next();                
+            test2.move_next();
             DLIB_TEST((test < test2) == true);
             DLIB_TEST(test.at_start() && test2.at_start());
-            test2.move_next();                
+            test2.move_next();
             DLIB_TEST((test2 < test) == false);
             DLIB_TEST(test.at_start() && test2.at_start());
 
@@ -387,10 +387,10 @@ namespace
             test2.move_next();
             DLIB_TEST((test == test2) == false);
             DLIB_TEST(test.at_start() && test2.at_start());
-            test2.move_next();                
+            test2.move_next();
             DLIB_TEST((test < test2) == false);
             DLIB_TEST(test.at_start() && test2.at_start());
-            test2.move_next();                
+            test2.move_next();
             DLIB_TEST((test2 < test) == true);
             DLIB_TEST(test.at_start() && test2.at_start());
 
@@ -400,10 +400,10 @@ namespace
             test2.move_next();
             DLIB_TEST((test == test2) == false);
             DLIB_TEST(test.at_start() && test2.at_start());
-            test2.move_next();                
+            test2.move_next();
             DLIB_TEST((test < test2) == true);
             DLIB_TEST(test.at_start() && test2.at_start());
-            test2.move_next();                
+            test2.move_next();
             DLIB_TEST((test2 < test) == false);
             DLIB_TEST(test.at_start() && test2.at_start());
 

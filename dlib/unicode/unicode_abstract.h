@@ -13,7 +13,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    // a typedef for an unsigned 32bit integer to hold our UNICODE characters 
+    // a typedef for an unsigned 32bit integer to hold our UNICODE characters
     typedef uint32 unichar;
 
     // a typedef for a string object to hold our UNICODE strings
@@ -45,7 +45,7 @@ namespace dlib
     !*/
 
     unichar surrogate_pair_to_unichar(
-        unichar first, 
+        unichar first,
         unichar second
     );
     /*!
@@ -59,13 +59,13 @@ namespace dlib
     !*/
 
     void unichar_to_surrogate_pair(
-        unichar ch, 
-        unichar& first, 
+        unichar ch,
+        unichar& first,
         unichar& second
     );
     /*!
         requires
-            - ch >= 0x10000 (i.e. is not in Basic Multilingual Plane) 
+            - ch >= 0x10000 (i.e. is not in Basic Multilingual Plane)
         ensures
             - surrogate_pair_to_unichar(#first,#second) == ch
               (i.e. converts ch into two surrogate characters)
@@ -137,7 +137,7 @@ namespace dlib
     );
     /*!
         requires
-            - str is a valid wide character string string whose encoding is same as current 
+            - str is a valid wide character string string whose encoding is same as current
               locale setting
         ensures
             - returns a multibyte encoded version of the given string
@@ -153,7 +153,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object represents an input file stream much like the
-                normal std::ifstream except that it knows how to read UTF-8 
+                normal std::ifstream except that it knows how to read UTF-8
                 data.  So when you read characters out of this stream it will
                 automatically convert them from the UTF-8 multibyte encoding
                 into a fixed width wide character encoding.
@@ -171,7 +171,7 @@ namespace dlib
 
         basic_utf8_ifstream (
             const char* file_name,
-            std::ios_base::openmode mode = std::ios::in 
+            std::ios_base::openmode mode = std::ios::in
         );
         /*!
             ensures
@@ -182,7 +182,7 @@ namespace dlib
 
         basic_utf8_ifstream (
             const std::string& file_name,
-            std::ios_base::openmode mode = std::ios::in 
+            std::ios_base::openmode mode = std::ios::in
         );
         /*!
             ensures
@@ -193,7 +193,7 @@ namespace dlib
 
         void open(
             const std::string& file_name,
-            std::ios_base::openmode mode = std::ios::in 
+            std::ios_base::openmode mode = std::ios::in
         );
         /*!
             ensures
@@ -204,7 +204,7 @@ namespace dlib
 
         void open (
             const char* file_name,
-            std::ios_base::openmode mode = std::ios::in 
+            std::ios_base::openmode mode = std::ios::in
         );
         /*!
             ensures

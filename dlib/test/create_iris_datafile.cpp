@@ -6,7 +6,7 @@
 #include <dlib/compress_stream.h>
 #include <dlib/base64.h>
 
-namespace 
+namespace
 {
     // This function returns the contents of the file 'iris.scale'
     const std::string get_decoded_string()

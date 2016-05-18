@@ -1,7 +1,7 @@
 // Copyright (C) 2006  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_CREATE_NEW_THREAD_EXTENSIOn_
-#define DLIB_CREATE_NEW_THREAD_EXTENSIOn_ 
+#define DLIB_CREATE_NEW_THREAD_EXTENSIOn_
 
 #include "threads_kernel_abstract.h"
 #include "create_new_thread_extension_abstract.h"

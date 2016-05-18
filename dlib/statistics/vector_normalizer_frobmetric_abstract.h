@@ -13,7 +13,7 @@ namespace dlib
     template <
         typename matrix_type
         >
-    struct frobmetric_training_sample 
+    struct frobmetric_training_sample
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -63,7 +63,7 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON matrix_type
-                - must be a dlib::matrix object capable of representing column 
+                - must be a dlib::matrix object capable of representing column
                   vectors
 
             INITIAL VALUE
@@ -92,11 +92,11 @@ namespace dlib
                 farther away.
 
             THREAD SAFETY
-                Note that this object contains a cached matrix object it uses 
+                Note that this object contains a cached matrix object it uses
                 to store intermediate results for normalization.  This avoids
                 needing to reallocate it every time this object performs normalization
                 but also makes it non-thread safe.  So make sure you don't share
-                instances of this object between threads. 
+                instances of this object between threads.
         !*/
 
     public:
@@ -154,7 +154,7 @@ namespace dlib
             requires
                 - eps > 0
             ensures
-                - #get_epsilon() == eps 
+                - #get_epsilon() == eps
         !*/
 
         double get_epsilon (
@@ -167,7 +167,7 @@ namespace dlib
         !*/
 
         void set_c (
-            double C 
+            double C
         );
         /*!
             requires
@@ -184,7 +184,7 @@ namespace dlib
                   determines the trade-off between trying to fit the training data exactly
                   or allowing more errors but hopefully improving the generalization of the
                   resulting distance metric.  Larger values encourage exact fitting while
-                  smaller values of C may encourage better generalization. 
+                  smaller values of C may encourage better generalization.
         !*/
        
         void set_max_iterations (
@@ -224,7 +224,7 @@ namespace dlib
                     - #transform() == The linear transformation learned by the FrobMetric
                       learning procedure.
                     - #in_vector_size() == samples[0].anchor_vect.size()
-                    - You can call (*this)(x) to transform a vector according to the learned 
+                    - You can call (*this)(x) to transform a vector according to the learned
                       distance metric.  That is, it should generally be the case that:
                         - length((*this)(anchor_vect) - (*this)(near)) + 1 < length((*this)(anchor_vect) - (*this)(far))
                       for the anchor_vect, near, and far vectors in the training data.
@@ -268,7 +268,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns a copy of the transformation matrix we learned during the last 
+                - returns a copy of the transformation matrix we learned during the last
                   call to train().
                 - The returned matrix is square and has in_vector_size() by in_vector_size()
                   dimensions.
@@ -284,7 +284,7 @@ namespace dlib
                 - is_col_vector(x) == true
             ensures
                 - returns a normalized version of x, call it Z, that has the following
-                  properties: 
+                  properties:
                     - Z == The result of applying the linear transform we learned during
                       train() to the input vector x.
                     - Z == transform()*x-transformed_means()
@@ -300,11 +300,11 @@ namespace dlib
         typename matrix_type
         >
     void serialize (
-        const vector_normalizer_frobmetric<matrix_type>& item, 
-        std::ostream& out 
+        const vector_normalizer_frobmetric<matrix_type>& item,
+        std::ostream& out
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -313,11 +313,11 @@ namespace dlib
         typename matrix_type
         >
     void deserialize (
-        vector_normalizer_frobmetric<matrix_type>& item, 
+        vector_normalizer_frobmetric<matrix_type>& item,
         std::istream& in
     );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

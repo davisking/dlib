@@ -67,7 +67,7 @@ namespace dlib
             DLIB_CASSERT(1 <= num_bits && num_bits <= 30,
                 "\tvoid quantum_register::set_num_bits()"
                 << "\n\tinvalid arguments to this function"
-                << "\n\tnum_bits: " << num_bits 
+                << "\n\tnum_bits: " << num_bits
                 << "\n\tthis:     " << this
                 );
 
@@ -88,7 +88,7 @@ namespace dlib
             state(0) = 1;
         }
 
-        void append ( 
+        void append (
             const quantum_register& reg
         )
         {
@@ -106,8 +106,8 @@ namespace dlib
             DLIB_CASSERT(0 <= bit && bit < num_bits(),
                 "\tbool quantum_register::measure_bit()"
                 << "\n\tinvalid arguments to this function"
-                << "\n\tbit:        " << bit 
-                << "\n\tnum_bits(): " << num_bits() 
+                << "\n\tbit:        " << bit
+                << "\n\tnum_bits(): " << num_bits()
                 << "\n\tthis:       " << this
                 );
 
@@ -130,7 +130,7 @@ namespace dlib
                 {
                     state(r) = 0;
                 }
-                // else if this state indicates that the bit should not be set and it is 
+                // else if this state indicates that the bit should not be set and it is
                 else if (!(field & mask) && value)
                 {
                     state(r) = 0;
@@ -153,8 +153,8 @@ namespace dlib
             DLIB_CASSERT(0 <= bit && bit < num_bits() && num_bits() > 0,
                 "\tbool quantum_register::measure_and_remove_bit()"
                 << "\n\tinvalid arguments to this function"
-                << "\n\tbit:        " << bit 
-                << "\n\tnum_bits(): " << num_bits() 
+                << "\n\tbit:        " << bit
+                << "\n\tnum_bits(): " << num_bits()
                 << "\n\tthis:       " << this
                 );
 
@@ -199,8 +199,8 @@ namespace dlib
             DLIB_CASSERT(0 <= bit && bit < num_bits(),
                 "\tdouble quantum_register::probability_of_bit()"
                 << "\n\tinvalid arguments to this function"
-                << "\n\tbit:        " << bit 
-                << "\n\tnum_bits(): " << num_bits() 
+                << "\n\tbit:        " << bit
+                << "\n\tnum_bits(): " << num_bits()
                 << "\n\tthis:       " << this
                 );
 
@@ -280,8 +280,8 @@ namespace dlib
             DLIB_CASSERT(reg.num_bits() == num_bits,
                 "\tvoid gate_exp::apply_gate_to()"
                 << "\n\tinvalid arguments to this function"
-                << "\n\treg.num_bits(): " << reg.num_bits() 
-                << "\n\tnum_bits:       " << num_bits 
+                << "\n\treg.num_bits(): " << reg.num_bits()
+                << "\n\tnum_bits:       " << num_bits
                 << "\n\tthis:           " << this
                 );
 
@@ -311,7 +311,7 @@ namespace dlib
             }
             else
             {
-                // do a matrix multiply but only use the columns in the gate matrix 
+                // do a matrix multiply but only use the columns in the gate matrix
                 // that correspond to the non-zero register elements
                 for (long r = 0; r < dims; ++r)
                 {
@@ -333,14 +333,14 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(reg.nr() == dims && reg.nc() == 1 && 
+            DLIB_ASSERT(reg.nr() == dims && reg.nc() == 1 &&
                          0 <= row_idx && row_idx < dims,
                 "\tqc_scalar_type gate_exp::compute_state_element(reg,row_idx)"
                 << "\n\tinvalid arguments to this function"
-                << "\n\treg.nr(): " << reg.nr() 
+                << "\n\treg.nr(): " << reg.nr()
                 << "\n\treg.nc(): " << reg.nc()
                 << "\n\tdims:     " << dims
-                << "\n\trow_idx:  " << row_idx 
+                << "\n\trow_idx:  " << row_idx
                 << "\n\tthis:     " << this
                 );
 
@@ -396,14 +396,14 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(reg.nr() == dims && reg.nc() == 1 && 
+            DLIB_ASSERT(reg.nr() == dims && reg.nc() == 1 &&
                          0 <= row_idx && row_idx < dims,
                 "\tqc_scalar_type composite_gate::compute_state_element(reg,row_idx)"
                 << "\n\tinvalid arguments to this function"
-                << "\n\treg.nr(): " << reg.nr() 
+                << "\n\treg.nr(): " << reg.nr()
                 << "\n\treg.nc(): " << reg.nc()
                 << "\n\tdims:     " << dims
-                << "\n\trow_idx:  " << row_idx 
+                << "\n\trow_idx:  " << row_idx
                 << "\n\tthis:     " << this
                 );
 
@@ -446,7 +446,7 @@ namespace dlib
         gate(const gate& g) :gate_exp<gate>(*this), data(g.data) {}
 
         template <typename T>
-        explicit gate(const gate_exp<T>& g) : gate_exp<gate>(*this) 
+        explicit gate(const gate_exp<T>& g) : gate_exp<gate>(*this)
         {
             COMPILE_TIME_ASSERT(T::num_bits == num_bits);
             for (long r = 0; r < dims; ++r)
@@ -471,14 +471,14 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(reg.nr() == dims && reg.nc() == 1 && 
+            DLIB_ASSERT(reg.nr() == dims && reg.nc() == 1 &&
                          0 <= row_idx && row_idx < dims,
                 "\tqc_scalar_type gate::compute_state_element(reg,row_idx)"
                 << "\n\tinvalid arguments to this function"
-                << "\n\treg.nr(): " << reg.nr() 
+                << "\n\treg.nr(): " << reg.nr()
                 << "\n\treg.nc(): " << reg.nc()
                 << "\n\tdims:     " << dims
-                << "\n\trow_idx:  " << row_idx 
+                << "\n\trow_idx:  " << row_idx
                 << "\n\tthis:     " << this
                 );
 
@@ -507,8 +507,8 @@ namespace dlib
         // These overloads all deal with intelligently composing chains of composite_gate expressions
         // such that the resulting expression has the form:
         //    (gate_exp,(gate_exp,(gate_exp,(gate_exp()))))
-        // and each gate_exp contains a cached gate matrix for a gate of at most qc_block_chunking_size bits.  
-        // This facilitates the optimizations in the compute_state_element() function. 
+        // and each gate_exp contains a cached gate matrix for a gate of at most qc_block_chunking_size bits.
+        // This facilitates the optimizations in the compute_state_element() function.
         template <typename T, typename U, typename V, typename enabled = void>
         struct combine_gates;
 
@@ -522,7 +522,7 @@ namespace dlib
             static const result_type eval (
                 const composite_gate<T,U>& lhs,
                 const gate_exp<V>& rhs
-            ) 
+            )
             {
                 typedef gate<T::num_bits + U::num_bits> gate_type;
                 return composite_gate<gate_type,V>(gate_type(lhs), rhs);
@@ -549,7 +549,7 @@ namespace dlib
         // This is a base case of this recursive template.  It takes care of adding new gates when the left
         // hand side is too big to just turn it into a cached gate object.
         template <typename T, typename U, typename V>
-        struct combine_gates<T,U,V,typename enable_if_c<(T::num_bits + U::num_bits > qc_block_chunking_size && 
+        struct combine_gates<T,U,V,typename enable_if_c<(T::num_bits + U::num_bits > qc_block_chunking_size &&
                                                          is_composite_gate<U>::value == false)>::type >
         {
             typedef composite_gate<T,composite_gate<U, V> > result_type;
@@ -557,9 +557,9 @@ namespace dlib
             static const result_type eval (
                 const composite_gate<T,U>& lhs,
                 const gate_exp<V>& rhs
-            ) 
+            )
             {
-                return result_type(lhs.lhs, composite_gate<U,V>(lhs.rhs, rhs)); 
+                return result_type(lhs.lhs, composite_gate<U,V>(lhs.rhs, rhs));
             }
 
         };
@@ -567,7 +567,7 @@ namespace dlib
     }
 
     template <typename T, typename U>
-    const composite_gate<T,U> operator, ( 
+    const composite_gate<T,U> operator, (
         const gate_exp<T>& lhs,
         const gate_exp<U>& rhs
     )
@@ -576,7 +576,7 @@ namespace dlib
     }
 
     template <typename T, typename U, typename V>
-    const typename qc_helpers::combine_gates<T,U,V>::result_type operator, ( 
+    const typename qc_helpers::combine_gates<T,U,V>::result_type operator, (
         const composite_gate<T,U>& lhs,
         const gate_exp<V>& rhs
     )
@@ -585,7 +585,7 @@ namespace dlib
     }
 
     // If you are getting an error here then it means that you are trying to combine a gate expression
-    // with an integer somewhere (and that is an error).  
+    // with an integer somewhere (and that is an error).
     template <typename T> void operator, ( const gate_exp<T>&, int) { COMPILE_TIME_ASSERT(sizeof(T) > 100000000); }
     template <typename T> void operator, ( int, const gate_exp<T>&) { COMPILE_TIME_ASSERT(sizeof(T) > 100000000); }
 
@@ -610,7 +610,7 @@ namespace dlib
     template <int control_bit1, int control_bit2, int target_bit>
     struct gate_traits<quantum_gates::toffoli<control_bit1, control_bit2, target_bit> >
     {
-        static const long num_bits = tmax<tabs<control_bit1-target_bit>::value, 
+        static const long num_bits = tmax<tabs<control_bit1-target_bit>::value,
                                             tabs<control_bit2-target_bit>::value>::value+1;
         static const long dims = qc_helpers::exp_2_n<num_bits>::value;
     };
@@ -685,7 +685,7 @@ namespace dlib
         public:
             COMPILE_TIME_ASSERT(control_bit != target_bit);
 
-            cnot() : gate_exp<cnot>(*this) 
+            cnot() : gate_exp<cnot>(*this)
             {
                 const int min_bit = std::min(control_bit, target_bit);
 
@@ -702,8 +702,8 @@ namespace dlib
             static const long num_bits = gate_traits<cnot>::num_bits;
             static const long dims = gate_traits<cnot>::dims;
 
-            const qc_scalar_type operator() (long r, long c) const 
-            { 
+            const qc_scalar_type operator() (long r, long c) const
+            {
                 unsigned long output;
                 // if the input control bit is set
                 if (control_mask&c)
@@ -728,14 +728,14 @@ namespace dlib
             ) const
             {
                 // make sure requires clause is not broken
-                DLIB_ASSERT(reg.nr() == dims && reg.nc() == 1 && 
+                DLIB_ASSERT(reg.nr() == dims && reg.nc() == 1 &&
                             0 <= row_idx && row_idx < dims,
                     "\tqc_scalar_type cnot::compute_state_element(reg,row_idx)"
                     << "\n\tinvalid arguments to this function"
-                    << "\n\treg.nr(): " << reg.nr() 
+                    << "\n\treg.nr(): " << reg.nr()
                     << "\n\treg.nc(): " << reg.nc()
                     << "\n\tdims:     " << dims
-                    << "\n\trow_idx:  " << row_idx 
+                    << "\n\trow_idx:  " << row_idx
                     << "\n\tthis:     " << this
                     );
 
@@ -767,7 +767,7 @@ namespace dlib
             COMPILE_TIME_ASSERT(control_bit1 != target_bit && control_bit2 != target_bit && control_bit1 != control_bit2);
             COMPILE_TIME_ASSERT((control_bit1 < target_bit && control_bit2 < target_bit) ||(control_bit1 > target_bit && control_bit2 > target_bit) );
 
-            toffoli() : gate_exp<toffoli>(*this) 
+            toffoli() : gate_exp<toffoli>(*this)
             {
                 const int min_bit = std::min(std::min(control_bit1, control_bit2), target_bit);
 
@@ -787,8 +787,8 @@ namespace dlib
             static const long num_bits = gate_traits<toffoli>::num_bits;
             static const long dims = gate_traits<toffoli>::dims;
 
-            const qc_scalar_type operator() (long r, long c) const 
-            { 
+            const qc_scalar_type operator() (long r, long c) const
+            {
                 unsigned long output;
                 // if the input control bits are set
                 if ((control1_mask&c) && (control2_mask&c))
@@ -813,14 +813,14 @@ namespace dlib
             ) const
             {
                 // make sure requires clause is not broken
-                DLIB_ASSERT(reg.nr() == dims && reg.nc() == 1 && 
+                DLIB_ASSERT(reg.nr() == dims && reg.nc() == 1 &&
                             0 <= row_idx && row_idx < dims,
                     "\tqc_scalar_type toffoli::compute_state_element(reg,row_idx)"
                     << "\n\tinvalid arguments to this function"
-                    << "\n\treg.nr(): " << reg.nr() 
+                    << "\n\treg.nr(): " << reg.nr()
                     << "\n\treg.nc(): " << reg.nc()
                     << "\n\tdims:     " << dims
-                    << "\n\trow_idx:  " << row_idx 
+                    << "\n\trow_idx:  " << row_idx
                     << "\n\tthis:     " << this
                     );
 

@@ -44,7 +44,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
+        typename T,
         typename alloc
         >
     double average_precision (
@@ -55,7 +55,7 @@ namespace dlib
         ensures
             - this function is equivalent to copying the bool values from items into a
               std::vector<bool> and then calling the above average_precision() routine on
-              it and returning the result. 
+              it and returning the result.
     !*/
 
 // ----------------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 // Copyright (C) 2009  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_MATRIx_LA_FUNCTS_
-#define DLIB_MATRIx_LA_FUNCTS_ 
+#define DLIB_MATRIx_LA_FUNCTS_
 
 #include "matrix_la_abstract.h"
 #include "matrix_utilities.h"
@@ -9,7 +9,7 @@
 #include "../optimization/optimization_line_search.h"
 
 // The 4 decomposition objects described in the matrix_la_abstract.h file are
-// actually implemented in the following 4 files.  
+// actually implemented in the following 4 files.
 #include "matrix_lu.h"
 #include "matrix_qr.h"
 #include "matrix_cholesky.h"
@@ -30,7 +30,7 @@ namespace dlib
 
     namespace nric
     {
-        // This namespace contains stuff adapted from the algorithms 
+        // This namespace contains stuff adapted from the algorithms
         // described in the book Numerical Recipes in C
 
         template <typename T>
@@ -39,13 +39,13 @@ namespace dlib
             T absa,absb;
             absa=std::abs(a);
             absb=std::abs(b);
-            if (absa > absb) 
+            if (absa > absb)
             {
                 T val = absb/absa;
                 val *= val;
                 return absa*std::sqrt(1.0+val);
             }
-            else 
+            else
             {
                 if (absb == 0.0)
                 {
@@ -78,7 +78,7 @@ namespace dlib
             typename T,
             long M, long N,
             long wN, long wX,
-            long vN, 
+            long vN,
             long rN, long rX,
             typename MM1,
             typename MM2,
@@ -90,7 +90,7 @@ namespace dlib
             typename L4
             >
         bool svdcmp(
-            matrix<T,M,N,MM1,L1>& a,  
+            matrix<T,M,N,MM1,L1>& a,
             matrix<T,wN,wX,MM2,L2>& w,
             matrix<T,vN,vN,MM3,L3>& v,
             matrix<T,rN,rX,MM4,L4>& rv1
@@ -135,21 +135,21 @@ namespace dlib
             T anorm,c,f,g,h,s,scale,x,y,z;
             g = 0.0;
             scale = 0.0;
-            anorm = 0.0; 
+            anorm = 0.0;
 
-            for (long i = 0; i < n; ++i) 
+            for (long i = 0; i < n; ++i)
             {
                 l = i+1;
                 rv1(i) = scale*g;
                 g = s = scale = 0.0;
-                if (i < m) 
+                if (i < m)
                 {
-                    for (long k = i; k < m; ++k) 
+                    for (long k = i; k < m; ++k)
                         scale += std::abs(a(k,i));
 
-                    if (scale) 
+                    if (scale)
                     {
-                        for (long k = i; k < m; ++k) 
+                        for (long k = i; k < m; ++k)
                         {
                             a(k,i) /= scale;
                             s += a(k,i)*a(k,i);
@@ -158,18 +158,18 @@ namespace dlib
                         g = -sign(std::sqrt(s),f);
                         h = f*g - s;
                         a(i,i) = f - g;
-                        for (long j = l; j < n; ++j) 
+                        for (long j = l; j < n; ++j)
                         {
                             s = 0.0;
-                            for (long k = i; k < m; ++k) 
+                            for (long k = i; k < m; ++k)
                                 s += a(k,i)*a(k,j);
 
                             f = s/h;
 
-                            for (long k = i; k < m; ++k) 
+                            for (long k = i; k < m; ++k)
                                 a(k,j) += f*a(k,i);
                         }
-                        for (long k = i; k < m; ++k) 
+                        for (long k = i; k < m; ++k)
                             a(k,i) *= scale;
                     }
                 }
@@ -178,14 +178,14 @@ namespace dlib
 
                 g=s=scale=0.0;
 
-                if (i < m && i < n-1) 
+                if (i < m && i < n-1)
                 {
-                    for (long k = l; k < n; ++k) 
+                    for (long k = l; k < n; ++k)
                         scale += std::abs(a(i,k));
 
-                    if (scale) 
+                    if (scale)
                     {
-                        for (long k = l; k < n; ++k) 
+                        for (long k = l; k < n; ++k)
                         {
                             a(i,k) /= scale;
                             s += a(i,k)*a(i,k);
@@ -195,45 +195,45 @@ namespace dlib
                         h = f*g - s;
                         a(i,l) = f - g;
 
-                        for (long k = l; k < n; ++k) 
+                        for (long k = l; k < n; ++k)
                             rv1(k) = a(i,k)/h;
 
-                        for (long j = l; j < m; ++j) 
+                        for (long j = l; j < m; ++j)
                         {
                             s = 0.0;
-                            for (long k = l; k < n; ++k) 
+                            for (long k = l; k < n; ++k)
                                 s += a(j,k)*a(i,k);
 
-                            for (long k = l; k < n; ++k) 
+                            for (long k = l; k < n; ++k)
                                 a(j,k) += s*rv1(k);
                         }
-                        for (long k = l; k < n; ++k) 
+                        for (long k = l; k < n; ++k)
                             a(i,k) *= scale;
                     }
                 }
                 anorm = std::max(anorm,(std::abs(w(i))+std::abs(rv1(i))));
             }
-            for (long i = n-1; i >= 0; --i) 
-            { 
-                if (i < n-1) 
+            for (long i = n-1; i >= 0; --i)
+            {
+                if (i < n-1)
                 {
-                    if (g != 0) 
+                    if (g != 0)
                     {
-                        for (long j = l; j < n ; ++j) 
+                        for (long j = l; j < n ; ++j)
                             v(j,i) = (a(i,j)/a(i,l))/g;
 
-                        for (long j = l; j < n; ++j) 
+                        for (long j = l; j < n; ++j)
                         {
                             s = 0.0;
-                            for (long k = l; k < n; ++k) 
+                            for (long k = l; k < n; ++k)
                                 s += a(i,k)*v(k,j);
 
-                            for (long k = l; k < n; ++k) 
+                            for (long k = l; k < n; ++k)
                                 v(k,j) += s*v(k,i);
                         }
                     }
 
-                    for (long j = l; j < n; ++j) 
+                    for (long j = l; j < n; ++j)
                         v(i,j) = v(j,i) = 0.0;
                 }
 
@@ -242,69 +242,69 @@ namespace dlib
                 l = i;
             }
 
-            for (long i = std::min(m,n)-1; i >= 0; --i) 
-            { 
+            for (long i = std::min(m,n)-1; i >= 0; --i)
+            {
                 l = i + 1;
                 g = w(i);
 
-                for (long j = l; j < n; ++j) 
+                for (long j = l; j < n; ++j)
                     a(i,j) = 0.0;
 
-                if (g != 0) 
+                if (g != 0)
                 {
                     g = 1.0/g;
 
-                    for (long j = l; j < n; ++j) 
+                    for (long j = l; j < n; ++j)
                     {
                         s = 0.0;
-                        for (long k = l; k < m; ++k) 
+                        for (long k = l; k < m; ++k)
                             s += a(k,i)*a(k,j);
 
                         f=(s/a(i,i))*g;
 
-                        for (long k = i; k < m; ++k) 
+                        for (long k = i; k < m; ++k)
                             a(k,j) += f*a(k,i);
                     }
-                    for (long j = i; j < m; ++j) 
+                    for (long j = i; j < m; ++j)
                         a(j,i) *= g;
-                } 
-                else 
+                }
+                else
                 {
-                    for (long j = i; j < m; ++j) 
+                    for (long j = i; j < m; ++j)
                         a(j,i) = 0.0;
                 }
 
                 ++a(i,i);
             }
 
-            for (long k = n-1; k >= 0; --k) 
-            { 
-                for (long its = 1; its <= max_iter; ++its) 
-                { 
+            for (long k = n-1; k >= 0; --k)
+            {
+                for (long its = 1; its <= max_iter; ++its)
+                {
                     flag = true;
-                    for (l = k; l >= 1; --l) 
-                    { 
-                        nm = l - 1; 
-                        if (std::abs(rv1(l)) <= eps*anorm) 
+                    for (l = k; l >= 1; --l)
+                    {
+                        nm = l - 1;
+                        if (std::abs(rv1(l)) <= eps*anorm)
                         {
                             flag = false;
                             break;
                         }
-                        if (std::abs(w(nm)) <= eps*anorm) 
+                        if (std::abs(w(nm)) <= eps*anorm)
                         {
                             break;
                         }
                     }
 
-                    if (flag) 
+                    if (flag)
                     {
-                        c = 0.0;  
+                        c = 0.0;
                         s = 1.0;
-                        for (long i = l; i <= k; ++i) 
+                        for (long i = l; i <= k; ++i)
                         {
                             f = s*rv1(i);
                             rv1(i) = c*rv1(i);
-                            if (std::abs(f) <= eps*anorm) 
+                            if (std::abs(f) <= eps*anorm)
                                 break;
 
                             g = w(i);
@@ -313,7 +313,7 @@ namespace dlib
                             h = 1.0/h;
                             c = g*h;
                             s = -f*h;
-                            for (long j = 0; j < m; ++j) 
+                            for (long j = 0; j < m; ++j)
                             {
                                 y = a(j,nm);
                                 z = a(j,i);
@@ -324,21 +324,21 @@ namespace dlib
                     }
 
                     z = w(k);
-                    if (l == k) 
-                    { 
-                        if (z < 0.0) 
+                    if (l == k)
+                    {
+                        if (z < 0.0)
                         {
                             w(k) = -z;
-                            for (long j = 0; j < n; ++j) 
+                            for (long j = 0; j < n; ++j)
                                 v(j,k) = -v(j,k);
                         }
                         break;
                     }
 
-                    if (its == max_iter) 
+                    if (its == max_iter)
                         return false;
 
-                    x = w(l); 
+                    x = w(l);
                     nm = k - 1;
                     y = w(nm);
                     g = rv1(nm);
@@ -346,8 +346,8 @@ namespace dlib
                     f = ((y-z)*(y+z) + (g-h)*(g+h))/(2.0*h*y);
                     g = pythag(f,one);
                     f = ((x-z)*(x+z) + h*((y/(f+sign(g,f)))-h))/x;
-                    c = s = 1.0; 
-                    for (long j = l; j <= nm; ++j) 
+                    c = s = 1.0;
+                    for (long j = l; j <= nm; ++j)
                     {
                         long i = j + 1;
                         g = rv1(i);
@@ -362,7 +362,7 @@ namespace dlib
                         g = g*c - x*s;
                         h = y*s;
                         y *= c;
-                        for (long jj = 0; jj < n; ++jj) 
+                        for (long jj = 0; jj < n; ++jj)
                         {
                             x = v(jj,j);
                             z = v(jj,i);
@@ -370,8 +370,8 @@ namespace dlib
                             v(jj,i) = z*c - x*s;
                         }
                         z = pythag(f,h);
-                        w(j) = z; 
-                        if (z != 0) 
+                        w(j) = z;
+                        if (z != 0)
                         {
                             z = 1.0/z;
                             c = f*z;
@@ -379,7 +379,7 @@ namespace dlib
                         }
                         f = c*g + s*y;
                         x = c*y - s*g;
-                        for (long jj = 0; jj < m; ++jj) 
+                        for (long jj = 0; jj < m; ++jj)
                         {
                             y = a(jj,j);
                             z = a(jj,i);
@@ -406,23 +406,23 @@ namespace dlib
     template <
         typename EXP,
         long qN, long qX,
-        long uM, 
-        long vN, 
+        long uM,
+        long vN,
         typename MM1,
         typename MM2,
         typename MM3,
         typename L1
         >
     long svd2 (
-        bool withu, 
-        bool withv, 
+        bool withu,
+        bool withv,
         const matrix_exp<EXP>& a,
-        matrix<typename EXP::type,uM,uM,MM1,L1>& u, 
-        matrix<typename EXP::type,qN,qX,MM2,L1>& q, 
+        matrix<typename EXP::type,uM,uM,MM1,L1>& u,
+        matrix<typename EXP::type,qN,qX,MM2,L1>& q,
         matrix<typename EXP::type,vN,vN,MM3,L1>& v
     )
     {
-        /*  
+        /*
             Singular value decomposition. Translated to 'C' from the
             original Algol code in "Handbook for Automatic Computation,
             vol. II, Linear Algebra", Springer-Verlag.  Note that this
@@ -437,12 +437,12 @@ namespace dlib
             Returns an error code = 0, if no errors and 'k' if a failure to
             converge at the 'kth' singular value.
 
-            USAGE: given the singular value decomposition a = u * diagm(q) * trans(v) for an m*n 
-                    matrix a with m >= n ...  
-                    After the svd call u is an m x m matrix which is columnwise 
-                    orthogonal. q will be an n element vector consisting of singular values 
-                    and v an n x n orthogonal matrix. eps and tol are tolerance constants. 
-                    Suitable values are eps=1e-16 and tol=(1e-300)/eps if T == double. 
+            USAGE: given the singular value decomposition a = u * diagm(q) * trans(v) for an m*n
+                    matrix a with m >= n ...
+                    After the svd call u is an m x m matrix which is columnwise
+                    orthogonal. q will be an n element vector consisting of singular values
+                    and v an n x n orthogonal matrix. eps and tol are tolerance constants.
+                    Suitable values are eps=1e-16 and tol=(1e-300)/eps if T == double.
 
                     If withu == false then u won't be computed and similarly if withv == false
                     then v won't be computed.
@@ -456,11 +456,11 @@ namespace dlib
         COMPILE_TIME_ASSERT(NR == 0 || uM == 0 || NR == uM);
         COMPILE_TIME_ASSERT(NC == 0 || vN == 0 || NC == vN);
 
-        DLIB_ASSERT(a.nr() >= a.nc(), 
+        DLIB_ASSERT(a.nr() >= a.nc(),
             "\tconst matrix_exp svd2()"
             << "\n\tYou have given an invalidly sized matrix"
             << "\n\ta.nr(): " << a.nr()
-            << "\n\ta.nc(): " << a.nc() 
+            << "\n\ta.nc(): " << a.nc()
             );
 
 
@@ -505,7 +505,7 @@ namespace dlib
         long i, j, k, l = 0, l1, iter, retval;
         T c, f, g, h, s, x, y, z;
 
-        matrix<T,qN,1,MM2> e(n,1); 
+        matrix<T,qN,1,MM2> e(n,1);
         q.set_size(n,1);
         u.set_size(m,m);
         retval = 0;
@@ -515,16 +515,16 @@ namespace dlib
             v.set_size(n,n);
         }
 
-        /* Copy 'a' to 'u' */    
-        for (i=0; i<m; i++) 
+        /* Copy 'a' to 'u' */
+        for (i=0; i<m; i++)
         {
             for (j=0; j<n; j++)
                 u(i,j) = a(i,j);
         }
 
         /* Householder's reduction to bidiagonal form. */
-        g = x = 0.0;    
-        for (i=0; i<n; i++) 
+        g = x = 0.0;
+        for (i=0; i<n; i++)
         {
             e(i) = g;
             s = 0.0;
@@ -535,14 +535,14 @@ namespace dlib
 
             if (s < tol)
                 g = 0.0;
-            else 
+            else
             {
                 f = u(i,i);
                 g = (f < 0) ? sqrt(s) : -sqrt(s);
                 h = f * g - s;
                 u(i,i) = f - g;
 
-                for (j=l; j<n; j++) 
+                for (j=l; j<n; j++)
                 {
                     s = 0.0;
 
@@ -564,21 +564,21 @@ namespace dlib
 
             if (s < tol)
                 g = 0.0;
-            else 
+            else
             {
                 f = u(i,i+1);
                 g = (f < 0) ? sqrt(s) : -sqrt(s);
                 h = f * g - s;
                 u(i,i+1) = f - g;
 
-                for (j=l; j<n; j++) 
+                for (j=l; j<n; j++)
                     e(j) = u(i,j) / h;
 
-                for (j=l; j<m; j++) 
+                for (j=l; j<m; j++)
                 {
                     s = 0.0;
 
-                    for (k=l; k<n; k++) 
+                    for (k=l; k<n; k++)
                         s += (u(j,k) * u(i,k));
 
                     for (k=l; k<n; k++)
@@ -586,28 +586,28 @@ namespace dlib
                 } /* end j */
             } /* end s */
 
-            y = abs(q(i)) + abs(e(i));                         
+            y = abs(q(i)) + abs(e(i));
             if (y > x)
                 x = y;
         } /* end i */
 
         /* accumulation of right-hand transformations */
-        if (withv) 
+        if (withv)
         {
-            for (i=n-1; i>=0; i--) 
+            for (i=n-1; i>=0; i--)
             {
-                if (g != 0.0) 
+                if (g != 0.0)
                 {
                     h = u(i,i+1) * g;
 
                     for (j=l; j<n; j++)
                         v(j,i) = u(i,j)/h;
 
-                    for (j=l; j<n; j++) 
+                    for (j=l; j<n; j++)
                     {
                         s = 0.0;
 
-                        for (k=l; k<n; k++) 
+                        for (k=l; k<n; k++)
                             s += (u(i,k) * v(k,j));
 
                         for (k=l; k<n; k++)
@@ -625,9 +625,9 @@ namespace dlib
         } /* end withv, parens added for clarity */
 
         /* accumulation of left-hand transformations */
-        if (withu) 
+        if (withu)
         {
-            for (i=n; i<m; i++) 
+            for (i=n; i<m; i++)
             {
                 for (j=n;j<m;j++)
                     u(i,j) = 0.0;
@@ -636,9 +636,9 @@ namespace dlib
             }
         }
 
-        if (withu) 
+        if (withu)
         {
-            for (i=n-1; i>=0; i--) 
+            for (i=n-1; i>=0; i--)
             {
                 l = i + 1;
                 g = q(i);
@@ -646,11 +646,11 @@ namespace dlib
                 for (j=l; j<m; j++)  /* upper limit was 'n' */
                     u(i,j) = 0.0;
 
-                if (g != 0.0) 
+                if (g != 0.0)
                 {
                     h = u(i,i) * g;
 
-                    for (j=l; j<m; j++) 
+                    for (j=l; j<m; j++)
                     { /* upper limit was 'n' */
                         s = 0.0;
 
@@ -659,14 +659,14 @@ namespace dlib
 
                         f = s / h;
 
-                        for (k=i; k<m; k++) 
+                        for (k=i; k<m; k++)
                             u(k,j) += (f * u(k,i));
                     } /* end j */
 
-                    for (j=i; j<m; j++) 
+                    for (j=i; j<m; j++)
                         u(j,i) /= g;
                 } /* end g */
-                else 
+                else
                 {
                     for (j=i; j<m; j++)
                         u(j,i) = 0.0;
@@ -679,18 +679,18 @@ namespace dlib
         /* diagonalization of the bidiagonal form */
         eps *= x;
 
-        for (k=n-1; k>=0; k--) 
+        for (k=n-1; k>=0; k--)
         {
             iter = 0;
 
 test_f_splitting:
 
-            for (l=k; l>=0; l--) 
+            for (l=k; l>=0; l--)
             {
-                if (abs(e(l)) <= eps) 
+                if (abs(e(l)) <= eps)
                     goto test_f_convergence;
 
-                if (abs(q(l-1)) <= eps) 
+                if (abs(q(l-1)) <= eps)
                     goto cancellation;
             } /* end l */
 
@@ -702,12 +702,12 @@ cancellation:
             s = 1.0;
             l1 = l - 1;
 
-            for (i=l; i<=k; i++) 
+            for (i=l; i<=k; i++)
             {
                 f = s * e(i);
                 e(i) *= c;
 
-                if (abs(f) <= eps) 
+                if (abs(f) <= eps)
                     goto test_f_convergence;
 
                 g = q(i);
@@ -715,9 +715,9 @@ cancellation:
                 c = g / h;
                 s = -f / h;
 
-                if (withu) 
+                if (withu)
                 {
-                    for (j=0; j<m; j++) 
+                    for (j=0; j<m; j++)
                     {
                         y = u(j,l1);
                         z = u(j,i);
@@ -730,12 +730,12 @@ cancellation:
 test_f_convergence:
 
             z = q(k);
-            if (l == k) 
+            if (l == k)
                 goto convergence;
 
             /* shift from bottom 2x2 minor */
             iter++;
-            if (iter > 300) 
+            if (iter > 300)
             {
                 retval = k;
                 break;
@@ -751,7 +751,7 @@ test_f_convergence:
             /* next QR transformation */
             c = s = 1.0;
 
-            for (i=l+1; i<=k; i++) 
+            for (i=l+1; i<=k; i++)
             {
                 g = e(i);
                 y = q(i);
@@ -765,9 +765,9 @@ test_f_convergence:
                 h = y * s;
                 y *= c;
 
-                if (withv) 
+                if (withv)
                 {
-                    for (j=0;j<n;j++) 
+                    for (j=0;j<n;j++)
                     {
                         x = v(j,i-1);
                         z = v(j,i);
@@ -781,9 +781,9 @@ test_f_convergence:
                 s = h / z;
                 f = c * g + s * y;
                 x = -s * g + c * y;
-                if (withu) 
+                if (withu)
                 {
-                    for (j=0; j<m; j++) 
+                    for (j=0; j<m; j++)
                     {
                         y = u(j,i-1);
                         z = u(j,i);
@@ -801,11 +801,11 @@ test_f_convergence:
 
 convergence:
 
-            if (z < 0.0) 
+            if (z < 0.0)
             {
                 /* q(k) is made non-negative */
                 q(k) = -z;
-                if (withv) 
+                if (withv)
                 {
                     for (j=0; j<n; j++)
                         v(j,k) = -v(j,k);
@@ -846,18 +846,18 @@ convergence:
         const matrix<T,Anr,Anc,MM,L>& A,
         unsigned long l,
         matrix<T,Anr,0,MM,L>& Q,
-        unsigned long q 
+        unsigned long q
     )
     /*!
         requires
             - A.nr() >= l
         ensures
-            - #Q.nr() == A.nr() 
+            - #Q.nr() == A.nr()
             - #Q.nc() == l
             - #Q == an orthonormal matrix whose range approximates the range of the
-              matrix A.  
-            - This function implements the randomized subspace iteration defined 
-              in the algorithm 4.4 box of the paper: 
+              matrix A.
+            - This function implements the randomized subspace iteration defined
+              in the algorithm 4.4 box of the paper:
                 Finding Structure with Randomness: Probabilistic Algorithms for
                 Constructing Approximate Matrix Decompositions by Halko et al.
             - q defines the number of extra subspace iterations this algorithm will
@@ -871,7 +871,7 @@ convergence:
 
         orthogonalize(Q);
 
-        // Do some extra iterations of the power method to make sure we get Q into the 
+        // Do some extra iterations of the power method to make sure we get Q into the
         // span of the most important singular vectors of A.
         if (q != 0)
         {
@@ -908,11 +908,11 @@ convergence:
     {
         const unsigned long k = std::min(l, std::min<unsigned long>(A.nr(),A.nc()));
 
-        DLIB_ASSERT(l > 0 && A.size() > 0, 
+        DLIB_ASSERT(l > 0 && A.size() > 0,
             "\t void svd_fast()"
             << "\n\t Invalid inputs were given to this function."
-            << "\n\t l: " << l 
-            << "\n\t A.size(): " << A.size() 
+            << "\n\t l: " << l
+            << "\n\t A.size(): " << A.size()
             );
 
         matrix<T,Anr,0,MM,L> Q;
@@ -930,7 +930,7 @@ convergence:
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename sparse_vector_type, 
+        typename sparse_vector_type,
         typename T,
         typename MM,
         typename L
@@ -939,7 +939,7 @@ convergence:
         const std::vector<sparse_vector_type>& A,
         unsigned long l,
         matrix<T,0,0,MM,L>& Q,
-        unsigned long q 
+        unsigned long q
     )
     /*!
         requires
@@ -950,8 +950,8 @@ convergence:
             - #Q == an orthonormal matrix whose range approximates the range of the
               matrix A.  In this case, we interpret A as a matrix of A.size() rows,
               where each row is defined by a sparse vector.
-            - This function implements the randomized subspace iteration defined 
-              in the algorithm 4.4 box of the paper: 
+            - This function implements the randomized subspace iteration defined
+              in the algorithm 4.4 box of the paper:
                 Finding Structure with Randomness: Probabilistic Algorithms for
                 Constructing Approximate Matrix Decompositions by Halko et al.
             - q defines the number of extra subspace iterations this algorithm will
@@ -974,7 +974,7 @@ convergence:
 
         orthogonalize(Q);
 
-        // Do some extra iterations of the power method to make sure we get Q into the 
+        // Do some extra iterations of the power method to make sure we get Q into the
         // span of the most important singular vectors of A.
         if (q != 0)
         {
@@ -1021,7 +1021,7 @@ convergence:
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename sparse_vector_type, 
+        typename sparse_vector_type,
         typename T,
         long Unr, long Unc,
         long Wnr, long Wnc,
@@ -1041,12 +1041,12 @@ convergence:
         const long n = max_index_plus_one(A);
         const unsigned long k = std::min(l, std::min<unsigned long>(A.size(),n));
 
-        DLIB_ASSERT(l > 0 && A.size() > 0 && n > 0, 
+        DLIB_ASSERT(l > 0 && A.size() > 0 && n > 0,
             "\t void svd_fast()"
             << "\n\t Invalid inputs were given to this function."
-            << "\n\t l: " << l 
-            << "\n\t n (i.e. max_index_plus_one(A)): " << n 
-            << "\n\t A.size(): " << A.size() 
+            << "\n\t l: " << l
+            << "\n\t n (i.e. max_index_plus_one(A)): " << n
+            << "\n\t A.size(): " << A.size()
             );
 
         matrix<T,0,0,MM,L> Q;
@@ -1092,14 +1092,14 @@ convergence:
         {
             using namespace nric;
             // you can't invert a non-square matrix
-            COMPILE_TIME_ASSERT(matrix_exp<EXP>::NR == matrix_exp<EXP>::NC || 
+            COMPILE_TIME_ASSERT(matrix_exp<EXP>::NR == matrix_exp<EXP>::NC ||
                                 matrix_exp<EXP>::NR == 0 ||
                                 matrix_exp<EXP>::NC == 0);
-            DLIB_ASSERT(m.nr() == m.nc(), 
+            DLIB_ASSERT(m.nr() == m.nc(),
                 "\tconst matrix_exp::type inv(const matrix_exp& m)"
                 << "\n\tYou can only apply inv() to a square matrix"
                 << "\n\tm.nr(): " << m.nr()
-                << "\n\tm.nc(): " << m.nc() 
+                << "\n\tm.nc(): " << m.nc()
                 );
             typedef typename matrix_exp<EXP>::type type;
 
@@ -1283,8 +1283,8 @@ convergence:
         // hold the matrix by value
         const matrix<type,NR,1,mem_manager_type,layout_type> m;
 
-        const_ret_type apply ( long r, long c) const 
-        { 
+        const_ret_type apply ( long r, long c) const
+        {
             if (r==c)
                 return m(r);
             else
@@ -1303,8 +1303,8 @@ convergence:
         >
     const matrix_diag_op<op_diag_inv<EXP> > inv (
         const matrix_diag_exp<EXP>& m
-    ) 
-    { 
+    )
+    {
         typedef op_diag_inv<EXP> op;
         return matrix_diag_op<op>(op(reciprocal(diag(m))));
     }
@@ -1314,8 +1314,8 @@ convergence:
         >
     const matrix_diag_op<op_diag_inv<EXP> > pinv (
         const matrix_diag_exp<EXP>& m
-    ) 
-    { 
+    )
+    {
         typedef op_diag_inv<EXP> op;
         return matrix_diag_op<op>(op(reciprocal(diag(m))));
     }
@@ -1328,12 +1328,12 @@ convergence:
     const matrix_diag_op<op_diag_inv<EXP> > pinv (
         const matrix_diag_exp<EXP>& m,
         double tol
-    ) 
-    { 
-        DLIB_ASSERT(tol >= 0, 
+    )
+    {
+        DLIB_ASSERT(tol >= 0,
             "\tconst matrix_exp::type pinv(const matrix_exp& m)"
             << "\n\t tol can't be negative"
-            << "\n\t tol: "<<tol 
+            << "\n\t tol: "<<tol
             );
         typedef op_diag_inv<EXP> op;
         return matrix_diag_op<op>(op(reciprocal(round_zeros(diag(m),tol))));
@@ -1343,14 +1343,14 @@ convergence:
 
     template <typename EXP>
     const typename matrix_exp<EXP>::matrix_type  inv_lower_triangular (
-        const matrix_exp<EXP>& A 
+        const matrix_exp<EXP>& A
     )
     {
-        DLIB_ASSERT(A.nr() == A.nc(), 
+        DLIB_ASSERT(A.nr() == A.nc(),
             "\tconst matrix inv_lower_triangular(const matrix_exp& A)"
             << "\n\tA must be a square matrix"
             << "\n\tA.nr(): " << A.nr()
-            << "\n\tA.nc(): " << A.nc() 
+            << "\n\tA.nc(): " << A.nc()
             );
 
         typedef typename matrix_exp<EXP>::matrix_type matrix_type;
@@ -1387,14 +1387,14 @@ convergence:
 
     template <typename EXP>
     const typename matrix_exp<EXP>::matrix_type  inv_upper_triangular (
-        const matrix_exp<EXP>& A 
+        const matrix_exp<EXP>& A
     )
     {
-        DLIB_ASSERT(A.nr() == A.nc(), 
+        DLIB_ASSERT(A.nr() == A.nc(),
             "\tconst matrix inv_upper_triangular(const matrix_exp& A)"
             << "\n\tA must be a square matrix"
             << "\n\tA.nr(): " << A.nr()
-            << "\n\tA.nc(): " << A.nc() 
+            << "\n\tA.nc(): " << A.nc()
             );
 
         typedef typename matrix_exp<EXP>::matrix_type matrix_type;
@@ -1433,17 +1433,17 @@ convergence:
         const matrix_exp<EXP>& A
     )
     {
-        DLIB_ASSERT(A.nr() == A.nc(), 
+        DLIB_ASSERT(A.nr() == A.nc(),
             "\tconst matrix chol(const matrix_exp& A)"
             << "\n\tYou can only apply the chol to a square matrix"
             << "\n\tA.nr(): " << A.nr()
-            << "\n\tA.nc(): " << A.nc() 
+            << "\n\tA.nc(): " << A.nc()
             );
         typename matrix_exp<EXP>::matrix_type L(A.nr(),A.nc());
 
 #ifdef DLIB_USE_LAPACK
         // Only call LAPACK if the matrix is big enough.  Otherwise,
-        // our own code is faster, especially for statically dimensioned 
+        // our own code is faster, especially for statically dimensioned
         // matrices.
         if (A.nr() > 4)
         {
@@ -1513,9 +1513,9 @@ convergence:
 
     template <
         typename EXP,
-        long uNR, 
+        long uNR,
         long uNC,
-        long wN, 
+        long wN,
         long vN,
         long wX,
         typename MM1,
@@ -1571,7 +1571,7 @@ convergence:
     template <
         typename EXP
         >
-    const matrix<typename EXP::type,EXP::NC,EXP::NR,typename EXP::mem_manager_type> pinv_helper ( 
+    const matrix<typename EXP::type,EXP::NC,EXP::NR,typename EXP::mem_manager_type> pinv_helper (
         const matrix_exp<EXP>& m,
         double tol
     )
@@ -1581,7 +1581,7 @@ convergence:
               when m.nc() <= m.nr().  So if m.nc() > m.nr() then it is best to use
               trans(pinv_helper(trans(m))) to compute pinv(m).
     !*/
-    { 
+    {
         typename matrix_exp<EXP>::matrix_type u;
         typedef typename EXP::mem_manager_type MM1;
         typedef typename EXP::layout_type layout_type;
@@ -1605,15 +1605,15 @@ convergence:
     template <
         typename EXP
         >
-    const matrix<typename EXP::type,EXP::NC,EXP::NR,typename EXP::mem_manager_type> pinv ( 
+    const matrix<typename EXP::type,EXP::NC,EXP::NR,typename EXP::mem_manager_type> pinv (
         const matrix_exp<EXP>& m,
         double tol = 0
     )
-    { 
-        DLIB_ASSERT(tol >= 0, 
+    {
+        DLIB_ASSERT(tol >= 0,
             "\tconst matrix_exp::type pinv(const matrix_exp& m)"
             << "\n\t tol can't be negative"
-            << "\n\t tol: "<<tol 
+            << "\n\t tol: "<<tol
             );
         // if m has more columns then rows then it is more efficient to
         // compute the pseudo-inverse of its transpose (given the way I'm doing it below).
@@ -1627,9 +1627,9 @@ convergence:
 
     template <
         typename EXP,
-        long uNR, 
+        long uNR,
         long uNC,
-        long wN, 
+        long wN,
         long vN,
         typename MM1,
         typename MM2,
@@ -1665,17 +1665,17 @@ convergence:
         >
     const typename matrix_exp<EXP>::type trace (
         const matrix_exp<EXP>& m
-    ) 
-    { 
+    )
+    {
         COMPILE_TIME_ASSERT(matrix_exp<EXP>::NR == matrix_exp<EXP>::NC ||
                             matrix_exp<EXP>::NR == 0 ||
-                            matrix_exp<EXP>::NC == 0 
+                            matrix_exp<EXP>::NC == 0
                             );
-        DLIB_ASSERT(m.nr() == m.nc(), 
+        DLIB_ASSERT(m.nr() == m.nc(),
             "\tconst matrix_exp::type trace(const matrix_exp& m)"
             << "\n\tYou can only apply trace() to a square matrix"
             << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tm.nc(): " << m.nc()
             );
         return sum(diag(m));
     }
@@ -1695,13 +1695,13 @@ convergence:
             using namespace nric;
             COMPILE_TIME_ASSERT(matrix_exp<EXP>::NR == matrix_exp<EXP>::NC ||
                                 matrix_exp<EXP>::NR == 0 ||
-                                matrix_exp<EXP>::NC == 0 
+                                matrix_exp<EXP>::NC == 0
                                 );
-            DLIB_ASSERT(m.nr() == m.nc(), 
+            DLIB_ASSERT(m.nr() == m.nc(),
                 "\tconst matrix_exp::type det(const matrix_exp& m)"
                 << "\n\tYou can only apply det() to a square matrix"
                 << "\n\tm.nr(): " << m.nr()
-                << "\n\tm.nc(): " << m.nc() 
+                << "\n\tm.nc(): " << m.nc()
                 );
 
             return lu_decomposition<EXP>(m).det();
@@ -1797,11 +1797,11 @@ convergence:
         COMPILE_TIME_ASSERT((is_same_type<typename EXP::type, float>::value ||
                              is_same_type<typename EXP::type, double>::value));
 
-        DLIB_ASSERT(m.nr() == m.nc(), 
+        DLIB_ASSERT(m.nr() == m.nc(),
             "\tconst matrix real_eigenvalues()"
             << "\n\tYou have given an invalidly sized matrix"
             << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tm.nc(): " << m.nc()
             );
 
         if (m.nr() == 2)
@@ -1829,7 +1829,7 @@ convergence:
         }
         else
         {
-            // Call .ref() so that the symmetric matrix overload can take effect if m 
+            // Call .ref() so that the symmetric matrix overload can take effect if m
             // has the appropriate type.
             return eigenvalue_decomposition<EXP>(m.ref()).get_real_eigenvalues();
         }
@@ -1838,18 +1838,18 @@ convergence:
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename EXP 
+        typename EXP
         >
     dlib::vector<double,2> max_point_interpolated (
         const matrix_exp<EXP>& m
     )
     {
-        DLIB_ASSERT(m.size() > 0, 
+        DLIB_ASSERT(m.size() > 0,
             "\tdlib::vector<double,2> point max_point_interpolated(const matrix_exp& m)"
             << "\n\tm can't be empty"
-            << "\n\tm.size():   " << m.size() 
-            << "\n\tm.nr():     " << m.nr() 
-            << "\n\tm.nc():     " << m.nc() 
+            << "\n\tm.size():   " << m.size()
+            << "\n\tm.nr():     " << m.nr()
+            << "\n\tm.nc():     " << m.nc()
             );
         const point p = max_point(m);
 
@@ -1908,8 +1908,8 @@ convergence:
             }
         }
 
-        // This bit of code is how we generated the derivative_filters matrix below.  
-        //A = diagm(G)*A; 
+        // This bit of code is how we generated the derivative_filters matrix below.
+        //A = diagm(G)*A;
         //std::cout << std::setprecision(20) << inv(trans(A)*A)*trans(A)*diagm(G) << std::endl; exit(1);
 
         const double m10 = 0.10597077880854270659;
@@ -1955,7 +1955,7 @@ convergence:
         matrix<double,2,1> g;
         H = 2*w(0), w(1),
               w(1), 2*w(2);
-        g = w(3), 
+        g = w(3),
             w(4);
         const dlib::vector<double,2> delta = -inv(H)*g;
 

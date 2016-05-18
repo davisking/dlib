@@ -38,8 +38,8 @@ namespace dlib
         ensures
             - Let Class1 denote the centroid of all the samples with labels that are < 0
             - Let Class2 denote the centroid of all the samples with labels that are > 0
-            - finds a ranking of the features where the best features come first.  This 
-              function does this by computing the distance between the centroid of the Class1 
+            - finds a ranking of the features where the best features come first.  This
+              function does this by computing the distance between the centroid of the Class1
               samples and the Class2 samples in kernel defined feature space.
               Good features are then ones that result in the biggest separation between
               the two centroids of Class1 and Class2.
@@ -51,7 +51,7 @@ namespace dlib
                   (e.g. samples(n)(R(0,0)) is the best feature from sample(n) and
                    samples(n)(R(1,0)) is the second best, samples(n)(R(2,0)) the
                    third best and so on)
-                - R(i,1) == a number that indicates how much separation exists between 
+                - R(i,1) == a number that indicates how much separation exists between
                   the two centroids when features 0 through i are used.
     !*/
 
@@ -73,13 +73,13 @@ namespace dlib
             - num_sv > 0
             - is_binary_classification_problem(samples, labels) == true
         ensures
-            - This is a function that tries to pick a reasonable default value for the gamma 
-              parameter of the radial_basis_kernel.  It picks the parameter that gives the 
-              largest separation between the centroids, in kernel feature space, of two classes 
-              of data. It does this using the kcentroid object and it sets the kcentroid up 
+            - This is a function that tries to pick a reasonable default value for the gamma
+              parameter of the radial_basis_kernel.  It picks the parameter that gives the
+              largest separation between the centroids, in kernel feature space, of two classes
+              of data. It does this using the kcentroid object and it sets the kcentroid up
               to use num_sv dictionary vectors.
             - This function does a search for the best gamma and the search starts with
-              the value given by initial_gamma.  Better initial guesses will give 
+              the value given by initial_gamma.  Better initial guesses will give
               better results since the routine may get stuck in a local minima.
             - returns the value of gamma that results in the largest separation.
     !*/
@@ -117,13 +117,13 @@ namespace dlib
     );
     /*!
         requires
-            - vector_type is something with an interface compatible with std::vector.  
-              Additionally, it must in turn contain dlib::matrix types which contain 
+            - vector_type is something with an interface compatible with std::vector.
+              Additionally, it must in turn contain dlib::matrix types which contain
               scalars such as float or double values.
             - for all valid i: is_vector(samples[i]) == true
         ensures
-            - computes the average value of the squares of all the pairwise 
-              distances between every element of samples.  
+            - computes the average value of the squares of all the pairwise
+              distances between every element of samples.
     !*/
 
 // ----------------------------------------------------------------------------------------

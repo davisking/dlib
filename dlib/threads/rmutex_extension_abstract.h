@@ -17,10 +17,10 @@ namespace dlib
                 rmutex is in the unlocked state
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a recursive mutex intended to be used for synchronous 
-                thread control of shared data. When a thread wants to access some 
-                shared data it locks out other threads by calling lock() and calls 
-                unlock() when it is finished.  
+                This object represents a recursive mutex intended to be used for synchronous
+                thread control of shared data. When a thread wants to access some
+                shared data it locks out other threads by calling lock() and calls
+                unlock() when it is finished.
 
                 The difference between this and the normal mutex object is that it is safe to
                 call lock() from a thread that already has a lock on this mutex.  Doing
@@ -37,7 +37,7 @@ namespace dlib
                 - #*this is properly initialized
             throws
                 - dlib::thread_error
-                    the constructor may throw this exception if there is a problem 
+                    the constructor may throw this exception if there is a problem
                     gathering resources to create the rmutex.
         !*/
 
@@ -64,16 +64,16 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - if (*this is currently locked by another thread) then 
-                    - the thread that called lock() on *this is put to sleep until 
-                      it becomes available.               
+                - if (*this is currently locked by another thread) then
+                    - the thread that called lock() on *this is put to sleep until
+                      it becomes available.
                     - #lock_count() == times
-                - if (*this is currently unlocked) then 
-                    - #*this becomes locked and the current thread is NOT put to sleep 
+                - if (*this is currently unlocked) then
+                    - #*this becomes locked and the current thread is NOT put to sleep
                       but now "owns" #*this
                     - #lock_count() == times
                 - if (*this is locked and owned by the current thread) then
-                    - the calling thread retains its lock on *this and isn't put to sleep.  
+                    - the calling thread retains its lock on *this and isn't put to sleep.
                     - #lock_count() == lock_count() + times
         !*/
 

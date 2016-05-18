@@ -15,16 +15,16 @@ namespace dlib
 
         sgd(
             float weight_decay_,
-            float momentum_ 
-        ) 
-        { 
+            float momentum_
+        )
+        {
             weight_decay = weight_decay_;
             momentum = momentum_;
         }
 
         sgd(
-        ) : sgd(0.0005, 0.9) 
-        { 
+        ) : sgd(0.0005, 0.9)
+        {
         }
 
         float get_momentum (
@@ -33,7 +33,7 @@ namespace dlib
         float get_weight_decay (
         ) const { return weight_decay; }
 
-        template <typename layer_type> 
+        template <typename layer_type>
         const tensor& operator() (
             const float learning_rate,
             const layer_type& l,
@@ -50,7 +50,7 @@ namespace dlib
             }
             
             //perform: v = momentum*mat(v) - weight_decay*learning_rate*mat(params) - learning_rate*mat(params_grad);
-            tt::affine_transform(v, v, params, params_grad, 
+            tt::affine_transform(v, v, params, params_grad,
                                momentum, -weight_decay*learning_rate, -learning_rate, 0);
 
             return v;
@@ -83,16 +83,16 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class adam 
+    class adam
     {
     public:
 
         adam(
             float weight_decay_,
-            float momentum1_, 
+            float momentum1_,
             float momentum2_
-        ) 
-        { 
+        )
+        {
             weight_decay = weight_decay_;
             momentum1 = momentum1_;
             momentum2 = momentum2_;
@@ -100,7 +100,7 @@ namespace dlib
         }
 
         adam(
-        ) : adam(0.0005, 0.9, 0.999) 
+        ) : adam(0.0005, 0.9, 0.999)
         {}
 
         float get_momentum1 (

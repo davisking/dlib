@@ -17,7 +17,7 @@
 
 // ----------------------------------------------------------------------------------------
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -26,7 +26,7 @@ namespace
 
     using dlib::array;
 
-    // Declare the logger we will use in this test.  The name of the tester 
+    // Declare the logger we will use in this test.  The name of the tester
     // should start with "test."
     logger dlog("test.scan_image");
 
@@ -221,7 +221,7 @@ namespace
         assign_all_pixels(img,0);
         rectangle rect = centered_rect(10,10,5,5);
         dlog << LTRACE << "expected: 10,10";
-        fill_rect(img, rect, 255); 
+        fill_rect(img, rect, 255);
 
 
         array<array2d<unsigned char> > images;
@@ -275,7 +275,7 @@ namespace
         assign_all_pixels(img,0);
         rectangle rect = centered_rect(10,11,5,6);
         dlog << LTRACE << "expected: 10,11";
-        fill_rect(img, rect, 255); 
+        fill_rect(img, rect, 255);
 
 
         array<array2d<unsigned char> > images;
@@ -445,7 +445,7 @@ namespace
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type1, 
+        typename image_type1,
         typename image_type2
         >
     void naive_max_filter (
@@ -493,9 +493,9 @@ namespace
         max_filter(img, out, rect.width(), rect.height(), thresh);
 
         DLIB_TEST_MSG(mat(out) == mat(out2),
-                                "rows: "<< rows 
-                                << "\ncols: "<< rows 
-                                << "\nwidth: "<< width 
+                                "rows: "<< rows
+                                << "\ncols: "<< rows
+                                << "\nwidth: "<< width
                                 << "\nheight: "<< height );
     }
 
@@ -584,7 +584,7 @@ namespace
         const std::vector<std::pair<unsigned int, rectangle> >& fixed_rects,
         const std::vector<std::pair<unsigned int, rectangle> >& movable_rects,
         const double thresh,
-        const unsigned long 
+        const unsigned long
     )
     {
         dets.clear();
@@ -600,7 +600,7 @@ namespace
                                                                     window,
                                                                     fixed_rects,
                                                                     movable_rects,
-                                                                    p); 
+                                                                    p);
 
                 if (score >= thresh)
                 {
@@ -619,7 +619,7 @@ namespace
             print_spinner();
             const int num_images = rnd.get_random_32bit_number()%4+1;
 
-            make_images(rnd,images, num_images, 
+            make_images(rnd,images, num_images,
                         rnd.get_random_32bit_number()%50+1,
                         rnd.get_random_32bit_number()%50+1
                         );
@@ -648,7 +648,7 @@ namespace
                 total_area += movable_rects.back().second.area();
             }
 
-            const rectangle window = centered_rect(0,0, 
+            const rectangle window = centered_rect(0,0,
                                                 rnd.get_random_32bit_number()%15+1,
                                                 rnd.get_random_32bit_number()%15+1);
             dlog << LINFO << "window size: "<< window.width() << ", " << window.height();

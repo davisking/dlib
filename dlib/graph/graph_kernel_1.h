@@ -18,8 +18,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename node_type, typename graph, bool is_checked>
-    struct graph_checker_helper 
-    { 
+    struct graph_checker_helper
+    {
         /*!
             This object is used to check preconditions based on the value of is_checked
         !*/
@@ -33,8 +33,8 @@ namespace dlib
             DLIB_CASSERT(edge_index < self.number_of_neighbors(),
                          "\tnode_type& graph::node_type::neighbor(edge_index)"
                          << "\n\tYou have specified an invalid index"
-                         << "\n\tedge_index:            " << edge_index 
-                         << "\n\tnumber_of_neighbors(): " << self.number_of_neighbors() 
+                         << "\n\tedge_index:            " << edge_index
+                         << "\n\tnumber_of_neighbors(): " << self.number_of_neighbors()
                          << "\n\tthis:                  " << &self
             );
         }
@@ -48,8 +48,8 @@ namespace dlib
             DLIB_CASSERT(edge_index < self.number_of_neighbors(),
                          "\tE& graph::node_type::edge(edge_index)"
                          << "\n\tYou have specified an invalid index"
-                         << "\n\tedge_index:            " << edge_index 
-                         << "\n\tnumber_of_neighbors(): " << self.number_of_neighbors() 
+                         << "\n\tedge_index:            " << edge_index
+                         << "\n\tnumber_of_neighbors(): " << self.number_of_neighbors()
                          << "\n\tthis:                  " << &self
             );
         }
@@ -63,7 +63,7 @@ namespace dlib
             DLIB_CASSERT(index < self.number_of_nodes(),
                          "\tnode_type& graph::node(index)"
                          << "\n\tYou have specified an invalid index"
-                         << "\n\tindex:             " << index 
+                         << "\n\tindex:             " << index
                          << "\n\tnumber_of_nodes(): " << self.number_of_nodes()
                          << "\n\tthis:              " << &self
             );
@@ -80,9 +80,9 @@ namespace dlib
                          node_index2 < self.number_of_nodes(),
                          "\tvoid graph::has_edge(node_index1, node_index2)"
                          << "\n\tYou have specified an invalid index"
-                         << "\n\tnode_index1:       " << node_index1 
-                         << "\n\tnode_index2:       " << node_index2 
-                         << "\n\tnumber_of_nodes(): " << self.number_of_nodes() 
+                         << "\n\tnode_index1:       " << node_index1
+                         << "\n\tnode_index2:       " << node_index2
+                         << "\n\tnumber_of_nodes(): " << self.number_of_nodes()
                          << "\n\tthis:              " << &self
             );
         }
@@ -95,10 +95,10 @@ namespace dlib
         {
             DLIB_CASSERT(node_index1 < self.number_of_nodes() &&
                          node_index2 < self.number_of_nodes(),
-                         "\tvoid graph::add_edge(node_index1, node_index2)" 
+                         "\tvoid graph::add_edge(node_index1, node_index2)"
                          << "\n\tYou have specified an invalid index"
-                         << "\n\tnode_index1:       " << node_index1 
-                         << "\n\tnode_index2:       " << node_index2 
+                         << "\n\tnode_index1:       " << node_index1
+                         << "\n\tnode_index2:       " << node_index2
                          << "\n\tnumber_of_nodes(): " << self.number_of_nodes()
                          << "\n\tthis:              " << &self
             );
@@ -106,9 +106,9 @@ namespace dlib
             DLIB_CASSERT( self.has_edge(node_index1, node_index2) == false,
                           "\tvoid graph::add_edge(node_index1, node_index2)"
                           << "\n\tYou can't add an edge if it already exists in the graph"
-                          << "\n\tnode_index1:       " << node_index1 
-                          << "\n\tnode_index2:       " << node_index2 
-                          << "\n\tnumber_of_nodes(): " << self.number_of_nodes() 
+                          << "\n\tnode_index1:       " << node_index1
+                          << "\n\tnode_index2:       " << node_index2
+                          << "\n\tnumber_of_nodes(): " << self.number_of_nodes()
                           << "\n\tthis:              " << &self
             );
 
@@ -122,10 +122,10 @@ namespace dlib
         {
             DLIB_CASSERT(node_index1 < self.number_of_nodes() &&
                          node_index2 < self.number_of_nodes(),
-                         "\tvoid graph::remove_edge(node_index1, node_index2)" 
+                         "\tvoid graph::remove_edge(node_index1, node_index2)"
                          << "\n\tYou have specified an invalid index"
-                         << "\n\tnode_index1:       " << node_index1 
-                         << "\n\tnode_index2:       " << node_index2 
+                         << "\n\tnode_index1:       " << node_index1
+                         << "\n\tnode_index2:       " << node_index2
                          << "\n\tnumber_of_nodes(): " << self.number_of_nodes()
                          << "\n\tthis:              " << &self
             );
@@ -133,8 +133,8 @@ namespace dlib
             DLIB_CASSERT( self.has_edge(node_index1, node_index2) == true,
                           "\tvoid graph::remove_edge(node_index1, node_index2)"
                           << "\n\tYou can't remove an edge if it isn't in the graph"
-                          << "\n\tnode_index1:       " << node_index1 
-                          << "\n\tnode_index2:       " << node_index2 
+                          << "\n\tnode_index1:       " << node_index1
+                          << "\n\tnode_index2:       " << node_index2
                           << "\n\tnumber_of_nodes(): " << self.number_of_nodes()
                           << "\n\tthis:              " << &self
             );
@@ -150,8 +150,8 @@ namespace dlib
             DLIB_CASSERT(index < self.number_of_nodes(),
                          "\tvoid graph::remove_node(index)"
                          << "\n\tYou have specified an invalid index"
-                         << "\n\tindex:             " << index 
-                         << "\n\tnumber_of_nodes(): " << self.number_of_nodes() 
+                         << "\n\tindex:             " << index
+                         << "\n\tnumber_of_nodes(): " << self.number_of_nodes()
                          << "\n\tthis:              " << &self
             );
         }
@@ -159,7 +159,7 @@ namespace dlib
 
     template <typename node_type, typename graph>
     struct graph_checker_helper <node_type, graph, false>
-    { 
+    {
         static inline void check_edge ( unsigned long , const node_type& ) { }
         static inline void check_neighbor ( unsigned long , const node_type& ) { }
         static inline void check_node ( unsigned long , const graph& ) { }
@@ -175,7 +175,7 @@ namespace dlib
         typename T,
         typename E = char,
         typename mem_manager = default_memory_manager,
-        bool is_checked = true 
+        bool is_checked = true
         >
     class graph_kernel_1 : noncopyable
     {
@@ -307,27 +307,27 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
-        typename E, 
+        typename T,
+        typename E,
         typename mem_manager,
         bool is_checked
         >
     inline void swap (
-        graph_kernel_1<T,E,mem_manager,is_checked>& a, 
-        graph_kernel_1<T,E,mem_manager,is_checked>& b 
-    ) { a.swap(b); }   
+        graph_kernel_1<T,E,mem_manager,is_checked>& a,
+        graph_kernel_1<T,E,mem_manager,is_checked>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
-        typename E, 
+        typename T,
+        typename E,
         typename mem_manager,
         bool is_checked
         >
     struct is_graph<graph_kernel_1<T,E,mem_manager, is_checked> >
     {
-        static const bool value = true; 
+        static const bool value = true;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -340,8 +340,8 @@ namespace dlib
         >
     void serialize (
         const graph_kernel_1<T,E,mem_manager,is_checked>& item,
-        std::ostream& out 
-    )   
+        std::ostream& out
+    )
     {
         try
         {
@@ -355,7 +355,7 @@ namespace dlib
                 // serialize all the edges
                 for (unsigned long n = 0; n < item.node(i).number_of_neighbors(); ++n)
                 {
-                    // only serialize edges that we haven't already serialized 
+                    // only serialize edges that we haven't already serialized
                     if (item.node(i).neighbor(n).index() >= i)
                     {
                         serialize(item.node(i).neighbor(n).index(), out);
@@ -368,7 +368,7 @@ namespace dlib
         }
         catch (serialization_error& e)
         {
-            throw serialization_error(e.info + "\n   while serializing object of type graph_kernel_1"); 
+            throw serialization_error(e.info + "\n   while serializing object of type graph_kernel_1");
         }
     }
 
@@ -383,7 +383,7 @@ namespace dlib
     void deserialize (
         graph_kernel_1<T,E,mem_manager,is_checked>& item,
         std::istream& in
-    )   
+    )
     {
         try
         {
@@ -419,7 +419,7 @@ namespace dlib
         }
         catch (serialization_error& e)
         {
-            throw serialization_error(e.info + "\n   while deserializing object of type graph_kernel_1"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type graph_kernel_1");
         }
     }
 
@@ -542,18 +542,18 @@ namespace dlib
         node_type& n1 = *nodes[node_index1];
         node_type& n2 = *nodes[node_index2];
 
-        // remove the record of the link from n1 
+        // remove the record of the link from n1
         unsigned long pos = static_cast<unsigned long>(find(n1.neighbors.begin(), n1.neighbors.end(), &n2) - n1.neighbors.begin());
-        n1.neighbors.erase(n1.neighbors.begin() + pos); 
-        n1.edges.erase(n1.edges.begin() + pos); 
+        n1.neighbors.erase(n1.neighbors.begin() + pos);
+        n1.edges.erase(n1.edges.begin() + pos);
 
         // check if this is an edge that goes from node_index1 back to itself
         if (node_index1 != node_index2)
         {
-            // remove the record of the link from n2 
+            // remove the record of the link from n2
             unsigned long pos = static_cast<unsigned long>(find(n2.neighbors.begin(), n2.neighbors.end(), &n1) - n2.neighbors.begin());
-            n2.neighbors.erase(n2.neighbors.begin() + pos); 
-            n2.edges.erase(n2.edges.begin() + pos); 
+            n2.neighbors.erase(n2.neighbors.begin() + pos);
+            n2.edges.erase(n2.edges.begin() + pos);
         }
     }
 
@@ -600,14 +600,14 @@ namespace dlib
 
         node_type& n = *nodes[index];
 
-        // remove all edges pointing to this node from its neighbors 
+        // remove all edges pointing to this node from its neighbors
         for (unsigned long i = 0; i < n.neighbors.size(); ++i)
         {
             // remove the edge from this specific parent
-            unsigned long pos = static_cast<unsigned long>(find(n.neighbors[i]->neighbors.begin(), n.neighbors[i]->neighbors.end(), &n) - 
+            unsigned long pos = static_cast<unsigned long>(find(n.neighbors[i]->neighbors.begin(), n.neighbors[i]->neighbors.end(), &n) -
                                 n.neighbors[i]->neighbors.begin());
-            n.neighbors[i]->neighbors.erase(n.neighbors[i]->neighbors.begin() + pos); 
-            n.neighbors[i]->edges.erase(n.neighbors[i]->edges.begin() + pos); 
+            n.neighbors[i]->neighbors.erase(n.neighbors[i]->neighbors.begin() + pos);
+            n.neighbors[i]->edges.erase(n.neighbors[i]->edges.begin() + pos);
         }
 
         // now remove this node by replacing it with the last node in the nodes vector

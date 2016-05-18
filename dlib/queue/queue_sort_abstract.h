@@ -49,7 +49,7 @@ namespace dlib
                 ensures
                     - for all elements in #*this the ith element is <= the i+1 element
                     - uses compare(a,b) as the < operator.  So if compare(a,b) == true
-                      then a comes before b in the resulting ordering.  
+                      then a comes before b in the resulting ordering.
                     - #at_start() == true
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor
@@ -61,9 +61,9 @@ namespace dlib
         template queue_base
         >
     inline void swap (
-        queue_sort<queue_base>& a, 
-        queue_sort<queue_base>& b 
-    ) { a.swap(b); }  
+        queue_sort<queue_base>& a,
+        queue_sort<queue_base>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/

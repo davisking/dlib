@@ -14,8 +14,8 @@ namespace dlib
         This is the RSA Data Security, Inc. MD5 Message-Digest Algorithm
         as described in rfc1321
 
-        For the functions which return a unsigned char*.  The array contains 
-        the 16 bytes of the digest and are in the correct order.  
+        For the functions which return a unsigned char*.  The array contains
+        the 16 bytes of the digest and are in the correct order.
         i.e.  output[0], output[1], output[2], ...
     !*/
 
@@ -38,11 +38,11 @@ namespace dlib
     );
     /*!
         requires
-            - input  == pointer to len bytes 
-            - output == pointer to 16 bytes 
+            - input  == pointer to len bytes
+            - output == pointer to 16 bytes
             - input != output
         ensures
-            - #output == the md5 digest of input.  
+            - #output == the md5 digest of input.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ namespace dlib
             - input.fail() == false
         ensures
             - returns the md5 digest of input as a hexadecimal string
-            - #input.eof()     == true 
+            - #input.eof()     == true
             - #input.fail()    == false
     !*/
 
@@ -70,8 +70,8 @@ namespace dlib
             - input.fail() == false
             - output       == pointer to 16 bytes
         ensures
-            - #output       == the md5 digest of input 
-            - #input.eof()  == true 
+            - #output       == the md5 digest of input
+            - #input.eof()  == true
             - #input.fail() == false
     !*/
 

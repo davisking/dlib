@@ -19,7 +19,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class drawable_window  
+    // class drawable_window
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -41,24 +41,24 @@ namespace dlib
                 - widget_set == a set that contains all the widgets in this window and
                   want to receive events.
 
-                - mouse_move == this is a set of drawables that are in this window and 
+                - mouse_move == this is a set of drawables that are in this window and
                   want to receive the mouse movement events.
-                - mouse_wheel == this is a set of drawables that are in this window and 
+                - mouse_wheel == this is a set of drawables that are in this window and
                   want to receive the mouse wheel events.
-                - mouse_click == this is a set of drawables that are in this window and 
+                - mouse_click == this is a set of drawables that are in this window and
                   want to receive the mouse click events.
-                - window_resized == this is a set of drawables that are in this window and 
+                - window_resized == this is a set of drawables that are in this window and
                   want to receive the window_resized event.
-                - keyboard == this is a set of drawables that are in this window and 
+                - keyboard == this is a set of drawables that are in this window and
                   want to receive keyboard events.
-                - focus == this is a set of drawables that are in this window and 
+                - focus == this is a set of drawables that are in this window and
                   want to receive focus events.
-                - window_moved == this is a set of drawables that are in this window and 
+                - window_moved == this is a set of drawables that are in this window and
                   want to receive window move events.
 
-                - lastx == the x coordinate that we last saw the mouse at or -1 if the 
+                - lastx == the x coordinate that we last saw the mouse at or -1 if the
                   mouse is outside this window.
-                - lasty == the y coordinate that we last saw the mouse at or -1 if the 
+                - lasty == the y coordinate that we last saw the mouse at or -1 if the
                   mouse is outside this window.
 
                 - event_id == a number we use to tag events so we don't end up sending
@@ -71,7 +71,7 @@ namespace dlib
         drawable_window(
             bool resizable = true,
             bool undecorated = false
-        ) : 
+        ) :
             base_window(resizable,undecorated),
             bg_color(rgb_pixel(212,208,200)),
             lastx(-1),
@@ -196,11 +196,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class drawable  
+    // class drawable
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    enum 
+    enum
     {
         MOUSE_MOVE = 1,
         MOUSE_CLICK = 2,
@@ -212,11 +212,11 @@ namespace dlib
         STRING_PUT = 128
     };
 
-    class drawable 
+    class drawable
     {
 
         /*!
-            INITIAL VALUE 
+            INITIAL VALUE
                 - enabled_events == false
                 - event_id == 0
 
@@ -272,52 +272,52 @@ namespace dlib
         );
 
         const rectangle get_rect (
-        ) const 
+        ) const
         {
             auto_mutex M(m);
             return rect;
         }
 
         long bottom (
-        ) const 
-        { 
-            auto_mutex M(m); 
-            return rect.bottom(); 
+        ) const
+        {
+            auto_mutex M(m);
+            return rect.bottom();
         }
 
         long top (
-        ) const 
-        { 
-            auto_mutex M(m); 
-            return rect.top(); 
+        ) const
+        {
+            auto_mutex M(m);
+            return rect.top();
         }
 
         long left (
-        ) const 
-        { 
-            auto_mutex M(m); 
-            return rect.left(); 
+        ) const
+        {
+            auto_mutex M(m);
+            return rect.left();
         }
 
         long right (
-        ) const 
-        { 
-            auto_mutex M(m); 
-            return rect.right(); 
+        ) const
+        {
+            auto_mutex M(m);
+            return rect.right();
         }
 
         long width (
-        ) const 
-        { 
-            auto_mutex M(m); 
-            return rect.width(); 
+        ) const
+        {
+            auto_mutex M(m);
+            return rect.width();
         }
 
         long height (
-        ) const 
-        { 
-            auto_mutex M(m); 
-            return rect.height(); 
+        ) const
+        {
+            auto_mutex M(m);
+            return rect.height();
         }
 
         bool is_enabled (
@@ -328,7 +328,7 @@ namespace dlib
         }
 
         virtual void enable (
-        ) 
+        )
         {
             auto_mutex M(m);
             enabled = true;
@@ -336,7 +336,7 @@ namespace dlib
         }
 
         virtual void disable (
-        ) 
+        )
         {
             auto_mutex M(m);
             enabled = false;
@@ -371,8 +371,8 @@ namespace dlib
             long y
         )
         {
-            m.lock();       
-            rectangle old(rect);            
+            m.lock();
+            rectangle old(rect);
 
             const unsigned long width = rect.width();
             const unsigned long height = rect.height();
@@ -412,7 +412,7 @@ namespace dlib
         virtual int next_free_user_event_number (
         )const { return 0; }
 
-    protected:   
+    protected:
         rectangle rect;
         const rmutex& m;
         drawable_window& parent;
@@ -452,7 +452,7 @@ namespace dlib
         ) const=0;
 
         virtual void on_user_event (
-            int 
+            int
         ){}
 
         virtual void on_window_resized(
@@ -466,20 +466,20 @@ namespace dlib
             unsigned long ,
             long ,
             long ,
-            bool 
+            bool
         ){}
 
         virtual void on_mouse_up (
             unsigned long ,
             unsigned long ,
             long ,
-            long 
+            long
         ){}
 
         virtual void on_mouse_move (
             unsigned long ,
             long ,
-            long 
+            long
         ){}
 
         virtual void on_mouse_leave (
@@ -489,11 +489,11 @@ namespace dlib
         ){}
 
         virtual void on_wheel_up (
-            unsigned long 
+            unsigned long
         ){}
 
         virtual void on_wheel_down (
-            unsigned long 
+            unsigned long
         ){}
 
         virtual void on_focus_gained (
@@ -505,7 +505,7 @@ namespace dlib
         virtual void on_keydown (
             unsigned long ,
             bool ,
-            unsigned long 
+            unsigned long
         ){}
 
         virtual void on_string_put (

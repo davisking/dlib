@@ -23,7 +23,7 @@ namespace dlib
             const double color_magnitude = 0.2
         )
         {
-            // pick a random gamma correction factor.  
+            // pick a random gamma correction factor.
             double gamma = std::max(0.0, 1 + gamma_magnitude*(rnd.get_random_double()-0.5));
 
             // pick a random color balancing scheme.
@@ -111,9 +111,9 @@ namespace dlib
         // Except that we used the square root of the eigenvalues (which I'm pretty sure is
         // what the authors intended).
         matrix<double,3,3> tform;
-        tform = -66.379,    25.094,   6.79698, 
+        tform = -66.379,    25.094,   6.79698,
                 -68.0492, -0.302309,  -13.9539,
-                -68.4907,  -24.0199,   7.27653; 
+                -68.4907,  -24.0199,   7.27653;
         matrix<double,3,1> v;
         v = rnd.get_random_gaussian(),rnd.get_random_gaussian(),rnd.get_random_gaussian();
         v = round(tform*0.1*v);

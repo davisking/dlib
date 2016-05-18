@@ -19,7 +19,7 @@ namespace dlib
         ) : seed(0) {}
 
         hash_similar_angles_64 (
-            const uint64 seed_ 
+            const uint64 seed_
         ) : seed(seed_) {}
 
         uint64 get_seed (
@@ -53,7 +53,7 @@ namespace dlib
         }
 
         template <typename EXP>
-        uint64 operator() ( 
+        uint64 operator() (
             const matrix_exp<EXP>& v
         ) const
         {
@@ -98,7 +98,7 @@ namespace dlib
         typedef std::pair<uint64,uint64> result_type;
 
         template <
-            typename vector_type 
+            typename vector_type
             >
         result_type operator() (
             const vector_type& v
@@ -112,7 +112,7 @@ namespace dlib
             const result_type& b
         ) const
         {
-            return hamming_distance(a.first,b.first) + 
+            return hamming_distance(a.first,b.first) +
                    hamming_distance(a.second,b.second);
         }
 
@@ -142,7 +142,7 @@ namespace dlib
         typedef std::pair<hash128_type,hash128_type> result_type;
 
         template <
-            typename vector_type 
+            typename vector_type
             >
         result_type operator() (
             const vector_type& v
@@ -156,7 +156,7 @@ namespace dlib
             const result_type& b
         ) const
         {
-            return hasher1.distance(a.first,b.first) + 
+            return hasher1.distance(a.first,b.first) +
                    hasher1.distance(a.second,b.second);
         }
 
@@ -187,7 +187,7 @@ namespace dlib
         typedef std::pair<hash256_type,hash256_type> result_type;
 
         template <
-            typename vector_type 
+            typename vector_type
             >
         result_type operator() (
             const vector_type& v
@@ -201,7 +201,7 @@ namespace dlib
             const result_type& b
         ) const
         {
-            return hasher1.distance(a.first,b.first) + 
+            return hasher1.distance(a.first,b.first) +
                    hasher1.distance(a.second,b.second);
         }
 

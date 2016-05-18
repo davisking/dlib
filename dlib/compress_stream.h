@@ -76,52 +76,52 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1a        
+        // kernel_1a
         typedef      compress_stream_kernel_1 <fce1,fcd1,crc32::kernel_1a>
                      kernel_1a;
    
-        // kernel_1b        
+        // kernel_1b
         typedef      compress_stream_kernel_1 <fce2,fcd2,crc32::kernel_1a>
                      kernel_1b;
 
-        // kernel_1c        
+        // kernel_1c
         typedef      compress_stream_kernel_1 <fce3,fcd3,crc32::kernel_1a>
                      kernel_1c;
 
-        // kernel_1da        
+        // kernel_1da
         typedef      compress_stream_kernel_1 <fce4a,fcd4a,crc32::kernel_1a>
                      kernel_1da;
 
-        // kernel_1ea        
+        // kernel_1ea
         typedef      compress_stream_kernel_1 <fce5a,fcd5a,crc32::kernel_1a>
                      kernel_1ea;
 
-        // kernel_1db        
+        // kernel_1db
         typedef      compress_stream_kernel_1 <fce4b,fcd4b,crc32::kernel_1a>
                      kernel_1db;
 
-        // kernel_1eb        
+        // kernel_1eb
         typedef      compress_stream_kernel_1 <fce5b,fcd5b,crc32::kernel_1a>
                      kernel_1eb;
 
-        // kernel_1ec        
+        // kernel_1ec
         typedef      compress_stream_kernel_1 <fce5c,fcd5c,crc32::kernel_1a>
                      kernel_1ec;
 
 
 
 
-        // kernel_2a        
+        // kernel_2a
         typedef      compress_stream_kernel_2 <fce2,fcd2,lz77_buffer2a,sliding_buffer1,fce_length,fcd_length,fce_index,fcd_index,crc32::kernel_1a>
                      kernel_2a;
 
 
 
 
-        // kernel_3a        
+        // kernel_3a
         typedef      compress_stream_kernel_3 <lzp_buf_1,crc32::kernel_1a,16>
                      kernel_3a;
-        // kernel_3b        
+        // kernel_3b
         typedef      compress_stream_kernel_3 <lzp_buf_2,crc32::kernel_1a,16>
                      kernel_3b;
    

@@ -11,7 +11,7 @@
 #include <dlib/rand.h>
 
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -43,21 +43,21 @@ namespace
     class feature_extractor
     {
     public:
-        typedef funny_sequence sequence_type; 
+        typedef funny_sequence sequence_type;
 
         unsigned long num_features() const
         {
             return num_label_states*num_label_states + num_label_states*num_sample_states;
         }
 
-        unsigned long order() const 
-        { 
-            return 1; 
+        unsigned long order() const
+        {
+            return 1;
         }
 
-        unsigned long num_labels() const 
-        { 
-            return num_label_states; 
+        unsigned long num_labels() const
+        {
+            return num_label_states;
         }
 
         template <typename feature_setter, typename EXP>
@@ -79,21 +79,21 @@ namespace
     class feature_extractor_partial
     {
     public:
-        typedef funny_sequence sequence_type; 
+        typedef funny_sequence sequence_type;
 
         unsigned long num_features() const
         {
             return num_label_states*num_label_states + num_label_states*num_sample_states;
         }
 
-        unsigned long order() const 
-        { 
-            return 1; 
+        unsigned long order() const
+        {
+            return 1;
         }
 
-        unsigned long num_labels() const 
-        { 
-            return num_label_states; 
+        unsigned long num_labels() const
+        {
+            return num_label_states;
         }
 
         template <typename feature_setter, typename EXP>
@@ -121,28 +121,28 @@ namespace
     class feature_extractor2
     {
     public:
-        typedef funny_sequence sequence_type; 
+        typedef funny_sequence sequence_type;
 
         unsigned long num_features() const
         {
             return num_label_states*num_label_states + num_label_states*num_sample_states;
         }
 
-        unsigned long order() const 
-        { 
-            return 1; 
+        unsigned long order() const
+        {
+            return 1;
         }
 
-        unsigned long num_labels() const 
-        { 
-            return num_label_states; 
+        unsigned long num_labels() const
+        {
+            return num_label_states;
         }
 
         template <typename EXP>
         bool reject_labeling (
             const sequence_type& ,
             const matrix_exp<EXP>& ,
-            unsigned long 
+            unsigned long
         ) const
         {
             called_rejct_labeling = true;
@@ -191,7 +191,7 @@ namespace
         ensures
             - This function randomly samples the HMM defined by transition_probabilities
               and emission_probabilities assuming that the previous hidden state
-              was previous_label. 
+              was previous_label.
             - The HMM is defined by:
                 - P(next_label |previous_label) == transition_probabilities(previous_label, next_label)
                 - P(next_sample|next_label)     == emission_probabilities  (next_label,     next_sample)
@@ -233,10 +233,10 @@ namespace
               (i.e. sum_cols(transition_probabilities) and sum_cols(emission_probabilities)
               must evaluate to vectors of all 1s.)
         ensures
-            - This function randomly samples a bunch of sequences from the HMM defined by 
-              transition_probabilities and emission_probabilities. 
+            - This function randomly samples a bunch of sequences from the HMM defined by
+              transition_probabilities and emission_probabilities.
             - The HMM is defined by:
-                - The probability of transitioning from hidden state H1 to H2 
+                - The probability of transitioning from hidden state H1 to H2
                   is given by transition_probabilities(H1,H2).
                 - The probability of a hidden state H producing an observed state
                   O is given by emission_probabilities(H,O).
@@ -263,7 +263,7 @@ namespace
             for (unsigned long i = 0; i < sample.size(); ++i)
             {
                 unsigned long next_label=0, next_sample=0;
-                sample_hmm(rnd, transition_probabilities, emission_probabilities, 
+                sample_hmm(rnd, transition_probabilities, emission_probabilities,
                            previous_label, next_label, next_sample);
 
                 label[i] = next_label;
@@ -299,7 +299,7 @@ namespace
 
         std::vector<funny_sequence> samples;
         std::vector<std::vector<unsigned long> > labels;
-        make_dataset(transition_probabilities,emission_probabilities, 
+        make_dataset(transition_probabilities,emission_probabilities,
                      samples, labels, 1000);
 
         dlog << LINFO << "samples.size(): "<< samples.size();
@@ -334,7 +334,7 @@ namespace
         print_spinner();
 
 
-        // We can also do cross-validation 
+        // We can also do cross-validation
         matrix<double> confusion_matrix;
         confusion_matrix = cross_validate_sequence_labeler(trainer, samples, labels, 4);
         dlog << LINFO << "cross-validation: ";
@@ -349,7 +349,7 @@ namespace
         matrix<double,0,1> true_hmm_model_weights = log(join_cols(reshape_to_column_vector(transition_probabilities),
                                                                   reshape_to_column_vector(emission_probabilities)));
 
-        sequence_labeler<fe_type> labeler_true(true_hmm_model_weights); 
+        sequence_labeler<fe_type> labeler_true(true_hmm_model_weights);
 
         confusion_matrix = test_sequence_labeler(labeler_true, samples, labels);
         dlog << LINFO << "True HMM model: ";
@@ -405,7 +405,7 @@ namespace
         0.5, 0.0, 0.5;
 
 
-        make_dataset(transition_probabilities,emission_probabilities, 
+        make_dataset(transition_probabilities,emission_probabilities,
                      samples, labels, 1000);
 
         dlog << LINFO << "samples.size(): "<< samples.size();

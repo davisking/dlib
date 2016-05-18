@@ -15,7 +15,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -41,7 +41,7 @@ namespace
         {
             for (long col = 0; col < m.nc(); ++col)
             {
-                m(row,col) = static_cast<type>(rnd.get_random_double()); 
+                m(row,col) = static_cast<type>(rnd.get_random_double());
             }
         }
 
@@ -56,7 +56,7 @@ namespace
         {
             for (long col = 0; col < m.nc(); ++col)
             {
-                m(row,col) = static_cast<type>(rnd.get_random_double()); 
+                m(row,col) = static_cast<type>(rnd.get_random_double());
             }
         }
 
@@ -76,7 +76,7 @@ namespace
 
         cholesky_decomposition<matrix_type> test(m);
 
-        // none of the matrices we should be passing in to test_cholesky() should be non-spd.  
+        // none of the matrices we should be passing in to test_cholesky() should be non-spd.
         DLIB_TEST(test.is_spd() == true);
 
         type temp;

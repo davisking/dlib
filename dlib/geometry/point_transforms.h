@@ -46,12 +46,12 @@ namespace dlib
         }
 
         const matrix<double,2,2> get_m(
-        ) const 
-        { 
+        ) const
+        {
             matrix<double,2,2> temp;
             temp = cos_angle, -sin_angle,
                    sin_angle, cos_angle;
-            return temp; 
+            return temp;
         }
 
         inline friend void serialize (const point_rotator& item, std::ostream& out)
@@ -108,12 +108,12 @@ namespace dlib
         }
 
         const matrix<double,2,2> get_m(
-        ) const 
-        { 
+        ) const
+        {
             matrix<double,2,2> temp;
             temp = cos_angle, -sin_angle,
                    sin_angle, cos_angle;
-            return temp; 
+            return temp;
         }
 
         const dlib::vector<double,2> get_b(
@@ -301,7 +301,7 @@ namespace dlib
         }
 
         matrix<double,2,2> r = u*s*trans(v);
-        double c = 1; 
+        double c = 1;
         if (sigma_from != 0)
             c = 1.0/sigma_from * trace(d*s);
         vector<double,2> t = mean_to - c*r*mean_from;
@@ -329,7 +329,7 @@ namespace dlib
         
         point_transform_projective (
             const point_transform_affine& tran
-        ) 
+        )
         {
             set_subm(m, 0,0, 2,2) = tran.get_m();
             set_subm(m, 0,2, 2,1) = tran.get_b();
@@ -400,7 +400,7 @@ namespace dlib
             ensures
                 - Uses the system of equations approach to finding a projective transform.
                   This is "Method 3" from Estimating Projective Transformation Matrix by
-                  Zhengyou Zhang. 
+                  Zhengyou Zhang.
                 - It should be emphasized that the find_projective_transform_basic()
                   routine, which uses the most popular method for finding projective
                   transformations, doesn't really work well when the minimum error solution
@@ -447,7 +447,7 @@ namespace dlib
             svd2(true, false, accum, u, w, v);
             long j = index_of_min(w);
 
-            return point_transform_projective(reshape(colm(u,j),3,3)); 
+            return point_transform_projective(reshape(colm(u,j),3,3));
         }
 
     // ----------------------------------------------------------------------------------------
@@ -465,7 +465,7 @@ namespace dlib
             obj(
                 const std::vector<dlib::vector<double,2> >& from_points_,
                 const std::vector<dlib::vector<double,2> >& to_points_
-            ) : 
+            ) :
                 from_points(from_points_) ,
                 to_points(to_points_)
             {}
@@ -497,7 +497,7 @@ namespace dlib
             obj_der(
                 const std::vector<dlib::vector<double,2> >& from_points_,
                 const std::vector<dlib::vector<double,2> >& to_points_
-            ) : 
+            ) :
                 from_points(from_points_) ,
                 to_points(to_points_)
             {}
@@ -579,7 +579,7 @@ namespace dlib
             error1 += length_squared(tran1(from_points[i])-to_points[i]);
             error2 += length_squared(tran2(from_points[i])-to_points[i]);
         }
-        matrix<double,9,1> params; 
+        matrix<double,9,1> params;
         // Pick the minimum error solution among the two so far.
         if (error1 < error2)
             params = reshape_to_column_vector(tran1.get_m());
@@ -598,7 +598,7 @@ namespace dlib
                 params,
                 0);
 
-        return point_transform_projective(reshape(params,3,3)); 
+        return point_transform_projective(reshape(params,3,3));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -802,7 +802,7 @@ namespace dlib
         camera_transform  (
         )
         {
-            *this = camera_transform(vector<double>(1,1,1), 
+            *this = camera_transform(vector<double>(1,1,1),
                                      vector<double>(0,0,0),
                                      vector<double>(0,0,1),
                                      90,
@@ -813,7 +813,7 @@ namespace dlib
             const vector<double>& camera_pos_,
             const vector<double>& camera_looking_at_,
             const vector<double>& camera_up_direction_,
-            const double camera_field_of_view_, 
+            const double camera_field_of_view_,
             const unsigned long num_pixels_
         )
         {
@@ -832,13 +832,13 @@ namespace dlib
 
             dlib::vector<double> X,Y,Z;
             Z = (camera_looking_at - camera_pos).normalize();
-            Y = camera_up_direction - dot(camera_up_direction,Z)*Z; 
+            Y = camera_up_direction - dot(camera_up_direction,Z)*Z;
             Y = Y.normalize();
             X = Z.cross(Y);
 
             set_rowm(proj,0) = trans(X);
             // Minus because images have y axis going down but we want the 3d projection to appear using a normal coordinate system with y going up.
-            set_rowm(proj,1) = -trans(Y); 
+            set_rowm(proj,1) = -trans(Y);
             set_rowm(proj,2) = trans(Z);
 
             width = num_pixels/2.0;
@@ -879,7 +879,7 @@ namespace dlib
             serialize(item.camera_pos, out);
             serialize(item.camera_looking_at, out);
             serialize(item.camera_up_direction, out);
-            serialize(item.camera_field_of_view, out); 
+            serialize(item.camera_field_of_view, out);
             serialize(item.num_pixels, out);
             serialize(item.proj, out);
             serialize(item.dist_scale, out);
@@ -891,7 +891,7 @@ namespace dlib
             deserialize(item.camera_pos, in);
             deserialize(item.camera_looking_at, in);
             deserialize(item.camera_up_direction, in);
-            deserialize(item.camera_field_of_view, in); 
+            deserialize(item.camera_field_of_view, in);
             deserialize(item.num_pixels, in);
             deserialize(item.proj, in);
             deserialize(item.dist_scale, in);
@@ -903,7 +903,7 @@ namespace dlib
         vector<double> camera_pos;
         vector<double> camera_looking_at;
         vector<double> camera_up_direction;
-        double camera_field_of_view; 
+        double camera_field_of_view;
         unsigned long num_pixels;
         matrix<double,3,3> proj;
         double dist_scale;

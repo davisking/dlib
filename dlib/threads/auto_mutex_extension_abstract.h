@@ -16,7 +16,7 @@ namespace dlib
     {
         /*!
             INITIAL VALUE
-                The mutex given in the constructor is locked and associated with this 
+                The mutex given in the constructor is locked and associated with this
                 object.
 
             WHAT THIS OBJECT REPRESENTS
@@ -117,7 +117,7 @@ namespace dlib
         !*/
 
         bool has_write_lock (
-        ); 
+        );
         /*!
             ensures
                 - returns true if this object has called read_write_mutex::lock() on its

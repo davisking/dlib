@@ -35,7 +35,7 @@ namespace dlib
                 std::vector<char>& buffer_
             ) :
                 read_pos(0),
-                buffer(buffer_) 
+                buffer(buffer_)
             {}
 
 
@@ -60,7 +60,7 @@ namespace dlib
 
             // ------------------------ INPUT FUNCTIONS ------------------------
 
-            int_type underflow( 
+            int_type underflow(
             )
             {
                 if (read_pos < buffer.size())
@@ -69,9 +69,9 @@ namespace dlib
                     return EOF;
             }
 
-            int_type uflow( 
+            int_type uflow(
             )
-            {   
+            {
                 if (read_pos < buffer.size())
                     return static_cast<unsigned char>(buffer[read_pos++]);
                 else
@@ -81,11 +81,11 @@ namespace dlib
             int_type pbackfail(
                 int_type c
             )
-            {  
+            {
                 // if they are trying to push back a character that they didn't read last
                 // that is an error
                 const unsigned long prev = read_pos-1;
-                if (c != EOF && prev < buffer.size() && 
+                if (c != EOF && prev < buffer.size() &&
                     c != static_cast<unsigned char>(buffer[prev]))
                 {
                     return EOF;
@@ -96,10 +96,10 @@ namespace dlib
             }
 
             std::streamsize xsgetn (
-                char* s, 
+                char* s,
                 std::streamsize n
             )
-            { 
+            {
                 if (read_pos < buffer.size())
                 {
                     const size_type num = std::min<size_type>(n, buffer.size()-read_pos);

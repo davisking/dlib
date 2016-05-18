@@ -18,7 +18,7 @@ namespace dlib
             REQUIREMENTS ON T
                 T must implement operator< for its type
 
-            REQUIREMENTS ON seq_base 
+            REQUIREMENTS ON seq_base
                 must be an implementation of sequence/sequence_kernel_abstract.h
 
 
@@ -52,9 +52,9 @@ namespace dlib
         typename seq_base
         >
     inline void swap (
-        sequence_sort<seq_base>& a, 
-        sequence_sort<seq_base>& b 
-    ) { a.swap(b); } 
+        sequence_sort<seq_base>& a,
+        sequence_sort<seq_base>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/

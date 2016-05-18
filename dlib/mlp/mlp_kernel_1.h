@@ -18,7 +18,7 @@ namespace dlib
     {
         /*!
             INITIAL VALUE
-                The network is initially initialized with random weights 
+                The network is initially initialized with random weights
 
             CONVENTION
                 - input_layer_nodes() == input_nodes
@@ -31,33 +31,33 @@ namespace dlib
 
                 - if (second_hidden_nodes == 0) then
                     - for all i and j:
-                        - w1(i,j) == the weight on the link from node i in the first hidden layer 
+                        - w1(i,j) == the weight on the link from node i in the first hidden layer
                           to input node j
-                        - w3(i,j) == the weight on the link from node i in the output layer 
+                        - w3(i,j) == the weight on the link from node i in the output layer
                           to first hidden layer node j
                     - for all i and j:
-                        - w1m == the momentum terms for w1 from the previous update 
-                        - w3m == the momentum terms for w3 from the previous update 
+                        - w1m == the momentum terms for w1 from the previous update
+                        - w3m == the momentum terms for w3 from the previous update
                 - else
                     - for all i and j:
-                        - w1(i,j) == the weight on the link from node i in the first hidden layer 
+                        - w1(i,j) == the weight on the link from node i in the first hidden layer
                           to input node j
-                        - w2(i,j) == the weight on the link from node i in the second hidden layer 
+                        - w2(i,j) == the weight on the link from node i in the second hidden layer
                           to first hidden layer node j
-                        - w3(i,j) == the weight on the link from node i in the output layer 
+                        - w3(i,j) == the weight on the link from node i in the output layer
                           to second hidden layer node j
                     - for all i and j:
-                        - w1m == the momentum terms for w1 from the previous update 
-                        - w2m == the momentum terms for w2 from the previous update 
-                        - w3m == the momentum terms for w3 from the previous update 
+                        - w1m == the momentum terms for w1 from the previous update
+                        - w2m == the momentum terms for w2 from the previous update
+                        - w3m == the momentum terms for w3 from the previous update
         !*/
 
     public:
 
         mlp_kernel_1 (
             long nodes_in_input_layer,
-            long nodes_in_first_hidden_layer, 
-            long nodes_in_second_hidden_layer = 0, 
+            long nodes_in_first_hidden_layer,
+            long nodes_in_second_hidden_layer = 0,
             long nodes_in_output_layer = 1,
             double alpha_ = 0.1,
             double momentum_ = 0.8
@@ -101,7 +101,7 @@ namespace dlib
         ) {}
 
         void reset (
-        ) 
+        )
         {
             // randomize the weights for the first layer
             for (long r = 0; r < w1.nr(); ++r)
@@ -144,16 +144,16 @@ namespace dlib
 
         template <typename EXP>
         const matrix<double> operator() (
-            const matrix_exp<EXP>& in 
+            const matrix_exp<EXP>& in
         ) const
         {
             for (long i = 0; i < in.nr(); ++i)
                 z(i) = in(i);
-            // insert the bias 
+            // insert the bias
             z(z.nr()-1) = -1;
 
             tmp1 = sigmoid(w1*z);
-            // insert the bias 
+            // insert the bias
             tmp1(tmp1.nr()-1) = -1;
 
             if (second_hidden_nodes == 0)
@@ -163,7 +163,7 @@ namespace dlib
             else
             {
                 tmp2 = sigmoid(w2*tmp1);
-                // insert the bias 
+                // insert the bias
                 tmp2(tmp2.nr()-1) = -1;
 
                 return sigmoid(w3*tmp2);
@@ -173,16 +173,16 @@ namespace dlib
         template <typename EXP1, typename EXP2>
         void train (
             const matrix_exp<EXP1>& example_in,
-            const matrix_exp<EXP2>& example_out 
+            const matrix_exp<EXP2>& example_out
         )
         {
             for (long i = 0; i < example_in.nr(); ++i)
                 z(i) = example_in(i);
-            // insert the bias 
+            // insert the bias
             z(z.nr()-1) = -1;
 
             tmp1 = sigmoid(w1*z);
-            // insert the bias 
+            // insert the bias
             tmp1(tmp1.nr()-1) = -1;
 
 
@@ -205,7 +205,7 @@ namespace dlib
             else
             {
                 tmp2 = sigmoid(w2*tmp1);
-                // insert the bias 
+                // insert the bias
                 tmp2(tmp2.nr()-1) = -1;
 
                 o = sigmoid(w3*tmp2);
@@ -246,8 +246,8 @@ namespace dlib
             double delta = sum(abs(w1m)) + sum(abs(w2m)) + sum(abs(w3m));
 
             // divide by the number of weights
-            delta /=  w1m.nr()*w1m.nc() + 
-                w2m.nr()*w2m.nc() + 
+            delta /=  w1m.nr()*w1m.nc() +
+                w2m.nr()*w2m.nc() +
                 w3m.nr()*w3m.nc();
 
             return delta;
@@ -272,7 +272,7 @@ namespace dlib
             w2m.swap(item.w2m);
             w3m.swap(item.w3m);
 
-            // even swap the temporary matrices because this may ultimately result in 
+            // even swap the temporary matrices because this may ultimately result in
             // fewer calls to new and delete.
             e1.swap(item.e1);
             e2.swap(item.e2);
@@ -285,12 +285,12 @@ namespace dlib
 
 
         friend void serialize (
-            const mlp_kernel_1& item, 
+            const mlp_kernel_1& item,
             std::ostream& out
         );
 
         friend void deserialize (
-            mlp_kernel_1& item, 
+            mlp_kernel_1& item,
             std::istream& in
         );
 
@@ -317,19 +317,19 @@ namespace dlib
         // temporary storage
         mutable matrix<double> e1, e2, e3;
         mutable matrix<double> z, tmp1, tmp2, o;
-    };   
+    };
 
     inline void swap (
-        mlp_kernel_1& a, 
-        mlp_kernel_1& b 
-    ) { a.swap(b); }   
+        mlp_kernel_1& a,
+        mlp_kernel_1& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 
     inline void serialize (
-        const mlp_kernel_1& item, 
+        const mlp_kernel_1& item,
         std::ostream& out
-    )   
+    )
     {
         try
         {
@@ -349,15 +349,15 @@ namespace dlib
             serialize(item.w3m, out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type mlp_kernel_1"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type mlp_kernel_1");
         }
     }
 
     inline void deserialize (
-        mlp_kernel_1& item, 
+        mlp_kernel_1& item,
         std::istream& in
-    )   
+    )
     {
         try
         {
@@ -379,10 +379,10 @@ namespace dlib
             item.z.set_size(item.input_nodes+1,1);
         }
         catch (serialization_error& e)
-        { 
+        {
             // give item a reasonable value since the deserialization failed
             mlp_kernel_1(1,1).swap(item);
-            throw serialization_error(e.info + "\n   while deserializing object of type mlp_kernel_1"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type mlp_kernel_1");
         }
     }
 

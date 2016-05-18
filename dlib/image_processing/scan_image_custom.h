@@ -26,7 +26,7 @@ namespace dlib
         typedef Feature_extractor_type feature_extractor_type;
 
         scan_image_custom (
-        );  
+        );
 
         template <
             typename image_type
@@ -87,7 +87,7 @@ namespace dlib
         template <typename T>
         friend void deserialize (
             scan_image_custom<T>& item,
-            std::istream& in 
+            std::istream& in
         );
 
     private:
@@ -102,7 +102,7 @@ namespace dlib
 
         DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(
             has_compute_object_score,
-            double, 
+            double,
             compute_object_score,
             ( const matrix<double,0,1>& w, const rectangle& obj) const
         );
@@ -185,7 +185,7 @@ namespace dlib
     template <typename T>
     void deserialize (
         scan_image_custom<T>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         int version = 0;
@@ -304,7 +304,7 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(is_loaded_with_image() &&
-                    w.size() >= get_num_dimensions(), 
+                    w.size() >= get_num_dimensions(),
             "\t void scan_image_custom::detect()"
             << "\n\t Invalid inputs were given to this function "
             << "\n\t is_loaded_with_image(): " << is_loaded_with_image()

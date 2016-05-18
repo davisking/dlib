@@ -5,6 +5,6 @@
 
 #include "bound_function_pointer/bound_function_pointer_kernel_1.h"
 
-#endif // DLIB_BOUND_FUNCTION_POINTEr_ 
+#endif // DLIB_BOUND_FUNCTION_POINTEr_
 
 

@@ -10,8 +10,8 @@
 
 namespace dlib
 {
-    class image_load_error : public dlib::error 
-    { 
+    class image_load_error : public dlib::error
+    {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is an exception used to indicate a failure to load an image.
@@ -22,7 +22,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type 
+        typename image_type
         >
     void load_bmp (
         image_type& image,
@@ -31,11 +31,11 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
         ensures
-            - #image == the image of the MS Windows BMP file that was available 
-              in the input stream in.  
-            - #image[0][0] will be the upper left corner of the image 
+            - #image == the image of the MS Windows BMP file that was available
+              in the input stream in.
+            - #image[0][0] will be the upper left corner of the image
             - #image[image.nr()-1][image.nc()-1] will be the lower right
               corner of the image
             - Performs any color space conversion necessary to convert the
@@ -44,9 +44,9 @@ namespace dlib
         throws
             - image_load_error
                 This exception is thrown if there is an error that prevents us
-                from loading the image.  If this exception is thrown then 
+                from loading the image.  If this exception is thrown then
                 #image will have an initial value for its type.
-            - std::bad_alloc 
+            - std::bad_alloc
                 If this exception is thrown then #image will have an initial
                 value for its type.
     !*/
@@ -54,7 +54,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type 
+        typename image_type
         >
     void load_bmp (
         image_type& image,
@@ -63,9 +63,9 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
         ensures
-            - opens the file indicated by file_name with an input file stream named fin 
+            - opens the file indicated by file_name with an input file stream named fin
               and performs:
               load_bmp(image,fin);
     !*/
@@ -74,13 +74,13 @@ namespace dlib
 
     /*!
         dlib dng file format:
-            This is a file format I created for this library.  It is a lossless 
+            This is a file format I created for this library.  It is a lossless
             compressed image format that is similar to the PNG format but uses
             the dlib PPM compression algorithms instead of the DEFLATE algorithm.
     !*/
 
     template <
-        typename image_type 
+        typename image_type
         >
     void load_dng (
         image_type& image,
@@ -89,11 +89,11 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
         ensures
-            - #image == the image of the dlib dng file that was available 
-              in the input stream in. 
-            - #image[0][0] will be the upper left corner of the image 
+            - #image == the image of the dlib dng file that was available
+              in the input stream in.
+            - #image[0][0] will be the upper left corner of the image
             - #image[image.nr()-1][image.nc()-1] will be the lower right
               corner of the image
             - Performs any color space conversion necessary to convert the
@@ -102,9 +102,9 @@ namespace dlib
         throws
             - image_load_error
                 This exception is thrown if there is an error that prevents us
-                from loading the image.  If this exception is thrown then 
+                from loading the image.  If this exception is thrown then
                 #image will have an initial value for its type.
-            - std::bad_alloc 
+            - std::bad_alloc
                 If this exception is thrown then #image will have an initial
                 value for its type.
     !*/
@@ -121,9 +121,9 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
         ensures
-            - opens the file indicated by file_name with an input file stream named fin 
+            - opens the file indicated by file_name with an input file stream named fin
               and performs:
               load_dng(image,fin);
     !*/

@@ -1,7 +1,7 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_MULTITHREADED_OBJECT_EXTENSIOn_ABSTRACT_
-#ifdef DLIB_MULTITHREADED_OBJECT_EXTENSIOn_ABSTRACT_ 
+#ifdef DLIB_MULTITHREADED_OBJECT_EXTENSIOn_ABSTRACT_
 
 #include "threads_kernel_abstract.h"
 
@@ -19,11 +19,11 @@ namespace dlib
                 - number_of_threads_registered() == 0
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a multithreaded object.  It is similar to 
-                the threaded_object except it allows you to have many threads in a 
-                single object rather than just one.  To use it you inherit from it 
-                and register the member functions in your new class that you want 
-                to run in their own threads by calling register_thread().  Then when 
+                This object represents a multithreaded object.  It is similar to
+                the threaded_object except it allows you to have many threads in a
+                single object rather than just one.  To use it you inherit from it
+                and register the member functions in your new class that you want
+                to run in their own threads by calling register_thread().  Then when
                 you call start() it will spawn all the registered functions
                 in their own threads.
         !*/
@@ -38,7 +38,7 @@ namespace dlib
             throws
                 - std::bad_alloc
                 - dlib::thread_error
-                    the constructor may throw this exception if there is a problem 
+                    the constructor may throw this exception if there is a problem
                     gathering resources to create threading objects.
         !*/
 
@@ -50,7 +50,7 @@ namespace dlib
                   (i.e. in the destructor for the object you derive from this one you
                   must wait for all the threads to end.)
             ensures
-                - all resources allocated by *this have been freed.  
+                - all resources allocated by *this have been freed.
         !*/
 
         void clear(
@@ -61,7 +61,7 @@ namespace dlib
                 - blocks until all threads have terminated
             throws
                 - std::bad_alloc or dlib::thread_error
-                    if an exception is thrown then *this is unusable 
+                    if an exception is thrown then *this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -95,10 +95,10 @@ namespace dlib
         ) const;
         /*!
             requires
-                - is not called from one of this object's threads 
+                - is not called from one of this object's threads
             ensures
                 - if (number_of_threads_alive() > 0) then
-                    - blocks until all the threads in this object have terminated 
+                    - blocks until all the threads in this object have terminated
                       (i.e. blocks until number_of_threads_alive() == 0)
         !*/
 
@@ -109,10 +109,10 @@ namespace dlib
                 - #number_of_threads_alive() == number_of_threads_registered()
                 - #is_running() == true
                 - #should_stop() == false
-                - all the threads registered are up and running. 
+                - all the threads registered are up and running.
             throws
                 - std::bad_alloc or dlib::thread_error
-                    If either of these exceptions are thrown then 
+                    If either of these exceptions are thrown then
                     #is_running() == false and should_stop() == true
         !*/
 
@@ -153,7 +153,7 @@ namespace dlib
                     - #number_of_threads_alive() += number_of_threads_alive() + 1
             throws
                 - std::bad_alloc or dlib::thread_error
-                    If either of these exceptions are thrown then 
+                    If either of these exceptions are thrown then
                     #is_running() == false and should_stop() == true
         !*/
 
@@ -161,10 +161,10 @@ namespace dlib
         ) const;
         /*!
             requires
-                - is only called from one of the registered threads in this object 
+                - is only called from one of the registered threads in this object
             ensures
                 - if (is_running() == false && should_stop() == false) then
-                    - blocks until (#is_running() == true || #should_stop() == true) 
+                    - blocks until (#is_running() == true || #should_stop() == true)
                 - if (this thread is supposed to terminate) then
                     - returns true
                 - else

@@ -29,7 +29,7 @@ namespace dlib
                 - next_add_accepts() == false
 
             WHAT THIS OBJECT REPRESENTS
-                This object is a tool to help you select a random subset of a large body of data.  
+                This object is a tool to help you select a random subset of a large body of data.
                 In particular, it is useful when the body of data is too large to fit into memory.
 
                 So for example, suppose you have 1000000 data samples and you want to select a
@@ -46,9 +46,9 @@ namespace dlib
                 up in the rand_subset object.
 
 
-                Note that the above example calls get_next_data_sample() for each data sample.  This 
-                may be inefficient since most of the data samples are just ignored.  An alternative 
-                method that doesn't require you to load each sample can also be used.  Consider the 
+                Note that the above example calls get_next_data_sample() for each data sample.  This
+                may be inefficient since most of the data samples are just ignored.  An alternative
+                method that doesn't require you to load each sample can also be used.  Consider the
                 following:
 
                     random_subset_selector<sample_type> rand_subset;
@@ -57,7 +57,7 @@ namespace dlib
                         if (rand_subset.next_add_accepts())
                             rand_subset.add(get_data_sample(i));
                         else
-                            rand_subset.add() 
+                            rand_subset.add()
 
                 In the above example we only actually fetch the data sample into memory if we
                 know that the rand_subset would include it into the random subset.  Otherwise,
@@ -66,7 +66,7 @@ namespace dlib
 
                 Finally, note that the random_subset_selector uses a deterministic pseudo-random
                 number generator under the hood.  Moreover, the default constructor always seeds
-                the random number generator in the same way.  So unless you call set_seed() 
+                the random number generator in the same way.  So unless you call set_seed()
                 each instance of the random_subset_selector will function identically.
         !*/
     public:
@@ -184,7 +184,7 @@ namespace dlib
         /*!
             ensures
                 - if (size() > 0) then
-                    - returns an iterator referring to the first element in 
+                    - returns an iterator referring to the first element in
                       this container.
                 - else
                     - returns end()
@@ -195,14 +195,14 @@ namespace dlib
         /*!
             ensures
                 - if (size() > 0) then
-                    - returns a const_iterator referring to the first element in 
+                    - returns a const_iterator referring to the first element in
                       this container.
                 - else
                     - returns end()
         !*/
 
         iterator end(
-        ); 
+        );
         /*!
             ensures
                 - returns an iterator that represents one past the end of
@@ -223,7 +223,7 @@ namespace dlib
             ensures
                 - returns a const reference to the underlying std::vector<T> that contains
                   all elements in this object.  That is, this function returns a vector, V,
-                  which has the following properties:  
+                  which has the following properties:
                     - V.size()  == this->size()
                     - V.begin() == this->begin()
                     - V.end()   == this->end()
@@ -241,7 +241,7 @@ namespace dlib
 
     template <
         typename T,
-        typename rand_type 
+        typename rand_type
         >
     void swap (
         random_subset_selector<T,rand_type>& a,
@@ -253,26 +253,26 @@ namespace dlib
 
     template <
         typename T,
-        typename rand_type 
+        typename rand_type
         >
     void serialize (
         const random_subset_selector<T,rand_type>& item,
-        std::ostream& out 
-    );   
+        std::ostream& out
+    );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     template <
         typename T,
-        typename rand_type 
+        typename rand_type
         >
     void deserialize (
         random_subset_selector<T,rand_type>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -369,12 +369,12 @@ namespace dlib
         typename T
         >
     const matrix_exp mat (
-        const random_subset_selector<T>& m 
+        const random_subset_selector<T>& m
     );
     /*!
         ensures
             - returns a matrix R such that:
-                - is_col_vector(R) == true 
+                - is_col_vector(R) == true
                 - R.size() == m.size()
                 - for all valid r:
                   R(r) == m[r]

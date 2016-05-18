@@ -13,25 +13,25 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename K 
+        typename K
         >
-    class rbf_network_trainer 
+    class rbf_network_trainer
     {
         /*!
-            REQUIREMENTS ON K 
-                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+            REQUIREMENTS ON K
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h
                 (since this is supposed to be a RBF network it is probably reasonable
                 to use some sort of radial basis kernel)
 
             INITIAL VALUE
-                - get_num_centers() == 10 
+                - get_num_centers() == 10
 
             WHAT THIS OBJECT REPRESENTS
                 This object implements a trainer for a radial basis function network.
 
-                The implementation of this algorithm follows the normal RBF training 
+                The implementation of this algorithm follows the normal RBF training
                 process.  For more details see the code or the Wikipedia article
-                about RBF networks.  
+                about RBF networks.
         !*/
 
     public:
@@ -42,7 +42,7 @@ namespace dlib
         typedef decision_function<kernel_type> trained_function_type;
 
         rbf_network_trainer (
-        ); 
+        );
         /*!
             ensures
                 - this object is properly initialized
@@ -53,7 +53,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_kernel() == k 
+                - #get_kernel() == k
         !*/
 
         const kernel_type& get_kernel (
@@ -75,7 +75,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the maximum number of centers (a.k.a. basis_vectors in the 
+                - returns the maximum number of centers (a.k.a. basis_vectors in the
                   trained decision_function) you will get when you train this object on data.
         !*/
 
@@ -95,7 +95,7 @@ namespace dlib
                   Also, y should contain scalar_type objects.
                 - is_learning_problem(x,y) == true
             ensures
-                - trains a RBF network given the training samples in x and 
+                - trains a RBF network given the training samples in x and
                   labels in y and returns the resulting decision_function
             throws
                 - std::bad_alloc
@@ -109,7 +109,7 @@ namespace dlib
                 - swaps *this and item
         !*/
 
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2008  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_THREAD_POOl_ABSTRACT_Hh_
-#ifdef DLIB_THREAD_POOl_ABSTRACT_Hh_ 
+#ifdef DLIB_THREAD_POOl_ABSTRACT_Hh_
 
 #include "threads_kernel_abstract.h"
 #include "../uintn.h"
@@ -17,11 +17,11 @@ namespace dlib
     class future
     {
         /*!
-            INITIAL VALUE 
+            INITIAL VALUE
                 - is_ready() == true
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a container that allows you to safely pass objects 
+                This object represents a container that allows you to safely pass objects
                 into the tasks performed by the thread_pool object defined below.  An
                 example will make it clear:
 
@@ -47,7 +47,7 @@ namespace dlib
         /*!
             ensures
                 - The object of type T contained in this future has
-                  an initial value for its type. 
+                  an initial value for its type.
                 - #is_ready() == true
         !*/
 
@@ -62,7 +62,7 @@ namespace dlib
 
         future (
             const future& item
-        ); 
+        );
         /*!
             ensures
                 - if (item.is_ready() == false) then
@@ -86,11 +86,11 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - if (the value of this future may not yet be ready to be accessed because it 
+                - if (the value of this future may not yet be ready to be accessed because it
                   is in use by a task in a thread_pool) then
-                    - returns false 
+                    - returns false
                 - else
-                    - returns true 
+                    - returns true
         !*/
 
         future& operator=(
@@ -204,12 +204,12 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class thread_pool 
+    class thread_pool
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object represents a fixed size group of threads which you can
-                submit tasks to and then wait for those tasks to be completed. 
+                submit tasks to and then wait for those tasks to be completed.
 
                 Note that setting the number of threads to 0 is a valid way to
                 use this object.  It causes it to not contain any threads
@@ -218,14 +218,14 @@ namespace dlib
                 mode any thread that calls add_task() is considered to be
                 a thread_pool thread capable of executing tasks.
 
-                This object is also implemented such that no memory allocations occur 
-                after the thread_pool has been constructed so long as the user doesn't 
-                call any of the add_task_by_value() routines.  The future object also 
-                doesn't perform any memory allocations or contain any system resources 
-                such as mutex objects. 
+                This object is also implemented such that no memory allocations occur
+                after the thread_pool has been constructed so long as the user doesn't
+                call any of the add_task_by_value() routines.  The future object also
+                doesn't perform any memory allocations or contain any system resources
+                such as mutex objects.
 
             EXCEPTIONS
-                Note that if an exception is thrown inside a task thread and 
+                Note that if an exception is thrown inside a task thread and
                 is not caught then the normal rule for uncaught exceptions in
                 threads applies. That is, the application will be terminated.
         !*/
@@ -240,7 +240,7 @@ namespace dlib
             throws
                 - std::bad_alloc
                 - dlib::thread_error
-                    the constructor may throw this exception if there is a problem 
+                    the constructor may throw this exception if there is a problem
                     gathering resources to create threading objects.
         !*/
 
@@ -276,7 +276,7 @@ namespace dlib
         );
         /*!
             requires
-                - function_object() is a valid expression 
+                - function_object() is a valid expression
             ensures
                 - makes a copy of function_object, call it FCOPY.
                 - if (is_task_thread() == true and there aren't any free threads available) then
@@ -297,7 +297,7 @@ namespace dlib
         /*!
             requires
                 - funct == a valid member function pointer for class T
-                - obj will not go out of scope until after the task has completed (i.e. 
+                - obj will not go out of scope until after the task has completed (i.e.
                   this function passes obj to the task by reference.  If you want to avoid
                   this restriction then use add_task_by_value())
             ensures
@@ -315,15 +315,15 @@ namespace dlib
         template <typename T>
         uint64 add_task_by_value (
             const T& obj,
-            void (T::*funct)() 
-        ); 
+            void (T::*funct)()
+        );
         /*!
             requires
                 - funct == a valid member function pointer for class T
             ensures
                 - makes a copy of obj, call it OBJ_COPY.
                 - if (is_task_thread() == true and there aren't any free threads available) then
-                    - calls (OBJ_COPY.*funct)() within the calling thread and returns 
+                    - calls (OBJ_COPY.*funct)() within the calling thread and returns
                       when it finishes.
                 - else
                     - the call to this function blocks until there is a free thread in the pool
@@ -342,7 +342,7 @@ namespace dlib
         /*!
             requires
                 - funct == a valid member function pointer for class T
-                - obj will not go out of scope until after the task has completed (i.e. 
+                - obj will not go out of scope until after the task has completed (i.e.
                   this function passes obj to the task by reference.  If you want to avoid
                   this restriction then use add_task_by_value())
             ensures
@@ -367,7 +367,7 @@ namespace dlib
         /*!
             requires
                 - funct == a valid member function pointer for class T
-                - obj will not go out of scope until after the task has completed (i.e. 
+                - obj will not go out of scope until after the task has completed (i.e.
                   this function passes obj to the task by reference.  If you want to avoid
                   this restriction then use add_task_by_value())
             ensures
@@ -398,7 +398,7 @@ namespace dlib
         /*!
             ensures
                 - the call to this function blocks until all tasks which were submitted
-                  to the thread pool by the thread that is calling this function have 
+                  to the thread pool by the thread that is calling this function have
                   finished.
         !*/
 
@@ -411,9 +411,9 @@ namespace dlib
         );
         /*!
             requires
-                - function_object(arg1.get()) is a valid expression 
+                - function_object(arg1.get()) is a valid expression
                   (i.e. The A1 type stored in the future must be a type that can be passed into the given function object)
-                - function_object will not go out of scope until after the task has completed (i.e. 
+                - function_object will not go out of scope until after the task has completed (i.e.
                   this function passes function_object to the task by reference.  If you want to avoid
                   this restriction then use add_task_by_value())
             ensures
@@ -424,7 +424,7 @@ namespace dlib
                     - the call to this function blocks until there is a free thread in the pool
                       to process this new task.  Once a free thread is available the task
                       is handed off to that thread which then calls function_object(arg1.get()).
-                - #arg1.is_ready() == false 
+                - #arg1.is_ready() == false
                 - returns a task id that can be used by this->wait_for_task() to wait
                   for the submitted task to finish.
         !*/
@@ -436,7 +436,7 @@ namespace dlib
         );
         /*!
             requires
-                - function_object(arg1.get()) is a valid expression 
+                - function_object(arg1.get()) is a valid expression
                   (i.e. The A1 type stored in the future must be a type that can be passed into the given function object)
             ensures
                 - makes a copy of function_object, call it FCOPY.
@@ -446,7 +446,7 @@ namespace dlib
                     - the call to this function blocks until there is a free thread in the pool
                       to process this new task.  Once a free thread is available the task
                       is handed off to that thread which then calls FCOPY(arg1.get()).
-                - #arg1.is_ready() == false 
+                - #arg1.is_ready() == false
                 - returns a task id that can be used by this->wait_for_task() to wait
                   for the submitted task to finish.
         !*/
@@ -456,13 +456,13 @@ namespace dlib
             T& obj,
             void (T::*funct)(T1),
             future<A1>& arg1
-        ); 
+        );
         /*!
             requires
                 - funct == a valid member function pointer for class T
                 - (obj.*funct)(arg1.get()) must be a valid expression.
                   (i.e. The A1 type stored in the future must be a type that can be passed into the given function)
-                - obj will not go out of scope until after the task has completed (i.e. 
+                - obj will not go out of scope until after the task has completed (i.e.
                   this function passes obj to the task by reference.  If you want to avoid
                   this restriction then use add_task_by_value())
             ensures
@@ -473,7 +473,7 @@ namespace dlib
                     - the call to this function blocks until there is a free thread in the pool
                       to process this new task.  Once a free thread is available the task
                       is handed off to that thread which then calls (obj.*funct)(arg1.get()).
-                - #arg1.is_ready() == false 
+                - #arg1.is_ready() == false
                 - returns a task id that can be used by this->wait_for_task() to wait
                   for the submitted task to finish.
         !*/
@@ -483,7 +483,7 @@ namespace dlib
             const T& obj,
             void (T::*funct)(T1),
             future<A1>& arg1
-        ); 
+        );
         /*!
             requires
                 - funct == a valid member function pointer for class T
@@ -492,7 +492,7 @@ namespace dlib
             ensures
                 - makes a copy of obj, call it OBJ_COPY.
                 - if (is_task_thread() == true and there aren't any free threads available) then
-                    - calls (OBJ_COPY.*funct)(arg1.get()) within the calling thread and returns 
+                    - calls (OBJ_COPY.*funct)(arg1.get()) within the calling thread and returns
                       when it finishes.
                 - else
                     - the call to this function blocks until there is a free thread in the pool
@@ -507,13 +507,13 @@ namespace dlib
             const T& obj,
             void (T::*funct)(T1) const,
             future<A1>& arg1
-        ); 
+        );
         /*!
             requires
                 - funct == a valid member function pointer for class T
                 - (obj.*funct)(arg1.get()) must be a valid expression.
                   (i.e. The A1 type stored in the future must be a type that can be passed into the given function)
-                - obj will not go out of scope until after the task has completed (i.e. 
+                - obj will not go out of scope until after the task has completed (i.e.
                   this function passes obj to the task by reference.  If you want to avoid
                   this restriction then use add_task_by_value())
             ensures
@@ -524,7 +524,7 @@ namespace dlib
                     - the call to this function blocks until there is a free thread in the pool
                       to process this new task.  Once a free thread is available the task
                       is handed off to that thread which then calls (obj.*funct)(arg1.get()).
-                - #arg1.is_ready() == false 
+                - #arg1.is_ready() == false
                 - returns a task id that can be used by this->wait_for_task() to wait
                   for the submitted task to finish.
         !*/
@@ -534,7 +534,7 @@ namespace dlib
             const T& obj,
             void (T::*funct)(T1) const,
             future<A1>& arg1
-        ); 
+        );
         /*!
             requires
                 - funct == a valid member function pointer for class T
@@ -543,7 +543,7 @@ namespace dlib
             ensures
                 - makes a copy of obj, call it OBJ_COPY.
                 - if (is_task_thread() == true and there aren't any free threads available) then
-                    - calls (OBJ_COPY.*funct)(arg1.get()) within the calling thread and returns 
+                    - calls (OBJ_COPY.*funct)(arg1.get()) within the calling thread and returns
                       when it finishes.
                 - else
                     - the call to this function blocks until there is a free thread in the pool
@@ -557,10 +557,10 @@ namespace dlib
         uint64 add_task (
             void (*funct)(T1),
             future<A1>& arg1
-        ); 
+        );
         /*!
             requires
-                - funct == a valid function pointer 
+                - funct == a valid function pointer
                 - (funct)(arg1.get()) must be a valid expression.
                   (i.e. The A1 type stored in the future must be a type that can be passed into the given function)
             ensures
@@ -571,14 +571,14 @@ namespace dlib
                     - the call to this function blocks until there is a free thread in the pool
                       to process this new task.  Once a free thread is available the task
                       is handed off to that thread which then calls funct(arg1.get()).
-                - #arg1.is_ready() == false 
+                - #arg1.is_ready() == false
                 - returns a task id that can be used by this->wait_for_task() to wait
                   for the submitted task to finish.
         !*/
 
         // --------------------------------------------------------------------------------
-        // The remainder of this class just contains overloads for add_task() and add_task_by_value() 
-        // that take up to 4 futures (as well as 0 futures).  Their behavior is identical to the above 
+        // The remainder of this class just contains overloads for add_task() and add_task_by_value()
+        // that take up to 4 futures (as well as 0 futures).  Their behavior is identical to the above
         // add_task() and add_task_by_value() functions.
         // --------------------------------------------------------------------------------
 
@@ -603,14 +603,14 @@ namespace dlib
             void (T::*funct)(T1,T2),
             future<A1>& arg1,
             future<A2>& arg2
-        ); 
+        );
         
         uint64 add_task_by_value (
             const T& obj,
             void (T::*funct)(T1,T2),
             future<A1>& arg1,
             future<A2>& arg2
-        ); 
+        );
 
         template <typename T, typename T1, typename A1,
                               typename T2, typename A2>
@@ -619,7 +619,7 @@ namespace dlib
             void (T::*funct)(T1,T2) const,
             future<A1>& arg1,
             future<A2>& arg2
-        ); 
+        );
         
         template <typename T, typename T1, typename A1,
                               typename T2, typename A2>
@@ -628,7 +628,7 @@ namespace dlib
             void (T::*funct)(T1,T2) const,
             future<A1>& arg1,
             future<A2>& arg2
-        ); 
+        );
 
         template <typename T1, typename A1,
                   typename T2, typename A2>
@@ -636,7 +636,7 @@ namespace dlib
             void (*funct)(T1,T2),
             future<A1>& arg1,
             future<A2>& arg2
-        ); 
+        );
 
         // --------------------
 
@@ -665,7 +665,7 @@ namespace dlib
             future<A1>& arg1,
             future<A2>& arg2,
             future<A3>& arg3
-        ); 
+        );
 
         template <typename T, typename T1, typename A1,
                               typename T2, typename A2,
@@ -676,7 +676,7 @@ namespace dlib
             future<A1>& arg1,
             future<A2>& arg2,
             future<A3>& arg3
-        ); 
+        );
         
         template <typename T, typename T1, typename A1,
                               typename T2, typename A2,
@@ -687,7 +687,7 @@ namespace dlib
             future<A1>& arg1,
             future<A2>& arg2,
             future<A3>& arg3
-        ); 
+        );
 
         template <typename T, typename T1, typename A1,
                               typename T2, typename A2,
@@ -698,7 +698,7 @@ namespace dlib
             future<A1>& arg1,
             future<A2>& arg2,
             future<A3>& arg3
-        ); 
+        );
         
         template <typename T1, typename A1,
                   typename T2, typename A2,
@@ -708,7 +708,7 @@ namespace dlib
             future<A1>& arg1,
             future<A2>& arg2,
             future<A3>& arg3
-        ); 
+        );
 
         // --------------------
 
@@ -741,7 +741,7 @@ namespace dlib
             future<A2>& arg2,
             future<A3>& arg3,
             future<A4>& arg4
-        ); 
+        );
 
         template <typename T, typename T1, typename A1,
                               typename T2, typename A2,
@@ -754,7 +754,7 @@ namespace dlib
             future<A2>& arg2,
             future<A3>& arg3,
             future<A4>& arg4
-        ); 
+        );
         
         template <typename T, typename T1, typename A1,
                               typename T2, typename A2,
@@ -767,7 +767,7 @@ namespace dlib
             future<A2>& arg2,
             future<A3>& arg3,
             future<A4>& arg4
-        ); 
+        );
 
         template <typename T, typename T1, typename A1,
                               typename T2, typename A2,
@@ -780,7 +780,7 @@ namespace dlib
             future<A2>& arg2,
             future<A3>& arg3,
             future<A4>& arg4
-        ); 
+        );
         
         template <typename T1, typename A1,
                   typename T2, typename A2,
@@ -805,17 +805,17 @@ namespace dlib
         uint64 add_task (
             const T& obj,
             void (T::*funct)() const,
-        ); 
+        );
         
         template <typename T>
         uint64 add_task_by_value (
             const T& obj,
             void (T::*funct)() const
-        ); 
+        );
 
         uint64 add_task (
             void (*funct)()
-        ); 
+        );
 
         // --------------------
 

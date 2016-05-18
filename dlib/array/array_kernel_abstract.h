@@ -12,7 +12,7 @@ namespace dlib
 
     template <
         typename T,
-        typename mem_manager = default_memory_manager 
+        typename mem_manager = default_memory_manager
         >
     class array : public enumerable<T>
     {
@@ -24,16 +24,16 @@ namespace dlib
             REQUIREMENTS ON mem_manager
                 must be an implementation of memory_manager/memory_manager_kernel_abstract.h or
                 must be an implementation of memory_manager_global/memory_manager_global_kernel_abstract.h or
-                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h
                 mem_manager::type can be set to anything.
 
             POINTERS AND REFERENCES TO INTERNAL DATA
-                front(), back(), swap(), max_size(), set_size(), and operator[] 
+                front(), back(), swap(), max_size(), set_size(), and operator[]
                 functions do not invalidate pointers or references to internal data.
                 All other functions have no such guarantee.
 
             INITIAL VALUE
-                size() == 0    
+                size() == 0
                 max_size() == 0
 
             ENUMERATION ORDER
@@ -41,10 +41,10 @@ namespace dlib
                 order (*this)[0], (*this)[1], (*this)[2], ...
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents an ordered 1-dimensional array of items, 
-                each item is associated with an integer value.  The items are 
-                numbered from 0 though size() - 1 and the operator[] functions 
-                run in constant time.  
+                This object represents an ordered 1-dimensional array of items,
+                each item is associated with an integer value.  The items are
+                numbered from 0 though size() - 1 and the operator[] functions
+                run in constant time.
 
                 Also note that unless specified otherwise, no member functions
                 of this object throw exceptions.
@@ -59,7 +59,7 @@ namespace dlib
             array (
             );
             /*!
-                ensures 
+                ensures
                     - #*this is properly initialized
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor
@@ -69,7 +69,7 @@ namespace dlib
                 unsigned long new_size
             );
             /*!
-                ensures 
+                ensures
                     - #*this is properly initialized
                     - #size() == new_size
                     - #max_size() == new_size
@@ -79,7 +79,7 @@ namespace dlib
             !*/
 
             ~array (
-            ); 
+            );
             /*!
                 ensures
                     - all memory associated with *this has been released
@@ -92,7 +92,7 @@ namespace dlib
                     - #*this has its initial value
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor
-                        if this exception is thrown then the array object is unusable 
+                        if this exception is thrown then the array object is unusable
                         until clear() is called and succeeds
             !*/
 
@@ -124,16 +124,16 @@ namespace dlib
                     - size <= max_size()
                 ensures
                     - #size() == size
-                    - any element with index between 0 and size - 1 which was in the 
+                    - any element with index between 0 and size - 1 which was in the
                       array before the call to set_size() retains its value and index.
-                      All other elements have undetermined (but valid for their type) 
-                      values.  (e.g. this object might buffer old T objects and reuse 
+                      All other elements have undetermined (but valid for their type)
+                      values.  (e.g. this object might buffer old T objects and reuse
                       them without reinitializing them between calls to set_size())
                     - #at_start() == true
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor
-                        may throw this exception if there is not enough memory and 
-                        if it does throw then the call to set_size() has no effect    
+                        may throw this exception if there is not enough memory and
+                        if it does throw then the call to set_size() has no effect
             !*/
 
             unsigned long max_size(
@@ -153,8 +153,8 @@ namespace dlib
                     - #at_start() == true
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor
-                        may throw this exception if there is not enough 
-                        memory and if it does throw then max_size() == 0    
+                        may throw this exception if there is not enough
+                        memory and if it does throw then max_size() == 0
             !*/
 
             void swap (
@@ -163,7 +163,7 @@ namespace dlib
             /*!
                 ensures
                     - swaps *this and item
-            !*/ 
+            !*/
             
             void sort (
             );
@@ -225,7 +225,7 @@ namespace dlib
                 ensures
                     - #size() == size() - 1
                     - swaps (*this)[size()-1] into item
-                    - All elements with an index less than size()-1 are 
+                    - All elements with an index less than size()-1 are
                       unmodified by this operation.
             !*/
 
@@ -236,7 +236,7 @@ namespace dlib
                     - size() != 0
                 ensures
                     - #size() == size() - 1
-                    - All elements with an index less than size()-1 are 
+                    - All elements with an index less than size()-1 are
                       unmodified by this operation.
             !*/
 
@@ -246,9 +246,9 @@ namespace dlib
             /*!
                 ensures
                     - #size() == size()+1
-                    - swaps item into (*this)[#size()-1] 
+                    - swaps item into (*this)[#size()-1]
                     - #back() == item
-                    - #item has some undefined value (whatever happens to 
+                    - #item has some undefined value (whatever happens to
                       get swapped out of the array)
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor.
@@ -293,7 +293,7 @@ namespace dlib
 
             // restricted functions
             array(array<T>&);        // copy constructor
-            array<T>& operator=(array<T>&);    // assignment operator        
+            array<T>& operator=(array<T>&);    // assignment operator
 
     };
 
@@ -301,8 +301,8 @@ namespace dlib
         typename T
         >
     inline void swap (
-        array<T>& a, 
-        array<T>& b 
+        array<T>& a,
+        array<T>& b
     ) { a.swap(b); }
     /*!
         provides a global swap function
@@ -312,22 +312,22 @@ namespace dlib
         typename T
         >
     void serialize (
-        const array<T>& item, 
-        std::ostream& out 
-    );   
+        const array<T>& item,
+        std::ostream& out
+    );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     template <
-        typename T 
+        typename T
         >
     void deserialize (
-        array<T>& item, 
+        array<T>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 }

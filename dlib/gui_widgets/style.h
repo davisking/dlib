@@ -20,7 +20,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // button styles  
+    // button styles
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ namespace dlib
         {
         }
 
-        virtual ~button_style() 
+        virtual ~button_style()
         {}
 
         virtual bool redraw_on_mouse_over (
@@ -44,7 +44,7 @@ namespace dlib
 
         virtual rectangle get_min_size (
             const ustring& name,
-            const font& mfont 
+            const font& mfont
         ) const = 0;
 
         virtual void draw_button (
@@ -79,7 +79,7 @@ namespace dlib
 
         virtual rectangle get_min_size (
             const ustring& name,
-            const font& mfont 
+            const font& mfont
         ) const;
 
     private:
@@ -112,14 +112,14 @@ namespace dlib
 
         virtual rectangle get_invalidation_rect (
             const rectangle& rect
-        ) const 
-        { 
+        ) const
+        {
             rectangle temp(rect);
             temp.left() -= 2;
             temp.top() -= 2;
             temp.right() += 2;
             temp.bottom() += 2;
-            return temp; 
+            return temp;
         }
 
         virtual bool redraw_on_mouse_over (
@@ -127,7 +127,7 @@ namespace dlib
 
         virtual rectangle get_min_size (
             const ustring& name,
-            const font& mfont 
+            const font& mfont
         ) const;
 
     private:
@@ -146,13 +146,13 @@ namespace dlib
     {
     public:
         template <typename image_type>
-        button_style_toolbar_icon1 (const image_type& img_, unsigned long pad = 6) : padding(pad) 
-        { 
-            assign_image(img_mouseover,img_); 
-            make_images();  
+        button_style_toolbar_icon1 (const image_type& img_, unsigned long pad = 6) : padding(pad)
+        {
+            assign_image(img_mouseover,img_);
+            make_images();
         }
 
-        button_style_toolbar_icon1( const button_style_toolbar_icon1& item): button_style(item), padding(item.padding) 
+        button_style_toolbar_icon1( const button_style_toolbar_icon1& item): button_style(item), padding(item.padding)
         {
             assign_image(img_mouseover, item.img_mouseover);
             assign_image(img_normal, item.img_normal);
@@ -175,7 +175,7 @@ namespace dlib
 
         virtual rectangle get_min_size (
             const ustring& name,
-            const font& mfont 
+            const font& mfont
         ) const;
 
     private:
@@ -234,7 +234,7 @@ namespace dlib
 
     public:
 
-        enum arrow_direction 
+        enum arrow_direction
         {
             UP,
             DOWN,
@@ -259,7 +259,7 @@ namespace dlib
 
         virtual rectangle get_min_size (
             const ustring& ,
-            const font&  
+            const font&
         ) const { return rectangle(); }
 
     private:
@@ -268,7 +268,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // toggle button styles  
+    // toggle button styles
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -280,7 +280,7 @@ namespace dlib
         {
         }
 
-        virtual ~toggle_button_style() 
+        virtual ~toggle_button_style()
         {}
 
         virtual bool redraw_on_mouse_over (
@@ -288,7 +288,7 @@ namespace dlib
 
         virtual rectangle get_min_size (
             const ustring& name,
-            const font& mfont 
+            const font& mfont
         ) const = 0;
 
         virtual void draw_toggle_button (
@@ -325,7 +325,7 @@ namespace dlib
 
         virtual rectangle get_min_size (
             const ustring& name,
-            const font& mfont 
+            const font& mfont
         ) const;
 
     private:
@@ -357,7 +357,7 @@ namespace dlib
 
         virtual rectangle get_min_size (
             const ustring& name,
-            const font& mfont 
+            const font& mfont
         ) const;
 
     };
@@ -381,14 +381,14 @@ namespace dlib
 
         virtual rectangle get_min_size (
             const ustring& name,
-            const font& mfont 
+            const font& mfont
         ) const;
 
     };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // scroll_bar styles  
+    // scroll_bar styles
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -485,7 +485,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // scrollable_region styles  
+    // scrollable_region styles
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -523,14 +523,14 @@ namespace dlib
         virtual void draw_scrollable_region_border (
             const canvas& c,
             const rectangle& rect,
-            const bool 
+            const bool
         ) const  { draw_sunken_rectangle(c,rect); }
 
     };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // list_box styles  
+    // list_box styles
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -654,7 +654,7 @@ namespace dlib
             }
             else
             {
-                // first fill our area with gray 
+                // first fill our area with gray
                 fill_rect(c, display_rect,rgb_pixel(212,208,200));
             }
         }
@@ -663,7 +663,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // text_box styles  
+    // text_box styles
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -675,11 +675,11 @@ namespace dlib
         {
         }
 
-        virtual ~text_box_style() 
+        virtual ~text_box_style()
         {}
 
         virtual unsigned long get_padding (
-            const font& mfont 
+            const font& mfont
         ) const = 0;
 
         virtual void draw_text_box (
@@ -712,11 +712,11 @@ namespace dlib
         scrollable_region_style_default get_scrollable_region_style (
         ) const { return scrollable_region_style_default(); }
 
-        virtual ~text_box_style_default() 
+        virtual ~text_box_style_default()
         {}
 
         virtual unsigned long get_padding (
-            const font&  
+            const font&
         ) const { return 1; }
 
         virtual void draw_text_box (
@@ -739,7 +739,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // text_field styles  
+    // text_field styles
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -751,11 +751,11 @@ namespace dlib
         {
         }
 
-        virtual ~text_field_style() 
+        virtual ~text_field_style()
         {}
 
         virtual unsigned long get_padding (
-            const font& mfont 
+            const font& mfont
         ) const = 0;
 
         virtual void draw_text_field (
@@ -786,11 +786,11 @@ namespace dlib
         {
         }
 
-        virtual ~text_field_style_default() 
+        virtual ~text_field_style_default()
         {}
 
         virtual unsigned long get_padding (
-            const font& mfont 
+            const font& mfont
         ) const;
 
         virtual void draw_text_field (

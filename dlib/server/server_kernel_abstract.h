@@ -19,7 +19,7 @@ namespace dlib
                 get_listening_port()         == 0
                 is_running()                 == false
                 get_max_connections()        == 1000
-                get_graceful_close_timeout() == 500 
+                get_graceful_close_timeout() == 500
 
 
             CALLBACK FUNCTIONS
@@ -27,10 +27,10 @@ namespace dlib
                 To use this object inherit from it and define the pure virtual function
                 on_connect.  Inside this function is where you will handle each new
                 connection.  Note that the connection object passed to on_connect() should
-                NOT be closed, just let the function end and it will be gracefully closed 
-                for you.  Also note that each call to on_connect() is run in its own 
-                thread.  Also note that on_connect() should NOT throw any exceptions, 
-                all exceptions must be dealt with inside on_connect() and cannot be 
+                NOT be closed, just let the function end and it will be gracefully closed
+                for you.  Also note that each call to on_connect() is run in its own
+                thread.  Also note that on_connect() should NOT throw any exceptions,
+                all exceptions must be dealt with inside on_connect() and cannot be
                 allowed to leave.
 
             on_listening_port_assigned():
@@ -44,11 +44,11 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a server that listens on a port and spawns new
-                threads to handle each new connection.            
+                threads to handle each new connection.
 
-                Note that the clear() function does not return until all calls to 
+                Note that the clear() function does not return until all calls to
                 on_connect() have finished and the start() function has been shutdown.
-                Also note that when clear() is called all open connection objects 
+                Also note that when clear() is called all open connection objects
                 will be shutdown().
 
                 A note about get_max_connections(): when the maximum number of connections
@@ -65,7 +65,7 @@ namespace dlib
             server(
             );
             /*!
-                ensures 
+                ensures
                     - #*this is properly initialized
                 throws
                     - std::bad_alloc
@@ -73,7 +73,7 @@ namespace dlib
             !*/
 
             virtual ~server(
-            ); 
+            );
             /*!
                 requires
                     - is not called from any of server's callbacks
@@ -87,13 +87,13 @@ namespace dlib
                 requires
                     - is not called from any of server's callbacks
                 ensures
-                    - #*this has its initial value 
-                    - all open connection objects passed to on_connect() are shutdown() 
-                    - blocks until all calls to on_connect() have finished 
+                    - #*this has its initial value
+                    - all open connection objects passed to on_connect() are shutdown()
+                    - blocks until all calls to on_connect() have finished
                     - blocks until the start() function has released all its resources
                 throws
                     - std::bad_alloc
-                        if this exception is thrown then the server object is unusable 
+                        if this exception is thrown then the server object is unusable
                         until clear() is called and succeeds
             !*/
 
@@ -106,32 +106,32 @@ namespace dlib
                     - starts listening on the port and ip specified by get_listening_ip()
                       and #get_listening_port() for new connections.
                     - if (get_listening_port() == 0) then
-                        - a port to listen on will be automatically selected 
+                        - a port to listen on will be automatically selected
                         - #get_listening_port() == the selected port being used
                     - if (get_listening_ip() == "" ) then
                         - all local IPs will be listened on
-                    - blocks until clear() is called or an error occurs  
+                    - blocks until clear() is called or an error occurs
                 throws
                     - dlib::socket_error
                         start() will throw this exception if there is some problem binding
-                        ports and/or starting the server or if there is a problem 
-                        accepting new connections while it's running. 
+                        ports and/or starting the server or if there is a problem
+                        accepting new connections while it's running.
                         If this happens then
                             - All open connection objects passed to on_connect() are shutdown()
                               and the exception will not be thrown until all on_connect() calls
                               have terminated.
-                            - The server will be cleared and returned to its initial value. 
+                            - The server will be cleared and returned to its initial value.
                     - dlib::thread_error
-                        start() will throw this exception if there is a problem 
+                        start() will throw this exception if there is a problem
                         creating new threads.  Or it may throw this exception if there
-                        is a problem creating threading objects. 
+                        is a problem creating threading objects.
                         If this happens then
                             - All open connection objects passed to on_connect() are shutdown()
                               and the exception will not be thrown until all on_connect() calls
                               have terminated.
-                            - The server will be cleared and returned to its initial value. 
+                            - The server will be cleared and returned to its initial value.
                     - std::bad_alloc
-                        start() may throw this exception and if it does then the object 
+                        start() may throw this exception and if it does then the object
                         will be unusable until clear() is called and succeeds
             !*/
 
@@ -140,33 +140,33 @@ namespace dlib
             /*!
                 ensures
                     - starts listening on the port and ip specified by get_listening_ip()
-                      and #get_listening_port() for new connections.  
+                      and #get_listening_port() for new connections.
                     - if (get_listening_port() == 0) then
-                        - a port to listen on will be automatically selected 
+                        - a port to listen on will be automatically selected
                         - #get_listening_port() == the selected port being used
                     - if (get_listening_ip() == "" ) then
                         - all local IPs will be listened on
                     - does NOT block.  That is, this function will return right away and
                       the server will run on a background thread until clear() or this
                       object's destructor is called (or until some kind of fatal error
-                      occurs).  
+                      occurs).
                     - if an error occurs in the background thread while the server is
                       running then it will shut itself down, set is_running() to false, and
-                      log the error to a dlib::logger object. 
+                      log the error to a dlib::logger object.
                     - calling start_async() on a running server has no effect.
                 throws
                     - dlib::socket_error
                         start_async() will throw this exception if there is some problem binding
-                        ports and/or starting the server. 
+                        ports and/or starting the server.
                         If this happens then
-                            - The server will be cleared and returned to its initial value. 
+                            - The server will be cleared and returned to its initial value.
             !*/
 
-            bool is_running ( 
+            bool is_running (
             ) const;
             /*!
                 ensures
-                    - returns true if start() is running 
+                    - returns true if start() is running
                     - returns false if start() is not running or has released all
                       its resources and is about to terminate
                 throws
@@ -177,7 +177,7 @@ namespace dlib
             ) const;
             /*!
                 ensures
-                    - returns the maximum number of connections the server will accept 
+                    - returns the maximum number of connections the server will accept
                       at a time.
                     - returns 0 if the server will accept any number of connections
                 throws
@@ -189,7 +189,7 @@ namespace dlib
             ) const;
             /*!
                 ensures
-                    - returns the local ip to listen for new connections on 
+                    - returns the local ip to listen for new connections on
                     - returns "" if ALL local ips are to be listened on
                 throws
                     - std::bad_alloc
@@ -199,7 +199,7 @@ namespace dlib
             ) const;
             /*!
                 ensures
-                    - returns the local port number to listen for new connections on 
+                    - returns the local port number to listen for new connections on
                     - returns 0 if the local port number has not yet been set
                 throws
                     - std::bad_alloc
@@ -210,7 +210,7 @@ namespace dlib
             );
             /*!
                 requires
-                    - port >= 0 
+                    - port >= 0
                     - is_running() == false
                 ensures
                     - #get_listening_port() == port
@@ -226,7 +226,7 @@ namespace dlib
                     - is_ip_address(ip) == true or ip == ""
                     - is_running() == false
                 ensures
-                    - #get_listening_ip() == ip                     
+                    - #get_listening_ip() == ip
                 throws
                     - std::bad_alloc
             !*/
@@ -272,14 +272,14 @@ namespace dlib
             )=0;
             /*!
                 requires
-                    - on_connect() is run in its own thread 
-                    - is_running() == true 
-                    - the number of current connections < get_max_connection() 
+                    - on_connect() is run in its own thread
+                    - is_running() == true
+                    - the number of current connections < get_max_connection()
                     - new_connection == the new connection to the server which is
                       to be serviced by this call to on_connect()
                 ensures
-                    - when new_connection is shutdown() on_connect() will terminate 
-                    - this function will not call clear()  
+                    - when new_connection is shutdown() on_connect() will terminate
+                    - this function will not call clear()
                 throws
                     - does not throw any exceptions
             !*/
@@ -292,8 +292,8 @@ namespace dlib
                     - is called if a listening port of zero was specified and
                       an actual port number has just been assigned to the server
                 ensures
-                    - this function will not block  
-                    - this function will not call clear()  
+                    - this function will not block
+                    - this function will not call clear()
                 throws
                     - does not throw any exceptions
             !*/

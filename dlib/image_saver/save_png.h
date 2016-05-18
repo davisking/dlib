@@ -56,7 +56,7 @@ namespace dlib
 
 #ifndef DLIB_PNG_SUPPORT
             /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                You are getting this error because you are trying to use save_png() 
+                You are getting this error because you are trying to use save_png()
                 but you haven't defined DLIB_PNG_SUPPORT.  You must do so to use
                 this function.   You must also make sure you set your build environment
                 to link against the libpng library.
@@ -100,7 +100,7 @@ namespace dlib
 
             impl::impl_save_png(file_name, row_pointers, img.nc(), impl::png_type_rgb_alpha, 8);
         }
-        else // this is supposed to be grayscale 
+        else // this is supposed to be grayscale
         {
             DLIB_CASSERT(pixel_traits<pixel_type>::grayscale, "impossible condition detected");
 
@@ -120,7 +120,7 @@ namespace dlib
             }
             else
             {
-                // convert from whatever this is to 16bit grayscale 
+                // convert from whatever this is to 16bit grayscale
                 array2d<dlib::uint16> temp_img;
                 assign_image(temp_img, img_);
                 for (unsigned long i = 0; i < row_pointers.size(); ++i)
@@ -138,7 +138,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename EXP 
+        typename EXP
         >
     void save_png(
         const matrix_exp<EXP>& img,

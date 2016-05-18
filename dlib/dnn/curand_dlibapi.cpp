@@ -13,7 +13,7 @@ static const char* curand_get_error_string(curandStatus_t s)
 {
     switch(s)
     {
-        case CURAND_STATUS_NOT_INITIALIZED: 
+        case CURAND_STATUS_NOT_INITIALIZED:
             return "CUDA Runtime API initialization failed.";
         case CURAND_STATUS_LENGTH_NOT_MULTIPLE:
             return "The requested length must be a multiple of two.";
@@ -37,7 +37,7 @@ do{                                                                             
 
 namespace dlib
 {
-    namespace cuda 
+    namespace cuda
     {
 
     // ----------------------------------------------------------------------------------------
@@ -73,7 +73,7 @@ namespace dlib
             if (data.size() == 0)
                 return;
 
-            CHECK_CURAND(curandGenerateNormal((curandGenerator_t)handle, 
+            CHECK_CURAND(curandGenerateNormal((curandGenerator_t)handle,
                                         data.device(),
                                         data.size(),
                                         mean,
@@ -93,7 +93,7 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
-    }  
+    }
 }
 
 #endif // DLIB_USE_CUDA

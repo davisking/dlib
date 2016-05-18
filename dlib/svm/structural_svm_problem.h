@@ -32,7 +32,7 @@ namespace dlib
     template <
         typename structural_svm_problem
         >
-    class cache_element_structural_svm 
+    class cache_element_structural_svm
     {
     public:
 
@@ -68,7 +68,7 @@ namespace dlib
         }
 
         void get_truth_joint_feature_vector_cached (
-            feature_vector_type& psi 
+            feature_vector_type& psi
         ) const
         {
             if (prob->get_max_cache_size() != 0)
@@ -121,7 +121,7 @@ namespace dlib
                     // Check if the best psi vector in the cache is still good enough to use as
                     // a proxy for the true separation oracle.  If the risk value has dropped
                     // by enough to get into the stopping condition then the best psi isn't
-                    // good enough. 
+                    // good enough.
                     if ((best_risk + saved_current_risk_gap > last_true_risk_computed &&
                         best_risk >= 0) || use_only_cache)
                     {
@@ -149,7 +149,7 @@ namespace dlib
 
             // If the separation oracle is only solved approximately then the result might
             // not be as good as just selecting true_psi as the output.  So here we check
-            // if that is the case. 
+            // if that is the case.
             if (last_true_risk_computed < 0 && best_risk < 0)
             {
                 out_psi = true_psi;
@@ -158,7 +158,7 @@ namespace dlib
             // Alternatively, an approximate separation oracle might not do as well as just
             // selecting from the cache.  So if that is the case when just take the best
             // element from the cache.
-            else if (last_true_risk_computed < best_risk) 
+            else if (last_true_risk_computed < best_risk)
             {
                 out_psi = psi[best_idx];
                 out_loss = loss[best_idx];
@@ -205,7 +205,7 @@ namespace dlib
             std::vector<std::pair<T,U>,alloc>& vect
         ) const
         {
-            // If the sparse vector has more entires than dimensions then it must have some 
+            // If the sparse vector has more entires than dimensions then it must have some
             // duplicate elements.  So compact them using make_sparse_vector_inplace().
             if (vect.size() > (unsigned long)prob->get_num_dimensions())
             {
@@ -232,7 +232,7 @@ namespace dlib
         typename matrix_type_,
         typename feature_vector_type_ = matrix_type_
         >
-    class structural_svm_problem : public oca_problem<matrix_type_> 
+    class structural_svm_problem : public oca_problem<matrix_type_>
     {
     public:
         /*!
@@ -285,7 +285,7 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\t void structural_svm_problem::set_cache_based_epsilon()"
                 << "\n\t eps_ must be greater than 0"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 << "\n\t this: " << this
                 );
 
@@ -300,7 +300,7 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\t void structural_svm_problem::set_epsilon()"
                 << "\n\t eps_ must be greater than 0"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 << "\n\t this: " << this
                 );
 
@@ -315,7 +315,7 @@ namespace dlib
 
         void set_max_iterations (
             unsigned long max_iter
-        ) 
+        )
         {
             max_iterations = max_iter;
         }
@@ -331,7 +331,7 @@ namespace dlib
         ) const { return max_cache_size; }
 
         void be_verbose (
-        ) 
+        )
         {
             verbose = true;
         }
@@ -347,17 +347,17 @@ namespace dlib
 
         void set_c (
             scalar_type C_
-        ) 
-        { 
+        )
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(C_ > 0,
                 "\t void structural_svm_problem::set_c()"
                 << "\n\t C_ must be greater than 0"
-                << "\n\t C_:    " << C_ 
+                << "\n\t C_:    " << C_
                 << "\n\t this: " << this
                 );
 
-            C = C_; 
+            C = C_;
         }
 
         void add_nuclear_norm_regularizer (
@@ -373,11 +373,11 @@ namespace dlib
                 0 < regularization_strength,
                 "\t void structural_svm_problem::add_nuclear_norm_regularizer()"
                 << "\n\t Invalid arguments were given to this function."
-                << "\n\t first_dimension:         " << first_dimension 
-                << "\n\t rows:                    " << rows 
-                << "\n\t cols:                    " << cols 
-                << "\n\t get_num_dimensions():    " << get_num_dimensions() 
-                << "\n\t regularization_strength: " << regularization_strength 
+                << "\n\t first_dimension:         " << first_dimension
+                << "\n\t rows:                    " << rows
+                << "\n\t cols:                    " << cols
+                << "\n\t get_num_dimensions():    " << get_num_dimensions()
+                << "\n\t regularization_strength: " << regularization_strength
                 << "\n\t this: " << this
                 );
 
@@ -403,7 +403,7 @@ namespace dlib
 
         virtual void get_truth_joint_feature_vector (
             long idx,
-            feature_vector_type& psi 
+            feature_vector_type& psi
         ) const = 0;
 
         virtual void separation_oracle (
@@ -417,10 +417,10 @@ namespace dlib
 
         virtual bool risk_has_lower_bound (
             scalar_type& lower_bound
-        ) const 
-        { 
+        ) const
+        {
             lower_bound = 0;
-            return true; 
+            return true;
         }
 
         virtual bool optimization_status (
@@ -430,7 +430,7 @@ namespace dlib
             scalar_type current_risk_gap,
             unsigned long num_cutting_planes,
             unsigned long num_iterations
-        ) const 
+        ) const
         {
             if (verbose)
             {
@@ -464,7 +464,7 @@ namespace dlib
 
             if (converged)
             {
-                return (current_risk_gap < std::max(cache_based_eps,cache_based_eps*current_risk_value)) || 
+                return (current_risk_gap < std::max(cache_based_eps,cache_based_eps*current_risk_value)) ||
                        (current_risk_gap == 0);
             }
 
@@ -509,7 +509,7 @@ namespace dlib
             matrix_type& w,
             scalar_type& risk,
             matrix_type& subgradient
-        ) const 
+        ) const
         {
             feature_vector_type ftemp;
             const unsigned long num = get_num_samples();
@@ -542,7 +542,7 @@ namespace dlib
 
             if (nuclear_norm_regularizers.size() != 0)
             {
-                matrix_type grad; 
+                matrix_type grad;
                 scalar_type obj;
                 compute_nuclear_norm_parts(w, grad, obj);
                 risk += obj;
@@ -611,10 +611,10 @@ namespace dlib
             const matrix_type& current_solution,
             scalar_type& loss,
             feature_vector_type& psi
-        ) const 
+        ) const
         {
             cache[idx].separation_oracle_cached(converged,
-                                                skip_cache, 
+                                                skip_cache,
                                                 saved_current_risk_gap,
                                                 current_solution,
                                                 loss,

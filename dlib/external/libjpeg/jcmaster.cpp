@@ -7,7 +7,7 @@
  *
  * This file contains master control logic for the JPEG compressor.
  * These routines are concerned with parameter validation, initial setup,
- * and inter-pass control (determining the number of passes and the work 
+ * and inter-pass control (determining the number of passes and the work
  * to be done in each pass).
  */
 
@@ -153,7 +153,7 @@ validate_script (j_compress_ptr cinfo)
 #ifdef C_PROGRESSIVE_SUPPORTED
     cinfo->progressive_mode = TRUE;
     last_bitpos_ptr = & last_bitpos[0][0];
-    for (ci = 0; ci < cinfo->num_components; ci++) 
+    for (ci = 0; ci < cinfo->num_components; ci++)
       for (coefi = 0; coefi < DCTSIZE2; coefi++)
 	*last_bitpos_ptr++ = -1;
 #else
@@ -161,7 +161,7 @@ validate_script (j_compress_ptr cinfo)
 #endif
   } else {
     cinfo->progressive_mode = FALSE;
-    for (ci = 0; ci < cinfo->num_components; ci++) 
+    for (ci = 0; ci < cinfo->num_components; ci++)
       component_sent[ci] = FALSE;
   }
 

@@ -30,9 +30,9 @@ namespace dlib
                 instances of this object can be created without needing to know the type
                 of object whose member function we will be calling.
 
-                There are five template specializations of this object.  The first 
+                There are five template specializations of this object.  The first
                 represents a pointer to a member function taking no parameters, the
-                second represents a pointer to a member function taking one parameter, 
+                second represents a pointer to a member function taking one parameter,
                 the third to one taking two parameters, and so on.
 
                 You specify the parameters to your member function pointer by filling in
@@ -46,8 +46,8 @@ namespace dlib
                     to a string you would say:
                         member_function_pointer<int,string&> my_pointer;
 
-                Also note that the formal comments are only present for the first 
-                template specialization.  They are all exactly the same except for the 
+                Also note that the formal comments are only present for the first
+                template specialization.  They are all exactly the same except for the
                 number of parameters each takes in its member function pointer.
         !*/
 
@@ -57,10 +57,10 @@ namespace dlib
         typedef void param3_type;
         typedef void param4_type;
 
-        member_function_pointer (  
+        member_function_pointer (
         );
         /*!
-            ensures                
+            ensures
                 - #*this is properly initialized
         !*/
 
@@ -179,13 +179,13 @@ namespace dlib
             requires
                 - is_set() == true
             ensures
-                - calls the member function on the object specified by the last 
+                - calls the member function on the object specified by the last
                   call to this->set()
             throws
                 - any exception thrown by the member function specified by
                   the previous call to this->set().
-                    If any of these exceptions are thrown then the call to this 
-                    function will have no effect on *this.                  
+                    If any of these exceptions are thrown then the call to this
+                    function will have no effect on *this.
         !*/
 
         void swap (
@@ -194,9 +194,9 @@ namespace dlib
         /*!
             ensures
                 - swaps *this and item
-        !*/ 
+        !*/
 
-    };    
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -262,7 +262,7 @@ namespace dlib
             member_function_pointer& item
         );
 
-    };    
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -330,7 +330,7 @@ namespace dlib
             member_function_pointer& item
         );
 
-    };    
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -400,7 +400,7 @@ namespace dlib
             member_function_pointer& item
         );
 
-    };    
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -472,7 +472,7 @@ namespace dlib
             member_function_pointer& item
         );
 
-    };    
+    };
 
 // ----------------------------------------------------------------------------------------
 

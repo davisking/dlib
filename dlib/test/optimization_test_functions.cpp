@@ -4,7 +4,7 @@
 
 /*
 
-    Most of the code in this file is converted from the set of Fortran 90 routines 
+    Most of the code in this file is converted from the set of Fortran 90 routines
     created by John Burkardt.
 
     The original Fortran can be found here: http://orion.math.iastate.edu/burkardt/f_src/testopt/testopt.html
@@ -48,7 +48,7 @@ namespace dlib
             for (i = 1; i <= n; ++i)
             {
                 fvec(i-1) = fvec(i-1) / (double) ( n );
-                if ( ( i%2 ) == 0 ) 
+                if ( ( i%2 ) == 0 )
                     fvec(i-1) = fvec(i-1) + 1.0E+00 / ( (double)i*i - 1.0E+00 );
             }
 
@@ -64,7 +64,7 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        int& chebyquad_calls() 
+        int& chebyquad_calls()
         {
             static int count = 0;
             return count;
@@ -280,7 +280,7 @@ namespace dlib
             f1 = x(0) + c * x(1) - std::exp ( c );
             f2 = x(2) + std::sin ( c ) * x(3) - std::cos ( c );
 
-            f = f1*f1 + f2*f2; 
+            f = f1*f1 + f2*f2;
 
             return f;
         }

@@ -38,7 +38,7 @@ namespace dlib
         inline rectangle get_best_matching_rect (
             const std::vector<rectangle>& rects,
             const rectangle& rect
-        ) 
+        )
         {
             double best_score = -1;
             rectangle best_rect;
@@ -79,7 +79,7 @@ namespace dlib
             // If the trainer is setup to automatically fit the overlap tester to the data then
             // we should use the loosest possible overlap tester here.  Otherwise we should use
             // the tester the trainer will use.
-            test_box_overlap boxes_overlap(0.9999999,1); 
+            test_box_overlap boxes_overlap(0.9999999,1);
             if (!trainer.auto_set_overlap_tester())
                 boxes_overlap = trainer.get_overlap_tester();
 
@@ -173,7 +173,7 @@ namespace dlib
     {
         template <
             typename image_array_type,
-            typename scanner_type, 
+            typename scanner_type,
             typename get_boxes_functor
             >
         std::vector<std::vector<rectangle> > remove_unobtainable_rectangles (
@@ -197,7 +197,7 @@ namespace dlib
             // If the trainer is setup to automatically fit the overlap tester to the data then
             // we should use the loosest possible overlap tester here.  Otherwise we should use
             // the tester the trainer will use.
-            test_box_overlap boxes_overlap(0.9999999,1); 
+            test_box_overlap boxes_overlap(0.9999999,1);
             if (!trainer.auto_set_overlap_tester())
                 boxes_overlap = trainer.get_overlap_tester();
 
@@ -266,7 +266,7 @@ namespace dlib
             T& obj;
 
             template <typename U, typename V>
-            void operator()(const U& u, V& v) 
+            void operator()(const U& u, V& v)
             {
                 obj.load(u,v);
             }
@@ -277,7 +277,7 @@ namespace dlib
 
     template <
         typename image_array_type,
-        typename feature_extractor, 
+        typename feature_extractor,
         typename box_generator
         >
     std::vector<std::vector<rectangle> > remove_unobtainable_rectangles (

@@ -29,7 +29,7 @@ namespace dlib
                 that works with sparse vectors.
 
             THREAD SAFETY
-                This kernel is threadsafe.  
+                This kernel is threadsafe.
         !*/
 
         typedef typename T::value_type::second_type scalar_type;
@@ -42,7 +42,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #gamma == 0.1 
+                - #gamma == 0.1
         !*/
 
         sparse_radial_basis_kernel(
@@ -111,7 +111,7 @@ namespace dlib
         >
     void deserialize (
         sparse_radial_basis_kernel<T>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides deserialization support for sparse_radial_basis_kernel
@@ -133,7 +133,7 @@ namespace dlib
                 that works with sparse vectors.
 
             THREAD SAFETY
-                This kernel is threadsafe.  
+                This kernel is threadsafe.
         !*/
 
         typedef typename T::value_type::second_type scalar_type;
@@ -147,8 +147,8 @@ namespace dlib
         );
         /*!
             ensures
-                - #gamma == 0.1 
-                - #coef == -1.0 
+                - #gamma == 0.1
+                - #coef == -1.0
         !*/
 
         sparse_sigmoid_kernel(
@@ -220,7 +220,7 @@ namespace dlib
         >
     void deserialize (
         sparse_sigmoid_kernel<T>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides deserialization support for sparse_sigmoid_kernel
@@ -243,7 +243,7 @@ namespace dlib
                 that works with sparse vectors.
 
             THREAD SAFETY
-                This kernel is threadsafe.  
+                This kernel is threadsafe.
         !*/
 
         typedef typename T::value_type::second_type scalar_type;
@@ -258,9 +258,9 @@ namespace dlib
         );
         /*!
             ensures
-                - #gamma == 1 
-                - #coef == 0 
-                - #degree == 1 
+                - #gamma == 1
+                - #coef == 0
+                - #degree == 1
         !*/
 
         sparse_polynomial_kernel(
@@ -336,7 +336,7 @@ namespace dlib
         >
     void deserialize (
         sparse_polynomial_kernel<T>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides deserialization support for sparse_polynomial_kernel
@@ -358,7 +358,7 @@ namespace dlib
                 that works with sparse vectors.
 
             THREAD SAFETY
-                This kernel is threadsafe.  
+                This kernel is threadsafe.
         !*/
 
         typedef typename T::value_type::second_type scalar_type;
@@ -374,7 +374,7 @@ namespace dlib
                 - a is a sparse vector
                 - b is a sparse vector
             ensures
-                - returns dot(a,b) 
+                - returns dot(a,b)
         !*/
 
         bool operator== (
@@ -402,10 +402,10 @@ namespace dlib
         >
     void deserialize (
         sparse_linear_kernel<T>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
-        provides deserialization support for sparse_linear_kernel 
+        provides deserialization support for sparse_linear_kernel
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -420,11 +420,11 @@ namespace dlib
                 Must be a sparse vector as defined in dlib/svm/sparse_vector_abstract.h
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a histogram intersection kernel 
+                This object represents a histogram intersection kernel
                 that works with sparse vectors.
 
             THREAD SAFETY
-                This kernel is threadsafe.  
+                This kernel is threadsafe.
         !*/
 
         typedef typename T::value_type::second_type scalar_type;
@@ -443,7 +443,7 @@ namespace dlib
             ensures
                 - Let A(i) denote the value of the ith dimension of the a vector.
                 - Let B(i) denote the value of the ith dimension of the b vector.
-                - returns sum over all i: std::min(A(i), B(i)) 
+                - returns sum over all i: std::min(A(i), B(i))
         !*/
 
         bool operator== (
@@ -471,10 +471,10 @@ namespace dlib
         >
     void deserialize (
         sparse_histogram_intersection_kernel<T>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
-        provides deserialization support for sparse_histogram_intersection_kernel 
+        provides deserialization support for sparse_histogram_intersection_kernel
     !*/
 
 // ----------------------------------------------------------------------------------------

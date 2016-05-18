@@ -12,11 +12,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class sample_pair 
+    class sample_pair
     {
     public:
         sample_pair(
-        ) : 
+        ) :
             _index1(0),
             _index2(0)
         {
@@ -109,8 +109,8 @@ namespace dlib
         const T& a,
         const T& b
     )
-    { 
-        return a.distance() < b.distance() || (a.distance() == b.distance() && order_by_index(a,b)); 
+    {
+        return a.distance() < b.distance() || (a.distance() == b.distance() && order_by_index(a,b));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ namespace dlib
     inline bool operator == (
         const sample_pair& a,
         const sample_pair& b
-    ) 
+    )
     {
         return a.index1() == b.index1() && a.index2() == b.index2();
     }
@@ -126,9 +126,9 @@ namespace dlib
     inline bool operator != (
         const sample_pair& a,
         const sample_pair& b
-    ) 
+    )
     {
-        return !(a == b); 
+        return !(a == b);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -145,14 +145,14 @@ namespace dlib
             serialize(item.distance(),out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type sample_pair"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type sample_pair");
         }
     }
 
     inline void deserialize (
         sample_pair& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         try
@@ -166,8 +166,8 @@ namespace dlib
             item = sample_pair(idx1, idx2, dist);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while deserializing object of type sample_pair"); 
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type sample_pair");
         }
     }
 

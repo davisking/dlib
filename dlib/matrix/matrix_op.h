@@ -34,7 +34,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 The matrix_op is simply a tool for reducing the amount of boilerplate
-                you need to write when creating matrix expressions.  
+                you need to write when creating matrix expressions.
         !*/
 
     public:
@@ -50,7 +50,7 @@ namespace dlib
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of object.
         template <typename T1>
-        matrix_op (T1); 
+        matrix_op (T1);
     public:
 
         matrix_op (
@@ -60,11 +60,11 @@ namespace dlib
         {}
 
         const_ret_type operator() (
-            long r, 
+            long r,
             long c
         ) const { return op.apply(r,c); }
 
-        const_ret_type operator() ( long i ) const 
+        const_ret_type operator() ( long i ) const
         { return matrix_exp<matrix_op>::operator()(i); }
 
         template <typename U>
@@ -112,7 +112,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 The matrix_diag_op is simply a tool for reducing the amount of boilerplate
-                you need to write when creating matrix expressions.  
+                you need to write when creating matrix expressions.
         !*/
 
     public:
@@ -128,7 +128,7 @@ namespace dlib
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of object.
         template <typename T1>
-        matrix_diag_op (T1); 
+        matrix_diag_op (T1);
     public:
 
         matrix_diag_op (
@@ -138,11 +138,11 @@ namespace dlib
         {}
 
         const_ret_type operator() (
-            long r, 
+            long r,
             long c
         ) const { return op.apply(r,c); }
 
-        const_ret_type operator() ( long i ) const 
+        const_ret_type operator() ( long i ) const
         { return matrix_exp<matrix_diag_op>::operator()(i); }
 
         template <typename U>
@@ -167,7 +167,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct does_not_alias 
+    struct does_not_alias
     {
         /*!
             This is a partial implementation of a matrix operator that never aliases
@@ -176,12 +176,12 @@ namespace dlib
 
         template <typename U> bool aliases               ( const U& ) const { return false; }
         template <typename U> bool destructively_aliases ( const U& ) const { return false; }
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 
     template <typename M>
-    struct basic_op_m 
+    struct basic_op_m
     {
         /*!
             This is a partial implementation of a matrix operator that preserves
@@ -192,7 +192,7 @@ namespace dlib
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of object.
         template <typename T1>
-        basic_op_m (T1); 
+        basic_op_m (T1);
     public:
 
         basic_op_m(
@@ -209,17 +209,17 @@ namespace dlib
         long nr () const { return m.nr(); }
         long nc () const { return m.nc(); }
 
-        template <typename U> bool aliases               ( const matrix_exp<U>& item) const 
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const
         { return m.aliases(item); }
-        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const 
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const
         { return m.destructively_aliases(item); }
 
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 
     template <typename M1, typename M2>
-    struct basic_op_mm 
+    struct basic_op_mm
     {
         /*!
             This is a partial implementation of a matrix operator that preserves
@@ -230,7 +230,7 @@ namespace dlib
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of object.
         template <typename T1, typename T2>
-        basic_op_mm (T1, T2); 
+        basic_op_mm (T1, T2);
     public:
 
         basic_op_mm(
@@ -249,17 +249,17 @@ namespace dlib
         long nr () const { return m1.nr(); }
         long nc () const { return m1.nc(); }
 
-        template <typename U> bool aliases               ( const matrix_exp<U>& item) const 
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const
         { return m1.aliases(item) || m2.aliases(item); }
-        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const 
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const
         { return m1.destructively_aliases(item) || m2.destructively_aliases(item); }
 
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 
     template <typename M1, typename M2, typename M3>
-    struct basic_op_mmm 
+    struct basic_op_mmm
     {
         /*!
             This is a partial implementation of a matrix operator that preserves
@@ -270,7 +270,7 @@ namespace dlib
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of object.
         template <typename T1, typename T2, typename T3>
-        basic_op_mmm (T1, T2, T3); 
+        basic_op_mmm (T1, T2, T3);
     public:
 
         basic_op_mmm(
@@ -291,18 +291,18 @@ namespace dlib
         long nr () const { return m1.nr(); }
         long nc () const { return m1.nc(); }
 
-        template <typename U> bool aliases               ( const matrix_exp<U>& item) const 
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const
         { return m1.aliases(item) || m2.aliases(item) || m3.aliases(item); }
-        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const 
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const
         { return m1.destructively_aliases(item) || m2.destructively_aliases(item) ||
                  m3.destructively_aliases(item);}
 
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 
     template <typename M1, typename M2, typename M3, typename M4>
-    struct basic_op_mmmm 
+    struct basic_op_mmmm
     {
         /*!
             This is a partial implementation of a matrix operator that preserves
@@ -313,7 +313,7 @@ namespace dlib
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of object.
         template <typename T1, typename T2, typename T3, typename T4>
-        basic_op_mmmm (T1, T2, T3, T4); 
+        basic_op_mmmm (T1, T2, T3, T4);
     public:
 
         basic_op_mmmm(
@@ -336,13 +336,13 @@ namespace dlib
         long nr () const { return m1.nr(); }
         long nc () const { return m1.nc(); }
 
-        template <typename U> bool aliases               ( const matrix_exp<U>& item) const 
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const
         { return m1.aliases(item) || m2.aliases(item) || m3.aliases(item) || m4.aliases(item); }
-        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const 
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const
         { return m1.destructively_aliases(item) || m2.destructively_aliases(item) ||
                  m3.destructively_aliases(item) || m4.destructively_aliases(item);}
 
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -374,7 +374,7 @@ namespace dlib
         template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const     \
         { return m.destructively_aliases(item); }                                               \
                                                                                                 \
-    };                                                                                          
+    };
 
 #define DLIB_DEFINE_FUNCTION_M(op_name, name, function, extra_cost)                             \
     DLIB_DEFINE_OP_M(op_name, function, extra_cost)                                             \
@@ -417,7 +417,7 @@ namespace dlib
         template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const     \
         { return m.destructively_aliases(item); }                                               \
                                                                                                 \
-    };                                                                                          
+    };
                                                                                                 
 #define DLIB_DEFINE_FUNCTION_MS(op_name, name, function, extra_cost)                            \
     DLIB_DEFINE_OP_MS(op_name, function, extra_cost)                                            \
@@ -460,7 +460,7 @@ namespace dlib
         template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const     \
         { return m.destructively_aliases(item); }                                               \
                                                                                                 \
-    };                                                                                          
+    };
                                                                                                 
 #define DLIB_DEFINE_FUNCTION_SM(op_name, name, function, extra_cost)                            \
     DLIB_DEFINE_OP_SM(op_name, function, extra_cost)                                            \

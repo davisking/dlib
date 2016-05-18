@@ -68,7 +68,7 @@ namespace dlib
             typename df6, typename df7, typename df8, typename df9, typename df10
             >
         one_vs_all_decision_function (
-            const one_vs_all_decision_function<one_vs_all_trainer, 
+            const one_vs_all_decision_function<one_vs_all_trainer,
                                                df1, df2, df3, df4, df5,
                                                df6, df7, df8, df9, df10>& item
         ) : dfs(item.get_binary_decision_functions()), num_classes(item.number_of_classes()) {}
@@ -83,7 +83,7 @@ namespace dlib
             const sample_type& sample
         ) const
         {
-            DLIB_ASSERT(number_of_classes() != 0, 
+            DLIB_ASSERT(number_of_classes() != 0,
                 "\t pair<result_type,scalar_type> one_vs_all_decision_function::predict()"
                 << "\n\t You can't make predictions with an empty decision function."
                 << "\n\t this: " << this
@@ -111,7 +111,7 @@ namespace dlib
             const sample_type& sample
         ) const
         {
-            DLIB_ASSERT(number_of_classes() != 0, 
+            DLIB_ASSERT(number_of_classes() != 0,
                 "\t result_type one_vs_all_decision_function::operator()"
                 << "\n\t You can't make predictions with an empty decision function."
                 << "\n\t this: " << this
@@ -135,10 +135,10 @@ namespace dlib
         typename DF1, typename DF2, typename DF3,
         typename DF4, typename DF5, typename DF6,
         typename DF7, typename DF8, typename DF9,
-        typename DF10 
+        typename DF10
         >
     void serialize(
-        const one_vs_all_decision_function<T,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10>& item, 
+        const one_vs_all_decision_function<T,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10>& item,
         std::ostream& out
     )
     {
@@ -156,7 +156,7 @@ namespace dlib
             const unsigned long size = item.get_binary_decision_functions().size();
             serialize(size, out);
 
-            for(typename binary_function_table::const_iterator i = item.get_binary_decision_functions().begin(); 
+            for(typename binary_function_table::const_iterator i = item.get_binary_decision_functions().begin();
                 i != item.get_binary_decision_functions().end(); ++i)
             {
                 serialize(i->first, out);
@@ -209,11 +209,11 @@ namespace dlib
         typename DF1, typename DF2, typename DF3,
         typename DF4, typename DF5, typename DF6,
         typename DF7, typename DF8, typename DF9,
-        typename DF10 
+        typename DF10
         >
     void deserialize(
-        one_vs_all_decision_function<T,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10>& item, 
-        std::istream& in 
+        one_vs_all_decision_function<T,DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10>& item,
+        std::istream& in
     )
     {
         try

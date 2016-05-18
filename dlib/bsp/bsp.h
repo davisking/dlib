@@ -31,7 +31,7 @@ namespace dlib
         {
             bsp_con(
                 const network_address& dest
-            ) : 
+            ) :
                 con(connect(dest)),
                 buf(con),
                 stream(&buf),
@@ -41,8 +41,8 @@ namespace dlib
             }
 
             bsp_con(
-               scoped_ptr<connection>& conptr 
-            ) : 
+               scoped_ptr<connection>& conptr
+            ) :
                 buf(conptr),
                 stream(&buf),
                 terminated(false)
@@ -84,7 +84,7 @@ namespace dlib
             hostinfo (
                 const network_address& addr_,
                 unsigned long node_id_
-            ) : 
+            ) :
                 addr(addr_),
                 node_id(node_id_)
             {
@@ -118,7 +118,7 @@ namespace dlib
             map_id_to_con& cons,
             const std::vector<hostinfo>& hosts,
             unsigned long node_id,
-            std::string& error_string 
+            std::string& error_string
         );
 
     // ------------------------------------------------------------------------------------
@@ -159,7 +159,7 @@ namespace dlib
             unsigned long remote_node_id;
             dlib::deserialize(remote_node_id, temp->stream);
             dlib::deserialize(node_id, temp->stream);
-            std::vector<hostinfo> targets; 
+            std::vector<hostinfo> targets;
             dlib::deserialize(targets, temp->stream);
             unsigned long num_incoming_connections;
             dlib::deserialize(num_incoming_connections, temp->stream);
@@ -287,10 +287,10 @@ namespace dlib
                 sig.broadcast();
             }
 
-            unsigned long size() const 
-            { 
+            unsigned long size() const
+            {
                 auto_mutex lock(class_mutex);
-                return data.size(); 
+                return data.size();
             }
 
             void push_and_consume( msg_data& item)
@@ -298,11 +298,11 @@ namespace dlib
                 auto_mutex lock(class_mutex);
                 data.push(msg_wrap(item, next_seq_num++));
                 // do this here so that we don't have to worry about different threads touching the shared_ptr.
-                item.data.reset(); 
+                item.data.reset();
                 sig.signal();
             }
 
-            bool pop ( 
+            bool pop (
                 msg_data& item
             )
             /*!
@@ -326,7 +326,7 @@ namespace dlib
                 return true;
             }
 
-            bool pop ( 
+            bool pop (
                 msg_data& item,
                 const dlib::uint64& max_epoch
             )
@@ -373,7 +373,7 @@ namespace dlib
         void send(
             const T& item,
             unsigned long target_node_id
-        ) 
+        )
         {
             // make sure requires clause is not broken
             DLIB_CASSERT(target_node_id < number_of_nodes() &&
@@ -395,7 +395,7 @@ namespace dlib
         template <typename T>
         void broadcast (
             const T& item
-        ) 
+        )
         {
             std::vector<char> buf;
             vectorstream sout(buf);
@@ -428,7 +428,7 @@ namespace dlib
         template <typename T>
         void receive (
             T& item
-        ) 
+        )
         {
             if(!try_receive(item))
                 throw dlib::socket_error("bsp_context::receive(): no messages to receive, all nodes currently blocked.");
@@ -437,7 +437,7 @@ namespace dlib
         template <typename T>
         bool try_receive (
             T& item
-        ) 
+        )
         {
             unsigned long sending_node_id;
             return try_receive(item, sending_node_id);
@@ -447,7 +447,7 @@ namespace dlib
         void receive (
             T& item,
             unsigned long& sending_node_id
-        ) 
+        )
         {
             if(!try_receive(item, sending_node_id))
                 throw dlib::socket_error("bsp_context::receive(): no messages to receive, all nodes currently blocked.");
@@ -457,7 +457,7 @@ namespace dlib
         bool try_receive (
             T& item,
             unsigned long& sending_node_id
-        ) 
+        )
         {
             shared_ptr<std::vector<char> > temp;
             if (receive_data(temp, sending_node_id))

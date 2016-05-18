@@ -13,7 +13,7 @@ namespace dlib
     template <
         typename T
         >
-    struct unordered_pair 
+    struct unordered_pair
     {
         /*!
             REQUIREMENTS ON T
@@ -21,16 +21,16 @@ namespace dlib
                 operator < and ==
 
             WHAT THIS OBJECT REPRESENTS
-                This object is very similar to the std::pair struct except unordered_pair 
-                is only capable of representing an unordered set of two items rather than 
-                an ordered list of two items like std::pair.  
+                This object is very similar to the std::pair struct except unordered_pair
+                is only capable of representing an unordered set of two items rather than
+                an ordered list of two items like std::pair.
 
                 This is best illustrated by example.  Suppose we have the following
                 five variables:
                     std::pair<int,int> p1(1, 5), p2(5,1);
                     unordered_pair<int> up1(1,5), up2(5,1), up3(6,7);
 
-                Then it is the case that:   
+                Then it is the case that:
                     up1 == up2
                     up1 != up3
                     p1 != p2
@@ -47,14 +47,14 @@ namespace dlib
         const T first;
         const T second;
 
-        unordered_pair() : first(), second() 
+        unordered_pair() : first(), second()
         /*!
             ensures
                 - #first and #second are default initialized
         !*/ {}
 
         unordered_pair(
-            const T& a, 
+            const T& a,
             const T& b
         ) :
             first( a < b ? a : b),
@@ -78,7 +78,7 @@ namespace dlib
 
         unordered_pair& operator= (
             const unordered_pair& item
-        ) 
+        )
         /*!
             ensures
                 - #*this == item
@@ -143,9 +143,9 @@ namespace dlib
     )
     {
         try
-        { 
-            serialize(item.first,out); 
-            serialize(item.second,out); 
+        {
+            serialize(item.first,out);
+            serialize(item.second,out);
         }
         catch (serialization_error& e)
         { throw serialization_error(e.info + "\n   while serializing object of type unordered_pair"); }
@@ -154,14 +154,14 @@ namespace dlib
     template <typename T>
     void deserialize (
         unordered_pair<T>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         try
-        { 
+        {
             T a, b;
-            deserialize(a,in); 
-            deserialize(b,in); 
+            deserialize(a,in);
+            deserialize(b,in);
             item = make_unordered_pair(a,b);
         }
         catch (serialization_error& e)

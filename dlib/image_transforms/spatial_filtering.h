@@ -73,7 +73,7 @@ namespace dlib
 
             const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
             if (!add_to)
-                zero_border_pixels(out_img_, non_border); 
+                zero_border_pixels(out_img_, non_border);
 
             // apply the filter to the image
             for (long r = first_row; r < last_row; ++r)
@@ -164,7 +164,7 @@ namespace dlib
 
             const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
             if (!add_to)
-                zero_border_pixels(out_img_, non_border); 
+                zero_border_pixels(out_img_, non_border);
 
             // apply the filter to the image
             for (long r = first_row; r < last_row; ++r)
@@ -260,8 +260,8 @@ namespace dlib
         typename EXP,
         typename T
         >
-    typename enable_if_c<pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale && 
-                         is_float_filtering2<in_image_type,out_image_type,EXP>::value,rectangle>::type 
+    typename enable_if_c<pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale &&
+                         is_float_filtering2<in_image_type,out_image_type,EXP>::value,rectangle>::type
     spatially_filter_image (
         const in_image_type& in_img,
         out_image_type& out_img,
@@ -292,8 +292,8 @@ namespace dlib
         typename EXP,
         typename T
         >
-    typename enable_if_c<pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale && 
-                         !is_float_filtering2<in_image_type,out_image_type,EXP>::value,rectangle>::type 
+    typename enable_if_c<pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale &&
+                         !is_float_filtering2<in_image_type,out_image_type,EXP>::value,rectangle>::type
     spatially_filter_image (
         const in_image_type& in_img,
         out_image_type& out_img,
@@ -314,7 +314,7 @@ namespace dlib
         typename EXP,
         typename T
         >
-    typename disable_if_c<pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale,rectangle>::type 
+    typename disable_if_c<pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale,rectangle>::type
     spatially_filter_image (
         const in_image_type& in_img_,
         out_image_type& out_img_,
@@ -359,7 +359,7 @@ namespace dlib
         const long last_col = in_img.nc() - ((filter.nc()-1)/2);
 
         const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
-        zero_border_pixels(out_img, non_border); 
+        zero_border_pixels(out_img, non_border);
 
         // apply the filter to the image
         for (long r = first_row; r < last_row; ++r)
@@ -428,7 +428,7 @@ namespace dlib
             const matrix_exp<EXP2>& _col_filter,
             T scale,
             bool use_abs,
-            bool add_to 
+            bool add_to
         )
         {
             const_temp_matrix<EXP1> row_filter(_row_filter);
@@ -474,7 +474,7 @@ namespace dlib
 
             const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
             if (!add_to)
-                zero_border_pixels(out_img, non_border); 
+                zero_border_pixels(out_img, non_border);
 
             typedef typename EXP1::type ptype;
 
@@ -498,7 +498,7 @@ namespace dlib
                 }
             }
 
-            // apply the column filter 
+            // apply the column filter
             for (long r = first_row; r < last_row; ++r)
             {
                 for (long c = first_col; c < last_col; ++c)
@@ -610,7 +610,7 @@ namespace dlib
 
         const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
         if (!add_to)
-            zero_border_pixels(out_img, non_border); 
+            zero_border_pixels(out_img, non_border);
 
         image_view<out_image_type> scratch(scratch_);
         scratch.set_size(in_img.nr(), in_img.nc());
@@ -656,7 +656,7 @@ namespace dlib
             }
         }
 
-        // apply the column filter 
+        // apply the column filter
         for (long r = first_row; r < last_row; ++r)
         {
             long c = first_col;
@@ -723,8 +723,8 @@ namespace dlib
         typename EXP2,
         typename T
         >
-    typename enable_if_c<pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale && 
-                         is_float_filtering<in_image_type,out_image_type,EXP1,EXP2>::value,rectangle>::type 
+    typename enable_if_c<pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale &&
+                         is_float_filtering<in_image_type,out_image_type,EXP1,EXP2>::value,rectangle>::type
     spatially_filter_image_separable (
         const in_image_type& in_img,
         out_image_type& out_img,
@@ -758,8 +758,8 @@ namespace dlib
         typename EXP2,
         typename T
         >
-    typename enable_if_c<pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale && 
-                         !is_float_filtering<in_image_type,out_image_type,EXP1,EXP2>::value,rectangle>::type 
+    typename enable_if_c<pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale &&
+                         !is_float_filtering<in_image_type,out_image_type,EXP1,EXP2>::value,rectangle>::type
     spatially_filter_image_separable (
         const in_image_type& in_img,
         out_image_type& out_img,
@@ -782,7 +782,7 @@ namespace dlib
         typename EXP2,
         typename T
         >
-    typename disable_if_c<pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale,rectangle>::type 
+    typename disable_if_c<pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale,rectangle>::type
     spatially_filter_image_separable (
         const in_image_type& in_img_,
         out_image_type& out_img_,
@@ -833,7 +833,7 @@ namespace dlib
         const long last_col = in_img.nc() - ((row_filter.size()-1)/2);
 
         const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
-        zero_border_pixels(out_img, non_border); 
+        zero_border_pixels(out_img, non_border);
 
         typedef typename image_traits<in_image_type>::pixel_type pixel_type;
         typedef matrix<typename EXP1::type,pixel_traits<pixel_type>::num,1> ptype;
@@ -859,7 +859,7 @@ namespace dlib
             }
         }
 
-        // apply the column filter 
+        // apply the column filter
         for (long r = first_row; r < last_row; ++r)
         {
             for (long c = first_col; c < last_col; ++c)
@@ -996,7 +996,7 @@ namespace dlib
             }
         }
 
-        // apply the column filter 
+        // apply the column filter
         for (long r = non_border.top(); r <= non_border.bottom(); ++r)
         {
             for (long c = non_border.left(); c <= non_border.right(); ++c)
@@ -1061,9 +1061,9 @@ namespace dlib
         const long& r,
         const long& c,
         const U& fe1, // separable filter end
-        const U& fm,  // separable filter middle 
+        const U& fm,  // separable filter middle
         const U& fe2 // separable filter end 2
-    ) 
+    )
     {
         const_image_view<in_image_type> img(img_);
         // make sure requires clause is not broken
@@ -1071,9 +1071,9 @@ namespace dlib
                     shrink_rect(get_rect(img),1).contains(c+NC-1,r+NR-1),
             "\t void separable_3x3_filter_block_grayscale()"
             << "\n\t The sub-window doesn't fit inside the given image."
-            << "\n\t get_rect(img):       " << get_rect(img) 
-            << "\n\t (c,r):               " << point(c,r) 
-            << "\n\t (c+NC-1,r+NR-1): " << point(c+NC-1,r+NR-1) 
+            << "\n\t get_rect(img):       " << get_rect(img)
+            << "\n\t (c,r):               " << point(c,r)
+            << "\n\t (c+NC-1,r+NR-1): " << point(c+NC-1,r+NR-1)
             );
 
 
@@ -1082,8 +1082,8 @@ namespace dlib
         {
             for (long cc = 0; cc < NC; ++cc)
             {
-                row_filt[rr][cc] = get_pixel_intensity(img[r+rr-1][c+cc-1])*fe1 + 
-                                   get_pixel_intensity(img[r+rr-1][c+cc])*fm + 
+                row_filt[rr][cc] = get_pixel_intensity(img[r+rr-1][c+cc-1])*fe1 +
+                                   get_pixel_intensity(img[r+rr-1][c+cc])*fm +
                                    get_pixel_intensity(img[r+rr-1][c+cc+1])*fe2;
             }
         }
@@ -1092,8 +1092,8 @@ namespace dlib
         {
             for (long cc = 0; cc < NC; ++cc)
             {
-                block[rr][cc] = (row_filt[rr][cc]*fe1 + 
-                                row_filt[rr+1][cc]*fm + 
+                block[rr][cc] = (row_filt[rr][cc]*fe1 +
+                                row_filt[rr+1][cc]*fm +
                                 row_filt[rr+2][cc]*fe2);
             }
         }
@@ -1115,9 +1115,9 @@ namespace dlib
         const long& r,
         const long& c,
         const U& fe1, // separable filter end
-        const U& fm,  // separable filter middle 
+        const U& fm,  // separable filter middle
         const U& fe2  // separable filter end 2
-    ) 
+    )
     {
         const_image_view<in_image_type> img(img_);
         // make sure requires clause is not broken
@@ -1125,9 +1125,9 @@ namespace dlib
                     shrink_rect(get_rect(img),1).contains(c+NC-1,r+NR-1),
             "\t void separable_3x3_filter_block_rgb()"
             << "\n\t The sub-window doesn't fit inside the given image."
-            << "\n\t get_rect(img):       " << get_rect(img) 
-            << "\n\t (c,r):               " << point(c,r) 
-            << "\n\t (c+NC-1,r+NR-1): " << point(c+NC-1,r+NR-1) 
+            << "\n\t get_rect(img):       " << get_rect(img)
+            << "\n\t (c,r):               " << point(c,r)
+            << "\n\t (c+NC-1,r+NR-1): " << point(c+NC-1,r+NR-1)
             );
 
         T row_filt[NR+2][NC];
@@ -1156,14 +1156,14 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline double gaussian (
-        double x, 
+        double x,
         double sigma
     )
     {
         DLIB_ASSERT(sigma > 0,
             "\tdouble gaussian(x)"
             << "\n\t sigma must be bigger than 0"
-            << "\n\t sigma: " << sigma 
+            << "\n\t sigma: " << sigma
         );
         const double sqrt_2_pi = 2.5066282746310002416123552393401041626930;
         return 1.0/(sigma*sqrt_2_pi) * std::exp( -(x*x)/(2*sigma*sigma));
@@ -1176,17 +1176,17 @@ namespace dlib
         >
     matrix<T,0,1> create_gaussian_filter (
         double sigma,
-        int max_size 
+        int max_size
     )
     {
         DLIB_ASSERT(sigma > 0 && max_size > 0 && (max_size%2)==1,
             "\t matrix<T,0,1> create_gaussian_filter()"
             << "\n\t Invalid inputs were given to this function."
-            << "\n\t sigma: " << sigma 
-            << "\n\t max_size:  " << max_size 
+            << "\n\t sigma: " << sigma
+            << "\n\t max_size:  " << max_size
         );
 
-        // Adjust the size so that the ratio of the gaussian values isn't huge.  
+        // Adjust the size so that the ratio of the gaussian values isn't huge.
         // This only matters when T is an integer type.  However, we do it for
         // all types so that the behavior of this function is always relatively
         // the same.
@@ -1228,9 +1228,9 @@ namespace dlib
                     is_same_object(in_img, out_img) == false,
             "\t void gaussian_blur()"
             << "\n\t Invalid inputs were given to this function."
-            << "\n\t sigma: " << sigma 
-            << "\n\t max_size:  " << max_size 
-            << "\n\t is_same_object(in_img,out_img): " << is_same_object(in_img,out_img) 
+            << "\n\t sigma: " << sigma
+            << "\n\t max_size:  " << max_size
+            << "\n\t is_same_object(in_img,out_img): " << is_same_object(in_img,out_img)
         );
 
         if (sigma < 18)
@@ -1261,7 +1261,7 @@ namespace dlib
     {
     template <
         bool add_to,
-        typename image_type1, 
+        typename image_type1,
         typename image_type2
         >
     void sum_filter (
@@ -1277,11 +1277,11 @@ namespace dlib
                     is_same_object(img_,out_) == false,
             "\t void sum_filter()"
             << "\n\t Invalid arguments given to this function."
-            << "\n\t img.nr(): " << img.nr() 
-            << "\n\t img.nc(): " << img.nc() 
-            << "\n\t out.nr(): " << out.nr() 
-            << "\n\t out.nc(): " << out.nc() 
-            << "\n\t is_same_object(img_,out_): " << is_same_object(img_,out_) 
+            << "\n\t img.nr(): " << img.nr()
+            << "\n\t img.nc(): " << img.nc()
+            << "\n\t out.nr(): " << out.nr()
+            << "\n\t out.nc(): " << out.nc()
+            << "\n\t is_same_object(img_,out_): " << is_same_object(img_,out_)
         );
 
         typedef typename image_traits<image_type1>::pixel_type pixel_type;
@@ -1319,7 +1319,7 @@ namespace dlib
         {
             // set to sum at point(-1,r). i.e. should be equal to sum(mat(img), translate_rect(rect, point(-1,r)))
             // We compute it's value in the next loop.
-            ptype cur_sum = 0; 
+            ptype cur_sum = 0;
 
             // Update the first part of column_sum since we only work on the c+width part of column_sum
             // in the main loop.
@@ -1361,7 +1361,7 @@ namespace dlib
     }
 
     template <
-        typename image_type1, 
+        typename image_type1,
         typename image_type2
         >
     void sum_filter (
@@ -1374,7 +1374,7 @@ namespace dlib
     }
 
     template <
-        typename image_type1, 
+        typename image_type1,
         typename image_type2
         >
     void sum_filter_assign (
@@ -1395,8 +1395,8 @@ namespace dlib
         class fast_deque
         {
         /*
-            This is a fast and minimal implementation of std::deque for 
-            use with the max_filter.  
+            This is a fast and minimal implementation of std::deque for
+            use with the max_filter.
 
             This object assumes that no more than max_size elements
             will ever be pushed into it at a time.
@@ -1470,7 +1470,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type1, 
+        typename image_type1,
         typename image_type2
         >
     void max_filter (
@@ -1490,13 +1490,13 @@ namespace dlib
                      is_same_object(img_,out_) == false,
                 "\t void max_filter()"
                 << "\n\t Invalid arguments given to this function."
-                << "\n\t img.nr(): " << img.nr() 
-                << "\n\t img.nc(): " << img.nc() 
-                << "\n\t out.nr(): " << out.nr() 
-                << "\n\t out.nc(): " << out.nc() 
-                << "\n\t width:    " << width 
-                << "\n\t height:   " << height 
-                << "\n\t is_same_object(img_,out_): " << is_same_object(img_,out_) 
+                << "\n\t img.nr(): " << img.nr()
+                << "\n\t img.nc(): " << img.nc()
+                << "\n\t out.nr(): " << out.nr()
+                << "\n\t out.nc(): " << out.nc()
+                << "\n\t width:    " << width
+                << "\n\t height:   " << height
+                << "\n\t is_same_object(img_,out_): " << is_same_object(img_,out_)
                      );
 
         typedef typename image_traits<image_type1>::pixel_type pixel_type;

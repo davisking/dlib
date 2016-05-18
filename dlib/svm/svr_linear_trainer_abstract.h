@@ -14,19 +14,19 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename K 
+        typename K
         >
     class svr_linear_trainer
     {
         /*!
-            REQUIREMENTS ON K 
-                Is either linear_kernel or sparse_linear_kernel.  
+            REQUIREMENTS ON K
+                Is either linear_kernel or sparse_linear_kernel.
 
             WHAT THIS OBJECT REPRESENTS
                 This object implements a trainer for performing epsilon-insensitive support
                 vector regression.  It uses the oca optimizer so it is very efficient at
                 solving this problem when linear kernels are used, making it suitable for
-                use with large datasets. 
+                use with large datasets.
                 
                 For an introduction to support vector regression see the following paper:
                     A Tutorial on Support Vector Regression by Alex J. Smola and Bernhard Scholkopf.
@@ -48,7 +48,7 @@ namespace dlib
             ensures
                 - This object is properly initialized and ready to be used to train a
                   ranking support vector machine.
-                - #get_oca() == oca() (i.e. an instance of oca with default parameters) 
+                - #get_oca() == oca() (i.e. an instance of oca with default parameters)
                 - #get_c() == 1
                 - #get_epsilon() == 0.01
                 - #get_epsilon_insensitivity() = 0.1
@@ -67,7 +67,7 @@ namespace dlib
             ensures
                 - This object is properly initialized and ready to be used to train a
                   ranking support vector machine.
-                - #get_oca() == oca() (i.e. an instance of oca with default parameters) 
+                - #get_oca() == oca() (i.e. an instance of oca with default parameters)
                 - #get_c() == C
                 - #get_epsilon() == 0.01
                 - #get_epsilon_insensitivity() = 0.1
@@ -84,11 +84,11 @@ namespace dlib
             requires
                 - eps > 0
             ensures
-                - #get_epsilon() == eps 
+                - #get_epsilon() == eps
         !*/
 
         const scalar_type get_epsilon (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the error epsilon that determines when training should stop.
@@ -127,7 +127,7 @@ namespace dlib
         !*/
 
         unsigned long get_max_iterations (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the maximum number of iterations the SVM optimizer is allowed to
@@ -163,7 +163,7 @@ namespace dlib
             ensures
                 - returns true if this trainer has the constraint that the last weight in
                   the learned parameter vector must be 1.  This is the weight corresponding
-                  to the feature in the training vectors with the highest dimension.  
+                  to the feature in the training vectors with the highest dimension.
                 - Forcing the last weight to 1 also disables the bias and therefore the b
                   field of the learned decision_function will be 0 when forces_last_weight_to_1() == true.
         !*/
@@ -181,14 +181,14 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_oca() == item 
+                - #get_oca() == item
         !*/
 
         const oca get_oca (
         ) const;
         /*!
             ensures
-                - returns a copy of the optimizer used to solve the SVM problem.  
+                - returns a copy of the optimizer used to solve the SVM problem.
         !*/
 
         const kernel_type get_kernel (
@@ -201,7 +201,7 @@ namespace dlib
         !*/
 
         bool learns_nonnegative_weights (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - The output of training is a weight vector and a bias value.  These two
@@ -222,13 +222,13 @@ namespace dlib
         !*/
 
         void set_c (
-            scalar_type C 
+            scalar_type C
         );
         /*!
             requires
                 - C > 0
             ensures
-                - #get_c() == C 
+                - #get_c() == C
         !*/
 
         const scalar_type get_c (
@@ -239,7 +239,7 @@ namespace dlib
                   determines the trade off between trying to fit the training data exactly
                   or allowing more errors but hopefully improving the generalization of the
                   resulting classifier.  Larger values encourage exact fitting while
-                  smaller values of C may encourage better generalization. 
+                  smaller values of C may encourage better generalization.
         !*/
 
         const decision_function<kernel_type> train (
@@ -250,7 +250,7 @@ namespace dlib
             requires
                 - is_learning_problem(samples,targets) == true
             ensures
-                - performs support vector regression given the training samples and targets.  
+                - performs support vector regression given the training samples and targets.
                 - returns a decision_function F with the following properties:
                     - F(new_sample) == predicted target value for new_sample
                     - F.alpha.size() == 1
@@ -258,7 +258,7 @@ namespace dlib
                     - F.alpha(0) == 1
         !*/
 
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 

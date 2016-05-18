@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_PARALLEL_FoR_Hh_
-#define DLIB_PARALLEL_FoR_Hh_ 
+#define DLIB_PARALLEL_FoR_Hh_
 
 #include "parallel_for_extension_abstract.h"
 #include "thread_pool_extension.h"
@@ -22,7 +22,7 @@ namespace dlib
             helper_parallel_for (
                 T& obj_,
                 void (T::*funct_)(long)
-            ) : 
+            ) :
                 obj(obj_),
                 funct(funct_)
             {}
@@ -87,7 +87,7 @@ namespace dlib
         DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
             "\t void parallel_for_blocked()"
             << "\n\t Invalid inputs were given to this function"
-            << "\n\t begin: " << begin 
+            << "\n\t begin: " << begin
             << "\n\t end:   " << end
             << "\n\t chunks_per_thread: " << chunks_per_thread
             );
@@ -129,7 +129,7 @@ namespace dlib
         DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
             "\t void parallel_for_blocked()"
             << "\n\t Invalid inputs were given to this function"
-            << "\n\t begin: " << begin 
+            << "\n\t begin: " << begin
             << "\n\t end:   " << end
             << "\n\t chunks_per_thread: " << chunks_per_thread
             );
@@ -153,7 +153,7 @@ namespace dlib
         DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
             "\t void parallel_for_blocked()"
             << "\n\t Invalid inputs were given to this function"
-            << "\n\t begin: " << begin 
+            << "\n\t begin: " << begin
             << "\n\t end:   " << end
             << "\n\t chunks_per_thread: " << chunks_per_thread
             );
@@ -177,7 +177,7 @@ namespace dlib
         DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
             "\t void parallel_for_blocked()"
             << "\n\t Invalid inputs were given to this function"
-            << "\n\t begin: " << begin 
+            << "\n\t begin: " << begin
             << "\n\t end:   " << end
             << "\n\t chunks_per_thread: " << chunks_per_thread
             );
@@ -203,7 +203,7 @@ namespace dlib
         DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
             "\t void parallel_for()"
             << "\n\t Invalid inputs were given to this function"
-            << "\n\t begin: " << begin 
+            << "\n\t begin: " << begin
             << "\n\t end:   " << end
             << "\n\t chunks_per_thread: " << chunks_per_thread
             );
@@ -228,7 +228,7 @@ namespace dlib
         DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
             "\t void parallel_for()"
             << "\n\t Invalid inputs were given to this function"
-            << "\n\t begin: " << begin 
+            << "\n\t begin: " << begin
             << "\n\t end:   " << end
             << "\n\t chunks_per_thread: " << chunks_per_thread
             );
@@ -252,7 +252,7 @@ namespace dlib
         DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
             "\t void parallel_for()"
             << "\n\t Invalid inputs were given to this function"
-            << "\n\t begin: " << begin 
+            << "\n\t begin: " << begin
             << "\n\t end:   " << end
             << "\n\t chunks_per_thread: " << chunks_per_thread
             );
@@ -276,7 +276,7 @@ namespace dlib
         DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
             "\t void parallel_for()"
             << "\n\t Invalid inputs were given to this function"
-            << "\n\t begin: " << begin 
+            << "\n\t begin: " << begin
             << "\n\t end:   " << end
             << "\n\t chunks_per_thread: " << chunks_per_thread
             );
@@ -417,7 +417,7 @@ namespace dlib
         DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
             "\t void parallel_for_verbose()"
             << "\n\t Invalid inputs were given to this function"
-            << "\n\t begin: " << begin 
+            << "\n\t begin: " << begin
             << "\n\t end:   " << end
             << "\n\t chunks_per_thread: " << chunks_per_thread
             );
@@ -442,7 +442,7 @@ namespace dlib
         DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
             "\t void parallel_for_verbose()"
             << "\n\t Invalid inputs were given to this function"
-            << "\n\t begin: " << begin 
+            << "\n\t begin: " << begin
             << "\n\t end:   " << end
             << "\n\t chunks_per_thread: " << chunks_per_thread
             );
@@ -466,7 +466,7 @@ namespace dlib
         DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
             "\t void parallel_for_verbose()"
             << "\n\t Invalid inputs were given to this function"
-            << "\n\t begin: " << begin 
+            << "\n\t begin: " << begin
             << "\n\t end:   " << end
             << "\n\t chunks_per_thread: " << chunks_per_thread
             );
@@ -490,7 +490,7 @@ namespace dlib
         DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
             "\t void parallel_for_verbose()"
             << "\n\t Invalid inputs were given to this function"
-            << "\n\t begin: " << begin 
+            << "\n\t begin: " << begin
             << "\n\t end:   " << end
             << "\n\t chunks_per_thread: " << chunks_per_thread
             );
@@ -515,7 +515,7 @@ namespace dlib
         DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
             "\t void parallel_for_blocked_verbose()"
             << "\n\t Invalid inputs were given to this function"
-            << "\n\t begin: " << begin 
+            << "\n\t begin: " << begin
             << "\n\t end:   " << end
             << "\n\t chunks_per_thread: " << chunks_per_thread
             );
@@ -540,7 +540,7 @@ namespace dlib
         DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
             "\t void parallel_for_blocked_verbose()"
             << "\n\t Invalid inputs were given to this function"
-            << "\n\t begin: " << begin 
+            << "\n\t begin: " << begin
             << "\n\t end:   " << end
             << "\n\t chunks_per_thread: " << chunks_per_thread
             );
@@ -564,7 +564,7 @@ namespace dlib
         DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
             "\t void parallel_for_blocked_verbose()"
             << "\n\t Invalid inputs were given to this function"
-            << "\n\t begin: " << begin 
+            << "\n\t begin: " << begin
             << "\n\t end:   " << end
             << "\n\t chunks_per_thread: " << chunks_per_thread
             );
@@ -588,7 +588,7 @@ namespace dlib
         DLIB_ASSERT(begin <= end && chunks_per_thread > 0,
             "\t void parallel_for_blocked_verbose()"
             << "\n\t Invalid inputs were given to this function"
-            << "\n\t begin: " << begin 
+            << "\n\t begin: " << begin
             << "\n\t end:   " << end
             << "\n\t chunks_per_thread: " << chunks_per_thread
             );

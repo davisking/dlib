@@ -9,7 +9,7 @@
 namespace dlib
 {
 
-    class base64 
+    class base64
     {
         /*!
             INITIAL VALUE
@@ -81,10 +81,10 @@ namespace dlib
                   and writes it to out
             throws
                 - std::ios_base::failure
-                    if there was a problem writing to out then this exception will 
-                    be thrown.                      
+                    if there was a problem writing to out then this exception will
+                    be thrown.
                 - any other exception
-                    this exception may be thrown if there is any other problem                    
+                    this exception may be thrown if there is any other problem
         !*/
 
         void decode (
@@ -94,17 +94,17 @@ namespace dlib
         /*!
             ensures
                 - reads data from in (until EOF is reached), decodes it,
-                  and writes it to out. 
+                  and writes it to out.
             throws
                 - std::ios_base::failure
-                    if there was a problem writing to out then this exception will 
-                    be thrown.           
+                    if there was a problem writing to out then this exception will
+                    be thrown.
                 - decode_error
                     if an error was detected in the encoded data that prevented
-                    it from being correctly decoded then this exception is 
-                    thrown.  
+                    it from being correctly decoded then this exception is
+                    thrown.
                 - any other exception
-                    this exception may be thrown if there is any other problem                    
+                    this exception may be thrown if there is any other problem
         !*/
 
     private:
@@ -113,7 +113,7 @@ namespace dlib
         base64(base64&);        // copy constructor
         base64& operator=(base64&);    // assignment operator
 
-    };   
+    };
    
 }
 

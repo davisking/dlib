@@ -96,13 +96,13 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    // Don't do anything when libpng calls us to tell us about an error.  Just return to 
+    // Don't do anything when libpng calls us to tell us about an error.  Just return to
     // our own code and throw an exception (at the long jump target).
-    void png_loader_user_error_fn_silent(png_structp  png_struct, png_const_charp ) 
+    void png_loader_user_error_fn_silent(png_structp  png_struct, png_const_charp )
     {
         longjmp(png_jmpbuf(png_struct),1);
     }
-    void png_loader_user_warning_fn_silent(png_structp , png_const_charp ) 
+    void png_loader_user_warning_fn_silent(png_structp , png_const_charp )
     {
     }
 
@@ -152,7 +152,7 @@ namespace dlib
 
         if (setjmp(png_jmpbuf(ld_->png_ptr_)))
         {
-            // If we get here, we had a problem writing the file 
+            // If we get here, we had a problem writing the file
             fclose(fp);
             png_destroy_read_struct( &( ld_->png_ptr_ ), &( ld_->info_ptr_ ), &( ld_->end_info_ ) );
             throw image_load_error(std::string("png_loader: parse error in file ") + filename);
@@ -174,8 +174,8 @@ namespace dlib
         color_type_ = png_get_color_type( ld_->png_ptr_, ld_-> info_ptr_ );
 
 
-        if (color_type_ != PNG_COLOR_TYPE_GRAY && 
-            color_type_ != PNG_COLOR_TYPE_RGB && 
+        if (color_type_ != PNG_COLOR_TYPE_GRAY &&
+            color_type_ != PNG_COLOR_TYPE_RGB &&
             color_type_ != PNG_COLOR_TYPE_RGB_ALPHA &&
             color_type_ != PNG_COLOR_TYPE_GRAY_ALPHA)
         {

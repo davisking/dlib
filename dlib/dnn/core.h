@@ -28,7 +28,7 @@ namespace dlib
 
     namespace impl
     {
-        class repeat_input_layer 
+        class repeat_input_layer
         {
             /*!
                 None of the declarations in this object are really used. The only reason it
@@ -47,7 +47,7 @@ namespace dlib
             void to_tensor (
                 input_iterator ,
                 input_iterator ,
-                resizable_tensor& 
+                resizable_tensor&
             ) const
             {
                 DLIB_CASSERT(false,"This function should never be called");
@@ -60,8 +60,8 @@ namespace dlib
 
         inline std::string tensor_to_str (
             const tensor& t,
-            int& min_length 
-        ) 
+            int& min_length
+        )
         {
             if (t.size() == 0)
                 return "";
@@ -134,7 +134,7 @@ namespace dlib
 
         template <size_t... indices, typename Tuple>
         auto tuple_subset(
-            const Tuple& item, 
+            const Tuple& item,
             ct_integers_list<indices...>
         ) -> decltype(std::make_tuple(std::get<indices>(item)...))
         {
@@ -150,7 +150,7 @@ namespace dlib
         }
 
         template <typename T>
-        std::tuple<T> tuple_flatten(const T& t) 
+        std::tuple<T> tuple_flatten(const T& t)
         {
             return std::make_tuple(t);
         }
@@ -165,7 +165,7 @@ namespace dlib
 
         template <size_t... indices, typename... T>
         auto tuple_flatten(
-            const std::tuple<T...>& item, 
+            const std::tuple<T...>& item,
             ct_integers_list<indices...>
         ) -> decltype(std::tuple_cat(tuple_flatten(std::get<indices-1>(item))...))
         {
@@ -176,7 +176,7 @@ namespace dlib
         struct tuple_head_helper
         {
             typedef T type;
-            static const type& get(const T& item) 
+            static const type& get(const T& item)
             {
                 return item;
             }
@@ -186,7 +186,7 @@ namespace dlib
         struct tuple_head_helper<std::tuple<T, U...>>
         {
             typedef typename tuple_head_helper<T>::type type;
-            static const type& get(const std::tuple<T,U...>& item) 
+            static const type& get(const std::tuple<T,U...>& item)
             {
                 return tuple_head_helper<T>::get(std::get<0>(item));
             }
@@ -274,7 +274,7 @@ namespace dlib
         template <typename layer_type, typename SUBNET>
         constexpr auto is_inplace_layer(
             layer_type& layer,
-            const SUBNET& sub 
+            const SUBNET& sub
         ) -> typename alwaysbool<decltype(layer.forward(sub,rt()))>::type
         {
             return false;
@@ -292,9 +292,9 @@ namespace dlib
         template <typename layer_type, typename SUBNET>
         auto call_layer_backward(
             layer_type& layer,
-            const tensor& computed_output, 
-            const tensor& gradient_input, 
-            SUBNET& sub, 
+            const tensor& computed_output,
+            const tensor& gradient_input,
+            SUBNET& sub,
             tensor& params_grad
         ) -> decltype(layer.backward(computed_output,gradient_input,sub,params_grad))
         {
@@ -304,9 +304,9 @@ namespace dlib
         template <typename layer_type, typename SUBNET>
         auto call_layer_backward(
             layer_type& layer,
-            const tensor& , 
-            const tensor& gradient_input, 
-            SUBNET& sub, 
+            const tensor& ,
+            const tensor& gradient_input,
+            SUBNET& sub,
             tensor& params_grad
         ) -> decltype(layer.backward(gradient_input,sub,params_grad))
         {
@@ -316,9 +316,9 @@ namespace dlib
         template <typename layer_type, typename SUBNET>
         auto call_layer_backward(
             layer_type& layer,
-            const tensor& computed_output, 
-            const tensor& gradient_input, 
-            SUBNET& sub, 
+            const tensor& computed_output,
+            const tensor& gradient_input,
+            SUBNET& sub,
             tensor& params_grad
         ) -> decltype(layer.backward_inplace(computed_output,gradient_input,sub.get_gradient_input(),params_grad))
         {
@@ -328,9 +328,9 @@ namespace dlib
         template <typename layer_type, typename SUBNET>
         auto call_layer_backward(
             layer_type& layer,
-            const tensor& , 
-            const tensor& gradient_input, 
-            SUBNET& sub, 
+            const tensor& ,
+            const tensor& gradient_input,
+            SUBNET& sub,
             tensor& params_grad
         ) -> decltype(layer.backward_inplace(gradient_input,sub.get_gradient_input(),params_grad))
         {
@@ -341,7 +341,7 @@ namespace dlib
         template <typename layer_type, typename SUBNET>
         auto call_layer_forward(
             layer_type& layer,
-            const SUBNET& sub, 
+            const SUBNET& sub,
             tensor& /*data_output*/
         ) -> decltype(layer.forward(sub,rt()))
         {
@@ -356,7 +356,7 @@ namespace dlib
         template <typename layer_type, typename SUBNET>
         auto call_layer_forward(
             layer_type& layer,
-            const SUBNET& sub, 
+            const SUBNET& sub,
             resizable_tensor& data_output
         ) -> decltype(layer.forward(sub,data_output))
         {
@@ -366,7 +366,7 @@ namespace dlib
         template <typename layer_type, typename SUBNET>
         auto call_layer_forward(
             layer_type& layer,
-            const SUBNET& sub, 
+            const SUBNET& sub,
             tensor& data_output
         ) -> decltype(layer.forward_inplace(sub.get_output(),data_output))
         {
@@ -376,7 +376,7 @@ namespace dlib
         template <typename layer_type, typename SUBNET>
         auto call_layer_forward(
             layer_type& layer,
-            const SUBNET& sub, 
+            const SUBNET& sub,
             resizable_tensor& data_output
         ) -> decltype(layer.forward_inplace(sub.get_output(),data_output))
         {
@@ -391,7 +391,7 @@ namespace dlib
     template <typename... T>
     typename impl::tuple_head_helper<std::tuple<T...>>::type tuple_head (
         const std::tuple<T...>& item
-    ) 
+    )
     {
         return impl::tuple_head_helper<std::tuple<T...>>::get(item);
     }
@@ -406,7 +406,7 @@ namespace dlib
 
     inline std::tuple<> tuple_tail(
         const std::tuple<>& item
-    ) 
+    )
     {
         return item;
     }
@@ -443,21 +443,21 @@ namespace dlib
             size_t s
         ) : data(data_), mysize(s) {}
 
-        const T& top() const 
-        { 
+        const T& top() const
+        {
             DLIB_CASSERT(size() != 0, "You can't call top() on an empty stack");
             return *data;
         }
-        T& top()  
-        { 
+        T& top()
+        {
             DLIB_CASSERT(size() != 0, "You can't call top() on an empty stack");
             return *data;
         }
 
         size_t size() const { return mysize; }
 
-        sstack pop(size_t num=1) 
-        { 
+        sstack pop(size_t num=1)
+        {
             DLIB_CASSERT(num < size(), "You can't pop more things from the stack than it has in it.");
             return sstack(data+num, mysize-num);
         }
@@ -488,8 +488,8 @@ namespace dlib
                     This is a tool that makes an add_layer or add_loss_layer object
                     expose only the part of its interface defined by the SUBNET
                     type in layers_abstract.h.  This way, when we pass subnetwork
-                    objects to the layer callbacks those callbacks won't be able to 
-                    interact with the subnetworks in a way other than specified 
+                    objects to the layer callbacks those callbacks won't be able to
+                    interact with the subnetworks in a way other than specified
                     by the SUBNET interface spec.
 
                     We also allow the top layer of a subnet_wrapper stack to call the
@@ -505,7 +505,7 @@ namespace dlib
             subnet_wrapper& operator=(const subnet_wrapper&) = delete;
 
             subnet_wrapper(T& l_) {}
-            // Nothing here because in this case T is one of the input layer types 
+            // Nothing here because in this case T is one of the input layer types
             // that doesn't have anything in it.
         };
 
@@ -568,7 +568,7 @@ namespace dlib
     struct is_nonloss_layer_type<add_layer<T,U>> : std::true_type {};
 
     template <typename LAYER_DETAILS, typename SUBNET>
-    class add_layer<LAYER_DETAILS,SUBNET, 
+    class add_layer<LAYER_DETAILS,SUBNET,
             typename std::enable_if<is_nonloss_layer_type<SUBNET>::value>::type>
     {
     public:
@@ -598,8 +598,8 @@ namespace dlib
             gradient_input_is_stale = item.gradient_input_is_stale;
             get_output_and_gradient_input_disabled = item.get_output_and_gradient_input_disabled;
             x_grad = item.x_grad;
-            cached_output = item.cached_output; 
-            params_grad = item.params_grad; 
+            cached_output = item.cached_output;
+            params_grad = item.params_grad;
             temp_tensor = item.temp_tensor;
         }
         add_layer& operator=(const add_layer& item) { add_layer(item).swap(*this); return *this;}
@@ -617,13 +617,13 @@ namespace dlib
         template <size_t N, template<typename> class L, typename S>
         friend class repeat;
 
-        // Allow copying networks from one to another as long as their corresponding 
+        // Allow copying networks from one to another as long as their corresponding
         // layers can be constructed from each other.
         template <typename T, typename U, typename E>
         add_layer(
             const add_layer<T,U,E>& item
         ) :
-            details(item.layer_details()), 
+            details(item.layer_details()),
             subnetwork(new subnet_type(item.subnet())),
             this_layer_setup_called(item.this_layer_setup_called),
             gradient_input_is_stale(item.gradient_input_is_stale),
@@ -637,10 +637,10 @@ namespace dlib
 
         template <typename ...T>
         add_layer(
-            const LAYER_DETAILS& layer_det, 
+            const LAYER_DETAILS& layer_det,
             T&& ...args
-        ) : 
-            details(layer_det), 
+        ) :
+            details(layer_det),
             subnetwork(new subnet_type(std::forward<T>(args)...)),
             this_layer_setup_called(false),
             gradient_input_is_stale(true),
@@ -651,7 +651,7 @@ namespace dlib
         }
 
         template <typename T, typename ...U>
-        struct disable_forwarding_constr 
+        struct disable_forwarding_constr
         {
             const static bool value = std::is_constructible<LAYER_DETAILS,T>::value;
         };
@@ -682,7 +682,7 @@ namespace dlib
             >
         add_layer(
             T&& ...args
-        ) : 
+        ) :
             subnetwork(new subnet_type(std::forward<T>(args)...)),
             this_layer_setup_called(false),
             gradient_input_is_stale(true),
@@ -694,10 +694,10 @@ namespace dlib
 
         template <typename ...T>
         add_layer(
-            LAYER_DETAILS&& layer_det, 
+            LAYER_DETAILS&& layer_det,
             T&& ...args
-        ) : 
-            details(std::move(layer_det)), 
+        ) :
+            details(std::move(layer_det)),
             subnetwork(new subnet_type(std::forward<T>(args)...)),
             this_layer_setup_called(false),
             gradient_input_is_stale(true),
@@ -709,10 +709,10 @@ namespace dlib
 
         template <typename ...T, typename LD, typename ...U>
         add_layer(
-            const std::tuple<LD,U...>& layer_det, 
+            const std::tuple<LD,U...>& layer_det,
             T&& ...args
-        ) : 
-            details(tuple_head(layer_det)), 
+        ) :
+            details(tuple_head(layer_det)),
             subnetwork(new subnet_type(tuple_tail(layer_det),std::forward<T>(args)...)),
             this_layer_setup_called(false),
             gradient_input_is_stale(true),
@@ -725,7 +725,7 @@ namespace dlib
         template <typename ...T, typename LD, typename ...U>
         add_layer(
             std::tuple<>,
-            const std::tuple<LD,U...>& layer_det, 
+            const std::tuple<LD,U...>& layer_det,
             T&& ...args
         ) : add_layer(layer_det,args...) { }
 
@@ -735,8 +735,8 @@ namespace dlib
 
         template <typename ...T>
         add_layer(
-            std::tuple<>, 
-            LAYER_DETAILS&& layer_det, 
+            std::tuple<>,
+            LAYER_DETAILS&& layer_det,
             T&& ...args
         ) : add_layer(layer_det, args...) { }
 
@@ -786,14 +786,14 @@ namespace dlib
 
     private:
         tensor& private_get_output() const
-        { 
+        {
             if (const_cast<add_layer&>(*this).this_layer_operates_inplace())
                 return subnetwork->private_get_output();
             else
-                return const_cast<resizable_tensor&>(cached_output); 
+                return const_cast<resizable_tensor&>(cached_output);
         }
-        tensor& private_get_gradient_input() 
-        { 
+        tensor& private_get_gradient_input()
+        {
             if (this_layer_operates_inplace())
             {
                 return subnetwork->private_get_gradient_input();
@@ -806,20 +806,20 @@ namespace dlib
                     x_grad.copy_size(private_get_output());
                     x_grad = 0;
                 }
-                return x_grad; 
+                return x_grad;
             }
         }
         void disable_output_and_gradient_getters (
         ) { get_output_and_gradient_input_disabled = true; }
     public:
-        const tensor& get_output() const 
-        { 
+        const tensor& get_output() const
+        {
             if (get_output_and_gradient_input_disabled)
                 throw dlib::error("Accessing this layer's get_output() is disabled because an in-place layer has been stacked on top of it.");
-            return private_get_output(); 
+            return private_get_output();
         }
-        tensor& get_gradient_input() 
-        { 
+        tensor& get_gradient_input()
+        {
             if (get_output_and_gradient_input_disabled)
                 throw dlib::error("Accessing this layer's get_gradient_input() is disabled because an in-place layer has been stacked on top of it.");
             return private_get_gradient_input();
@@ -839,7 +839,7 @@ namespace dlib
             impl::call_layer_backward(details, private_get_output(),
                 gradient_input, wsub, static_cast<tensor&>(params_grad));
 
-            subnetwork->back_propagate_error(x); 
+            subnetwork->back_propagate_error(x);
 
             // zero out get_gradient_input()
             gradient_input_is_stale = true;
@@ -867,8 +867,8 @@ namespace dlib
         const subnet_type& subnet() const { return *subnetwork; }
         subnet_type& subnet() { return *subnetwork; }
 
-        const layer_details_type& layer_details() const { return details; } 
-        layer_details_type& layer_details() { return details; } 
+        const layer_details_type& layer_details() const { return details; }
+        layer_details_type& layer_details() { return details; }
 
         void clean()
         {
@@ -927,7 +927,7 @@ namespace dlib
     private:
 
         bool this_layer_operates_inplace(
-        ) 
+        )
         {
             // This layer can run in-place if it's an in-place capable layer and also if
             // the layer it's on top of doesn't need its own output tensor (since in-place
@@ -935,7 +935,7 @@ namespace dlib
             return impl::is_inplace_layer(details, *subnetwork) && !subnetwork->this_layer_requires_forward_output();
         }
         bool this_layer_requires_forward_output(
-        ) 
+        )
         {
             return impl::backward_requires_forward_output(details, *subnetwork);
         }
@@ -962,11 +962,11 @@ namespace dlib
         // are not used at all.  Instead, this layer uses these variables from the lower
         // layer.
         resizable_tensor x_grad;
-        resizable_tensor cached_output; 
+        resizable_tensor cached_output;
 
-        resizable_tensor params_grad; 
+        resizable_tensor params_grad;
 
-        // temp_tensor doesn't logically contribute to the state of this object.  
+        // temp_tensor doesn't logically contribute to the state of this object.
         // It is here only to prevent it from being reallocated over and over.
         resizable_tensor temp_tensor;
 
@@ -999,7 +999,7 @@ namespace dlib
             "The input layer can't produce fewer output tensors than there are inputs.");
 
         add_layer(
-        ): 
+        ):
             this_layer_setup_called(false),
             gradient_input_is_stale(true),
             get_output_and_gradient_input_disabled(false)
@@ -1021,7 +1021,7 @@ namespace dlib
         template <size_t N, template<typename> class L, typename S>
         friend class repeat;
 
-        // Allow copying networks from one to another as long as their corresponding 
+        // Allow copying networks from one to another as long as their corresponding
         // layers can be constructed from each other.
         template <typename T, typename U, typename E>
         add_layer(
@@ -1040,17 +1040,17 @@ namespace dlib
 
         add_layer(
             const LAYER_DETAILS& layer_det
-        ) : 
-            details(layer_det), 
+        ) :
+            details(layer_det),
             this_layer_setup_called(false),
             gradient_input_is_stale(true),
             get_output_and_gradient_input_disabled(false)
         {}
 
         add_layer(
-            const INPUT_LAYER& il 
-        ) : 
-            input_layer(il), 
+            const INPUT_LAYER& il
+        ) :
+            input_layer(il),
             this_layer_setup_called(false),
             gradient_input_is_stale(true),
             get_output_and_gradient_input_disabled(false)
@@ -1058,17 +1058,17 @@ namespace dlib
 
         add_layer(
             LAYER_DETAILS&& layer_det
-        ) : 
-            details(std::move(layer_det)), 
+        ) :
+            details(std::move(layer_det)),
             this_layer_setup_called(false),
             gradient_input_is_stale(true),
             get_output_and_gradient_input_disabled(false)
         {}
 
         add_layer(
-            LAYER_DETAILS layer_det, 
+            LAYER_DETAILS layer_det,
             INPUT_LAYER il
-        ) : 
+        ) :
             details(std::move(layer_det)),
             input_layer(std::move(il)),
             this_layer_setup_called(false),
@@ -1088,7 +1088,7 @@ namespace dlib
 
         add_layer(
             std::tuple<>,
-            LAYER_DETAILS layer_det, 
+            LAYER_DETAILS layer_det,
             INPUT_LAYER il
         ) : add_layer(layer_det,il) {}
 
@@ -1147,27 +1147,27 @@ namespace dlib
 
     private:
         tensor& private_get_output() const { return const_cast<resizable_tensor&>(cached_output); }
-        tensor& private_get_gradient_input() 
-        { 
+        tensor& private_get_gradient_input()
+        {
             if (gradient_input_is_stale)
             {
                 gradient_input_is_stale = false;
                 x_grad.copy_size(private_get_output());
                 x_grad = 0;
             }
-            return x_grad; 
+            return x_grad;
         }
         void disable_output_and_gradient_getters (
         ) { get_output_and_gradient_input_disabled = true; }
     public:
-        const tensor& get_output() const 
-        { 
+        const tensor& get_output() const
+        {
             if (get_output_and_gradient_input_disabled)
                 throw dlib::error("Accessing this layer's get_output() is disabled because an in-place layer has been stacked on top of it.");
-            return private_get_output(); 
+            return private_get_output();
         }
-        tensor& get_gradient_input() 
-        { 
+        tensor& get_gradient_input()
+        {
             if (get_output_and_gradient_input_disabled)
                 throw dlib::error("Accessing this layer's get_gradient_input() is disabled because an in-place layer has been stacked on top of it.");
             return private_get_gradient_input();
@@ -1185,7 +1185,7 @@ namespace dlib
             // make sure grad_final is initialized to 0
             if (!have_same_dimensions(x, grad_final))
                 grad_final.copy_size(x);
-            grad_final = 0;  
+            grad_final = 0;
 
             subnet_wrapper wsub(x, grad_final);
             params_grad.copy_size(details.get_layer_params());
@@ -1201,7 +1201,7 @@ namespace dlib
         {
             DLIB_CASSERT(solvers.size()>=num_computational_layers,"");
             // Don't try to adjust the parameters if this layer doesn't have any.
-            if (params_grad.size() != 0) 
+            if (params_grad.size() != 0)
             {
                 const tensor& step = solvers.top()(learning_rate, details, static_cast<const tensor&>(params_grad));
                 tt::add(details.get_layer_params(), details.get_layer_params(), step);
@@ -1214,11 +1214,11 @@ namespace dlib
         tensor& get_parameter_gradient (
         )  { return params_grad; }
 
-        const subnet_type& subnet() const { return input_layer; } 
-        subnet_type& subnet() { return input_layer; } 
+        const subnet_type& subnet() const { return input_layer; }
+        subnet_type& subnet() { return input_layer; }
 
-        const layer_details_type& layer_details() const { return details; } 
-        layer_details_type& layer_details() { return details; } 
+        const layer_details_type& layer_details() const { return details; }
+        layer_details_type& layer_details() { return details; }
 
         void clean()
         {
@@ -1280,7 +1280,7 @@ namespace dlib
     private:
 
         bool this_layer_requires_forward_output(
-        ) 
+        )
         {
             subnet_wrapper wsub(grad_final, grad_final);
             return impl::backward_requires_forward_output(details, wsub);
@@ -1296,14 +1296,14 @@ namespace dlib
             subnet_wrapper& operator=(const subnet_wrapper&) = delete;
 
             const tensor& get_output() const { return x; }
-            tensor& get_gradient_input() 
-            { 
+            tensor& get_gradient_input()
+            {
                 if (!have_same_dimensions(x, grad_final))
                 {
                     grad_final.copy_size(x);
-                    grad_final = 0;  
+                    grad_final = 0;
                 }
-                return grad_final; 
+                return grad_final;
             }
 
         private:
@@ -1318,9 +1318,9 @@ namespace dlib
             std::swap(this_layer_setup_called, item.this_layer_setup_called);
             std::swap(gradient_input_is_stale, item.gradient_input_is_stale);
             std::swap(get_output_and_gradient_input_disabled, item.get_output_and_gradient_input_disabled);
-            std::swap(x_grad, item.x_grad); 
-            std::swap(cached_output, item.cached_output); 
-            std::swap(grad_final, item.grad_final); 
+            std::swap(x_grad, item.x_grad);
+            std::swap(cached_output, item.cached_output);
+            std::swap(grad_final, item.grad_final);
         }
 
         subnet_type input_layer;
@@ -1328,15 +1328,15 @@ namespace dlib
         bool this_layer_setup_called;
         bool gradient_input_is_stale;
         bool get_output_and_gradient_input_disabled;
-        resizable_tensor x_grad; 
-        resizable_tensor cached_output; 
+        resizable_tensor x_grad;
+        resizable_tensor cached_output;
         resizable_tensor grad_final;
 
         // The following 2 objects don't logically contribute to the state of this class.
         // They are only here to prevent them from being reallocated over and over in
         // member functions.
-        resizable_tensor params_grad; 
-        resizable_tensor temp_tensor; 
+        resizable_tensor params_grad;
+        resizable_tensor temp_tensor;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -1372,8 +1372,8 @@ namespace dlib
         template <typename ...T>
         add_tag_layer(
             T ...args
-        ) : 
-            subnetwork(std::move(args)...) 
+        ) :
+            subnetwork(std::move(args)...)
         {
         }
 
@@ -1408,8 +1408,8 @@ namespace dlib
 
         const tensor& get_output() const { return subnetwork.get_output(); }
 
-        tensor& get_gradient_input() 
-        { 
+        tensor& get_gradient_input()
+        {
             return subnetwork.get_gradient_input();
         }
 
@@ -1490,22 +1490,22 @@ namespace dlib
         // You wouldn't put a tag on a layer if you didn't want to access its forward
         // outputs.  So this is always true.
         bool this_layer_requires_forward_output(
-        ) { return true; } 
+        ) { return true; }
 
         void disable_output_and_gradient_getters (
-        ) 
-        { 
+        )
+        {
             // This should never happen because only inplace layers call
             // disable_output_and_gradient_getters(), however, putting a tag layer right
             // before an inplace layer basically means you don't want the following layer
             // to operate in place.  So the inplace layer should turn itself into an
-            // out-of-place layer and not call disable_output_and_gradient_getters(). 
+            // out-of-place layer and not call disable_output_and_gradient_getters().
             DLIB_CASSERT(false,"This should never happen");
         }
 
         tensor& private_get_output() const
         { return subnetwork.private_get_output(); }
-        tensor& private_get_gradient_input() 
+        tensor& private_get_gradient_input()
         { return subnetwork.private_get_gradient_input(); }
 
         subnet_type subnetwork;
@@ -1537,7 +1537,7 @@ namespace dlib
 
     template <
         size_t num,
-        template<typename> class REPEATED_LAYER, 
+        template<typename> class REPEATED_LAYER,
         typename SUBNET
         >
     class repeat
@@ -1559,7 +1559,7 @@ namespace dlib
         typedef REPEATED_LAYER<impl::repeat_input_layer> repeated_layer_type;
 
         repeat(
-        ) : 
+        ) :
             details(num)
         {
         }
@@ -1568,19 +1568,19 @@ namespace dlib
         ) const { return num; }
 
         const repeated_layer_type& get_repeated_layer (
-            size_t i 
+            size_t i
         ) const
-        { 
+        {
             DLIB_CASSERT(i < num_repetitions(), "");
-            return details[i]; 
+            return details[i];
         }
 
         repeated_layer_type& get_repeated_layer (
-            size_t i 
-        ) 
-        { 
+            size_t i
+        )
+        {
             DLIB_CASSERT(i < num_repetitions(), "");
-            return details[i]; 
+            return details[i];
         }
 
         repeat(const repeat&) = default;
@@ -1591,7 +1591,7 @@ namespace dlib
         template <template<typename> class T, typename U>
         repeat(
             const repeat<num,T,U>& item
-        ) : 
+        ) :
             subnetwork(item.subnetwork)
         {
             for (auto&& d : item.details)
@@ -1602,7 +1602,7 @@ namespace dlib
         repeat(
             T arg1,
             U ...args2
-        ): 
+        ):
             details(num, std::move(arg1)),
             subnetwork(std::move(args2)...)
         {
@@ -1612,7 +1612,7 @@ namespace dlib
         repeat(
             decorator_repeat_group<T...>&& arg1,
             U ...args2
-        ): 
+        ):
             details(num, arg1.data),
             subnetwork(std::move(args2)...)
         {
@@ -1623,7 +1623,7 @@ namespace dlib
             std::tuple<>,
             T arg1,
             U ...args2
-        ): 
+        ):
             details(num, std::move(arg1)),
             subnetwork(std::move(args2)...)
         {
@@ -1665,20 +1665,20 @@ namespace dlib
 
     private:
         tensor& private_get_output() const
-        { 
+        {
             return details[0].private_get_output();
         }
-        tensor& private_get_gradient_input() 
-        { 
+        tensor& private_get_gradient_input()
+        {
             return details[0].private_get_gradient_input();
         }
     public:
-        const tensor& get_output() const 
-        { 
-            return details[0].get_output(); 
+        const tensor& get_output() const
+        {
+            return details[0].get_output();
         }
-        tensor& get_gradient_input() 
-        { 
+        tensor& get_gradient_input()
+        {
             return details[0].get_gradient_input();
         }
 
@@ -1780,19 +1780,19 @@ namespace dlib
         friend class repeat;
 
         bool this_layer_requires_forward_output(
-        ) 
-        { 
-            return details[0].this_layer_requires_forward_output(); 
-        } 
+        )
+        {
+            return details[0].this_layer_requires_forward_output();
+        }
 
         void disable_output_and_gradient_getters (
-        ) 
-        { 
+        )
+        {
             details[0].disable_output_and_gradient_getters();
         }
 
 
-        std::vector<repeated_layer_type> details; 
+        std::vector<repeated_layer_type> details;
         subnet_type subnetwork;
 
         // temp_tensor doesn't logically contribute to the state of this class.
@@ -1802,7 +1802,7 @@ namespace dlib
 
     template <
         size_t num,
-        template<typename> class REPEATED_LAYER, 
+        template<typename> class REPEATED_LAYER,
         typename SUBNET
         >
     struct is_nonloss_layer_type<repeat<num,REPEATED_LAYER,SUBNET>> : std::true_type {};
@@ -1835,7 +1835,7 @@ namespace dlib
         template <typename T, typename E>
         add_tag_layer(
             const add_tag_layer<ID,T,E>& item
-        ) : input_layer(item.subnet()), 
+        ) : input_layer(item.subnet()),
             cached_output(item.cached_output),
             cached_output_ptr(nullptr),
             grad_final(item.grad_final),
@@ -1845,7 +1845,7 @@ namespace dlib
         template <typename ...T>
         add_tag_layer(
             T ...args
-        ) : 
+        ) :
             input_layer(std::move(args)...),
             cached_output_ptr(nullptr),
             gradient_input_is_stale(true)
@@ -1854,7 +1854,7 @@ namespace dlib
 
         add_tag_layer (
             std::tuple<>
-        ) : 
+        ) :
             cached_output_ptr(nullptr),
             gradient_input_is_stale(true)
         {}
@@ -1871,7 +1871,7 @@ namespace dlib
 
         template <typename input_iterator>
         const tensor& operator() (
-            input_iterator ibegin, 
+            input_iterator ibegin,
             input_iterator iend
         )
         {
@@ -1890,7 +1890,7 @@ namespace dlib
             // If this tag is the first layer in one of the sub networks inside a repeat
             // layer then we don't want it to be creating copies of x.  This is because, we
             // can just hold a pointer to x since the way repeat is constructed guarantees
-            // that x will have a lifetime larger than this pointer. 
+            // that x will have a lifetime larger than this pointer.
             if (is_same_type<INPUT_LAYER, impl::repeat_input_layer>::value)
                 cached_output_ptr = const_cast<tensor*>(&x);
             else
@@ -1899,19 +1899,19 @@ namespace dlib
             return get_output();
         }
 
-        const tensor& get_output() const 
-        { 
+        const tensor& get_output() const
+        {
             if (cached_output_ptr)
                 return *cached_output_ptr;
             else
-                return cached_output; 
+                return cached_output;
         }
 
         const tensor& get_final_data_gradient(
         ) const { return grad_final; }
 
-        tensor& get_gradient_input() 
-        { 
+        tensor& get_gradient_input()
+        {
             if (!have_same_dimensions(get_output(), grad_final) ||
                 gradient_input_is_stale)
             {
@@ -1919,7 +1919,7 @@ namespace dlib
                 grad_final = 0;
                 gradient_input_is_stale = false;
             }
-            return grad_final; 
+            return grad_final;
         }
 
         void back_propagate_error(const tensor& /*x*/)
@@ -2002,22 +2002,22 @@ namespace dlib
         // You woudln't put a tag on a layer if you didn't want to access its forward
         // outputs.  So this is always true.
         bool this_layer_requires_forward_output(
-        ) { return true; } 
+        ) { return true; }
 
         void disable_output_and_gradient_getters (
-        ) 
-        { 
+        )
+        {
             // This should never happen because only inplace layers call
             // disable_output_and_gradient_getters(), however, putting a tag layer right
             // before an inplace layer basically means you don't want the following layer
             // to operate in place.  So the inplace layer should turn itself into an
-            // out-of-place layer and not call disable_output_and_gradient_getters(). 
+            // out-of-place layer and not call disable_output_and_gradient_getters().
             DLIB_CASSERT(false,"This should never happen");
         }
 
         tensor& private_get_output() const
         { return const_cast<tensor&>(get_output()); }
-        tensor& private_get_gradient_input() 
+        tensor& private_get_gradient_input()
         { return get_gradient_input(); }
 
         void swap(add_tag_layer& item)
@@ -2059,7 +2059,7 @@ namespace dlib
         // implementation).
         no_label_type(){};
         template <typename LOSS_DETAILS, typename SUBNET> friend class add_loss_layer;
-        template < typename net_type, typename solver_type > friend class dnn_trainer; 
+        template < typename net_type, typename solver_type > friend class dnn_trainer;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -2088,8 +2088,8 @@ namespace dlib
         const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         typedef typename get_loss_layer_label_type<LOSS_DETAILS>::type label_type;
 
-        static_assert(is_nonloss_layer_type<SUBNET>::value, 
-            "SUBNET must be of type add_layer, add_skip_layer, or add_tag_layer."); 
+        static_assert(is_nonloss_layer_type<SUBNET>::value,
+            "SUBNET must be of type add_layer, add_skip_layer, or add_tag_layer.");
         static_assert(sample_expansion_factor == LOSS_DETAILS::sample_expansion_factor,
             "The loss layer and input layer must agree on the sample_expansion_factor.");
 
@@ -2103,27 +2103,27 @@ namespace dlib
         template <typename T, typename U>
         add_loss_layer(
             const add_loss_layer<T,U>& item
-        ) : 
+        ) :
             loss(item.loss_details()),
             subnetwork(item.subnet())
         {}
 
         template <typename ...T>
         add_loss_layer(
-            const LOSS_DETAILS& layer_det, 
+            const LOSS_DETAILS& layer_det,
             T&& ...args
-        ) : 
-            loss(layer_det), 
+        ) :
+            loss(layer_det),
             subnetwork(std::forward<T>(args)...)
         {
         }
 
         template <typename ...T>
         add_loss_layer(
-            LOSS_DETAILS&& layer_det, 
+            LOSS_DETAILS&& layer_det,
             T&& ...args
-        ) : 
-            loss(std::move(layer_det)), 
+        ) :
+            loss(std::move(layer_det)),
             subnetwork(std::forward<T>(args)...)
         {
         }
@@ -2131,7 +2131,7 @@ namespace dlib
         template <typename ...T>
         add_loss_layer(
             T ...args
-        ) : 
+        ) :
             subnetwork(std::move(args)...)
         {
         }
@@ -2148,7 +2148,7 @@ namespace dlib
 
         template <typename output_iterator>
         void operator() (
-            const tensor& x, 
+            const tensor& x,
             output_iterator obegin
         )
         {
@@ -2193,7 +2193,7 @@ namespace dlib
         template <typename label_iterator>
         double compute_loss (
             const tensor& x,
-            label_iterator lbegin 
+            label_iterator lbegin
         )
         {
             subnetwork.forward(x);
@@ -2205,7 +2205,7 @@ namespace dlib
         double compute_loss (
             input_iterator ibegin,
             input_iterator iend,
-            label_iterator lbegin 
+            label_iterator lbegin
         )
         {
             to_tensor(ibegin,iend,temp_tensor);
@@ -2454,7 +2454,7 @@ namespace dlib
         // This overload catches subnet_wrapper templates.
         template <template<typename> class Match, typename T, unsigned int i>
         struct layer_helper_match<Match,T,i,
-            typename std::enable_if<std::is_same<const typename T::wrapped_type, 
+            typename std::enable_if<std::is_same<const typename T::wrapped_type,
                                                  const Match<typename T::wrapped_type::subnet_type>>::value>::type>
         {
             using type = typename layer_helper<i,T>::type;
@@ -2466,19 +2466,19 @@ namespace dlib
     }
 
     template <unsigned int i, typename T>
-    typename impl::layer_helper<i,T>::type& layer (T& n) 
+    typename impl::layer_helper<i,T>::type& layer (T& n)
     {
         return impl::layer_helper<i,T>::layer(n);
     }
 
     template <template<typename> class Match, typename T>
-    typename impl::layer_helper_match<Match,T,0>::type& layer (T& n) 
+    typename impl::layer_helper_match<Match,T,0>::type& layer (T& n)
     {
         return impl::layer_helper_match<Match,T,0>::layer(n);
     }
 
     template <template<typename> class Match, unsigned int i, typename T>
-    typename impl::layer_helper_match<Match,T,i>::type& layer (T& n) 
+    typename impl::layer_helper_match<Match,T,i>::type& layer (T& n)
     {
         return impl::layer_helper_match<Match,T,i>::layer(n);
     }
@@ -2512,8 +2512,8 @@ namespace dlib
         template <typename ...T>
         add_skip_layer(
             T ...args
-        ) : 
-            subnetwork(std::move(args)...) 
+        ) :
+            subnetwork(std::move(args)...)
         {
         }
 
@@ -2549,20 +2549,20 @@ namespace dlib
             return layer<TAG_TYPE>(subnetwork).get_output();
         }
 
-        const tensor& get_output() const 
-        { 
+        const tensor& get_output() const
+        {
             return layer<TAG_TYPE>(subnetwork).get_output();
         }
 
-        tensor& get_gradient_input() 
-        { 
+        tensor& get_gradient_input()
+        {
             return layer<TAG_TYPE>(subnetwork).get_gradient_input();
         }
 
         const tensor& get_final_data_gradient(
-        ) const 
-        { 
-            return subnetwork.get_final_data_gradient(); 
+        ) const
+        {
+            return subnetwork.get_final_data_gradient();
         }
 
         void back_propagate_error(const tensor& x)
@@ -2583,14 +2583,14 @@ namespace dlib
         ) { return params_grad; }
 
 
-        const subnet_type& subnet() const 
-        { 
-            return subnetwork; 
+        const subnet_type& subnet() const
+        {
+            return subnetwork;
         }
 
-        subnet_type& subnet() 
-        { 
-            return subnetwork; 
+        subnet_type& subnet()
+        {
+            return subnetwork;
         }
 
         void clean()
@@ -2642,14 +2642,14 @@ namespace dlib
         friend class repeat;
 
         bool this_layer_requires_forward_output(
-        ) { return layer<TAG_TYPE>(subnetwork).this_layer_requires_forward_output(); } 
+        ) { return layer<TAG_TYPE>(subnetwork).this_layer_requires_forward_output(); }
 
         void disable_output_and_gradient_getters (
         ) { layer<TAG_TYPE>(subnetwork).disable_output_and_gradient_getters(); }
 
         tensor& private_get_output() const
         { return layer<TAG_TYPE>(subnetwork).private_get_output(); }
-        tensor& private_get_gradient_input() 
+        tensor& private_get_gradient_input()
         { return layer<TAG_TYPE>(subnetwork).private_get_gradient_input(); }
 
         subnet_type subnetwork;
@@ -2699,12 +2699,12 @@ namespace dlib
                 data[i] = rnd.get_random_gaussian()*sigma;
         }
 
-        class test_layer_subnet 
+        class test_layer_subnet
         {
         public:
             test_layer_subnet (
                 dlib::rand& rnd_
-            ) : rnd(rnd_) 
+            ) : rnd(rnd_)
             {
                 // Output and gradient_input have to have the same dimensions in each
                 // layer.
@@ -2799,7 +2799,7 @@ namespace dlib
         >
     layer_test_results impl_test_layer (
         layer_details_type l,
-        const float base_eps 
+        const float base_eps
     )
     {
         using namespace timpl;
@@ -2866,7 +2866,7 @@ namespace dlib
                     using namespace std;
                     sout << "This layer is supposed to support in-place computations but the output of forward_inplace()\n";
                     sout << "changes when invoked in-place vs. out-of-place. The error was: " << forward_error << endl;
-                    return layer_test_results(sout.str()); 
+                    return layer_test_results(sout.str());
                 }
 
                 resizable_tensor params_grad;
@@ -2898,7 +2898,7 @@ namespace dlib
                         using namespace std;
                         sout << "This layer is supposed to support in-place computations but the output of backward_inplace()\n";
                         sout << "changes when invoked in-place vs. out-of-place. The error was: " << backward_param_error << endl;
-                        return layer_test_results(sout.str()); 
+                        return layer_test_results(sout.str());
                     }
                 }
                 const auto backward_data_error = max(abs(mat(data_grad1)-9 - mat(data_grad2)));
@@ -2907,7 +2907,7 @@ namespace dlib
                     using namespace std;
                     sout << "This layer is supposed to support in-place computations but the output of backward_inplace()\n";
                     sout << "changes when invoked in-place vs. out-of-place. The error was: " << backward_data_error << endl;
-                    return layer_test_results(sout.str()); 
+                    return layer_test_results(sout.str());
                 }
             }
 
@@ -2945,7 +2945,7 @@ namespace dlib
                     sout << "expected derivative: " << reference_derivative << endl;
                     sout << "output derivative:   " << output_derivative << endl;
                     sout << "iteration:           " << iter << endl;
-                    return layer_test_results(sout.str()); 
+                    return layer_test_results(sout.str());
                 }
             }
 
@@ -2982,7 +2982,7 @@ namespace dlib
                     sout << "expected derivative: " << reference_derivative << endl;
                     sout << "output derivative:   " << output_derivative << endl;
                     sout << "iteration:           " << iter << endl;
-                    return layer_test_results(sout.str()); 
+                    return layer_test_results(sout.str());
                 }
             }
 
@@ -2992,13 +2992,13 @@ namespace dlib
         {
             using namespace std;
             sout << "Average parameter gradient error is somewhat large at: "<< rs_params.mean() << endl;
-            return layer_test_results(sout.str()); 
+            return layer_test_results(sout.str());
         }
         if (rs_data.mean() > 0.003)
         {
             using namespace std;
             sout << "Average data gradient error is somewhat large at: "<< rs_data.mean() << endl;
-            return layer_test_results(sout.str()); 
+            return layer_test_results(sout.str());
         }
 
         return layer_test_results();
@@ -3011,7 +3011,7 @@ namespace dlib
         layer_details_type l
     )
     {
-        // Try a few different derivative step sizes to see if any work. 
+        // Try a few different derivative step sizes to see if any work.
         for (float base_eps = 0.0001; base_eps < 0.1; base_eps *= 2)
         {
             auto result = impl_test_layer(l, base_eps);
@@ -3068,7 +3068,7 @@ namespace dlib
             static void visit(
                 size_t,
                 net_type&,
-                visitor&& 
+                visitor&&
             )
             {
                 // Base case of recursion.  Don't do anything.
@@ -3135,7 +3135,7 @@ namespace dlib
             static void visit(
                 size_t,
                 net_type&,
-                visitor&& 
+                visitor&&
             )
             {
                 // Base case of recursion.  Don't do anything.

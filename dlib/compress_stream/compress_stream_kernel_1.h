@@ -46,9 +46,9 @@ namespace dlib
 
     public:
 
-        class decompression_error : public dlib::error 
-        { 
-            public: 
+        class decompression_error : public dlib::error
+        {
+            public:
                 decompression_error(
                     const char* i
                 ) :
@@ -133,7 +133,7 @@ namespace dlib
             temp = in.sbumpc();
 
             // if we have hit EOF then encode the marker symbol
-            if (temp != EOF)  
+            if (temp != EOF)
             {
                 // encode the symbol
                 model.encode(static_cast<unsigned long>(temp));
@@ -158,7 +158,7 @@ namespace dlib
 
                 break;
             }
-        }      
+        }
     }
 
 // ----------------------------------------------------------------------------------------

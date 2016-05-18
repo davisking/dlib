@@ -29,17 +29,17 @@ namespace dlib
         DLIB_ASSERT(is_graph_labeling_problem(samples, labels, reason_for_failure) ,
             "\t matrix test_graph_labeling_function()"
             << "\n\t invalid inputs were given to this function"
-            << "\n\t samples.size(): " << samples.size() 
-            << "\n\t reason_for_failure: " << reason_for_failure 
+            << "\n\t samples.size(): " << samples.size()
+            << "\n\t reason_for_failure: " << reason_for_failure
             );
         DLIB_ASSERT((losses.size() == 0 || sizes_match(labels, losses) == true) &&
                     all_values_are_nonnegative(losses) == true,
                 "\t matrix test_graph_labeling_function()"
                 << "\n\t Invalid inputs were given to this function."
-                << "\n\t labels.size():  " << labels.size() 
-                << "\n\t losses.size():  " << losses.size() 
-                << "\n\t sizes_match(labels,losses): " << sizes_match(labels,losses) 
-                << "\n\t all_values_are_nonnegative(losses): " << all_values_are_nonnegative(losses) 
+                << "\n\t labels.size():  " << labels.size()
+                << "\n\t losses.size():  " << losses.size()
+                << "\n\t sizes_match(labels,losses): " << sizes_match(labels,losses)
+                << "\n\t all_values_are_nonnegative(losses): " << all_values_are_nonnegative(losses)
                  );
 #endif
 
@@ -55,7 +55,7 @@ namespace dlib
 
             for (unsigned long j = 0; j < labels[i].size(); ++j)
             {
-                // What is the loss for this example?  It's just 1 unless we have a 
+                // What is the loss for this example?  It's just 1 unless we have a
                 // per example loss vector.
                 const double loss = (losses.size() == 0) ? 1.0 : losses[i][j];
 
@@ -76,11 +76,11 @@ namespace dlib
 
         matrix<double, 1, 2> res;
         if (num_pos != 0)
-            res(0) = num_pos_correct/num_pos; 
+            res(0) = num_pos_correct/num_pos;
         else
             res(0) = 1;
         if (num_neg != 0)
-            res(1) = num_neg_correct/num_neg; 
+            res(1) = num_neg_correct/num_neg;
         else
             res(1) = 1;
         return res;
@@ -119,22 +119,22 @@ namespace dlib
         DLIB_ASSERT(is_graph_labeling_problem(samples, labels, reason_for_failure),
             "\t matrix cross_validate_graph_labeling_trainer()"
             << "\n\t invalid inputs were given to this function"
-            << "\n\t samples.size(): " << samples.size() 
-            << "\n\t reason_for_failure: " << reason_for_failure 
+            << "\n\t samples.size(): " << samples.size()
+            << "\n\t reason_for_failure: " << reason_for_failure
             );
         DLIB_ASSERT( 1 < folds && folds <= static_cast<long>(samples.size()),
             "\t matrix cross_validate_graph_labeling_trainer()"
             << "\n\t invalid inputs were given to this function"
-            << "\n\t folds:  " << folds 
+            << "\n\t folds:  " << folds
             );
         DLIB_ASSERT((losses.size() == 0 || sizes_match(labels, losses) == true) &&
                     all_values_are_nonnegative(losses) == true,
                 "\t matrix cross_validate_graph_labeling_trainer()"
                 << "\n\t Invalid inputs were given to this function."
-                << "\n\t labels.size():  " << labels.size() 
-                << "\n\t losses.size():  " << losses.size() 
-                << "\n\t sizes_match(labels,losses): " << sizes_match(labels,losses) 
-                << "\n\t all_values_are_nonnegative(losses): " << all_values_are_nonnegative(losses) 
+                << "\n\t labels.size():  " << labels.size()
+                << "\n\t losses.size():  " << losses.size()
+                << "\n\t sizes_match(labels,losses): " << sizes_match(labels,losses)
+                << "\n\t all_values_are_nonnegative(losses): " << all_values_are_nonnegative(losses)
                  );
 #endif
 
@@ -200,7 +200,7 @@ namespace dlib
                 labeler(samples_test[i], temp);
                 for (unsigned long j = 0; j < labels_test[i].size(); ++j)
                 {
-                    // What is the loss for this example?  It's just 1 unless we have a 
+                    // What is the loss for this example?  It's just 1 unless we have a
                     // per example loss vector.
                     const double loss = (losses_test.size() == 0) ? 1.0 : losses_test[i][j];
 
@@ -224,11 +224,11 @@ namespace dlib
 
         matrix<double, 1, 2> res;
         if (num_pos != 0)
-            res(0) = num_pos_correct/num_pos; 
+            res(0) = num_pos_correct/num_pos;
         else
             res(0) = 1;
         if (num_neg != 0)
-            res(1) = num_neg_correct/num_neg; 
+            res(1) = num_neg_correct/num_neg;
         else
             res(1) = 1;
         return res;

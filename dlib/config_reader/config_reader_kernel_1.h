@@ -23,18 +23,18 @@ namespace dlib
         typename map_string_void,
         typename tokenizer
         >
-    class config_reader_kernel_1 
+    class config_reader_kernel_1
     {
 
-        /*!                
+        /*!
             REQUIREMENTS ON map_string_string
                 is an implementation of map/map_kernel_abstract.h that maps std::string to std::string
 
-            REQUIREMENTS ON map_string_void 
+            REQUIREMENTS ON map_string_void
                 is an implementation of map/map_kernel_abstract.h that maps std::string to void*
 
             REQUIREMENTS ON tokenizer
-                is an implementation of tokenizer/tokenizer_kernel_abstract.h 
+                is an implementation of tokenizer/tokenizer_kernel_abstract.h
 
             CONVENTION
                 key_table.is_in_domain(x) == is_key_defined(x)
@@ -51,22 +51,22 @@ namespace dlib
 #ifndef DLIB_ISO_CPP_ONLY
         typedef config_reader_thread_safe_1<
             config_reader_kernel_1,
-            map_string_void 
+            map_string_void
             > thread_safe_1a;
 #endif // DLIB_ISO_CPP_ONLY
 
 
         config_reader_kernel_1();
 
-        class config_reader_error : public dlib::error 
+        class config_reader_error : public dlib::error
         {
             friend class config_reader_kernel_1;
             config_reader_error(
-                unsigned long ln, 
+                unsigned long ln,
                 bool r = false
-            ) : 
+            ) :
                 dlib::error(ECONFIG_READER),
-                line_number(ln), 
+                line_number(ln),
                 redefinition(r)
             {
                 std::ostringstream sout;
@@ -80,12 +80,12 @@ namespace dlib
             const bool redefinition;
         };
 
-        class file_not_found : public dlib::error 
+        class file_not_found : public dlib::error
         {
             friend class config_reader_kernel_1;
             file_not_found(
                 const std::string& file_name_
-            ) : 
+            ) :
                 dlib::error(ECONFIG_READER, "Error in config_reader, unable to open file " + file_name_),
                 file_name(file_name_)
             {}
@@ -102,9 +102,9 @@ namespace dlib
             config_reader_access_error(
                 const std::string& block_name_,
                 const std::string& key_name_
-            ) : 
+            ) :
                 dlib::error(ECONFIG_READER),
-                block_name(block_name_), 
+                block_name(block_name_),
                 key_name(key_name_)
             {
                 std::ostringstream sout;
@@ -123,7 +123,7 @@ namespace dlib
         };
 
         config_reader_kernel_1(
-            const std::string& config_file 
+            const std::string& config_file
         );
 
         config_reader_kernel_1(
@@ -131,7 +131,7 @@ namespace dlib
         );
 
         virtual ~config_reader_kernel_1(
-        ); 
+        );
 
         void clear (
         );
@@ -169,14 +169,14 @@ namespace dlib
         ) const;
 
         template <
-            typename alloc 
+            typename alloc
             >
         void get_keys (
             std::vector<std::string,alloc>& keys
         ) const;
 
         template <
-            typename alloc 
+            typename alloc
             >
         void get_keys (
             std_vector_c<std::string,alloc>& keys
@@ -190,14 +190,14 @@ namespace dlib
         ) const;
 
         template <
-            typename alloc 
+            typename alloc
             >
         void get_blocks (
             std::vector<std::string,alloc>& blocks
         ) const;
 
         template <
-            typename alloc 
+            typename alloc
             >
         void get_blocks (
             std_vector_c<std::string,alloc>& blocks
@@ -226,7 +226,7 @@ namespace dlib
         map_string_void block_table;
 
         // restricted functions
-        config_reader_kernel_1(config_reader_kernel_1&);     
+        config_reader_kernel_1(config_reader_kernel_1&);
         config_reader_kernel_1& operator=(config_reader_kernel_1&);
 
     };
@@ -431,13 +431,13 @@ namespace dlib
                         if (type == tokenizer::CHAR && token[0] == '\\')
                         {
                             tok.get_token(type,token);
-                            if (tok.peek_type() == tokenizer::CHAR && 
+                            if (tok.peek_type() == tokenizer::CHAR &&
                                 tok.peek_token()[0] == '#')
                             {
                                 tok.get_token(type,token);
                                 value += '#';
                             }
-                            else if (tok.peek_type() == tokenizer::CHAR && 
+                            else if (tok.peek_type() == tokenizer::CHAR &&
                                 tok.peek_token()[0] == '}')
                             {
                                 tok.get_token(type,token);
@@ -448,7 +448,7 @@ namespace dlib
                                 value += '\\';
                             }
                         }
-                        else if (type == tokenizer::CHAR && 
+                        else if (type == tokenizer::CHAR &&
                                  (token[0] == '#' || token[0] == '}'))
                         {
                             break;
@@ -488,7 +488,7 @@ namespace dlib
                     try { cr.block_table.add(identifier,vtemp); }
                     catch (...) { delete new_cr; throw; }
 
-                    // now parse this block 
+                    // now parse this block
                     parse_config_file(*new_cr,tok,line_number,false);
                 }
             }
@@ -501,7 +501,7 @@ namespace dlib
                 seen_identifier = true;
                 identifier = token;
             }
-        } // while (true) 
+        } // while (true)
     }
 
 // ----------------------------------------------------------------------------------------
@@ -513,7 +513,7 @@ namespace dlib
         >
     config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
     ~config_reader_kernel_1(
-    ) 
+    )
     {
         clear();
     }
@@ -621,7 +621,7 @@ namespace dlib
         typename tokenizer
         >
     template <
-        typename alloc 
+        typename alloc
         >
     void config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
     get_keys (
@@ -644,7 +644,7 @@ namespace dlib
         typename tokenizer
         >
     template <
-        typename alloc 
+        typename alloc
         >
     void config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
     get_keys (
@@ -692,7 +692,7 @@ namespace dlib
         typename tokenizer
         >
     template <
-        typename alloc 
+        typename alloc
         >
     void config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
     get_blocks (
@@ -715,7 +715,7 @@ namespace dlib
         typename tokenizer
         >
     template <
-        typename alloc 
+        typename alloc
         >
     void config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
     get_blocks (

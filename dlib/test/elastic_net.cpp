@@ -10,7 +10,7 @@
 #include <sstream>
 #include <ctime>
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -74,9 +74,9 @@ namespace
         test_elastic_net (
         ) :
             tester (
-                "test_elastic_net",       
-                "Run tests on the elastic_net object.", 
-                0                     
+                "test_elastic_net",
+                "Run tests on the elastic_net object.",
+                0
             )
         {
         }
@@ -105,7 +105,7 @@ namespace
             {
                 print_spinner();
                 dlog << LINFO << "s: "<< s;
-                // make sure the two solvers agree.  
+                // make sure the two solvers agree.
                 results = basic_elastic_net(X, Y, ridge_lambda, lasso_budget*s, eps);
                 results2 = solver(ridge_lambda, lasso_budget*s);
                 dlog << LINFO << "error: "<< max(abs(results - results2));

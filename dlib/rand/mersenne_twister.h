@@ -22,17 +22,17 @@
 #include "../uintn.h"
 #include "../serialize.h"
 
-namespace dlib 
+namespace dlib
 {
-    namespace random_helpers 
+    namespace random_helpers
     {
 
     // ------------------------------------------------------------------------------------
 
         // http://www.math.keio.ac.jp/matumoto/emt.html
         template<
-            class UIntType, 
-            int w, 
+            class UIntType,
+            int w,
             int n,
             int m,
             int r,
@@ -73,7 +73,7 @@ namespace dlib
 
             void seed(UIntType value)
             {
-                // New seeding algorithm from 
+                // New seeding algorithm from
                 // http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/emt19937ar.html
                 // In the previous versions, MSBs of the seed affected only MSBs of the
                 // state x[].
@@ -98,7 +98,7 @@ namespace dlib
             result_type operator()();
 
             friend void serialize(
-                const mersenne_twister& item, 
+                const mersenne_twister& item,
                 std::ostream& out
             )
             {
@@ -107,8 +107,8 @@ namespace dlib
             }
 
             friend void deserialize(
-                mersenne_twister& item, 
-                std::istream& in 
+                mersenne_twister& item,
+                std::istream& in
             )
             {
                 dlib::deserialize(item.x, in);
@@ -125,7 +125,7 @@ namespace dlib
             // The goal is to always have x(i-n) ... x(i-1) available for
             // operator== and save/restore.
 
-            UIntType x[2*n]; 
+            UIntType x[2*n];
             int i;
         };
 
@@ -203,7 +203,7 @@ namespace dlib
     typedef random_helpers::mersenne_twister<uint32,32,624,397,31,0x9908b0df,11,
     7,0x9d2c5680,15,0xefc60000,18, 3346425566U> mt19937;
 
-} // namespace dlib 
+} // namespace dlib
 
 
 #endif // DLIB_BOOST_RANDOM_MERSENNE_TWISTER_HPP

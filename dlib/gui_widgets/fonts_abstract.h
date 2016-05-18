@@ -14,11 +14,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class letter 
-    {    
+    class letter
+    {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object represents a letter in a font.  It tells you the nominal 
+                This object represents a letter in a font.  It tells you the nominal
                 width of the letter and which pixels form the letter.
 
             THREAD SAFETY
@@ -26,15 +26,15 @@ namespace dlib
                 be modifying it then you must serialize access to it.
         !*/
     public:
-        struct point 
+        struct point
         {
             /*!
                 WHAT THIS OBJECT REPRESENTS
-                    This object represents one of the pixels of a letter.  
+                    This object represents one of the pixels of a letter.
                     
-                    The origin (i.e. (0,0)) of the coordinate plane is at the left 
-                    side of the letter's baseline.  Also note that y is negative when 
-                    above the baseline and positive below (it is zero on the baseline 
+                    The origin (i.e. (0,0)) of the coordinate plane is at the left
+                    side of the letter's baseline.  Also note that y is negative when
+                    above the baseline and positive below (it is zero on the baseline
                     itself).
 
                     The x value is positive going to the right and negative to the left.
@@ -46,7 +46,7 @@ namespace dlib
             );
             /*!
                 ensures
-                    - This constructor does nothing.  The value of x and y 
+                    - This constructor does nothing.  The value of x and y
                       are undefined after its execution.
             !*/
 
@@ -71,8 +71,8 @@ namespace dlib
         );
         /*!
             ensures
-                - #width() == 0 
-                - #num_of_points() == 0 
+                - #width() == 0
+                - #num_of_points() == 0
         !*/
 
         letter (
@@ -96,10 +96,10 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the width reserved for this letter in pixels.  This is the 
-                  number of pixels that are reserved for this letter between adjoining 
-                  letters.  It isn't necessarily the width of the actual letter itself.  
-                  (for example, you can make a letter with a width less than how wide it 
+                - returns the width reserved for this letter in pixels.  This is the
+                  number of pixels that are reserved for this letter between adjoining
+                  letters.  It isn't necessarily the width of the actual letter itself.
+                  (for example, you can make a letter with a width less than how wide it
                   actually is so that it overlaps with its neighbor letters.)
         !*/
 
@@ -156,17 +156,17 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void serialize (
-        const letter& item, 
-        std::ostream& out 
-    );   
+        const letter& item,
+        std::ostream& out
+    );
     /*!
         provides serialization support for letter objects
     !*/
 
     void deserialize (
-        letter& item, 
+        letter& item,
         std::istream& in
-    );   
+    );
     /*!
         provides deserialization support for letter objects
     !*/
@@ -218,7 +218,7 @@ namespace dlib
         ) const = 0;
         /*!
             ensures
-                - returns the height in pixels of the tallest letter in the font                
+                - returns the height in pixels of the tallest letter in the font
         !*/
 
         virtual const unsigned long ascender (
@@ -231,7 +231,7 @@ namespace dlib
 
         virtual const unsigned long left_overflow (
         ) const = 0;
-        /*! 
+        /*!
             ensures
                 - returns how far outside and to the left of its width a letter
                   from this font may set pixels.  (i.e. how many extra pixels to its
@@ -240,7 +240,7 @@ namespace dlib
 
         virtual const unsigned long right_overflow (
         ) const = 0;
-        /*! 
+        /*!
             ensures
                 - returns how far outside and to the right of its width a letter
                   from this font may set pixels.  (i.e. how many extra pixels to its
@@ -264,14 +264,14 @@ namespace dlib
                 - all characters in str with an index < first are ignored by this
                   function.
                 - if (last != std::basic_string<T,traits,alloc>::npos) then
-                    - all characters in str with an index > last are ignored by 
+                    - all characters in str with an index > last are ignored by
                       this function.
                 - if (str.size() == 0) then
                     - #width == 0
                     - #height == 0
                 - else
-                    - #width == sum of the widths of the characters in the widest 
-                      line in str + left_overflow() + right_overflow(). 
+                    - #width == sum of the widths of the characters in the widest
+                      line in str + left_overflow() + right_overflow().
                     - #height == (count(str.begin(),str.end(),'\n')+1)*height()
         !*/
 
@@ -294,15 +294,15 @@ namespace dlib
                 - all characters in str with an index < first are ignored by this
                   function.
                 - if (last != std::basic_string<T,traits,alloc>::npos) then
-                    - all characters in str with an index > last are ignored by 
+                    - all characters in str with an index > last are ignored by
                       this function.
                 - if (str.size() == 0) then
                     - does nothing
                 - else
-                    - draws str on the given canvas at the position defined by rect.  
+                    - draws str on the given canvas at the position defined by rect.
                       Also uses the given pixel colors for the font color.
                 - If the string is too big to fit in rect then the right and
-                  bottom sides of it will be clipped to make it fit.                  
+                  bottom sides of it will be clipped to make it fit.
                 - only the part of the string that is contained inside the area
                   rectangle will be drawn
         !*/
@@ -321,7 +321,7 @@ namespace dlib
                     - first <= last
                     - last < str.size()
             ensures
-                - the returned rectangle has a width of 1 and a 
+                - the returned rectangle has a width of 1 and a
                   height of this->height().
                 - computes the location of the cursor that would sit just before
                   the character str[index] if str were drawn on the screen by
@@ -381,8 +381,8 @@ namespace dlib
                 This is an implementation of the Helvetica 12 point font.
 
             THREAD SAFETY
-                It is safe to call get_font() and access the returned font from any 
-                thread and no synchronization is needed as long as it is called 
+                It is safe to call get_font() and access the returned font from any
+                thread and no synchronization is needed as long as it is called
                 after the main() function has been entered.
         !*/
 
@@ -403,7 +403,7 @@ namespace dlib
         // restricted functions
         default_font();        // normal constructor
         default_font(default_font&);        // copy constructor
-        default_font& operator=(default_font&);    // assignment operator   
+        default_font& operator=(default_font&);    // assignment operator
     };
 
 // ----------------------------------------------------------------------------------------
@@ -413,20 +413,20 @@ namespace dlib
     
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is a font object that is capable of loading of loading BDF (Glyph 
+                This is a font object that is capable of loading of loading BDF (Glyph
                 Bitmap Distribution Format) font files.
 
             THREAD SAFETY
-                If you only access this object via the functions in the parent class font 
+                If you only access this object via the functions in the parent class font
                 then this object is thread safe.  But if you need to call any of the
-                functions introduced in this derived class then you need to serialize 
+                functions introduced in this derived class then you need to serialize
                 access to this object while you call these functions.
         !*/
 
     public:
 
-        bdf_font( 
-            long default_char = -1 
+        bdf_font(
+            long default_char = -1
         );
         /*!
             ensures
@@ -444,10 +444,10 @@ namespace dlib
                       letter (*this)[default_char].
         !*/
     
-        long read_bdf_file( 
-            std::istream& in, 
-            unichar max_enc, 
-            unichar min_enc = 0 
+        long read_bdf_file(
+            std::istream& in,
+            unichar max_enc,
+            unichar min_enc = 0
         );
         /*!
             ensures
@@ -463,8 +463,8 @@ namespace dlib
         void adjust_metrics();
         /*!
             ensures
-                - Computes metrics based on actual glyphs loaded, instead of using 
-                  the values in the bdf file header. (May be useful if loading glyphs 
+                - Computes metrics based on actual glyphs loaded, instead of using
+                  the values in the bdf file header. (May be useful if loading glyphs
                   from more than one file or a small part of a file.)
         !*/
 

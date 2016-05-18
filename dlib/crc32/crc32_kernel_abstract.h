@@ -10,46 +10,46 @@
 namespace dlib
 {
 
-    class crc32 
+    class crc32
     {
         /*!
             INITIAL VALUE
-                The current checksum covers zero bytes. 
+                The current checksum covers zero bytes.
                 get_checksum() == 0x00000000
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents the CRC32 algorithm for calculating
-                checksums.  
+                checksums.
         !*/
 
     public:
 
-        crc32 (        
+        crc32 (
         );
         /*!
-            ensures                
+            ensures
                 - #*this is properly initialized
         !*/
 
-        crc32 (        
+        crc32 (
             const std::string& item
         );
         /*!
-            ensures                
+            ensures
                 - #*this is properly initialized
                 - calls this->add(item).
-                  (i.e. Using this constructor is the same as using the default 
+                  (i.e. Using this constructor is the same as using the default
                   constructor and then calling add() on item)
         !*/
 
-        crc32 (        
+        crc32 (
             const std::vector<char>& item
         );
         /*!
-            ensures                
+            ensures
                 - #*this is properly initialized
                 - calls this->add(item).
-                  (i.e. Using this constructor is the same as using the default 
+                  (i.e. Using this constructor is the same as using the default
                   constructor and then calling add() on item)
         !*/
 
@@ -102,7 +102,7 @@ namespace dlib
         !*/
 
         operator unsigned long (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns get_checksum()
@@ -114,14 +114,14 @@ namespace dlib
         /*!
             ensures
                 - swaps *this and item
-        !*/ 
+        !*/
 
-    };    
+    };
 
     void swap (
-        crc32& a, 
-        crc32& b 
-    ) { a.swap(b); }   
+        crc32& a,
+        crc32& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/

@@ -11,7 +11,7 @@
 namespace dlib
 {
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     class sockstreambuf_unbuffered : public std::streambuf
     {
@@ -24,7 +24,7 @@ namespace dlib
                 flushes immediately (since it isn't buffers.  Moreover, it should be
                 pointed out that this object is deprecated and only present for backwards
                 compatibility with previous versions of dlib.  So you really should use the
-                sockstreambuf object instead.  
+                sockstreambuf object instead.
 
             INITIAL VALUE
                 con == a connection
@@ -81,10 +81,10 @@ namespace dlib
         );
 
         // input functions
-        int_type underflow( 
+        int_type underflow(
         );
 
-        int_type uflow( 
+        int_type uflow(
         );
 
         int_type pbackfail(
@@ -92,7 +92,7 @@ namespace dlib
         );
 
         std::streamsize xsgetn (
-            char_type* s, 
+            char_type* s,
             std::streamsize n
         );
 
@@ -106,7 +106,7 @@ namespace dlib
     
     };
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
 }
 

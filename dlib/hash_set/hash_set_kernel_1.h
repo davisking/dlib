@@ -18,7 +18,7 @@ namespace dlib
         typename T,
         unsigned long expnum,
         typename hash_table,
-        typename mem_manager = default_memory_manager 
+        typename mem_manager = default_memory_manager
         >
     class hash_set_kernel_1 : public enumerable<const T>,
                               public remover<T>
@@ -112,7 +112,7 @@ namespace dlib
             char junk;
 
             // restricted functions
-            hash_set_kernel_1(hash_set_kernel_1&);    
+            hash_set_kernel_1(hash_set_kernel_1&);
             hash_set_kernel_1& operator= ( hash_set_kernel_1&);
 
     };
@@ -124,9 +124,9 @@ namespace dlib
         typename mem_manager
         >
     inline void swap (
-        hash_set_kernel_1<T,expnum,hash_table,mem_manager>& a, 
-        hash_set_kernel_1<T,expnum,hash_table,mem_manager>& b 
-    ) { a.swap(b); } 
+        hash_set_kernel_1<T,expnum,hash_table,mem_manager>& a,
+        hash_set_kernel_1<T,expnum,hash_table,mem_manager>& b
+    ) { a.swap(b); }
 
     template <
         typename T,
@@ -152,9 +152,9 @@ namespace dlib
             }
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type hash_set_kernel_1"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type hash_set_kernel_1");
         }
     }
 

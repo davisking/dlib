@@ -99,9 +99,9 @@ TODO:
                 - the Content-Type header
         !*/
 
-        void set_callback_function( 
-            fnOnDownload od, 
-            void * _user_info 
+        void set_callback_function(
+            fnOnDownload od,
+            void * _user_info
         );
         /*!
             Set a callback function for one of the following events:
@@ -109,7 +109,7 @@ TODO:
         !*/
 
         void set_cookie(
-            const std::string& cookie_name, 
+            const std::string& cookie_name,
             const std::string& cookie_value
         );
         /*!
@@ -117,7 +117,7 @@ TODO:
         !*/
 
         void set_cookie(
-            const std::string& cookie_name, 
+            const std::string& cookie_name,
             long cookie_value
         );
         /*!
@@ -131,8 +131,8 @@ TODO:
             Remove a cookie if it's set
         !*/
 
-        void set_timeout( 
-            unsigned int milliseconds  
+        void set_timeout(
+            unsigned int milliseconds
         );
         /*!
             Set the maximum time how long a request can take. Setting this to 0 disables
@@ -140,7 +140,7 @@ TODO:
         !*/
 
         string_to_stringvector get_returned_headers(
-        ) const; 
+        ) const;
         /*!
             Returns all the headers which are returned in the download of the webpage.
         !*/
@@ -152,13 +152,13 @@ TODO:
         !*/
 
         const std::string& get_body (
-        ) const; 
+        ) const;
         /*!
             Retrieves the HTTP body.
         !*/
 
         const std::string& post_url (
-            const std::string& url, 
+            const std::string& url,
             const string_to_stringmap& postvars,
             const string_to_stringmap& filenames = string_to_stringmap()
         );
@@ -168,7 +168,7 @@ TODO:
         !*/
 
         const std::string& post_url (
-            const std::string& url, 
+            const std::string& url,
             const std::string& postbuffer
         );
         /*!
@@ -183,20 +183,20 @@ TODO:
             GET an url from the internet.
         !*/
 
-        bool has_error( 
+        bool has_error(
         ) const;
         /*!
             Has there happened an error?
         !*/
 
-        const std::string& get_error( 
+        const std::string& get_error(
         ) const;
         /*!
             Get the error explanation
         !*/
 
         static std::string urlencode(
-            const std::string& in, 
+            const std::string& in,
             bool post_encode = false
         );
         /*!

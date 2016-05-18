@@ -21,7 +21,7 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON feature_extractor
-                It must be an object that implements an interface compatible with 
+                It must be an object that implements an interface compatible with
                 the example_feature_extractor defined in dlib/svm/sequence_labeler_abstract.h.
 
             WHAT THIS OBJECT REPRESENTS
@@ -30,9 +30,9 @@ namespace dlib
                 sequence_labeler object which can be used to predict the labels of
                 new data sequences.
 
-                Note that this is just a convenience wrapper around the 
-                structural_svm_sequence_labeling_problem to make it look 
-                similar to all the other trainers in dlib.  
+                Note that this is just a convenience wrapper around the
+                structural_svm_sequence_labeling_problem to make it look
+                similar to all the other trainers in dlib.
         !*/
 
     public:
@@ -64,7 +64,7 @@ namespace dlib
                 - #get_max_iterations() == 10000
                 - #get_num_threads() == 2
                 - #get_max_cache_size() == 5
-                - #get_feature_extractor() == fe 
+                - #get_feature_extractor() == fe
         !*/
 
         const feature_extractor& get_feature_extractor (
@@ -75,11 +75,11 @@ namespace dlib
         !*/
 
         unsigned long num_labels (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns get_feature_extractor().num_labels()
-                  (i.e. returns the number of possible output labels for each 
+                  (i.e. returns the number of possible output labels for each
                   element of a sequence)
         !*/
 
@@ -95,7 +95,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the number of threads used during training.  You should 
+                - returns the number of threads used during training.  You should
                   usually set this equal to the number of processing cores on your
                   machine.
         !*/
@@ -115,9 +115,9 @@ namespace dlib
         /*!
             ensures
                 - returns the error epsilon that determines when training should stop.
-                  Smaller values may result in a more accurate solution but take longer 
-                  to train.  You can think of this epsilon value as saying "solve the 
-                  optimization problem until the average number of labeling mistakes per 
+                  Smaller values may result in a more accurate solution but take longer
+                  to train.  You can think of this epsilon value as saying "solve the
+                  optimization problem until the average number of labeling mistakes per
                   training sample is within epsilon of its optimal value".
         !*/
 
@@ -130,7 +130,7 @@ namespace dlib
         !*/
 
         unsigned long get_max_iterations (
-        ); 
+        );
         /*!
             ensures
                 - returns the maximum number of iterations the SVM optimizer is allowed to
@@ -149,18 +149,18 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - During training, this object basically runs the sequence_labeler on 
-                  each training sample, over and over.  To speed this up, it is possible to 
-                  cache the results of these labeler invocations.  This function returns the 
-                  number of cache elements per training sample kept in the cache.  Note 
-                  that a value of 0 means caching is not used at all.  
+                - During training, this object basically runs the sequence_labeler on
+                  each training sample, over and over.  To speed this up, it is possible to
+                  cache the results of these labeler invocations.  This function returns the
+                  number of cache elements per training sample kept in the cache.  Note
+                  that a value of 0 means caching is not used at all.
         !*/
 
         void be_verbose (
         );
         /*!
             ensures
-                - This object will print status messages to standard out so that a 
+                - This object will print status messages to standard out so that a
                   user can observe the progress of the algorithm.
         !*/
 
@@ -176,14 +176,14 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_oca() == item 
+                - #get_oca() == item
         !*/
 
         const oca get_oca (
         ) const;
         /*!
             ensures
-                - returns a copy of the optimizer used to solve the structural SVM problem.  
+                - returns a copy of the optimizer used to solve the structural SVM problem.
         !*/
 
         void set_c (
@@ -200,12 +200,12 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the SVM regularization parameter.  It is the parameter 
-                  that determines the trade-off between trying to fit the training 
-                  data (i.e. minimize the loss) or allowing more errors but hopefully 
-                  improving the generalization of the resulting sequence labeler.  Larger 
-                  values encourage exact fitting while smaller values of C may encourage 
-                  better generalization. 
+                - returns the SVM regularization parameter.  It is the parameter
+                  that determines the trade-off between trying to fit the training
+                  data (i.e. minimize the loss) or allowing more errors but hopefully
+                  improving the generalization of the resulting sequence labeler.  Larger
+                  values encourage exact fitting while smaller values of C may encourage
+                  better generalization.
         !*/
 
         double get_loss (
@@ -243,11 +243,11 @@ namespace dlib
                 - contains_invalid_labeling(get_feature_extractor(), x, y) == false
                 - for all valid i and j: y[i][j] < num_labels()
             ensures
-                - Uses the structural_svm_sequence_labeling_problem to train a 
-                  sequence_labeler on the given x/y training pairs.  The idea is 
+                - Uses the structural_svm_sequence_labeling_problem to train a
+                  sequence_labeler on the given x/y training pairs.  The idea is
                   to learn to predict a y given an input x.
                 - returns a function F with the following properties:
-                    - F(new_x) == A sequence of predicted labels for the elements of new_x.  
+                    - F(new_x) == A sequence of predicted labels for the elements of new_x.
                     - F(new_x).size() == new_x.size()
                     - for all valid i:
                         - F(new_x)[i] == the predicted label of new_x[i]

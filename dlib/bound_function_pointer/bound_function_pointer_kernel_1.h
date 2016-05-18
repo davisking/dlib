@@ -205,9 +205,9 @@ namespace dlib
                 clone(buf.get());
             }
 
-            void clone   (void* ptr) const  
-            { 
-                bound_function_helper_T* p = new(ptr) bound_function_helper_T(); 
+            void clone   (void* ptr) const
+            {
+                bound_function_helper_T* p = new(ptr) bound_function_helper_T();
                 p->arg1 = this->arg1;
                 p->arg2 = this->arg2;
                 p->arg3 = this->arg3;
@@ -236,7 +236,7 @@ namespace dlib
         bound_function_pointer (
         ) { bf_null_type().safe_clone(bf_memory); }
 
-        bound_function_pointer ( 
+        bound_function_pointer (
             const bound_function_pointer& item
         ) { item.bf()->clone(bf_memory.get()); }
 
@@ -268,7 +268,7 @@ namespace dlib
             // copy *this into item
             bf()->clone(item.bf_memory.get());
 
-            // destory the stuff in this 
+            // destory the stuff in this
             destroy_bf_memory();
             // copy temp into *this
             temp.bf()->clone(bf_memory.get());
@@ -751,10 +751,10 @@ namespace dlib
             bf()->~bound_function_helper_base_base();
         }
 
-        bfp1_helpers::bound_function_helper_base_base*       bf ()       
+        bfp1_helpers::bound_function_helper_base_base*       bf ()
         { return static_cast<bfp1_helpers::bound_function_helper_base_base*>(bf_memory.get()); }
 
-        const bfp1_helpers::bound_function_helper_base_base* bf () const 
+        const bfp1_helpers::bound_function_helper_base_base* bf () const
         { return static_cast<const bfp1_helpers::bound_function_helper_base_base*>(bf_memory.get()); }
 
     };

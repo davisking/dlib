@@ -10,7 +10,7 @@
 #include <dlib/sliding_buffer.h>
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -26,12 +26,12 @@ namespace
     )
     /*!
         requires
-            - buf is an implementation of sliding_buffer/sliding_buffer_kernel_abstract.h 
+            - buf is an implementation of sliding_buffer/sliding_buffer_kernel_abstract.h
             - buf is instantiated with T=unsigned char
         ensures
-            - runs tests on buf for compliance with the specs 
+            - runs tests on buf for compliance with the specs
     !*/
-    {        
+    {
 
         print_spinner();
 
@@ -98,7 +98,7 @@ namespace
             DLIB_TEST(test[0] == 's');
             DLIB_TEST(test[1] == 'd');
             DLIB_TEST(test[2] == 'f');
-            DLIB_TEST(test[3] == 'a');   
+            DLIB_TEST(test[3] == 'a');
 
 
             test.rotate_left(1);

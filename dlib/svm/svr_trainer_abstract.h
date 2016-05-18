@@ -17,21 +17,21 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename K 
+        typename K
         >
     class svr_trainer
     {
         /*!
-            REQUIREMENTS ON K 
-                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+            REQUIREMENTS ON K
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h
 
             WHAT THIS OBJECT REPRESENTS
-                This object implements a trainer for performing epsilon-insensitive support 
+                This object implements a trainer for performing epsilon-insensitive support
                 vector regression.  It is implemented using the SMO algorithm.
 
                 The implementation of the eps-SVR training algorithm used by this object is based
                 on the following paper:
-                    - Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
+                    - Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector
                       machines, 2001. Software available at http://www.csie.ntu.edu.tw/~cjlin/libsvm
         !*/
 
@@ -61,7 +61,7 @@ namespace dlib
             requires
                 - cache_size > 0
             ensures
-                - #get_cache_size() == cache_size 
+                - #get_cache_size() == cache_size
         !*/
 
         const long get_cache_size (
@@ -70,8 +70,8 @@ namespace dlib
             ensures
                 - returns the number of megabytes of cache this object will use
                   when it performs training via the this->train() function.
-                  (bigger values of this may make training go faster but won't affect 
-                  the result.  However, too big a value will cause you to run out of 
+                  (bigger values of this may make training go faster but won't affect
+                  the result.  However, too big a value will cause you to run out of
                   memory, obviously.)
         !*/
 
@@ -82,7 +82,7 @@ namespace dlib
             requires
                 - eps > 0
             ensures
-                - #get_epsilon() == eps 
+                - #get_epsilon() == eps
         !*/
 
         const scalar_type get_epsilon (
@@ -117,9 +117,9 @@ namespace dlib
                     - else
                         - The error grows linearly once it gets bigger than eps
                  
-                  So epsilon-insensitive regression means we do regression but 
-                  stop trying to fit a data point once it is "close enough".  
-                  This function returns that eps value which controls what we 
+                  So epsilon-insensitive regression means we do regression but
+                  stop trying to fit a data point once it is "close enough".
+                  This function returns that eps value which controls what we
                   mean by "close enough".
         !*/
 
@@ -128,7 +128,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_kernel() == k 
+                - #get_kernel() == k
         !*/
 
         const kernel_type& get_kernel (
@@ -139,24 +139,24 @@ namespace dlib
         !*/
 
         void set_c (
-            scalar_type C 
+            scalar_type C
         );
         /*!
             requires
                 - C > 0
             ensures
-                - #get_c() == C 
+                - #get_c() == C
         !*/
 
         const scalar_type get_c (
         ) const;
         /*!
             ensures
-                - returns the SVR regularization parameter.  It is the parameter that 
-                  determines the trade-off between trying to reduce the training error 
-                  or allowing more errors but hopefully improving the generalization 
-                  of the resulting decision_function.  Larger values encourage exact 
-                  fitting while smaller values of C may encourage better generalization. 
+                - returns the SVR regularization parameter.  It is the parameter that
+                  determines the trade-off between trying to reduce the training error
+                  or allowing more errors but hopefully improving the generalization
+                  of the resulting decision_function.  Larger values encourage exact
+                  fitting while smaller values of C may encourage better generalization.
         !*/
 
         template <
@@ -175,8 +175,8 @@ namespace dlib
                 - y == a matrix or something convertible to a matrix via mat().
                   Also, y should contain scalar_type objects.
             ensures
-                - performs support vector regression given the training samples in x and 
-                  target values in y.  
+                - performs support vector regression given the training samples in x and
+                  target values in y.
                 - returns a decision_function F with the following properties:
                     - F(new_x) == predicted y value
         !*/
@@ -188,7 +188,7 @@ namespace dlib
             ensures
                 - swaps *this and item
         !*/
-    }; 
+    };
 
     template <typename K>
     void swap (

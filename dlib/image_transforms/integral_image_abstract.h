@@ -31,7 +31,7 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object is an alternate way of representing image data
-                that allows for very fast computations of sums of pixels in 
+                that allows for very fast computations of sums of pixels in
                 rectangular regions.  To use this object you load it with a
                 normal image and then you can use the get_sum_of_area()
                 function to compute sums of pixels in a given area in
@@ -61,14 +61,14 @@ namespace dlib
         /*!
             requires
                 - image_type == an image object that implements the interface defined in
-                  dlib/image_processing/generic_image.h 
+                  dlib/image_processing/generic_image.h
                 - Let P denote the type of pixel in img, then we require:
-                    - pixel_traits<P>::has_alpha == false 
+                    - pixel_traits<P>::has_alpha == false
             ensures
                 - #nr() == img.nr()
                 - #nc() == img.nc()
                 - #*this will now contain an "integral image" representation of the
-                  given input image.  
+                  given input image.
         !*/
 
         value_type get_sum_of_area (
@@ -105,7 +105,7 @@ namespace dlib
     ) { a.swap(b); }
     /*!
         provides a global swap function
-    !*/ 
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
@@ -122,7 +122,7 @@ namespace dlib
     /*!
         requires
             - get_rect(img).contains(centered_rect(p,width,width)) == true
-            - integral_image_type == a type that implements the integral_image_generic 
+            - integral_image_type == a type that implements the integral_image_generic
               interface defined above
         ensures
             - returns the response of a Haar wavelet centered at the point p
@@ -147,11 +147,11 @@ namespace dlib
     /*!
         requires
             - get_rect(img).contains(centered_rect(p,width,width)) == true
-            - integral_image_type == a type that implements the integral_image_generic 
+            - integral_image_type == a type that implements the integral_image_generic
               interface defined above
         ensures
             - returns the response of a Haar wavelet centered at the point p
-              with the given width in the given image.  The wavelet is oriented 
+              with the given width in the given image.  The wavelet is oriented
               along the Y axis and has the following shape:
                 --------
                 --------

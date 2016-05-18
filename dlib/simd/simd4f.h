@@ -52,7 +52,7 @@ namespace dlib
         inline void store(type* ptr)         const { _mm_storeu_ps(ptr, x); }
 
         inline unsigned int size() const { return 4; }
-        inline float operator[](unsigned int idx) const 
+        inline float operator[](unsigned int idx) const
         {
             float temp[4];
             store(temp);
@@ -95,8 +95,8 @@ namespace dlib
         inline simd4f(const simd4i& val) { x[0]=val[0]; x[1]=val[1]; x[2]=val[2]; x[3]=val[3];}
 
         // truncate to 32bit integers
-        inline operator simd4i::rawarray() const 
-        { 
+        inline operator simd4i::rawarray() const
+        {
             simd4i::rawarray temp;
             temp.a[0] = (int32)x[0];
             temp.a[1] = (int32)x[1];
@@ -186,10 +186,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4f operator+ (const simd4f& lhs, const simd4f& rhs) 
-    { 
+    inline simd4f operator+ (const simd4f& lhs, const simd4f& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_add_ps(lhs, rhs); 
+        return _mm_add_ps(lhs, rhs);
 #else
         return simd4f(lhs[0]+rhs[0],
                       lhs[1]+rhs[1],
@@ -197,15 +197,15 @@ namespace dlib
                       lhs[3]+rhs[3]);
 #endif
     }
-    inline simd4f& operator+= (simd4f& lhs, const simd4f& rhs) 
+    inline simd4f& operator+= (simd4f& lhs, const simd4f& rhs)
     { return lhs = lhs + rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4f operator- (const simd4f& lhs, const simd4f& rhs) 
-    { 
+    inline simd4f operator- (const simd4f& lhs, const simd4f& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_sub_ps(lhs, rhs); 
+        return _mm_sub_ps(lhs, rhs);
 #else
         return simd4f(lhs[0]-rhs[0],
                       lhs[1]-rhs[1],
@@ -213,15 +213,15 @@ namespace dlib
                       lhs[3]-rhs[3]);
 #endif
     }
-    inline simd4f& operator-= (simd4f& lhs, const simd4f& rhs) 
+    inline simd4f& operator-= (simd4f& lhs, const simd4f& rhs)
     { return lhs = lhs - rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4f operator* (const simd4f& lhs, const simd4f& rhs) 
-    { 
+    inline simd4f operator* (const simd4f& lhs, const simd4f& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_mul_ps(lhs, rhs); 
+        return _mm_mul_ps(lhs, rhs);
 #else
         return simd4f(lhs[0]*rhs[0],
                       lhs[1]*rhs[1],
@@ -229,15 +229,15 @@ namespace dlib
                       lhs[3]*rhs[3]);
 #endif
     }
-    inline simd4f& operator*= (simd4f& lhs, const simd4f& rhs) 
+    inline simd4f& operator*= (simd4f& lhs, const simd4f& rhs)
     { return lhs = lhs * rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4f operator/ (const simd4f& lhs, const simd4f& rhs) 
-    { 
+    inline simd4f operator/ (const simd4f& lhs, const simd4f& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_div_ps(lhs, rhs); 
+        return _mm_div_ps(lhs, rhs);
 #else
         return simd4f(lhs[0]/rhs[0],
                       lhs[1]/rhs[1],
@@ -245,15 +245,15 @@ namespace dlib
                       lhs[3]/rhs[3]);
 #endif
     }
-    inline simd4f& operator/= (simd4f& lhs, const simd4f& rhs) 
+    inline simd4f& operator/= (simd4f& lhs, const simd4f& rhs)
     { return lhs = lhs / rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4f_bool operator== (const simd4f& lhs, const simd4f& rhs) 
-    { 
+    inline simd4f_bool operator== (const simd4f& lhs, const simd4f& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_cmpeq_ps(lhs, rhs); 
+        return _mm_cmpeq_ps(lhs, rhs);
 #else
         return simd4f_bool(lhs[0]==rhs[0],
                            lhs[1]==rhs[1],
@@ -264,10 +264,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4f_bool operator!= (const simd4f& lhs, const simd4f& rhs) 
-    { 
+    inline simd4f_bool operator!= (const simd4f& lhs, const simd4f& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_cmpneq_ps(lhs, rhs); 
+        return _mm_cmpneq_ps(lhs, rhs);
 #else
         return simd4f_bool(lhs[0]!=rhs[0],
                            lhs[1]!=rhs[1],
@@ -278,10 +278,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4f_bool operator< (const simd4f& lhs, const simd4f& rhs) 
-    { 
+    inline simd4f_bool operator< (const simd4f& lhs, const simd4f& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_cmplt_ps(lhs, rhs); 
+        return _mm_cmplt_ps(lhs, rhs);
 #else
         return simd4f_bool(lhs[0]<rhs[0],
                            lhs[1]<rhs[1],
@@ -292,17 +292,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4f_bool operator> (const simd4f& lhs, const simd4f& rhs) 
-    { 
+    inline simd4f_bool operator> (const simd4f& lhs, const simd4f& rhs)
+    {
         return rhs < lhs;
     }
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4f_bool operator<= (const simd4f& lhs, const simd4f& rhs) 
-    { 
+    inline simd4f_bool operator<= (const simd4f& lhs, const simd4f& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_cmple_ps(lhs, rhs); 
+        return _mm_cmple_ps(lhs, rhs);
 #else
         return simd4f_bool(lhs[0]<=rhs[0],
                            lhs[1]<=rhs[1],
@@ -313,17 +313,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4f_bool operator>= (const simd4f& lhs, const simd4f& rhs) 
-    { 
+    inline simd4f_bool operator>= (const simd4f& lhs, const simd4f& rhs)
+    {
         return rhs <= lhs;
     }
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4f min (const simd4f& lhs, const simd4f& rhs) 
-    { 
+    inline simd4f min (const simd4f& lhs, const simd4f& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_min_ps(lhs, rhs); 
+        return _mm_min_ps(lhs, rhs);
 #else
         return simd4f(std::min(lhs[0],rhs[0]),
                       std::min(lhs[1],rhs[1]),
@@ -334,10 +334,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4f max (const simd4f& lhs, const simd4f& rhs) 
-    { 
+    inline simd4f max (const simd4f& lhs, const simd4f& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_max_ps(lhs, rhs); 
+        return _mm_max_ps(lhs, rhs);
 #else
         return simd4f(std::max(lhs[0],rhs[0]),
                       std::max(lhs[1],rhs[1]),
@@ -348,10 +348,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4f reciprocal (const simd4f& item) 
-    { 
+    inline simd4f reciprocal (const simd4f& item)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_rcp_ps(item); 
+        return _mm_rcp_ps(item);
 #else
         return simd4f(1.0f/item[0],
                       1.0f/item[1],
@@ -362,10 +362,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4f reciprocal_sqrt (const simd4f& item) 
-    { 
+    inline simd4f reciprocal_sqrt (const simd4f& item)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_rsqrt_ps(item); 
+        return _mm_rsqrt_ps(item);
 #else
         return simd4f(1.0f/std::sqrt(item[0]),
                       1.0f/std::sqrt(item[1]),

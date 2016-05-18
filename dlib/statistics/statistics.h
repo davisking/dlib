@@ -29,7 +29,7 @@ namespace dlib
             COMPILE_TIME_ASSERT ((
                     is_same_type<float,T>::value ||
                     is_same_type<double,T>::value ||
-                    is_same_type<long double,T>::value 
+                    is_same_type<long double,T>::value
             ));
         }
 
@@ -138,7 +138,7 @@ namespace dlib
 
         T skewness (
         ) const
-        {  
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(current_n() > 2,
                 "\tT running_stats::skewness"
@@ -147,11 +147,11 @@ namespace dlib
             );
 
             T temp  = 1/n;
-            T temp1 = std::sqrt(n*(n-1))/(n-2); 
+            T temp1 = std::sqrt(n*(n-1))/(n-2);
             temp    = temp1*temp*(sum_cub - 3*sum_sqr*sum*temp + 2*cubed(sum)*temp*temp)/
                       (std::sqrt(std::pow(temp*(sum_sqr-sum*sum*temp),3)));
 
-            return temp; 
+            return temp;
         }
 
         T ex_kurtosis (
@@ -170,7 +170,7 @@ namespace dlib
             T m2   = temp*(sum_sqr-sum*sum*temp);
             temp   = (n-1)*((n+1)*m4/(m2*m2)-3*(n-1))/((n-2)*(n-3));
 
-            return temp; 
+            return temp;
         }
 
         T scale (
@@ -204,15 +204,15 @@ namespace dlib
 
         template <typename U>
         friend void serialize (
-            const running_stats<U>& item, 
-            std::ostream& out 
+            const running_stats<U>& item,
+            std::ostream& out
         );
 
         template <typename U>
         friend void deserialize (
-            running_stats<U>& item, 
+            running_stats<U>& item,
             std::istream& in
-        ); 
+        );
 
     private:
         T sum;
@@ -229,8 +229,8 @@ namespace dlib
 
     template <typename T>
     void serialize (
-        const running_stats<T>& item, 
-        std::ostream& out 
+        const running_stats<T>& item,
+        std::ostream& out
     )
     {
         int version = 2;
@@ -247,9 +247,9 @@ namespace dlib
 
     template <typename T>
     void deserialize (
-        running_stats<T>& item, 
+        running_stats<T>& item,
         std::istream& in
-    ) 
+    )
     {
         int version = 0;
         deserialize(version, in);
@@ -281,7 +281,7 @@ namespace dlib
             COMPILE_TIME_ASSERT ((
                     is_same_type<float,T>::value ||
                     is_same_type<double,T>::value ||
-                    is_same_type<long double,T>::value 
+                    is_same_type<long double,T>::value
             ));
         }
 
@@ -453,7 +453,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
+        typename T,
         typename alloc
         >
     double mean_sign_agreement (
@@ -486,7 +486,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
+        typename T,
         typename alloc
         >
     double correlation (
@@ -513,7 +513,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
+        typename T,
         typename alloc
         >
     double covariance (
@@ -540,7 +540,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
+        typename T,
         typename alloc
         >
     double r_squared (
@@ -562,7 +562,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
+        typename T,
         typename alloc
         >
     double mean_squared_error (
@@ -595,7 +595,7 @@ namespace dlib
 
             CONVENTION
                 - vect_size == in_vector_size()
-                - total_count == current_n() 
+                - total_count == current_n()
 
                 - if (total_count != 0)
                     - total_sum == the sum of all vectors given to add()
@@ -649,7 +649,7 @@ namespace dlib
             DLIB_ASSERT( size > 0,
                 "\t void running_covariance::set_dimension()"
                 << "\n\t Invalid inputs were given to this function"
-                << "\n\t size: " << size 
+                << "\n\t size: " << size
                 << "\n\t this: " << this
                 );
 
@@ -670,8 +670,8 @@ namespace dlib
             DLIB_ASSERT(((long)max_index_plus_one(val) <= in_vector_size() && in_vector_size() > 0),
                 "\t void running_covariance::add()"
                 << "\n\t Invalid inputs were given to this function"
-                << "\n\t max_index_plus_one(val): " << max_index_plus_one(val) 
-                << "\n\t in_vector_size():        " << in_vector_size() 
+                << "\n\t max_index_plus_one(val): " << max_index_plus_one(val)
+                << "\n\t in_vector_size():        " << in_vector_size()
                 << "\n\t this:                    " << this
                 );
 
@@ -696,9 +696,9 @@ namespace dlib
             DLIB_ASSERT(is_col_vector(val) && (in_vector_size() == 0 || val.size() == in_vector_size()),
                 "\t void running_covariance::add()"
                 << "\n\t Invalid inputs were given to this function"
-                << "\n\t is_col_vector(val): " << is_col_vector(val) 
-                << "\n\t in_vector_size():   " << in_vector_size() 
-                << "\n\t val.size():         " << val.size() 
+                << "\n\t is_col_vector(val): " << is_col_vector(val)
+                << "\n\t in_vector_size():   " << in_vector_size()
+                << "\n\t val.size():         " << val.size()
                 << "\n\t this:               " << this
                 );
 
@@ -723,8 +723,8 @@ namespace dlib
             DLIB_ASSERT( in_vector_size() != 0,
                 "\t running_covariance::mean()"
                 << "\n\t This object can not execute this function in its current state."
-                << "\n\t in_vector_size(): " << in_vector_size() 
-                << "\n\t current_n():      " << current_n() 
+                << "\n\t in_vector_size(): " << in_vector_size()
+                << "\n\t current_n():      " << current_n()
                 << "\n\t this:             " << this
                 );
 
@@ -738,8 +738,8 @@ namespace dlib
             DLIB_ASSERT( in_vector_size() != 0 && current_n() > 1,
                 "\t running_covariance::covariance()"
                 << "\n\t This object can not execute this function in its current state."
-                << "\n\t in_vector_size(): " << in_vector_size() 
-                << "\n\t current_n():      " << current_n() 
+                << "\n\t in_vector_size(): " << in_vector_size()
+                << "\n\t current_n():      " << current_n()
                 << "\n\t this:             " << this
                 );
 
@@ -754,8 +754,8 @@ namespace dlib
             DLIB_ASSERT((in_vector_size() == 0 || item.in_vector_size() == 0 || in_vector_size() == item.in_vector_size()),
                 "\t running_covariance running_covariance::operator+()"
                 << "\n\t The two running_covariance objects being added must have compatible parameters"
-                << "\n\t in_vector_size():            " << in_vector_size() 
-                << "\n\t item.in_vector_size():       " << item.in_vector_size() 
+                << "\n\t in_vector_size():            " << in_vector_size()
+                << "\n\t item.in_vector_size():       " << item.in_vector_size()
                 << "\n\t this:                        " << this
                 );
 
@@ -804,7 +804,7 @@ namespace dlib
             CONVENTION
                 - x_vect_size == x_vector_size()
                 - y_vect_size == y_vector_size()
-                - total_count == current_n() 
+                - total_count == current_n()
 
                 - if (total_count != 0)
                     - sum_x == the sum of all x vectors given to add()
@@ -860,8 +860,8 @@ namespace dlib
             DLIB_ASSERT( x_size > 0 && y_size > 0,
                 "\t void running_cross_covariance::set_dimensions()"
                 << "\n\t Invalid inputs were given to this function"
-                << "\n\t x_size: " << x_size 
-                << "\n\t y_size: " << y_size 
+                << "\n\t x_size: " << x_size
+                << "\n\t y_size: " << y_size
                 << "\n\t this:   " << this
                 );
 
@@ -894,10 +894,10 @@ namespace dlib
                          ((long)max_index_plus_one(y) <= y_vector_size() && y_vector_size() > 0) ,
                 "\t void running_cross_covariance::add()"
                 << "\n\t Invalid inputs were given to this function"
-                << "\n\t max_index_plus_one(x): " << max_index_plus_one(x) 
-                << "\n\t max_index_plus_one(y): " << max_index_plus_one(y) 
-                << "\n\t x_vector_size():       " << x_vector_size() 
-                << "\n\t y_vector_size():       " << y_vector_size() 
+                << "\n\t max_index_plus_one(x): " << max_index_plus_one(x)
+                << "\n\t max_index_plus_one(y): " << max_index_plus_one(y)
+                << "\n\t x_vector_size():       " << x_vector_size()
+                << "\n\t y_vector_size():       " << y_vector_size()
                 << "\n\t this:                  " << this
                 );
 
@@ -930,11 +930,11 @@ namespace dlib
                          ((long)max_index_plus_one(y) <= y_vector_size() && y_vector_size() > 0) ,
                 "\t void running_cross_covariance::add()"
                 << "\n\t Invalid inputs were given to this function"
-                << "\n\t is_col_vector(x):      " << is_col_vector(x) 
-                << "\n\t x.size():              " << x.size() 
-                << "\n\t max_index_plus_one(y): " << max_index_plus_one(y) 
-                << "\n\t x_vector_size():       " << x_vector_size() 
-                << "\n\t y_vector_size():       " << y_vector_size() 
+                << "\n\t is_col_vector(x):      " << is_col_vector(x)
+                << "\n\t x.size():              " << x.size()
+                << "\n\t max_index_plus_one(y): " << max_index_plus_one(y)
+                << "\n\t x_vector_size():       " << x_vector_size()
+                << "\n\t y_vector_size():       " << y_vector_size()
                 << "\n\t this:                  " << this
                 );
 
@@ -968,11 +968,11 @@ namespace dlib
                          (is_col_vector(y) && y.size() == (long)y_vector_size() && y_vector_size() > 0) ,
                 "\t void running_cross_covariance::add()"
                 << "\n\t Invalid inputs were given to this function"
-                << "\n\t max_index_plus_one(x): " << max_index_plus_one(x) 
-                << "\n\t is_col_vector(y):      " << is_col_vector(y) 
-                << "\n\t y.size():              " << y.size() 
-                << "\n\t x_vector_size():       " << x_vector_size() 
-                << "\n\t y_vector_size():       " << y_vector_size() 
+                << "\n\t max_index_plus_one(x): " << max_index_plus_one(x)
+                << "\n\t is_col_vector(y):      " << is_col_vector(y)
+                << "\n\t y.size():              " << y.size()
+                << "\n\t x_vector_size():       " << x_vector_size()
+                << "\n\t y_vector_size():       " << y_vector_size()
                 << "\n\t this:                  " << this
                 );
 
@@ -1003,12 +1003,12 @@ namespace dlib
                         y.size() != 0,
                 "\t void running_cross_covariance::add()"
                 << "\n\t Invalid inputs were given to this function"
-                << "\n\t is_col_vector(x): " << is_col_vector(x) 
-                << "\n\t x_vector_size():  " << x_vector_size() 
-                << "\n\t x.size():         " << x.size() 
-                << "\n\t is_col_vector(y): " << is_col_vector(y) 
-                << "\n\t y_vector_size():  " << y_vector_size() 
-                << "\n\t y.size():         " << y.size() 
+                << "\n\t is_col_vector(x): " << is_col_vector(x)
+                << "\n\t x_vector_size():  " << x_vector_size()
+                << "\n\t x.size():         " << x.size()
+                << "\n\t is_col_vector(y): " << is_col_vector(y)
+                << "\n\t y_vector_size():  " << y_vector_size()
+                << "\n\t y.size():         " << y.size()
                 << "\n\t this:             " << this
                 );
 
@@ -1036,7 +1036,7 @@ namespace dlib
             DLIB_ASSERT( current_n() != 0,
                 "\t running_cross_covariance::mean()"
                 << "\n\t This object can not execute this function in its current state."
-                << "\n\t current_n():      " << current_n() 
+                << "\n\t current_n():      " << current_n()
                 << "\n\t this:             " << this
                 );
 
@@ -1050,7 +1050,7 @@ namespace dlib
             DLIB_ASSERT( current_n() != 0,
                 "\t running_cross_covariance::mean()"
                 << "\n\t This object can not execute this function in its current state."
-                << "\n\t current_n():      " << current_n() 
+                << "\n\t current_n():      " << current_n()
                 << "\n\t this:             " << this
                 );
 
@@ -1064,9 +1064,9 @@ namespace dlib
             DLIB_ASSERT( current_n() > 1,
                 "\t running_cross_covariance::covariance()"
                 << "\n\t This object can not execute this function in its current state."
-                << "\n\t x_vector_size(): " << x_vector_size() 
-                << "\n\t y_vector_size(): " << y_vector_size() 
-                << "\n\t current_n():     " << current_n() 
+                << "\n\t x_vector_size(): " << x_vector_size()
+                << "\n\t y_vector_size(): " << y_vector_size()
+                << "\n\t current_n():     " << current_n()
                 << "\n\t this:            " << this
                 );
 
@@ -1082,10 +1082,10 @@ namespace dlib
                         (y_vector_size() == 0 || item.y_vector_size() == 0 || y_vector_size() == item.y_vector_size()),
                 "\t running_cross_covariance running_cross_covariance::operator+()"
                 << "\n\t The two running_cross_covariance objects being added must have compatible parameters"
-                << "\n\t x_vector_size():            " << x_vector_size() 
-                << "\n\t item.x_vector_size():       " << item.x_vector_size() 
-                << "\n\t y_vector_size():            " << y_vector_size() 
-                << "\n\t item.y_vector_size():       " << item.y_vector_size() 
+                << "\n\t x_vector_size():            " << x_vector_size()
+                << "\n\t item.x_vector_size():       " << item.x_vector_size()
+                << "\n\t y_vector_size():            " << y_vector_size()
+                << "\n\t item.y_vector_size():       " << item.y_vector_size()
                 << "\n\t this:                       " << this
                 );
 
@@ -1205,14 +1205,14 @@ namespace dlib
 
         template <typename mt>
         friend void deserialize (
-            vector_normalizer<mt>& item, 
+            vector_normalizer<mt>& item,
             std::istream& in
-        ); 
+        );
 
         template <typename mt>
         friend void serialize (
-            const vector_normalizer<mt>& item, 
-            std::ostream& out 
+            const vector_normalizer<mt>& item,
+            std::ostream& out
         );
 
     private:
@@ -1232,9 +1232,9 @@ namespace dlib
         typename matrix_type
         >
     inline void swap (
-        vector_normalizer<matrix_type>& a, 
-        vector_normalizer<matrix_type>& b 
-    ) { a.swap(b); }   
+        vector_normalizer<matrix_type>& a,
+        vector_normalizer<matrix_type>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 
@@ -1242,9 +1242,9 @@ namespace dlib
         typename matrix_type
         >
     void deserialize (
-        vector_normalizer<matrix_type>& item, 
+        vector_normalizer<matrix_type>& item,
         std::istream& in
-    )   
+    )
     {
         deserialize(item.m, in);
         deserialize(item.sd, in);
@@ -1253,7 +1253,7 @@ namespace dlib
         deserialize(pca, in);
 
         if (pca.size() != 0)
-            throw serialization_error("Error deserializing object of type vector_normalizer\n"   
+            throw serialization_error("Error deserializing object of type vector_normalizer\n"
                                         "It looks like a serialized vector_normalizer_pca was accidentally deserialized into \n"
                                         "a vector_normalizer object.");
     }
@@ -1264,8 +1264,8 @@ namespace dlib
         typename matrix_type
         >
     void serialize (
-        const vector_normalizer<matrix_type>& item, 
-        std::ostream& out 
+        const vector_normalizer<matrix_type>& item,
+        std::ostream& out
     )
     {
         serialize(item.m, out);
@@ -1296,7 +1296,7 @@ namespace dlib
         )
         {
             // You are getting an error here because you are trying to apply PCA
-            // to a vector of fixed length.  But PCA is going to try and do 
+            // to a vector of fixed length.  But PCA is going to try and do
             // dimensionality reduction so you can't use a vector with a fixed dimension.
             COMPILE_TIME_ASSERT(matrix_type::NR == 0);
 
@@ -1379,14 +1379,14 @@ namespace dlib
 
         template <typename T>
         friend void deserialize (
-            vector_normalizer_pca<T>& item, 
+            vector_normalizer_pca<T>& item,
             std::istream& in
         );
 
         template <typename T>
         friend void serialize (
-            const vector_normalizer_pca<T>& item, 
-            std::ostream& out 
+            const vector_normalizer_pca<T>& item,
+            std::ostream& out
         );
 
     private:
@@ -1394,7 +1394,7 @@ namespace dlib
         template <typename mat_type>
         void train_pca_impl (
             const mat_type& samples,
-            const double eps 
+            const double eps
         )
         {
             m = mean(samples);
@@ -1435,7 +1435,7 @@ namespace dlib
                 x(r) = pca*x(r);
             }
 
-            // Here we just scale the output features from the pca transform so 
+            // Here we just scale the output features from the pca transform so
             // that the variance of each feature is 1.  So this doesn't really change
             // what the pca is doing, it just makes sure the output features are
             // normalized.
@@ -1457,9 +1457,9 @@ namespace dlib
         typename matrix_type
         >
     inline void swap (
-        vector_normalizer_pca<matrix_type>& a, 
-        vector_normalizer_pca<matrix_type>& b 
-    ) { a.swap(b); }   
+        vector_normalizer_pca<matrix_type>& a,
+        vector_normalizer_pca<matrix_type>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 
@@ -1467,15 +1467,15 @@ namespace dlib
         typename matrix_type
         >
     void deserialize (
-        vector_normalizer_pca<matrix_type>& item, 
+        vector_normalizer_pca<matrix_type>& item,
         std::istream& in
-    )   
+    )
     {
         deserialize(item.m, in);
         deserialize(item.sd, in);
         deserialize(item.pca, in);
         if (item.pca.nc() != item.m.nr())
-            throw serialization_error("Error deserializing object of type vector_normalizer_pca\n"   
+            throw serialization_error("Error deserializing object of type vector_normalizer_pca\n"
                                         "It looks like a serialized vector_normalizer was accidentally deserialized into \n"
                                         "a vector_normalizer_pca object.");
     }
@@ -1484,8 +1484,8 @@ namespace dlib
         typename matrix_type
         >
     void serialize (
-        const vector_normalizer_pca<matrix_type>& item, 
-        std::ostream& out 
+        const vector_normalizer_pca<matrix_type>& item,
+        std::ostream& out
     )
     {
         serialize(item.m, out);

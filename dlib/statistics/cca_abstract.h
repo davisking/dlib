@@ -20,12 +20,12 @@ namespace dlib
     );
     /*!
         requires
-            - L.size() > 0 
-            - R.size() > 0 
+            - L.size() > 0
+            - R.size() > 0
             - L.nr() == R.nr()
         ensures
             - This function treats L and R as sequences of paired row vectors.  It
-              then computes the correlation values between the elements of these 
+              then computes the correlation values between the elements of these
               row vectors.  In particular, we return a vector COR such that:
                 - COR.size() == L.nc()
                 - for all valid i:
@@ -56,8 +56,8 @@ namespace dlib
     /*!
         requires
             - num_correlations > 0
-            - L.size() > 0 
-            - R.size() > 0 
+            - L.size() > 0
+            - R.size() > 0
             - L.nr() == R.nr()
             - regularization >= 0
         ensures
@@ -72,9 +72,9 @@ namespace dlib
               Therefore, note that you can't get more outputs than there are rows or
               columns in the input matrices.)
             - #Ltrans.nr() == L.nc()
-            - #Ltrans.nc() == N 
+            - #Ltrans.nc() == N
             - #Rtrans.nr() == R.nc()
-            - #Rtrans.nc() == N 
+            - #Rtrans.nc() == N
             - This function assumes the data vectors in L and R have already been centered
               (i.e. we assume the vectors have zero means).  However, in many cases it is
               fine to use uncentered data with cca().  But if it is important for your
@@ -82,7 +82,7 @@ namespace dlib
             - This function works with reduced rank approximations of the L and R matrices.
               This makes it fast when working with large matrices.  In particular, we use
               the svd_fast() routine to find reduced rank representations of the input
-              matrices by calling it as follows: svd_fast(L, U,D,V, num_correlations+extra_rank, q) 
+              matrices by calling it as follows: svd_fast(L, U,D,V, num_correlations+extra_rank, q)
               and similarly for R.  This means that you can use the extra_rank and q
               arguments to cca() to influence the accuracy of the reduced rank
               approximation.  However, the default values should work fine for most
@@ -116,7 +116,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename sparse_vector_type, 
+        typename sparse_vector_type,
         typename T
         >
     matrix<T,0,1> cca (
@@ -142,7 +142,7 @@ namespace dlib
             - This is just an overload of the cca() function defined above.  Except in this
               case we take a sparse representation of the input L and R matrices rather than
               dense matrices.  Therefore, in this case, we interpret L and R as matrices
-              with L.size() rows, where each row is defined by a sparse vector.  So this 
+              with L.size() rows, where each row is defined by a sparse vector.  So this
               function does exactly the same thing as the above cca().
             - Note that you can apply the output transforms to a sparse vector with the
               following code:
@@ -152,8 +152,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename sparse_vector_type, 
-        typename Rand_type, 
+        typename sparse_vector_type,
+        typename Rand_type,
         typename T
         >
     matrix<T,0,1> cca (

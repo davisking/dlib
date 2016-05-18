@@ -36,7 +36,7 @@ namespace dlib
                 table.size() == 0
 
             CONVENTION
-                table.size() = size() == the number of elements in the map 
+                table.size() = size() == the number of elements in the map
                 the elements in this hash_map are stored in table
         !*/
         
@@ -60,7 +60,7 @@ namespace dlib
             {}
 
             inline void clear(
-            );            
+            );
 
             void add (
                 domain& d,
@@ -126,7 +126,7 @@ namespace dlib
             hash_table table;
 
             // restricted functions
-            hash_map_kernel_1(hash_map_kernel_1&);    
+            hash_map_kernel_1(hash_map_kernel_1&);
             hash_map_kernel_1& operator= ( hash_map_kernel_1&);
 
     };
@@ -139,9 +139,9 @@ namespace dlib
         typename mem_manager
         >
     inline void swap (
-        hash_map_kernel_1<domain,range,expnum,hash_table,mem_manager>& a, 
-        hash_map_kernel_1<domain,range,expnum,hash_table,mem_manager>& b 
-    ) { a.swap(b); } 
+        hash_map_kernel_1<domain,range,expnum,hash_table,mem_manager>& a,
+        hash_map_kernel_1<domain,range,expnum,hash_table,mem_manager>& b
+    ) { a.swap(b); }
 
     template <
         typename domain,
@@ -170,9 +170,9 @@ namespace dlib
             }
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type hash_map_kernel_1"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type hash_map_kernel_1");
         }
     }
 
@@ -211,7 +211,7 @@ namespace dlib
         range& r
     )
     {
-        table.add(d,r); 
+        table.add(d,r);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -349,7 +349,7 @@ namespace dlib
         hash_map_kernel_1<domain,range,expnum,hash_table,mem_manager>& item
     )
     {
-        table.swap(item.table);      
+        table.swap(item.table);
     }
 
 // ----------------------------------------------------------------------------------------

@@ -36,43 +36,43 @@ namespace dlib
             data.clear();
         }
 
-        T& operator[] ( unsigned long i) 
-        { 
+        T& operator[] ( unsigned long i)
+        {
             DLIB_ASSERT(i < size(),
                 "\t T& circular_buffer::operator[](i)"
                 << "\n\t You have supplied an invalid index"
                 << "\n\t this:   " << this
-                << "\n\t i:      " << i 
+                << "\n\t i:      " << i
                 << "\n\t size(): " << size()
             );
-            return data[(i+offset)%data.size()]; 
+            return data[(i+offset)%data.size()];
         }
 
-        const T& operator[] ( unsigned long i) const 
-        { 
+        const T& operator[] ( unsigned long i) const
+        {
             DLIB_ASSERT(i < size(),
                 "\t const T& circular_buffer::operator[](i)"
                 << "\n\t You have supplied an invalid index"
                 << "\n\t this:   " << this
-                << "\n\t i:      " << i 
+                << "\n\t i:      " << i
                 << "\n\t size(): " << size()
             );
-            return data[(i+offset)%data.size()]; 
+            return data[(i+offset)%data.size()];
         }
 
-        void resize(unsigned long size) 
-        {  
+        void resize(unsigned long size)
+        {
             offset = 0;
-            data.resize(size); 
+            data.resize(size);
         }
 
         void assign(
-            unsigned long size, 
+            unsigned long size,
             const T& value
-        ) 
-        { 
+        )
+        {
             offset = 0;
-            data.assign(size,value); 
+            data.assign(size,value);
         }
 
         unsigned long size() const { return data.size(); }
@@ -96,8 +96,8 @@ namespace dlib
         }
 
         T& front(
-        ) 
-        { 
+        )
+        {
             DLIB_CASSERT(size() > 0,
                 "\t T& circular_buffer::front()"
                 << "\n\t You can't call front() on an empty circular_buffer"
@@ -108,7 +108,7 @@ namespace dlib
 
         const T& front(
         ) const
-        { 
+        {
             DLIB_CASSERT(size() > 0,
                 "\t const T& circular_buffer::front()"
                 << "\n\t You can't call front() on an empty circular_buffer"
@@ -118,8 +118,8 @@ namespace dlib
         }
 
         T& back(
-        ) 
-        { 
+        )
+        {
             DLIB_CASSERT(size() > 0,
                 "\t T& circular_buffer::back()"
                 << "\n\t You can't call back() on an empty circular_buffer"
@@ -130,7 +130,7 @@ namespace dlib
 
         const T& back(
         ) const
-        { 
+        {
             DLIB_CASSERT(size() > 0,
                 "\t const T& circular_buffer::back()"
                 << "\n\t You can't call back() on an empty circular_buffer"
@@ -158,9 +158,9 @@ namespace dlib
         typename T
         >
     void swap (
-        circular_buffer<T>& a, 
-        circular_buffer<T>& b 
-    ) { a.swap(b); }   
+        circular_buffer<T>& a,
+        circular_buffer<T>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 
@@ -168,9 +168,9 @@ namespace dlib
         typename T
         >
     void serialize (
-        const circular_buffer<T>& item, 
-        std::ostream& out 
-    )   
+        const circular_buffer<T>& item,
+        std::ostream& out
+    )
     {
         try
         {
@@ -179,8 +179,8 @@ namespace dlib
                 serialize(item[i],out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type circular_buffer"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type circular_buffer");
         }
 
     }
@@ -191,9 +191,9 @@ namespace dlib
         typename T
         >
     void deserialize (
-        circular_buffer<T>& item, 
+        circular_buffer<T>& item,
         std::istream& in
-    )   
+    )
     {
         try
         {
@@ -204,9 +204,9 @@ namespace dlib
                 deserialize(item[i],in);
         }
         catch (serialization_error& e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type circular_buffer"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type circular_buffer");
         }
     }
 
@@ -216,7 +216,7 @@ namespace dlib
         typename T
         >
     const matrix_op<op_array_to_mat<circular_buffer<T> > > mat (
-        const circular_buffer<T>& m 
+        const circular_buffer<T>& m
     )
     {
         typedef op_array_to_mat<circular_buffer<T> > op;

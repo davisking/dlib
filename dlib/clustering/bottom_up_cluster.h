@@ -56,12 +56,12 @@ namespace dlib
     {
         matrix<double> dists = matrix_cast<double>(dists_);
         // make sure requires clause is not broken
-        DLIB_CASSERT(dists.nr() == dists.nc() && min_num_clusters > 0, 
+        DLIB_CASSERT(dists.nr() == dists.nc() && min_num_clusters > 0,
             "\t unsigned long bottom_up_cluster()"
             << "\n\t Invalid inputs were given to this function."
-            << "\n\t dists.nr(): " << dists.nr() 
-            << "\n\t dists.nc(): " << dists.nc() 
-            << "\n\t min_num_clusters: " << min_num_clusters 
+            << "\n\t dists.nr(): " << dists.nr()
+            << "\n\t dists.nc(): " << dists.nc()
+            << "\n\t min_num_clusters: " << min_num_clusters
             );
 
         using namespace buc_impl;

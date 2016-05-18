@@ -21,7 +21,7 @@ namespace dlib
     public:
         explicit hough_transform (
             unsigned long size_
-        ) : _size(size_) 
+        ) : _size(size_)
         {
             DLIB_CASSERT(size_ > 0,
                 "\t hough_transform::hough_transform(size_)"
@@ -75,7 +75,7 @@ namespace dlib
             DLIB_ASSERT(rectangle(0,0,size()-1,size()-1).contains(p) == true,
                 "\t pair<point,point> hough_transform::get_line(point)"
                 << "\n\t Invalid arguments given to this function."
-                << "\n\t p:      " << p 
+                << "\n\t p:      " << p
                 << "\n\t size(): " << size()
                 );
 
@@ -117,7 +117,7 @@ namespace dlib
                 << "\n\t himg.nr(): " << himg.nr()
                 << "\n\t himg.nc(): " << himg.nc()
                 << "\n\t size():    " << size()
-                << "\n\t p:         " << p 
+                << "\n\t p:         " << p
                 );
 
 

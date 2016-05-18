@@ -15,7 +15,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -30,7 +30,7 @@ namespace
         ensures
             - runs tests on the geometry stuff compliance with the specs
     !*/
-    {        
+    {
         print_spinner();
 
         point p1;
@@ -167,15 +167,15 @@ namespace
             DLIB_TEST(vl3.y() == 5);
 
 
-            DLIB_TEST(abs(vd2.cross(vd3).dot(vd2)) < 1e-7); 
-            DLIB_TEST(abs(vd3.cross(vd2).dot(vd2)) < 1e-7); 
-            DLIB_TEST(abs(vd2.cross(vd3).dot(vd3)) < 1e-7); 
-            DLIB_TEST(abs(vd3.cross(vd2).dot(vd3)) < 1e-7); 
+            DLIB_TEST(abs(vd2.cross(vd3).dot(vd2)) < 1e-7);
+            DLIB_TEST(abs(vd3.cross(vd2).dot(vd2)) < 1e-7);
+            DLIB_TEST(abs(vd2.cross(vd3).dot(vd3)) < 1e-7);
+            DLIB_TEST(abs(vd3.cross(vd2).dot(vd3)) < 1e-7);
 
-            DLIB_TEST(abs(vl2.cross(vl3).dot(vl2)) == 0); 
-            DLIB_TEST(abs(vl3.cross(vl2).dot(vl2)) == 0); 
-            DLIB_TEST(abs(vl2.cross(vl3).dot(vl3)) == 0); 
-            DLIB_TEST(abs(vl3.cross(vl2).dot(vl3)) == 0); 
+            DLIB_TEST(abs(vl2.cross(vl3).dot(vl2)) == 0);
+            DLIB_TEST(abs(vl3.cross(vl2).dot(vl2)) == 0);
+            DLIB_TEST(abs(vl2.cross(vl3).dot(vl3)) == 0);
+            DLIB_TEST(abs(vl3.cross(vl2).dot(vl3)) == 0);
 
 
             DLIB_TEST((vd2-vd3).length() < 1e-7);
@@ -345,7 +345,7 @@ namespace
 
             // This test is just to make sure the covariance function can compile when used
             // on a dlib::vector.  The actual test doesn't matter.
-            DLIB_TEST(sum(covariance(mat(a))) < 10); 
+            DLIB_TEST(sum(covariance(mat(a))) < 10);
 
         }
 
@@ -529,7 +529,7 @@ namespace
 
         {
             matrix<bool,4,5> hits, truth;
-            const rectangle rect = rectangle(1,1,4,3); 
+            const rectangle rect = rectangle(1,1,4,3);
 
             border_enumerator be(rect, rectangle(2,2, 3, 3));
             DLIB_TEST(be.size() == 8);
@@ -681,7 +681,7 @@ namespace
 
             H(2,0) = rnd.get_random_double()*2.1;
             H(2,1) = rnd.get_random_double()*2.1;
-            H(2,2) = 1 + rnd.get_random_gaussian()*3.1; 
+            H(2,2) = 1 + rnd.get_random_gaussian()*3.1;
 
             point_transform_projective tran(H);
             point_transform_projective traninv = inv(tran);
@@ -842,8 +842,8 @@ namespace
         DLIB_TEST(length(tform(dlib::vector<double>())-z) < 1e-12);
         DLIB_TEST(length(inv(tform)(z)) < 1e-12);
 
-        point_transform_affine tform2; 
-        tform = tform*tform2;// the default tform is the identity mapping so this shouldn't do anything different 
+        point_transform_affine tform2;
+        tform = tform*tform2;// the default tform is the identity mapping so this shouldn't do anything different
         DLIB_TEST(length(tform(dlib::vector<double>())-z) < 1e-12);
         DLIB_TEST(length(inv(tform)(z)) < 1e-12);
     }
@@ -870,10 +870,10 @@ namespace
             DLIB_TEST(projective_transform_pass_rate(0.1) > 0.99);
             DLIB_TEST(projective_transform_pass_rate(0.0) == 1);
 
-            test_find_similarity_transform<double>(); 
-            test_find_similarity_transform2<double>(); 
-            test_find_similarity_transform<float>(); 
-            test_find_similarity_transform2<float>(); 
+            test_find_similarity_transform<double>();
+            test_find_similarity_transform2<double>();
+            test_find_similarity_transform<float>();
+            test_find_similarity_transform2<float>();
         }
     } a;
 

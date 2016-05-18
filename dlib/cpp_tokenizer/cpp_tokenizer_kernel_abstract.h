@@ -9,14 +9,14 @@
 namespace dlib
 {
 
-    class cpp_tokenizer 
+    class cpp_tokenizer
     {
         /*!
             INITIAL VALUE
                 stream_is_set() == false
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a simple tokenizer for C++ source code. 
+                This object represents a simple tokenizer for C++ source code.
 
             BUFFERING
                 This object is allowed to buffer data from the input stream.
@@ -24,14 +24,14 @@ namespace dlib
                 any buffered data will be lost.
 
             TOKENS
-                When picking out tokens the cpp_tokenizer will always extract the 
-                longest token it can.  For example, if faced with the string 
-                "AAA" it will consider the three As to be a single IDENTIFIER 
+                When picking out tokens the cpp_tokenizer will always extract the
+                longest token it can.  For example, if faced with the string
+                "AAA" it will consider the three As to be a single IDENTIFIER
                 token not three smaller IDENTIFIER tokens.
 
                 Also note that no characters in the input stream are discarded.
-                They will all be returned in the text of some token.  
-                Additionally, each character will never be returned more than once.  
+                They will all be returned in the text of some token.
+                Additionally, each character will never be returned more than once.
                 This means that if you concatenated all returned tokens it would exactly
                 reproduce the contents of the input stream.
 
@@ -53,18 +53,18 @@ namespace dlib
                     For example, 'a' would be a match and the text of this token
                     would be the single character a.
 
-                DOUBLE_QUOTED_TEXT  
+                DOUBLE_QUOTED_TEXT
                     This token matches the text of any double quoted string.
                     For example, "C++" would be a match and the text of this token
                     would be the three character string C++.
 
                 WHITE_SPACE
                     This is a multi character token.  It is defined as a sequence of
-                    one or more spaces, carrage returns, newlines, and tabs.  I.e. It 
+                    one or more spaces, carrage returns, newlines, and tabs.  I.e. It
                     is composed of characters from the following string " \r\n\t".
 
                 IDENTIFIER
-                    This token matches any C++ identifier that isn't matched by any 
+                    This token matches any C++ identifier that isn't matched by any
                     of the above tokens.   (A C++ identifier being a string matching
                     the regular expression [_$a-zA-Z][_$a-zA-Z0-9]*).
 
@@ -72,13 +72,13 @@ namespace dlib
                     This token matches any C++ numerical constant.
 
                 OTHER
-                    This matches anything that isn't part of one of the above tokens. 
-                    It is always a single character. 
+                    This matches anything that isn't part of one of the above tokens.
+                    It is always a single character.
         !*/
 
     public:
 
-        enum 
+        enum
         {
             END_OF_FILE,
             KEYWORD,
@@ -91,10 +91,10 @@ namespace dlib
             WHITE_SPACE
         };
 
-        cpp_tokenizer (        
+        cpp_tokenizer (
         );
         /*!
-            ensures                
+            ensures
                 - #*this is properly initialized
             throws
                 - std::bad_alloc
@@ -114,7 +114,7 @@ namespace dlib
                 - #*this has its initial value
             throws
                 - std::bad_alloc
-                    If this exception is thrown then #*this is unusable 
+                    If this exception is thrown then #*this is unusable
                     until clear() is called and succeeds.
         !*/
 
@@ -142,7 +142,7 @@ namespace dlib
             requires
                 - stream_is_set() == true
             ensures
-                - returns a reference to the istream object that *this is reading 
+                - returns a reference to the istream object that *this is reading
                   from.
         !*/
 
@@ -158,8 +158,8 @@ namespace dlib
                 - #type == the type of the token in #token
             throws
                 - bad_alloc
-                    If this exception is thrown then the call to this function will 
-                    have no effect on *this but the values of #type and #token will be 
+                    If this exception is thrown then the call to this function will
+                    have no effect on *this but the values of #type and #token will be
                     undefined.  Additionally, some characters may have been read
                     from the stream get_stream() and lost.
         !*/
@@ -174,8 +174,8 @@ namespace dlib
                   the next call to get_token()
             throws
                 - bad_alloc
-                    If this exception is thrown then the call to this function will 
-                    have no effect on *this.  However, some characters may have been 
+                    If this exception is thrown then the call to this function will
+                    have no effect on *this.  However, some characters may have been
                     read from the stream get_stream() and lost.
         !*/
 
@@ -189,8 +189,8 @@ namespace dlib
                   the next call to get_token()
             throws
                 - bad_alloc
-                    If this exception is thrown then the call to this function will 
-                    have no effect on *this.  However, some characters may have been 
+                    If this exception is thrown then the call to this function will
+                    have no effect on *this.  However, some characters may have been
                     read from the stream get_stream() and lost.
         !*/
 
@@ -200,7 +200,7 @@ namespace dlib
         /*!
             ensures
                 - swaps *this and item
-        !*/ 
+        !*/
 
     private:
 
@@ -208,12 +208,12 @@ namespace dlib
         cpp_tokenizer(const cpp_tokenizer&);        // copy constructor
         cpp_tokenizer& operator=(const cpp_tokenizer&);    // assignment operator
 
-    };    
+    };
 
     inline void swap (
-        cpp_tokenizer& a, 
-        cpp_tokenizer& b 
-    ) { a.swap(b); }   
+        cpp_tokenizer& a,
+        cpp_tokenizer& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/

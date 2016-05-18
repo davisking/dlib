@@ -14,9 +14,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class invalid_network_address : public dlib::error 
-    { 
-    public: 
+    class invalid_network_address : public dlib::error
+    {
+    public:
         invalid_network_address(const std::string& msg) : dlib::error(msg) {};
     };
 
@@ -51,7 +51,7 @@ namespace dlib
     inline bool operator < (
         const network_address& a,
         const network_address& b
-    ) 
+    )
     {
         if (a.host_address < b.host_address)
             return true;
@@ -82,7 +82,7 @@ namespace dlib
 
     void deserialize(
         network_address& item,
-        std::istream& in 
+        std::istream& in
     );
 
     std::ostream& operator<< (

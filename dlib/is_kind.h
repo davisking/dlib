@@ -46,7 +46,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T, typename helper = void>
-    struct is_matrix : public default_is_kind_value  
+    struct is_matrix : public default_is_kind_value
     {
         /*!
             - if (T is some kind of matrix expression from the matrix/matrix_exp_abstract.h component) then
@@ -62,7 +62,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    struct is_array2d : public default_is_kind_value  
+    struct is_array2d : public default_is_kind_value
     {
         /*!
             - if (T is an implementation of array2d/array2d_kernel_abstract.h) then
@@ -75,7 +75,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    struct is_array : public default_is_kind_value  
+    struct is_array : public default_is_kind_value
     {
         /*!
             - if (T is an implementation of array/array_kernel_abstract.h) then
@@ -88,7 +88,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    struct is_std_vector : public default_is_kind_value  
+    struct is_std_vector : public default_is_kind_value
     {
         /*!
             - if (T is an implementation of the standard C++ std::vector object) then
@@ -101,7 +101,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    struct is_pair : public default_is_kind_value  
+    struct is_pair : public default_is_kind_value
     {
         /*!
             - if (T is a std::pair object) then
@@ -114,7 +114,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    struct is_rand : public default_is_kind_value  
+    struct is_rand : public default_is_kind_value
     {
         /*!
             - if (T is an implementation of rand/rand_kernel_abstract.h) then
@@ -127,7 +127,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    struct is_config_reader : public default_is_kind_value  
+    struct is_config_reader : public default_is_kind_value
     {
         /*!
             - if (T is an implementation of config_reader/config_reader_kernel_abstract.h) then
@@ -143,7 +143,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    template <typename T, typename alloc> 
+    template <typename T, typename alloc>
     struct is_std_vector<std::vector<T,alloc> >         { const static bool value = true; };
     template <typename T> struct is_std_vector<T&>      { const static bool value = is_std_vector<T>::value; };
     template <typename T> struct is_std_vector<const T&>{ const static bool value = is_std_vector<T>::value; };

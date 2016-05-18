@@ -17,9 +17,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename vector_type 
+        typename vector_type
         >
-    class graph_labeler 
+    class graph_labeler
     {
 
     public:
@@ -34,7 +34,7 @@ namespace dlib
         graph_labeler(
             const vector_type& edge_weights_,
             const vector_type& node_weights_
-        ) : 
+        ) :
             edge_weights(edge_weights_),
             node_weights(node_weights_)
         {
@@ -56,7 +56,7 @@ namespace dlib
         template <typename graph_type>
         void operator() (
             const graph_type& sample,
-            std::vector<bool>& labels 
+            std::vector<bool>& labels
         ) const
         {
             // make sure requires clause is not broken
@@ -80,7 +80,7 @@ namespace dlib
                                 << "\n\t The size of the node weight vector must match the one in the node."
                                 << "\n\t get_node_weights().size():  " << get_node_weights().size()
                                 << "\n\t sample.node(i).data.size(): " << sample.node(i).data.size()
-                                << "\n\t i: " << i 
+                                << "\n\t i: " << i
                                 << "\n\t this:              " << this
                             );
                 }
@@ -96,7 +96,7 @@ namespace dlib
                                     << "\n\t The size of the edge weight vector must match the one in graph's edge."
                                     << "\n\t get_edge_weights().size():  " << get_edge_weights().size()
                                     << "\n\t sample.node(i).edge(n).size(): " << sample.node(i).edge(n).size()
-                                    << "\n\t i: " << i 
+                                    << "\n\t i: " << i
                                     << "\n\t this:              " << this
                         );
                     }
@@ -105,8 +105,8 @@ namespace dlib
                                 "\t void graph_labeler::operator()"
                                 << "\n\t No edge vectors are allowed to have negative elements."
                                 << "\n\t min(sample.node(i).edge(n)): " << min(sample.node(i).edge(n))
-                                << "\n\t i:    " << i 
-                                << "\n\t n:    " << n 
+                                << "\n\t i:    " << i
+                                << "\n\t n:    " << n
                                 << "\n\t this: " << this
                     );
                 }
@@ -114,7 +114,7 @@ namespace dlib
 #endif
 
 
-            graph<double,double>::kernel_1a g; 
+            graph<double,double>::kernel_1a g;
             copy_graph_structure(sample, g);
             for (unsigned long i = 0; i < g.number_of_nodes(); ++i)
             {
@@ -123,7 +123,7 @@ namespace dlib
                 for (unsigned long n = 0; n < g.node(i).number_of_neighbors(); ++n)
                 {
                     const unsigned long j = g.node(i).neighbor(n).index();
-                    // Don't compute an edge weight more than once. 
+                    // Don't compute an edge weight more than once.
                     if (i < j)
                     {
                         g.node(i).edge(n) = dot(edge_weights, sample.node(i).edge(n));
@@ -146,7 +146,7 @@ namespace dlib
 
         template <typename graph_type>
         std::vector<bool> operator() (
-            const graph_type& sample 
+            const graph_type& sample
         ) const
         {
             std::vector<bool> temp;
@@ -164,7 +164,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename vector_type 
+        typename vector_type
         >
     void serialize (
         const graph_labeler<vector_type>& item,
@@ -180,18 +180,18 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename vector_type 
+        typename vector_type
         >
     void deserialize (
         graph_labeler<vector_type>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         int version = 0;
         deserialize(version, in);
         if (version != 1)
         {
-            throw dlib::serialization_error("While deserializing graph_labeler, found unexpected version number of " + 
+            throw dlib::serialization_error("While deserializing graph_labeler, found unexpected version number of " +
                                             cast_to_string(version) + ".");
         }
 

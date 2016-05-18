@@ -23,14 +23,14 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON Pyramid_type
-                - must be one of the pyramid_down objects defined in 
+                - must be one of the pyramid_down objects defined in
                   dlib/image_transforms/image_pyramid_abstract.h or an object with
                   a compatible interface
 
             REQUIREMENTS ON Feature_extractor_type
-                - must be an object with an interface compatible with the hashed_feature_image 
-                  object defined in dlib/image_keypoint/hashed_feature_image_abstract.h or 
-                  with the nearest_neighbor_feature_image object defined in 
+                - must be an object with an interface compatible with the hashed_feature_image
+                  object defined in dlib/image_keypoint/hashed_feature_image_abstract.h or
+                  with the nearest_neighbor_feature_image object defined in
                   dlib/image_keypoint/nearest_neighbor_feature_image_abstract.h
 
             INITIAL VALUE
@@ -43,30 +43,30 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for running a sliding window classifier over
-                an image pyramid.  This object can also be understood as a general 
+                an image pyramid.  This object can also be understood as a general
                 tool for implementing the spatial pyramid models described in the paper:
-                    Beyond Bags of Features: Spatial Pyramid Matching for Recognizing 
-                    Natural Scene Categories by Svetlana Lazebnik, Cordelia Schmid, 
+                    Beyond Bags of Features: Spatial Pyramid Matching for Recognizing
+                    Natural Scene Categories by Svetlana Lazebnik, Cordelia Schmid,
                     and Jean Ponce
                 It also includes the ability to represent movable part models.
 
                 
 
 
-                The sliding window classifiers used by this object have three parts: 
+                The sliding window classifiers used by this object have three parts:
                    1. The underlying feature extraction provided by Feature_extractor_type
                       objects, which associate a vector with each location in an image.
 
-                   2. A detection template.  This is a rectangle which defines the shape of a 
-                      sliding window (i.e. the object_box), as well as a set of rectangular feature 
-                      extraction regions inside it.  This set of regions defines the spatial 
-                      structure of the overall feature extraction within a sliding window.  In 
-                      particular, each location of a sliding window has a feature vector 
+                   2. A detection template.  This is a rectangle which defines the shape of a
+                      sliding window (i.e. the object_box), as well as a set of rectangular feature
+                      extraction regions inside it.  This set of regions defines the spatial
+                      structure of the overall feature extraction within a sliding window.  In
+                      particular, each location of a sliding window has a feature vector
                       associated with it.  This feature vector is defined as follows:
                         - Let N denote the number of feature extraction zones.
                         - Let M denote the dimensionality of the vectors output by Feature_extractor_type
                           objects.
-                        - Let F(i) == the M dimensional vector which is the sum of all vectors 
+                        - Let F(i) == the M dimensional vector which is the sum of all vectors
                           given by our Feature_extractor_type object inside the i-th feature extraction
                           zone.
                         - Then the feature vector for a sliding window is an M*N dimensional vector
@@ -76,8 +76,8 @@ namespace dlib
                           feature extraction zones.
                           
                    3. A weight vector and a threshold value.  The dot product between the weight
-                      vector and the feature vector for a sliding window location gives the score 
-                      of the window.  If this score is greater than the threshold value then the 
+                      vector and the feature vector for a sliding window location gives the score
+                      of the window.  If this score is greater than the threshold value then the
                       window location is output as a detection.
 
                 Finally, the sliding window classifiers described above are applied to every level of
@@ -93,12 +93,12 @@ namespace dlib
                 feature vector is set to zero.  This way the length of the feature vector stays
                 constant).  This movable region construction allows us to represent objects with parts
                 that move around relative to the object box.  For example, a human has hands but they
-                aren't always in the same place relative to a person's bounding box.  
+                aren't always in the same place relative to a person's bounding box.
 
             THREAD SAFETY
                 Concurrent access to an instance of this object is not safe and should be protected
-                by a mutex lock except for the case where you are copying the configuration 
-                (via copy_configuration()) of a scan_image_pyramid object to many other threads.  
+                by a mutex lock except for the case where you are copying the configuration
+                (via copy_configuration()) of a scan_image_pyramid object to many other threads.
                 In this case, it is safe to copy the configuration of a shared object so long
                 as no other operations are performed on it.
         !*/
@@ -110,7 +110,7 @@ namespace dlib
         typedef Feature_extractor_type feature_extractor_type;
 
         scan_image_pyramid (
-        );  
+        );
         /*!
             ensures
                 - this object is properly initialized
@@ -154,8 +154,8 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns a const reference to the feature_extractor_type object used 
-                  internally for local feature extraction.  
+                - returns a const reference to the feature_extractor_type object used
+                  internally for local feature extraction.
         !*/
 
         void copy_configuration(
@@ -174,9 +174,9 @@ namespace dlib
         );
         /*!
             ensures
-                - copies all the state information of item into *this, except for state 
-                  information populated by load().  More precisely, given two scan_image_pyramid 
-                  objects S1 and S2, the following sequence of instructions should always 
+                - copies all the state information of item into *this, except for state
+                  information populated by load().  More precisely, given two scan_image_pyramid
+                  objects S1 and S2, the following sequence of instructions should always
                   result in both of them having the exact same state.
                     S2.copy_configuration(S1);
                     S1.load(img);
@@ -194,17 +194,17 @@ namespace dlib
                 - for all valid i:
                     - center(movable_feature_extraction_regions[i]) == point(0,0)
                 - if (get_num_detection_templates() > 0) then
-                    - get_num_stationary_components_per_detection_template() == stationary_feature_extraction_regions.size() 
-                    - get_num_movable_components_per_detection_template() == movable_feature_extraction_regions.size() 
+                    - get_num_stationary_components_per_detection_template() == stationary_feature_extraction_regions.size()
+                    - get_num_movable_components_per_detection_template() == movable_feature_extraction_regions.size()
                       (i.e. if you already have detection templates in this object, then
-                      any new detection template must declare a consistent number of 
+                      any new detection template must declare a consistent number of
                       feature extraction regions)
             ensures
-                - Adds another detection template to this object.  In particular, object_box 
-                  defines the size and shape of a sliding window while stationary_feature_extraction_regions 
-                  and movable_feature_extraction_regions defines the locations for feature extraction as 
-                  discussed in the WHAT THIS OBJECT REPRESENTS section above.  Note also that the locations of 
-                  the stationary feature extraction regions are relative to the object_box.  
+                - Adds another detection template to this object.  In particular, object_box
+                  defines the size and shape of a sliding window while stationary_feature_extraction_regions
+                  and movable_feature_extraction_regions defines the locations for feature extraction as
+                  discussed in the WHAT THIS OBJECT REPRESENTS section above.  Note also that the locations of
+                  the stationary feature extraction regions are relative to the object_box.
                 - #get_num_detection_templates() == get_num_detection_templates() + 1
                 - The order of rectangles in stationary_feature_extraction_regions and
                   movable_feature_extraction_regions matters.  Recall that each rectangle
@@ -214,8 +214,8 @@ namespace dlib
                   between the rectangle ordering in different detection templates.  For,
                   example, different detection templates should place corresponding feature
                   extraction regions in roughly the same part of the object_box.
-                - #get_num_stationary_components_per_detection_template() = stationary_feature_extraction_regions.size() 
-                - #get_num_movable_components_per_detection_template()    = movable_feature_extraction_regions.size() 
+                - #get_num_stationary_components_per_detection_template() = stationary_feature_extraction_regions.size()
+                - #get_num_movable_components_per_detection_template()    = movable_feature_extraction_regions.size()
         !*/
 
         void add_detection_template (
@@ -245,7 +245,7 @@ namespace dlib
                 - A detection template is a rectangle which defines the shape of a sliding
                   window (the object_box), as well as a set of rectangles which define
                   feature extraction zones.  This function returns the number of stationary
-                  feature extraction zones in the detection templates used by this object. 
+                  feature extraction zones in the detection templates used by this object.
         !*/
 
         unsigned long get_num_movable_components_per_detection_template (
@@ -256,8 +256,8 @@ namespace dlib
             ensures
                 - A detection template is a rectangle which defines the shape of a sliding
                   window (the object_box), as well as a set of rectangles which define
-                  feature extraction zones.  This function returns the number of movable 
-                  feature extraction zones in the detection templates used by this object. 
+                  feature extraction zones.  This function returns the number of movable
+                  feature extraction zones in the detection templates used by this object.
         !*/
 
         unsigned long get_num_components_per_detection_template (
@@ -268,7 +268,7 @@ namespace dlib
             ensures
                 - returns the total number of feature extraction zones in the detection
                   templates used by this object.  That is, returns the following:
-                    - get_num_movable_components_per_detection_template() + 
+                    - get_num_movable_components_per_detection_template() +
                       get_num_stationary_components_per_detection_template()
         !*/
 
@@ -279,8 +279,8 @@ namespace dlib
                 - get_num_detection_templates() > 0
             ensures
                 - returns the number of dimensions in the feature vector for a sliding window
-                  location.  This value is the dimensionality of the underlying feature vectors 
-                  produced by Feature_extractor_type times (get_num_stationary_components_per_detection_template() + 
+                  location.  This value is the dimensionality of the underlying feature vectors
+                  produced by Feature_extractor_type times (get_num_stationary_components_per_detection_template() +
                   get_num_movable_components_per_detection_template()).
         !*/
 
@@ -291,7 +291,7 @@ namespace dlib
                 - returns the maximum number of image pyramid levels this object will use.
                   Note that #get_max_pyramid_levels() == 1 indicates that no image pyramid
                   will be used at all.  That is, only the original image will be processed
-                  and no lower scale versions will be created.  
+                  and no lower scale versions will be created.
         !*/
 
         void set_max_pyramid_levels (
@@ -306,7 +306,7 @@ namespace dlib
 
         void set_min_pyramid_layer_size (
             unsigned long width,
-            unsigned long height 
+            unsigned long height
         );
         /*!
             requires
@@ -346,9 +346,9 @@ namespace dlib
                   function returns a number which defines a hard upper limit on the number of
                   detections allowed by a single scan.  This means that the total number of
                   possible detections produced by detect() is get_max_detections_per_template()*
-                  get_num_detection_templates()*(number of image pyramid layers).  Additionally, 
-                  if the maximum number of detections is reached during a scan then this object 
-                  will return a random subsample of all detections which are above the detection 
+                  get_num_detection_templates()*(number of image pyramid layers).  Additionally,
+                  if the maximum number of detections is reached during a scan then this object
+                  will return a random subsample of all detections which are above the detection
                   threshold.
         !*/
 
@@ -373,14 +373,14 @@ namespace dlib
                 - is_loaded_with_image() == true
                 - get_num_detection_templates() > 0
             ensures
-                - Scans all the detection templates over all pyramid layers as discussed in the 
+                - Scans all the detection templates over all pyramid layers as discussed in the
                   WHAT THIS OBJECT REPRESENTS section and stores all detections into #dets.
                 - for all valid i:
                     - #dets[i].second == The object box which produced this detection.  This rectangle gives
                       the location of the detection.  Note that the rectangle will have been converted back into
                       the original image input space.  That is, if this detection was made at a low level in the
                       image pyramid then the object box will have been automatically mapped up the pyramid layers
-                      to the original image space.  Or in other words, if you plot #dets[i].second on top of the 
+                      to the original image space.  Or in other words, if you plot #dets[i].second on top of the
                       image given to load() it will show up in the right place.
                     - #dets[i].first == The score for this detection.  This value is equal to dot(w, feature vector
                       for this sliding window location).
@@ -389,7 +389,7 @@ namespace dlib
                 - Elements of w beyond index get_num_dimensions()-1 are ignored.  I.e. only the first
                   get_num_dimensions() are used.
                 - Note that no form of non-max suppression is performed.  If a window has a score >= thresh
-                  then it is reported in #dets (assuming the limit imposed by get_max_detections_per_template() hasn't 
+                  then it is reported in #dets (assuming the limit imposed by get_max_detections_per_template() hasn't
                   been reached).
         !*/
 
@@ -400,7 +400,7 @@ namespace dlib
             requires
                 - get_num_detection_templates() > 0
             ensures
-                - Since scan_image_pyramid is a sliding window classifier system, not all possible rectangles 
+                - Since scan_image_pyramid is a sliding window classifier system, not all possible rectangles
                   can be represented.  Therefore, this function allows you to supply a rectangle and obtain the
                   nearest possible sliding window rectangle.
         !*/
@@ -451,7 +451,7 @@ namespace dlib
                   were detected.  To do this, you supply the w and detected rectangle.
                   Then the corresponding fully populated full_object_detection will be
                   returned.
-                - returns a full_object_detection, OBJ, such that: 
+                - returns a full_object_detection, OBJ, such that:
                     - OBJ.get_rect() == rect
                     - OBJ.num_parts() == get_num_movable_components_per_detection_template()
                     - OBJ.part(i) == the location of the i-th movable part inside this detection,
@@ -471,7 +471,7 @@ namespace dlib
         std::ostream& out
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     template <
@@ -480,10 +480,10 @@ namespace dlib
         >
     void deserialize (
         scan_image_pyramid<Pyramid_type,Feature_extractor_type>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

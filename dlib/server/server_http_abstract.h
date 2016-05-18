@@ -14,16 +14,16 @@ namespace dlib
 // -----------------------------------------------------------------------------------------
 
     template <
-        typename Key, 
-        typename Value, 
-        typename Comparer = std::less<Key> 
+        typename Key,
+        typename Value,
+        typename Comparer = std::less<Key>
         >
     class constmap : public std::map<Key, Value, Comparer>
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is simply an extension to the std::map that allows you 
-                to use the operator[] accessor with a constant map.  
+                This is simply an extension to the std::map that allows you
+                to use the operator[] accessor with a constant map.
         !*/
     public:
 
@@ -53,7 +53,7 @@ namespace dlib
                     - Adds a new entry into the map that is associated with the
                       given key.  The new entry will be default initialized and
                       this function returns a reference to it.
-        !*/ 
+        !*/
     };
 
     typedef constmap<std::string, std::string> key_value_map;
@@ -64,7 +64,7 @@ namespace dlib
 
 // -----------------------------------------------------------------------------------------
 
-    struct incoming_things 
+    struct incoming_things
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -105,7 +105,7 @@ namespace dlib
         unsigned short local_port;
     };
 
-    struct outgoing_things 
+    struct outgoing_things
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -132,18 +132,18 @@ namespace dlib
 
 // -----------------------------------------------------------------------------------------
 
-    class http_parse_error : public error 
+    class http_parse_error : public error
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is an exception thrown by the parse_http_request() routine if 
+                This is an exception thrown by the parse_http_request() routine if
                 there is a problem.
         !*/
     };
 
 // -----------------------------------------------------------------------------------------
 
-    unsigned long parse_http_request ( 
+    unsigned long parse_http_request (
         std::istream& in,
         incoming_things& incoming,
         unsigned long max_content_length
@@ -201,17 +201,17 @@ namespace dlib
 
     void write_http_response (
         std::ostream& out,
-        const http_parse_error& e 
+        const http_parse_error& e
     );
     /*!
         ensures
-            - Writes an HTTP error response based on the information in the exception 
+            - Writes an HTTP error response based on the information in the exception
               object e.
     !*/
 
     void write_http_response (
         std::ostream& out,
-        const std::exception& e 
+        const std::exception& e
     );
     /*!
         ensures
@@ -222,14 +222,14 @@ namespace dlib
 // -----------------------------------------------------------------------------------------
 // -----------------------------------------------------------------------------------------
 
-    class server_http : public server_iostream 
+    class server_http : public server_iostream
     {
 
         /*!
             WHAT THIS EXTENSION DOES FOR server_iostream
                 This extension turns the server object into a simple HTTP server.  It only
                 handles HTTP GET, PUT and POST requests and each incoming request triggers
-                the on_request() callback.  
+                the on_request() callback.
 
             COOKIE STRINGS
                 The strings returned in the cookies key_value_map should be of the following form:
@@ -237,17 +237,17 @@ namespace dlib
                     value: cookie contents; expires=Fri, 31-Dec-2010 23:59:59 GMT; path=/; domain=.example.net
 
                 You don't have to supply all the extra cookie arguments.  So if you just want to
-                set a cookie that will expire when the client's browser is closed you can 
+                set a cookie that will expire when the client's browser is closed you can
                 just say something like incoming.cookies["cookie_name"] = "cookie contents";
 
             HTTP HEADERS
                 The HTTP headers in the incoming.headers and outgoing.headers are the name/value pairs
                 of HTTP headers.  For example, the HTTP header "Content-Type: text/html" would be
-                encoded such that outgoing.headers["Content-Type"] == "text/html". 
+                encoded such that outgoing.headers["Content-Type"] == "text/html".
 
-                Also note that if you wish to change the content type of your response to the 
-                client you may do so by setting the "Content-Type" header to whatever you like. 
-                However, setting this field manually is not necessary as it will default to 
+                Also note that if you wish to change the content type of your response to the
+                client you may do so by setting the "Content-Type" header to whatever you like.
+                However, setting this field manually is not necessary as it will default to
                 "text/html" if you don't explicitly set it to something.
         !*/
 
@@ -286,48 +286,48 @@ namespace dlib
         ) = 0;
         /*!
             requires
-                - on_request() is called when there is an HTTP GET or POST request to be serviced 
-                - on_request() is run in its own thread 
-                - is_running() == true 
-                - the number of current on_request() functions running < get_max_connection() 
-                - in incoming: 
+                - on_request() is called when there is an HTTP GET or POST request to be serviced
+                - on_request() is run in its own thread
+                - is_running() == true
+                - the number of current on_request() functions running < get_max_connection()
+                - in incoming:
                     - incoming.path == the path being requested by this request
                     - incoming.request_type == the type of request, GET or POST
                     - incoming.content_type == the content type associated with this request
-                    - incoming.protocol == The protocol being used by the web browser (e.g. HTTP/1.1) 
+                    - incoming.protocol == The protocol being used by the web browser (e.g. HTTP/1.1)
                     - incoming.body == a string that contains the data that was posted back to the
                       web server by the client (e.g. The string has the length specified by the
                       Content-Length header).
                     - incoming.body.size() < get_max_content_length()
-                    - incoming.queries == a map that contains all the key/value pairs in the query 
+                    - incoming.queries == a map that contains all the key/value pairs in the query
                       string of this request.  The key and value strings of the query string will
                       have been decoded back into their original form before being sent to this
-                      function (i.e. '+' decoded back to ' ' and "%hh" into its corresponding 
+                      function (i.e. '+' decoded back to ' ' and "%hh" into its corresponding
                       ascii value.  So the URL-encoding is decoded automatically)
-                    - incoming.cookies == The set of cookies that came from the client along with 
+                    - incoming.cookies == The set of cookies that came from the client along with
                       this request.  The cookies will have been decoded back to normal form
                       from the URL-encoding.
-                    - incoming.headers == a map that contains all the incoming HTTP headers 
-                      from the client web browser.  
-                    - incoming.foreign_ip == the foreign ip address for this request 
+                    - incoming.headers == a map that contains all the incoming HTTP headers
+                      from the client web browser.
+                    - incoming.foreign_ip == the foreign ip address for this request
                     - incoming.foreign_port == the foreign port number for this request
-                    - incoming.local_ip == the IP of the local interface this request is coming in on 
-                    - incoming.local_port == the local port number this request is coming in on 
+                    - incoming.local_ip == the IP of the local interface this request is coming in on
+                    - incoming.local_port == the local port number this request is coming in on
                 - in outgoing:
                     - outgoing.cookies.size() == 0
                     - outgoing.headers.size() == 0
                     - outgoing.http_return == 200
                     - outgoing.http_return_status == "OK"
             ensures
-                - This function returns the HTML page to be displayed as the response to this request. 
-                - this function will not call clear()  
+                - This function returns the HTML page to be displayed as the response to this request.
+                - this function will not call clear()
                 - #outgoing.cookies == a set of new cookies to pass back to the client along
-                  with the result of this request.  (Note that URL-encoding is automatically applied 
+                  with the result of this request.  (Note that URL-encoding is automatically applied
                   so you don't have to do it yourself)
                 - #outgoing.headers == a set of additional headers you wish to appear in the
                   HTTP response to this request.  (This may be empty, the minimum needed headers
                   will be added automatically if you don't set them)
-                - outgoing.http_return and outgoing.http_return_status may be set to override the 
+                - outgoing.http_return and outgoing.http_return_status may be set to override the
                   default HTTP return code of 200 OK
             throws
                 - throws only exceptions derived from std::exception.  If an exception is thrown
@@ -384,7 +384,7 @@ namespace dlib
 
 }
 
-#endif // DLIB_SERVER_HTTp_ABSTRACT_ 
+#endif // DLIB_SERVER_HTTp_ABSTRACT_
 
 
 

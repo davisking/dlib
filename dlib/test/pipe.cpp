@@ -11,7 +11,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -81,7 +81,7 @@ namespace
                 dlog << LWARN << "ERRORS FOUND";
                 dlog << LWARN << e.what();
                 p.disable();
-            }        
+            }
 
             remove_running_thread();
         }
@@ -117,7 +117,7 @@ namespace
                 dlog << LWARN << "ERRORS FOUND";
                 dlog << LWARN << e.what();
                 p.disable();
-            }        
+            }
             remove_running_thread();
         }
 
@@ -153,7 +153,7 @@ namespace
                 dlog << LWARN << "ERRORS FOUND";
                 dlog << LWARN << e.what();
                 p.disable();
-            }        
+            }
             remove_running_thread();
         }
 
@@ -190,16 +190,16 @@ namespace
         in_type InMsg;
         out_type OutMsg;
 
-        void thread() 
+        void thread()
         {
             while (!should_stop()) {
-                if(InPipe.dequeue_or_timeout(InMsg, 100)) 
+                if(InPipe.dequeue_or_timeout(InMsg, 100))
                 {
                     // if function signals ready to send OutMsg
-                    while (!OutPipe.enqueue_or_timeout(OutMsg, 100)) 
+                    while (!OutPipe.enqueue_or_timeout(OutMsg, 100))
                     {
                         // try to send until should stop
-                        if (should_stop()) 
+                        if (should_stop())
                         {
                             return;
                         }
@@ -252,9 +252,9 @@ namespace
             - pipe is an implementation of pipe/pipe_kernel_abstract.h and
               is instantiated with int
         ensures
-            - runs tests on pipe for compliance with the specs 
+            - runs tests on pipe for compliance with the specs
     !*/
-    {        
+    {
         using namespace pipe_kernel_test_helpers;
         found_error = false;
 

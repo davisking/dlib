@@ -31,8 +31,8 @@ namespace dlib
         typename bit_stream_base
         >
     inline void swap (
-        bit_stream_multi_1<bit_stream_base>& a, 
-        bit_stream_multi_1<bit_stream_base>& b 
+        bit_stream_multi_1<bit_stream_base>& a,
+        bit_stream_multi_1<bit_stream_base>& b
     ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ namespace dlib
     template <
         typename bit_stream_base
         >
-    void bit_stream_multi_1<bit_stream_base>:: 
+    void bit_stream_multi_1<bit_stream_base>::
     multi_write (
         unsigned long data,
         int num_to_write
@@ -69,7 +69,7 @@ namespace dlib
     template <
         typename bit_stream_base
         >
-    int bit_stream_multi_1<bit_stream_base>:: 
+    int bit_stream_multi_1<bit_stream_base>::
     multi_read (
         unsigned long& data,
         int num_to_read

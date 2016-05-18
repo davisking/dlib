@@ -15,7 +15,7 @@
 #include "../array2d.h"
 #include "../pixel.h"
 #include "../image_transforms/assign_image.h"
-#include "../array.h" 
+#include "../array.h"
 #include "style.h"
 #include "../smart_pointers.h"
 #include "../unicode.h"
@@ -52,10 +52,10 @@ namespace dlib
 
     public:
 
-        draggable(  
+        draggable(
             drawable_window& w,
             unsigned long events = 0
-        ) : 
+        ) :
             drawable(w,events | MOUSE_MOVE | MOUSE_CLICK),
             drag(false)
         {}
@@ -67,8 +67,8 @@ namespace dlib
         ) const { auto_mutex M(m); return area; }
 
         void set_draggable_area (
-            const rectangle& area_ 
-        ) { auto_mutex M(m); area = area_; } 
+            const rectangle& area_
+        ) { auto_mutex M(m); area = area_; }
 
     protected:
 
@@ -92,7 +92,7 @@ namespace dlib
             unsigned long ,
             long x,
             long y,
-            bool 
+            bool
         );
 
         void on_mouse_up (
@@ -115,7 +115,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class mouse_over_event 
+    // class mouse_over_event
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -131,7 +131,7 @@ namespace dlib
 
     public:
 
-        mouse_over_event(  
+        mouse_over_event(
             drawable_window& w,
             unsigned long events = 0
         ) :
@@ -182,11 +182,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class button_action 
+    // class button_action
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class button_action : public mouse_over_event 
+    class button_action : public mouse_over_event
     {
         /*!
             INITIAL VALUE
@@ -198,13 +198,13 @@ namespace dlib
                 - if (the user has clicked the button but hasn't yet released the
                       left mouse button) then
                     - seen_click == true
-                - else 
+                - else
                     - seen_click == false
         !*/
 
     public:
 
-        button_action(  
+        button_action(
             drawable_window& w,
             unsigned long events = 0
         ) :
@@ -231,7 +231,7 @@ namespace dlib
         ){}
 
         virtual void on_button_up (
-            bool 
+            bool
         ){}
 
         void on_mouse_not_over (
@@ -274,7 +274,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class widget_group 
+    // class widget_group
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -288,7 +288,7 @@ namespace dlib
                 - widgets contains all the drawable objects and their relative positions
                   that are in *this.
                 - wg_widgets contains pointers to just the widgets that happen
-                  to be widget_group objects.  
+                  to be widget_group objects.
         !*/
 
         struct relpos
@@ -298,7 +298,7 @@ namespace dlib
         };
 
     public:
-        widget_group(  
+        widget_group(
             drawable_window& w
         ) : drawable(w) { rect = rectangle(0,0,-1,-1); enable_events();}
 
@@ -329,7 +329,7 @@ namespace dlib
         );
 
         unsigned long size (
-        ) const; 
+        ) const;
 
         void set_pos (
             long x,
@@ -359,7 +359,7 @@ namespace dlib
 
         // this object doesn't draw anything but also isn't abstract
         void draw (
-            const canvas& 
+            const canvas&
         ) const {}
 
     private:
@@ -388,7 +388,7 @@ namespace dlib
 
     public:
 
-        image_widget(  
+        image_widget(
             drawable_window& w
         ): draggable(w)  { enable_events(); }
 
@@ -396,7 +396,7 @@ namespace dlib
         )
         {
             disable_events();
-            parent.invalidate_rectangle(rect); 
+            parent.invalidate_rectangle(rect);
         }
 
         template <
@@ -409,7 +409,7 @@ namespace dlib
             auto_mutex M(m);
             assign_image_scaled(img,new_img);
             rectangle old(rect);
-            rect.set_right(rect.left()+img.nc()-1); 
+            rect.set_right(rect.left()+img.nc()-1);
             rect.set_bottom(rect.top()+img.nr()-1);
             parent.invalidate_rectangle(rect+old);
         }
@@ -436,11 +436,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class tooltip 
+    // class tooltip
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class tooltip : public mouse_over_event 
+    class tooltip : public mouse_over_event
     {
         /*!
             INITIAL VALUE
@@ -454,9 +454,9 @@ namespace dlib
 
     public:
 
-        tooltip(  
+        tooltip(
             drawable_window& w
-        ) : 
+        ) :
             mouse_over_event(w,MOUSE_CLICK)
         {}
 
@@ -464,8 +464,8 @@ namespace dlib
         ){ disable_events();}
 
         void set_size (
-            unsigned long width, 
-            unsigned long height 
+            unsigned long width,
+            unsigned long height
         )
         {
             auto_mutex M(m);
@@ -578,12 +578,12 @@ namespace dlib
         }
 
         void draw (
-            const canvas& 
+            const canvas&
         ) const{}
 
     private:
 
-        class tooltip_window : public base_window 
+        class tooltip_window : public base_window
         {
         public:
             tooltip_window (const shared_ptr_thread_safe<font>& f) : base_window(false,true), pad(3), mfont(f)
@@ -641,7 +641,7 @@ namespace dlib
         {
             auto_mutex M(m);
             long x, y;
-            // if the mouse has moved since we started the timer then 
+            // if the mouse has moved since we started the timer then
             // keep waiting until the user stops moving it
             if (lastx != stuff->x || lasty != stuff->y)
             {
@@ -660,7 +660,7 @@ namespace dlib
             // make sure the tooltip isn't going to be off the screen
             parent.get_display_size(display_width, display_height);
             rectangle wrect(move_rect(stuff->win.rect_all,x,y));
-            rectangle srect(display_width, display_height); 
+            rectangle srect(display_width, display_height);
             if (srect.contains(wrect) == false)
             {
                 rectangle temp(srect.intersect(wrect));
@@ -673,19 +673,19 @@ namespace dlib
         }
 
         // put all this stuff in data so we can arrange to only
-        // construct it when someone is actually using the tooltip widget 
+        // construct it when someone is actually using the tooltip widget
         // rather than just instantiating it.
         struct data
         {
             data(
                 tooltip& self
-            ) : 
-                x(-1), 
+            ) :
+                x(-1),
                 y(-1),
                 win(self.mfont),
-                tt_timer(self,&tooltip::show_tooltip) 
-            { 
-                tt_timer.set_delay_time(400); 
+                tt_timer(self,&tooltip::show_tooltip)
+            {
+                tt_timer.set_delay_time(400);
             }
 
             long x, y;
@@ -705,16 +705,16 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class button  
+    // class button
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class button : public button_action 
+    class button : public button_action
     {
     public:
         button(
             drawable_window& w
-        ) : 
+        ) :
             button_action(w),
             btn_tooltip(w)
         {
@@ -976,11 +976,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class scroll_bar 
+    // class scroll_bar
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class scroll_bar : public drawable 
+    class scroll_bar : public drawable
     {
         /*!
             INITIAL VALUE
@@ -1001,13 +1001,13 @@ namespace dlib
         !*/
 
     public:
-        enum bar_orientation 
+        enum bar_orientation
         {
             HORIZONTAL,
             VERTICAL
         };
 
-        scroll_bar(  
+        scroll_bar(
             drawable_window& w,
             bar_orientation orientation_
         );
@@ -1166,7 +1166,7 @@ namespace dlib
 
 
         void on_slider_drag (
-        ); 
+        );
         /*!
             requires
                 - is called whenever the user drags the slider
@@ -1274,11 +1274,11 @@ namespace dlib
             }
 
             void on_button_down (
-            ) { bdown(); } 
+            ) { bdown(); }
 
             void on_button_up (
                 bool mouse_over
-            ) { bup(mouse_over); } 
+            ) { bup(mouse_over); }
 
             scroll_bar& my_scroll_bar;
             any_function<void()> bdown;
@@ -1290,7 +1290,7 @@ namespace dlib
         {
             friend class scroll_bar;
         public:
-            slider_class ( 
+            slider_class (
                 drawable_window& w,
                 scroll_bar& object,
                 void (scroll_bar::*handler)()
@@ -1357,7 +1357,7 @@ namespace dlib
             }
 
             void on_drag_stop (
-            ) 
+            )
             {
                 if (my_scroll_bar.style->redraw_on_mouse_over_slider())
                     parent.invalidate_rectangle(rect);
@@ -1402,12 +1402,12 @@ namespace dlib
 
         button b1, b2;
         slider_class slider;
-        bar_orientation ori; 
+        bar_orientation ori;
         filler top_filler, bottom_filler;
         any_function<void()> scroll_handler;
 
         long pos;
-        long max_pos; 
+        long max_pos;
         long js;
 
         timer<scroll_bar> b1_timer;
@@ -1424,7 +1424,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class popup_menu 
+    // class popup_menu
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -1436,7 +1436,7 @@ namespace dlib
         virtual rectangle get_left_size (
         ) const { return rectangle(); }
         virtual rectangle get_middle_size (
-        ) const = 0; 
+        ) const = 0;
         virtual rectangle get_right_size (
         ) const { return rectangle(); }
 
@@ -1447,28 +1447,28 @@ namespace dlib
             const canvas& ,
             const rectangle& ,
             const bool ,
-            const bool 
+            const bool
         ) const {}
 
         virtual void draw_left (
             const canvas& ,
             const rectangle& ,
             const bool ,
-            const bool 
+            const bool
         ) const {}
 
         virtual void draw_middle (
             const canvas& ,
             const rectangle& ,
             const bool ,
-            const bool 
+            const bool
         ) const = 0;
 
         virtual void draw_right (
             const canvas& ,
             const rectangle& ,
             const bool ,
-            const bool 
+            const bool
         ) const {}
 
         virtual void on_click (
@@ -1508,7 +1508,7 @@ namespace dlib
         menu_item_submenu (
             const std::string& str,
             unichar hk = 0
-        ) : 
+        ) :
             text(convert_wstring_to_utf32(convert_mbstring_to_wstring(str))),
             f(default_font::get_font()),
             hotkey(hk)
@@ -1519,7 +1519,7 @@ namespace dlib
         menu_item_submenu (
             const std::wstring& str,
             unichar hk = 0
-        ) : 
+        ) :
             text(convert_wstring_to_utf32(str)),
             f(default_font::get_font()),
             hotkey(hk)
@@ -1530,7 +1530,7 @@ namespace dlib
         menu_item_submenu (
             const dlib::ustring& str,
             unichar hk = 0
-        ) : 
+        ) :
             text(str),
             f(default_font::get_font()),
             hotkey(hk)
@@ -1542,7 +1542,7 @@ namespace dlib
         ) const { return hotkey; }
 
         virtual rectangle get_middle_size (
-        ) const  
+        ) const
         {
             unsigned long width, height;
             f->compute_size(text,width,height);
@@ -1550,7 +1550,7 @@ namespace dlib
         }
 
         virtual rectangle get_right_size (
-        ) const  
+        ) const
         {
             return rectangle(15, 5);
         }
@@ -1560,7 +1560,7 @@ namespace dlib
             const rectangle& rect,
             const bool enabled,
             const bool is_selected
-        ) const 
+        ) const
         {
             if (c.intersect(rect).is_empty())
                 return;
@@ -1576,8 +1576,8 @@ namespace dlib
             const canvas& c,
             const rectangle& rect,
             const bool enabled,
-            const bool 
-        ) const 
+            const bool
+        ) const
         {
             if (c.intersect(rect).is_empty())
                 return;
@@ -1599,8 +1599,8 @@ namespace dlib
             const canvas& c,
             const rectangle& rect,
             const bool enabled,
-            const bool 
-        ) const 
+            const bool
+        ) const
         {
             if (c.intersect(rect).is_empty())
                 return;
@@ -1666,7 +1666,7 @@ namespace dlib
             T& object,
             void (T::*event_handler_)(),
             unichar hk = 0
-        ) : 
+        ) :
             text(convert_wstring_to_utf32(convert_mbstring_to_wstring(str))),
             f(default_font::get_font()),
             hotkey(hk)
@@ -1678,7 +1678,7 @@ namespace dlib
             const std::string& str,
             const any_function<void()>& event_handler_,
             unichar hk = 0
-        ) : 
+        ) :
             text(convert_wstring_to_utf32(convert_mbstring_to_wstring(str))),
             f(default_font::get_font()),
             hotkey(hk)
@@ -1692,7 +1692,7 @@ namespace dlib
             T& object,
             void (T::*event_handler_)(),
             unichar hk = 0
-        ) : 
+        ) :
             text(convert_wstring_to_utf32(str)),
             f(default_font::get_font()),
             hotkey(hk)
@@ -1704,7 +1704,7 @@ namespace dlib
             const std::wstring& str,
             const any_function<void()>& event_handler_,
             unichar hk = 0
-        ) : 
+        ) :
             text(convert_wstring_to_utf32(str)),
             f(default_font::get_font()),
             hotkey(hk)
@@ -1718,7 +1718,7 @@ namespace dlib
             T& object,
             void (T::*event_handler_)(),
             unichar hk = 0
-        ) : 
+        ) :
             text(str),
             f(default_font::get_font()),
             hotkey(hk)
@@ -1730,7 +1730,7 @@ namespace dlib
             const dlib::ustring& str,
             const any_function<void()>& event_handler_,
             unichar hk = 0
-        ) : 
+        ) :
             text(str),
             f(default_font::get_font()),
             hotkey(hk)
@@ -1742,7 +1742,7 @@ namespace dlib
         ) const { return hotkey; }
 
         virtual rectangle get_middle_size (
-        ) const  
+        ) const
         {
             unsigned long width, height;
             f->compute_size(text,width,height);
@@ -1754,7 +1754,7 @@ namespace dlib
             const rectangle& rect,
             const bool enabled,
             const bool is_selected
-        ) const 
+        ) const
         {
             if (c.intersect(rect).is_empty())
                 return;
@@ -1770,8 +1770,8 @@ namespace dlib
             const canvas& c,
             const rectangle& rect,
             const bool enabled,
-            const bool 
-        ) const 
+            const bool
+        ) const
         {
             if (c.intersect(rect).is_empty())
                 return;
@@ -1791,7 +1791,7 @@ namespace dlib
         }
 
         virtual void on_click (
-        ) const 
+        ) const
         {
             action();
         }
@@ -1814,7 +1814,7 @@ namespace dlib
     {
     public:
         virtual rectangle get_middle_size (
-        ) const  
+        ) const
         {
             return rectangle(10,4);
         }
@@ -1823,8 +1823,8 @@ namespace dlib
             const canvas& c,
             const rectangle& rect,
             const bool ,
-            const bool 
-        ) const 
+            const bool
+        ) const
         {
             if (c.intersect(rect).is_empty())
                 return;
@@ -1842,8 +1842,8 @@ namespace dlib
             const canvas& ,
             const rectangle& ,
             const bool ,
-            const bool 
-        ) const 
+            const bool
+        ) const
         {
         }
     };
@@ -1859,7 +1859,7 @@ namespace dlib
                 - cur_rect == rectangle(pad,pad,pad-1,pad-1)
                 - left_width == 0
                 - middle_width == 0
-                - selected_item == 0 
+                - selected_item == 0
                 - submenu_open == false
                 - items.size() == 0
                 - item_enabled.size() == 0
@@ -1874,13 +1874,13 @@ namespace dlib
                 - pad = 2
                 - item_pad = 3
                 - all of the following arrays have the same size:
-                    - items.size() 
-                    - item_enabled.size() 
-                    - left_rects.size() 
-                    - middle_rects.size() 
-                    - right_rects.size() 
-                    - line_rects.size() 
-                    - submenus.size() 
+                    - items.size()
+                    - item_enabled.size()
+                    - left_rects.size()
+                    - middle_rects.size()
+                    - right_rects.size()
+                    - line_rects.size()
+                    - submenus.size()
 
                 - win_rect == a rectangle that is the exact size of this window and with
                   its upper left corner at (0,0)
@@ -1893,7 +1893,7 @@ namespace dlib
 
                 - if (there is a selected submenu and it is currently open) then
                     - submenu_open == true
-                - else 
+                - else
                     - submenu_open == false
 
                 - for all valid i:
@@ -1903,7 +1903,7 @@ namespace dlib
                     - middle_rects[i] == the middle rectangle for the ith menu item
                     - right_rects[i] == the right rectangle for the ith menu item
                     - line_rects[i] == the rectangle for the entire line on which the ith menu
-                      item appears. 
+                      item appears.
                     - if (submenus[i] != 0) then
                         - the ith menu item has a submenu and it is pointed to by submenus[i]
 
@@ -1987,7 +1987,7 @@ namespace dlib
             rectangle line(move_rect(rectangle(cur_rect.width(),all.height()+2*item_pad), x-item_pad, y-item_pad));
 
             // make sure the left, middle, and right rectangles are centered in the
-            // line. 
+            // line.
             if (left.height() < all.height())
                 left = translate_rect(left,0, (all.height()-left.height())/2);
             if (middle.height() < all.height())
@@ -2131,10 +2131,10 @@ namespace dlib
 
         const long pad;
         const long item_pad;
-        rectangle cur_rect; 
-        rectangle win_rect; 
-        unsigned long left_width;    
-        unsigned long middle_width;    
+        rectangle cur_rect;
+        rectangle win_rect;
+        unsigned long left_width;
+        unsigned long middle_width;
         array<scoped_ptr<menu_item> > items;
         array<bool> item_enabled;
         array<rectangle> left_rects;
@@ -2153,7 +2153,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class zoomable_region : public drawable 
+    class zoomable_region : public drawable
     {
         /*!
             INITIAL VALUE
@@ -2169,10 +2169,10 @@ namespace dlib
                 - min_zoom_scale() == min_scale
                 - max_zoom_scale() == max_scale
                 - zoom_scale() == scale
-                - if (the user is currently dragging the graph around via the mouse) then 
+                - if (the user is currently dragging the graph around via the mouse) then
                     - mouse_drag_screen == true
                 - else
-                    - mouse_drag_screen == false 
+                    - mouse_drag_screen == false
 
                 - max_graph_point() == lr_point
                 - display_rect() == display_rect_
@@ -2218,11 +2218,11 @@ namespace dlib
         ) const;
 
         void set_max_zoom_scale (
-            double ms 
+            double ms
         );
 
         void set_min_zoom_scale (
-            double ms 
+            double ms
         );
 
         double min_zoom_scale (
@@ -2366,7 +2366,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class scrollable_region : public drawable 
+    class scrollable_region : public drawable
     {
         /*!
             INITIAL VALUE
@@ -2390,10 +2390,10 @@ namespace dlib
 
                 - if (the user is currently dragging the total_rect around with a mouse drag) then
                     - user_is_dragging_mouse == true
-                    - drag_origin == the point the mouse was at, with respect to total_rect, 
+                    - drag_origin == the point the mouse was at, with respect to total_rect,
                       when the dragging started
                 - else
-                    - user_is_dragging_mouse == false 
+                    - user_is_dragging_mouse == false
         !*/
 
     public:
@@ -2582,11 +2582,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class popup_menu_region 
+    // class popup_menu_region
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class popup_menu_region : public drawable 
+    class popup_menu_region : public drawable
     {
         /*!
             CONVENTION
@@ -2595,7 +2595,7 @@ namespace dlib
 
     public:
 
-        popup_menu_region(  
+        popup_menu_region(
             drawable_window& w
         );
 
@@ -2603,7 +2603,7 @@ namespace dlib
         );
 
         void set_size (
-            unsigned long width, 
+            unsigned long width,
             unsigned long height
         );
 
@@ -2652,7 +2652,7 @@ namespace dlib
         );
 
         void draw (
-            const canvas& 
+            const canvas&
         ) const;
 
     private:

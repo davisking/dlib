@@ -51,14 +51,14 @@ namespace dlib
 
 
     template <
-        typename net_type, 
+        typename net_type,
         typename solver_type = sgd
         >
     class dnn_trainer : private threaded_object
     {
     public:
 
-        static_assert(is_loss_layer_type<net_type>::value, 
+        static_assert(is_loss_layer_type<net_type>::value,
             "The last layer in a network must be a loss layer.");
 
         typedef typename net_type::label_type label_type;
@@ -82,9 +82,9 @@ namespace dlib
         }
 
         dnn_trainer(
-            net_type& net_, 
+            net_type& net_,
             const solver_type& solver_
-        ) : job_pipe(0), net(net_) 
+        ) : job_pipe(0), net(net_)
         {
             devices.push_back(std::make_shared<device_data>(dlib::cuda::get_device(), net, solver_));
 
@@ -92,10 +92,10 @@ namespace dlib
         }
 
         dnn_trainer(
-            net_type& net_, 
+            net_type& net_,
             const solver_type& solver_,
             const std::vector<int>& cuda_extra_devices
-        ) : job_pipe(0), net(net_) 
+        ) : job_pipe(0), net(net_)
         {
             devices.push_back(std::make_shared<device_data>(dlib::cuda::get_device(), net, solver_));
 
@@ -129,10 +129,10 @@ namespace dlib
         }
 
         net_type& get_net (
-        ) const 
-        { 
+        ) const
+        {
             wait_for_thread_to_pause();
-            return net; 
+            return net;
         }
 
 
@@ -140,7 +140,7 @@ namespace dlib
         ) const { return mini_batch_size; }
 
         void set_mini_batch_size (
-            unsigned long batch_size 
+            unsigned long batch_size
         )
         {
             DLIB_CASSERT(batch_size > 0,"");
@@ -152,7 +152,7 @@ namespace dlib
 
         void set_max_num_epochs (
             unsigned long num
-        )  
+        )
         {
             DLIB_CASSERT(num > 0,"");
             max_num_epochs = num;
@@ -172,15 +172,15 @@ namespace dlib
 
 
         const std::vector<solver_type>& get_solvers (
-        ) const 
-        { 
+        ) const
+        {
             wait_for_thread_to_pause();
-            return devices[0]->solvers; 
+            return devices[0]->solvers;
         }
 
         void train_one_step (
             const std::vector<input_type>& data,
-            const std::vector<label_type>& labels 
+            const std::vector<label_type>& labels
         )
         {
             DLIB_CASSERT(data.size() == labels.size() && data.size() > 0, "");
@@ -192,7 +192,7 @@ namespace dlib
                 if (now_time-last_time > seconds(40))
                 {
                     last_time = now_time;
-                    std::cout << "step#: " << rpad(cast_to_string(train_one_step_calls),epoch_string_pad) << "  " 
+                    std::cout << "step#: " << rpad(cast_to_string(train_one_step_calls),epoch_string_pad) << "  "
                               << "learning rate: " << rpad(cast_to_string(learning_rate),lr_string_pad) << "  "
                               << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad)  << "  ";
                     print_progress();
@@ -217,7 +217,7 @@ namespace dlib
                 if (now_time-last_time > seconds(40))
                 {
                     last_time = now_time;
-                    std::cout << "step#: " << rpad(cast_to_string(train_one_step_calls),epoch_string_pad) << "  " 
+                    std::cout << "step#: " << rpad(cast_to_string(train_one_step_calls),epoch_string_pad) << "  "
                               << "learning rate: " << rpad(cast_to_string(learning_rate),lr_string_pad) << "  "
                               << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) << "  ";
                     print_progress();
@@ -231,8 +231,8 @@ namespace dlib
 
         void train (
             const std::vector<input_type>& data,
-            const std::vector<label_type>& labels 
-        ) 
+            const std::vector<label_type>& labels
+        )
         {
             DLIB_CASSERT(data.size() == labels.size() && data.size() > 0, "");
 
@@ -240,8 +240,8 @@ namespace dlib
             // The reason these two loops don't initialize their counter variables but
             // instead use class members is so we can include the state of the loops in the
             // stuff written by sync_to_disk()
-            for (; 
-                epoch_iteration < max_num_epochs && learning_rate >= min_learning_rate; 
+            for (;
+                epoch_iteration < max_num_epochs && learning_rate >= min_learning_rate;
                 ++epoch_iteration)
             {
                 using namespace std::chrono;
@@ -256,7 +256,7 @@ namespace dlib
                         {
                             last_time = now_time;
                             auto iter = epoch_iteration + epoch_pos/(double)data.size();
-                            std::cout << "epoch: " << rpad(cast_to_string(iter),epoch_string_pad) << "  " 
+                            std::cout << "epoch: " << rpad(cast_to_string(iter),epoch_string_pad) << "  "
                                       << "learning rate: " << rpad(cast_to_string(learning_rate),lr_string_pad) << "  "
                                       << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) << "  ";
                             print_progress();
@@ -264,8 +264,8 @@ namespace dlib
                     }
 
                     sync_to_disk();
-                    send_job(data.begin()+epoch_pos, 
-                              data.begin()+std::min(epoch_pos+mini_batch_size,data.size()), 
+                    send_job(data.begin()+epoch_pos,
+                              data.begin()+std::min(epoch_pos+mini_batch_size,data.size()),
                               labels.begin()+epoch_pos);
                     updated_the_network = true;
                 }
@@ -275,7 +275,7 @@ namespace dlib
                 {
                     // Capitalize the E in Epoch so it's easy to grep out the lines that
                     // are for full epoch status statements.
-                    std::cout << "Epoch: " << rpad(cast_to_string(epoch_iteration+1),epoch_string_pad) << "  " 
+                    std::cout << "Epoch: " << rpad(cast_to_string(epoch_iteration+1),epoch_string_pad) << "  "
                               << "learning rate: " << rpad(cast_to_string(learning_rate),lr_string_pad) << "  "
                               << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) << "  ";
                     print_progress();
@@ -288,20 +288,20 @@ namespace dlib
 
         void train (
             const std::vector<input_type>& data
-        ) 
+        )
         {
             DLIB_CASSERT(data.size() > 0, "");
 
-            const bool has_unsupervised_loss = std::is_same<no_label_type, label_type>::value; 
-            static_assert(has_unsupervised_loss, 
+            const bool has_unsupervised_loss = std::is_same<no_label_type, label_type>::value;
+            static_assert(has_unsupervised_loss,
                 "You can only call this version of train() when using an unsupervised loss.");
 
             bool updated_the_network = false;
             // The reason these two loops don't initialize their counter variables but
             // instead use class members is so we can include the state of the loops in the
             // stuff written by sync_to_disk()
-            for (; 
-                epoch_iteration < max_num_epochs && learning_rate >= min_learning_rate; 
+            for (;
+                epoch_iteration < max_num_epochs && learning_rate >= min_learning_rate;
                 ++epoch_iteration)
             {
                 using namespace std::chrono;
@@ -316,7 +316,7 @@ namespace dlib
                         {
                             last_time = now_time;
                             auto iter = epoch_iteration + epoch_pos/(double)data.size();
-                            std::cout << "epoch: " << rpad(cast_to_string(iter),epoch_string_pad) << "  " 
+                            std::cout << "epoch: " << rpad(cast_to_string(iter),epoch_string_pad) << "  "
                                       << "learning rate: " << rpad(cast_to_string(learning_rate),lr_string_pad) << "  "
                                       << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) << "  ";
                             print_progress();
@@ -324,7 +324,7 @@ namespace dlib
                     }
 
                     sync_to_disk();
-                    send_job(data.begin()+epoch_pos, 
+                    send_job(data.begin()+epoch_pos,
                              data.begin()+std::min(epoch_pos+mini_batch_size,data.size()));
                     updated_the_network = true;
                 }
@@ -334,7 +334,7 @@ namespace dlib
                 {
                     // Capitalize the E in Epoch so it's easy to grep out the lines that
                     // are for full epoch status statements.
-                    std::cout << "Epoch: " << rpad(cast_to_string(epoch_iteration+1),epoch_string_pad) << "  " 
+                    std::cout << "Epoch: " << rpad(cast_to_string(epoch_iteration+1),epoch_string_pad) << "  "
                               << "learning rate: " << rpad(cast_to_string(learning_rate),lr_string_pad) << "  "
                               << "average loss: " << rpad(cast_to_string(get_average_loss()),string_pad) << "  ";
                     print_progress();
@@ -361,8 +361,8 @@ namespace dlib
         }
 
         double get_average_loss (
-        ) const 
-        { 
+        ) const
+        {
             wait_for_thread_to_pause();
             return rs.mean();
         }
@@ -387,7 +387,7 @@ namespace dlib
         }
 
         double get_learning_rate(
-        ) const 
+        ) const
         {
             return learning_rate;
         }
@@ -429,7 +429,7 @@ namespace dlib
         }
 
         void set_iterations_without_progress_threshold (
-            unsigned long thresh 
+            unsigned long thresh
         )
         {
             wait_for_thread_to_pause();
@@ -612,8 +612,8 @@ namespace dlib
                 {
                     for (size_t i = 1; i < devices.size(); ++i)
                     {
-                        visit_layer_parameters(devices[i]->net, [&](size_t j, tensor& t) 
-                        { 
+                        visit_layer_parameters(devices[i]->net, [&](size_t j, tensor& t)
+                        {
                             memcpy(t, *reference_params[j]);
                         });
                     }
@@ -630,7 +630,7 @@ namespace dlib
                     steps_without_progress = count_steps_without_decrease(previous_loss_values);
                     if (steps_without_progress >= iter_without_progress_thresh)
                     {
-                        // optimization has flattened out, so drop the learning rate. 
+                        // optimization has flattened out, so drop the learning rate.
                         learning_rate = learning_rate_shrink*learning_rate;
                         steps_without_progress = 0;
                         previous_loss_values.clear();
@@ -785,7 +785,7 @@ namespace dlib
                 wait_for_thread_to_pause();
 
                 // compact network before saving to disk.
-                this->net.clean(); 
+                this->net.clean();
 
                 // save our state to a temp file
                 const std::string tempfile = sync_filename + ".tmp";
@@ -832,7 +832,7 @@ namespace dlib
             typename label_iterator
             >
         void send_job (
-            data_iterator dbegin, 
+            data_iterator dbegin,
             data_iterator dend,
             label_iterator lbegin
         )
@@ -874,7 +874,7 @@ namespace dlib
             typename data_iterator
             >
         void send_job (
-            data_iterator dbegin, 
+            data_iterator dbegin,
             data_iterator dend
         )
         {

@@ -28,7 +28,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
     
     double gaussian (
-        double x, 
+        double x,
         double y,
         double sig
     );
@@ -36,7 +36,7 @@ namespace dlib
         requires
             - sig > 0
         ensures
-            - computes and returns the value of a 2D Gaussian function with mean 0 
+            - computes and returns the value of a 2D Gaussian function with mean 0
               and standard deviation sig at the given (x,y) point.
     !*/
 
@@ -57,7 +57,7 @@ namespace dlib
               (i.e. center can't be within 17*scale pixels of the edge of the image)
         ensures
             - computes and returns the dominant angle (i.e. the angle of the dominant gradient)
-              at the given center point and scale in img.  
+              at the given center point and scale in img.
             - The returned angle is in radians.  Specifically, if the angle is described by
               a vector vect then the angle is exactly the value of std::atan2(vect.y(), vect.x())
     !*/
@@ -81,11 +81,11 @@ namespace dlib
               (i.e. center can't be within 32*scale pixels of the edge of the image)
         ensures
             - computes the 64 dimensional SURF descriptor vector of a box centered
-              at the given center point, tilted at an angle determined by the given 
-              angle, and sized according to the given scale.  
+              at the given center point, tilted at an angle determined by the given
+              angle, and sized according to the given scale.
             - #des == the computed SURF descriptor vector extracted from the img object.
-            - The angle is measured in radians and measures the degree of counter-clockwise 
-              rotation around the center point.  This is the same kind of rotation as is 
+            - The angle is measured in radians and measures the degree of counter-clockwise
+              rotation around the center point.  This is the same kind of rotation as is
               performed by the dlib::rotate_point() function.
     !*/
 
@@ -95,7 +95,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object represents a detected SURF point.  The meanings of 
+                This object represents a detected SURF point.  The meanings of
                 its fields are defined below in the get_surf_points() function.
         !*/
 
@@ -116,7 +116,7 @@ namespace dlib
 
     void deserialize (
         surf_point& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides serialization support
@@ -135,21 +135,21 @@ namespace dlib
             - max_points > 0
             - detection_threshold >= 0
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - Let P denote the type of pixel in img, then we require:
-                - pixel_traits<P>::has_alpha == false 
+                - pixel_traits<P>::has_alpha == false
         ensures
-            - This function runs the complete SURF algorithm on the given input image and 
-              returns the points it found. 
+            - This function runs the complete SURF algorithm on the given input image and
+              returns the points it found.
             - returns a vector V such that:
                 - V.size() <= max_points
                 - for all valid i:
                     - V[i] == a SURF point found in the given input image img
                     - V[i].p == the interest_point extracted from the hessian pyramid for this
                       SURF point.
-                    - V[i].des == the SURF descriptor for this point (calculated using 
+                    - V[i].des == the SURF descriptor for this point (calculated using
                       compute_surf_descriptor())
-                    - V[i].angle == the angle of the SURF box at this point (calculated using 
+                    - V[i].angle == the angle of the SURF box at this point (calculated using
                       compute_dominant_angle())
                     - V[i].p.score >= detection_threshold
     !*/

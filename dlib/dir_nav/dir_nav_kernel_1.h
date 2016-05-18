@@ -28,7 +28,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // file object    
+    // file object
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
     
@@ -77,7 +77,7 @@ namespace dlib
 
 
 
-        class file_not_found : public error { 
+        class file_not_found : public error {
             public: file_not_found(const std::string& s): error(s){}
         };
         
@@ -121,9 +121,9 @@ namespace dlib
 
         inline void swap (
             file& item
-        ) 
-        { 
-            exchange(state,item.state); 
+        )
+        {
+            exchange(state,item.state);
         }
 
     private:
@@ -134,7 +134,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // directory object    
+    // directory object
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
        
@@ -165,17 +165,17 @@ namespace dlib
 
         /*
             The reason we don't just make this constructor actually
-            private is because doing it this way avoids a bug that 
-            sometimes occurs in visual studio 7.1.  The bug has 
-            something to do with templated friend functions 
-            such as the get_filesystem_roots() function below if 
-            it was declared as a friend template of this class. 
+            private is because doing it this way avoids a bug that
+            sometimes occurs in visual studio 7.1.  The bug has
+            something to do with templated friend functions
+            such as the get_filesystem_roots() function below if
+            it was declared as a friend template of this class.
         */
         struct private_constructor{};
         inline directory (
             const std::string& name,
             const std::string& full_name,
-            private_constructor 
+            private_constructor
         )
         {
             state.name = name;
@@ -267,9 +267,9 @@ namespace dlib
 
         inline void swap (
             directory& item
-        ) 
-        { 
-            exchange(state,item.state); 
+        )
+        {
+            exchange(state,item.state);
         }
 
     private:
@@ -282,7 +282,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns true if path is a root path.  
+                - returns true if path is a root path.
                   Note that this function considers root paths that don't
                   have a trailing separator to also be valid.
         !*/
@@ -355,16 +355,16 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline void swap (
-        file& a, 
-        file& b 
-    ) { a.swap(b); }   
+        file& a,
+        file& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 
     inline void swap (
-        directory& a, 
-        directory& b 
-    ) { a.swap(b); }  
+        directory& a,
+        directory& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -375,11 +375,11 @@ namespace dlib
     template <
         typename queue_of_files
         >
-    typename disable_if<is_std_vector<queue_of_files>,void>::type 
+    typename disable_if<is_std_vector<queue_of_files>,void>::type
     directory_helper_get_files (
         const directory::data& state,
         queue_of_files& files
-    ) 
+    )
     {
         using namespace std;
         typedef directory::listing_error listing_error;
@@ -410,7 +410,7 @@ namespace dlib
             {
                 if ((data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) == 0)
                 {
-                    uint64 file_size = data.nFileSizeHigh;                                   
+                    uint64 file_size = data.nFileSizeHigh;
                     file_size <<= 32;
                     file_size |= data.nFileSizeLow;
                     // this is a file so add it to the queue
@@ -430,17 +430,17 @@ namespace dlib
                     {
                         // there was an error
                         throw listing_error("Unable to list the contents of " + state.full_name);
-                    }  
+                    }
                 }
             } while (no_more_files == false);
 
-            FindClose(ffind); 
+            FindClose(ffind);
             ffind = INVALID_HANDLE_VALUE;
         }
         catch (...)
         {
             if (ffind != INVALID_HANDLE_VALUE)
-                FindClose(ffind);    
+                FindClose(ffind);
             files.clear();
             throw;
         }
@@ -451,11 +451,11 @@ namespace dlib
     template <
         typename queue_of_files
         >
-    typename enable_if<is_std_vector<queue_of_files>,void>::type 
+    typename enable_if<is_std_vector<queue_of_files>,void>::type
     directory_helper_get_files (
         const directory::data& state,
         queue_of_files& files
-    ) 
+    )
     {
         queue<file>::kernel_2a temp_files;
         directory_helper_get_files(state,temp_files);
@@ -492,11 +492,11 @@ namespace dlib
     template <
         typename queue_of_dirs
         >
-    typename disable_if<is_std_vector<queue_of_dirs>,void>::type 
+    typename disable_if<is_std_vector<queue_of_dirs>,void>::type
     directory_helper_get_dirs (
         const directory::data& state,
         queue_of_dirs& dirs
-    ) 
+    )
     {
         using namespace std;
         typedef directory::listing_error listing_error;
@@ -547,15 +547,15 @@ namespace dlib
                     {
                         // there was an error
                         throw listing_error("Unable to list the contents of " + state.full_name);
-                    }  
+                    }
                 }
             } while (no_more_files == false);
 
-            FindClose(dfind);  
+            FindClose(dfind);
             dfind = INVALID_HANDLE_VALUE;
         }
         catch (...)
-        {         
+        {
             if (dfind != INVALID_HANDLE_VALUE)
                 FindClose(dfind);
             dirs.clear();
@@ -569,11 +569,11 @@ namespace dlib
     template <
         typename queue_of_dirs
         >
-    typename enable_if<is_std_vector<queue_of_dirs>,void>::type 
+    typename enable_if<is_std_vector<queue_of_dirs>,void>::type
     directory_helper_get_dirs (
         const directory::data& state,
         queue_of_dirs& dirs
-    ) 
+    )
     {
         queue<directory>::kernel_2a temp_dirs;
         directory_helper_get_dirs(state,temp_dirs);

@@ -78,7 +78,7 @@ namespace dlib
             {
                 // Since we don't have a previous state estimate at the start of filtering,
                 // we will just set the current state to whatever is indicated by the measurement
-                x = pinv(H)*z; 
+                x = pinv(H)*z;
                 got_first_meas = true;
             }
 

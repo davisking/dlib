@@ -7,5 +7,5 @@
 #include "logger/extra_logger_headers.h"
 #include "logger/logger_config_file.h"
 
-#endif // DLIB_LOGGEr_ 
+#endif // DLIB_LOGGEr_
 

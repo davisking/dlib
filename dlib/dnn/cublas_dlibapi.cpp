@@ -14,9 +14,9 @@ static const char* cublas_get_error_string(cublasStatus_t s)
 {
     switch(s)
     {
-        case CUBLAS_STATUS_NOT_INITIALIZED: 
+        case CUBLAS_STATUS_NOT_INITIALIZED:
             return "CUDA Runtime API initialization failed.";
-        case CUBLAS_STATUS_ALLOC_FAILED: 
+        case CUBLAS_STATUS_ALLOC_FAILED:
             return "CUDA Resources could not be allocated.";
         default:
             return "A call to cuBLAS failed";
@@ -38,7 +38,7 @@ do{                                                                             
 
 namespace dlib
 {
-    namespace cuda 
+    namespace cuda
     {
 
     // -----------------------------------------------------------------------------------
@@ -61,8 +61,8 @@ namespace dlib
             }
 
             cublasHandle_t get_handle (
-            )  
-            { 
+            )
+            {
                 // Check if the active device for the current thread changed.  If so then
                 // regenerate our cuBLAS handle so it will use the currently selected
                 // device.
@@ -73,7 +73,7 @@ namespace dlib
                     CHECK_CUBLAS(cublasDestroy(handle));
                     CHECK_CUBLAS(cublasCreate(&handle));
                 }
-                return handle; 
+                return handle;
             }
 
         private:
@@ -139,7 +139,7 @@ namespace dlib
             const int k = trans_rhs ? rhs_nc : rhs_nr;
             CHECK_CUBLAS(cublasSgemm(context(),
                               transb,
-                              transa, 
+                              transa,
                               dest_nc, dest_nr, k,
                               &alpha,
                               rhs.device(), rhs_nc,
@@ -150,7 +150,7 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-    }  
+    }
 }
 
 #endif // DLIB_USE_CUDA

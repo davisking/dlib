@@ -14,7 +14,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    namespace bs_impl 
+    namespace bs_impl
     {
         template <typename EXP>
         typename EXP::matrix_type invert (
@@ -59,17 +59,17 @@ namespace dlib
             const vect1_type& samples,
             const vect2_type& labels,
             const vect3_type& basis,
-            double eps 
+            double eps
         )
         {
             DLIB_ASSERT(is_binary_classification_problem(samples, labels) &&
-                        0 < eps && eps <= 1 && 
+                        0 < eps && eps <= 1 &&
                         basis.size() > 0,
                         "\t void sort_basis_vectors()"
                         << "\n\t Invalid arguments were given to this function."
                         << "\n\t is_binary_classification_problem(samples, labels): " << is_binary_classification_problem(samples, labels)
-                        << "\n\t basis.size(): " << basis.size() 
-                        << "\n\t eps:          " << eps 
+                        << "\n\t basis.size(): " << basis.size()
+                        << "\n\t eps:          " << eps
             );
 
             typedef typename kernel_type::scalar_type scalar_type;
@@ -166,7 +166,7 @@ namespace dlib
                     ++misses;
 
                     // Give up once we have had 10 rounds where we didn't find a weights vector with
-                    // a smaller concentration of good features. 
+                    // a smaller concentration of good features.
                     if (misses >= 10)
                         break;
                 }
@@ -179,12 +179,12 @@ namespace dlib
 
             std::vector<typename kernel_type::sample_type> sorted_basis;
 
-            // permute the basis so that it matches up with the contents of the best weights 
+            // permute the basis so that it matches up with the contents of the best weights
             sorted_basis.resize(best_size);
             for (unsigned long i = 0; i < sorted_basis.size(); ++i)
             {
                 // Note that we load sorted_basis backwards so that the most important
-                // basis elements come first.  
+                // basis elements come first.
                 sorted_basis[i] = basis(best_total_perm(basis.size()-i-1));
             }
 
@@ -209,7 +209,7 @@ namespace dlib
         double eps = 0.99
     )
     {
-        return bs_impl::sort_basis_vectors_impl(kern, 
+        return bs_impl::sort_basis_vectors_impl(kern,
                                                 mat(samples),
                                                 mat(labels),
                                                 mat(basis),

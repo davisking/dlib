@@ -12,7 +12,7 @@
 namespace dlib
 {
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     class sockstreambuf : public std::streambuf
     {
@@ -99,8 +99,8 @@ namespace dlib
                 throw;
             }
             setp(out_buffer, out_buffer + (out_buffer_size-1));
-            setg(in_buffer+max_putback, 
-                 in_buffer+max_putback, 
+            setg(in_buffer+max_putback,
+                 in_buffer+max_putback,
                  in_buffer+max_putback);
         }
 
@@ -110,9 +110,9 @@ namespace dlib
             int num = static_cast<int>(pptr()-pbase());
             if (con.write(out_buffer,num) != num)
             {
-                // the write was not successful so return EOF 
+                // the write was not successful so return EOF
                 return EOF;
-            } 
+            }
             pbump(-num);
             return num;
         }
@@ -139,11 +139,11 @@ namespace dlib
         );
 
         // input functions
-        int_type underflow( 
+        int_type underflow(
         );
 
         std::streamsize xsgetn (
-            char_type* s, 
+            char_type* s,
             std::streamsize n
         );
 
@@ -160,7 +160,7 @@ namespace dlib
     
     };
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
 }
 

@@ -33,7 +33,7 @@ namespace dlib
         typedef std::vector<std::pair<unsigned int,double> > descriptor_type;
 
         nearest_neighbor_feature_image (
-        ); 
+        );
 
         void clear (
         );
@@ -105,7 +105,7 @@ namespace dlib
         template <typename T>
         friend void deserialize (
             nearest_neighbor_feature_image<T>& item,
-            std::istream& in 
+            std::istream& in
         );
 
     private:
@@ -136,7 +136,7 @@ namespace dlib
     template <typename T>
     void deserialize (
         nearest_neighbor_feature_image<T>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         deserialize(item.feats, in);
@@ -155,7 +155,7 @@ namespace dlib
         >
     nearest_neighbor_feature_image<feature_extractor>::
     nearest_neighbor_feature_image (
-    )  
+    )
     {
         nn_feats.resize(1);
     }
@@ -310,7 +310,7 @@ namespace dlib
     template <
         typename feature_extractor
         >
-    const typename nearest_neighbor_feature_image<feature_extractor>::descriptor_type& 
+    const typename nearest_neighbor_feature_image<feature_extractor>::descriptor_type&
     nearest_neighbor_feature_image<feature_extractor>::
     operator() (
         long row,
@@ -323,7 +323,7 @@ namespace dlib
             "\t descriptor_type nearest_neighbor_feature_image::operator(row,col)"
             << "\n\t Invalid inputs were given to this function"
             << "\n\t row:  " << row
-            << "\n\t col:  " << col 
+            << "\n\t col:  " << col
             << "\n\t nr(): " << nr()
             << "\n\t nc(): " << nc()
             << "\n\t this: " << this
@@ -394,7 +394,7 @@ namespace dlib
     const rectangle nearest_neighbor_feature_image<feature_extractor>::
     feat_to_image_space (
         const rectangle& rect
-    ) const 
+    ) const
     {
         return fe.feat_to_image_space(rect);
     }

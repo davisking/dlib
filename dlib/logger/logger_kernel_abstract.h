@@ -20,14 +20,14 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object is a simple named level to log at.  It contains a numeric 
+                This object is a simple named level to log at.  It contains a numeric
                 priority and a name to use in the logging messages.
         !*/
     public:
         log_level(
-            int priority_, 
+            int priority_,
             const char* name_
-        );  
+        );
         /*!
             ensures
                 - #priority = priority_
@@ -72,7 +72,7 @@ namespace dlib
     /*!
         ensures
             - for all loggers L (even loggers not yet constructed):
-                - #L.output_streambuf() == out.rdbuf() 
+                - #L.output_streambuf() == out.rdbuf()
                 - Removes any previous output hook from L.  So now the logger
                   L will write all its messages to the given output stream.
         throws
@@ -82,8 +82,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     typedef void (*print_header_type)(
-        std::ostream& out, 
-        const std::string& logger_name, 
+        std::ostream& out,
+        const std::string& logger_name,
         const log_level& l,
         const uint64 thread_id
     );
@@ -94,7 +94,7 @@ namespace dlib
     /*!
         ensures
             - for all loggers L (even loggers not yet constructed):
-                - #L.logger_header() == new_header 
+                - #L.logger_header() == new_header
         throws
             - std::bad_alloc
     !*/
@@ -106,7 +106,7 @@ namespace dlib
         >
     void set_all_logging_output_hooks (
         T& object,
-        void (T::*hook)(const std::string& logger_name, 
+        void (T::*hook)(const std::string& logger_name,
                         const log_level& l,
                         const uint64 thread_id,
                         const char* message_to_log)
@@ -160,7 +160,7 @@ namespace dlib
             - is not called more than once at a time (i.e. is not called from multiple
               threads at the same time).
         ensures
-            - let MS be the number of milliseconds since program start.  
+            - let MS be the number of milliseconds since program start.
             - prints a string to out in the form:  "MS l.name [thread_id] logger_name:"
     !*/
 
@@ -168,17 +168,17 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class logger 
+    class logger
     {
         /*!
             INITIAL VALUE
                 - name() == a user supplied value given to the constructor
                 - The values of level(), output_streambuf(), logger_header(), and
-                  auto_flush() are inherited from the parent of this logger. 
+                  auto_flush() are inherited from the parent of this logger.
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a logging output stream in the style of the log4j
-                logger available for Java.  
+                logger available for Java.
                 
                 Additionally, the logger doesn't perform any memory allocations during
                 each logging action.  It just writes directly into the user supplied output
@@ -192,15 +192,15 @@ namespace dlib
                 values will be used.  The defaults are as follows:
                 - level() == LERROR
                 - output_streambuf() == std::cout.rdbuf() (i.e. the default is to log
-                  to standard output).  
+                  to standard output).
                 - logger_header() == print_default_logger_header
                 - auto_flush() == true
             
             THREAD SAFETY
-                All methods of this class are thread safe.  Note that it is safe to 
+                All methods of this class are thread safe.  Note that it is safe to
                 chain calls to operator << such as:
                     log << LINFO << "message " << variable << " more message";
-                The logger ensures that the entire statement executes atomically so the 
+                The logger ensures that the entire statement executes atomically so the
                 message won't be broken up by other loggers in other threads.
         !*/
 
@@ -230,13 +230,13 @@ namespace dlib
 
     public:
 
-        logger (  
+        logger (
             const std::string& name_
         );
         /*!
             requires
                 - name_ != ""
-            ensures                
+            ensures
                 - #*this is properly initialized
                 - #name() == name_
             throws
@@ -265,10 +265,10 @@ namespace dlib
             ensures
                 - if (l.priority >= level().priority) then
                     - returns a logger_stream with is_enabled() == true.  I.e. this
-                      returned stream will write its output to the I/O destination 
+                      returned stream will write its output to the I/O destination
                       used by this logger object.
                 - else
-                    - returns a logger stream with is_enabled() == false 
+                    - returns a logger stream with is_enabled() == false
             throws
                 - std::bad_alloc
         !*/
@@ -319,7 +319,7 @@ namespace dlib
         /*!
             ensures
                 - for all loggers L such that L.is_child_of(*this) == true:
-                    - #L.auto_flush() == enabled 
+                    - #L.auto_flush() == enabled
             throws
                 - std::bad_alloc
         !*/
@@ -330,14 +330,14 @@ namespace dlib
             >
         void set_output_hook (
             T& object,
-            void (T::*hook)(const std::string& logger_name, 
+            void (T::*hook)(const std::string& logger_name,
                             const log_level& l,
                             const uint64 thread_id,
                             const char* message_to_log)
         );
         /*!
             requires
-                - hook is a valid pointer to a member function in T 
+                - hook is a valid pointer to a member function in T
             ensures
                 - for all loggers L such that L.is_child_of(*this) == true:
                     - #L.output_streambuf() == 0
@@ -374,7 +374,7 @@ namespace dlib
         /*!
             ensures
                 - for all loggers L such that L.is_child_of(*this) == true:
-                    - #L.output_streambuf() == out.rdbuf() 
+                    - #L.output_streambuf() == out.rdbuf()
                     - Removes any previous output hook from L.  So now the logger
                       L will write all its messages to the given output stream.
             throws
@@ -385,7 +385,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the function that is called to print the header information 
+                - returns the function that is called to print the header information
                   onto each logged message.  The arguments to the function have the following
                   meanings:
                     - out == The output stream this function writes the header to.
@@ -406,7 +406,7 @@ namespace dlib
         /*!
             ensures
                 - for all loggers L such that L.is_child_of(*this) == true:
-                    - #L.logger_header() == print_header 
+                    - #L.logger_header() == print_header
             throws
                 - std::bad_alloc
         !*/
@@ -417,7 +417,7 @@ namespace dlib
         logger(const logger&);        // copy constructor
         logger& operator=(const logger&);    // assignment operator
 
-    };    
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------

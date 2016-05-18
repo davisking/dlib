@@ -17,7 +17,7 @@ namespace dlib
         {
             std::string token;
             int type;
-        };        
+        };
 
     }
 
@@ -26,7 +26,7 @@ namespace dlib
         typename queue,
         typename set
         >
-    class cpp_tokenizer_kernel_1 
+    class cpp_tokenizer_kernel_1
     {
         /*!
             REQUIREMENTS ON tok
@@ -44,24 +44,24 @@ namespace dlib
                 - keywords == a set of all the C++ keywords
                 - tokenizer.stream_is_set() == false
                 - buffer.size() == 0
-                - tokenizer.get_identifier_head() == "$_" + tokenizer.lowercase_letters() + 
+                - tokenizer.get_identifier_head() == "$_" + tokenizer.lowercase_letters() +
                   tokenizer.uppercase_letters()
-                - tokenizer.get_identifier_body() == "$_" + tokenizer.lowercase_letters() + 
+                - tokenizer.get_identifier_body() == "$_" + tokenizer.lowercase_letters() +
                   tokenizer.uppercase_letters() + tokenizer.numbers()
                 - have_peeked == false
 
 
-            CONVENTION                  
+            CONVENTION
                 - tokenizer.stream_is_set() == stream_is_set()
                 - tokenizer.get_stream() == get_stream()
                 - keywords == a set of all the C++ keywords
 
-                - tokenizer.get_identifier_head() == "$_" + tokenizer.lowercase_letters() + 
+                - tokenizer.get_identifier_head() == "$_" + tokenizer.lowercase_letters() +
                   tokenizer.uppercase_letters()
-                - tokenizer.get_identifier_body() == "$_" + tokenizer.lowercase_letters() + 
+                - tokenizer.get_identifier_body() == "$_" + tokenizer.lowercase_letters() +
                   tokenizer.uppercase_letters() + tokenizer.numbers()
 
-                - buffer == a queue of tokens.  This is where we put tokens 
+                - buffer == a queue of tokens.  This is where we put tokens
                   we gathered early due to looking ahead.
 
 
@@ -74,7 +74,7 @@ namespace dlib
 
     public:
 
-        enum 
+        enum
         {
             END_OF_FILE,
             KEYWORD,
@@ -87,7 +87,7 @@ namespace dlib
             WHITE_SPACE
         };
 
-        cpp_tokenizer_kernel_1 (        
+        cpp_tokenizer_kernel_1 (
         );
 
         virtual ~cpp_tokenizer_kernel_1 (
@@ -167,7 +167,7 @@ namespace dlib
         mutable bool have_peeked;
 
 
-    };    
+    };
 
     template <
         typename tok,
@@ -175,9 +175,9 @@ namespace dlib
         typename set
         >
     inline void swap (
-        cpp_tokenizer_kernel_1<tok,queue,set>& a, 
-        cpp_tokenizer_kernel_1<tok,queue,set>& b 
-    ) { a.swap(b); }   
+        cpp_tokenizer_kernel_1<tok,queue,set>& a,
+        cpp_tokenizer_kernel_1<tok,queue,set>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -191,7 +191,7 @@ namespace dlib
         typename set
         >
     cpp_tokenizer_kernel_1<tok,queue,set>::
-    cpp_tokenizer_kernel_1(        
+    cpp_tokenizer_kernel_1(
     ) :
         have_peeked(false)
     {
@@ -199,7 +199,7 @@ namespace dlib
         std::string temp;
         temp = "#include";              keywords.add(temp);
         temp = "__asm";                 keywords.add(temp);
-        temp = "_asm";                  keywords.add(temp);        
+        temp = "_asm";                  keywords.add(temp);
         temp = "if";                    keywords.add(temp);
         temp = "int";                   keywords.add(temp);
         temp = "else";                  keywords.add(temp);
@@ -273,7 +273,7 @@ namespace dlib
         temp = "long";                  keywords.add(temp);
         temp = "#elif";                 keywords.add(temp);
         temp = "static";                keywords.add(temp);
-        temp = "operator";              keywords.add(temp);  
+        temp = "operator";              keywords.add(temp);
         temp = "switch";                keywords.add(temp);
         temp = "extern";                keywords.add(temp);
 
@@ -281,7 +281,7 @@ namespace dlib
         // set the tokenizer's IDENTIFIER token for C++ identifiers
         tokenizer.set_identifier_token(
             "$_" + tokenizer.lowercase_letters() + tokenizer.uppercase_letters(),
-            "$_" + tokenizer.lowercase_letters() + tokenizer.uppercase_letters() + 
+            "$_" + tokenizer.lowercase_letters() + tokenizer.uppercase_letters() +
             tokenizer.numbers()
             );
     }
@@ -317,7 +317,7 @@ namespace dlib
         // set the tokenizer's IDENTIFIER token for C++ identifiers
         tokenizer.set_identifier_token(
             "$_" + tokenizer.lowercase_letters() + tokenizer.uppercase_letters(),
-            "$_" + tokenizer.lowercase_letters() + tokenizer.uppercase_letters() + 
+            "$_" + tokenizer.lowercase_letters() + tokenizer.uppercase_letters() +
             tokenizer.numbers()
             );
     }
@@ -425,14 +425,14 @@ namespace dlib
             case tok::NUMBER:
                 {
                     // this could be a hex number such as 0xa33.  we should check for this.
-                    if (tokenizer.peek_type() == tok::IDENTIFIER && token == "0" && 
+                    if (tokenizer.peek_type() == tok::IDENTIFIER && token == "0" &&
                         (tokenizer.peek_token()[0] == 'x' || tokenizer.peek_token()[0] == 'X'))
                     {
                         // this is a hex number so accumulate all the numbers and identifiers that follow
                         // because they have to be part of the number
                         std::string temp;
                         tokenizer.get_token(type,temp);
-                        token = "0" + temp; 
+                        token = "0" + temp;
 
                         // get the rest of the hex number
                         while (tokenizer.peek_type() == tok::IDENTIFIER ||
@@ -476,7 +476,7 @@ namespace dlib
                     }
                 } break;
 
-            case tok::CHAR:            
+            case tok::CHAR:
                 type = OTHER;
                 switch (token[0])
                 {
@@ -484,7 +484,7 @@ namespace dlib
                     {
                         // this might be a preprocessor keyword so we should check the
                         // next token
-                        if (tokenizer.peek_type() == tok::IDENTIFIER && 
+                        if (tokenizer.peek_type() == tok::IDENTIFIER &&
                             keywords.is_member('#'+tokenizer.peek_token()))
                         {
                             tokenizer.get_token(type,token);
@@ -501,7 +501,7 @@ namespace dlib
 
                 case '"':
                     {
-                        string temp;                    
+                        string temp;
                         tokenizer.get_token(type,token);
                         while (type != tok::END_OF_FILE)
                         {
@@ -510,7 +510,7 @@ namespace dlib
                                 (temp.size() == 0 || temp[temp.size()-1] != '\\' ||
                                 (temp.size() > 1 && temp[temp.size()-2] == '\\') ))
                             {
-                                buffer_token(DOUBLE_QUOTED_TEXT,temp);                         
+                                buffer_token(DOUBLE_QUOTED_TEXT,temp);
                                 buffer_token(OTHER,"\"");
                                 break;
                             }
@@ -528,7 +528,7 @@ namespace dlib
 
                 case '\'':
                     {
-                        string temp;                    
+                        string temp;
                         tokenizer.get_token(type,token);
                         if (type == tok::CHAR && token[0] == '\\')
                         {
@@ -548,7 +548,7 @@ namespace dlib
                     } break;
 
                 case '/':
-                    {                
+                    {
                         // look ahead to see if this is the start of a comment
                         if (tokenizer.peek_type() == tok::CHAR)
                         {
@@ -557,12 +557,12 @@ namespace dlib
                                 tokenizer.get_token(type,token);
                                 // this is the start of a line comment
                                 token = "//";
-                                string temp;                    
+                                string temp;
                                 tokenizer.get_token(type,temp);
                                 while (type != tok::END_OF_FILE)
                                 {
                                     // if this is the end of the comment
-                                    if (type == tok::END_OF_LINE && 
+                                    if (type == tok::END_OF_LINE &&
                                         token[token.size()-1] != '\\' )
                                     {
                                         token += '\n';
@@ -582,7 +582,7 @@ namespace dlib
                                 tokenizer.get_token(type,token);
                                 // this is the start of a block comment
                                 token = "/*";
-                                string temp;                    
+                                string temp;
                                 tokenizer.get_token(type,temp);
                                 while (type != tok::END_OF_FILE)
                                 {
@@ -598,8 +598,8 @@ namespace dlib
                                         token += temp;
                                     }
                                     tokenizer.get_token(type,temp);
-                                }  
-                                type = COMMENT;                       
+                                }
+                                type = COMMENT;
                             }
                         }
                     } break;
@@ -611,7 +611,7 @@ namespace dlib
         }
         else
         {
-            // if we get this far it means we have peeked so we should 
+            // if we get this far it means we have peeked so we should
             // return the peek data.
             type = next_type;
             token = next_token;

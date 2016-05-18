@@ -13,7 +13,7 @@ namespace dlib
 
     template <
         typename T,
-        typename mem_manager = default_memory_manager 
+        typename mem_manager = default_memory_manager
         >
     class array2d : public enumerable<T>
     {
@@ -25,7 +25,7 @@ namespace dlib
             REQUIREMENTS ON mem_manager
                 must be an implementation of memory_manager/memory_manager_kernel_abstract.h or
                 must be an implementation of memory_manager_global/memory_manager_global_kernel_abstract.h or
-                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h
                 mem_manager::type can be set to anything.
 
             POINTERS AND REFERENCES TO INTERNAL DATA
@@ -41,20 +41,20 @@ namespace dlib
                 The enumerator will iterate over the elements of the array starting
                 with row 0 and then proceeding to row 1 and so on.  Each row will be
                 fully enumerated before proceeding on to the next row and the elements
-                in a row will be enumerated beginning with the 0th column, then the 1st 
+                in a row will be enumerated beginning with the 0th column, then the 1st
                 column and so on.
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a 2-Dimensional array of objects of 
-                type T. 
+                This object represents a 2-Dimensional array of objects of
+                type T.
 
                 Also note that unless specified otherwise, no member functions
                 of this object throw exceptions.
 
 
-                Finally, note that this object stores its data contiguously and in 
+                Finally, note that this object stores its data contiguously and in
                 row major order.  Moreover, there is no padding at the end of each row.
-                This means that its width_step() value is always equal to sizeof(type)*nc().  
+                This means that its width_step() value is always equal to sizeof(type)*nc().
         !*/
 
 
@@ -67,7 +67,7 @@ namespace dlib
          
         // ----------------------------------------
 
-        class row 
+        class row
         {
             /*!
                 POINTERS AND REFERENCES TO INTERNAL DATA
@@ -92,7 +92,7 @@ namespace dlib
                 requires
                     - 0 <= column < nc()
                 ensures
-                    - returns a const reference to the T in the given column 
+                    - returns a const reference to the T in the given column
             !*/
 
             T& operator[] (
@@ -102,7 +102,7 @@ namespace dlib
                 requires
                     - 0 <= column < nc()
                 ensures
-                    - returns a non-const reference to the T in the given column 
+                    - returns a non-const reference to the T in the given column
             !*/
 
         private:
@@ -116,10 +116,10 @@ namespace dlib
         array2d (
         );
         /*!
-            ensures 
+            ensures
                 - #*this is properly initialized
             throws
-                - std::bad_alloc 
+                - std::bad_alloc
         !*/
 
         array2d(
@@ -133,7 +133,7 @@ namespace dlib
 
         array2d (
             long rows,
-            long cols 
+            long cols
         );
         /*!
             requires
@@ -144,11 +144,11 @@ namespace dlib
                 - #at_start() == true
                 - all elements in this array have initial values for their type
             throws
-                - std::bad_alloc 
+                - std::bad_alloc
         !*/
 
         virtual ~array2d (
-        ); 
+        );
         /*!
             ensures
                 - all resources associated with *this has been released
@@ -192,7 +192,7 @@ namespace dlib
                 - else
                     - all elements in this array have initial values for their type
             throws
-                - std::bad_alloc 
+                - std::bad_alloc
                     If this exception is thrown then #*this will have an initial
                     value for its type.
         !*/
@@ -204,7 +204,7 @@ namespace dlib
             requires
                 - 0 <= row_index < nr()
             ensures
-                - returns a non-const row of nc() elements that represents the 
+                - returns a non-const row of nc() elements that represents the
                   given row_index'th row in *this.
         !*/
 
@@ -215,7 +215,7 @@ namespace dlib
             requires
                 - 0 <= row_index < nr()
             ensures
-                - returns a const row of nc() elements that represents the 
+                - returns a const row of nc() elements that represents the
                   given row_index'th row in *this.
         !*/
 
@@ -225,7 +225,7 @@ namespace dlib
         /*!
             ensures
                 - swaps *this and item
-        !*/ 
+        !*/
 
         array2d& operator= (
             array2d&& rhs
@@ -241,7 +241,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the size of one row of the image, in bytes.  
+                - returns the size of one row of the image, in bytes.
                   More precisely, return a number N such that:
                   (char*)&item[0][0] + N == (char*)&item[1][0].
                 - for dlib::array2d objects, the returned value
@@ -265,9 +265,9 @@ namespace dlib
         typename mem_manager
         >
     inline void swap (
-        array2d<T,mem_manager>& a, 
-        array2d<T,mem_manager>& b 
-    ) { a.swap(b); }   
+        array2d<T,mem_manager>& a,
+        array2d<T,mem_manager>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
@@ -277,9 +277,9 @@ namespace dlib
         typename mem_manager
         >
     void serialize (
-        const array2d<T,mem_manager>& item, 
-        std::ostream& out 
-    );   
+        const array2d<T,mem_manager>& item,
+        std::ostream& out
+    );
     /*!
         Provides serialization support.  Note that the serialization formats used by the
         dlib::matrix and dlib::array2d objects are compatible.  That means you can load the
@@ -291,14 +291,14 @@ namespace dlib
         typename mem_manager
         >
     void deserialize (
-        array2d<T,mem_manager>& item, 
+        array2d<T,mem_manager>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 }
 
-#endif // DLIB_ARRAY2D_KERNEl_ABSTRACT_ 
+#endif // DLIB_ARRAY2D_KERNEl_ABSTRACT_
 

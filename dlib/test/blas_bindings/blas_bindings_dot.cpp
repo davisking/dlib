@@ -21,11 +21,11 @@ namespace dlib
     }
 }
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace std;
-    // Declare the logger we will use in this test.  The name of the logger 
+    // Declare the logger we will use in this test.  The name of the logger
     // should start with "test."
     dlib::logger dlog("test.dot");
 
@@ -69,7 +69,7 @@ namespace
             DLIB_TEST(counter_dot() == 1);
 
             std::vector<double> sv(10,1);
-            rv = 1; 
+            rv = 1;
             counter_dot() = 0;
             val = trans(mat(&rv(0),rv.size()))*mat(sv);
             DLIB_TEST(val == 10);
@@ -180,12 +180,12 @@ namespace
             val = trans(cv)*m*trans(rv);
             DLIB_TEST_MSG(counter_dot() == 1, counter_dot());
 
-            // This does one dot and two gemv 
+            // This does one dot and two gemv
             counter_dot() = 0;
             val = (trans(cv)*m)*(m*trans(rv));
             DLIB_TEST_MSG(counter_dot() == 1, counter_dot());
 
-            // This does one dot and two gemv 
+            // This does one dot and two gemv
             counter_dot() = 0;
             val = trans(cv)*m*trans(m)*trans(rv);
             DLIB_TEST_MSG(counter_dot() == 1, counter_dot());

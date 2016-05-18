@@ -14,19 +14,19 @@ namespace dlib
     {
         /*!
             INITIAL VALUE
-                The initial value of this object is defined by its constructor.                
+                The initial value of this object is defined by its constructor.
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a rectangular region inside a Cartesian 
-                coordinate system.  The region is the rectangle with its top 
-                left corner at position (left(),top()) and its bottom right corner 
+                This object represents a rectangular region inside a Cartesian
+                coordinate system.  The region is the rectangle with its top
+                left corner at position (left(),top()) and its bottom right corner
                 at (right(),bottom()).
 
                 Note that the origin of the coordinate system, i.e. (0,0), is located
-                at the upper left corner.  That is, points such as (1,1) or (3,5) 
+                at the upper left corner.  That is, points such as (1,1) or (3,5)
                 represent locations that are below and to the right of the origin.
 
-                Also note that rectangles where top() > bottom() or left() > right() 
+                Also note that rectangles where top() > bottom() or left() > right()
                 represent empty rectangles.
         !*/
 
@@ -46,8 +46,8 @@ namespace dlib
             ensures
                 - #left() == 0
                 - #top() == 0
-                - #right() == -1 
-                - #bottom() == -1 
+                - #right() == -1
+                - #bottom() == -1
                 - #is_empty() == true
         !*/
 
@@ -73,7 +73,7 @@ namespace dlib
             requires
                 - (width_ > 0 && height_ > 0) || (width_ == 0 && height_ == 0)
             ensures
-                - #left() == 0  
+                - #left() == 0
                 - #top() == 0
                 - #width() == width_
                 - #height() == height_
@@ -111,7 +111,7 @@ namespace dlib
         );
         /*!
             ensures
-                - returns a non-const reference to the x coordinate for the left side 
+                - returns a non-const reference to the x coordinate for the left side
                   of this rectangle
         !*/
 
@@ -134,7 +134,7 @@ namespace dlib
         );
         /*!
             ensures
-                - returns a non-const reference to the y coordinate for the 
+                - returns a non-const reference to the y coordinate for the
                   top of this rectangle
         !*/
 
@@ -157,7 +157,7 @@ namespace dlib
         );
         /*!
             ensures
-                - returns a non-const reference to the x coordinate for the right 
+                - returns a non-const reference to the x coordinate for the right
                   side of this rectangle
         !*/
 
@@ -180,7 +180,7 @@ namespace dlib
         );
         /*!
             ensures
-                - returns a non-const reference to the y coordinate for the bottom 
+                - returns a non-const reference to the y coordinate for the bottom
                   of this rectangle
         !*/
        
@@ -196,7 +196,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns point(left(), top()) 
+                - returns point(left(), top())
                   (i.e. returns the top left corner point for this rectangle)
         !*/
 
@@ -204,7 +204,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns point(left(), bottom()) 
+                - returns point(left(), bottom())
                   (i.e. returns the bottom left corner point for this rectangle)
         !*/
 
@@ -212,7 +212,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns point(right(), top()) 
+                - returns point(right(), top())
                   (i.e. returns the top right corner point for this rectangle)
         !*/
 
@@ -220,7 +220,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns point(right(), bottom()) 
+                - returns point(right(), bottom())
                   (i.e. returns the bottom right corner point for this rectangle)
         !*/
 
@@ -269,7 +269,7 @@ namespace dlib
         /*!
             ensures
                 - if (rhs.is_empty() == false && this->is_empty() == false) then
-                    - returns the smallest rectangle that contains both *this and 
+                    - returns the smallest rectangle that contains both *this and
                       rhs.
                 - if (rhs.is_empty() == true && this->is_empty() == false) then
                     - returns *this
@@ -285,7 +285,7 @@ namespace dlib
         /*!
             ensures
                 - if (there is a region of intersection between *this and rhs) then
-                    - returns a rectangle that represents the intersection of *this 
+                    - returns a rectangle that represents the intersection of *this
                       and rhs.
                 - else
                     - returns a rectangle where is_empty() == true
@@ -340,7 +340,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #*this == *this + rect 
+                - #*this == *this + rect
                 - returns #*this
         !*/
 
@@ -378,34 +378,34 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void serialize (
-        const rectangle& item, 
+        const rectangle& item,
         std::ostream& out
-    );   
+    );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     void deserialize (
-        rectangle& item, 
+        rectangle& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
     std::ostream& operator<< (
-        std::ostream& out, 
-        const rectangle& item 
-    );   
+        std::ostream& out,
+        const rectangle& item
+    );
     /*!
         ensures
             - writes item to out in the form "[(left, top) (right, bottom)]"
     !*/
 
     std::istream& operator>>(
-        std::istream& in, 
-        rectangle& item 
-    );   
+        std::istream& in,
+        rectangle& item
+    );
     /*!
         ensures
             - reads a rectangle from the input stream in and stores it in #item.
@@ -429,7 +429,7 @@ namespace dlib
     );
     /*!
         ensures
-            - returns the center of the given rectangle using a real valued vector.  
+            - returns the center of the given rectangle using a real valued vector.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -444,11 +444,11 @@ namespace dlib
             - returns a rectangle R such that:
                 - center(R) == p
                 - if (width == 0 || height == 0)
-                    - R.width() == 0 
-                    - R.height() == 0 
+                    - R.width() == 0
+                    - R.height() == 0
                 - else
                     - R.width() == width
-                    - R.height() == height 
+                    - R.height() == height
                 - R.tl_corner() == point(p.x()-width/2, p.y()-height/2)
     !*/
 
@@ -465,11 +465,11 @@ namespace dlib
             - returns a rectangle R such that:
                 - center(R) == p
                 - if (width == 0 || height == 0)
-                    - R.width() == 0 
-                    - R.height() == 0 
+                    - R.width() == 0
+                    - R.height() == 0
                 - else
                     - R.width() == width
-                    - R.height() == height 
+                    - R.height() == height
                 - R.tl_corner() == point(x-width/2, y-height/2)
     !*/
 
@@ -531,7 +531,7 @@ namespace dlib
 
     inline const rectangle shrink_rect (
         const rectangle& rect,
-        long num 
+        long num
     );
     /*!
         ensures
@@ -543,7 +543,7 @@ namespace dlib
 
     inline const rectangle grow_rect (
         const rectangle& rect,
-        long num 
+        long num
     );
     /*!
         ensures
@@ -620,13 +620,13 @@ namespace dlib
         ensures
             - returns a rectangle R such that:
                 - if (width == 0 || height == 0)
-                    - R.width() == 0 
-                    - R.height() == 0 
+                    - R.width() == 0
+                    - R.height() == 0
                 - else
                     - R.width() == width
-                    - R.height() == height 
-                - R.left() == rect.left() 
-                - R.top() == rect.top() 
+                    - R.height() == height
+                - R.left() == rect.left()
+                - R.top() == rect.top()
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -639,24 +639,24 @@ namespace dlib
         ensures
             - returns a rectangle R such that:
                 - R.width() == width
-                - R.left() == rect.left() 
-                - R.top() == rect.top() 
-                - R.bottom() == rect.bottom() 
+                - R.left() == rect.left()
+                - R.top() == rect.top()
+                - R.bottom() == rect.bottom()
     !*/
 
 // ----------------------------------------------------------------------------------------
 
     const rectangle resize_rect_height (
         const rectangle& rect,
-        unsigned long height 
+        unsigned long height
     );
     /*!
         ensures
             - returns a rectangle R such that:
-                - R.height() == height 
-                - R.left() == rect.left() 
-                - R.top() == rect.top() 
-                - R.right() == rect.right() 
+                - R.height() == height
+                - R.left() == rect.left()
+                - R.top() == rect.top()
+                - R.right() == rect.right()
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -668,10 +668,10 @@ namespace dlib
     /*!
         ensures
             - returns a rectangle R such that:
-                - R.width() == rect.width() 
-                - R.height() == rect.height() 
+                - R.width() == rect.width()
+                - R.height() == rect.height()
                 - R.left() == p.x()
-                - R.top() == p.y() 
+                - R.top() == p.y()
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -679,15 +679,15 @@ namespace dlib
     const rectangle move_rect (
         const rectangle& rect,
         long x,
-        long y 
+        long y
     );
     /*!
         ensures
             - returns a rectangle R such that:
-                - R.width() == rect.width() 
-                - R.height() == rect.height() 
-                - R.left() == x 
-                - R.top() == y 
+                - R.width() == rect.width()
+                - R.height() == rect.height()
+                - R.left() == x
+                - R.top() == y
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -753,7 +753,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T 
+        typename T
         >
     const rectangle get_rect (
         const T& m

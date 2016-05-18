@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_HAsH_Hh_ 
-#define DLIB_HAsH_Hh_ 
+#ifndef DLIB_HAsH_Hh_
+#define DLIB_HAsH_Hh_
 
 #include "hash_abstract.h"
 #include <vector>
@@ -131,7 +131,7 @@ namespace dlib
         uint32 seed = 0
     )
     {
-        return hash(item.first, seed) ^ hash(item.second, seed+1); 
+        return hash(item.first, seed) ^ hash(item.second, seed+1);
     }
 
 // ----------------------------------------------------------------------------------------

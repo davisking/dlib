@@ -10,7 +10,7 @@
 #include <dlib/map.h>
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -29,9 +29,9 @@ namespace
             - map is an implementation of map/map_kernel_abstract.h and
               is instantiated to map int to int
         ensures
-            - runs tests on map for compliance with the specs 
+            - runs tests on map for compliance with the specs
     !*/
-    {        
+    {
 
         print_spinner();
 
@@ -203,7 +203,7 @@ namespace
                 DLIB_TEST(test2.element().key() == test2.element().key());
                 DLIB_TEST(test2.element().value() == test2.element().value());
                 DLIB_TEST(a < test2.element().key());
-                a = test2.element().key();                
+                a = test2.element().key();
                 ++count;
             }
             DLIB_TEST(test2.size() == 10000);
@@ -321,7 +321,7 @@ namespace
                     DLIB_TEST(test2.element().value() == test2.element().value());
                     DLIB_TEST(test2.element().key() == test2.element().key());
                     DLIB_TEST(a < test2.element().key());
-                    a = test2.element().key();                
+                    a = test2.element().key();
                     ++count;
                 }
 
@@ -352,7 +352,7 @@ namespace
                     test.add(a,b);
             }
 
-            count = 0; 
+            count = 0;
             a = -1;
             while (test.move_next())
             {
@@ -367,7 +367,7 @@ namespace
 
             test.reset();
 
-            count = 0; 
+            count = 0;
             a = -1;
             while (test.move_next())
             {

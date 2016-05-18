@@ -12,12 +12,12 @@ namespace dlib
 
     namespace http_impl
     {
-        inline unsigned char to_hex( unsigned char x )  
+        inline unsigned char to_hex( unsigned char x )
         {
             return x + (x > 9 ? ('A'-10) : '0');
         }
 
-        const std::string urlencode( const std::string& s )  
+        const std::string urlencode( const std::string& s )
         {
             std::ostringstream os;
 
@@ -44,7 +44,7 @@ namespace dlib
 
         inline unsigned char from_hex (
             unsigned char ch
-        ) 
+        )
         {
             if (ch <= '9' && ch >= '0')
                 ch -= '0';
@@ -52,14 +52,14 @@ namespace dlib
                 ch -= 'a' - 10;
             else if (ch <= 'F' && ch >= 'A')
                 ch -= 'A' - 10;
-            else 
+            else
                 ch = 0;
             return ch;
         }
 
         const std::string urldecode (
             const std::string& str
-        ) 
+        )
         {
             using namespace std;
             string result;
@@ -87,7 +87,7 @@ namespace dlib
         }
 
         void parse_url(
-            std::string word, 
+            std::string word,
             key_value_map& queries
         )
         /*!
@@ -120,10 +120,10 @@ namespace dlib
         }
       
         void read_with_limit(
-            std::istream& in, 
-            std::string& buffer, 
+            std::istream& in,
+            std::string& buffer,
             int delim = '\n'
-        ) 
+        )
         {
             using namespace std;
             const size_t max = 64*1024;
@@ -153,7 +153,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    unsigned long parse_http_request ( 
+    unsigned long parse_http_request (
         std::istream& in,
         incoming_things& incoming,
         unsigned long max_content_length
@@ -230,7 +230,7 @@ namespace dlib
                             continue;
 
                         seen_key_start = true;
-                        if (!seen_equal_sign) 
+                        if (!seen_equal_sign)
                         {
                             if (line[pos] == '=')
                             {
@@ -271,8 +271,8 @@ namespace dlib
 
         // If there is data being posted back to us as a query string then
         // pick out the queries using parse_url.
-        if ((strings_equal_ignore_case(incoming.request_type, "POST") || 
-             strings_equal_ignore_case(incoming.request_type, "PUT")) && 
+        if ((strings_equal_ignore_case(incoming.request_type, "POST") ||
+             strings_equal_ignore_case(incoming.request_type, "PUT")) &&
             strings_equal_ignore_case(left_substr(content_type,";"), "application/x-www-form-urlencoded"))
         {
             if (content_length > 0)
@@ -363,7 +363,7 @@ namespace dlib
             out << ci->first << ": " << ci->second << "\r\n";
         }
 
-        // set any cookies 
+        // set any cookies
         for(key_value_map::const_iterator ci = new_cookies.begin(); ci != new_cookies.end(); ++ci )
         {
             out << "Set-Cookie: " << urlencode(ci->first) << '=' << urlencode(ci->second) << "\r\n";
@@ -375,7 +375,7 @@ namespace dlib
 
     void write_http_response (
         std::ostream& out,
-        const http_parse_error& e 
+        const http_parse_error& e
     )
     {
         outgoing_things outgoing;
@@ -388,7 +388,7 @@ namespace dlib
 
     void write_http_response (
         std::ostream& out,
-        const std::exception& e 
+        const std::exception& e
     )
     {
         outgoing_things outgoing;

@@ -10,7 +10,7 @@
     {                                                                       \
         PyErr_SetString( PyExc_ValueError, _message );                      \
         boost::python::throw_error_already_set();                           \
-    }}                                                                      
+    }}
 
 #endif // DLIB_PYaSSERT_Hh_
 

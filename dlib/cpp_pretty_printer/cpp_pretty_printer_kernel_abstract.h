@@ -9,23 +9,23 @@
 namespace dlib
 {
 
-    class cpp_pretty_printer 
+    class cpp_pretty_printer
     {
         /*!
             INITIAL VALUE
                 This object does not have any state associated with it.
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents an HTML pretty printer for C++ source code. 
+                This object represents an HTML pretty printer for C++ source code.
 
         !*/
 
     public:
 
-        cpp_pretty_printer (        
+        cpp_pretty_printer (
         );
         /*!
-            ensures                
+            ensures
                 - #*this is properly initialized
             throws
                 - std::bad_alloc
@@ -50,10 +50,10 @@ namespace dlib
                 - The title of the HTML document writen to out will be title
             throws
                 - std::ios_base::failure
-                    If there was a problem writing to out then this exception will 
-                    be thrown.                      
+                    If there was a problem writing to out then this exception will
+                    be thrown.
                 - any other exception
-                    This exception may be thrown if there is any other problem. 
+                    This exception may be thrown if there is any other problem.
         !*/
 
         void print_and_number (
@@ -68,10 +68,10 @@ namespace dlib
                 - The title of the HTML document writen to out will be title
             throws
                 - std::ios_base::failure
-                    If there was a problem writing to out then this exception will 
-                    be thrown.                      
+                    If there was a problem writing to out then this exception will
+                    be thrown.
                 - any other exception
-                    This exception may be thrown if there is any other problem. 
+                    This exception may be thrown if there is any other problem.
         !*/
 
     private:
@@ -80,7 +80,7 @@ namespace dlib
         cpp_pretty_printer(const cpp_pretty_printer&);        // copy constructor
         cpp_pretty_printer& operator=(const cpp_pretty_printer&);    // assignment operator
 
-    };    
+    };
 
 }
 

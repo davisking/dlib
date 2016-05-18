@@ -83,9 +83,9 @@ namespace dlib
         typename map_base
         >
     inline void swap (
-        map_kernel_c<map_base>& a, 
-        map_kernel_c<map_base>& b 
-    ) { a.swap(b); }  
+        map_kernel_c<map_base>& a,
+        map_kernel_c<map_base>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -135,7 +135,7 @@ namespace dlib
             "\tvoid map::remove_any"
             << "\n\tsize() must be greater than zero if something is going to be removed"
             << "\n\tand d and r must not be the same variable."
-            << "\n\tsize(): " << this->size() 
+            << "\n\tsize(): " << this->size()
             << "\n\tthis:   " << this
             << "\n\t&d:     " << static_cast<void*>(&d)
             << "\n\t&r:     " << static_cast<void*>(&r)

@@ -11,7 +11,7 @@
 #include <dlib/timeout.h>
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -29,11 +29,11 @@ namespace
         dlib::timestamper ts;
 
         timer_test_helper():count(0), timestamp(0){}
-        void add() 
-        { 
-            m.lock(); 
-            ++count; 
-            m.unlock(); 
+        void add()
+        {
+            m.lock();
+            ++count;
+            m.unlock();
         }
 
         void delayed_add()
@@ -61,12 +61,12 @@ namespace
     )
     /*!
         requires
-            - timer_t is an implementation of dlib/timer/timer_abstract.h is instantiated 
+            - timer_t is an implementation of dlib/timer/timer_abstract.h is instantiated
               timer_test_helper
         ensures
-            - runs tests on timer_t for compliance with the specs 
+            - runs tests on timer_t for compliance with the specs
     !*/
-    {        
+    {
         for (int j = 0; j < 4; ++j)
         {
             print_spinner();
@@ -97,12 +97,12 @@ namespace
     )
     /*!
         requires
-            - timer_t is an implementation of dlib/timer/timer_abstract.h is instantiated 
+            - timer_t is an implementation of dlib/timer/timer_abstract.h is instantiated
               timer_test_helper
         ensures
-            - runs tests on timer_t for compliance with the specs 
+            - runs tests on timer_t for compliance with the specs
     !*/
-    {        
+    {
 
         print_spinner();
         for (int j = 0; j < 3; ++j)

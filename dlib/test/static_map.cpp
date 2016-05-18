@@ -13,7 +13,7 @@
 #include <dlib/static_map.h>
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -32,9 +32,9 @@ namespace
             - map is an implementation of static_map/static_map_kernel_abstract.h and
               is instantiated to map int to int
         ensures
-            - runs tests on map for compliance with the specs 
+            - runs tests on map for compliance with the specs
     !*/
-    {        
+    {
 
         print_spinner();
         srand(static_cast<unsigned int>(time(0)));
@@ -147,10 +147,10 @@ namespace
 
         DLIB_TEST(e.size() == 0);
         DLIB_TEST(e.at_start() == true);
-        DLIB_TEST(e.current_element_valid() == false);     
+        DLIB_TEST(e.current_element_valid() == false);
         DLIB_TEST(e.move_next() == false);
         DLIB_TEST(e.at_start() == false);
-        DLIB_TEST(e.current_element_valid() == false);            
+        DLIB_TEST(e.current_element_valid() == false);
 
         DLIB_TEST(m_4.size() == table_4b.size());
         DLIB_TEST(m_8.size() == table_8b.size());
@@ -159,9 +159,9 @@ namespace
         DLIB_TEST(m_4.at_start() == true);
         DLIB_TEST(m_8.at_start() == true);
         DLIB_TEST(m_t.at_start() == true);
-        DLIB_TEST(m_4.current_element_valid() == false);            
-        DLIB_TEST(m_8.current_element_valid() == false);            
-        DLIB_TEST(m_t.current_element_valid() == false);     
+        DLIB_TEST(m_4.current_element_valid() == false);
+        DLIB_TEST(m_8.current_element_valid() == false);
+        DLIB_TEST(m_t.current_element_valid() == false);
 
 
         DLIB_TEST(m_4.move_next() == true);

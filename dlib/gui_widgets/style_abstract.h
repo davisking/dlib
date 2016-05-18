@@ -13,7 +13,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // button styles  
+    // button styles
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ namespace dlib
 
         virtual rectangle get_min_size (
             const ustring& name,
-            const font& mfont 
+            const font& mfont
         ) const = 0;
         /*!
             requires
@@ -86,7 +86,7 @@ namespace dlib
                 - name == the name of the button to be drawn
                 - is_depressed == true if the button is to be drawn in a depressed state
             ensures
-                - draws the button on the canvas c at the location given by rect.  
+                - draws the button on the canvas c at the location given by rect.
         !*/
     };
 
@@ -115,12 +115,12 @@ namespace dlib
     class button_style_toolbar_icon1 : public button_style
     {
         /*!
-            This draws a simple toolbar style button that displays an image in the 
+            This draws a simple toolbar style button that displays an image in the
             middle of itself.  When the mouse moves over it it will light up.
         !*/
         template <typename image_type>
         button_style_toolbar_icon1 (
-            const image_type& img, 
+            const image_type& img,
             unsigned long border_size = 6
         );
         /*!
@@ -140,10 +140,10 @@ namespace dlib
     {
     public:
         /*!
-            This draws a simple button with an arrow in it 
+            This draws a simple button with an arrow in it
         !*/
 
-        enum arrow_direction 
+        enum arrow_direction
         {
             UP,
             DOWN,
@@ -162,7 +162,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // toggle button styles  
+    // toggle button styles
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -193,7 +193,7 @@ namespace dlib
 
         virtual rectangle get_min_size (
             const ustring& name,
-            const font& mfont 
+            const font& mfont
         ) const = 0;
         /*!
             requires
@@ -212,7 +212,7 @@ namespace dlib
             const long lasty,
             const ustring& name,
             const bool is_depressed,
-            const bool is_checked 
+            const bool is_checked
         ) const = 0;
         /*!
             requires
@@ -222,9 +222,9 @@ namespace dlib
                   defined in the protected section of the drawable class.
                 - name == the name of the button to be drawn
                 - is_depressed == true if the button is to be drawn in a depressed state
-                - is_checked == true if the toggle_button is in the checked state 
+                - is_checked == true if the toggle_button is in the checked state
             ensures
-                - draws the button on the canvas c at the location given by rect.  
+                - draws the button on the canvas c at the location given by rect.
         !*/
     };
 
@@ -243,8 +243,8 @@ namespace dlib
     class toggle_button_style_check_box : public toggle_button_style
     {
         /*!
-            This draws a simple check box style toggle button that displays its 
-            name to the right of a check box. 
+            This draws a simple check box style toggle button that displays its
+            name to the right of a check box.
         !*/
     };
 
@@ -253,14 +253,14 @@ namespace dlib
     class toggle_button_style_radio_button : public toggle_button_style
     {
         /*!
-            This draws a simple radio button style toggle button that displays its 
-            name to the right of a circular radio button. 
+            This draws a simple radio button style toggle button that displays its
+            name to the right of a circular radio button.
         !*/
     };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // scroll_bar styles  
+    // scroll_bar styles
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -347,11 +347,11 @@ namespace dlib
                 - c == the canvas to draw on
                 - rect, enabled, lastx, and lasty are the variables
                   defined in the protected section of the drawable class.
-                - is_depressed == true if the background area of the scroll_bar is to 
+                - is_depressed == true if the background area of the scroll_bar is to
                   be drawn in a depressed state (because the user is clicking on it)
             ensures
-                - draws the background part of the scroll_bar on the canvas c at the 
-                  location given by rect.  
+                - draws the background part of the scroll_bar on the canvas c at the
+                  location given by rect.
         !*/
 
         virtual void draw_scroll_bar_slider (
@@ -370,8 +370,8 @@ namespace dlib
                   defined in the protected section of the drawable class
                 - is_being_dragged == true if the user is dragging the slider
             ensures
-                - draws the slider part of the scroll_bar on the canvas c at the 
-                  location given by rect.  
+                - draws the slider part of the scroll_bar on the canvas c at the
+                  location given by rect.
         !*/
 
         button_style_type get_up_button_style (
@@ -419,7 +419,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // scrollable_region (and zoomable_region) styles  
+    // scrollable_region (and zoomable_region) styles
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -443,7 +443,7 @@ namespace dlib
             requires
                 - the mutex drawable::m is locked
             ensures
-                - returns the size of the border region in pixels 
+                - returns the size of the border region in pixels
         !*/
 
         virtual void draw_scrollable_region_border (
@@ -455,18 +455,18 @@ namespace dlib
             requires
                 - the mutex drawable::m is locked
                 - c == the canvas to draw on
-                - rect and enabled are the variables defined in the protected section 
+                - rect and enabled are the variables defined in the protected section
                   of the drawable class.
             ensures
-                - draws the border part of a scrollable_region on the canvas c at the 
-                  location given by rect.  
+                - draws the border part of a scrollable_region on the canvas c at the
+                  location given by rect.
         !*/
 
         scroll_bar_style_type get_horizontal_scroll_bar_style (
         ) const;
         /*!
             ensures
-                - returns the style of scroll_bar to use for the 
+                - returns the style of scroll_bar to use for the
                   horizontal scroll_bar in this widget.
         !*/
 
@@ -474,7 +474,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the style of scroll_bar to use for the 
+                - returns the style of scroll_bar to use for the
                   vertical scroll_bar in this widget.
         !*/
     };
@@ -485,13 +485,13 @@ namespace dlib
     {
     public:
         /*!
-            This is the default style for scrollable_region and zoomable_region objects.  
+            This is the default style for scrollable_region and zoomable_region objects.
         !*/
     };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // text_box styles  
+    // text_box styles
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -513,18 +513,18 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the style of scrollable_region to use for the 
+                - returns the style of scrollable_region to use for the
                   text_box.
         !*/
 
         virtual unsigned long get_padding (
-            const font& mfont 
+            const font& mfont
         ) const = 0;
         /*!
             requires
                 - the mutex drawable::m is locked
             ensures
-                - returns the number of pixels that separate the text in the text_box 
+                - returns the number of pixels that separate the text in the text_box
                   from the edge of the text_box widget itself.
         !*/
 
@@ -547,24 +547,24 @@ namespace dlib
             requires
                 - the mutex drawable::m is locked
                 - c == the canvas to draw on
-                - enabled and mfont are the variables defined in the protected section 
+                - enabled and mfont are the variables defined in the protected section
                 - text_rect == the rectangle in which we should draw the given text
                   of the drawable class.
                 - display_rect == the rectangle returned by scrollable_region::display_rect()
-                - text == the current text in the text_box 
+                - text == the current text in the text_box
                 - cursor_rect == A rectangle of width 1 that represents the current
                   position of the cursor on the screen.
                 - text_color == the color of the text to be drawn
                 - bg_color == the background color of the text field
                 - has_focus == true if this text field has keyboard input focus
-                - cursor_visible == true if the cursor should be drawn 
+                - cursor_visible == true if the cursor should be drawn
                 - if (highlight_start <= highlight_end) then
                     - text[highlight_start] though text[highlight_end] should be
                       highlighted
             ensures
                 - draws the text_box on the canvas c at the location given by text_rect.
                   (Note that the scroll bars and borders are drawn by the scrollable_region
-                  and therefore the style returned by get_scrollable_region_style() 
+                  and therefore the style returned by get_scrollable_region_style()
                   controls how those appear)
                 - doesn't draw anything outside display_rect
         !*/
@@ -576,13 +576,13 @@ namespace dlib
     {
     public:
         /*!
-            This is the default style for text_box objects.  
+            This is the default style for text_box objects.
         !*/
     };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // list_box styles  
+    // list_box styles
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -614,15 +614,15 @@ namespace dlib
                   widget for more info)
                 - enabled == true if the list box is enabled
             ensures
-                - draws the background of a list box on the canvas c at the location given 
-                  by display_rect.  
+                - draws the background of a list box on the canvas c at the location given
+                  by display_rect.
         !*/
 
         scrollable_region_style_type get_scrollable_region_style (
         ) const;
         /*!
             ensures
-                - returns the style of scrollable_region to use for the 
+                - returns the style of scrollable_region to use for the
                   list_box.
         !*/
 
@@ -648,7 +648,7 @@ namespace dlib
                 - enabled == true if the list box is enabled
                 - is_selected == true if the item is to be drawn in a selected state
             ensures
-                - draws the list box item on the canvas c at the location given by rect.  
+                - draws the list box item on the canvas c at the location given by rect.
         !*/
 
         // wide character overloads
@@ -680,13 +680,13 @@ namespace dlib
     {
     public:
         /*!
-            This is the default style for list_box objects.  
+            This is the default style for list_box objects.
         !*/
     };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // text_field styles  
+    // text_field styles
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -705,7 +705,7 @@ namespace dlib
         virtual ~text_field_style() {}
 
         virtual unsigned long get_padding (
-            const font& mfont 
+            const font& mfont
         ) const = 0;
         /*!
             requires
@@ -735,24 +735,24 @@ namespace dlib
             requires
                 - the mutex drawable::m is locked
                 - c == the canvas to draw on
-                - rect, enabled, and mfont are the variables defined in the protected section 
+                - rect, enabled, and mfont are the variables defined in the protected section
                   of the drawable class.
-                - text == the current text in the text_field 
+                - text == the current text in the text_field
                 - text_rect == the rectangle in which we should draw the given text
-                - cursor_x == the x coordinate of the cursor relative to the left side 
+                - cursor_x == the x coordinate of the cursor relative to the left side
                   of rect.  i.e. the number of pixels that separate the cursor from the
                   left side of the text_field.
-                - text_pos == the index of the first letter in text that appears in 
+                - text_pos == the index of the first letter in text that appears in
                   this text field.
                 - text_color == the color of the text to be drawn
                 - bg_color == the background color of the text field
                 - has_focus == true if this text field has keyboard input focus
-                - cursor_visible == true if the cursor should be drawn 
+                - cursor_visible == true if the cursor should be drawn
                 - if (highlight_start <= highlight_end) then
                     - text[highlight_start] though text[highlight_end] should be
                       highlighted
             ensures
-                - draws the text_field on the canvas c at the location given by rect.  
+                - draws the text_field on the canvas c at the location given by rect.
         !*/
 
     };
@@ -763,7 +763,7 @@ namespace dlib
     {
     public:
         /*!
-            This is the default style for text_field objects.  
+            This is the default style for text_field objects.
         !*/
     };
 

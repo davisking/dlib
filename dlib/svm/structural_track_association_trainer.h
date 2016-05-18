@@ -42,7 +42,7 @@ namespace dlib
     public:
 
         structural_track_association_trainer (
-        )  
+        )
         {
             set_defaults();
         }
@@ -68,7 +68,7 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\t void structural_track_association_trainer::set_epsilon()"
                 << "\n\t eps_ must be greater than 0"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 << "\n\t this: " << this
                 );
 
@@ -88,7 +88,7 @@ namespace dlib
         unsigned long get_max_cache_size (
         ) const
         {
-            return max_cache_size; 
+            return max_cache_size;
         }
 
         void set_loss_per_false_association (
@@ -96,7 +96,7 @@ namespace dlib
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(loss > 0, 
+            DLIB_ASSERT(loss > 0,
                 "\t void structural_track_association_trainer::set_loss_per_false_association(loss)"
                 << "\n\t Invalid inputs were given to this function "
                 << "\n\t loss: " << loss
@@ -117,7 +117,7 @@ namespace dlib
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(loss > 0, 
+            DLIB_ASSERT(loss > 0,
                 "\t void structural_track_association_trainer::set_loss_per_track_break(loss)"
                 << "\n\t Invalid inputs were given to this function "
                 << "\n\t loss: " << loss
@@ -159,14 +159,14 @@ namespace dlib
         }
 
         void set_c (
-            double C_ 
+            double C_
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C_ > 0,
                 "\t void structural_track_association_trainer::set_c()"
                 << "\n\t C_ must be greater than 0"
-                << "\n\t C_:    " << C_ 
+                << "\n\t C_:    " << C_
                 << "\n\t this: " << this
                 );
 
@@ -193,7 +193,7 @@ namespace dlib
             typename detection_type,
             typename label_type
             >
-        const track_association_function<detection_type> train (  
+        const track_association_function<detection_type> train (
             const std::vector<std::vector<std::vector<labeled_detection<detection_type,label_type> > > >& samples
         ) const
         {
@@ -236,7 +236,7 @@ namespace dlib
             typename detection_type,
             typename label_type
             >
-        const track_association_function<detection_type> train (  
+        const track_association_function<detection_type> train (
             const std::vector<std::vector<labeled_detection<detection_type,label_type> > >& sample
         ) const
         {
@@ -259,7 +259,7 @@ namespace dlib
             // find a detection_type object so we can call get_similarity_features() and
             // find out how big the feature vectors are.
 
-            // for all detection histories 
+            // for all detection histories
             for (unsigned long i = 0; i < samples.size(); ++i)
             {
                 // for all time instances in the detection history
@@ -276,7 +276,7 @@ namespace dlib
                 }
             }
 
-            DLIB_CASSERT(false, 
+            DLIB_CASSERT(false,
                 "No detection objects were given in the call to dlib::structural_track_association_trainer::train()");
         }
 
@@ -289,7 +289,7 @@ namespace dlib
             const std::vector<detections_at_single_time_step>& det_history,
             std::vector<std::pair<std::vector<detection_type>, std::vector<track_type> > >& data,
             std::vector<std::vector<long> >& labels
-        ) 
+        )
         {
             if (det_history.size() < 1)
                 return;

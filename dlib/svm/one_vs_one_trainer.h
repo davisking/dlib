@@ -40,7 +40,7 @@ namespace dlib
         typedef one_vs_one_decision_function<one_vs_one_trainer> trained_function_type;
 
         one_vs_one_trainer (
-        ) : 
+        ) :
             verbose(false),
             num_threads(4)
         {}
@@ -87,8 +87,8 @@ namespace dlib
             return num_threads;
         }
 
-        struct invalid_label : public dlib::error 
-        { 
+        struct invalid_label : public dlib::error
+        {
             invalid_label(const std::string& msg, const label_type& l1_, const label_type& l2_
                 ) : dlib::error(msg), l1(l1_), l2(l2_) {};
 
@@ -107,14 +107,14 @@ namespace dlib
             DLIB_ASSERT(is_learning_problem(all_samples,all_labels),
                 "\t trained_function_type one_vs_one_trainer::train(all_samples,all_labels)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t all_samples.size():     " << all_samples.size() 
-                << "\n\t all_labels.size():      " << all_labels.size() 
+                << "\n\t all_samples.size():     " << all_samples.size()
+                << "\n\t all_labels.size():      " << all_labels.size()
                 );
 
             const std::vector<label_type> distinct_labels = select_all_distinct_labels(all_labels);
 
 
-            // fill pairs with all the pairs of labels.  
+            // fill pairs with all the pairs of labels.
             std::vector<unordered_pair<label_type> > pairs;
             for (unsigned long i = 0; i < distinct_labels.size(); ++i)
             {
@@ -127,7 +127,7 @@ namespace dlib
                     if (itr == trainers.end() && default_trainer.is_empty())
                     {
                         std::ostringstream sout;
-                        sout << "In one_vs_one_trainer, no trainer registered for the (" 
+                        sout << "In one_vs_one_trainer, no trainer registered for the ("
                              << pairs.back().first << ", " << pairs.back().second << ") label pair.";
                         throw invalid_label(sout.str(), pairs.back().first, pairs.back().second);
                     }
@@ -136,7 +136,7 @@ namespace dlib
 
 
 
-            // Now train on all the label pairs.  
+            // Now train on all the label pairs.
             parallel_for_helper helper(all_samples,all_labels,default_trainer,trainers,verbose,pairs);
             parallel_for(num_threads, 0, pairs.size(), helper, 500);
 
@@ -160,16 +160,16 @@ namespace dlib
                 const binary_function_table& trainers_,
                 const bool verbose_,
                 const std::vector<unordered_pair<label_type> >& pairs_
-            ) : 
+            ) :
                 all_samples(all_samples_),
                 all_labels(all_labels_),
                 default_trainer(default_trainer_),
-                trainers(trainers_), 
+                trainers(trainers_),
                 verbose(verbose_),
                 pairs(pairs_)
             {}
 
-            void operator()(long i) const 
+            void operator()(long i) const
             {
                 try
                 {
@@ -201,11 +201,11 @@ namespace dlib
 
                     any_trainer trainer;
                     // now train a binary classifier using the samples we selected
-                    { auto_mutex lock(class_mutex); 
+                    { auto_mutex lock(class_mutex);
                     const typename binary_function_table::const_iterator itr = trainers.find(p);
                     if (itr != trainers.end())
                         trainer = itr->second;
-                    else 
+                    else
                         trainer = default_trainer;
                     }
 

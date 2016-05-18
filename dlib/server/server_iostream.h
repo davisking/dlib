@@ -15,7 +15,7 @@
 namespace dlib
 {
 
-    class server_iostream : public server 
+    class server_iostream : public server
     {
 
         /*!
@@ -24,7 +24,7 @@ namespace dlib
                 - con_map.size() == 0
 
             CONVENTION
-                - next_id == the id of the next connection 
+                - next_id == the id of the next connection
                 - for all current connections
                     - con_map[id] == the connection object with the given id
                 - m == the mutex that protects the members of this object
@@ -126,7 +126,7 @@ namespace dlib
                 }
 
                 _dLog << LERROR << "We ran out of memory in server_iostream::on_connect()";
-                // if this is an escaped exception from on_connect then let it fly! 
+                // if this is an escaped exception from on_connect then let it fly!
                 // Seriously though, this way it is obvious to the user that something bad happened
                 // since they probably won't have the dlib logger enabled.
                 if (!my_fault)

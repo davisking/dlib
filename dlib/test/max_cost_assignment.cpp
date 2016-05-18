@@ -13,7 +13,7 @@
 #include "tester.h"
 
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -43,7 +43,7 @@ namespace
 
         for (long i = 0; i < vals.size(); ++i)
         {
-            const std::vector<std::vector<long> >& res = permutations(remove_col(vals,i));       
+            const std::vector<std::vector<long> >& res = permutations(remove_col(vals,i));
 
             for (unsigned long j = 0; j < res.size(); ++j)
             {

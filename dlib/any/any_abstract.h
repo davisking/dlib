@@ -10,7 +10,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class bad_any_cast : public std::bad_cast 
+    class bad_any_cast : public std::bad_cast
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -35,10 +35,10 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object is basically a type-safe version of a void*.  In particular,
                 it is a container which can contain only one object but the object may
-                be of any type.  
+                be of any type.
 
-                It is somewhat like the type_safe_union except you don't have to declare 
-                the set of possible content types beforehand.  So in some sense this is 
+                It is somewhat like the type_safe_union except you don't have to declare
+                the set of possible content types beforehand.  So in some sense this is
                 like a less type-strict version of the type_safe_union.
         !*/
 
@@ -56,7 +56,7 @@ namespace dlib
         );
         /*!
             ensures
-                - copies the state of item into *this.  
+                - copies the state of item into *this.
                 - Note that *this and item will contain independent copies of the
                   contents of item.  That is, this function performs a deep
                   copy and therefore does not result in *this containing
@@ -97,9 +97,9 @@ namespace dlib
         /*!
             ensures
                 - if (this object contains any kind of object) then
-                    - returns false 
+                    - returns false
                 - else
-                    - returns true 
+                    - returns true
         !*/
 
         template <typename T>
@@ -145,7 +145,7 @@ namespace dlib
         );
         /*!
             ensures
-                - copies the state of item into *this.  
+                - copies the state of item into *this.
                 - Note that *this and item will contain independent copies of the
                   contents of item.  That is, this function performs a deep
                   copy and therefore does not result in *this containing
@@ -158,8 +158,8 @@ namespace dlib
         /*!
             ensures
                 - swaps *this and item
-                - does not invalidate pointers or references to the object contained 
-                  inside *this or item.  Moreover, a pointer or reference to the object in 
+                - does not invalidate pointers or references to the object contained
+                  inside *this or item.  Moreover, a pointer or reference to the object in
                   *this will now refer to the contents of #item and vice versa.
         !*/
 
@@ -179,7 +179,7 @@ namespace dlib
 
     template <
         typename T
-        > 
+        >
     T& any_cast(
         any& a
     ) { return a.cast_to<T>(); }
@@ -192,7 +192,7 @@ namespace dlib
 
     template <
         typename T
-        > 
+        >
     const T& any_cast(
         const any& a
     ) { return a.cast_to<T>(); }

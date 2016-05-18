@@ -58,9 +58,9 @@ namespace dlib
         typename seq_base
         >
     inline void swap (
-        sequence_kernel_c<seq_base>& a, 
-        sequence_kernel_c<seq_base>& b 
-    ) { a.swap(b); }  
+        sequence_kernel_c<seq_base>& a,
+        sequence_kernel_c<seq_base>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -79,10 +79,10 @@ namespace dlib
     {
 
         // make sure requires clause is not broken
-        DLIB_CASSERT(( pos <= this->size() ), 
+        DLIB_CASSERT(( pos <= this->size() ),
                 "\tvoid sequence::add"
-                << "\n\tpos must be >= 0 and <= size()" 
-                << "\n\tpos: " << pos 
+                << "\n\tpos must be >= 0 and <= size()"
+                << "\n\tpos: " << pos
                 << "\n\tsize(): " << this->size()
                 << "\n\tthis: " << this
         );
@@ -102,9 +102,9 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT(&item != this, 
+        DLIB_CASSERT(&item != this,
                 "\tvoid sequence::cat"
-                << "\n\tyou can't concatenate a sequence onto itself" 
+                << "\n\tyou can't concatenate a sequence onto itself"
                 << "\n\t&item: " << &item
                 << "\n\tthis:  " << this
         );
@@ -126,10 +126,10 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT(( pos < this->size() ), 
+        DLIB_CASSERT(( pos < this->size() ),
                 "\tvoid sequence::remove"
-                << "\n\tpos must be >= 0 and < size()" 
-                << "\n\tpos: " << pos 
+                << "\n\tpos must be >= 0 and < size()"
+                << "\n\tpos: " << pos
                 << "\n\tsize(): " << this->size()
                 << "\n\tthis: " << this
         );
@@ -151,10 +151,10 @@ namespace dlib
     {
 
         // make sure requires clause is not broken
-        DLIB_CASSERT(( pos < this->size() ), 
+        DLIB_CASSERT(( pos < this->size() ),
                 "\tconst T& sequence::operator[]"
-                << "\n\tpos must be >= 0 and < size()" 
-                << "\n\tpos: " << pos 
+                << "\n\tpos must be >= 0 and < size()"
+                << "\n\tpos: " << pos
                 << "\n\tsize(): " << this->size()
                 << "\n\tthis: " << this
         );
@@ -175,10 +175,10 @@ namespace dlib
     {
 
         // make sure requires clause is not broken
-        DLIB_CASSERT(( pos < this->size() ), 
+        DLIB_CASSERT(( pos < this->size() ),
                 "\tT& sequence::operator[]"
-                << "\n\tpos must be >= 0 and < size()" 
-                << "\n\tpos: " << pos 
+                << "\n\tpos must be >= 0 and < size()"
+                << "\n\tpos: " << pos
                 << "\n\tsize(): " << this->size()
                 << "\n\tthis: " << this
         );
@@ -212,7 +212,7 @@ namespace dlib
         >
     typename seq_base::type& sequence_kernel_c<seq_base>::
     element (
-    ) 
+    )
     {
         DLIB_CASSERT(this->current_element_valid() == true,
                 "\tT& sequence::element()"
@@ -231,13 +231,13 @@ namespace dlib
     void sequence_kernel_c<seq_base>::
     remove_any (
         T& item
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_CASSERT( (this->size() > 0),
                  "\tvoid sequence::remove_any"
                  << "\n\tsize() must be greater than zero if something is going to be removed"
-                 << "\n\tsize(): " << this->size() 
+                 << "\n\tsize(): " << this->size()
                  << "\n\tthis:   " << this
         );
 

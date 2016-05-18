@@ -9,7 +9,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -166,7 +166,7 @@ namespace
                 bsp_connect(hosts, sum_array_driver, dlib::ref(v), dlib::ref(result));
 
                 dlog << LINFO << "result: "<< result;
-                dlog << LINFO << "should be: "<< 3*true_value; 
+                dlog << LINFO << "should be: "<< 3*true_value;
                 DLIB_TEST(result == 3*true_value);
             }
             catch (std::exception& e)
@@ -441,7 +441,7 @@ namespace
         min_value = std::numeric_limits<double>::infinity();
         double interval_width = std::abs(right-left);
 
-        // This is doing a BSP based grid search for the minimum of f().  Here we 
+        // This is doing a BSP based grid search for the minimum of f().  Here we
         // do 100 iterations where we keep shrinking the grid size.
         for (int i = 0; i < 100; ++i)
         {

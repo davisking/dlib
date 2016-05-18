@@ -37,7 +37,7 @@ namespace dlib
 
 }
 
-namespace  
+namespace
 {
 
 // ----------------------------------------------------------------------------------------
@@ -142,7 +142,7 @@ namespace
             s2 = L"yo yo yo";
 
             for (int i = 0; i < 10; ++i)
-                array[i] = i; 
+                array[i] = i;
 
             b_true = true;
             b_false = false;
@@ -194,7 +194,7 @@ namespace
             s2 = L"";
 
             for (int i = 0; i < 10; ++i)
-                array[i] = 10-i; 
+                array[i] = 10-i;
 
             b_true = false;
             b_false = true;
@@ -371,7 +371,7 @@ namespace
 
     void deserialize (
         test_object& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         dlib::deserialize(item.i1,in);
@@ -425,7 +425,7 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    // This function returns the contents of the file 'stuff.bin' but using the old 
+    // This function returns the contents of the file 'stuff.bin' but using the old
     // floating point serialization format.
     const std::string get_decoded_string()
     {
@@ -461,7 +461,7 @@ namespace
     }
 
 
-    // This function returns the contents of the file 'stuff.bin' but using the new 
+    // This function returns the contents of the file 'stuff.bin' but using the new
     // floating point serialization format.
     const std::string get_decoded_string2()
     {
@@ -494,7 +494,7 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    // Declare the logger we will use in this test.  The name of the tester 
+    // Declare the logger we will use in this test.  The name of the tester
     // should start with "test."
     logger dlog("test.serialize");
 
@@ -504,7 +504,7 @@ namespace
         ensures
             - runs tests on the serialization code for compliance with the specs
     !*/
-    {        
+    {
 
 
         print_spinner();
@@ -932,8 +932,8 @@ namespace
 
 
         {
-            // Make sure we can still deserialize the serialization 
-            // format for array2d and matrix objects used by older versions 
+            // Make sure we can still deserialize the serialization
+            // format for array2d and matrix objects used by older versions
             // of dlib.
             istringstream sin(get_decoded_string_matarray_old());
             test_deserialize(sin);

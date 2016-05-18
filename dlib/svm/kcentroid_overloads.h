@@ -38,13 +38,13 @@ namespace dlib
 
 
         explicit kcentroid (
-            const kernel_type& kernel_, 
+            const kernel_type& kernel_,
             scalar_type tolerance_ = 0.001,
             unsigned long max_dictionary_size_ = 1000000,
-            bool remove_oldest_first_ = false 
-        ) : 
+            bool remove_oldest_first_ = false
+        ) :
             my_remove_oldest_first(remove_oldest_first_),
-            kernel(kernel_), 
+            kernel(kernel_),
             my_tolerance(tolerance_),
             my_max_dictionary_size(max_dictionary_size_)
         {
@@ -53,8 +53,8 @@ namespace dlib
                 "\tkcentroid::kcentroid()"
                 << "\n\t You have to give a positive tolerance"
                 << "\n\t this:                 " << this
-                << "\n\t tolerance_:           " << tolerance_ 
-                << "\n\t max_dictionary_size_: " << max_dictionary_size_ 
+                << "\n\t tolerance_:           " << tolerance_
+                << "\n\t max_dictionary_size_: " << max_dictionary_size_
                 );
 
             clear_dictionary();
@@ -106,7 +106,7 @@ namespace dlib
         {
             if (w.size() > 0)
                 return alpha*trans(w)*x;
-            else 
+            else
                 return 0;
         }
 
@@ -214,8 +214,8 @@ namespace dlib
         }
 
         unsigned long dictionary_size (
-        ) const 
-        { 
+        ) const
+        {
             if (samples_seen > 0)
                 return 1;
             else
@@ -249,8 +249,8 @@ namespace dlib
         {
             if (samples_seen > 0)
             {
-                typename distance_function<kernel_type>::sample_vector_type temp_basis_vectors; 
-                typename distance_function<kernel_type>::scalar_vector_type temp_alpha; 
+                typename distance_function<kernel_type>::sample_vector_type temp_basis_vectors;
+                typename distance_function<kernel_type>::scalar_vector_type temp_alpha;
 
                 temp_basis_vectors.set_size(1);
                 temp_basis_vectors(0) = w;
@@ -343,13 +343,13 @@ namespace dlib
 
 
         explicit kcentroid (
-            const kernel_type& kernel_, 
+            const kernel_type& kernel_,
             scalar_type tolerance_ = 0.001,
             unsigned long max_dictionary_size_ = 1000000,
-            bool remove_oldest_first_ = false 
-        ) : 
+            bool remove_oldest_first_ = false
+        ) :
             my_remove_oldest_first(remove_oldest_first_),
-            kernel(kernel_), 
+            kernel(kernel_),
             my_tolerance(tolerance_),
             my_max_dictionary_size(max_dictionary_size_)
         {
@@ -358,8 +358,8 @@ namespace dlib
                 "\tkcentroid::kcentroid()"
                 << "\n\t You have to give a positive tolerance"
                 << "\n\t this:                 " << this
-                << "\n\t tolerance_:           " << tolerance_ 
-                << "\n\t max_dictionary_size_: " << max_dictionary_size_ 
+                << "\n\t tolerance_:           " << tolerance_
+                << "\n\t max_dictionary_size_: " << max_dictionary_size_
                 );
 
             x_extra = std::sqrt(kernel.offset);
@@ -420,7 +420,7 @@ namespace dlib
         {
             if (w.size() > 0)
                 return alpha*(trans(w)*x + w_extra*x_extra);
-            else 
+            else
                 return 0;
         }
 
@@ -537,8 +537,8 @@ namespace dlib
         }
 
         unsigned long dictionary_size (
-        ) const 
-        { 
+        ) const
+        {
             if (samples_seen > 0)
             {
                 if (std::abs(w_extra) > std::numeric_limits<scalar_type>::epsilon())
@@ -582,8 +582,8 @@ namespace dlib
 
             if (samples_seen > 0)
             {
-                typename distance_function<kernel_type>::sample_vector_type temp_basis_vectors; 
-                typename distance_function<kernel_type>::scalar_vector_type temp_alpha; 
+                typename distance_function<kernel_type>::sample_vector_type temp_basis_vectors;
+                typename distance_function<kernel_type>::scalar_vector_type temp_alpha;
 
                 // What we are doing here needs a bit of explanation.  The w vector
                 // has an implicit extra dimension tacked on to it with the value of w_extra.
@@ -698,13 +698,13 @@ namespace dlib
 
 
         explicit kcentroid (
-            const kernel_type& kernel_, 
+            const kernel_type& kernel_,
             scalar_type tolerance_ = 0.001,
             unsigned long max_dictionary_size_ = 1000000,
-            bool remove_oldest_first_ = false 
-        ) : 
+            bool remove_oldest_first_ = false
+        ) :
             my_remove_oldest_first(remove_oldest_first_),
-            kernel(kernel_), 
+            kernel(kernel_),
             my_tolerance(tolerance_),
             my_max_dictionary_size(max_dictionary_size_)
         {
@@ -713,8 +713,8 @@ namespace dlib
                 "\tkcentroid::kcentroid()"
                 << "\n\t You have to give a positive tolerance"
                 << "\n\t this:                 " << this
-                << "\n\t tolerance_:           " << tolerance_ 
-                << "\n\t max_dictionary_size_: " << max_dictionary_size_ 
+                << "\n\t tolerance_:           " << tolerance_
+                << "\n\t max_dictionary_size_: " << max_dictionary_size_
                 );
 
             clear_dictionary();
@@ -849,8 +849,8 @@ namespace dlib
         }
 
         unsigned long dictionary_size (
-        ) const 
-        { 
+        ) const
+        {
             if (samples_seen > 0)
                 return 1;
             else
@@ -884,8 +884,8 @@ namespace dlib
         {
             if (samples_seen > 0)
             {
-                typename distance_function<kernel_type>::sample_vector_type temp_basis_vectors; 
-                typename distance_function<kernel_type>::scalar_vector_type temp_alpha; 
+                typename distance_function<kernel_type>::sample_vector_type temp_basis_vectors;
+                typename distance_function<kernel_type>::scalar_vector_type temp_alpha;
 
                 temp_basis_vectors.set_size(1);
                 temp_basis_vectors(0) = sample_type(w.begin(), w.end());
@@ -981,13 +981,13 @@ namespace dlib
 
 
         explicit kcentroid (
-            const kernel_type& kernel_, 
+            const kernel_type& kernel_,
             scalar_type tolerance_ = 0.001,
             unsigned long max_dictionary_size_ = 1000000,
-            bool remove_oldest_first_ = false 
-        ) : 
+            bool remove_oldest_first_ = false
+        ) :
             my_remove_oldest_first(remove_oldest_first_),
-            kernel(kernel_), 
+            kernel(kernel_),
             my_tolerance(tolerance_),
             my_max_dictionary_size(max_dictionary_size_)
         {
@@ -996,8 +996,8 @@ namespace dlib
                 "\tkcentroid::kcentroid()"
                 << "\n\t You have to give a positive tolerance"
                 << "\n\t this:                 " << this
-                << "\n\t tolerance_:           " << tolerance_ 
-                << "\n\t max_dictionary_size_: " << max_dictionary_size_ 
+                << "\n\t tolerance_:           " << tolerance_
+                << "\n\t max_dictionary_size_: " << max_dictionary_size_
                 );
 
             x_extra = std::sqrt(kernel.offset);
@@ -1048,7 +1048,7 @@ namespace dlib
         {
             if (samples_seen > 0)
                 return alpha*(dot(w,x) + w_extra*x_extra);
-            else 
+            else
                 return 0;
         }
 
@@ -1165,8 +1165,8 @@ namespace dlib
         }
 
         unsigned long dictionary_size (
-        ) const 
-        { 
+        ) const
+        {
             if (samples_seen > 0)
             {
                 if (std::abs(w_extra) > std::numeric_limits<scalar_type>::epsilon())
@@ -1211,8 +1211,8 @@ namespace dlib
         {
             if (samples_seen > 0)
             {
-                typename distance_function<kernel_type>::sample_vector_type temp_basis_vectors; 
-                typename distance_function<kernel_type>::scalar_vector_type temp_alpha; 
+                typename distance_function<kernel_type>::sample_vector_type temp_basis_vectors;
+                typename distance_function<kernel_type>::scalar_vector_type temp_alpha;
 
                 // What we are doing here needs a bit of explanation.  The w vector
                 // has an implicit extra dimension tacked on to it with the value of w_extra.

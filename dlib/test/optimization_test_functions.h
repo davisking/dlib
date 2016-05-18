@@ -9,7 +9,7 @@
 
 /*
 
-    Most of the code in this file is converted from the set of Fortran 90 routines 
+    Most of the code in this file is converted from the set of Fortran 90 routines
     created by John Burkardt.
 
     The original Fortran can be found here: http://orion.math.iastate.edu/burkardt/f_src/testopt/testopt.html
@@ -48,7 +48,7 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        class chebyquad_function_model 
+        class chebyquad_function_model
         {
         public:
 
@@ -57,7 +57,7 @@ namespace dlib
             // Define the type used to represent the hessian matrix
             typedef matrix<double> general_matrix;
 
-            double operator() ( 
+            double operator() (
                 const column_vector& x
             ) const
             {
@@ -98,7 +98,7 @@ namespace dlib
 
         matrix<double,4,1> brown_solution ();
 
-        class brown_function_model 
+        class brown_function_model
         {
         public:
 
@@ -107,7 +107,7 @@ namespace dlib
             // Define the type used to represent the hessian matrix
             typedef matrix<double> general_matrix;
 
-            double operator() ( 
+            double operator() (
                 const column_vector& x
             ) const
             {
@@ -144,14 +144,14 @@ namespace dlib
         T rosen_big_residual (int i, const matrix<T,2,1>& m)
         {
             using std::pow;
-            const T x = m(0); 
+            const T x = m(0);
             const T y = m(1);
 
             if (i == 1)
             {
                 return 100*pow(y - x*x,2)+1.0;
             }
-            else 
+            else
             {
                 return pow(1 - x,2) + 1.0;
             }
@@ -189,7 +189,7 @@ namespace dlib
         template <typename T>
         T rosen ( const matrix<T,2,1>& m)
         {
-            const T x = m(0); 
+            const T x = m(0);
             const T y = m(1);
 
             using std::pow;
@@ -200,7 +200,7 @@ namespace dlib
         template <typename T>
         T rosen_residual (int i, const matrix<T,2,1>& m)
         {
-            const T x = m(0); 
+            const T x = m(0);
             const T y = m(1);
 
 
@@ -217,7 +217,7 @@ namespace dlib
         template <typename T>
         matrix<T,2,1> rosen_residual_derivative (int i, const matrix<T,2,1>& m)
         {
-            const T x = m(0); 
+            const T x = m(0);
 
             matrix<T,2,1> d;
 
@@ -257,11 +257,11 @@ namespace dlib
             matrix<T,2,2> res;
 
             // now compute the gradient vector
-            res(0,0) = -400*y + 3*400*x*x + 2; 
-            res(1,1) = 200;              
+            res(0,0) = -400*y + 3*400*x*x + 2;
+            res(1,1) = 200;
 
-            res(0,1) = -400*x;              
-            res(1,0) = -400*x;              
+            res(0,1) = -400*x;
+            res(1,0) = -400*x;
             return res;
         }
 
@@ -291,7 +291,7 @@ namespace dlib
                 const column_vector& x,
                 column_vector& d,
                 general_matrix& h
-            ) const 
+            ) const
             {
                 d = rosen_derivative(x);
                 h = rosen_hessian(x);

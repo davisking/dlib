@@ -13,7 +13,7 @@ namespace dlib
     template <
         unsigned long alphabet_size
         >
-    class conditioning_class_kernel_2 
+    class conditioning_class_kernel_2
     {
         /*!
             INITIAL VALUE
@@ -39,7 +39,7 @@ namespace dlib
                 symbols[i].left_count == the sum of the counts of all the
                                          symbols to the left of symbols[i]
 
-                get_memory_usage() == global_state.memory_usage                                         
+                get_memory_usage() == global_state.memory_usage
         !*/
 
     public:
@@ -85,7 +85,7 @@ namespace dlib
 
         void get_symbol (
             unsigned long target,
-            unsigned long& symbol,            
+            unsigned long& symbol,
             unsigned long& low_count,
             unsigned long& high_count
         ) const;
@@ -116,7 +116,7 @@ namespace dlib
         data* symbols;
         global_state_type& global_state;
 
-    };   
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -141,8 +141,8 @@ namespace dlib
         data* end = symbols + alphabet_size-1;
         
         while (start != end)
-        {            
-            start->count = 0;            
+        {
+            start->count = 0;
             start->left_count = 0;
             ++start;
         }
@@ -162,14 +162,14 @@ namespace dlib
             // set symbol to its parent
             symbol = (symbol-1)>>1;
             
-            // note that all left subchidren are odd and also that 
+            // note that all left subchidren are odd and also that
             // if symbol was a left subchild then we want to increment
-            // its parents left_count 
+            // its parents left_count
             if (temp)
                 ++symbols[symbol].left_count;
         }
 
-        global_state.memory_usage += sizeof(data)*alphabet_size + 
+        global_state.memory_usage += sizeof(data)*alphabet_size +
                                      sizeof(conditioning_class_kernel_2);
     }
 
@@ -183,7 +183,7 @@ namespace dlib
     )
     {
         delete [] symbols;
-        global_state.memory_usage -= sizeof(data)*alphabet_size + 
+        global_state.memory_usage -= sizeof(data)*alphabet_size +
                                      sizeof(conditioning_class_kernel_2);
     }
 
@@ -202,8 +202,8 @@ namespace dlib
         total = 1;
 
         while (start != end)
-        {            
-            start->count = 0;            
+        {
+            start->count = 0;
             start->left_count = 0;
             ++start;
         }
@@ -211,7 +211,7 @@ namespace dlib
         start->count = 1;
         start->left_count = 0;
 
-        // update the left_counts 
+        // update the left_counts
         unsigned short temp;
         unsigned long symbol = alphabet_size-1;
         while (symbol != 0)
@@ -222,9 +222,9 @@ namespace dlib
             // set symbol to its parent
             symbol = (symbol-1)>>1;
             
-            // note that all left subchidren are odd and also that 
+            // note that all left subchidren are odd and also that
             // if symbol was a left subchild then we want to increment
-            // its parents left_count 
+            // its parents left_count
             symbols[symbol].left_count += temp;
         }
     }
@@ -263,7 +263,7 @@ namespace dlib
         unsigned long symbol,
         unsigned short amount
     )
-    {        
+    {
         // if we need to renormalize then do so
         if (static_cast<unsigned long>(total)+static_cast<unsigned long>(amount) >= 65536)
         {
@@ -273,12 +273,12 @@ namespace dlib
             {
                 s = i;
 
-                // divide the count for this symbol by 2                
+                // divide the count for this symbol by 2
                 symbols[i].count >>= 1;
                 
                 symbols[i].left_count = 0;
 
-                // bubble this change up though the tree                
+                // bubble this change up though the tree
                 while (s != 0)
                 {
                     // temp will be 1 if symbol is odd, 0 if it is even
@@ -287,12 +287,12 @@ namespace dlib
                     // set s to its parent
                     s = (s-1)>>1;
                     
-                    // note that all left subchidren are odd and also that 
+                    // note that all left subchidren are odd and also that
                     // if s was a left subchild then we want to increment
-                    // its parents left_count 
+                    // its parents left_count
                     if (temp)
                         symbols[s].left_count += symbols[i].count;
-                }   
+                }
             }
 
             // update symbols alphabet_size-1
@@ -303,7 +303,7 @@ namespace dlib
                 if (symbols[alphabet_size-1].count > 1)
                     symbols[alphabet_size-1].count >>= 1;
                 
-                // bubble this change up though the tree                
+                // bubble this change up though the tree
                 while (s != 0)
                 {
                     // temp will be 1 if symbol is odd, 0 if it is even
@@ -312,13 +312,13 @@ namespace dlib
                     // set s to its parent
                     s = (s-1)>>1;
                     
-                    // note that all left subchidren are odd and also that 
+                    // note that all left subchidren are odd and also that
                     // if s was a left subchild then we want to increment
-                    // its parents left_count 
+                    // its parents left_count
                     if (temp)
                         symbols[s].left_count += symbols[alphabet_size-1].count;
-                }   
-            }        
+                }
+            }
             
 
 
@@ -331,7 +331,7 @@ namespace dlib
             while (m < alphabet_size)
             {
                 total += symbols[m].count + symbols[m].left_count;
-                m = (m<<1) + 2;        
+                m = (m<<1) + 2;
             }
             
         }
@@ -339,7 +339,7 @@ namespace dlib
         
 
 
-        // increment the count for the specified symbol      
+        // increment the count for the specified symbol
         symbols[symbol].count += amount;;
         total += amount;
 
@@ -353,9 +353,9 @@ namespace dlib
             // set symbol to its parent
             symbol = (symbol-1)>>1;
             
-            // note that all left subchidren are odd and also that 
+            // note that all left subchidren are odd and also that
             // if symbol was a left subchild then we want to increment
-            // its parents left_count 
+            // its parents left_count
             if (temp)
                 symbols[symbol].left_count += amount;
         }
@@ -382,8 +382,8 @@ namespace dlib
         unsigned long alphabet_size
         >
     unsigned long conditioning_class_kernel_2<alphabet_size>::
-    get_alphabet_size (        
-    ) 
+    get_alphabet_size (
+    )
     {
         return alphabet_size;
     }
@@ -421,7 +421,7 @@ namespace dlib
         unsigned long high_count_temp = 0;
         bool came_from_right = true;
         while (true)
-        {                        
+        {
             if (came_from_right)
             {
                 high_count_temp += symbols[current].count + symbols[current].left_count;
@@ -452,7 +452,7 @@ namespace dlib
     void conditioning_class_kernel_2<alphabet_size>::
     get_symbol (
         unsigned long target,
-        unsigned long& symbol,            
+        unsigned long& symbol,
         unsigned long& low_count,
         unsigned long& high_count
     ) const
@@ -467,7 +467,7 @@ namespace dlib
                 // we should go left
                 current = (current<<1) + 1;
             }
-            else 
+            else
             {
                 target -= symbols[current].left_count;
                 low_count_temp += symbols[current].left_count;
@@ -480,7 +480,7 @@ namespace dlib
                     break;
                 }
                 else
-                {   
+                {
                     // go right
                     target -= symbols[current].count;
                     low_count_temp += symbols[current].count;

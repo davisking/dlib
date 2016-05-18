@@ -55,8 +55,8 @@ namespace dlib
             DLIB_ASSERT((w > 0 && h > 0) || (w == 0 && h == 0),
                 "\trectangle(width,height)"
                 << "\n\twidth and height must be > 0 or both == 0"
-                << "\n\twidth:  " << w 
-                << "\n\theight: " << h 
+                << "\n\twidth:  " << w
+                << "\n\theight: " << h
                 << "\n\tthis: " << this
                 );
         }
@@ -140,7 +140,7 @@ namespace dlib
         ) const { return point(left(), top()); }
 
         const point bl_corner (
-        ) const { return point(left(), bottom()); } 
+        ) const { return point(left(), bottom()); }
 
         const point tr_corner (
         ) const { return point(right(), top()); }
@@ -149,21 +149,21 @@ namespace dlib
         ) const { return point(right(), bottom()); }
        
         unsigned long width (
-        ) const 
-        { 
+        ) const
+        {
             if (is_empty())
                 return 0;
             else
-                return r - l + 1; 
+                return r - l + 1;
         }
 
         unsigned long height (
-        ) const 
-        { 
+        ) const
+        {
             if (is_empty())
                 return 0;
             else
-                return b - t + 1; 
+                return b - t + 1;
         }
 
         unsigned long area (
@@ -231,7 +231,7 @@ namespace dlib
         }
 
         rectangle& operator+= (
-            const point& p 
+            const point& p
         )
         {
             *this = *this + rectangle(p);
@@ -247,21 +247,21 @@ namespace dlib
         }
 
         bool operator== (
-            const rectangle& rect 
-        ) const 
+            const rectangle& rect
+        ) const
         {
             return (l == rect.l) && (t == rect.t) && (r == rect.r) && (b == rect.b);
         }
 
         bool operator!= (
-            const rectangle& rect 
-        ) const 
+            const rectangle& rect
+        ) const
         {
             return !(*this == rect);
         }
 
         inline bool operator< (const dlib::rectangle& b) const
-        { 
+        {
             if      (left() < b.left()) return true;
             else if (left() > b.left()) return false;
             else if (top() < b.top()) return true;
@@ -277,22 +277,22 @@ namespace dlib
         long l;
         long t;
         long r;
-        long b;   
+        long b;
     };
 
 // ----------------------------------------------------------------------------------------
 
     inline void serialize (
-        const rectangle& item, 
+        const rectangle& item,
         std::ostream& out
     )
     {
         try
         {
-            serialize(item.left(),out); 
-            serialize(item.top(),out); 
-            serialize(item.right(),out); 
-            serialize(item.bottom(),out); 
+            serialize(item.left(),out);
+            serialize(item.top(),out);
+            serialize(item.right(),out);
+            serialize(item.bottom(),out);
         }
         catch (serialization_error& e)
         {
@@ -301,16 +301,16 @@ namespace dlib
     }
 
     inline void deserialize (
-        rectangle& item, 
+        rectangle& item,
         std::istream& in
     )
     {
         try
         {
-            deserialize(item.left(),in); 
-            deserialize(item.top(),in); 
-            deserialize(item.right(),in); 
-            deserialize(item.bottom(),in); 
+            deserialize(item.left(),in);
+            deserialize(item.top(),in);
+            deserialize(item.right(),in);
+            deserialize(item.bottom(),in);
         }
         catch (serialization_error& e)
         {
@@ -319,17 +319,17 @@ namespace dlib
     }
 
     inline std::ostream& operator<< (
-        std::ostream& out, 
-        const rectangle& item 
-    )   
+        std::ostream& out,
+        const rectangle& item
+    )
     {
         out << "[(" << item.left() << ", " << item.top() << ") (" << item.right() << ", " << item.bottom() << ")]";
         return out;
     }
 
     inline std::istream& operator>>(
-        std::istream& in, 
-        rectangle& item 
+        std::istream& in,
+        rectangle& item
     )
     {
         // ignore any whitespace
@@ -569,7 +569,7 @@ namespace dlib
 
     inline const rectangle shrink_rect (
         const rectangle& rect,
-        long num 
+        long num
     )
     {
         return rectangle(rect.left()+num, rect.top()+num, rect.right()-num, rect.bottom()-num);
@@ -579,7 +579,7 @@ namespace dlib
 
     inline const rectangle grow_rect (
         const rectangle& rect,
-        long num 
+        long num
     )
     {
         return shrink_rect(rect, -num);
@@ -646,7 +646,7 @@ namespace dlib
         unsigned long height
     )
     {
-        return rectangle(rect.left(),rect.top(), 
+        return rectangle(rect.left(),rect.top(),
                          rect.left()+width-1,
                          rect.top()+height-1);
     }
@@ -658,7 +658,7 @@ namespace dlib
         unsigned long width
     )
     {
-        return rectangle(rect.left(),rect.top(), 
+        return rectangle(rect.left(),rect.top(),
                          rect.left()+width-1,
                          rect.bottom());
     }
@@ -667,10 +667,10 @@ namespace dlib
 
     inline const rectangle resize_rect_height (
         const rectangle& rect,
-        unsigned long height 
+        unsigned long height
     )
     {
-        return rectangle(rect.left(),rect.top(), 
+        return rectangle(rect.left(),rect.top(),
                          rect.right(),
                          rect.top()+height-1);
     }
@@ -690,7 +690,7 @@ namespace dlib
     inline const rectangle move_rect (
         const rectangle& rect,
         long x,
-        long y 
+        long y
     )
     {
         return rectangle(x, y, x+rect.width()-1, y+rect.height()-1);
@@ -705,7 +705,7 @@ namespace dlib
     {
         DLIB_ASSERT(ratio > 0,
             "\t rectangle set_aspect_ratio()"
-            << "\n\t ratio: " << ratio 
+            << "\n\t ratio: " << ratio
             );
 
         // aspect ratio is w/h
@@ -733,7 +733,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T 
+        typename T
         >
     inline const rectangle get_rect (
         const T& m

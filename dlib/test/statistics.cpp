@@ -15,7 +15,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -171,7 +171,7 @@ namespace
             DLIB_TEST(max(abs(rcc.mean_y()-ym)) < 1e-14);
         }
 
-        std::map<unsigned long,double> dense_to_sparse ( 
+        std::map<unsigned long,double> dense_to_sparse (
             const matrix<double,0,1>& x
         )
         {
@@ -375,7 +375,7 @@ namespace
             {
                 tp = rnum.get_random_gaussian();
                 rs1.add(tp);
-            }   
+            }
 
             // check the unbiased skewness and excess kurtosis of one million Gaussian
             // draws are both near_vects zero.
@@ -415,12 +415,12 @@ namespace
                     rs1.add(tp);
                     dat(i)=tp;
                     xb += dat(i);
-                }   
+                }
     
                 xb = xb/n;
 
                 for(int i = 0; i < n; i++ )
-                { 
+                {
                     sknum += pow(dat(i) - xb,3);
                     skdenom += pow(dat(i) - xb,2);
                     exkurnum += pow(dat(i) - xb,4);
@@ -602,7 +602,7 @@ namespace
         }
 
         void test_vector_normalizer_frobmetric(dlib::rand& rnd)
-        { 
+        {
             print_spinner();
             typedef matrix<double,0,1> sample_type;
             vector_normalizer_frobmetric<sample_type> normalizer;
@@ -614,7 +614,7 @@ namespace
             const long dims = 5;
             // Lets make some two class training data.  Each sample will have dims dimensions but
             // only the one with index equal to key will be meaningful.  In particular, if the key
-            // dimension is > 0 then the sample is class +1 and -1 otherwise.  
+            // dimension is > 0 then the sample is class +1 and -1 otherwise.
 
             long k = 0;
             for (int i = 0; i < 50; ++i)
@@ -715,7 +715,7 @@ namespace
 
             matrix<double,3,3> correct;
             correct = 0, 0, 0,
-                      0, 1, 0, 
+                      0, 1, 0,
                       0, 0, 0;
 
             dlog << LDEBUG << trainer.transform();
@@ -725,7 +725,7 @@ namespace
             print_spinner();
             trainer.train(samples);
             correct = 1, 0, 0,
-                      0, 2, 0, 
+                      0, 2, 0,
                       0, 0, 1;
 
             dlog << LDEBUG << trainer.transform();
@@ -746,23 +746,23 @@ namespace
                 s(0) = i;
                 s(1) = i+1;
                 samples.push_back(s);
-                labels.push_back(1);       
+                labels.push_back(1);
 
                 sample_type s1;
                 s1(0) = i+1;
                 s1(1) = i;
-                samples.push_back(s1);      
-                labels.push_back(2);       
+                samples.push_back(s1);
+                labels.push_back(2);
             }
 
-            matrix<double> X;  
+            matrix<double> X;
             X.set_size(8,2);
             for (int i=0; i<8; i++){
                 X(i,0) = samples[i](0);
                 X(i,1) = samples[i](1);
-            }  
+            }
 
-            matrix<double,0,1> mean;   
+            matrix<double,0,1> mean;
 
             dlib::compute_lda_transform(X,mean,labels,1);
 

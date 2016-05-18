@@ -21,7 +21,7 @@ namespace dlib
             DLIB_CASSERT(dets[i].num_parts() == 68,
                 "\t std::vector<image_window::overlay_line> render_face_detections()"
                 << "\n\t Invalid inputs were given to this function. "
-                << "\n\t dets["<<i<<"].num_parts():  " << dets[i].num_parts() 
+                << "\n\t dets["<<i<<"].num_parts():  " << dets[i].num_parts()
             );
 
             const full_object_detection& d = dets[i];

@@ -12,7 +12,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class SUBNET 
+    class SUBNET
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -133,7 +133,7 @@ namespace dlib
             ensures
                 - Default constructs this object.  This function is not required to do
                   anything in particular but it must exist, that is, it is required that
-                  layer objects be default constructable. 
+                  layer objects be default constructable.
         !*/
 
         EXAMPLE_COMPUTATIONAL_LAYER_ (
@@ -157,12 +157,12 @@ namespace dlib
                     relu<fc<my_layer2<fc<input<matrix<float>>>>>> my_dnn2(my_dnn1);
                   This kind of pattern is useful if you want to use one type of layer
                   during training but a different type of layer during testing since it
-                  allows you to easily convert between related deep neural network types.  
+                  allows you to easily convert between related deep neural network types.
 
                   Additionally, if you provide a constructor to build a layer from another
                   layer type you should also write your layer's deserialize() routine such
                   that it can read that other layer's serialized data in addition to your
-                  own serialized data.  
+                  own serialized data.
         !*/
 
         template <typename SUBNET>
@@ -182,7 +182,7 @@ namespace dlib
 
         template <typename SUBNET>
         void forward(
-            const SUBNET& sub, 
+            const SUBNET& sub,
             resizable_tensor& data_output
         );
         /*!
@@ -199,15 +199,15 @@ namespace dlib
         template <typename SUBNET>
         void backward(
             const tensor& computed_output, // this parameter is optional
-            const tensor& gradient_input, 
-            SUBNET& sub, 
+            const tensor& gradient_input,
+            SUBNET& sub,
             tensor& params_grad
         );
         /*!
             requires
                 - SUBNET implements the SUBNET interface defined at the top of this file.
                 - setup() has been called.
-                - computed_output is the tensor resulting from calling forward(sub,computed_output).  
+                - computed_output is the tensor resulting from calling forward(sub,computed_output).
                   Moreover, this was the most recent call to forward().  This means that
                   forward() is allowed to cache intermediate results so they can be used
                   during the backward computation.
@@ -219,13 +219,13 @@ namespace dlib
                   input data from sub and also with respect to this layer's parameters.
                   These gradients are stored into #sub and #params_grad, respectively. To be
                   precise, the gradients are taken of a function f(sub,get_layer_params())
-                  which is defined thusly:   
-                    - Recalling that computed_output is a function of both sub and get_layer_params(), 
+                  which is defined thusly:
+                    - Recalling that computed_output is a function of both sub and get_layer_params(),
                       since it is the result of calling forward(sub,computed_output):
                       let f(sub,get_layer_params()) == dot(computed_output, gradient_input)
-                  Then we define the following gradient vectors: 
+                  Then we define the following gradient vectors:
                     - PARAMETER_GRADIENT == gradient of f(sub,get_layer_params()) with
-                      respect to get_layer_params(). 
+                      respect to get_layer_params().
                     - for all valid I:
                         - DATA_GRADIENT_I == gradient of f(sub,get_layer_params()) with
                           respect to layer<I>(sub).get_output() (recall that forward() can
@@ -233,13 +233,13 @@ namespace dlib
                           any earlier layer.  So you must consider the gradients with
                           respect to all inputs drawn from sub)
                   Finally, backward() outputs these gradients by performing:
-                    - params_grad = PARAMETER_GRADIENT 
+                    - params_grad = PARAMETER_GRADIENT
                     - for all valid I:
                         - layer<I>(sub).get_gradient_input() += DATA_GRADIENT_I
         !*/
 
         void forward_inplace(
-            const tensor& data_input, 
+            const tensor& data_input,
             tensor& data_output
         );
         /*!
@@ -275,18 +275,18 @@ namespace dlib
                   input data from a sublayer and also with respect to this layer's parameters.
                   These gradients are stored into #data_grad and #params_grad, respectively. To be
                   precise, the gradients are taken of a function f(data_input,get_layer_params())
-                  which is defined thusly:   
+                  which is defined thusly:
                     - Recalling that computed_output is a function of both the input to
                       forward_inplace() and get_layer_params(), since it is the result of
                       calling forward_inplace(data_input,computed_output):
                       let f(data_input,get_layer_params()) == dot(computed_output, gradient_input)
-                  Then we define the following gradient vectors: 
+                  Then we define the following gradient vectors:
                     - PARAMETER_GRADIENT == gradient of f(data_input,get_layer_params()) with
-                      respect to get_layer_params(). 
+                      respect to get_layer_params().
                     - DATA_GRADIENT == gradient of f(data_input,get_layer_params()) with respect
-                      to data_input. 
+                      to data_input.
                   Finally, backward_inplace() outputs these gradients by performing:
-                    - params_grad = PARAMETER_GRADIENT 
+                    - params_grad = PARAMETER_GRADIENT
                     - if (is_same_object(gradient_input, data_grad)) then
                         - data_grad = DATA_GRADIENT
                     - else
@@ -294,14 +294,14 @@ namespace dlib
         !*/
 
         const tensor& get_layer_params(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the parameters that define the behavior of forward().
         !*/
 
         tensor& get_layer_params(
-        ); 
+        );
         /*!
             ensures
                 - returns the parameters that define the behavior of forward().
@@ -317,7 +317,7 @@ namespace dlib
     void serialize(const EXAMPLE_COMPUTATIONAL_LAYER_& item, std::ostream& out);
     void deserialize(EXAMPLE_COMPUTATIONAL_LAYER_& item, std::istream& in);
     /*!
-        provides serialization support  
+        provides serialization support
     !*/
 
     // For each layer you define, always define an add_layer template so that layers can be
@@ -366,11 +366,11 @@ namespace dlib
         /*!
             ensures
                 - #get_num_outputs() == num_outputs
-                - #get_bias_mode() == bias_mode 
+                - #get_bias_mode() == bias_mode
         !*/
 
         unsigned long get_num_outputs (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - This layer outputs column vectors that contain get_num_outputs()
@@ -386,14 +386,14 @@ namespace dlib
             ensures
                 - returns the bias mode which determines if this layer includes bias terms.
                   That is, if the bias mode is FC_HAS_BIAS then a different constant scalar
-                  is added to each of the outputs of this layer. 
+                  is added to each of the outputs of this layer.
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
-        const tensor& get_layer_params() const; 
-        tensor& get_layer_params(); 
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
         /*!
             These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
@@ -436,7 +436,7 @@ namespace dlib
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
                 defined above.  In particular, it defines a convolution layer that takes an
                 input tensor (nominally representing an image) and convolves it with a set
-                of filters and then outputs the results. 
+                of filters and then outputs the results.
 
                 The dimensions of the tensors output by this layer are as follows (letting
                 IN be the input tensor and OUT the output tensor):
@@ -461,7 +461,7 @@ namespace dlib
         !*/
 
         long num_filters(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of filters contained in this layer.  The k dimension
@@ -470,7 +470,7 @@ namespace dlib
         !*/
 
         long nr(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of rows in the filters in this layer.
@@ -484,7 +484,7 @@ namespace dlib
         !*/
 
         long stride_y(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the vertical stride used when convolving the filters over an
@@ -502,7 +502,7 @@ namespace dlib
         !*/
 
         long padding_y(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of pixels of zero padding added to the top and bottom
@@ -510,18 +510,18 @@ namespace dlib
         !*/
 
         long padding_x(
-        ) const; 
+        ) const;
         /*!
             ensures
-                - returns the number of pixels of zero padding added to the left and right 
+                - returns the number of pixels of zero padding added to the left and right
                   sides of the image.
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
-        const tensor& get_layer_params() const; 
-        tensor& get_layer_params(); 
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
         /*!
             These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
@@ -552,7 +552,7 @@ namespace dlib
 
                 Note that, after you finish training a network with dropout, it is a good
                 idea to replace each dropout_ layer with a multiply_ layer because the
-                multiply_ layer is faster and deterministic. 
+                multiply_ layer is faster and deterministic.
         !*/
 
     public:
@@ -568,7 +568,7 @@ namespace dlib
         !*/
 
         float get_drop_rate (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the probability that an individual input value to this layer will
@@ -578,8 +578,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
-        const tensor& get_layer_params() const; 
-        tensor& get_layer_params(); 
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
         /*!
             These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
@@ -603,7 +603,7 @@ namespace dlib
     public:
         explicit multiply_(
             float val = 0.5
-        ); 
+        );
         /*!
             ensures
                 - #get_multiply_value() == val
@@ -611,7 +611,7 @@ namespace dlib
 
         multiply_ (
             const dropout_& item
-        ); 
+        );
         /*!
             ensures
                 - #get_multiply_value() == 1-item.get_drop_rate()
@@ -630,8 +630,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
-        const tensor& get_layer_params() const; 
-        tensor& get_layer_params(); 
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
         /*!
             These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
@@ -657,25 +657,25 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
                 defined above.  In particular, it defines a batch normalization layer that
-                implements the method described in the paper: 
+                implements the method described in the paper:
                     Batch Normalization: Accelerating Deep Network Training by Reducing
                     Internal Covariate Shift by Sergey Ioffe and Christian Szegedy
                 
                 In particular, this layer produces output tensors with the same
                 dimensionality as the input tensors, except that the mean and variances of
-                the elements have been standardized to 0 and 1 respectively. 
+                the elements have been standardized to 0 and 1 respectively.
 
                 It should also be noted that when tensors with a num_samples() dimension of
                 1 are passed to this layer it doesn't perform batch normalization.
                 Instead, it runs in "inference mode" where the learned linear normalizing
-                transformation is used to transform the tensor. 
+                transformation is used to transform the tensor.
 
                 Finally, after you finish training a batch normalized network, it is a good
                 idea to replace each bn_ layer with an affine_ layer because the affine_
                 layer is faster and will never surprise you by performing batch
                 normalization on tensors that have a num_samples() dimension > 1.  This allows
                 you to run large mini-batches of samples through your final network without
-                batch normalization executing at all. 
+                batch normalization executing at all.
         !*/
 
     public:
@@ -692,12 +692,12 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_mode() == mode 
+                - #get_mode() == mode
                 - get_running_stats_window_size() == window_size
         !*/
 
         layer_mode get_mode(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the mode of this layer, either CONV_MODE or FC_MODE.
@@ -713,7 +713,7 @@ namespace dlib
         !*/
 
         unsigned long get_running_stats_window_size (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - Just as recommended in the batch normalization paper, this object keeps a
@@ -728,8 +728,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
-        const tensor& get_layer_params() const; 
-        tensor& get_layer_params(); 
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
         /*!
             These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
@@ -783,7 +783,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_mode() == FC_MODE 
+                - #get_mode() == FC_MODE
         !*/
 
         affine_(
@@ -805,22 +805,22 @@ namespace dlib
                 - Constructs affine_ so that it performs the same transformation as the
                   supplied batch normalization layer.  You would want to do this after you
                   finish training a network with bn_ layers because the affine_ layer will
-                  execute faster.  
+                  execute faster.
                 - #get_mode() == layer.get_mode()
         !*/
 
         layer_mode get_mode(
-        ) const; 
+        ) const;
         /*!
             ensures
-                - returns the mode of this layer, either CONV_MODE or FC_MODE.  
+                - returns the mode of this layer, either CONV_MODE or FC_MODE.
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
-        const tensor& get_layer_params() const; 
-        tensor& get_layer_params(); 
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
         /*!
             These functions are implemented as described in the
             EXAMPLE_COMPUTATIONAL_LAYER_ interface.  Also note that get_layer_params()
@@ -867,7 +867,7 @@ namespace dlib
                 defined above.  In particular, it defines a max pooling layer that takes an
                 input tensor and downsamples it.  It does this by sliding a window over the
                 images in an input tensor and outputting, for each channel, the maximum
-                element within the window.  
+                element within the window.
 
                 If _nr == 0 then it means the filter size covers all the rows in the input
                 tensor, similarly for the _nc parameter.  To be precise, if we call the
@@ -901,7 +901,7 @@ namespace dlib
         !*/
 
         long nr(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of rows in the pooling window or 0 if the window size
@@ -917,7 +917,7 @@ namespace dlib
         !*/
 
         long stride_y(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the vertical stride used when scanning the max pooling window
@@ -935,7 +935,7 @@ namespace dlib
         !*/
 
         long padding_y(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of pixels of zero padding added to the top and bottom
@@ -943,20 +943,20 @@ namespace dlib
         !*/
 
         long padding_x(
-        ) const; 
+        ) const;
         /*!
             ensures
-                - returns the number of pixels of zero padding added to the left and right 
+                - returns the number of pixels of zero padding added to the left and right
                   sides of the image.
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& computed_output, const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
-        const tensor& get_layer_params() const; 
-        tensor& get_layer_params(); 
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
         /*!
-            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ 
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_
             interface.  Note that this layer doesn't have any parameters, so the tensor
             returned by get_layer_params() is always empty.
         !*/
@@ -1010,7 +1010,7 @@ namespace dlib
                 defined above.  In particular, it defines an average pooling layer that
                 takes an input tensor and downsamples it.  It does this by sliding a window
                 over the images in an input tensor and outputting, for each channel, the
-                average element within the window.  
+                average element within the window.
 
                 If _nr == 0 then it means the filter size covers all the rows in the input
                 tensor, similarly for the _nc parameter.  To be precise, if we call the
@@ -1044,7 +1044,7 @@ namespace dlib
         !*/
 
         long nr(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of rows in the pooling window or 0 if the window size
@@ -1060,7 +1060,7 @@ namespace dlib
         !*/
 
         long stride_y(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the vertical stride used when scanning the pooling window
@@ -1078,7 +1078,7 @@ namespace dlib
         !*/
 
         long padding_y(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of pixels of zero padding added to the top and bottom
@@ -1086,20 +1086,20 @@ namespace dlib
         !*/
 
         long padding_x(
-        ) const; 
+        ) const;
         /*!
             ensures
-                - returns the number of pixels of zero padding added to the left and right 
+                - returns the number of pixels of zero padding added to the left and right
                   sides of the image.
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& computed_output, const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
-        const tensor& get_layer_params() const; 
-        tensor& get_layer_params(); 
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
         /*!
-            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ 
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_
             interface.  Note that this layer doesn't have any parameters, so the tensor
             returned by get_layer_params() is always empty.
         !*/
@@ -1128,8 +1128,8 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
                 defined above.  In particular, it defines a rectified linear layer.
-                Therefore, it passes its inputs through the function 
-                    f(x)=max(x,0) 
+                Therefore, it passes its inputs through the function
+                    f(x)=max(x,0)
                 where f() is applied pointwise across the input tensor.
         !*/
 
@@ -1141,10 +1141,10 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
-        const tensor& get_layer_params() const; 
-        tensor& get_layer_params(); 
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
         /*!
-            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ 
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_
             interface.  Note that this layer doesn't have any parameters, so the tensor
             returned by get_layer_params() is always empty.
         !*/
@@ -1161,8 +1161,8 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
                 defined above.  In particular, it defines a parametric rectified linear
-                layer.  Therefore, it passes its inputs through the function 
-                    f(x) = x>0 ? x : p*x 
+                layer.  Therefore, it passes its inputs through the function
+                    f(x) = x>0 ? x : p*x
                 where f() is applied pointwise across the input tensor and p is a scalar
                 parameter learned by this layer.
 
@@ -1188,14 +1188,14 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the initial value of the prelu parameter. 
+                - returns the initial value of the prelu parameter.
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
-        const tensor& get_layer_params() const; 
-        tensor& get_layer_params(); 
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
         /*!
             These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
@@ -1212,8 +1212,8 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
                 defined above.  In particular, it defines a sigmoid layer.  Therefore, it
-                passes its inputs through the function 
-                    f(x)=1/(1+exp(-x)) 
+                passes its inputs through the function
+                    f(x)=1/(1+exp(-x))
                 where f() is applied pointwise across the input tensor.
         !*/
 
@@ -1225,10 +1225,10 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
-        const tensor& get_layer_params() const; 
-        tensor& get_layer_params(); 
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
         /*!
-            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ 
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_
             interface.  Note that this layer doesn't have any parameters, so the tensor
             returned by get_layer_params() is always empty.
         !*/
@@ -1245,7 +1245,7 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
                 defined above.  In particular, it defines a hyperbolic tangent layer.
-                Therefore, it passes its inputs through the function 
+                Therefore, it passes its inputs through the function
                     f(x)=std::tanh(x)
                 where f() is applied pointwise across the input tensor.
         !*/
@@ -1258,10 +1258,10 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
-        const tensor& get_layer_params() const; 
-        tensor& get_layer_params(); 
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
         /*!
-            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ 
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_
             interface.  Note that this layer doesn't have any parameters, so the tensor
             returned by get_layer_params() is always empty.
         !*/
@@ -1279,11 +1279,11 @@ namespace dlib
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
                 defined above.  In particular, it defines a softmax layer.  To be precise,
                 we define the softmax function s(x) as:
-                    s(x) == exp(x)/sum(exp(x)) 
+                    s(x) == exp(x)/sum(exp(x))
                 where x is a vector.  Then this layer treats its input tensor as a
                 collection of multi-channel images and applies s() to each spatial location
                 in each image.  In each application, the tensor::k() channel elements at
-                each position are input to s() and then replaced by the outputs of s().   
+                each position are input to s() and then replaced by the outputs of s().
 
                 This means that, for example, if you collapsed each output image to a 1
                 channel image by adding the channels then you would end up with images
@@ -1299,10 +1299,10 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
-        const tensor& get_layer_params() const; 
-        tensor& get_layer_params(); 
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
         /*!
-            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ 
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_
             interface.  Note that this layer doesn't have any parameters, so the tensor
             returned by get_layer_params() is always empty.
         !*/
@@ -1335,13 +1335,13 @@ namespace dlib
 
     public:
         add_prev_(
-        ); 
+        );
 
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
-        const tensor& get_layer_params() const; 
-        tensor& get_layer_params(); 
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
         /*!
             These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
@@ -1354,7 +1354,7 @@ namespace dlib
         >
     using add_prev = add_layer<add_prev_<tag>, SUBNET>;
 
-    // Here we add some convenient aliases for using add_prev_ with the tag layers. 
+    // Here we add some convenient aliases for using add_prev_ with the tag layers.
     template <typename SUBNET> using add_prev1  = add_prev<tag1, SUBNET>;
     template <typename SUBNET> using add_prev2  = add_prev<tag2, SUBNET>;
     template <typename SUBNET> using add_prev3  = add_prev<tag3, SUBNET>;

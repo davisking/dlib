@@ -12,7 +12,7 @@ namespace dlib
 
     template <
         typename T,
-        typename mem_manager = default_memory_manager 
+        typename mem_manager = default_memory_manager
         >
     class stack
     {
@@ -21,8 +21,8 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1a        
-        typedef     stack_kernel_1<T,mem_manager>    
+        // kernel_1a
+        typedef     stack_kernel_1<T,mem_manager>
                     kernel_1a;
         typedef     stack_kernel_c<kernel_1a>
                     kernel_1a_c;

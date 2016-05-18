@@ -13,7 +13,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -26,9 +26,9 @@ namespace
     )
     /*!
         ensures
-            - runs tests on pixel objects and functions for compliance with the specs 
+            - runs tests on pixel objects and functions for compliance with the specs
     !*/
-    {        
+    {
 
         print_spinner();
 
@@ -838,7 +838,7 @@ namespace
         out = 10;
         rect = spatially_filter_image_separable(img, imout, row_filt, col_filt,2,true,true);
         out += abs(xcorr_same(tmp(xcorr_same(mat(img),trans(row_filt))), col_filt)/2);
-        DLIB_TEST_MSG(max(abs(subm(mat(imout),rect) - subm(out,rect))) < 1e-7, 
+        DLIB_TEST_MSG(max(abs(subm(mat(imout),rect) - subm(out,rect))) < 1e-7,
             max(abs(subm(mat(imout),rect) - subm(out,rect))));
 
         be = border_enumerator(get_rect(imout),rect);
@@ -1205,7 +1205,7 @@ namespace
 
         array2d<unsigned char> labels;
         unsigned long num;
-        num = label_connected_blobs(img, 
+        num = label_connected_blobs(img,
                                     zero_pixels_are_background(),
                                     neighbors_8(),
                                     connected_if_both_not_zero(),
@@ -1265,7 +1265,7 @@ namespace
 
         array2d<unsigned char> labels;
         unsigned long num;
-        num = label_connected_blobs(img, 
+        num = label_connected_blobs(img,
                                     nothing_is_background(),
                                     neighbors_4(),
                                     connected_if_equal(),
@@ -1281,7 +1281,7 @@ namespace
         const unsigned char l3 = labels[rect3.top()][rect3.left()];
 
         DLIB_TEST(l0 != 0 && l1 != 0 && l2 != 0 && l3 != 0);
-        DLIB_TEST(l1 != l2 && l1 != l3 && l2 != l3 && 
+        DLIB_TEST(l1 != l2 && l1 != l3 && l2 != l3 &&
                   l0 != l1 && l0 != l2 && l0 != l3);
 
         for (long r = 0; r < labels.nr(); ++r)
@@ -1750,7 +1750,7 @@ namespace
             img = 255;
             chip_details details(centered_rect(center(get_rect(img)),nr,nc), size, angle);
             extract_image_chip(img, details, chip);
-            DLIB_TEST_MSG(max(abs(chip-255))==0,"nr: " << nr << "  nc: "<< nc << "  size: " << size << "  angle: " << angle 
+            DLIB_TEST_MSG(max(abs(chip-255))==0,"nr: " << nr << "  nc: "<< nc << "  size: " << size << "  angle: " << angle
                 << " error: " << max(abs(chip-255)) );
         }
 

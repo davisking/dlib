@@ -126,7 +126,7 @@ namespace dlib
         svd3(A, v, s, u);
         matrix<T> tform = H*diagm(W)*u;
         // pick out only the number of dimensions we are supposed to for the output, unless
-        // we should just keep them all, then don't do anything. 
+        // we should just keep them all, then don't do anything.
         if ((long)lda_dims <= tform.nc())
         {
             rsort_columns(tform, s);
@@ -141,7 +141,7 @@ namespace dlib
 
     inline std::pair<double,double> equal_error_rate (
         const std::vector<double>& low_vals,
-        const std::vector<double>& high_vals 
+        const std::vector<double>& high_vals
     )
     {
         std::vector<std::pair<double,int> > temp;

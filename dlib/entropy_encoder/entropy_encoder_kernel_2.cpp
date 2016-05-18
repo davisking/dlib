@@ -104,7 +104,7 @@ namespace dlib
     {
         // note that we must add one because of the convention that
         // high == the real upper range minus 1
-        uint32 r = (high-low+1)/total;                 
+        uint32 r = (high-low+1)/total;
 
         // note that we must subtract 1 to preserve the convention that
         // high == the real upper range - 1
@@ -117,10 +117,10 @@ namespace dlib
         {
 
             // if high and low don't have the same 8 high order bits
-            if ((high&0xFF000000) != (low&0xFF000000)) 
-            {   
+            if ((high&0xFF000000) != (low&0xFF000000))
+            {
                 // if the distance between high and low is small and there aren't
-                // any bits we can roll off then force high and low to have common high 
+                // any bits we can roll off then force high and low to have common high
                 // order bits.
                 if ((high-low < 0x10000))
                 {
@@ -131,7 +131,7 @@ namespace dlib
                         high = low = high+low;
                         high += 0xFF;
                         low -= 0xFF;
-                    } 
+                    }
                     else /**/
                     {
                         high>>=1;
@@ -146,7 +146,7 @@ namespace dlib
                     break;
                 }
                 
-            }  
+            }
             // else if there are 8 bits we can roll off
             else
             {
@@ -155,8 +155,8 @@ namespace dlib
 
 
                 // roll off the bits we just wrote to buf
-                high <<= 8;  
-                low <<= 8;               
+                high <<= 8;
+                low <<= 8;
                 high |= 0xFF;  // note that it is ok to add 0xFF to high here because
                             // of the convention that high == real upper range - 1.
                             // so that means that if we want to shift the upper range
@@ -171,9 +171,9 @@ namespace dlib
                 if (streambuf->sputn(reinterpret_cast<char*>(&buf),1)==0)
                 {
                     throw std::ios_base::failure("error occured in the entropy_encoder object");
-                }                   
+                }
                 
-            } 
+            }
 
         } // while (true)
 

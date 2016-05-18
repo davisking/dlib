@@ -8,7 +8,7 @@
 namespace dlib
 {
     template <
-        typename bit_stream_base  
+        typename bit_stream_base
         >
     class bit_stream_multi : public bit_stream_base
     {
@@ -19,7 +19,7 @@ namespace dlib
 
       
             WHAT THIS EXTENSION DOES FOR BIT_STREAM
-                this gives a bit_stream object the ability to read/write multible bits 
+                this gives a bit_stream object the ability to read/write multible bits
                 at a time
         !*/
 
@@ -32,12 +32,12 @@ namespace dlib
         );
         /*!
             requires
-                - is_in_write_mode() == true 
+                - is_in_write_mode() == true
                 - 0 <= num_to_write <= 32
             ensures
-                - num_to_write low order bits from data will be written to the ostream 
+                - num_to_write low order bits from data will be written to the ostream
                 - object associated with *this
-                  example: if data is 10010 then the bits will be written in the 
+                  example: if data is 10010 then the bits will be written in the
                   order 1,0,0,1,0
         !*/
 
@@ -48,13 +48,13 @@ namespace dlib
         );
         /*!
             requires
-                - is_in_read_mode() == true 
+                - is_in_read_mode() == true
                 - 0 <= num_to_read <= 32
             ensures
-                - tries to read num_to_read bits into the low order end of #data       
-                  example:  if the incoming bits were 10010 then data would end 
+                - tries to read num_to_read bits into the low order end of #data
+                  example:  if the incoming bits were 10010 then data would end
                   up with 10010 as its low order bits
-                - all of the bits in #data not filled in by multi_read() are zero             
+                - all of the bits in #data not filled in by multi_read() are zero
                 - returns the number of bits actually read into #data
         !*/
 
@@ -64,8 +64,8 @@ namespace dlib
         typename bit_stream_base
         >
     inline void swap (
-        bit_stream_multi<bit_stream_base>& a, 
-        bit_stream_multi<bit_stream_base>& b 
+        bit_stream_multi<bit_stream_base>& a,
+        bit_stream_multi<bit_stream_base>& b
     ) { a.swap(b); }
     /*!
         provides a global swap function

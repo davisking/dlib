@@ -32,10 +32,10 @@ namespace dlib
                 - Bdiag.size() == max_index_plus_one(edges)
                 - edges must be sorted according to order_by_index()
             ensures
-                - This routine splits a graph into two subgraphs using the Newman 
-                  clustering method.  
+                - This routine splits a graph into two subgraphs using the Newman
+                  clustering method.
                 - returns the modularity obtained when the graph is split according
-                  to the contents of #labels. 
+                  to the contents of #labels.
                 - #labels.size() == node_degrees.size()
                 - for all valid i: #labels(i) == -1 or +1
                 - if (this function returns 0) then
@@ -61,8 +61,8 @@ namespace dlib
             {
 
                 // any number larger than power_iter_eps
-                double iteration_change = power_iter_eps*2+1; 
-                for (unsigned long i = 0; i < max_iterations && iteration_change > power_iter_eps; ++i) 
+                double iteration_change = power_iter_eps*2+1;
+                for (unsigned long i = 0; i < max_iterations && iteration_change > power_iter_eps; ++i)
                 {
                     sparse_matrix_vector_multiply(edges, labels, Bv);
                     Bv -= dot(node_degrees, labels)/(2*edge_sum) * node_degrees;

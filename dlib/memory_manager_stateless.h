@@ -24,11 +24,11 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1        
+        // kernel_1
         typedef      memory_manager_stateless_kernel_1<T>
                      kernel_1a;
       
-        // kernel_2        
+        // kernel_2
         typedef      memory_manager_stateless_kernel_2<T,memory_manager<char>::kernel_1a>
                      kernel_2_1a;
         typedef      memory_manager_stateless_kernel_2<T,memory_manager<char>::kernel_1b>

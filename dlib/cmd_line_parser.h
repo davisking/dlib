@@ -27,7 +27,7 @@ namespace dlib
     class impl_cmd_line_parser
     {
         /*!
-            This class is basically just a big templated typedef for building 
+            This class is basically just a big templated typedef for building
             a complete command line parser type out of all the parts it needs.
         !*/
 
@@ -64,12 +64,12 @@ namespace dlib
     };
 
     template <
-        typename charT 
+        typename charT
         >
     inline void swap (
-        cmd_line_parser<charT>& a, 
-        cmd_line_parser<charT>& b 
-    ) { a.swap(b); } 
+        cmd_line_parser<charT>& a,
+        cmd_line_parser<charT>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 

@@ -1,6 +1,6 @@
 // Copyright (C) 2006  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_PIXEl_ 
+#ifndef DLIB_PIXEl_
 #define DLIB_PIXEl_
 
 #include <iostream>
@@ -39,7 +39,7 @@ namespace dlib
 
             - bool has_alpha
 
-            - long num 
+            - long num
 
             - basic_pixel_type
             - basic_pixel_type min()
@@ -49,47 +49,47 @@ namespace dlib
         The above public constants are subject to the following constraints:
             - only one of grayscale, rgb, rgb_alpha, or hsi is true
             - if (rgb == true) then
-                - The type T will be a struct with 3 public members of type 
-                  unsigned char named "red" "green" and "blue".  
+                - The type T will be a struct with 3 public members of type
+                  unsigned char named "red" "green" and "blue".
                 - This type of pixel represents the RGB color space.
                 - num == 3
                 - has_alpha == false
                 - basic_pixel_type == unsigned char
-                - min() == 0 
+                - min() == 0
                 - max() == 255
                 - is_unsigned == true
             - if (rgb_alpha == true) then
-                - The type T will be a struct with 4 public members of type 
-                  unsigned char named "red" "green" "blue" and "alpha".  
+                - The type T will be a struct with 4 public members of type
+                  unsigned char named "red" "green" "blue" and "alpha".
                 - This type of pixel represents the RGB color space with
                   an alpha channel where an alpha of 0 represents a pixel
-                  that is totally transparent and 255 represents a pixel 
+                  that is totally transparent and 255 represents a pixel
                   with maximum opacity.
                 - num == 4
-                - has_alpha == true 
+                - has_alpha == true
                 - basic_pixel_type == unsigned char
-                - min() == 0 
+                - min() == 0
                 - max() == 255
                 - is_unsigned == true
             - else if (hsi == true) then
                 - The type T will be a struct with 3 public members of type
-                  unsigned char named "h" "s" and "i".  
+                  unsigned char named "h" "s" and "i".
                 - This type of pixel represents the HSI color space.
                 - num == 3
-                - has_alpha == false 
+                - has_alpha == false
                 - basic_pixel_type == unsigned char
-                - min() == 0 
+                - min() == 0
                 - max() == 255
                 - is_unsigned == true
             - else
                 - grayscale == true
-                - This type of pixel represents a grayscale color space.  T 
+                - This type of pixel represents a grayscale color space.  T
                   will be some kind of basic scalar type such as unsigned int.
                 - num == 1
-                - has_alpha == false 
-                - basic_pixel_type == T 
-                - min() == the minimum obtainable value of objects of type T 
-                - max() == the maximum obtainable value of objects of type T 
+                - has_alpha == false
+                - basic_pixel_type == T
+                - min() == the minimum obtainable value of objects of type T
+                - max() == the maximum obtainable value of objects of type T
                 - is_unsigned is true if min() == 0 and false otherwise
     !*/
 
@@ -195,7 +195,7 @@ namespace dlib
 
     template <
         typename P1,
-        typename P2  
+        typename P2
         >
     inline void assign_pixel (
         P1& dest,
@@ -211,15 +211,15 @@ namespace dlib
                   dest will be identical to src after this function returns.
             - else if (P1 and P2 are not the same type of pixel) then
                 - assigns pixel src to pixel dest and does any necessary color space
-                  conversions.   
+                  conversions.
                 - When converting from a grayscale color space with more than 255 values the
                   pixel intensity is saturated at pixel_traits<P1>::max() or pixel_traits<P1>::min()
                   as appropriate.
                 - if (the dest pixel has an alpha channel and the src pixel doesn't) then
-                    - #dest.alpha == 255 
+                    - #dest.alpha == 255
                 - else if (the src pixel has an alpha channel but the dest pixel doesn't) then
                     - #dest == the original dest value blended with the src value according
-                      to the alpha channel in src.  
+                      to the alpha channel in src.
                       (i.e.  #dest == src*(alpha/255) + dest*(1-alpha/255))
     !*/
 
@@ -256,13 +256,13 @@ namespace dlib
             - pixel_traits<P> must be defined
             - pixel_traits<T> must be defined
         ensures
-            - This function changes the intensity of the dest pixel. So if the pixel in 
-              question is a grayscale pixel then it simply assigns that pixel with the 
-              value of get_pixel_intensity(new_intensity).  However, if the pixel is not 
-              a grayscale pixel then it converts the pixel to the HSI color space and sets 
-              the I channel to the given intensity and then converts this HSI value back to 
+            - This function changes the intensity of the dest pixel. So if the pixel in
+              question is a grayscale pixel then it simply assigns that pixel with the
+              value of get_pixel_intensity(new_intensity).  However, if the pixel is not
+              a grayscale pixel then it converts the pixel to the HSI color space and sets
+              the I channel to the given intensity and then converts this HSI value back to
               the original pixel's color space.
-            - Note that we don't necessarily have #get_pixel_intensity(dest) == get_pixel_intensity(new_intensity) 
+            - Note that we don't necessarily have #get_pixel_intensity(dest) == get_pixel_intensity(new_intensity)
               due to vagaries of how converting to and from HSI works out.
             - if (the dest pixel has an alpha channel) then
                 - #dest.alpha == dest.alpha
@@ -271,9 +271,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline void serialize (
-        const rgb_pixel& item, 
-        std::ostream& out 
-    );   
+        const rgb_pixel& item,
+        std::ostream& out
+    );
     /*!
         provides serialization support for the rgb_pixel struct
     !*/
@@ -281,9 +281,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline void deserialize (
-        rgb_pixel& item, 
+        rgb_pixel& item,
         std::istream& in
-    );   
+    );
     /*!
         provides deserialization support for the rgb_pixel struct
     !*/
@@ -291,9 +291,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline void serialize (
-        const bgr_pixel& item, 
-        std::ostream& out 
-    );   
+        const bgr_pixel& item,
+        std::ostream& out
+    );
     /*!
         provides serialization support for the bgr_pixel struct
     !*/
@@ -301,9 +301,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline void deserialize (
-        bgr_pixel& item, 
+        bgr_pixel& item,
         std::istream& in
-    );   
+    );
     /*!
         provides deserialization support for the bgr_pixel struct
     !*/
@@ -311,9 +311,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline void serialize (
-        const rgb_alpha_pixel& item, 
-        std::ostream& out 
-    );   
+        const rgb_alpha_pixel& item,
+        std::ostream& out
+    );
     /*!
         provides serialization support for the rgb_alpha_pixel struct
     !*/
@@ -321,9 +321,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline void deserialize (
-        rgb_alpha_pixel& item, 
+        rgb_alpha_pixel& item,
         std::istream& in
-    );   
+    );
     /*!
         provides deserialization support for the rgb_alpha_pixel struct
     !*/
@@ -331,9 +331,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline void serialize (
-        const hsi_pixel& item, 
-        std::ostream& out 
-    );   
+        const hsi_pixel& item,
+        std::ostream& out
+    );
     /*!
         provides serialization support for the hsi_pixel struct
     !*/
@@ -341,9 +341,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline void deserialize (
-        hsi_pixel& item, 
+        hsi_pixel& item,
         std::istream& in
-    );   
+    );
     /*!
         provides deserialization support for the hsi_pixel struct
     !*/
@@ -483,12 +483,12 @@ namespace dlib
     {
 
     // -----------------------------
-        // all the same kind 
+        // all the same kind
 
         template < typename P >
         typename enable_if_c<pixel_traits<P>::grayscale>::type
-        assign(P& dest, const P& src) 
-        { 
+        assign(P& dest, const P& src)
+        {
             dest = src;
         }
 
@@ -507,20 +507,20 @@ namespace dlib
         template <typename T, typename P>
         typename enable_if_c<pixel_traits<T>::is_unsigned == pixel_traits<P>::is_unsigned, bool>::type less_or_equal_to_max (
             const P& p
-        ) 
+        )
         /*!
             ensures
                 - returns true if p is <= max value of T
         !*/
-        { 
-            return p <= pixel_traits<T>::max();         
+        {
+            return p <= pixel_traits<T>::max();
         }
 
         template <typename T, typename P>
         typename enable_if_c<pixel_traits<T>::is_unsigned && !pixel_traits<P>::is_unsigned, bool>::type less_or_equal_to_max (
             const P& p
-        ) 
-        { 
+        )
+        {
             if (p <= 0)
                 return true;
             else if (make_unsigned(p) <= pixel_traits<T>::max())
@@ -532,8 +532,8 @@ namespace dlib
         template <typename T, typename P>
         typename enable_if_c<!pixel_traits<T>::is_unsigned && pixel_traits<P>::is_unsigned, bool>::type less_or_equal_to_max (
             const P& p
-        ) 
-        { 
+        )
+        {
             return p <= make_unsigned(pixel_traits<T>::max());
         }
 
@@ -541,7 +541,7 @@ namespace dlib
 
         template <typename T, typename P>
         typename enable_if_c<pixel_traits<P>::is_unsigned, bool >::type greater_or_equal_to_min (
-            const P& 
+            const P&
         ) { return true; }
         /*!
             ensures
@@ -551,27 +551,27 @@ namespace dlib
         template <typename T, typename P>
         typename enable_if_c<!pixel_traits<P>::is_unsigned && pixel_traits<T>::is_unsigned, bool >::type greater_or_equal_to_min (
             const P& p
-        ) 
-        { 
+        )
+        {
             return p >= 0;
         }
 
         template <typename T, typename P>
         typename enable_if_c<!pixel_traits<P>::is_unsigned && !pixel_traits<T>::is_unsigned, bool >::type greater_or_equal_to_min (
             const P& p
-        ) 
-        { 
+        )
+        {
             return p >= pixel_traits<T>::min();
         }
     // -----------------------------
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::grayscale && pixel_traits<P2>::grayscale>::type
-        assign(P1& dest, const P2& src) 
-        { 
+        assign(P1& dest, const P2& src)
+        {
             /*
                 The reason for these weird comparison functions is to avoid getting compiler
-                warnings about comparing signed types to unsigned and stuff like that.  
+                warnings about comparing signed types to unsigned and stuff like that.
             */
 
             if (less_or_equal_to_max<P1>(src))
@@ -589,30 +589,30 @@ namespace dlib
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::rgb && pixel_traits<P2>::rgb>::type
-        assign(P1& dest, const P2& src) 
-        { 
-            dest.red = src.red; 
-            dest.green = src.green; 
-            dest.blue = src.blue; 
+        assign(P1& dest, const P2& src)
+        {
+            dest.red = src.red;
+            dest.green = src.green;
+            dest.blue = src.blue;
         }
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::rgb_alpha && pixel_traits<P2>::rgb_alpha>::type
-        assign(P1& dest, const P2& src) 
-        { 
-            dest.red = src.red; 
-            dest.green = src.green; 
-            dest.blue = src.blue; 
-            dest.alpha = src.alpha; 
+        assign(P1& dest, const P2& src)
+        {
+            dest.red = src.red;
+            dest.green = src.green;
+            dest.blue = src.blue;
+            dest.alpha = src.alpha;
         }
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::hsi>::type
-        assign(P1& dest, const P2& src) 
-        { 
-            dest.h = src.h; 
-            dest.s = src.s; 
-            dest.i = src.i; 
+        assign(P1& dest, const P2& src)
+        {
+            dest.h = src.h;
+            dest.s = src.s;
+            dest.i = src.i;
         }
 
     // -----------------------------
@@ -620,22 +620,22 @@ namespace dlib
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::grayscale && pixel_traits<P2>::rgb>::type
-        assign(P1& dest, const P2& src) 
-        { 
+        assign(P1& dest, const P2& src)
+        {
             const unsigned int temp = ((static_cast<unsigned int>(src.red) +
-                                        static_cast<unsigned int>(src.green) +  
+                                        static_cast<unsigned int>(src.green) +
                                         static_cast<unsigned int>(src.blue))/3);
             assign_pixel(dest, temp);
         }
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::grayscale && pixel_traits<P2>::rgb_alpha>::type
-        assign(P1& dest, const P2& src) 
-        { 
+        assign(P1& dest, const P2& src)
+        {
 
             const unsigned char avg = static_cast<unsigned char>((static_cast<unsigned int>(src.red) +
-                                                                  static_cast<unsigned int>(src.green) +  
-                                                                  static_cast<unsigned int>(src.blue))/3); 
+                                                                  static_cast<unsigned int>(src.green) +
+                                                                  static_cast<unsigned int>(src.blue))/3);
 
             if (src.alpha == 255)
             {
@@ -643,7 +643,7 @@ namespace dlib
             }
             else
             {
-                // perform this assignment using fixed point arithmetic: 
+                // perform this assignment using fixed point arithmetic:
                 // dest = src*(alpha/255) + dest*(1 - alpha/255);
                 // dest = src*(alpha/255) + dest*1 - dest*(alpha/255);
                 // dest = dest*1 + src*(alpha/255) - dest*(alpha/255);
@@ -668,8 +668,8 @@ namespace dlib
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::grayscale && pixel_traits<P2>::hsi>::type
-        assign(P1& dest, const P2& src) 
-        { 
+        assign(P1& dest, const P2& src)
+        {
             assign_pixel(dest, src.i);
         }
 
@@ -691,7 +691,7 @@ namespace dlib
         };
 
         /*
-            I found this excellent bit of code for dealing with HSL spaces at 
+            I found this excellent bit of code for dealing with HSL spaces at
             http://local.wasp.uwa.edu.au/~pbourke/colour/hsl/
         */
         /*
@@ -777,28 +777,28 @@ namespace dlib
 
         template < typename P1 >
         typename enable_if_c<pixel_traits<P1>::rgb>::type
-        assign(P1& dest, const unsigned char& src) 
-        { 
-            dest.red = src; 
-            dest.green = src; 
-            dest.blue = src; 
+        assign(P1& dest, const unsigned char& src)
+        {
+            dest.red = src;
+            dest.green = src;
+            dest.blue = src;
         }
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::rgb && pixel_traits<P2>::grayscale>::type
-        assign(P1& dest, const P2& src) 
-        { 
+        assign(P1& dest, const P2& src)
+        {
             unsigned char p;
             assign_pixel(p, src);
-            dest.red = p; 
-            dest.green = p; 
-            dest.blue = p; 
+            dest.red = p;
+            dest.green = p;
+            dest.blue = p;
         }
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::rgb && pixel_traits<P2>::rgb_alpha>::type
-        assign(P1& dest, const P2& src) 
-        { 
+        assign(P1& dest, const P2& src)
+        {
             if (src.alpha == 255)
             {
                 dest.red = src.red;
@@ -807,7 +807,7 @@ namespace dlib
             }
             else
             {
-                // perform this assignment using fixed point arithmetic: 
+                // perform this assignment using fixed point arithmetic:
                 // dest = src*(alpha/255) + dest*(1 - alpha/255);
                 // dest = src*(alpha/255) + dest*1 - dest*(alpha/255);
                 // dest = dest*1 + src*(alpha/255) - dest*(alpha/255);
@@ -838,8 +838,8 @@ namespace dlib
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::rgb && pixel_traits<P2>::hsi>::type
-        assign(P1& dest, const P2& src) 
-        { 
+        assign(P1& dest, const P2& src)
+        {
             COLOUR c;
             HSL h;
             h.h = src.h;
@@ -858,32 +858,32 @@ namespace dlib
 
         template < typename P1 >
         typename enable_if_c<pixel_traits<P1>::rgb_alpha>::type
-        assign(P1& dest, const unsigned char& src) 
-        { 
-            dest.red = src; 
-            dest.green = src; 
-            dest.blue = src; 
+        assign(P1& dest, const unsigned char& src)
+        {
+            dest.red = src;
+            dest.green = src;
+            dest.blue = src;
             dest.alpha = 255;
         }
 
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::rgb_alpha && pixel_traits<P2>::grayscale>::type
-        assign(P1& dest, const P2& src) 
-        { 
+        assign(P1& dest, const P2& src)
+        {
             unsigned char p;
             assign_pixel(p, src);
 
-            dest.red = p; 
-            dest.green = p; 
-            dest.blue = p; 
+            dest.red = p;
+            dest.green = p;
+            dest.blue = p;
             dest.alpha = 255;
         }
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::rgb_alpha && pixel_traits<P2>::rgb>::type
-        assign(P1& dest, const P2& src) 
-        { 
+        assign(P1& dest, const P2& src)
+        {
             dest.red = src.red;
             dest.green = src.green;
             dest.blue = src.blue;
@@ -892,8 +892,8 @@ namespace dlib
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::rgb_alpha && pixel_traits<P2>::hsi>::type
-        assign(P1& dest, const P2& src) 
-        { 
+        assign(P1& dest, const P2& src)
+        {
             COLOUR c;
             HSL h;
             h.h = src.h;
@@ -913,8 +913,8 @@ namespace dlib
 
         template < typename P1>
         typename enable_if_c<pixel_traits<P1>::hsi>::type
-        assign(P1& dest, const unsigned char& src) 
-        { 
+        assign(P1& dest, const unsigned char& src)
+        {
             dest.h = 0;
             dest.s = 0;
             dest.i = src;
@@ -923,8 +923,8 @@ namespace dlib
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::grayscale>::type
-        assign(P1& dest, const P2& src) 
-        { 
+        assign(P1& dest, const P2& src)
+        {
             dest.h = 0;
             dest.s = 0;
             assign_pixel(dest.i, src);
@@ -932,8 +932,8 @@ namespace dlib
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::rgb>::type
-        assign(P1& dest, const P2& src) 
-        { 
+        assign(P1& dest, const P2& src)
+        {
             COLOUR c1;
             HSL c2;
             c1.r = src.red/255.0;
@@ -948,8 +948,8 @@ namespace dlib
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::rgb_alpha>::type
-        assign(P1& dest, const P2& src) 
-        { 
+        assign(P1& dest, const P2& src)
+        {
             rgb_pixel temp;
             // convert target hsi pixel to rgb
             assign_pixel_helpers::assign(temp,dest);
@@ -1041,7 +1041,7 @@ namespace dlib
         typename P
         >
     inline typename enable_if_c<pixel_traits<P>::grayscale, P>::type get_pixel_intensity_helper (
-        const P& src 
+        const P& src
     )
     {
         return src;
@@ -1051,7 +1051,7 @@ namespace dlib
         typename P
         >
     inline typename enable_if_c<pixel_traits<P>::grayscale == false&&
-                                pixel_traits<P>::has_alpha, 
+                                pixel_traits<P>::has_alpha,
                                 typename pixel_traits<P>::basic_pixel_type>::type get_pixel_intensity_helper (
         const P& src
     )
@@ -1067,7 +1067,7 @@ namespace dlib
         typename P
         >
     inline typename enable_if_c<pixel_traits<P>::grayscale == false&&
-                                pixel_traits<P>::has_alpha == false, 
+                                pixel_traits<P>::has_alpha == false,
                                 typename pixel_traits<P>::basic_pixel_type>::type get_pixel_intensity_helper (
         const P& src
     )
@@ -1092,9 +1092,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline void serialize (
-        const rgb_alpha_pixel& item, 
-        std::ostream& out 
-    )   
+        const rgb_alpha_pixel& item,
+        std::ostream& out
+    )
     {
         try
         {
@@ -1105,16 +1105,16 @@ namespace dlib
         }
         catch (serialization_error& e)
         {
-            throw serialization_error(e.info + "\n   while serializing object of type rgb_alpha_pixel"); 
+            throw serialization_error(e.info + "\n   while serializing object of type rgb_alpha_pixel");
         }
     }
 
 // ----------------------------------------------------------------------------------------
 
     inline void deserialize (
-        rgb_alpha_pixel& item, 
+        rgb_alpha_pixel& item,
         std::istream& in
-    )   
+    )
     {
         try
         {
@@ -1125,16 +1125,16 @@ namespace dlib
         }
         catch (serialization_error& e)
         {
-            throw serialization_error(e.info + "\n   while deserializing object of type rgb_alpha_pixel"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type rgb_alpha_pixel");
         }
     }
 
 // ----------------------------------------------------------------------------------------
 
     inline void serialize (
-        const rgb_pixel& item, 
-        std::ostream& out 
-    )   
+        const rgb_pixel& item,
+        std::ostream& out
+    )
     {
         try
         {
@@ -1144,16 +1144,16 @@ namespace dlib
         }
         catch (serialization_error& e)
         {
-            throw serialization_error(e.info + "\n   while serializing object of type rgb_pixel"); 
+            throw serialization_error(e.info + "\n   while serializing object of type rgb_pixel");
         }
     }
 
 // ----------------------------------------------------------------------------------------
 
     inline void deserialize (
-        rgb_pixel& item, 
+        rgb_pixel& item,
         std::istream& in
-    )   
+    )
     {
         try
         {
@@ -1163,16 +1163,16 @@ namespace dlib
         }
         catch (serialization_error& e)
         {
-            throw serialization_error(e.info + "\n   while deserializing object of type rgb_pixel"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type rgb_pixel");
         }
     }
 
 // ----------------------------------------------------------------------------------------
 
     inline void serialize (
-        const bgr_pixel& item, 
-        std::ostream& out 
-    )   
+        const bgr_pixel& item,
+        std::ostream& out
+    )
     {
         try
         {
@@ -1182,16 +1182,16 @@ namespace dlib
         }
         catch (serialization_error& e)
         {
-            throw serialization_error(e.info + "\n   while serializing object of type bgr_pixel"); 
+            throw serialization_error(e.info + "\n   while serializing object of type bgr_pixel");
         }
     }
 
 // ----------------------------------------------------------------------------------------
 
     inline void deserialize (
-        bgr_pixel& item, 
+        bgr_pixel& item,
         std::istream& in
-    )   
+    )
     {
         try
         {
@@ -1201,16 +1201,16 @@ namespace dlib
         }
         catch (serialization_error& e)
         {
-            throw serialization_error(e.info + "\n   while deserializing object of type bgr_pixel"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type bgr_pixel");
         }
     }
 
 // ----------------------------------------------------------------------------------------
 
     inline void serialize (
-        const hsi_pixel& item, 
-        std::ostream& out 
-    )   
+        const hsi_pixel& item,
+        std::ostream& out
+    )
     {
         try
         {
@@ -1220,16 +1220,16 @@ namespace dlib
         }
         catch (serialization_error& e)
         {
-            throw serialization_error(e.info + "\n   while serializing object of type hsi_pixel"); 
+            throw serialization_error(e.info + "\n   while serializing object of type hsi_pixel");
         }
     }
 
 // ----------------------------------------------------------------------------------------
 
     inline void deserialize (
-        hsi_pixel& item, 
+        hsi_pixel& item,
         std::istream& in
-    )   
+    )
     {
         try
         {
@@ -1239,7 +1239,7 @@ namespace dlib
         }
         catch (serialization_error& e)
         {
-            throw serialization_error(e.info + "\n   while deserializing object of type hsi_pixel"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type hsi_pixel");
         }
     }
 
@@ -1247,5 +1247,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_PIXEl_ 
+#endif // DLIB_PIXEl_
 

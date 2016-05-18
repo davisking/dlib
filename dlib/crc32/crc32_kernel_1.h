@@ -11,7 +11,7 @@
 namespace dlib
 {
 
-    class crc32 
+    class crc32
     {
         /*!
             INITIAL VALUE
@@ -26,10 +26,10 @@ namespace dlib
         // this is here for backwards compatibility with older versions of dlib.
         typedef crc32 kernel_1a;
 
-        inline crc32 (        
+        inline crc32 (
         );
 
-        inline crc32 (        
+        inline crc32 (
             const std::string& item
         );
 
@@ -67,7 +67,7 @@ namespace dlib
 
         inline crc32& operator=(
             const crc32&
-        );  
+        );
 
     private:
 
@@ -75,7 +75,7 @@ namespace dlib
 
         inline unsigned long table (
             unsigned int idx
-        ) const 
+        ) const
         {
             /*
             // This code generates the crc_table used below.
@@ -133,12 +133,12 @@ namespace dlib
             return crc_table[idx];
         }
 
-    };    
+    };
 
     inline void swap (
-        crc32& a, 
-        crc32& b 
-    ) { a.swap(b); }   
+        crc32& a,
+        crc32& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -147,7 +147,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     crc32::
-    crc32 (        
+    crc32 (
     )
     {
         checksum = 0xFFFFFFFF;
@@ -156,7 +156,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     crc32::
-    crc32 (        
+    crc32 (
         const std::string& item
     )
     {
@@ -167,7 +167,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     crc32::
-    crc32 (        
+    crc32 (
         const std::vector<char>& item
     )
     {

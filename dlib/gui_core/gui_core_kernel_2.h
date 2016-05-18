@@ -34,7 +34,7 @@ namespace dlib
         class event_handler_thread;
         void trigger_user_event_threadproc (void*);
 
-        // This is a forward declaration for a struct that contains any 
+        // This is a forward declaration for a struct that contains any
         // X11 variables.  This allows me to avoid having any dlib header files
         // include the X11 headers.  Which in turn speeds build times and simplifies
         // build setups.
@@ -94,8 +94,8 @@ namespace dlib
                 "\tpixel* canvas::operator[]"
                 << "\n\tyou have to give a row that is less than the height()"
                 << "\n\tthis:     " << this
-                << "\n\trow:      " << row 
-                << "\n\theight(): " << height() 
+                << "\n\trow:      " << row
+                << "\n\theight(): " << height()
                 );
             unsigned char* temp = bits + row_width*row;
             return reinterpret_cast<pixel*>(temp);
@@ -115,10 +115,10 @@ namespace dlib
         canvas (
             unsigned char* bits_,
             unsigned long left_,
-            unsigned long top_,            
-            unsigned long right_,            
-            unsigned long bottom_   
-        ) : 
+            unsigned long top_,
+            unsigned long right_,
+            unsigned long bottom_
+        ) :
             rectangle(left_,top_,right_,bottom_),
             bits(bits_),
             width_(width()),
@@ -129,7 +129,7 @@ namespace dlib
         // restricted functions
         canvas();        // normal constructor
         canvas(canvas&);        // copy constructor
-        canvas& operator=(canvas&);    // assignment operator    
+        canvas& operator=(canvas&);    // assignment operator
 
         unsigned char* const bits;
         const unsigned long width_;
@@ -234,21 +234,21 @@ namespace dlib
 
         const bool resizable;
         bool has_been_destroyed;
-        bool has_been_resized;  // true if someone called set_size() and the on_window_resized() event 
+        bool has_been_resized;  // true if someone called set_size() and the on_window_resized() event
                                 // hasn't yet occurred.
         bool has_been_moved;    // true if someone called set_pos() and the on_window_moved() event
                                 // hasn't yet occurred.
 
 
-        // The following 3 variables (and x11_stuff.last_click_time) are only accessed from the 
-        // event handling loop (except for being initialized below). They record the last 
+        // The following 3 variables (and x11_stuff.last_click_time) are only accessed from the
+        // event handling loop (except for being initialized below). They record the last
         // mouse click event details.
         long last_click_x, last_click_y;
         unsigned long last_click_button;
 
 
     protected:
-        const rmutex& wm; 
+        const rmutex& wm;
 
     public:
 
@@ -287,10 +287,10 @@ namespace dlib
         );
 
         virtual void show (
-        );    
+        );
 
         virtual void hide(
-        );    
+        );
 
         void set_size (
             int width_,
@@ -338,7 +338,7 @@ namespace dlib
         ){}
         virtual void on_user_event (
             void* ,
-            int 
+            int
         ){}
 
         virtual void on_mouse_down (
@@ -346,20 +346,20 @@ namespace dlib
             unsigned long ,
             long ,
             long ,
-            bool 
+            bool
         ){}
 
         virtual void on_mouse_up (
             unsigned long ,
             unsigned long ,
             long ,
-            long 
+            long
         ){}
 
         virtual void on_mouse_move (
             unsigned long ,
             long ,
-            long 
+            long
         ){}
 
         virtual void on_mouse_leave (
@@ -369,11 +369,11 @@ namespace dlib
         ){}
 
         virtual void on_wheel_up (
-            unsigned long 
+            unsigned long
         ){}
 
         virtual void on_wheel_down (
-            unsigned long 
+            unsigned long
         ){}
 
         virtual void on_focus_gained (
@@ -383,9 +383,9 @@ namespace dlib
         ){}
 
         virtual void on_keydown (
-            unsigned long ,            
+            unsigned long ,
             bool ,
-            unsigned long 
+            unsigned long
         ){}
 
         virtual void on_string_put (

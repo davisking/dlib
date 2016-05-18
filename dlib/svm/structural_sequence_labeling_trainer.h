@@ -66,7 +66,7 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\t void structural_sequence_labeling_trainer::set_epsilon()"
                 << "\n\t eps_ must be greater than 0"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 << "\n\t this: " << this
                 );
 
@@ -81,7 +81,7 @@ namespace dlib
 
         void set_max_iterations (
             unsigned long max_iter
-        ) 
+        )
         {
             max_iterations = max_iter;
         }
@@ -96,7 +96,7 @@ namespace dlib
         unsigned long get_max_cache_size (
         ) const
         {
-            return max_cache_size; 
+            return max_cache_size;
         }
 
         void be_verbose (
@@ -125,14 +125,14 @@ namespace dlib
         }
 
         void set_c (
-            double C_ 
+            double C_
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C_ > 0,
                 "\t void structural_sequence_labeling_trainer::set_c()"
                 << "\n\t C_ must be greater than 0"
-                << "\n\t C_:    " << C_ 
+                << "\n\t C_:    " << C_
                 << "\n\t this: " << this
                 );
 
@@ -147,32 +147,32 @@ namespace dlib
 
         double get_loss (
             unsigned long label
-        ) const 
-        { 
+        ) const
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(label < num_labels(),
                         "\t void structural_sequence_labeling_trainer::get_loss()"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t label:        " << label 
-                        << "\n\t num_labels(): " << num_labels() 
+                        << "\n\t label:        " << label
+                        << "\n\t num_labels(): " << num_labels()
                         << "\n\t this:         " << this
                         );
 
-            return loss_values[label]; 
+            return loss_values[label];
         }
 
         void set_loss (
             unsigned long label,
             double value
-        )  
-        { 
+        )
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(label < num_labels() && value >= 0,
                         "\t void structural_sequence_labeling_trainer::set_loss()"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t label:        " << label 
-                        << "\n\t num_labels(): " << num_labels() 
-                        << "\n\t value:        " << value 
+                        << "\n\t label:        " << label
+                        << "\n\t num_labels(): " << num_labels()
+                        << "\n\t value:        " << value
                         << "\n\t this:         " << this
                         );
 
@@ -191,7 +191,7 @@ namespace dlib
                         contains_invalid_labeling(get_feature_extractor(), x, y) == false,
                         "\t sequence_labeler structural_sequence_labeling_trainer::train(x,y)"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t x.size(): " << x.size() 
+                        << "\n\t x.size(): " << x.size()
                         << "\n\t is_sequence_labeling_problem(x,y): " << is_sequence_labeling_problem(x,y)
                         << "\n\t contains_invalid_labeling(get_feature_extractor(),x,y): " << contains_invalid_labeling(get_feature_extractor(),x,y)
                         << "\n\t this: " << this
@@ -206,10 +206,10 @@ namespace dlib
                     DLIB_ASSERT(y[i][j] < num_labels(),
                                 "\t sequence_labeler structural_sequence_labeling_trainer::train(x,y)"
                                 << "\n\t The given labels in y are invalid."
-                                << "\n\t y[i][j]: " << y[i][j] 
+                                << "\n\t y[i][j]: " << y[i][j]
                                 << "\n\t num_labels(): " << num_labels()
-                                << "\n\t i: " << i 
-                                << "\n\t j: " << j 
+                                << "\n\t i: " << i
+                                << "\n\t j: " << j
                                 << "\n\t this: " << this
                     );
                 }
@@ -220,7 +220,7 @@ namespace dlib
 
 
             structural_svm_sequence_labeling_problem<feature_extractor> prob(x, y, fe, num_threads);
-            matrix<double,0,1> weights; 
+            matrix<double,0,1> weights;
             if (verbose)
                 prob.be_verbose();
 

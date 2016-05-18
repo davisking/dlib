@@ -21,7 +21,7 @@ namespace dlib
                 pointers or references to internal data when called.
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a command line option.  
+                This object represents a command line option.
         !*/
 
     public:
@@ -54,7 +54,7 @@ namespace dlib
                 - returns the description for this option
         !*/
 
-        virtual unsigned long number_of_arguments( 
+        virtual unsigned long number_of_arguments(
         ) const = 0;
         /*!
             ensures
@@ -77,7 +77,7 @@ namespace dlib
                 - arg < number_of_arguments()
                 - N < count()
             ensures
-                - returns the arg-th argument to the Nth occurrence of this 
+                - returns the arg-th argument to the Nth occurrence of this
                   option on the command line.
         !*/
 

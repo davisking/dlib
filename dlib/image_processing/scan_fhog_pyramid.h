@@ -42,8 +42,8 @@ namespace dlib
             typename image_type
             >
         void operator()(
-            const image_type& img, 
-            dlib::array<array2d<float> >& hog, 
+            const image_type& img,
+            dlib::array<array2d<float> >& hog,
             int cell_size,
             int filter_rows_padding,
             int filter_cols_padding
@@ -79,11 +79,11 @@ namespace dlib
         typedef Feature_extractor_type feature_extractor_type;
 
         scan_fhog_pyramid (
-        );  
+        );
 
         explicit scan_fhog_pyramid (
             const feature_extractor_type& fe_
-        );  
+        );
 
         template <
             typename image_type
@@ -173,7 +173,7 @@ namespace dlib
 
         void set_min_pyramid_layer_size (
             unsigned long width,
-            unsigned long height 
+            unsigned long height
         );
 
         inline unsigned long get_min_pyramid_layer_width (
@@ -190,7 +190,7 @@ namespace dlib
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(is_loaded_with_image() &&
-                        w.size() >= get_num_dimensions(), 
+                        w.size() >= get_num_dimensions(),
                 "\t void scan_fhog_pyramid::detect()"
                 << "\n\t Invalid inputs were given to this function "
                 << "\n\t is_loaded_with_image(): " << is_loaded_with_image()
@@ -203,7 +203,7 @@ namespace dlib
             detect(temp, dets, thresh);
         }
 
-        class fhog_filterbank 
+        class fhog_filterbank
         {
             friend class scan_fhog_pyramid;
         public:
@@ -217,9 +217,9 @@ namespace dlib
                 return dims;
             }
 
-            const std::vector<matrix<float> >& get_filters() const { return filters;} 
+            const std::vector<matrix<float> >& get_filters() const { return filters;}
 
-            unsigned long num_separable_filters() const 
+            unsigned long num_separable_filters() const
             {
                 unsigned long num = 0;
                 for (unsigned long i = 0; i < row_filters.size(); ++i)
@@ -234,15 +234,15 @@ namespace dlib
         };
 
         fhog_filterbank build_fhog_filterbank (
-            const feature_vector_type& weights 
+            const feature_vector_type& weights
         ) const
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(weights.size() >= get_num_dimensions(),
                 "\t fhog_filterbank scan_fhog_pyramid::build_fhog_filterbank()"
                 << "\n\t The number of weights isn't enough to fill out the filterbank. "
-                << "\n\t weights.size():       " << weights.size() 
-                << "\n\t get_num_dimensions(): " << get_num_dimensions() 
+                << "\n\t weights.size():       " << weights.size()
+                << "\n\t get_num_dimensions(): " << get_num_dimensions()
                 << "\n\t this: " << this
                 );
 
@@ -310,13 +310,13 @@ namespace dlib
 
         void set_nuclear_norm_regularization_strength (
             double strength
-        ) 
+        )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(strength >= 0 ,
                 "\t void scan_fhog_pyramid::set_nuclear_norm_regularization_strength()"
                 << "\n\t You can't have a negative regularization strength."
-                << "\n\t strength: " << strength 
+                << "\n\t strength: " << strength
                 << "\n\t this: " << this
             );
 
@@ -324,7 +324,7 @@ namespace dlib
         }
 
         unsigned long get_fhog_window_width (
-        ) const 
+        ) const
         {
             unsigned long width, height;
             compute_fhog_window_size(width, height);
@@ -332,7 +332,7 @@ namespace dlib
         }
 
         unsigned long get_fhog_window_height (
-        ) const 
+        ) const
         {
             unsigned long width, height;
             compute_fhog_window_size(width, height);
@@ -348,7 +348,7 @@ namespace dlib
         template <typename T, typename U>
         friend void deserialize (
             scan_fhog_pyramid<T,U>& item,
-            std::istream& in 
+            std::istream& in
         );
 
     private:
@@ -386,7 +386,7 @@ namespace dlib
         feature_extractor_type fe;
         array<fhog_image> feats;
         int cell_size;
-        unsigned long padding; 
+        unsigned long padding;
         unsigned long window_width;
         unsigned long window_height;
         unsigned long max_pyramid_levels;
@@ -439,7 +439,7 @@ namespace dlib
 
                 // find the first filter to apply
                 unsigned long i = 0;
-                while (i < w.row_filters.size() && w.row_filters[i].size() == 0) 
+                while (i < w.row_filters.size() && w.row_filters[i].size() == 0)
                     ++i;
 
                 for (; i < w.row_filters.size(); ++i)
@@ -490,7 +490,7 @@ namespace dlib
     template <typename T, typename U>
     void deserialize (
         scan_fhog_pyramid<T,U>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         int version = 0;
@@ -531,7 +531,7 @@ namespace dlib
         >
     scan_fhog_pyramid<Pyramid_type,feature_extractor_type>::
     scan_fhog_pyramid (
-    ) 
+    )
     {
         init();
     }
@@ -545,7 +545,7 @@ namespace dlib
     scan_fhog_pyramid<Pyramid_type,feature_extractor_type>::
     scan_fhog_pyramid (
         const feature_extractor_type& fe_
-    ) 
+    )
     {
         init();
         fe = fe_;
@@ -592,7 +592,7 @@ namespace dlib
 
             // build our feature pyramid
             fe(img, feats[0], cell_size,filter_rows_padding,filter_cols_padding);
-            DLIB_ASSERT(feats[0].size() == fe.get_num_planes(), 
+            DLIB_ASSERT(feats[0].size() == fe.get_num_planes(),
                 "Invalid feature extractor used with dlib::scan_fhog_pyramid.  The output does not have the \n"
                 "indicated number of planes.");
 
@@ -739,7 +739,7 @@ namespace dlib
         DLIB_ASSERT(max_levels > 0 ,
             "\t void scan_fhog_pyramid::set_max_pyramid_levels()"
             << "\n\t You can't have zero levels. "
-            << "\n\t max_levels: " << max_levels 
+            << "\n\t max_levels: " << max_levels
             << "\n\t this: " << this
             );
 
@@ -774,7 +774,7 @@ namespace dlib
             const int filter_rows_padding,
             const int filter_cols_padding,
             std::vector<std::pair<double, rectangle> >& dets
-        ) 
+        )
         {
             dets.clear();
 
@@ -794,7 +794,7 @@ namespace dlib
                         // if we found a detection
                         if (saliency_image[r][c] >= thresh)
                         {
-                            rectangle rect = fe.feats_to_image(centered_rect(point(c,r),det_box_width,det_box_height), 
+                            rectangle rect = fe.feats_to_image(centered_rect(point(c,r),det_box_width,det_box_height),
                                 cell_size, filter_rows_padding, filter_cols_padding);
                             rect = pyr.rect_up(rect, l);
                             dets.push_back(std::make_pair(saliency_image[r][c], rect));
@@ -810,12 +810,12 @@ namespace dlib
             const test_box_overlap& tester,
             const std::vector<rect_detection>& rects,
             const rect_detection& rect
-        ) 
+        )
         {
             for (unsigned long i = 0; i < rects.size(); ++i)
             {
                 // Only compare detections from the same detector.  That is, we don't want
-                // the output of one detector to stop on the output of another detector. 
+                // the output of one detector to stop on the output of another detector.
                 if (rects[i].weight_index == rect.weight_index && tester(rects[i].rect, rect.rect))
                     return true;
             }
@@ -839,7 +839,7 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(is_loaded_with_image() &&
-                    w.get_num_dimensions() == get_num_dimensions(), 
+                    w.get_num_dimensions() == get_num_dimensions(),
             "\t void scan_fhog_pyramid::detect()"
             << "\n\t Invalid inputs were given to this function "
             << "\n\t is_loaded_with_image(): " << is_loaded_with_image()
@@ -896,14 +896,14 @@ namespace dlib
         compute_fhog_window_size(width,height);
 
         // Figure out the pyramid level which best matches rect against our detection
-        // window. 
+        // window.
         for (unsigned long l = 0; l < number_pyramid_levels; ++l)
         {
             const rectangle rect_fhog_space = fe.image_to_feats(pyr.rect_down(rect,l), cell_size, height,width);
 
             const rectangle win_image_space = pyr.rect_up(fe.feats_to_image(centered_rect(center(rect_fhog_space),width-2*padding,height-2*padding), cell_size, height,width), l);
 
-            const double match_score = get_match_score(win_image_space, rect); 
+            const double match_score = get_match_score(win_image_space, rect);
             if (match_score > best_match_score)
             {
                 best_match_score = match_score;
@@ -911,7 +911,7 @@ namespace dlib
                 fhog_rect = centered_rect(center(rect_fhog_space), width, height);
             }
 
-            if (rect_fhog_space.area() <= 1) 
+            if (rect_fhog_space.area() <= 1)
                 break;
         }
         mapped_rect = pyr.rect_up(fe.feats_to_image(shrink_rect(fhog_rect,padding), cell_size,height,width),best_level);
@@ -926,7 +926,7 @@ namespace dlib
     full_object_detection scan_fhog_pyramid<Pyramid_type,feature_extractor_type>::
     get_full_object_detection (
         const rectangle& rect,
-        const feature_vector_type& 
+        const feature_vector_type&
     ) const
     {
         return full_object_detection(rect);
@@ -990,15 +990,15 @@ namespace dlib
     void scan_fhog_pyramid<Pyramid_type,feature_extractor_type>::
     set_min_pyramid_layer_size (
         unsigned long width,
-        unsigned long height 
+        unsigned long height
     )
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(width > 0 && height > 0 ,
             "\t void scan_fhog_pyramid::set_min_pyramid_layer_size()"
             << "\n\t These sizes can't be zero. "
-            << "\n\t width:  " << width 
-            << "\n\t height: " << height 
+            << "\n\t width:  " << width
+            << "\n\t height: " << height
             << "\n\t this:   " << this
             );
 
@@ -1110,7 +1110,7 @@ namespace dlib
         DLIB_ASSERT(thresh >= 0 ,
             "\t object_detector threshold_filter_singular_values()"
             << "\n\t Invalid inputs were given to this function."
-            << "\n\t thresh: " << thresh 
+            << "\n\t thresh: " << thresh
         );
 
         DLIB_ASSERT(weight_index < detector.num_detectors(),
@@ -1155,7 +1155,7 @@ namespace dlib
             detector_weights.push_back(weights);
         }
         
-        return object_detector<scan_fhog_pyramid<Pyramid_type,feature_extractor_type> >(detector.get_scanner(), 
+        return object_detector<scan_fhog_pyramid<Pyramid_type,feature_extractor_type> >(detector.get_scanner(),
                                                                  detector.get_overlap_tester(),
                                                                  detector_weights);
     }
@@ -1171,7 +1171,7 @@ namespace dlib
         const scan_fhog_pyramid<Pyramid_type,feature_extractor_type>& scanner,
         svm_struct_prob_type& prob
     )
-    { 
+    {
         const double strength = scanner.get_nuclear_norm_regularization_strength();
         const long num_planes = scanner.get_feature_extractor().get_num_planes();
         if (strength != 0)
@@ -1201,7 +1201,7 @@ namespace dlib
 
         void init (
             const scan_fhog_pyramid<Pyramid_type,feature_extractor_type>& scanner
-        ) 
+        )
         {
             fb = scanner.build_fhog_filterbank(w);
         }

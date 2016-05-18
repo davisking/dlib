@@ -11,18 +11,18 @@
 namespace dlib
 {
 
-    class config_reader_thread_safe 
+    class config_reader_thread_safe
     {
 
-        /*!                
-            WHAT THIS EXTENSION DOES FOR config_reader 
-                This object extends a normal config_reader by simply wrapping all 
+        /*!
+            WHAT THIS EXTENSION DOES FOR config_reader
+                This object extends a normal config_reader by simply wrapping all
                 its member functions inside mutex locks to make it safe to use
-                in a threaded program.  
+                in a threaded program.
 
                 So this object provides an interface identical to the one defined
                 in the config_reader/config_reader_kernel_abstract.h file except that
-                the rmutex returned by get_mutex() is always locked when this 
+                the rmutex returned by get_mutex() is always locked when this
                 object's member functions are called.
         !*/
     

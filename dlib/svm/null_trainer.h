@@ -13,7 +13,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename dec_funct_type 
+        typename dec_funct_type
         >
     class null_trainer_type
     {
@@ -37,12 +37,12 @@ namespace dlib
             >
         const dec_funct_type& train (
             const in_sample_vector_type& ,
-            const in_scalar_vector_type& 
+            const in_scalar_vector_type&
         ) const { return dec_funct; }
 
     private:
         dec_funct_type dec_funct;
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 

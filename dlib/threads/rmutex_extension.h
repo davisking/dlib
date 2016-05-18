@@ -55,7 +55,7 @@ namespace dlib
             if (thread_id == current_thread_id)
             {
                 // we already own this mutex in this case
-                count += times;                
+                count += times;
             }
             else
             {

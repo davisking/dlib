@@ -42,7 +42,7 @@ namespace dlib
 
         void get_symbol (
             unsigned long target,
-            unsigned long& symbol,            
+            unsigned long& symbol,
             unsigned long& low_count,
             unsigned long& high_count
         ) const;
@@ -136,7 +136,7 @@ namespace dlib
     void conditioning_class_kernel_c<cc_base>::
     get_symbol (
         unsigned long target,
-        unsigned long& symbol,            
+        unsigned long& symbol,
         unsigned long& low_count,
         unsigned long& high_count
     ) const

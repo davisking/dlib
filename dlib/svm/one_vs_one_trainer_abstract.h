@@ -22,7 +22,7 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON any_trainer
-                must be an instantiation of the dlib::any_trainer template.   
+                must be an instantiation of the dlib::any_trainer template.
 
             REQUIREMENTS ON label_type_
                 label_type_ must be default constructable, copyable, and comparable using
@@ -37,7 +37,7 @@ namespace dlib
                 to vote on the identity of a test sample.
 
                 This object works with any kind of binary classification trainer object
-                capable of being assigned to an any_trainer object.  (e.g. the svm_nu_trainer) 
+                capable of being assigned to an any_trainer object.  (e.g. the svm_nu_trainer)
         !*/
 
     public:
@@ -67,9 +67,9 @@ namespace dlib
         );
         /*!
             ensures
-                - sets the trainer used for all pairs of training.  Any previous 
+                - sets the trainer used for all pairs of training.  Any previous
                   calls to set_trainer() are overridden by this function.  Even the
-                  more specific set_trainer(trainer, l1, l2) form. 
+                  more specific set_trainer(trainer, l1, l2) form.
         !*/
 
         void set_trainer (
@@ -89,7 +89,7 @@ namespace dlib
         );
         /*!
             ensures
-                - This object will print status messages to standard out so that a 
+                - This object will print status messages to standard out so that a
                   user can observe the progress of the algorithm.
         !*/
 
@@ -112,13 +112,13 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the number of threads used during training.  You should 
+                - returns the number of threads used during training.  You should
                   usually set this equal to the number of processing cores on your
                   machine.
         !*/
 
-        struct invalid_label : public dlib::error 
-        { 
+        struct invalid_label : public dlib::error
+        {
             /*!
                 This is the exception thrown by the train() function below.
             !*/
@@ -133,8 +133,8 @@ namespace dlib
             requires
                 - is_learning_problem(all_samples, all_labels)
             ensures
-                - trains a bunch of binary classifiers in a one vs one fashion to solve the given 
-                  multiclass classification problem.  
+                - trains a bunch of binary classifiers in a one vs one fashion to solve the given
+                  multiclass classification problem.
                 - returns a one_vs_one_decision_function F with the following properties:
                     - F contains all the learned binary classifiers and can be used to predict
                       the labels of new samples.

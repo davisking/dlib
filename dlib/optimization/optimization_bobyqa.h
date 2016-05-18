@@ -5,14 +5,14 @@
 
 /*
     The code in this file is derived from Powell's BOBYQA Fortran code.
-    It was created by running f2c on the original Fortran code and then 
+    It was created by running f2c on the original Fortran code and then
     massaging the resulting C code into what you can see below.
 
 
     The following paper, published in 2009 by Powell, describes the
-    detailed workings of the BOBYQA algorithm.  
+    detailed workings of the BOBYQA algorithm.
 
-        The BOBYQA algorithm for bound constrained optimization 
+        The BOBYQA algorithm for bound constrained optimization
         without derivatives by M.J.D. Powell
 */
 
@@ -43,7 +43,7 @@ namespace dlib
 
         template <
             typename funct,
-            typename T, 
+            typename T,
             typename U
             >
         double find_min (
@@ -86,9 +86,9 @@ namespace dlib
         template <typename funct>
         doublereal bobyqa_(
             const funct& calfun,
-            const integer n, 
-            const integer npt, 
-            doublereal *x, 
+            const integer n,
+            const integer npt,
+            doublereal *x,
             const doublereal *xl,
             const doublereal *xu,
             const doublereal rhobeg,
@@ -246,7 +246,7 @@ namespace dlib
             const doublereal rhobeg,
             const doublereal rhoend,
             const integer maxfun,
-            doublereal *xbase, 
+            doublereal *xbase,
             doublereal *xpt,
             doublereal *fval,
             doublereal *xopt,
@@ -254,19 +254,19 @@ namespace dlib
             doublereal *hq,
             doublereal *pq,
             doublereal *bmat,
-            doublereal *zmat, 
+            doublereal *zmat,
             const integer ndim,
             doublereal *sl,
-            doublereal *su, 
-            doublereal *xnew, 
+            doublereal *su,
+            doublereal *xnew,
             doublereal *xalt,
             doublereal *d__,
-            doublereal *vlag, 
+            doublereal *vlag,
             doublereal *w
         ) const
         {
             /* System generated locals */
-            integer xpt_dim1, xpt_offset, bmat_dim1, bmat_offset, zmat_dim1, 
+            integer xpt_dim1, xpt_offset, bmat_dim1, bmat_offset, zmat_dim1,
             zmat_offset, i__1, i__2, i__3;
             doublereal d__1, d__2, d__3, d__4;
 
@@ -376,8 +376,8 @@ namespace dlib
             /*     initial XOPT is set too. The branch to label 720 occurs if MAXFUN is */
             /*     less than NPT. GOPT will be updated if KOPT is different from KBASE. */
 
-            prelim_(calfun, n, npt, &x[1], &xl[1], &xu[1], rhobeg, maxfun, &xbase[1], 
-                    &xpt[xpt_offset], &fval[1], &gopt[1], &hq[1], &pq[1], &bmat[bmat_offset], 
+            prelim_(calfun, n, npt, &x[1], &xl[1], &xu[1], rhobeg, maxfun, &xbase[1],
+                    &xpt[xpt_offset], &fval[1], &gopt[1], &hq[1], &pq[1], &bmat[bmat_offset],
                     &zmat[zmat_offset], ndim, &sl[1], &su[1], nf, kopt);
             xoptsq = zero;
             i__1 = n;
@@ -451,7 +451,7 @@ L20:
             /*     label 650 or 680 with NTRITS=-1, instead of calculating F at XNEW. */
 
 L60:
-            trsbox_(n, npt, &xpt[xpt_offset], &xopt[1], &gopt[1], &hq[1], &pq[1], &sl[1], 
+            trsbox_(n, npt, &xpt[xpt_offset], &xopt[1], &gopt[1], &hq[1], &pq[1], &sl[1],
                     &su[1], delta, &xnew[1], &d__[1], &w[1], &w[np], &w[np + n],
                     &w[np + (n << 1)], &w[np + n * 3], &dsq, &crvmin);
             /* Computing MIN */
@@ -602,7 +602,7 @@ L90:
                         ++ih;
                         hq[ih] = hq[ih] + w[i__] * xopt[j] + xopt[i__] * w[j];
                         /* L170: */
-                        bmat[npt + i__ + j * bmat_dim1] = bmat[npt + j + i__ * 
+                        bmat[npt + i__ + j * bmat_dim1] = bmat[npt + j + i__ *
                             bmat_dim1];
                     }
                 }
@@ -636,7 +636,7 @@ L190:
             kbase = kopt;
             rescue_(calfun, n, npt, &xl[1], &xu[1], maxfun, &xbase[1], &xpt[
                     xpt_offset], &fval[1], &xopt[1], &gopt[1], &hq[1], &pq[1], &bmat[
-                    bmat_offset], &zmat[zmat_offset], ndim, &sl[1], &su[1], nf, delta, 
+                    bmat_offset], &zmat[zmat_offset], ndim, &sl[1], &su[1], nf, delta,
                     kopt, &vlag[1], &w[1], &w[n + np], &w[ndim + np]);
 
             /*     XOPT is updated now in case the branch below to label 720 is taken. */
@@ -680,8 +680,8 @@ L190:
             /*     going to be made when the denominator is calculated. */
 
 L210:
-            altmov_(n, npt, &xpt[xpt_offset], &xopt[1], &bmat[bmat_offset], &zmat[zmat_offset], 
-                    ndim, &sl[1], &su[1], kopt, knew, adelt, &xnew[1], 
+            altmov_(n, npt, &xpt[xpt_offset], &xopt[1], &bmat[bmat_offset], &zmat[zmat_offset],
+                    ndim, &sl[1], &su[1], kopt, knew, adelt, &xnew[1],
                     &xalt[1], alpha, cauchy, &w[1], &w[np], &w[ndim + 1]);
             i__1 = n;
             for (i__ = 1; i__ <= i__1; ++i__) {
@@ -997,7 +997,7 @@ L360:
             /*     Update BMAT and ZMAT, so that the KNEW-th interpolation point can be */
             /*     moved. Also update the second derivative terms of the model. */
 
-            update_(n, npt, &bmat[bmat_offset], &zmat[zmat_offset], ndim, &vlag[1], 
+            update_(n, npt, &bmat[bmat_offset], &zmat[zmat_offset], ndim, &vlag[1],
                     beta, denom, knew, &w[1]);
             ih = 0;
             pqold = pq[knew];
@@ -1143,7 +1143,7 @@ L360:
                     i__2 = npt;
                     for (k = 1; k <= i__2; ++k) {
                         /* L620: */
-                        sum = sum + bmat[k + i__ * bmat_dim1] * vlag[k] + xpt[k + i__ 
+                        sum = sum + bmat[k + i__ * bmat_dim1] * vlag[k] + xpt[k + i__
                             * xpt_dim1] * w[k];
                     }
                     if (xopt[i__] == sl[i__]) {
@@ -1328,27 +1328,27 @@ L720:
         void altmov_(
             const integer n,
             const integer npt,
-            const doublereal *xpt, 
+            const doublereal *xpt,
             const doublereal *xopt,
             const doublereal *bmat,
             const doublereal *zmat,
-            const integer ndim, 
+            const integer ndim,
             const doublereal *sl,
             const doublereal *su,
             const integer kopt,
-            const integer knew, 
+            const integer knew,
             const doublereal adelt,
             doublereal *xnew,
             doublereal *xalt,
             doublereal& alpha,
             doublereal& cauchy,
             doublereal *glag,
-            doublereal *hcol, 
+            doublereal *hcol,
             doublereal *w
         ) const
         {
             /* System generated locals */
-            integer xpt_dim1, xpt_offset, bmat_dim1, bmat_offset, zmat_dim1, 
+            integer xpt_dim1, xpt_offset, bmat_dim1, bmat_offset, zmat_dim1,
             zmat_offset, i__1, i__2;
             doublereal d__1, d__2, d__3, d__4;
 
@@ -1363,7 +1363,7 @@ L720:
             integer ksav = 0;
             doublereal step = 0, zero = 0, curv = 0;
             integer iflag;
-            doublereal scale = 0, csave = 0, tempa = 0, tempb = 0, tempd = 0, const__ = 0, sumin = 0, 
+            doublereal scale = 0, csave = 0, tempa = 0, tempb = 0, tempd = 0, const__ = 0, sumin = 0,
                        ggfree = 0;
             integer ibdsav = 0;
             doublereal dderiv = 0, bigstp = 0, predsq = 0, presav = 0, distsq = 0, stpsav = 0, wfixsq = 0, wsqsav = 0;
@@ -1767,7 +1767,7 @@ L200:
             const funct& calfun,
             const integer n,
             const integer npt,
-            doublereal *x, 
+            doublereal *x,
             const doublereal *xl,
             const doublereal *xu,
             const doublereal rhobeg,
@@ -1778,17 +1778,17 @@ L200:
             doublereal *gopt,
             doublereal *hq,
             doublereal *pq,
-            doublereal *bmat, 
+            doublereal *bmat,
             doublereal *zmat,
             const integer ndim,
             const doublereal *sl,
-            const doublereal *su, 
-            integer& nf, 
+            const doublereal *su,
+            integer& nf,
             integer& kopt
         ) const
         {
             /* System generated locals */
-            integer xpt_dim1, xpt_offset, bmat_dim1, bmat_offset, zmat_dim1, 
+            integer xpt_dim1, xpt_offset, bmat_dim1, bmat_offset, zmat_dim1,
             zmat_offset, i__1, i__2;
             doublereal d__1, d__2, d__3, d__4;
 
@@ -1987,13 +1987,13 @@ L50:
                         }
                     }
                     bmat[nfx * bmat_dim1 + 1] = -(stepa + stepb) / (stepa * stepb);
-                    bmat[nf + nfx * bmat_dim1] = -half / xpt[nf - n + nfx * 
+                    bmat[nf + nfx * bmat_dim1] = -half / xpt[nf - n + nfx *
                         xpt_dim1];
-                    bmat[nf - n + nfx * bmat_dim1] = -bmat[nfx * bmat_dim1 + 1] - 
+                    bmat[nf - n + nfx * bmat_dim1] = -bmat[nfx * bmat_dim1 + 1] -
                         bmat[nf + nfx * bmat_dim1];
                     zmat[nfx * zmat_dim1 + 1] = std::sqrt(two) / (stepa * stepb);
                     zmat[nf + nfx * zmat_dim1] = std::sqrt(half) / rhosq;
-                    zmat[nf - n + nfx * zmat_dim1] = -zmat[nfx * zmat_dim1 + 1] - 
+                    zmat[nf - n + nfx * zmat_dim1] = -zmat[nfx * zmat_dim1 + 1] -
                         zmat[nf + nfx * zmat_dim1];
                 }
 
@@ -2022,22 +2022,22 @@ L50:
             const funct& calfun,
             const integer n,
             const integer npt,
-            const doublereal *xl, 
+            const doublereal *xl,
             const doublereal *xu,
             const integer maxfun,
-            doublereal *xbase, 
-            doublereal *xpt, 
+            doublereal *xbase,
+            doublereal *xpt,
             doublereal *fval,
             doublereal *xopt,
             doublereal *gopt,
-            doublereal *hq, 
+            doublereal *hq,
             doublereal *pq,
             doublereal *bmat,
-            doublereal *zmat, 
+            doublereal *zmat,
             const integer ndim,
             doublereal *sl,
             doublereal *su,
-            integer& nf, 
+            integer& nf,
             const doublereal delta,
             integer& kopt,
             doublereal *vlag,
@@ -2047,7 +2047,7 @@ L50:
         ) const
         {
             /* System generated locals */
-            integer xpt_dim1, xpt_offset, bmat_dim1, bmat_offset, zmat_dim1, 
+            integer xpt_dim1, xpt_offset, bmat_dim1, bmat_offset, zmat_dim1,
             zmat_offset, i__1, i__2, i__3;
             doublereal d__1, d__2, d__3, d__4;
 
@@ -2237,13 +2237,13 @@ L50:
                     temp = one / (ptsaux[(j << 1) + 1] - ptsaux[(j << 1) + 2]);
                     bmat[jp + j * bmat_dim1] = -temp + one / ptsaux[(j << 1) + 1];
                     bmat[jpn + j * bmat_dim1] = temp + one / ptsaux[(j << 1) + 2];
-                    bmat[j * bmat_dim1 + 1] = -bmat[jp + j * bmat_dim1] - bmat[jpn + 
+                    bmat[j * bmat_dim1 + 1] = -bmat[jp + j * bmat_dim1] - bmat[jpn +
                         j * bmat_dim1];
-                    zmat[j * zmat_dim1 + 1] = std::sqrt(2.) / (d__1 = ptsaux[(j << 1) + 1] 
+                    zmat[j * zmat_dim1 + 1] = std::sqrt(2.) / (d__1 = ptsaux[(j << 1) + 1]
                                                           * ptsaux[(j << 1) + 2], std::abs(d__1));
-                    zmat[jp + j * zmat_dim1] = zmat[j * zmat_dim1 + 1] * ptsaux[(j << 
+                    zmat[jp + j * zmat_dim1] = zmat[j * zmat_dim1 + 1] * ptsaux[(j <<
                                                                                  1) + 2] * temp;
-                    zmat[jpn + j * zmat_dim1] = -zmat[j * zmat_dim1 + 1] * ptsaux[(j 
+                    zmat[jpn + j * zmat_dim1] = -zmat[j * zmat_dim1 + 1] * ptsaux[(j
                                                                                    << 1) + 1] * temp;
                 } else {
                     bmat[j * bmat_dim1 + 1] = -one / ptsaux[(j << 1) + 1];
@@ -2267,7 +2267,7 @@ L50:
                     if (iq > n) {
                         iq -= n;
                     }
-                    ptsid[k] = (doublereal) ip + (doublereal) iq / (doublereal) np + 
+                    ptsid[k] = (doublereal) ip + (doublereal) iq / (doublereal) np +
                         sfrac;
                     temp = one / (ptsaux[(ip << 1) + 1] * ptsaux[(iq << 1) + 1]);
                     zmat[(k - np) * zmat_dim1 + 1] = temp;
@@ -2313,7 +2313,7 @@ L80:
                 /*     branch to label 350 occurs if all the original points are reinstated. */
                 /*     The nonnegative values of W(NDIM+K) are required in the search below. */
 
-                update_(n, npt, &bmat[bmat_offset], &zmat[zmat_offset], ndim, &vlag[1], 
+                update_(n, npt, &bmat[bmat_offset], &zmat[zmat_offset], ndim, &vlag[1],
                         beta, denom, knew, &w[1]);
                 if (nrem == 0) {
                     goto L350;
@@ -2367,7 +2367,7 @@ L120:
                     if (ip > 0) {
                         sum = w[npt + ip] * ptsaux[(ip << 1) + 1];
                     }
-                    iq = (integer) ((doublereal) np * ptsid[k] - (doublereal) (ip * 
+                    iq = (integer) ((doublereal) np * ptsid[k] - (doublereal) (ip *
                                                                                np));
                     if (iq > 0) {
                         iw = 1;
@@ -2600,7 +2600,7 @@ L260:
                         pq[k] += temp;
                     } else {
                         ip = (integer) ptsid[k];
-                        iq = (integer) ((doublereal) np * ptsid[k] - (doublereal) (ip 
+                        iq = (integer) ((doublereal) np * ptsid[k] - (doublereal) (ip
                                                                                    * np));
                         ihq = (iq * iq + iq) / 2;
                         if (ip == 0) {
@@ -2637,19 +2637,19 @@ L350:
         void trsbox_(
             const integer n,
             const integer npt,
-            const doublereal *xpt, 
+            const doublereal *xpt,
             const doublereal *xopt,
             const doublereal *gopt,
             const doublereal *hq,
-            const doublereal *pq, 
+            const doublereal *pq,
             const doublereal *sl,
             const doublereal *su,
             const doublereal delta,
-            doublereal *xnew, 
+            doublereal *xnew,
             doublereal *d__,
             doublereal *gnew,
             doublereal *xbdi,
-            doublereal *s, 
+            doublereal *s,
             doublereal *hs,
             doublereal *hred,
             doublereal *dsq,
@@ -2670,7 +2670,7 @@ L350:
             integer isav;
             doublereal temp = 0, zero = 0, xsav = 0, xsum = 0, angbd = 0, dredg = 0, sredg = 0;
             integer iterc;
-            doublereal resid = 0, delsq = 0, ggsav = 0, tempa = 0, tempb = 0,  
+            doublereal resid = 0, delsq = 0, ggsav = 0, tempa = 0, tempb = 0,
                        redmax = 0, dredsq = 0, redsav = 0, onemin = 0, gredsq = 0, rednew = 0;
             integer itcsav = 0;
             doublereal rdprev = 0, rdnext = 0, stplen = 0, stepsq = 0;
@@ -3204,11 +3204,11 @@ L210:
         void update_(
             const integer n,
             const integer npt,
-            doublereal *bmat, 
+            doublereal *bmat,
             doublereal *zmat,
             const integer ndim,
             doublereal *vlag,
-            const doublereal beta, 
+            const doublereal beta,
             const doublereal denom,
             const integer knew,
             doublereal *w
@@ -3277,9 +3277,9 @@ L210:
                     tempb = zmat[knew + j * zmat_dim1] / temp;
                     i__1 = npt;
                     for (i__ = 1; i__ <= i__1; ++i__) {
-                        temp = tempa * zmat[i__ + zmat_dim1] + tempb * zmat[i__ + j * 
+                        temp = tempa * zmat[i__ + zmat_dim1] + tempb * zmat[i__ + j *
                             zmat_dim1];
-                        zmat[i__ + j * zmat_dim1] = tempa * zmat[i__ + j * zmat_dim1] 
+                        zmat[i__ + j * zmat_dim1] = tempa * zmat[i__ + j * zmat_dim1]
                             - tempb * zmat[i__ + zmat_dim1];
                         /* L20: */
                         zmat[i__ + zmat_dim1] = temp;
@@ -3323,10 +3323,10 @@ L210:
                 tempb = (-(beta) * w[jp] - tau * vlag[jp]) / denom;
                 i__1 = jp;
                 for (i__ = 1; i__ <= i__1; ++i__) {
-                    bmat[i__ + j * bmat_dim1] = bmat[i__ + j * bmat_dim1] + tempa * 
+                    bmat[i__ + j * bmat_dim1] = bmat[i__ + j * bmat_dim1] + tempa *
                         vlag[i__] + tempb * w[i__];
                     if (i__ > npt) {
-                        bmat[jp + (i__ - npt) * bmat_dim1] = bmat[i__ + j * 
+                        bmat[jp + (i__ - npt) * bmat_dim1] = bmat[i__ + j *
                             bmat_dim1];
                     }
                     /* L60: */
@@ -3339,7 +3339,7 @@ L210:
 
     template <
         typename funct,
-        typename T, 
+        typename T,
         typename U
         >
     double find_min_bobyqa (
@@ -3351,9 +3351,9 @@ L210:
         const double rho_begin,
         const double rho_end,
         const long max_f_evals
-    ) 
+    )
     {
-        // The starting point (i.e. x) must be a column vector.  
+        // The starting point (i.e. x) must be a column vector.
         COMPILE_TIME_ASSERT(T::NC <= 1);
 
         // check the requirements.  Also split the assert up so that the error message isn't huge.
@@ -3362,9 +3362,9 @@ L210:
                     x.size() > 1 && max_f_evals > 1,
             "\tdouble find_min_bobyqa()"
             << "\n\t Invalid arguments have been given to this function"
-            << "\n\t is_col_vector(x):       " << is_col_vector(x) 
-            << "\n\t is_col_vector(x_lower): " << is_col_vector(x_lower) 
-            << "\n\t is_col_vector(x_upper): " << is_col_vector(x_upper) 
+            << "\n\t is_col_vector(x):       " << is_col_vector(x)
+            << "\n\t is_col_vector(x_lower): " << is_col_vector(x_lower)
+            << "\n\t is_col_vector(x_upper): " << is_col_vector(x_upper)
             << "\n\t x.size():               " << x.size()
             << "\n\t x_lower.size():         " << x_lower.size()
             << "\n\t x_upper.size():         " << x_upper.size()
@@ -3378,8 +3378,8 @@ L210:
             "\tdouble find_min_bobyqa()"
             << "\n\t Invalid arguments have been given to this function"
             << "\n\t ntp in valid range: " << (x.size() + 2 <= npt && npt <= (x.size()+1)*(x.size()+2)/2)
-            << "\n\t npt:                " << npt 
-            << "\n\t rho_begin:          " << rho_begin 
+            << "\n\t npt:                " << npt
+            << "\n\t rho_begin:          " << rho_begin
             << "\n\t rho_end:            " << rho_end
             << "\n\t min(x_upper - x_lower) > 2*rho_begin:           " << (min(x_upper - x_lower) > 2*rho_begin)
             << "\n\t min(x - x_lower) >= 0 && min(x_upper - x) >= 0: " << (min(x - x_lower) >= 0 && min(x_upper - x) >= 0)
@@ -3394,7 +3394,7 @@ L210:
 
     template <
         typename funct,
-        typename T, 
+        typename T,
         typename U
         >
     double find_max_bobyqa (
@@ -3406,9 +3406,9 @@ L210:
         const double rho_begin,
         const double rho_end,
         const long max_f_evals
-    ) 
+    )
     {
-        // The starting point (i.e. x) must be a column vector.  
+        // The starting point (i.e. x) must be a column vector.
         COMPILE_TIME_ASSERT(T::NC <= 1);
 
         return -find_min_bobyqa(negate_function(f), x, npt, x_lower, x_upper, rho_begin, rho_end, max_f_evals);

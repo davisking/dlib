@@ -22,7 +22,7 @@ namespace dlib
         explicit test_box_overlap (
             double match_thresh_,
             double overlap_thresh_ = 1.0
-        ) : match_thresh(match_thresh_), overlap_thresh(overlap_thresh_) 
+        ) : match_thresh(match_thresh_), overlap_thresh(overlap_thresh_)
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(0 <= match_thresh && match_thresh <= 1  &&
@@ -46,8 +46,8 @@ namespace dlib
                 return false;
 
             const double outer = (a+b).area();
-            if (inner/outer > match_thresh || 
-                inner/a.area() > overlap_thresh || 
+            if (inner/outer > match_thresh ||
+                inner/a.area() > overlap_thresh ||
                 inner/b.area() > overlap_thresh)
                 return true;
             else
@@ -84,7 +84,7 @@ namespace dlib
 
     inline void deserialize (
         test_box_overlap& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         double overlap_thresh, match_thresh;

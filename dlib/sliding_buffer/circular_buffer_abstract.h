@@ -21,7 +21,7 @@ namespace dlib
                 T must have a default constructor and be copyable.
 
             POINTERS AND REFERENCES TO INTERNAL DATA
-                swap(), size(), front(), back(), and operator[] functions do 
+                swap(), size(), front(), back(), and operator[] functions do
                 not invalidate pointers or references to internal data.
                 All other functions have no such guarantee.
 
@@ -29,10 +29,10 @@ namespace dlib
                 - size() == 0
 
             WHAT THIS OBJECT REPRESENTS
-                This object is a circular buffer of objects of type T.  This means 
-                that when objects are pushed onto one of its ends it does not grow 
-                in size.  Instead, it shifts all elements over one to make room for 
-                the new element and the element at the opposing end falls off the 
+                This object is a circular buffer of objects of type T.  This means
+                that when objects are pushed onto one of its ends it does not grow
+                in size.  Instead, it shifts all elements over one to make room for
+                the new element and the element at the opposing end falls off the
                 buffer and is lost.
         !*/
 
@@ -57,7 +57,7 @@ namespace dlib
                 - #size() == 0
         !*/
 
-        T& operator[] ( 
+        T& operator[] (
             unsigned long i
         ) const;
         /*!
@@ -67,7 +67,7 @@ namespace dlib
                 - returns a non-const reference to the i-th element of this circular buffer
         !*/
 
-        const T& operator[] ( 
+        const T& operator[] (
             unsigned long i
         ) const;
         /*!
@@ -79,25 +79,25 @@ namespace dlib
 
         void resize(
             unsigned long new_size
-        ); 
+        );
         /*!
             ensures
                 - #size() == new_size
         !*/
 
         void assign(
-            unsigned long new_size, 
+            unsigned long new_size,
             const T& value
-        ); 
+        );
         /*!
             ensures
-                - #size() == new_size 
+                - #size() == new_size
                 - for all valid i:
                     - (*this)[i] == value
         !*/
 
         unsigned long size(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of elements in this circular buffer
@@ -148,14 +148,14 @@ namespace dlib
                   (i.e. the size of this object does not change)
                 - if (size() != 0) then
                     - #front() == value
-                    - all items are shifted over such that, 
+                    - all items are shifted over such that,
                         - #(*this)[1] == (*this)[0]
                         - #(*this)[2] == (*this)[1]
                         - #(*this)[3] == (*this)[2]
                         - etc.
                         - back() is shifted out of the circular buffer
                 - else
-                    - This function has no effect on this object 
+                    - This function has no effect on this object
         !*/
 
         void push_back(
@@ -167,14 +167,14 @@ namespace dlib
                   (i.e. the size of this object does not change)
                 - if (size() != 0) then
                     - #back() == value
-                    - all items are shifted over such that, 
-                        - front() is shifted out of the circular buffer 
+                    - all items are shifted over such that,
+                        - front() is shifted out of the circular buffer
                         - #(*this)[0] == (*this)[1]
                         - #(*this)[1] == (*this)[2]
                         - #(*this)[2] == (*this)[3]
                         - etc.
                 - else
-                    - This function has no effect on this object 
+                    - This function has no effect on this object
         !*/
 
         void swap (
@@ -193,9 +193,9 @@ namespace dlib
         typename T
         >
     void swap (
-        circular_buffer<T>& a, 
-        circular_buffer<T>& b 
-    ) { a.swap(b); }   
+        circular_buffer<T>& a,
+        circular_buffer<T>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
@@ -204,22 +204,22 @@ namespace dlib
         typename T
         >
     void serialize (
-        const circular_buffer<T>& item, 
-        std::ostream& out 
-    );   
+        const circular_buffer<T>& item,
+        std::ostream& out
+    );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     template <
         typename T
         >
     void deserialize (
-        circular_buffer<T>& item, 
+        circular_buffer<T>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -228,12 +228,12 @@ namespace dlib
         typename T
         >
     const matrix_exp mat (
-        const circular_buffer<T>& m 
+        const circular_buffer<T>& m
     );
     /*!
         ensures
             - returns a matrix R such that:
-                - is_col_vector(R) == true 
+                - is_col_vector(R) == true
                 - R.size() == m.size()
                 - for all valid r:
                   R(r) == m[r]

@@ -15,10 +15,10 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object is a simple function object for determining if two rectangles
-                overlap.  
+                overlap.
 
             THREAD SAFETY
-                Concurrent access to an instance of this object is safe provided that 
+                Concurrent access to an instance of this object is safe provided that
                 only const member functions are invoked.  Otherwise, access must be
                 protected by a mutex lock.
         !*/
@@ -41,7 +41,7 @@ namespace dlib
                 - 0 <= match_thresh <= 1
                 - 0 <= overlap_thresh <= 1
             ensures
-                - #get_match_thresh() == match_thresh 
+                - #get_match_thresh() == match_thresh
                 - #get_overlap_thresh() == overlap_thresh
         !*/
 
@@ -93,7 +93,7 @@ namespace dlib
 
     void deserialize (
         test_box_overlap& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides deserialization support
@@ -106,9 +106,9 @@ namespace dlib
     );
     /*!
         ensures
-            - This function finds the most restrictive test_box_overlap object possible 
-              that is consistent with the given set of sets of rectangles.  
-            - To be precise, this function finds and returns a test_box_overlap object 
+            - This function finds the most restrictive test_box_overlap object possible
+              that is consistent with the given set of sets of rectangles.
+            - To be precise, this function finds and returns a test_box_overlap object
               TBO such that:
                 - TBO.get_match_thresh() and TBO.get_overlap_thresh() are as small
                   as possible such that the following conditions are satisfied.

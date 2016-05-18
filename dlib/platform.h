@@ -30,8 +30,8 @@
 // Define WIN32 if this is MS Windows
 #ifndef WIN32
     #if defined( _MSC_VER) || defined(__BORLANDC__) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__)
-    #define WIN32 
-    #endif 
+    #define WIN32
+    #endif
 #endif
 
 #ifndef WIN32
@@ -44,13 +44,13 @@
     #ifndef HPUX
        #if defined(__hpux ) || defined(hpux) || defined (_hpux)
        #define HPUX
-       #endif	
+       #endif
     #endif
 
     #ifndef MACOSX
         #ifdef __MACOSX__
         #define MACOSX
-        #endif 
+        #endif
         #ifdef __APPLE__
         #define MACOSX
         #endif

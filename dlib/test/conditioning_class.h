@@ -13,7 +13,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -30,14 +30,14 @@ namespace
     )
     /*!
         requires
-            - cc is an implementation of conditioning_class/conditioning_class_kernel_abstract.h            
+            - cc is an implementation of conditioning_class/conditioning_class_kernel_abstract.h
               the alphabet_size for cc is 256
-            - cc2 is an implementation of conditioning_class/conditioning_class_kernel_abstract.h            
+            - cc2 is an implementation of conditioning_class/conditioning_class_kernel_abstract.h
               the alphabet_size for cc2 is 2
         ensures
-            - runs tests on cc for compliance with the specs 
+            - runs tests on cc for compliance with the specs
     !*/
-    {        
+    {
 
         srand(static_cast<unsigned int>(time(0)));
 
@@ -59,7 +59,7 @@ namespace
 
             DLIB_TEST(test.get_memory_usage() != 0);
 
-            const unsigned long alphabet_size = 2;                
+            const unsigned long alphabet_size = 2;
 
 
             DLIB_TEST(test.get_total() == 1);
@@ -101,22 +101,22 @@ namespace
                     DLIB_TEST(test.get_count(i) == amount);
                 }
                 DLIB_TEST(test.get_total() == (i+1)*amount + 1);
-            } 
+            }
 
 
             for (unsigned long i = 0; i < alphabet_size; ++i)
-            {                
+            {
                 unsigned long temp = static_cast<unsigned long>(::rand()%40);
                 for (unsigned long j = 0; j < temp; ++j)
                 {
                     test.increment_count(i,static_cast<unsigned short>(amount));
                     if (i == alphabet_size-1)
                     {
-                        DLIB_TEST(test.get_count(i) == (j+1)*amount + 1 + amount);                    
+                        DLIB_TEST(test.get_count(i) == (j+1)*amount + 1 + amount);
                     }
                     else
                     {
-                        DLIB_TEST(test.get_count(i) == (j+1)*amount + amount);                    
+                        DLIB_TEST(test.get_count(i) == (j+1)*amount + amount);
                     }
                 }
 
@@ -157,7 +157,7 @@ namespace
 
                 DLIB_TEST(test.get_count(i) == 1);
                 DLIB_TEST(test.get_total() == i+2);
-            } 
+            }
 
 
 
@@ -179,11 +179,11 @@ namespace
 
 
                 for (unsigned long i = 0; i < alphabet_size; ++i)
-                {                
+                {
                     unsigned long temp = static_cast<unsigned long>(::rand()%range);
                     for (unsigned long j = 0; j < temp; ++j)
                     {
-                        test.increment_count(i);  
+                        test.increment_count(i);
 
 
                         if (total >= 65535)
@@ -271,12 +271,12 @@ namespace
                 for (unsigned long j = 0; j < temp; ++j)
                 {
                     unsigned long symbol = (unsigned long)::rand()%alphabet_size;
-                    test.increment_count(symbol);                    
+                    test.increment_count(symbol);
                 }
 
                 // make sure all symbols have a count of at least one
                 for (unsigned long j = 0; j < alphabet_size; ++j)
-                {   
+                {
                     if (test.get_count(j) == 0)
                         test.increment_count(j);
                 }
@@ -304,7 +304,7 @@ namespace
 
                 // make sure get_symbol() matches what get_range() told us
                 for (unsigned long j = 0; j < alphabet_size; ++j)
-                {                    
+                {
                     for (unsigned long k = low_counts[j]; k < high_counts[j]; ++k)
                     {
                         unsigned long symbol, low_count, high_count;
@@ -317,9 +317,9 @@ namespace
                                      "low_counts[j] == " << low_counts[j] << endl <<
                                      "high_counts[j] == " << high_counts[j] << endl <<
                                      "low_counts[symbol] == " << low_counts[symbol] << endl <<
-                                     "high_counts[symbol] == " << high_counts[symbol] << endl << 
-                                     "low_count == " << low_count << endl << 
-                                     "high_count == " << high_count << endl << 
+                                     "high_counts[symbol] == " << high_counts[symbol] << endl <<
+                                     "low_count == " << low_count << endl <<
+                                     "high_count == " << high_count << endl <<
                                      "temp.count(j) == " << test.get_count(j)
                         );
                         DLIB_TEST_MSG(low_count == low_counts[j],
@@ -355,7 +355,7 @@ namespace
                 unsigned long temp = 65536;
                 for (unsigned long j = 0; j < temp; ++j)
                 {
-                    test.increment_count(i);  
+                    test.increment_count(i);
 
 
                     if (total >= 65535)
@@ -438,7 +438,7 @@ namespace
 
             DLIB_TEST(test.get_memory_usage() != 0);
 
-            const unsigned long alphabet_size = 256;                
+            const unsigned long alphabet_size = 256;
 
 
             DLIB_TEST(test.get_total() == 1);
@@ -486,12 +486,12 @@ namespace
                     if (!oom)
                         DLIB_TEST(test.get_total() == (i+1)*amount + 1);
                 }
-            } 
+            }
 
 
             oom = false;
             for (unsigned long i = 0; i < alphabet_size; ++i)
-            {        
+            {
                 unsigned long temp = static_cast<unsigned long>(::rand()%40);
                 for (unsigned long j = 0; j < temp; ++j)
                 {
@@ -502,11 +502,11 @@ namespace
                     {
                         if (i == alphabet_size-1)
                         {
-                            DLIB_TEST(test.get_count(i) == (j+1)*amount + 1 + amount);                    
+                            DLIB_TEST(test.get_count(i) == (j+1)*amount + 1 + amount);
                         }
                         else
                         {
-                            DLIB_TEST(test.get_count(i) == (j+1)*amount + amount);                    
+                            DLIB_TEST(test.get_count(i) == (j+1)*amount + amount);
                         }
                     }
                 }
@@ -558,7 +558,7 @@ namespace
                     DLIB_TEST(test.get_count(i) == 1);
                     DLIB_TEST(test.get_total() == i+2);
                 }
-            } 
+            }
 
 
 
@@ -579,7 +579,7 @@ namespace
 
                 oom = false;
                 for (unsigned long i = 0; i < alphabet_size; ++i)
-                {                
+                {
                     unsigned long temp = static_cast<unsigned long>(::rand()%range);
                     for (unsigned long j = 0; j < temp; ++j)
                     {
@@ -684,7 +684,7 @@ namespace
 
                 // make sure all symbols have a count of at least one
                 for (unsigned long j = 0; j < alphabet_size; ++j)
-                {   
+                {
                     if (test.get_count(j) == 0)
                         test.increment_count(j);
                 }
@@ -719,7 +719,7 @@ namespace
 
                     // make sure get_symbol() matches what get_range() told us
                     for (unsigned long j = 0; j < alphabet_size; ++j)
-                    {                    
+                    {
                         for (unsigned long k = low_counts[j]; k < high_counts[j]; ++k)
                         {
                             unsigned long symbol, low_count, high_count;
@@ -732,9 +732,9 @@ namespace
                                          "low_counts[j] == " << low_counts[j] << endl <<
                                          "high_counts[j] == " << high_counts[j] << endl <<
                                          "low_counts[symbol] == " << low_counts[symbol] << endl <<
-                                         "high_counts[symbol] == " << high_counts[symbol] << endl << 
-                                         "low_count == " << low_count << endl << 
-                                         "high_count == " << high_count << endl << 
+                                         "high_counts[symbol] == " << high_counts[symbol] << endl <<
+                                         "low_count == " << low_count << endl <<
+                                         "high_count == " << high_count << endl <<
                                          "temp.count(j) == " << test.get_count(j)
                             );
                             DLIB_TEST_MSG(low_count == low_counts[j],
@@ -770,7 +770,7 @@ namespace
                 unsigned long temp = 65536;
                 for (unsigned long j = 0; j < temp; ++j)
                 {
-                    test.increment_count(i);  
+                    test.increment_count(i);
 
 
                     if (total >= 65535)

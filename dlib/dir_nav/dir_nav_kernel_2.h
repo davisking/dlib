@@ -37,7 +37,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // file object    
+    // file object
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
     
@@ -83,7 +83,7 @@ namespace dlib
         }
 
 
-        class file_not_found : public error { 
+        class file_not_found : public error {
             public: file_not_found(const std::string& s): error(s){}
         };
         
@@ -127,9 +127,9 @@ namespace dlib
 
         inline void swap (
             file& item
-        ) 
-        { 
-            exchange(state,item.state); 
+        )
+        {
+            exchange(state,item.state);
         }
 
     private:
@@ -141,7 +141,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // directory object    
+    // directory object
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
        
@@ -261,9 +261,9 @@ namespace dlib
 
         inline void swap (
             directory& item
-        ) 
-        { 
-            exchange(state,item.state); 
+        )
+        {
+            exchange(state,item.state);
         }
 
     private:
@@ -276,7 +276,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns true if path is a root path.  
+                - returns true if path is a root path.
                   Note that this function considers root paths that don't
                   have a trailing separator to also be valid.
         !*/
@@ -298,16 +298,16 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline void swap (
-        file& a, 
-        file& b 
-    ) { a.swap(b); }   
+        file& a,
+        file& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 
     inline void swap (
-        directory& a, 
-        directory& b 
-    ) { a.swap(b); }  
+        directory& a,
+        directory& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -322,7 +322,7 @@ namespace dlib
     directory_helper_get_files (
         const directory::data& state,
         queue_of_files& files
-    ) 
+    )
     {
         using namespace std;
 
@@ -352,7 +352,7 @@ namespace dlib
             {
                 errno = 0;
                 if ( (data = readdir(ffind)) == 0)
-                {                    
+                {
                     // there was an error or no more files
                     if ( errno == 0)
                     {
@@ -363,7 +363,7 @@ namespace dlib
                     {
                         // there was an error
                         throw directory::listing_error("Unable to list the contents of " + state.full_name);
-                    }                
+                    }
                 }
 
                 uint64 file_size;
@@ -371,10 +371,10 @@ namespace dlib
                 if (::stat64((path+data->d_name).c_str(), &buffer) != 0)
                 {
                     // this might be a broken symbolic link.  We can check by calling
-                    // readlink and seeing if it finds anything.  
+                    // readlink and seeing if it finds anything.
                     char buf[PATH_MAX];
                     ssize_t temp = readlink((path+data->d_name).c_str(),buf,sizeof(buf));
-                    if (temp == -1)                    
+                    if (temp == -1)
                         throw directory::listing_error("Unable to list the contents of " + state.full_name);
                     else
                         file_size = static_cast<uint64>(temp);
@@ -429,11 +429,11 @@ namespace dlib
     template <
         typename queue_of_files
         >
-    typename enable_if<is_std_vector<queue_of_files>,void>::type 
+    typename enable_if<is_std_vector<queue_of_files>,void>::type
     directory_helper_get_files (
         const directory::data& state,
         queue_of_files& files
-    ) 
+    )
     {
         queue<file>::kernel_2a temp_files;
         directory_helper_get_files(state,temp_files);
@@ -470,11 +470,11 @@ namespace dlib
     template <
         typename queue_of_dirs
         >
-    typename disable_if<is_std_vector<queue_of_dirs>,void>::type 
+    typename disable_if<is_std_vector<queue_of_dirs>,void>::type
     directory_helper_get_dirs (
         const directory::data& state,
         queue_of_dirs& dirs
-    ) 
+    )
     {
         using namespace std;
 
@@ -504,7 +504,7 @@ namespace dlib
             {
                 errno = 0;
                 if ( (data = readdir(ffind)) == 0)
-                {                    
+                {
                     // there was an error or no more files
                     if ( errno == 0)
                     {
@@ -515,7 +515,7 @@ namespace dlib
                     {
                         // there was an error
                         throw directory::listing_error("Unable to list the contents of " + state.full_name);
-                    }                
+                    }
                 }
 
                 // get a stat64 structure so we can see if this is a file
@@ -569,11 +569,11 @@ namespace dlib
     template <
         typename queue_of_dirs
         >
-    typename enable_if<is_std_vector<queue_of_dirs>,void>::type 
+    typename enable_if<is_std_vector<queue_of_dirs>,void>::type
     directory_helper_get_dirs (
         const directory::data& state,
         queue_of_dirs& dirs
-    ) 
+    )
     {
         queue<directory>::kernel_2a temp_dirs;
         directory_helper_get_dirs(state,temp_dirs);

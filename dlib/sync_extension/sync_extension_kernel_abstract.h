@@ -25,16 +25,16 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a general extension to any object (given the
-                restrictions on base).  This object gives any object which it extends 
-                an integrated rmutex and rsignaler object.  The extended object will 
+                restrictions on base).  This object gives any object which it extends
+                an integrated rmutex and rsignaler object.  The extended object will
                 then be able to be treated as if it was also a rmutex and rsignaler.
 
                 NOTE that just like the threading api, this object does not check
                 its requires clauses so be careful with it.
 
                 Also note that swap() does not swap the rmutex and rsignaler objects.
-                the rmutex and rsignaler are associated with the object instance itself, 
-                not with whatever the object represents.  
+                the rmutex and rsignaler are associated with the object instance itself,
+                not with whatever the object represents.
         !*/
 
 
@@ -62,7 +62,7 @@ namespace dlib
         /*!
             ensures
                 - #*this is properly initialized
-                - the argument one will be passed on to the constructor for the parent 
+                - the argument one will be passed on to the constructor for the parent
                   class base.
             throws
                 - std::bad_alloc
@@ -78,14 +78,14 @@ namespace dlib
             >
         sync_extension (
             const T& one,
-            const T& two 
+            const T& two
         );
         /*!
             ensures
                 - #*this is properly initialized
-                - the argument one will be passed on to the constructor for the parent 
+                - the argument one will be passed on to the constructor for the parent
                   class base as its first argument.
-                - the argument two will be passed on to the constructor for the parent 
+                - the argument two will be passed on to the constructor for the parent
                   class base as its second argument.
             throws
                 - std::bad_alloc
@@ -109,11 +109,11 @@ namespace dlib
             requires
                 - the thread calling lock() does not already have a lock on *this
             ensures
-                - if (*this is currently locked by another thread) then 
-                    - the thread that called lock() on *this is put to sleep until 
-                      it becomes available                  
-                - if (*this is currently unlocked) then 
-                    - #*this becomes locked and the current thread is NOT put to sleep 
+                - if (*this is currently locked by another thread) then
+                    - the thread that called lock() on *this is put to sleep until
+                      it becomes available
+                - if (*this is currently unlocked) then
+                    - #*this becomes locked and the current thread is NOT put to sleep
                       but now "owns" #*this
         !*/
 
@@ -132,7 +132,7 @@ namespace dlib
                 - *this is locked and owned by the calling thread
             ensures
                 - atomically unlocks *this and blocks the calling thread
-                - calling thread will wake if another thread calls signal() or broadcast() 
+                - calling thread will wake if another thread calls signal() or broadcast()
                   on *this
                 - when wait returns the calling thread again has a lock on #*this
         !*/
@@ -146,13 +146,13 @@ namespace dlib
                 - *this is locked and owned by the calling thread
             ensures
                 - atomically unlocks *this and blocks the calling thread
-                - calling thread will wake if another thread calls signal() or broadcast() 
+                - calling thread will wake if another thread calls signal() or broadcast()
                   on *this
                 - after the specified number of milliseconds has elapsed the calling thread
                   will wake once *this is free to be locked
                 - when wait returns the calling thread again has a lock on #*this
 
-                - returns false if the call to wait_or_timeout timed out 
+                - returns false if the call to wait_or_timeout timed out
                 - returns true if the call did not time out
         !*/
         
@@ -161,14 +161,14 @@ namespace dlib
         /*!
             ensures
                 - if (at least one thread is waiting on *this) then
-                    - at least one of the waiting threads will wake 
+                    - at least one of the waiting threads will wake
         !*/
 
         void broadcast (
         ) const;
         /*!
             ensures
-                - any and all threads waiting on *this will wake 
+                - any and all threads waiting on *this will wake
         !*/
 
     };
@@ -177,8 +177,8 @@ namespace dlib
         typename base
         >
     inline void swap (
-        sync_extension<base>& a, 
-        sync_extension<base>& b 
+        sync_extension<base>& a,
+        sync_extension<base>& b
     ) { a.swap(b); }
     /*!
         provides a global swap function

@@ -21,7 +21,7 @@ namespace dlib
                 public asc_remover<T,compare>
     {
 
-        /*!                
+        /*!
             REQUIREMENTS ON T
                 T must be comparable by compare where compare is a functor compatible with std::less and
                 T must be swappable by a global swap() and
@@ -30,26 +30,26 @@ namespace dlib
             REQUIREMENTS ON mem_manager
                 must be an implementation of memory_manager/memory_manager_kernel_abstract.h or
                 must be an implementation of memory_manager_global/memory_manager_global_kernel_abstract.h or
-                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h
                 mem_manager::type can be set to anything.
 
             POINTERS AND REFERENCES TO INTERNAL DATA
-                swap() and is_member() functions do not invalidate pointers 
+                swap() and is_member() functions do not invalidate pointers
                 or references to internal data.
                 All other functions have no such guarantee.
 
             INITIAL VALUE
-                size() == 0    
+                size() == 0
 
             ENUMERATION ORDER
-                The enumerator will iterate over the elements in the set in 
-                ascending order according to the compare functor. 
+                The enumerator will iterate over the elements in the set in
+                ascending order according to the compare functor.
                 (i.e. the elements are enumerated in sorted order)
 
             WHAT THIS OBJECT REPRESENTS
                 set contains items of type T
 
-                This object represents an unaddressed collection of items. 
+                This object represents an unaddressed collection of items.
                 Every element in a set is unique.
 
                 definition of equivalent:
@@ -67,14 +67,14 @@ namespace dlib
             set(
             );
             /*!
-                ensures 
+                ensures
                     - #*this is properly initialized
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor
             !*/
 
             virtual ~set(
-            ); 
+            );
             /*!
                 ensures
                     - all memory associated with *this has been released
@@ -87,7 +87,7 @@ namespace dlib
                     - #*this has its initial value
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor
-                        if this exception is thrown then *this is unusable 
+                        if this exception is thrown then *this is unusable
                         until clear() is called and succeeds
             !*/
 
@@ -98,8 +98,8 @@ namespace dlib
                 requires
                     - is_member(item) == false
                 ensures
-                    - #is_member(item) == true 
-                    - #item has an initial value for its type 
+                    - #is_member(item) == true
+                    - #item has an initial value for its type
                     - #size() == size() + 1
                     - #at_start() == true
                 throws
@@ -112,7 +112,7 @@ namespace dlib
             ) const;
             /*!
                 ensures
-                    - returns whether or not there is an element in *this equivalent to 
+                    - returns whether or not there is an element in *this equivalent to
                       item
             !*/
 
@@ -123,11 +123,11 @@ namespace dlib
             /*!
                 requires
                     - is_member(item) == true
-                    - &item != &item_copy (i.e. item and item_copy cannot be the same 
-                      variable) 
+                    - &item != &item_copy (i.e. item and item_copy cannot be the same
+                      variable)
                 ensures
-                    - #is_member(item) == false 
-                    - the element in *this equivalent to item has been removed and 
+                    - #is_member(item) == false
+                    - the element in *this equivalent to item has been removed and
                       swapped into #item_copy
                     - #size() == size() - 1
                     - #at_start() == true
@@ -140,7 +140,7 @@ namespace dlib
                 requires
                     - is_member(item) == true
                 ensures
-                    - #is_member(item) == false 
+                    - #is_member(item) == false
                     - #size() == size() - 1
                     - #at_start() == true
             !*/
@@ -151,7 +151,7 @@ namespace dlib
             /*!
                 ensures
                     - swaps *this and item
-            !*/ 
+            !*/
     
         private:
 
@@ -167,9 +167,9 @@ namespace dlib
         typename compare
         >
     inline void swap (
-        set<T,mem_manager,compare>& a, 
-        set<T,mem_manager,compare>& b 
-    ) { a.swap(b); }   
+        set<T,mem_manager,compare>& a,
+        set<T,mem_manager,compare>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
@@ -180,11 +180,11 @@ namespace dlib
         typename compare
         >
     void deserialize (
-        set<T,mem_manager,compare>& item, 
+        set<T,mem_manager,compare>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 }
 

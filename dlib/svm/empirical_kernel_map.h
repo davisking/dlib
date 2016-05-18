@@ -20,22 +20,22 @@ namespace dlib
     const decision_function<kernel_type> convert_to_decision_function (
         const projection_function<kernel_type>& project_funct,
         const matrix_exp<EXP>& vect
-    ) 
+    )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(project_funct.out_vector_size() > 0 && is_vector(vect) && 
+        DLIB_ASSERT(project_funct.out_vector_size() > 0 && is_vector(vect) &&
                     project_funct.out_vector_size() == vect.size() && project_funct.weights.nc() == project_funct.basis_vectors.size(),
             "\t const decision_function convert_to_decision_function()"
             << "\n\t Invalid inputs to this function."
-            << "\n\t project_funct.out_vector_size():    " << project_funct.out_vector_size() 
-            << "\n\t project_funct.weights.nc():         " << project_funct.weights.nc() 
-            << "\n\t project_funct.basis_vectors.size(): " << project_funct.basis_vectors.size() 
-            << "\n\t is_vector(vect):                    " << is_vector(vect) 
-            << "\n\t vect.size():                        " << vect.size() 
+            << "\n\t project_funct.out_vector_size():    " << project_funct.out_vector_size()
+            << "\n\t project_funct.weights.nc():         " << project_funct.weights.nc()
+            << "\n\t project_funct.basis_vectors.size(): " << project_funct.basis_vectors.size()
+            << "\n\t is_vector(vect):                    " << is_vector(vect)
+            << "\n\t vect.size():                        " << vect.size()
             );
 
-        return decision_function<kernel_type>(trans(project_funct.weights)*vect, 
-                                              0, 
+        return decision_function<kernel_type>(trans(project_funct.weights)*vect,
+                                              0,
                                               project_funct.kernel_function,
                                               project_funct.basis_vectors);
     }
@@ -128,7 +128,7 @@ namespace dlib
             DLIB_ASSERT( idx < basis_size(),
                 "\t const sample_type& empirical_kernel_map::operator[](idx)"
                 << "\n\t Invalid inputs to this function."
-                << "\n\t basis_size(): " << basis_size() 
+                << "\n\t basis_size(): " << basis_size()
                 << "\n\t this:         " << this
                 );
 
@@ -144,9 +144,9 @@ namespace dlib
             DLIB_ASSERT(out_vector_size() != 0 && is_vector(vect) && out_vector_size() == vect.size(),
                 "\t const decision_function empirical_kernel_map::convert_to_decision_function()"
                 << "\n\t Invalid inputs to this function."
-                << "\n\t out_vector_size(): " << out_vector_size() 
-                << "\n\t is_vector(vect):   " << is_vector(vect) 
-                << "\n\t vect.size():       " << vect.size() 
+                << "\n\t out_vector_size(): " << out_vector_size()
+                << "\n\t is_vector(vect):   " << is_vector(vect)
+                << "\n\t vect.size():       " << vect.size()
                 << "\n\t this: " << this
                 );
 
@@ -162,9 +162,9 @@ namespace dlib
             DLIB_ASSERT(out_vector_size() != 0 && is_vector(vect) && out_vector_size() == vect.size(),
                 "\t const distance_function empirical_kernel_map::convert_to_distance_function()"
                 << "\n\t Invalid inputs to this function."
-                << "\n\t out_vector_size(): " << out_vector_size() 
-                << "\n\t is_vector(vect):   " << is_vector(vect) 
-                << "\n\t vect.size():       " << vect.size() 
+                << "\n\t out_vector_size(): " << out_vector_size()
+                << "\n\t is_vector(vect):   " << is_vector(vect)
+                << "\n\t vect.size():       " << vect.size()
                 << "\n\t this: " << this
                 );
 
@@ -189,13 +189,13 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(out_vector_size() != 0 && 
+            DLIB_ASSERT(out_vector_size() != 0 &&
                         target.out_vector_size() != 0 &&
                         get_kernel() == target.get_kernel(),
                 "\t const matrix empirical_kernel_map::get_transformation_to(target)"
                 << "\n\t Invalid inputs were given to this function"
-                << "\n\t out_vector_size():                 " << out_vector_size() 
-                << "\n\t target.out_vector_size():          " << target.out_vector_size() 
+                << "\n\t out_vector_size():                 " << out_vector_size()
+                << "\n\t target.out_vector_size():          " << target.out_vector_size()
                 << "\n\t get_kernel()==target.get_kernel(): " << (get_kernel()==target.get_kernel())
                 << "\n\t this: " << this
                 );
@@ -210,16 +210,16 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(out_vector_size() != 0 && 
+            DLIB_ASSERT(out_vector_size() != 0 &&
                         target.out_vector_size() != 0 &&
                         get_kernel() == target.get_kernel() &&
                         basis_size() < target.basis_size(),
                 "\t void empirical_kernel_map::get_transformation_to(target, tmat, partial_projection)"
                 << "\n\t Invalid inputs were given to this function"
-                << "\n\t out_vector_size():                 " << out_vector_size() 
-                << "\n\t target.out_vector_size():          " << target.out_vector_size() 
-                << "\n\t basis_size():                      " << basis_size() 
-                << "\n\t target.basis_size():               " << target.basis_size() 
+                << "\n\t out_vector_size():                 " << out_vector_size()
+                << "\n\t target.out_vector_size():          " << target.out_vector_size()
+                << "\n\t basis_size():                      " << basis_size()
+                << "\n\t target.basis_size():               " << target.basis_size()
                 << "\n\t get_kernel()==target.get_kernel(): " << (get_kernel()==target.get_kernel())
                 << "\n\t this: " << this
                 );
@@ -227,7 +227,7 @@ namespace dlib
 #ifdef ENABLE_ASSERTS
             for (unsigned long i = 0; i < basis_size(); ++i)
             {
-                DLIB_ASSERT(dlib::equal((*this)[i], target[i]), 
+                DLIB_ASSERT(dlib::equal((*this)[i], target[i]),
                     "\t const matrix empirical_kernel_map::get_transformation_to(target, tmat, partial_projection)"
                     << "\n\t target must contain a superset of the basis vectors in *this"
                     << "\n\t i: " << i
@@ -270,7 +270,7 @@ namespace dlib
 
         const matrix<scalar_type,0,1,mem_manager_type>& project (
             const sample_type& samp,
-            scalar_type& projection_error 
+            scalar_type& projection_error
         ) const
         {
             // make sure requires clause is not broken
@@ -282,7 +282,7 @@ namespace dlib
 
             temp1 = kernel_matrix(kernel, basis, samp);
             temp2 = weights*temp1;
-            // This value should never be negative (it measures squared distance) but I'm putting the abs() 
+            // This value should never be negative (it measures squared distance) but I'm putting the abs()
             // here just for good measure since rounding error might push it slightly negative.
             projection_error = std::abs( kernel(samp,samp) - dot(temp2,temp2));
 
@@ -313,7 +313,7 @@ namespace dlib
 
         friend void deserialize (
             empirical_kernel_map& item,
-            std::istream& in 
+            std::istream& in
         )
         {
             deserialize(item.basis, in);
@@ -333,8 +333,8 @@ namespace dlib
             DLIB_ASSERT(basis_samples.size() > 0 && is_vector(basis_samples),
                 "\tvoid empirical_kernel_map::load(kernel,basis_samples)"
                 << "\n\t You have to give a non-empty set of basis_samples and it must be a vector"
-                << "\n\t basis_samples.size():     " << basis_samples.size() 
-                << "\n\t is_vector(basis_samples): " << is_vector(basis_samples) 
+                << "\n\t basis_samples.size():     " << basis_samples.size()
+                << "\n\t is_vector(basis_samples): " << is_vector(basis_samples)
                 << "\n\t this: " << this
                 );
 

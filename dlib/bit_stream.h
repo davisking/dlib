@@ -20,8 +20,8 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1a        
-        typedef     bit_stream_kernel_1    
+        // kernel_1a
+        typedef     bit_stream_kernel_1
                     kernel_1a;
         typedef     bit_stream_kernel_c<kernel_1a >
                     kernel_1a_c;

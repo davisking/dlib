@@ -21,13 +21,13 @@ namespace dlib
             REQUIREMENTS ON states
                 states > 0
 
-            REQUIREMENTS ON measurements 
+            REQUIREMENTS ON measurements
                 measurements > 0
 
             WHAT THIS OBJECT REPRESENTS
-                This object implements the Kalman filter, which is a tool for 
+                This object implements the Kalman filter, which is a tool for
                 recursively estimating the state of a process given measurements
-                related to that process.  To use this tool you will have to 
+                related to that process.  To use this tool you will have to
                 be familiar with the workings of the Kalman filter.  An excellent
                 introduction can be found in the paper:
                     An Introduction to the Kalman Filter
@@ -49,7 +49,7 @@ namespace dlib
             - #get_current_estimation_error_covariance() == the identity matrix
         !*/
 
-        void set_observation_model ( 
+        void set_observation_model (
             const matrix<double,measurements,states>& H
         );
         /*!
@@ -57,7 +57,7 @@ namespace dlib
                 - #get_observation_model() == H
         !*/
 
-        void set_transition_model  ( 
+        void set_transition_model  (
             const matrix<double,states,states>& A
         );
         /*!
@@ -65,7 +65,7 @@ namespace dlib
                 - #get_transition_model() == A
         !*/
 
-        void set_process_noise     ( 
+        void set_process_noise     (
             const matrix<double,states,states>& Q
         );
         /*!
@@ -73,7 +73,7 @@ namespace dlib
                 - #get_process_noise() == Q
         !*/
 
-        void set_measurement_noise ( 
+        void set_measurement_noise (
             const matrix<double,measurements,measurements>& R
         );
         /*!
@@ -81,9 +81,9 @@ namespace dlib
                 - #get_measurement_noise() == R
         !*/
 
-        void set_estimation_error_covariance ( 
+        void set_estimation_error_covariance (
             const matrix<double,states,states>& P
-        ); 
+        );
         /*!
             ensures
                 - #get_current_estimation_error_covariance() == P
@@ -117,7 +117,7 @@ namespace dlib
             ensures
                 - returns the process noise covariance matrix.  You can think of this
                   covariance matrix as a measure of how wrong the assumption of
-                  linear state transitions is. 
+                  linear state transitions is.
         !*/
 
         const matrix<double,measurements,measurements>& get_measurement_noise (
@@ -146,7 +146,7 @@ namespace dlib
         );
         /*!
             ensures
-                - propagates the current state estimate forward in time one time step.  
+                - propagates the current state estimate forward in time one time step.
                   Also applies a correction based on the given measurement z.  In particular:
                     - #get_current_state(), #get_predicted_next_state(), and
                       #get_current_estimation_error_covariance() are updated using the
@@ -166,7 +166,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the next expected value of the process state.  
+                - returns the next expected value of the process state.
                 - Specifically, returns get_transition_model()*get_current_state()
                   
         !*/
@@ -175,7 +175,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the current state error estimation covariance matrix.  
+                - returns the current state error estimation covariance matrix.
                   This matrix captures our uncertainty about the value of get_current_state().
         !*/
 
@@ -184,19 +184,19 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void serialize (
-        const kalman_filter& item, 
-        std::ostream& out 
-    );   
+        const kalman_filter& item,
+        std::ostream& out
+    );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     void deserialize (
-        kalman_filter& item, 
+        kalman_filter& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

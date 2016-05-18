@@ -19,19 +19,19 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents an image pyramid where each level in the
-                pyramid holds determinants of Hessian matrices for the original 
+                pyramid holds determinants of Hessian matrices for the original
                 input image.  This object can be used to find stable interest
                 points in an image.  For further details consult the following
                 papers.
 
-                This object is an implementation of the fast Hessian pyramid 
-                as described in the paper: 
+                This object is an implementation of the fast Hessian pyramid
+                as described in the paper:
                    SURF: Speeded Up Robust Features
                    By Herbert Bay, Tinne Tuytelaars, and Luc Van Gool
 
                 This implementation was also influenced by the very well documented
                 OpenSURF library and its corresponding description of how the fast
-                Hessian algorithm functions:  
+                Hessian algorithm functions:
                     Notes on the OpenSURF Library
                     Christopher Evans
         !*/
@@ -55,7 +55,7 @@ namespace dlib
                 - #get_step_size(0) == initial_step_size
                 - #octaves() == num_octaves
                 - #intervals() == num_intervals
-                - creates a Hessian pyramid from the given input image.  
+                - creates a Hessian pyramid from the given input image.
         !*/
 
         long octaves (
@@ -66,7 +66,7 @@ namespace dlib
         !*/
 
         long intervals (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of intervals in this pyramid
@@ -104,7 +104,7 @@ namespace dlib
             requires
                 - 0 <= octave < octaves()
             ensures
-                - returns the number of rows there are per layer in the given 
+                - returns the number of rows there are per layer in the given
                   octave of pyramid
         !*/
 
@@ -115,7 +115,7 @@ namespace dlib
             requires
                 - 0 <= octave < octaves()
             ensures
-                - returns the number of columns there are per layer in the given 
+                - returns the number of columns there are per layer in the given
                   octave of pyramid
         !*/
 
@@ -155,7 +155,7 @@ namespace dlib
                 - returns the sign of the laplacian for the given octave and interval
                   of the pyramid.  The specific point sampled at this pyramid level is
                   the one that corresponds to the input image point (point(r,c)*get_step_size(octave)).
-                - The laplacian is the trace of the Hessian at the given point.  So this 
+                - The laplacian is the trace of the Hessian at the given point.  So this
                   function returns either +1 or -1 depending on this number's sign.  This
                   value can be used to distinguish bright blobs on dark backgrounds from
                   the reverse.
@@ -169,7 +169,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object contains the interest points found using the 
+                This object contains the interest points found using the
                 hessian_pyramid object.  Its fields have the following
                 meanings:
                     - center == the x/y location of the center of the interest point
@@ -194,7 +194,7 @@ namespace dlib
 
         bool operator < (const interest_point& p) const { return score < p.score; }
         /*!
-            This function is here so you can sort interest points according to 
+            This function is here so you can sort interest points according to
             their scores
         !*/
     };
@@ -211,7 +211,7 @@ namespace dlib
 
     void deserialize (
         interest_point& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides serialization support

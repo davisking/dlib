@@ -16,7 +16,7 @@ namespace dlib
         template <
             typename directed_graph_type
             >
-        class general_flow_graph 
+        class general_flow_graph
         {
             /*!
                 this is a utility class used by dlib::min_cut to convert a directed_graph

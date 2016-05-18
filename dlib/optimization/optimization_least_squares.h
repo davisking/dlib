@@ -18,14 +18,14 @@ namespace dlib
         typename funct_der_type,
         typename vector_type
         >
-    class least_squares_function_model 
+    class least_squares_function_model
     {
     public:
         least_squares_function_model (
             const funct_type& f_,
             const funct_der_type& der_,
             const vector_type& list_
-        ) : f(f_), der(der_), list(list_) 
+        ) : f(f_), der(der_), list(list_)
         {
             S = 0;
             last_f = 0;
@@ -47,7 +47,7 @@ namespace dlib
         typedef matrix<type,NR,NR,mem_manager_type,layout_type> general_matrix;
 
 
-        type operator() ( 
+        type operator() (
             const column_vector& x
         ) const
         {
@@ -186,27 +186,27 @@ namespace dlib
         const funct_type& f,
         const funct_der_type& der,
         const vector_type& list,
-        T& x, 
+        T& x,
         double radius = 1
     )
     {
-        // The starting point (i.e. x) must be a column vector.  
+        // The starting point (i.e. x) must be a column vector.
         COMPILE_TIME_ASSERT(T::NC <= 1);
 
         // make sure requires clause is not broken
-        DLIB_ASSERT(is_vector(mat(list)) && list.size() > 0 && 
+        DLIB_ASSERT(is_vector(mat(list)) && list.size() > 0 &&
                     is_col_vector(x) && radius > 0,
             "\t double solve_least_squares()"
             << "\n\t invalid arguments were given to this function"
-            << "\n\t is_vector(list):  " << is_vector(mat(list)) 
-            << "\n\t list.size():      " << list.size() 
-            << "\n\t is_col_vector(x): " << is_col_vector(x) 
+            << "\n\t is_vector(list):  " << is_vector(mat(list))
+            << "\n\t list.size():      " << list.size()
+            << "\n\t is_col_vector(x): " << is_col_vector(x)
             << "\n\t radius:           " << radius
             );
 
         return find_min_trust_region(stop_strategy,
-                                     least_squares_model<T>(f, der, mat(list)), 
-                                     x, 
+                                     least_squares_model<T>(f, der, mat(list)),
+                                     x,
                                      radius);
     }
 
@@ -220,14 +220,14 @@ namespace dlib
         typename funct_der_type,
         typename vector_type
         >
-    class least_squares_lm_function_model 
+    class least_squares_lm_function_model
     {
     public:
         least_squares_lm_function_model (
             const funct_type& f_,
             const funct_der_type& der_,
             const vector_type& list_
-        ) : f(f_), der(der_), list(list_) 
+        ) : f(f_), der(der_), list(list_)
         {
             r.set_size(list.size(),1);
         }
@@ -247,7 +247,7 @@ namespace dlib
         mutable matrix<type,0,1,mem_manager_type,layout_type> r;
         mutable column_vector vtemp;
 
-        type operator() ( 
+        type operator() (
             const column_vector& x
         ) const
         {
@@ -273,7 +273,7 @@ namespace dlib
             h = 0;
             for (long i = 0; i < list.size(); ++i)
             {
-                vtemp = der(list(i), x); 
+                vtemp = der(list(i), x);
                 d += r(i)*vtemp;
                 h += vtemp*trans(vtemp);
             }
@@ -312,27 +312,27 @@ namespace dlib
         const funct_type& f,
         const funct_der_type& der,
         const vector_type& list,
-        T& x, 
+        T& x,
         double radius = 1
     )
     {
-        // The starting point (i.e. x) must be a column vector.  
+        // The starting point (i.e. x) must be a column vector.
         COMPILE_TIME_ASSERT(T::NC <= 1);
 
         // make sure requires clause is not broken
-        DLIB_ASSERT(is_vector(mat(list)) && list.size() > 0 && 
+        DLIB_ASSERT(is_vector(mat(list)) && list.size() > 0 &&
                     is_col_vector(x) && radius > 0,
             "\t double solve_least_squares_lm()"
             << "\n\t invalid arguments were given to this function"
-            << "\n\t is_vector(list):  " << is_vector(mat(list)) 
-            << "\n\t list.size():      " << list.size() 
-            << "\n\t is_col_vector(x): " << is_col_vector(x) 
+            << "\n\t is_vector(list):  " << is_vector(mat(list))
+            << "\n\t list.size():      " << list.size()
+            << "\n\t is_col_vector(x): " << is_col_vector(x)
             << "\n\t radius:           " << radius
             );
 
         return find_min_trust_region(stop_strategy,
-                                     least_squares_lm_model<T>(f, der, mat(list)), 
-                                     x, 
+                                     least_squares_lm_model<T>(f, der, mat(list)),
+                                     x,
                                      radius);
     }
 

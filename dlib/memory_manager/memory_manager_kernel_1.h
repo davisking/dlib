@@ -18,20 +18,20 @@ namespace dlib
         >
     class memory_manager_kernel_1
     {
-        /*!            
+        /*!
             INITIAL VALUE
                 allocations == 0
                 next == 0
                 pool_size == 0
 
-            REQUIREMENTS ON max_pool_size 
+            REQUIREMENTS ON max_pool_size
                 max_pool_size is the maximum number of nodes we will keep in our linked list at once.
                 So you can put any value in for this argument.
 
             CONVENTION
                 This memory manager implementation allocates T objects one at a time when there are
                 allocation requests.  Then when there is a deallocate request the returning T object
-                is place into a list of free blocks if that list has less than max_pool_size 
+                is place into a list of free blocks if that list has less than max_pool_size
                 blocks in it.  subsequent allocation requests will be serviced by drawing from the
                 free list whenever it isn't empty.
 
@@ -41,7 +41,7 @@ namespace dlib
                 - if (next != 0) then
                     - next == the next pointer to return from allocate()
                       and next == pointer to the first node in a linked list.  each node
-                      is one item in the memory pool.    
+                      is one item in the memory pool.
                     - the last node in the linked list has next set to 0
                     - pool_size == the number of nodes in the linked list
                     - pool_size <= max_pool_size
@@ -107,8 +107,8 @@ namespace dlib
         }
 
         T* allocate (
-        ) 
-        {              
+        )
+        {
             T* temp;
             if (next != 0)
             {
@@ -153,9 +153,9 @@ namespace dlib
 
         void deallocate (
             T* item
-        ) 
-        { 
-            --allocations;  
+        )
+        {
+            --allocations;
             item->~T();
 
             if (pool_size >= max_pool_size)
@@ -167,16 +167,16 @@ namespace dlib
             // add this memory chunk into our linked list.
             node* temp = reinterpret_cast<node*>(item);
             temp->next = next;
-            next = temp;                
+            next = temp;
             ++pool_size;
         }
 
         void swap (
             memory_manager_kernel_1& item
-        ) 
-        { 
-            exchange(allocations,item.allocations); 
-            exchange(next,item.next); 
+        )
+        {
+            exchange(allocations,item.allocations);
+            exchange(next,item.next);
             exchange(pool_size,item.pool_size);
         }
 
@@ -199,12 +199,12 @@ namespace dlib
         >
     class memory_manager_kernel_1<T,0>
     {
-        /*!            
+        /*!
             INITIAL VALUE
                 allocations == 0
 
             CONVENTION
-                This memory manager just calls new and delete directly so it doesn't 
+                This memory manager just calls new and delete directly so it doesn't
                 really do anything.
 
                 allocations == get_number_of_allocations()
@@ -252,8 +252,8 @@ namespace dlib
         }
 
         T* allocate (
-        ) 
-        {              
+        )
+        {
             T* temp = new T;
             ++allocations;
             return temp;
@@ -261,17 +261,17 @@ namespace dlib
 
         void deallocate (
             T* item
-        ) 
-        { 
+        )
+        {
             delete item;
-            --allocations;  
+            --allocations;
         }
 
         void swap (
             memory_manager_kernel_1& item
-        ) 
-        { 
-            exchange(allocations,item.allocations); 
+        )
+        {
+            exchange(allocations,item.allocations);
         }
 
     private:
@@ -291,9 +291,9 @@ namespace dlib
         unsigned long max_pool_size
         >
     inline void swap (
-        memory_manager_kernel_1<T,max_pool_size>& a, 
-        memory_manager_kernel_1<T,max_pool_size>& b 
-    ) { a.swap(b); }   
+        memory_manager_kernel_1<T,max_pool_size>& a,
+        memory_manager_kernel_1<T,max_pool_size>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 

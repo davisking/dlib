@@ -13,7 +13,7 @@ namespace dlib
         typename T,
         typename copy = copy_functor<T>
         >
-    class reference_counter_kernel_1 
+    class reference_counter_kernel_1
     {
 
         /*!
@@ -25,7 +25,7 @@ namespace dlib
                     *data = pointer to item of type T
                     *count = number of references to *data
 
-                    if clear() threw an exception then count = 0 and data is not a 
+                    if clear() threw an exception then count = 0 and data is not a
                     valid pointer
         !*/
 
@@ -37,12 +37,12 @@ namespace dlib
             reference_counter_kernel_1 (
             );
 
-            inline reference_counter_kernel_1 ( 
+            inline reference_counter_kernel_1 (
                 const reference_counter_kernel_1& item
             );
 
             virtual ~reference_counter_kernel_1 (
-            ); 
+            );
 
             void clear (
             );
@@ -74,9 +74,9 @@ namespace dlib
         typename copy
         >
     inline void swap (
-        reference_counter_kernel_1<T,copy>& a, 
-        reference_counter_kernel_1<T,copy>& b 
-    ) { a.swap(b); }   
+        reference_counter_kernel_1<T,copy>& a,
+        reference_counter_kernel_1<T,copy>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -90,7 +90,7 @@ namespace dlib
         >
     reference_counter_kernel_1<T,copy>::
     reference_counter_kernel_1 (
-    ) 
+    )
     {
         data = new T;
         try { count = new unsigned long; }
@@ -106,9 +106,9 @@ namespace dlib
         typename copy
         >
     reference_counter_kernel_1<T,copy>::
-    reference_counter_kernel_1 ( 
+    reference_counter_kernel_1 (
         const reference_counter_kernel_1<T,copy>& item
-    ) : 
+    ) :
         data(item.data),
         count(item.count)
     {
@@ -155,17 +155,17 @@ namespace dlib
             try { count = new unsigned long; }
             catch (...) { delete data; throw; }
 
-            *count = 1;            
+            *count = 1;
         }
         // if there are other references to the data then do this
         else if (*count > 1)
         {
             --(*count);
 
-            try { data = new T; }               
+            try { data = new T; }
             catch (...) { count = 0; throw; }
 
-            try { count = new unsigned long; }  
+            try { count = new unsigned long; }
             catch (...) { delete data; count = 0; throw; }
 
             *count = 1;
@@ -198,10 +198,10 @@ namespace dlib
 
 
             // get memory for the new copy
-            try { data = new T; }               
+            try { data = new T; }
             catch (...) { data = &old_data; throw; }
 
-            try { count = new unsigned long; }  
+            try { count = new unsigned long; }
             catch (...) {delete data; data = &old_data; count = &old_count; throw;}
 
             // decrement the number of references to old_data
@@ -210,8 +210,8 @@ namespace dlib
             *count = 1;
 
             // make a copy of the old data
-            try { copy_item(old_data,*data); }  
-            catch (...) 
+            try { copy_item(old_data,*data); }
+            catch (...)
             { delete data; delete count; data = &old_data; count = &old_count; }
 
         }
@@ -258,7 +258,7 @@ namespace dlib
             // if there are no other references to this data
             delete count;
             delete data;
-        }        
+        }
 
         // copy the pointers
         count = (rhs.count);

@@ -13,24 +13,24 @@ namespace dlib
     template <
         typename T,
         typename E = char,
-        typename mem_manager = default_memory_manager 
+        typename mem_manager = default_memory_manager
         >
     class graph : noncopyable
     {
 
         /*!
-            REQUIREMENTS ON T 
+            REQUIREMENTS ON T
                 T must be swappable by a global swap() and
                 T must have a default constructor
 
-            REQUIREMENTS ON E 
+            REQUIREMENTS ON E
                 E must be swappable by a global swap() and
                 E must have a default constructor
 
             REQUIREMENTS ON mem_manager
                 must be an implementation of memory_manager/memory_manager_kernel_abstract.h or
                 must be an implementation of memory_manager_global/memory_manager_global_kernel_abstract.h or
-                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h
                 mem_manager::type can be set to anything.
 
             POINTERS AND REFERENCES TO INTERNAL DATA
@@ -42,7 +42,7 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents an undirected graph which is a set of nodes with undirected
-                edges connecting various nodes.  
+                edges connecting various nodes.
 
                 Also note that unless specified otherwise, no member functions
                 of this object throw exceptions.
@@ -57,14 +57,14 @@ namespace dlib
         graph(
         );
         /*!
-            ensures 
+            ensures
                 - #*this is properly initialized
             throws
                 - std::bad_alloc or any exception thrown by T's constructor.
         !*/
 
         virtual ~graph(
-        ); 
+        );
         /*!
             ensures
                 - all resources associated with *this has been released
@@ -77,7 +77,7 @@ namespace dlib
                 - #*this has its initial value
             throws
                 - std::bad_alloc or any exception thrown by T's constructor.
-                  If this exception is thrown then *this is unusable 
+                  If this exception is thrown then *this is unusable
                   until clear() is called and succeeds
         !*/
 
@@ -91,7 +91,7 @@ namespace dlib
                     - number_of_neighbors(i) == 0
             throws
                 - std::bad_alloc or any exception thrown by T's constructor.
-                  If this exception is thrown then this object reverts back 
+                  If this exception is thrown then this object reverts back
                   to its initial state.
         !*/
 
@@ -122,7 +122,7 @@ namespace dlib
                 ensures
                     - returns the number of nodes in this graph that are
                       adjacent to this node.  I.e. the number of nodes
-                      that are directly connected to this node via an edge. 
+                      that are directly connected to this node via an edge.
             !*/
 
             const node_type& neighbor (
@@ -191,7 +191,7 @@ namespace dlib
 
         bool has_edge (
             unsigned long node_index1,
-            unsigned long node_index2 
+            unsigned long node_index2
         ) const;
         /*!
             requires
@@ -214,10 +214,10 @@ namespace dlib
                 - node_index2 < number_of_nodes()
                 - has_edge(node_index1, node_index2) == false
             ensures
-                - #has_edge(node_index1, node_index2) == true 
+                - #has_edge(node_index1, node_index2) == true
             throws
-                - std::bad_alloc 
-                  If this exception is thrown then this object reverts back 
+                - std::bad_alloc
+                  If this exception is thrown then this object reverts back
                   to its initial state.
         !*/
 
@@ -229,12 +229,12 @@ namespace dlib
             requires
                 - node_index1 < number_of_nodes()
                 - node_index2 < number_of_nodes()
-                - has_edge(node_index1, node_index2) == true 
+                - has_edge(node_index1, node_index2) == true
             ensures
-                - #has_edge(node_index1, node_index2) == false 
+                - #has_edge(node_index1, node_index2) == false
             throws
-                - std::bad_alloc 
-                  If this exception is thrown then this object reverts back 
+                - std::bad_alloc
+                  If this exception is thrown then this object reverts back
                   to its initial state.
         !*/
 
@@ -244,12 +244,12 @@ namespace dlib
             ensures
                 - does not change the index number of existing nodes
                 - adds a node with index N == number_of_nodes() such that:
-                    - #node(N).number_of_neighbors() == 0 
+                    - #node(N).number_of_neighbors() == 0
                     - #number_of_nodes() == number_of_nodes() + 1
-                    - returns N  
+                    - returns N
             throws
                 - std::bad_alloc or any exception thrown by T's constructor.
-                  If this exception is thrown then this object reverts back 
+                  If this exception is thrown then this object reverts back
                   to its initial state.
         !*/
 
@@ -260,7 +260,7 @@ namespace dlib
             requires
                 - index < number_of_nodes()
             ensures
-                - removes the node with the given index from the graph. 
+                - removes the node with the given index from the graph.
                 - removes all edges linking the removed node to the rest
                   of the graph.
                 - the remaining node indexes are remapped so that they remain
@@ -269,7 +269,7 @@ namespace dlib
                 - #number_of_nodes() == number_of_nodes() - 1
             throws
                 - std::bad_alloc or any exception thrown by T's constructor.
-                  If this exception is thrown then this object reverts back 
+                  If this exception is thrown then this object reverts back
                   to its initial state.
         !*/
 
@@ -279,19 +279,19 @@ namespace dlib
         /*!
             ensures
                 - swaps *this and item
-        !*/ 
+        !*/
 
     };
 
     template <
-        typename T, 
-        typename E, 
+        typename T,
+        typename E,
         typename mem_manager
         >
     inline void swap (
-        graph<T,E,mem_manager>& a, 
-        graph<T,E,mem_manager>& b 
-    ) { a.swap(b); }   
+        graph<T,E,mem_manager>& a,
+        graph<T,E,mem_manager>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
@@ -303,10 +303,10 @@ namespace dlib
         >
     void serialize (
         const graph<T,E,mem_manager>& item,
-        std::ostream& out 
-    );   
+        std::ostream& out
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
     template <
@@ -317,9 +317,9 @@ namespace dlib
     void deserialize (
         graph<T,E,mem_manager>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 }

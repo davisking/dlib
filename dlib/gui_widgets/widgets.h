@@ -31,11 +31,11 @@
 
 #ifdef _MSC_VER
 // This #pragma directive is also located in the algs.h file but for whatever
-// reason visual studio 9 just ignores it when it is only there. 
+// reason visual studio 9 just ignores it when it is only there.
 
 // this is to disable the "'this' : used in base member initializer list"
 // warning you get from some of the GUI objects since all the objects
-// require that their parent class be passed into their constructor. 
+// require that their parent class be passed into their constructor.
 // In this case though it is totally safe so it is ok to disable this warning.
 #pragma warning(disable : 4355)
 #endif
@@ -45,7 +45,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class label  
+    // class label
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -54,7 +54,7 @@ namespace dlib
     public:
         label(
             drawable_window& w
-        ) : 
+        ) :
             drawable(w),
             text_color_(0,0,0)
         {
@@ -119,7 +119,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class toggle_button : public button_action 
+    class toggle_button : public button_action
     {
         /*!
             INITIAL VALUE
@@ -133,7 +133,7 @@ namespace dlib
 
         toggle_button(
             drawable_window& w
-        ) : 
+        ) :
             button_action(w),
             btn_tooltip(w),
             checked(false)
@@ -312,7 +312,7 @@ namespace dlib
  
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class text_field  
+    // class text_field
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -334,15 +334,15 @@ namespace dlib
                 text_pos == 0
     
             CONVENTION
-                - cursor_pos == the position of the cursor in the string text_.  The 
+                - cursor_pos == the position of the cursor in the string text_.  The
                   cursor appears before the letter text_[cursor_pos]
-                - cursor_x == the x coordinate of the cursor relative to the left side 
+                - cursor_x == the x coordinate of the cursor relative to the left side
                   of rect.  i.e. the number of pixels that separate the cursor from the
                   left side of the text_field.
                 - has_focus == true if this text field has keyboard input focus
                 - cursor_visible == true if the cursor should be painted
                 - text_ == text()
-                - text_pos == the index of the first letter in text_ that appears in 
+                - text_pos == the index of the first letter in text_ that appears in
                   this text field.
                 - text_width == the width of text_[text_pos] though text_[text.size()-1]
 
@@ -369,7 +369,7 @@ namespace dlib
     public:
         text_field(
             drawable_window& w
-        ) : 
+        ) :
             drawable(w,MOUSE_CLICK | KEYBOARD_EVENTS | MOUSE_MOVE | STRING_PUT),
             text_color_(0,0,0),
             bg_color_(255,255,255),
@@ -407,7 +407,7 @@ namespace dlib
         )
         {
             disable_events();
-            parent.invalidate_rectangle(rect); 
+            parent.invalidate_rectangle(rect);
             t.stop_and_wait();
         }
 
@@ -592,15 +592,15 @@ namespace dlib
 
             if (recent_movement == false)
             {
-                cursor_visible = !cursor_visible; 
-                parent.invalidate_rectangle(rect); 
+                cursor_visible = !cursor_visible;
+                parent.invalidate_rectangle(rect);
             }
             else
             {
                 if (cursor_visible == false)
                 {
                     cursor_visible = true;
-                    parent.invalidate_rectangle(rect); 
+                    parent.invalidate_rectangle(rect);
                 }
                 recent_movement = false;
             }
@@ -618,9 +618,9 @@ namespace dlib
         );
         /*!
             requires
-                - pos <= text_.size() 
+                - pos <= text_.size()
             ensures
-                - moves the cursor to the position given by pos and moves the text 
+                - moves the cursor to the position given by pos and moves the text
                   in the text box if necessary
                 - if the position changes then the parent window will be updated
         !*/
@@ -726,9 +726,9 @@ namespace dlib
                 shift_pos == -1
     
             CONVENTION
-                - cursor_pos == the position of the cursor in the string text_.  The 
+                - cursor_pos == the position of the cursor in the string text_.  The
                   cursor appears before the letter text_[cursor_pos]
-                - cursor_rect == The rectangle that should be drawn for the cursor. 
+                - cursor_rect == The rectangle that should be drawn for the cursor.
                   The position is relative to total_rect().
                 - has_focus == true if this text field has keyboard input focus
                 - cursor_visible == true if the cursor should be painted
@@ -757,7 +757,7 @@ namespace dlib
     public:
         text_box(
             drawable_window& w
-        ) : 
+        ) :
             scrollable_region(w,MOUSE_CLICK | KEYBOARD_EVENTS | MOUSE_MOVE | STRING_PUT),
             text_color_(0,0,0),
             bg_color_(255,255,255),
@@ -801,7 +801,7 @@ namespace dlib
         )
         {
             disable_events();
-            parent.invalidate_rectangle(rect); 
+            parent.invalidate_rectangle(rect);
             t.stop_and_wait();
         }
 
@@ -857,7 +857,7 @@ namespace dlib
 
         void set_size (
             unsigned long width,
-            unsigned long height 
+            unsigned long height
         );
 
         void set_pos (
@@ -980,15 +980,15 @@ namespace dlib
 
             if (recent_movement == false)
             {
-                cursor_visible = !cursor_visible; 
-                parent.invalidate_rectangle(rect); 
+                cursor_visible = !cursor_visible;
+                parent.invalidate_rectangle(rect);
             }
             else
             {
                 if (cursor_visible == false)
                 {
                     cursor_visible = true;
-                    parent.invalidate_rectangle(rect); 
+                    parent.invalidate_rectangle(rect);
                 }
                 recent_movement = false;
             }
@@ -1008,9 +1008,9 @@ namespace dlib
         );
         /*!
             requires
-                - pos <= text_.size() 
+                - pos <= text_.size()
             ensures
-                - moves the cursor to the position given by pos and moves the text 
+                - moves the cursor to the position given by pos and moves the text
                   in the text box if necessary
                 - if the position changes then the parent window will be updated
         !*/
@@ -1106,10 +1106,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class check_box : public toggle_button 
+    class check_box : public toggle_button
     {
     public:
-        check_box(  
+        check_box(
             drawable_window& w
         ) : toggle_button(w)
         {
@@ -1124,10 +1124,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class radio_button : public toggle_button 
+    class radio_button : public toggle_button
     {
     public:
-        radio_button (  
+        radio_button (
             drawable_window& w
         ) : toggle_button(w)
         {
@@ -1173,7 +1173,7 @@ namespace dlib
 
     public:
 
-        tabbed_display(  
+        tabbed_display(
             drawable_window& w
         );
 
@@ -1331,7 +1331,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class named_rectangle : public drawable 
+    class named_rectangle : public drawable
     {
         /*!
             INITIAL VALUE
@@ -1343,7 +1343,7 @@ namespace dlib
 
     public:
 
-        named_rectangle(  
+        named_rectangle(
             drawable_window& w
         );
 
@@ -1410,14 +1410,14 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class mouse_tracker : public draggable 
+    class mouse_tracker : public draggable
     {
 
     public:
 
-        mouse_tracker(  
+        mouse_tracker(
             drawable_window& w
-        ); 
+        );
 
         ~mouse_tracker(
         );
@@ -1472,7 +1472,7 @@ namespace dlib
         const long offset;
         named_rectangle nr;
         label x_label;
-        label y_label; 
+        label y_label;
         std::ostringstream sout;
 
         long click_x, click_y;
@@ -1484,7 +1484,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // function message_box()  
+    // function message_box()
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -1584,7 +1584,7 @@ namespace dlib
         const std::string& title,
         const std::string& message,
         T& object,
-        void (T::*event_handler)() 
+        void (T::*event_handler)()
     )
     {
         using namespace message_box_helper;
@@ -1630,7 +1630,7 @@ namespace dlib
 
     namespace list_box_helper{
     template <typename S = std::string>
-    class list_box : public scrollable_region, 
+    class list_box : public scrollable_region,
                      public enumerable<const S>
     {
         /*!
@@ -1645,15 +1645,15 @@ namespace dlib
                 - is_selected(i) == items[i].is_selected
                 - ms_enabled == multiple_select_enabled()
 
-                - items[i].width == the width of items[i].name as given by font::compute_size() 
-                - items[i].height == the height of items[i].name as given by font::compute_size() 
+                - items[i].width == the width of items[i].name as given by font::compute_size()
+                - items[i].height == the height of items[i].name as given by font::compute_size()
 
                 - last_selected == the last item the user selected
         !*/
 
     public:
 
-        list_box(  
+        list_box(
             drawable_window& w
         );
 
@@ -1665,11 +1665,11 @@ namespace dlib
         ) const;
 
         void select (
-            unsigned long index 
+            unsigned long index
         );
 
         void unselect (
-            unsigned long index 
+            unsigned long index
         );
 
         template <
@@ -1741,7 +1741,7 @@ namespace dlib
         ) const;
 
         void enable_multiple_select (
-        ); 
+        );
 
         void disable_multiple_select (
         );
@@ -1840,7 +1840,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // function open_file_box() 
+    // function open_file_box()
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -1889,7 +1889,7 @@ namespace dlib
             );
 
             void on_files_double_click (
-                unsigned long 
+                unsigned long
             );
 
             void on_cancel_click (
@@ -1935,7 +1935,7 @@ namespace dlib
         >
     void open_file_box (
         T& object,
-        void (T::*event_handler)(const std::string&) 
+        void (T::*event_handler)(const std::string&)
     )
     {
         using namespace open_file_box_helper;
@@ -1957,7 +1957,7 @@ namespace dlib
         >
     void open_existing_file_box (
         T& object,
-        void (T::*event_handler)(const std::string&) 
+        void (T::*event_handler)(const std::string&)
     )
     {
         using namespace open_file_box_helper;
@@ -1979,7 +1979,7 @@ namespace dlib
         >
     void save_file_box (
         T& object,
-        void (T::*event_handler)(const std::string&) 
+        void (T::*event_handler)(const std::string&)
     )
     {
         using namespace open_file_box_helper;
@@ -2007,10 +2007,10 @@ namespace dlib
         /*!
             INITIAL VALUE
                 - menus.size() == 0
-                - open_menu == 0 
+                - open_menu == 0
 
-            CONVENTION 
-                - size() == menus.size() 
+            CONVENTION
+                - size() == menus.size()
                 - all menu data is stored in menus
                 - menus[x].name == the name of the xth menu
                 - if (menus[x].underline_pos != std::string::npos) then
@@ -2025,9 +2025,9 @@ namespace dlib
                 - menus[x].bgrect == the rectangle for the xth menu button
 
                 - if (there is an open menu on the screen) then
-                    - open_menu == the index of the open menu from menus 
+                    - open_menu == the index of the open menu from menus
                 - else
-                    - open_menu == menus.size() 
+                    - open_menu == menus.size()
         !*/
 
     public:
@@ -2109,7 +2109,7 @@ namespace dlib
             unsigned long ,
             long x,
             long y,
-            bool 
+            bool
         );
 
         void on_mouse_move (
@@ -2171,7 +2171,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename graph_type>
-    class directed_graph_drawer : public zoomable_region 
+    class directed_graph_drawer : public zoomable_region
     {
         /*!
             INITIAL VALUE
@@ -2211,8 +2211,8 @@ namespace dlib
 
                 - for all valid i:
                     - graph_.node(i).data.p == the center of the node in graph space
-                    - graph_.node(i).data.name == node_label(i) 
-                    - graph_.node(i).data.color == node_color(i) 
+                    - graph_.node(i).data.name == node_label(i)
+                    - graph_.node(i).data.color == node_color(i)
                     - graph_.node(i).data.str_rect == a rectangle sized to contain graph_.node(i).data.name
 
                 - if (the last mouse click in our parent window as in our display_rect_ ) then
@@ -2235,8 +2235,8 @@ namespace dlib
 
             // Whenever you make your own drawable (or inherit from draggable or button_action)
             // you have to remember to call this function to enable the events.  The idea
-            // here is that you can perform whatever setup you need to do to get your 
-            // object into a valid state without needing to worry about event handlers 
+            // here is that you can perform whatever setup you need to do to get your
+            // object into a valid state without needing to worry about event handlers
             // triggering before you are ready.
             enable_events();
         }
@@ -2244,8 +2244,8 @@ namespace dlib
         ~directed_graph_drawer (
         )
         {
-            // Disable all further events for this drawable object.  We have to do this 
-            // because we don't want draw() events coming to this object while or after 
+            // Disable all further events for this drawable object.  We have to do this
+            // because we don't want draw() events coming to this object while or after
             // it has been destructed.
             disable_events();
 
@@ -2269,20 +2269,20 @@ namespace dlib
         {
             DLIB_ASSERT ( i < number_of_nodes() ,
                     "\tgraph_type::node_type& directed_graph_drawer::graph_node(i)"
-                    << "\n\ti:                 " << i 
-                    << "\n\tnumber_of_nodes(): " << number_of_nodes() 
+                    << "\n\ti:                 " << i
+                    << "\n\tnumber_of_nodes(): " << number_of_nodes()
                     );
             return external_graph.node(i);
         }
 
         typename graph_type::node_type& graph_node (
             unsigned long i
-        ) 
+        )
         {
             DLIB_ASSERT ( i < number_of_nodes() ,
                     "\tgraph_type::node_type& directed_graph_drawer::graph_node(i)"
-                    << "\n\ti:                 " << i 
-                    << "\n\tnumber_of_nodes(): " << number_of_nodes() 
+                    << "\n\ti:                 " << i
+                    << "\n\tnumber_of_nodes(): " << number_of_nodes()
                     );
             return external_graph.node(i);
         }
@@ -2304,7 +2304,7 @@ namespace dlib
         }
 
         void load_graph (
-            std::istream& in 
+            std::istream& in
         )
         {
             auto_mutex M(m);
@@ -2344,9 +2344,9 @@ namespace dlib
             auto_mutex M(m);
             DLIB_ASSERT ( i < number_of_nodes() ,
                     "\tvoid directed_graph_drawer::set_node_label(i,label)"
-                    << "\n\ti:                 " << i 
-                    << "\n\tlabel:             " << narrow(label) 
-                    << "\n\tnumber_of_nodes(): " << number_of_nodes() 
+                    << "\n\ti:                 " << i
+                    << "\n\tlabel:             " << narrow(label)
+                    << "\n\tnumber_of_nodes(): " << number_of_nodes()
                     );
             graph_.node(i).data.name = label.c_str();
             unsigned long width, height;
@@ -2363,8 +2363,8 @@ namespace dlib
             auto_mutex M(m);
             DLIB_ASSERT ( i < number_of_nodes() ,
                     "\tvoid directed_graph_drawer::set_node_color(i,label)"
-                    << "\n\ti:                 " << i 
-                    << "\n\tnumber_of_nodes(): " << number_of_nodes() 
+                    << "\n\ti:                 " << i
+                    << "\n\tnumber_of_nodes(): " << number_of_nodes()
                     );
             graph_.node(i).data.color = color;
             parent.invalidate_rectangle(display_rect());
@@ -2377,8 +2377,8 @@ namespace dlib
             auto_mutex M(m);
             DLIB_ASSERT ( i < number_of_nodes() ,
                     "\trgb_pixel directed_graph_drawer::node_color(i)"
-                    << "\n\ti:                 " << i 
-                    << "\n\tnumber_of_nodes(): " << number_of_nodes() 
+                    << "\n\ti:                 " << i
+                    << "\n\tnumber_of_nodes(): " << number_of_nodes()
                     );
             return graph_.node(i).data.color;
         }
@@ -2390,8 +2390,8 @@ namespace dlib
             auto_mutex M(m);
             DLIB_ASSERT ( i < number_of_nodes() ,
                     "\tconst std::ustring directed_graph_drawer::node_label(i)"
-                    << "\n\ti:                 " << i 
-                    << "\n\tnumber_of_nodes(): " << number_of_nodes() 
+                    << "\n\ti:                 " << i
+                    << "\n\tnumber_of_nodes(): " << number_of_nodes()
                     );
             return narrow(graph_.node(i).data.name);
         }
@@ -2410,8 +2410,8 @@ namespace dlib
             auto_mutex M(m);
             DLIB_ASSERT ( i < number_of_nodes() ,
                     "\tconst std::ustring directed_graph_drawer::node_label(i)"
-                    << "\n\ti:                 " << i 
-                    << "\n\tnumber_of_nodes(): " << number_of_nodes() 
+                    << "\n\ti:                 " << i
+                    << "\n\tnumber_of_nodes(): " << number_of_nodes()
                     );
             return graph_.node(i).data.name.c_str();
         }
@@ -2499,12 +2499,12 @@ namespace dlib
     protected:
 
         void on_keydown (
-            unsigned long key,          
+            unsigned long key,
             bool ,
-            unsigned long 
+            unsigned long
         )
         {
-            // ignore all keyboard input if the last thing the user clicked on 
+            // ignore all keyboard input if the last thing the user clicked on
             // wasn't the display area
             if (last_mouse_click_in_display == false)
                 return;
@@ -2521,7 +2521,7 @@ namespace dlib
                     selected_node = graph_.number_of_nodes();
                 }
 
-                // delete the node if the user hits delete 
+                // delete the node if the user hits delete
                 if (key == base_window::KEY_DELETE || key == base_window::KEY_BACKSPACE)
                 {
                     parent.invalidate_rectangle(display_rect());
@@ -2546,7 +2546,7 @@ namespace dlib
                     edge_selected = false;
                 }
 
-                // delete the node if the user hits delete 
+                // delete the node if the user hits delete
                 if (key == base_window::KEY_DELETE || key == base_window::KEY_BACKSPACE)
                 {
                     parent.invalidate_rectangle(display_rect());
@@ -2608,8 +2608,8 @@ namespace dlib
         {
             bool redraw = false;
 
-            if (display_rect().contains(x,y) && 
-                (btn == base_window::RIGHT || btn == base_window::LEFT) && 
+            if (display_rect().contains(x,y) &&
+                (btn == base_window::RIGHT || btn == base_window::LEFT) &&
                 (state & base_window::SHIFT) == 0 )
             {
                 // start out saying no edge is selected
@@ -2721,9 +2721,9 @@ namespace dlib
 
             // If the user is shift clicking with the mouse then see if we
             // should add a new edge.
-            if (display_rect().contains(x,y) && 
-                btn == base_window::LEFT && 
-                (state & base_window::SHIFT) && 
+            if (display_rect().contains(x,y) &&
+                btn == base_window::LEFT &&
+                (state & base_window::SHIFT) &&
                 selected_node != graph_.number_of_nodes() )
             {
                 dlib::vector<double,2> p(gui_to_graph_space(point(x,y)));
@@ -2733,7 +2733,7 @@ namespace dlib
                     dlib::vector<double,2> n(graph_.node(i).data.p);
                     if ((p-n).length() < radius)
                     {
-                        // add the edge if it doesn't already exist and isn't an edge back to 
+                        // add the edge if it doesn't already exist and isn't an edge back to
                         // the same node
                         if (graph_.has_edge(selected_node,i) == false && selected_node != i &&
                             graph_.has_edge(i, selected_node) == false)
@@ -2788,7 +2788,7 @@ namespace dlib
                 center = graph_to_gui_space(graph_.node(i).data.p);
                 const rectangle circle_area(centered_rect(center,2*(rad+8),2*(rad+8)));
 
-                // draw lines to all this node's parents 
+                // draw lines to all this node's parents
                 const dlib::vector<double> z(0,0,1);
                 for (unsigned long j = 0; j < graph_.node(i).number_of_parents(); ++j)
                 {
@@ -2799,7 +2799,7 @@ namespace dlib
                     if (edge_selected && selected_edge_child == i && selected_edge_parent == graph_.node(i).parent(j).index())
                     {
                         color.red = 255;
-                        // we need to be careful when drawing this line to not draw it over the node dots since it 
+                        // we need to be careful when drawing this line to not draw it over the node dots since it
                         // has a different color from them and would look weird
                         dlib::vector<double,2> v(p-center);
                         v = v.normalize()*rad;
@@ -2925,7 +2925,7 @@ namespace dlib
         const double radius;
         unsigned long selected_node;
         bool mouse_drag; // true if the user is dragging a node
-        point drag_offset; 
+        point drag_offset;
 
         bool edge_selected;
         unsigned long selected_edge_parent;
@@ -2949,7 +2949,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class text_grid : public scrollable_region 
+    class text_grid : public scrollable_region
     {
         /*!
             INITIAL VALUE
@@ -2982,7 +2982,7 @@ namespace dlib
     public:
         text_grid (
             drawable_window& w
-        ); 
+        );
 
         ~text_grid (
         );
@@ -3081,7 +3081,7 @@ namespace dlib
 
         void set_row_height (
             unsigned long row,
-            unsigned long height 
+            unsigned long height
         );
 
         void disable (
@@ -3109,10 +3109,10 @@ namespace dlib
         );
 
         void timer_action (
-        ); 
+        );
         /*!
             ensures
-                - flips the state of show_cursor 
+                - flips the state of show_cursor
         !*/
 
         void compute_bg_rects (
@@ -3122,7 +3122,7 @@ namespace dlib
         );
 
         void on_keydown (
-            unsigned long key,          
+            unsigned long key,
             bool is_printable,
             unsigned long state
         );
@@ -3162,7 +3162,7 @@ namespace dlib
         struct data_type
         {
             data_type(): text_color(0,0,0), bg_color(255,255,255),
-            first(0), is_editable(true) 
+            first(0), is_editable(true)
             {}
 
             dlib::ustring text;
@@ -3198,7 +3198,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class image_display : public scrollable_region 
+    class image_display : public scrollable_region
     {
         /*!
             INITIAL VALUE
@@ -3217,7 +3217,7 @@ namespace dlib
                     - the user is drawing a rectangle on the screen and is
                       thus holding down CTRL and the left mouse button.
                     - rect_anchor == the point on the screen where the user
-                      clicked to begin drawing the rectangle.  
+                      clicked to begin drawing the rectangle.
                     - rect_to_draw == the rectangle which should appear on the screen.
 
                 - if (rect_is_selected) then
@@ -3236,7 +3236,7 @@ namespace dlib
                     - selected_part_name.size() == 0
 
                 - if (moving_overlay) then
-                    - moving_rect == the index in overlay_rects that the move applies to.  
+                    - moving_rect == the index in overlay_rects that the move applies to.
                     - if (moving_what == MOVING_PART) then
                         - moving_part_name == the name of the part in
                           overlay_rects[moving_rect] that is being moved around with the
@@ -3248,7 +3248,7 @@ namespace dlib
 
     public:
 
-        image_display(  
+        image_display(
             drawable_window& w
         );
 
@@ -3296,7 +3296,7 @@ namespace dlib
 
         virtual void set_size (
             unsigned long width,
-            unsigned long height 
+            unsigned long height
         )
         {
             auto_mutex lock(m);
@@ -3309,15 +3309,15 @@ namespace dlib
             overlay_rect() :crossed_out(false) { assign_pixel(color, 0);}
 
             template <typename pixel_type>
-            overlay_rect(const rectangle& r, pixel_type p) 
+            overlay_rect(const rectangle& r, pixel_type p)
                 : rect(r),crossed_out(false) { assign_pixel(color, p); }
 
             template <typename pixel_type>
-            overlay_rect(const rectangle& r, pixel_type p, const std::string& l) 
+            overlay_rect(const rectangle& r, pixel_type p, const std::string& l)
                 : rect(r),label(l),crossed_out(false) { assign_pixel(color, p); }
 
             template <typename pixel_type>
-            overlay_rect(const rectangle& r, pixel_type p, const std::string& l, const std::map<std::string,point>& parts_) 
+            overlay_rect(const rectangle& r, pixel_type p, const std::string& l, const std::map<std::string,point>& parts_)
                 : rect(r),label(l),parts(parts_),crossed_out(false) { assign_pixel(color, p); }
 
             rectangle rect;
@@ -3332,7 +3332,7 @@ namespace dlib
             overlay_line() { assign_pixel(color, 0);}
 
             template <typename pixel_type>
-            overlay_line(const point& p1_, const point& p2_, pixel_type p) 
+            overlay_line(const point& p1_, const point& p2_, pixel_type p)
                 : p1(p1_), p2(p2_) { assign_pixel(color, p); }
 
             point p1;
@@ -3345,11 +3345,11 @@ namespace dlib
             overlay_circle():radius(0) { assign_pixel(color, 0);}
 
             template <typename pixel_type>
-            overlay_circle(const point& center_, const int radius_, pixel_type p) 
+            overlay_circle(const point& center_, const int radius_, pixel_type p)
                 : center(center_), radius(radius_) { assign_pixel(color, p); }
 
             template <typename pixel_type>
-            overlay_circle(const point& center_, const int radius_, pixel_type p, const std::string& l) 
+            overlay_circle(const point& center_, const int radius_, pixel_type p, const std::string& l)
                 : center(center_), radius(radius_), label(l) { assign_pixel(color, p); }
 
             point center;
@@ -3476,10 +3476,10 @@ namespace dlib
         ) { auto_mutex M(m); overlay_editing_enabled = true; }
 
         void disable_overlay_editing (
-        ) 
-        { 
-            auto_mutex M(m); 
-            overlay_editing_enabled = false;  
+        )
+        {
+            auto_mutex M(m);
+            overlay_editing_enabled = false;
             rect_is_selected = false;
             drawing_rect = false;
             parent.invalidate_rectangle(rect);
@@ -3538,7 +3538,7 @@ namespace dlib
         ) const;
 
         rectangle get_rect_on_screen (
-            rectangle orect 
+            rectangle orect
         ) const;
 
         rgb_alpha_pixel invert_pixel (const rgb_alpha_pixel& p) const
@@ -3549,9 +3549,9 @@ namespace dlib
         // The reason for using user actions here rather than just having the timer just call
         // what it needs directly is to avoid a potential deadlock during destruction of this widget.
         void timer_event_unhighlight_rect()
-        { 
-            highlight_timer.stop(); 
-            parent.trigger_user_event(this,scrollable_region::next_free_user_event_number()); 
+        {
+            highlight_timer.stop();
+            parent.trigger_user_event(this,scrollable_region::next_free_user_event_number());
         }
         void on_user_event (int num)
         {
@@ -3616,7 +3616,7 @@ namespace dlib
     {
     public:
 
-        perspective_display(  
+        perspective_display(
             drawable_window& w
         );
 
@@ -3625,18 +3625,18 @@ namespace dlib
 
         virtual void set_size (
             unsigned long width,
-            unsigned long height 
+            unsigned long height
         );
 
         struct overlay_line
         {
             overlay_line() { assign_pixel(color, 0);}
 
-            overlay_line(const vector<double>& p1_, const vector<double>& p2_) 
+            overlay_line(const vector<double>& p1_, const vector<double>& p2_)
                 : p1(p1_), p2(p2_) { assign_pixel(color, 255); }
 
             template <typename pixel_type>
-            overlay_line(const vector<double>& p1_, const vector<double>& p2_, pixel_type p) 
+            overlay_line(const vector<double>& p1_, const vector<double>& p2_, pixel_type p)
                 : p1(p1_), p2(p2_) { assign_pixel(color, p); }
 
             vector<double> p1;
@@ -3648,11 +3648,11 @@ namespace dlib
         {
             overlay_dot() { assign_pixel(color, 0);}
 
-            overlay_dot(const vector<double>& p_) 
+            overlay_dot(const vector<double>& p_)
                 : p(p_) { assign_pixel(color, 255); }
 
             template <typename pixel_type>
-            overlay_dot(const vector<double>& p_, pixel_type color_) 
+            overlay_dot(const vector<double>& p_, pixel_type color_)
                 : p(p_) { assign_pixel(color, color_); }
 
             vector<double> p;
@@ -3742,7 +3742,7 @@ namespace dlib
         typedef perspective_display::overlay_dot overlay_dot;
 
         perspective_window(
-        ) : disp(*this) 
+        ) : disp(*this)
         {
             set_size(100,100);
             on_window_resized();
@@ -3751,34 +3751,34 @@ namespace dlib
 
         perspective_window(
             const std::vector<dlib::vector<double> >& point_cloud
-        ) : 
+        ) :
             disp(*this)
-        {  
+        {
             set_size(100,100);
             on_window_resized();
-            add_overlay(point_cloud); 
-            show(); 
+            add_overlay(point_cloud);
+            show();
         }
         
         perspective_window(
             const std::vector<dlib::vector<double> >& point_cloud,
             const std::string& title
-        ) : 
+        ) :
             disp(*this)
-        {  
+        {
             set_size(100,100);
             on_window_resized();
-            add_overlay(point_cloud); 
+            add_overlay(point_cloud);
             set_title(title);
-            show(); 
+            show();
         }
         
         ~perspective_window(
         )
         {
             // You should always call close_window() in the destructor of window
-            // objects to ensure that no events will be sent to this window while 
-            // it is being destructed.  
+            // objects to ensure that no events will be sent to this window while
+            // it is being destructed.
             close_window();
         }
 
@@ -3808,14 +3808,14 @@ namespace dlib
             add_overlay(std::vector<overlay_line>(1,overlay_line(p1,p2,p)));
         }
 
-        void add_overlay(const std::vector<dlib::vector<double> >& d) 
-        { 
+        void add_overlay(const std::vector<dlib::vector<double> >& d)
+        {
             add_overlay(d, 255);
         }
 
         template <typename pixel_type>
-        void add_overlay(const std::vector<dlib::vector<double> >& d, pixel_type p) 
-        { 
+        void add_overlay(const std::vector<dlib::vector<double> >& d, pixel_type p)
+        {
             std::vector<overlay_dot> temp;
             temp.resize(d.size());
             for (unsigned long i = 0; i < temp.size(); ++i)
@@ -3859,7 +3859,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class image_window : public drawable_window 
+    class image_window : public drawable_window
     {
     public:
 
@@ -3868,44 +3868,44 @@ namespace dlib
         typedef image_display::overlay_circle overlay_circle;
 
         image_window(
-        ); 
+        );
 
         template < typename image_type >
         image_window(
             const image_type& img
-        ) : 
-            gui_img(*this), 
+        ) :
+            gui_img(*this),
             window_has_closed(false),
             have_last_click(false),
             mouse_btn(0),
             clicked_signaler(this->wm),
             have_last_keypress(false),
             tie_input_events(false)
-        {  
+        {
             gui_img.set_image_clicked_handler(*this, &image_window::on_image_clicked);
             gui_img.disable_overlay_editing();
-            set_image(img); 
-            show(); 
+            set_image(img);
+            show();
         }
         
         template < typename image_type >
         image_window(
             const image_type& img,
             const std::string& title
-        ) : 
-            gui_img(*this), 
+        ) :
+            gui_img(*this),
             window_has_closed(false),
             have_last_click(false),
             mouse_btn(0),
             clicked_signaler(this->wm),
             have_last_keypress(false),
             tie_input_events(false)
-        {  
+        {
             gui_img.set_image_clicked_handler(*this, &image_window::on_image_clicked);
             gui_img.disable_overlay_editing();
-            set_image(img); 
+            set_image(img);
             set_title(title);
-            show(); 
+            show();
         }
         
 
@@ -3915,16 +3915,16 @@ namespace dlib
         template < typename image_type >
         void set_image (
             const image_type& img
-        ) 
-        { 
+        )
+        {
             const unsigned long padding = scrollable_region_style_default().get_border_size();
             auto_mutex M(wm);
-            gui_img.set_image(img); 
+            gui_img.set_image(img);
 
             // Only ever mess with the size of the window if the user is giving us an image
             // that is a different size.  Otherwise we assume that they will have already
             // sized the window to whatever they feel is reasonable for an image of the
-            // current size.  
+            // current size.
             if (previous_image_size != get_rect(img))
             {
                 const rectangle r = gui_img.get_image_display_rect();
@@ -3947,19 +3947,19 @@ namespace dlib
         );
 
         template <typename pixel_type>
-        void add_overlay(const rectangle& r, pixel_type p) 
+        void add_overlay(const rectangle& r, pixel_type p)
         { add_overlay(image_display::overlay_rect(r,p)); }
 
-        void add_overlay(const rectangle& r) 
+        void add_overlay(const rectangle& r)
         { add_overlay(image_display::overlay_rect(r,rgb_pixel(255,0,0))); }
 
         template <typename pixel_type>
-        void add_overlay(const rectangle& r, pixel_type p, const std::string& l) 
+        void add_overlay(const rectangle& r, pixel_type p, const std::string& l)
         { add_overlay(image_display::overlay_rect(r,p,l)); }
 
         template <typename pixel_type>
-        void add_overlay(const std::vector<rectangle>& r, pixel_type p) 
-        { 
+        void add_overlay(const std::vector<rectangle>& r, pixel_type p)
+        {
             std::vector<overlay_rect> temp;
             temp.resize(r.size());
             for (unsigned long i = 0; i < temp.size(); ++i)
@@ -3968,14 +3968,14 @@ namespace dlib
             add_overlay(temp);
         }
 
-        void add_overlay(const std::vector<rectangle>& r) 
+        void add_overlay(const std::vector<rectangle>& r)
         { add_overlay(r, rgb_pixel(255,0,0)); }
 
         void add_overlay(
             const full_object_detection& object,
             const std::vector<std::string>& part_names
-        ) 
-        { 
+        )
+        {
 
             add_overlay(overlay_rect(object.get_rect(), rgb_pixel(255,0,0)));
 
@@ -3997,8 +3997,8 @@ namespace dlib
 
         void add_overlay(
             const full_object_detection& object
-        ) 
-        { 
+        )
+        {
             std::vector<std::string> part_names;
             add_overlay(object, part_names);
         }
@@ -4006,8 +4006,8 @@ namespace dlib
         void add_overlay(
             const std::vector<full_object_detection>& objects,
             const std::vector<std::string>& part_names
-        ) 
-        { 
+        )
+        {
             std::vector<overlay_rect> rtemp;
             rtemp.reserve(objects.size());
             for (unsigned long i = 0; i < objects.size(); ++i)
@@ -4038,8 +4038,8 @@ namespace dlib
 
         void add_overlay(
             const std::vector<full_object_detection>& objects
-        ) 
-        { 
+        )
+        {
             std::vector<std::string> part_names;
             add_overlay(objects, part_names);
         }
@@ -4053,7 +4053,7 @@ namespace dlib
         );
 
         template <typename pixel_type>
-        void add_overlay(const point& p1, const point& p2, pixel_type p) 
+        void add_overlay(const point& p1, const point& p2, pixel_type p)
         { add_overlay(image_display::overlay_line(p1,p2,p)); }
 
         void add_overlay (
@@ -4074,7 +4074,7 @@ namespace dlib
         bool get_next_double_click (
             point& p,
             unsigned long& mouse_button
-        ); 
+        );
 
         void tie_events (
         );
@@ -4087,7 +4087,7 @@ namespace dlib
 
         bool get_next_double_click (
             point& p
-        ) 
+        )
         {
             unsigned long mouse_button;
             return get_next_double_click(p, mouse_button);

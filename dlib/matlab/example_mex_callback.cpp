@@ -21,19 +21,19 @@ void mex_function (
     const matrix<double>& A,
     const function_handle& f,
     matrix<double>& result
-) 
+)
 {
     // The f argument to this function is a function handle passed from MATLAB.  To
     // call it we use the following syntax:
     call_matlab(f, A, returns(result));
-    // This is equivalent to result = f(A). Therefore, the returns(variable) syntax 
+    // This is equivalent to result = f(A). Therefore, the returns(variable) syntax
     // is used to indicate which variables are outputs of the function.
 
 
 
 
     // Another thing we can do is call MATLAB functions based on their string name
-    // rather than a function_handle.  Here is an example of calling eigs().   
+    // rather than a function_handle.  Here is an example of calling eigs().
     matrix<double> m(2,2);
     m = 1,2,
         3,4;

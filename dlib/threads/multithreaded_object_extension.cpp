@@ -62,7 +62,7 @@ namespace dlib
 
     bool multithreaded_object::
     is_running (
-    ) const 
+    ) const
     {
         auto_mutex M(m_);
         return is_running_;

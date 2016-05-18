@@ -1,7 +1,7 @@
 // Copyright (C) 2006  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_STRINg_
-#define DLIB_STRINg_ 
+#define DLIB_STRINg_
 
 #include "string_abstract.h"
 #include <sstream>
@@ -52,7 +52,7 @@ namespace dlib
     inline const typename enable_if<is_same_type<charT,char>,std::string>::type narrow (
         const std::basic_string<charT,traits,alloc>& str
     )
-    { 
+    {
         return str;
     }
 
@@ -231,7 +231,7 @@ namespace dlib
         typename T
         >
     const std::string cast_to_string (
-        const T& item 
+        const T& item
     )
     {
         std::ostringstream sout;
@@ -248,7 +248,7 @@ namespace dlib
         typename T
         >
     const std::wstring cast_to_wstring (
-        const T& item 
+        const T& item
     )
     {
         std::basic_ostringstream<wchar_t> sout;
@@ -295,7 +295,7 @@ namespace dlib
             T temp;
             sin >> temp;
             if (!sin) throw string_cast_error(narrow(str));
-            if (sin.get() != std::char_traits<charT>::eof()) throw string_cast_error(narrow(str));   
+            if (sin.get() != std::char_traits<charT>::eof()) throw string_cast_error(narrow(str));
             return temp;
         }
     };
@@ -472,14 +472,14 @@ namespace dlib
 
         char_assign_helper operator= (
             const char* str
-        ) const 
+        ) const
         {
             return char_assign_helper(str);
         }
 
         wchar_t_assign_helper operator= (
             const wchar_t* str
-        ) const 
+        ) const
         {
             return wchar_t_assign_helper(str);
         }
@@ -501,7 +501,7 @@ namespace dlib
         const unsigned long max_per_line = 79
     )
     {
-        DLIB_ASSERT ( first_pad < max_per_line && rest_pad < max_per_line && 
+        DLIB_ASSERT ( first_pad < max_per_line && rest_pad < max_per_line &&
                  rest_pad >= first_pad,
                  "\tconst std::basic_string<charT,traits,alloc> wrap_string()"
                  << "\n\tfirst_pad:    " << first_pad
@@ -597,7 +597,7 @@ namespace dlib
         >
     const std::basic_string<charT,traits,alloc> ltrim (
         const std::basic_string<charT,traits,alloc>& str,
-        const std::basic_string<charT,traits,alloc>& trim_chars 
+        const std::basic_string<charT,traits,alloc>& trim_chars
     )
     {
         typedef std::basic_string<charT,traits,alloc> string;
@@ -627,7 +627,7 @@ namespace dlib
         >
     const std::basic_string<charT,traits,alloc> rtrim (
         const std::basic_string<charT,traits,alloc>& str,
-        const std::basic_string<charT,traits,alloc>& trim_chars 
+        const std::basic_string<charT,traits,alloc>& trim_chars
     )
     {
         typedef std::basic_string<charT,traits,alloc> string;
@@ -658,11 +658,11 @@ namespace dlib
         >
     const std::basic_string<charT,traits,alloc> trim (
         const std::basic_string<charT,traits,alloc>& str,
-        const std::basic_string<charT,traits,alloc>& trim_chars 
+        const std::basic_string<charT,traits,alloc>& trim_chars
     )
     {
         typedef std::basic_string<charT,traits,alloc> string;
-        typename string::size_type lpos = str.find_first_not_of(trim_chars); 
+        typename string::size_type lpos = str.find_first_not_of(trim_chars);
         if (lpos != string::npos)
         {
             typename string::size_type rpos = str.find_last_not_of(trim_chars);
@@ -694,7 +694,7 @@ namespace dlib
     const std::basic_string<charT,traits,alloc> rpad (
         const std::basic_string<charT,traits,alloc>& str,
         long pad_length,
-        const std::basic_string<charT,traits,alloc>& pad_string 
+        const std::basic_string<charT,traits,alloc>& pad_string
     )
     {
         typedef std::basic_string<charT,traits,alloc> string;
@@ -733,7 +733,7 @@ namespace dlib
     const std::basic_string<charT,traits,alloc> lpad (
         const std::basic_string<charT,traits,alloc>& str,
         long pad_length,
-        const std::basic_string<charT,traits,alloc>& pad_string 
+        const std::basic_string<charT,traits,alloc>& pad_string
     )
     {
         typedef std::basic_string<charT,traits,alloc> string;
@@ -772,12 +772,12 @@ namespace dlib
     const std::basic_string<charT,traits,alloc> pad (
         const std::basic_string<charT,traits,alloc>& str,
         long pad_length,
-        const std::basic_string<charT,traits,alloc>& pad_string 
+        const std::basic_string<charT,traits,alloc>& pad_string
     )
     {
         const long str_size = static_cast<long>(str.size());
-        return rpad(lpad(str,(pad_length-str_size)/2 + str_size,pad_string),  
-                    pad_length, 
+        return rpad(lpad(str,(pad_length-str_size)/2 + str_size,pad_string),
+                    pad_length,
                     pad_string);
     }
 
@@ -801,7 +801,7 @@ namespace dlib
         >
     const std::basic_string<charT,traits,alloc> left_substr (
         const std::basic_string<charT,traits,alloc>& str,
-        const std::basic_string<charT,traits,alloc>& delim 
+        const std::basic_string<charT,traits,alloc>& delim
     )
     {
         return str.substr(0,str.find_first_of(delim));
@@ -829,7 +829,7 @@ namespace dlib
         >
     const std::basic_string<charT,traits,alloc> right_substr (
         const std::basic_string<charT,traits,alloc>& str,
-        const std::basic_string<charT,traits,alloc>& delim 
+        const std::basic_string<charT,traits,alloc>& delim
     )
     {
         typename std::basic_string<charT,traits,alloc>::size_type delim_pos = str.find_last_of(delim);
@@ -863,7 +863,7 @@ namespace dlib
         typename traits,
         typename alloc
         >
-    std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> > 
+    std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> >
     split_on_first (
         const std::basic_string<charT,traits,alloc>& str,
         const charT* delim = _dT(charT," \n\r\t")
@@ -881,10 +881,10 @@ namespace dlib
         typename traits,
         typename alloc
         >
-    inline std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> > 
+    inline std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> >
     split_on_first (
         const std::basic_string<charT,traits,alloc>& str,
-        const std::basic_string<charT,traits,alloc>& delim 
+        const std::basic_string<charT,traits,alloc>& delim
     )
     {
         return split_on_first(str, delim.c_str());
@@ -897,7 +897,7 @@ namespace dlib
         typename traits,
         typename alloc
         >
-    std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> > 
+    std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> >
     split_on_last (
         const std::basic_string<charT,traits,alloc>& str,
         const charT* delim = _dT(charT," \n\r\t")
@@ -915,10 +915,10 @@ namespace dlib
         typename traits,
         typename alloc
         >
-    inline std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> > 
+    inline std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> >
     split_on_last (
         const std::basic_string<charT,traits,alloc>& str,
-        const std::basic_string<charT,traits,alloc>& delim 
+        const std::basic_string<charT,traits,alloc>& delim
     )
     {
         return split_on_last(str, delim.c_str());
@@ -982,7 +982,7 @@ namespace dlib
         >
     const std::vector<std::basic_string<charT,traits,alloc> > split (
         const std::basic_string<charT,traits,alloc>& str,
-        const std::basic_string<charT,traits,alloc>& delim 
+        const std::basic_string<charT,traits,alloc>& delim
     )
     {
         return split(str,delim.c_str());

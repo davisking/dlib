@@ -19,14 +19,14 @@ namespace dlib
         typename mem_manager = default_memory_manager,
         typename compare = std::less<domain>
         >
-    class map : public enumerable<map_pair<domain,range> >, 
+    class map : public enumerable<map_pair<domain,range> >,
                 public asc_pair_remover<domain,range,compare>
     {
 
         /*!
             REQUIREMENTS ON domain
                 domain must be comparable by compare where compare is a functor compatible with std::less and
-                domain is swappable by a global swap() and                
+                domain is swappable by a global swap() and
                 domain must have a default constructor
 
             REQUIREMENTS ON range
@@ -36,11 +36,11 @@ namespace dlib
             REQUIREMENTS ON mem_manager
                 must be an implementation of memory_manager/memory_manager_kernel_abstract.h or
                 must be an implementation of memory_manager_global/memory_manager_global_kernel_abstract.h or
-                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h
                 mem_manager::type can be set to anything.
 
             POINTERS AND REFERENCES TO INTERNAL DATA
-                swap(), is_in_domain(), and operator[] functions do not invalidate 
+                swap(), is_in_domain(), and operator[] functions do not invalidate
                 pointers or references to internal data.
                 All other functions have no such guarantee.
 
@@ -49,14 +49,14 @@ namespace dlib
 
             ENUMERATION ORDER
                 The enumerator will iterate over the domain (and each associated
-                range element) elements in ascending order according to the compare functor. 
+                range element) elements in ascending order according to the compare functor.
                 (i.e. the elements are enumerated in sorted order)
 
             WHAT THIS OBJECT REPRESENTS
                 map contains items of type domain and range
 
-                This object is similar an array.  It maps items of type domain on to 
-                items of type range.   
+                This object is similar an array.  It maps items of type domain on to
+                items of type range.
 
                 Also note that unless specified otherwise, no member functions
                 of this object throw exceptions.
@@ -77,15 +77,15 @@ namespace dlib
             map(
             );
             /*!
-                ensures 
+                ensures
                     - #*this is properly initialized
                 throws
-                    - std::bad_alloc or any exception thrown by domain's or range's 
+                    - std::bad_alloc or any exception thrown by domain's or range's
                       constructor.
             !*/
 
             virtual ~map(
-            ); 
+            );
             /*!
                 ensures
                     - all memory associated with *this has been released
@@ -97,9 +97,9 @@ namespace dlib
                 ensures
                     - #*this has its initial value
                 throws
-                    - std::bad_alloc or any exception thrown by domain's or range's 
+                    - std::bad_alloc or any exception thrown by domain's or range's
                       constructor.
-                        if this exception is thrown then *this is unusable 
+                        if this exception is thrown then *this is unusable
                         until clear() is called and succeeds
             !*/
 
@@ -114,11 +114,11 @@ namespace dlib
                 ensures
                     - #is_in_domain(d) == true
                     - #operator[](d)   == r
-                    - #d and #r have initial values for their types 
+                    - #d and #r have initial values for their types
                     - #size() == size() + 1
                     - #at_start() == true
                 throws
-                    - std::bad_alloc or any exception thrown by domain's or range's 
+                    - std::bad_alloc or any exception thrown by domain's or range's
                       constructor.
                         if add() throws then it has no effect
             !*/
@@ -128,7 +128,7 @@ namespace dlib
             ) const;
             /*!
                 ensures
-                    - returns whether or not an element equivalent to d is in the 
+                    - returns whether or not an element equivalent to d is in the
                       domain of *this
             !*/
 
@@ -139,15 +139,15 @@ namespace dlib
             );
             /*!
                 requires
-                    - &d != &r (i.e. d and r cannot be the same variable) 
-                    - &d != &d_copy (i.e. d and d_copy cannot be the same variable) 
-                    - &r != &d_copy (i.e. r and d_copy cannot be the same variable) 
+                    - &d != &r (i.e. d and r cannot be the same variable)
+                    - &d != &d_copy (i.e. d and d_copy cannot be the same variable)
+                    - &r != &d_copy (i.e. r and d_copy cannot be the same variable)
                     - is_in_domain(d) == true
                 ensures
-                    - #is_in_domain(d) == false 
-                    - #d_copy is equivalent to d 
-                    - the element in the range of *this associated with #d_copy has been 
-                      swapped into #r 
+                    - #is_in_domain(d) == false
+                    - #d_copy is equivalent to d
+                    - the element in the range of *this associated with #d_copy has been
+                      swapped into #r
                     - #size() == size() - 1
                     - #at_start() == true
             !*/
@@ -159,7 +159,7 @@ namespace dlib
                 requires
                     - is_in_domain(d) == true
                 ensures
-                    - #is_in_domain(d) == false 
+                    - #is_in_domain(d) == false
                     - #size() == size() - 1
                     - #at_start() == true
             !*/
@@ -171,7 +171,7 @@ namespace dlib
                 requires
                     - is_in_domain(d) == true
                 ensures
-                    - returns a non-const reference to the element in the range of *this 
+                    - returns a non-const reference to the element in the range of *this
                       associated with the element equivalent to d
             !*/
 
@@ -182,7 +182,7 @@ namespace dlib
                 requires
                     - is_in_domain(d) == true
                 ensures
-                    - returns a const reference to the element in the range of *this 
+                    - returns a const reference to the element in the range of *this
                       associated with the element equivalent to d
             !*/
 
@@ -192,7 +192,7 @@ namespace dlib
             /*!
                 ensures
                     - swaps *this and item
-            !*/ 
+            !*/
 
     
         private:
@@ -209,9 +209,9 @@ namespace dlib
         typename compare
         >
     inline void swap (
-        map<domain,range,mem_manager,compare>& a, 
-        map<domain,range,mem_manager,compare>& b 
-    ) { a.swap(b); }   
+        map<domain,range,mem_manager,compare>& a,
+        map<domain,range,mem_manager,compare>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
@@ -223,11 +223,11 @@ namespace dlib
         typename compare
         >
     void deserialize (
-        map<domain,range,mem_manager,compare>& item, 
+        map<domain,range,mem_manager,compare>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 }
 

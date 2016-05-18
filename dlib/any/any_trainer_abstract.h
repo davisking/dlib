@@ -25,9 +25,9 @@ namespace dlib
                 - for all T: contains<T>() == false
 
             WHAT THIS OBJECT REPRESENTS
-                This object is a version of dlib::any that is restricted to containing 
-                elements which are some kind of object with a .train() method compatible 
-                with the following signature: 
+                This object is a version of dlib::any that is restricted to containing
+                elements which are some kind of object with a .train() method compatible
+                with the following signature:
 
                     decision_function train(
                         const std::vector<sample_type>& samples,
@@ -38,8 +38,8 @@ namespace dlib
                     any_decision_function<sample_type,scalar_type> object.
 
                 any_trainer is intended to be used to contain objects such as the svm_nu_trainer
-                and other similar types which represent supervised machine learning algorithms.   
-                It allows you to write code which contains and processes these trainer objects 
+                and other similar types which represent supervised machine learning algorithms.
+                It allows you to write code which contains and processes these trainer objects
                 without needing to know the specific types of trainer objects used.
         !*/
 
@@ -62,7 +62,7 @@ namespace dlib
         );
         /*!
             ensures
-                - copies the state of item into *this.  
+                - copies the state of item into *this.
                 - Note that *this and item will contain independent copies of the
                   contents of item.  That is, this function performs a deep
                   copy and therefore does not result in *this containing
@@ -103,7 +103,7 @@ namespace dlib
         /*!
             ensures
                 - if (this object contains any kind of object) then
-                    - returns false 
+                    - returns false
                 - else
                     - returns true
         !*/
@@ -164,7 +164,7 @@ namespace dlib
         );
         /*!
             ensures
-                - copies the state of item into *this.  
+                - copies the state of item into *this.
                 - Note that *this and item will contain independent copies of the
                   contents of item.  That is, this function performs a deep
                   copy and therefore does not result in *this containing
@@ -201,7 +201,7 @@ namespace dlib
         typename T,
         typename sample_type,
         typename scalar_type
-        > 
+        >
     T& any_cast(
         any_trainer<sample_type,scalar_type>& a
     ) { return a.cast_to<T>(); }
@@ -216,7 +216,7 @@ namespace dlib
         typename T,
         typename sample_type,
         typename scalar_type
-        > 
+        >
     const T& any_cast(
         const any_trainer<sample_type,scalar_type>& a
     ) { return a.cast_to<T>(); }

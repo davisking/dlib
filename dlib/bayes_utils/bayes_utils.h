@@ -24,7 +24,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class assignment 
+    class assignment
     {
     public:
 
@@ -63,8 +63,8 @@ namespace dlib
 
         bool operator < (
             const assignment& item
-        ) const 
-        {  
+        ) const
+        {
             if (size() < item.size())
                 return true;
             else if (size() > item.size())
@@ -104,7 +104,7 @@ namespace dlib
             DLIB_ASSERT( has_index(idx) == false ,
                          "\tvoid assignment::add(idx)"
                          << "\n\tYou can't add the same index to an assignment object more than once"
-                         << "\n\tidx:  " << idx 
+                         << "\n\tidx:  " << idx
                          << "\n\tthis: " << this
             );
 
@@ -119,7 +119,7 @@ namespace dlib
             DLIB_ASSERT( has_index(idx) == true ,
                          "\tunsigned long assignment::operator[](idx)"
                          << "\n\tYou can't access an index value if it isn't already in the object"
-                         << "\n\tidx:  " << idx 
+                         << "\n\tidx:  " << idx
                          << "\n\tthis: " << this
             );
 
@@ -129,12 +129,12 @@ namespace dlib
         const unsigned long& operator[] (
             const long idx
         ) const
-        { 
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT( has_index(idx) == true ,
                          "\tunsigned long assignment::operator[](idx)"
                          << "\n\tYou can't access an index value if it isn't already in the object"
-                         << "\n\tidx:  " << idx 
+                         << "\n\tidx:  " << idx
                          << "\n\tthis: " << this
             );
 
@@ -156,7 +156,7 @@ namespace dlib
             DLIB_ASSERT( has_index(idx) == true ,
                          "\tunsigned long assignment::remove(idx)"
                          << "\n\tYou can't remove an index value if it isn't already in the object"
-                         << "\n\tidx:  " << idx 
+                         << "\n\tidx:  " << idx
                          << "\n\tthis: " << this
             );
 
@@ -169,19 +169,19 @@ namespace dlib
 
         bool move_next() const { return vals.move_next(); }
 
-        map_pair<unsigned long, unsigned long>& element() 
-        { 
+        map_pair<unsigned long, unsigned long>& element()
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(current_element_valid() == true,
                         "\tmap_pair<unsigned long,unsigned long>& assignment::element()"
                         << "\n\tyou can't access the current element if it doesn't exist"
                         << "\n\tthis: " << this
             );
-            return vals.element(); 
+            return vals.element();
         }
 
-        const map_pair<unsigned long, unsigned long>& element() const 
-        { 
+        const map_pair<unsigned long, unsigned long>& element() const
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(current_element_valid() == true,
                         "\tconst map_pair<unsigned long,unsigned long>& assignment::element() const"
@@ -189,7 +189,7 @@ namespace dlib
                         << "\n\tthis: " << this
             );
 
-            return vals.element(); 
+            return vals.element();
         }
 
         bool at_start() const { return vals.at_start(); }
@@ -198,8 +198,8 @@ namespace dlib
 
         friend inline void serialize (
             const assignment& item,
-            std::ostream& out 
-        )   
+            std::ostream& out
+        )
         {
             serialize(item.vals, out);
         }
@@ -247,7 +247,7 @@ namespace dlib
 
 // ------------------------------------------------------------------------
 
-    class joint_probability_table 
+    class joint_probability_table
     {
         /*!
             INITIAL VALUE
@@ -293,8 +293,8 @@ namespace dlib
             DLIB_ASSERT(0.0 <= p && p <= 1.0,
                         "\tvoid& joint_probability_table::set_probability(a,p)"
                         << "\n\tyou have given an invalid probability value"
-                        << "\n\tp:    " << p 
-                        << "\n\ta:    " << a 
+                        << "\n\tp:    " << p
+                        << "\n\ta:    " << a
                         << "\n\tthis: " << this
             );
 
@@ -325,8 +325,8 @@ namespace dlib
             DLIB_ASSERT(0.0 <= p && p <= 1.0,
                         "\tvoid& joint_probability_table::add_probability(a,p)"
                         << "\n\tyou have given an invalid probability value"
-                        << "\n\tp:    " << p 
-                        << "\n\ta:    " << a 
+                        << "\n\tp:    " << p
+                        << "\n\ta:    " << a
                         << "\n\tthis: " << this
             );
 
@@ -358,8 +358,8 @@ namespace dlib
         unsigned long size () const { return table.size(); }
         bool move_next() const { return table.move_next(); }
         void reset() const { table.reset(); }
-        map_pair<assignment,double>& element() 
-        { 
+        map_pair<assignment,double>& element()
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(current_element_valid() == true,
                         "\tmap_pair<assignment,double>& joint_probability_table::element()"
@@ -367,11 +367,11 @@ namespace dlib
                         << "\n\tthis: " << this
             );
 
-            return table.element(); 
+            return table.element();
         }
 
-        const map_pair<assignment,double>& element() const 
-        { 
+        const map_pair<assignment,double>& element() const
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(current_element_valid() == true,
                         "\tconst map_pair<assignment,double>& joint_probability_table::element() const"
@@ -379,7 +379,7 @@ namespace dlib
                         << "\n\tthis: " << this
             );
 
-            return table.element(); 
+            return table.element();
         }
 
         bool at_start() const { return table.at_start(); }
@@ -461,8 +461,8 @@ namespace dlib
 
         friend inline void serialize (
             const joint_probability_table& item,
-            std::ostream& out 
-        )   
+            std::ostream& out
+        )
         {
             serialize(item.table, out);
         }
@@ -498,7 +498,7 @@ namespace dlib
                     - has_entry_for(value,ps) == true
                     - probability(value,ps) == table[ps](value)
                 - else
-                    - has_entry_for(value,ps) == false 
+                    - has_entry_for(value,ps) == false
 
                 - num_values() == num_vals
         !*/
@@ -541,10 +541,10 @@ namespace dlib
             DLIB_ASSERT( value < num_values() && 0.0 <= p && p <= 1.0 ,
                          "\tvoid conditional_probability_table::set_probability()"
                          << "\n\tinvalid arguments to set_probability"
-                         << "\n\tvalue: " << value 
+                         << "\n\tvalue: " << value
                          << "\n\tnum_values(): " << num_values()
-                         << "\n\tp:     " << p 
-                         << "\n\tps:    " << ps 
+                         << "\n\tp:     " << p
+                         << "\n\tps:    " << ps
                          << "\n\tthis:  " << this
             );
 
@@ -564,16 +564,16 @@ namespace dlib
 
         double probability(
             unsigned long value,
-            const assignment& ps 
+            const assignment& ps
         ) const
         {
             // make sure requires clause is not broken
             DLIB_ASSERT( value < num_values() && has_entry_for(value,ps) ,
                          "\tvoid conditional_probability_table::probability()"
                          << "\n\tinvalid arguments to probability"
-                         << "\n\tvalue:        " << value 
-                         << "\n\tnum_values(): " << num_values() 
-                         << "\n\tps:           " << ps 
+                         << "\n\tvalue:        " << value
+                         << "\n\tnum_values(): " << num_values()
+                         << "\n\tps:           " << ps
                          << "\n\tthis:         " << this
             );
 
@@ -592,17 +592,17 @@ namespace dlib
         }
 
         void swap (
-            conditional_probability_table& item 
-        ) 
-        { 
+            conditional_probability_table& item
+        )
+        {
             exchange(num_vals, item.num_vals);
             table.swap(item.table);
         }
 
         friend inline void serialize (
             const conditional_probability_table& item,
-            std::ostream& out 
-        )   
+            std::ostream& out
+        )
         {
             serialize(item.table, out);
             serialize(item.num_vals, out);
@@ -649,8 +649,8 @@ namespace dlib
             DLIB_ASSERT( new_value < table().num_values(),
                          "\tvoid bayes_node::set_value(new_value)"
                          << "\n\tnew_value must be less than the number of possible values for this node"
-                         << "\n\tnew_value:            " << new_value 
-                         << "\n\ttable().num_values(): " << table().num_values() 
+                         << "\n\tnew_value:            " << new_value
+                         << "\n\ttable().num_values(): " << table().num_values()
                          << "\n\tthis:                 " << this
             );
 
@@ -673,9 +673,9 @@ namespace dlib
         ) { is_instantiated = true; }
 
         void swap (
-            bayes_node& item 
-        ) 
-        { 
+            bayes_node& item
+        )
+        {
             exchange(value_, item.value_);
             exchange(is_instantiated, item.is_instantiated);
             table_.swap(item.table_);
@@ -683,8 +683,8 @@ namespace dlib
 
         friend inline void serialize (
             const bayes_node& item,
-            std::ostream& out 
-        )   
+            std::ostream& out
+        )
         {
             serialize(item.value_, out);
             serialize(item.is_instantiated, out);
@@ -703,7 +703,7 @@ namespace dlib
 
     private:
 
-        unsigned long value_; 
+        unsigned long value_;
         bool is_instantiated;
         conditional_probability_table table_;
     };
@@ -722,17 +722,17 @@ namespace dlib
         unsigned long node_num_values (
             const T& bn,
             unsigned long n
-        )  
-        { 
+        )
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT( n < bn.number_of_nodes(),
                          "\tvoid bayes_node_utils::node_num_values(bn, n)"
                          << "\n\tInvalid arguments to this function"
-                         << "\n\tn:                     " << n 
-                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes() 
+                         << "\n\tn:                     " << n
+                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes()
             );
 
-            return bn.node(n).data.table().num_values(); 
+            return bn.node(n).data.table().num_values();
         }
 
     // ----------------------------------------------------------------------------------------
@@ -742,19 +742,19 @@ namespace dlib
             T& bn,
             unsigned long n,
             unsigned long val
-        ) 
-        { 
+        )
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT( n < bn.number_of_nodes() && val < node_num_values(bn,n),
                          "\tvoid bayes_node_utils::set_node_value(bn, n, val)"
                          << "\n\tInvalid arguments to this function"
-                         << "\n\tn:                     " << n 
-                         << "\n\tval:                   " << val 
-                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes() 
-                         << "\n\tnode_num_values(bn,n): " << node_num_values(bn,n) 
+                         << "\n\tn:                     " << n
+                         << "\n\tval:                   " << val
+                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes()
+                         << "\n\tnode_num_values(bn,n): " << node_num_values(bn,n)
             );
 
-            bn.node(n).data.set_value(val); 
+            bn.node(n).data.set_value(val);
         }
 
     // ----------------------------------------------------------------------------------------
@@ -762,14 +762,14 @@ namespace dlib
         unsigned long node_value (
             const T& bn,
             unsigned long n
-        ) 
-        { 
+        )
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT( n < bn.number_of_nodes(),
                          "\tunsigned long bayes_node_utils::node_value(bn, n)"
                          << "\n\tInvalid arguments to this function"
-                         << "\n\tn:                     " << n 
-                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes() 
+                         << "\n\tn:                     " << n
+                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes()
             );
 
             return bn.node(n).data.value();
@@ -780,14 +780,14 @@ namespace dlib
         bool node_is_evidence (
             const T& bn,
             unsigned long n
-        ) 
-        { 
+        )
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT( n < bn.number_of_nodes(),
                          "\tbool bayes_node_utils::node_is_evidence(bn, n)"
                          << "\n\tInvalid arguments to this function"
-                         << "\n\tn:                     " << n 
-                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes() 
+                         << "\n\tn:                     " << n
+                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes()
             );
 
             return bn.node(n).data.is_evidence();
@@ -799,17 +799,17 @@ namespace dlib
         void set_node_as_evidence (
             T& bn,
             unsigned long n
-        ) 
-        { 
+        )
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT( n < bn.number_of_nodes(),
                          "\tvoid bayes_node_utils::set_node_as_evidence(bn, n)"
                          << "\n\tInvalid arguments to this function"
-                         << "\n\tn:                     " << n 
-                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes() 
+                         << "\n\tn:                     " << n
+                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes()
             );
 
-            bn.node(n).data.set_as_evidence(); 
+            bn.node(n).data.set_as_evidence();
         }
 
     // ----------------------------------------------------------------------------------------
@@ -817,17 +817,17 @@ namespace dlib
         void set_node_as_nonevidence (
             T& bn,
             unsigned long n
-        ) 
-        { 
+        )
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT( n < bn.number_of_nodes(),
                          "\tvoid bayes_node_utils::set_node_as_nonevidence(bn, n)"
                          << "\n\tInvalid arguments to this function"
-                         << "\n\tn:                     " << n 
-                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes() 
+                         << "\n\tn:                     " << n
+                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes()
             );
 
-            bn.node(n).data.set_as_nonevidence(); 
+            bn.node(n).data.set_as_nonevidence();
         }
 
     // ----------------------------------------------------------------------------------------
@@ -837,17 +837,17 @@ namespace dlib
             T& bn,
             unsigned long n,
             unsigned long num
-        ) 
-        { 
+        )
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT( n < bn.number_of_nodes(),
                          "\tvoid bayes_node_utils::set_node_num_values(bn, n, num)"
                          << "\n\tInvalid arguments to this function"
-                         << "\n\tn:                     " << n 
-                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes() 
+                         << "\n\tn:                     " << n
+                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes()
             );
 
-            bn.node(n).data.table().set_num_values(num); 
+            bn.node(n).data.table().set_num_values(num);
         }
 
     // ----------------------------------------------------------------------------------------
@@ -857,23 +857,23 @@ namespace dlib
             const T& bn,
             unsigned long n,
             unsigned long value,
-            const assignment& parents 
-        ) 
+            const assignment& parents
+        )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT( n < bn.number_of_nodes() && value < node_num_values(bn,n),
                          "\tdouble bayes_node_utils::node_probability(bn, n, value, parents)"
                          << "\n\tInvalid arguments to this function"
-                         << "\n\tn:                     " << n 
-                         << "\n\tvalue:                 " << value 
-                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes() 
-                         << "\n\tnode_num_values(bn,n): " << node_num_values(bn,n) 
+                         << "\n\tn:                     " << n
+                         << "\n\tvalue:                 " << value
+                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes()
+                         << "\n\tnode_num_values(bn,n): " << node_num_values(bn,n)
             );
 
             DLIB_ASSERT( parents.size() == bn.node(n).number_of_parents(),
                          "\tdouble bayes_node_utils::node_probability(bn, n, value, parents)"
                          << "\n\tInvalid arguments to this function"
-                         << "\n\tn:                             " << n 
+                         << "\n\tn:                             " << n
                          << "\n\tparents.size():                " << parents.size()
                          << "\n\tb.node(n).number_of_parents(): " << bn.node(n).number_of_parents()
             );
@@ -886,16 +886,16 @@ namespace dlib
                 DLIB_ASSERT( bn.has_edge(x, n),
                              "\tdouble bayes_node_utils::node_probability(bn, n, value, parents)"
                              << "\n\tInvalid arguments to this function"
-                             << "\n\tn: " << n 
-                             << "\n\tx: " << x 
+                             << "\n\tn: " << n
+                             << "\n\tx: " << x
                 );
                 DLIB_ASSERT( parents[x] < node_num_values(bn,x),
                              "\tdouble bayes_node_utils::node_probability(bn, n, value, parents)"
                              << "\n\tInvalid arguments to this function"
-                             << "\n\tn:                     " << n 
-                             << "\n\tx:                     " << x 
-                             << "\n\tparents[x]:            " << parents[x] 
-                             << "\n\tnode_num_values(bn,x): " << node_num_values(bn,x) 
+                             << "\n\tn:                     " << n
+                             << "\n\tx:                     " << x
+                             << "\n\tparents[x]:            " << parents[x]
+                             << "\n\tnode_num_values(bn,x): " << node_num_values(bn,x)
                 );
             }
 #endif
@@ -918,18 +918,18 @@ namespace dlib
             DLIB_ASSERT( n < bn.number_of_nodes() && value < node_num_values(bn,n),
                          "\tvoid bayes_node_utils::set_node_probability(bn, n, value, parents, p)"
                          << "\n\tInvalid arguments to this function"
-                         << "\n\tn:                     " << n 
-                         << "\n\tp:                     " << p 
-                         << "\n\tvalue:                 " << value 
-                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes() 
-                         << "\n\tnode_num_values(bn,n): " << node_num_values(bn,n) 
+                         << "\n\tn:                     " << n
+                         << "\n\tp:                     " << p
+                         << "\n\tvalue:                 " << value
+                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes()
+                         << "\n\tnode_num_values(bn,n): " << node_num_values(bn,n)
             );
 
             DLIB_ASSERT( parents.size() == bn.node(n).number_of_parents(),
                          "\tvoid bayes_node_utils::set_node_probability(bn, n, value, parents, p)"
                          << "\n\tInvalid arguments to this function"
-                         << "\n\tn:                             " << n 
-                         << "\n\tp:                             " << p 
+                         << "\n\tn:                             " << n
+                         << "\n\tp:                             " << p
                          << "\n\tparents.size():                " << parents.size()
                          << "\n\tbn.node(n).number_of_parents(): " << bn.node(n).number_of_parents()
             );
@@ -937,8 +937,8 @@ namespace dlib
             DLIB_ASSERT( 0.0 <= p && p <= 1.0,
                          "\tvoid bayes_node_utils::set_node_probability(bn, n, value, parents, p)"
                          << "\n\tInvalid arguments to this function"
-                         << "\n\tn: " << n 
-                         << "\n\tp: " << p 
+                         << "\n\tn: " << n
+                         << "\n\tp: " << p
             );
 
 #ifdef ENABLE_ASSERTS
@@ -949,16 +949,16 @@ namespace dlib
                 DLIB_ASSERT( bn.has_edge(x, n),
                              "\tvoid bayes_node_utils::set_node_probability(bn, n, value, parents, p)"
                              << "\n\tInvalid arguments to this function"
-                             << "\n\tn: " << n 
-                             << "\n\tx: " << x 
+                             << "\n\tn: " << n
+                             << "\n\tx: " << x
                 );
                 DLIB_ASSERT( parents[x] < node_num_values(bn,x),
                              "\tvoid bayes_node_utils::set_node_probability(bn, n, value, parents, p)"
                              << "\n\tInvalid arguments to this function"
-                             << "\n\tn:                     " << n 
-                             << "\n\tx:                     " << x 
-                             << "\n\tparents[x]:            " << parents[x] 
-                             << "\n\tnode_num_values(bn,x): " << node_num_values(bn,x) 
+                             << "\n\tn:                     " << n
+                             << "\n\tx:                     " << x
+                             << "\n\tparents[x]:            " << parents[x]
+                             << "\n\tnode_num_values(bn,x): " << node_num_values(bn,x)
                 );
             }
 #endif
@@ -972,13 +972,13 @@ namespace dlib
         const assignment node_first_parent_assignment (
             const T& bn,
             unsigned long n
-        ) 
-        { 
+        )
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT( n < bn.number_of_nodes(),
                          "\tconst assignment bayes_node_utils::node_first_parent_assignment(bn, n)"
                          << "\n\tInvalid arguments to this function"
-                         << "\n\tn:                     " << n 
+                         << "\n\tn:                     " << n
             );
 
             assignment a;
@@ -997,19 +997,19 @@ namespace dlib
             const T& bn,
             unsigned long n,
             assignment& a
-        ) 
-        { 
+        )
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT( n < bn.number_of_nodes(),
                          "\tbool bayes_node_utils::node_next_parent_assignment(bn, n, a)"
                          << "\n\tInvalid arguments to this function"
-                         << "\n\tn:                     " << n 
+                         << "\n\tn:                     " << n
             );
 
             DLIB_ASSERT( a.size() == bn.node(n).number_of_parents(),
                          "\tbool bayes_node_utils::node_next_parent_assignment(bn, n, a)"
                          << "\n\tInvalid arguments to this function"
-                         << "\n\tn:                             " << n 
+                         << "\n\tn:                             " << n
                          << "\n\ta.size():                      " << a.size()
                          << "\n\tbn.node(n).number_of_parents(): " << bn.node(n).number_of_parents()
             );
@@ -1022,16 +1022,16 @@ namespace dlib
                 DLIB_ASSERT( bn.has_edge(x, n),
                              "\tbool bayes_node_utils::node_next_parent_assignment(bn, n, a)"
                              << "\n\tInvalid arguments to this function"
-                             << "\n\tn: " << n 
-                             << "\n\tx: " << x 
+                             << "\n\tn: " << n
+                             << "\n\tx: " << x
                 );
                 DLIB_ASSERT( a[x] < node_num_values(bn,x),
                              "\tbool bayes_node_utils::node_next_parent_assignment(bn, n, a)"
                              << "\n\tInvalid arguments to this function"
-                             << "\n\tn:                     " << n 
-                             << "\n\tx:                     " << x 
-                             << "\n\ta[x]:                  " << a[x] 
-                             << "\n\tnode_num_values(bn,x): " << node_num_values(bn,x) 
+                             << "\n\tn:                     " << n
+                             << "\n\tx:                     " << x
+                             << "\n\ta[x]:                  " << a[x]
+                             << "\n\tnode_num_values(bn,x): " << node_num_values(bn,x)
                 );
             }
 #endif
@@ -1066,14 +1066,14 @@ namespace dlib
         bool node_cpt_filled_out (
             const T& bn,
             unsigned long n
-        ) 
-        { 
+        )
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT( n < bn.number_of_nodes(),
                          "\tbool bayes_node_utils::node_cpt_filled_out(bn, n)"
                          << "\n\tInvalid arguments to this function"
-                         << "\n\tn:                     " << n 
-                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes() 
+                         << "\n\tn:                     " << n
+                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes()
             );
 
             const unsigned long num_values = node_num_values(bn,n);
@@ -1130,7 +1130,7 @@ namespace dlib
                 if (node_is_evidence(bn, n))
                     continue;
 
-                samples.set_size(node_num_values(bn,n)); 
+                samples.set_size(node_num_values(bn,n));
                 // obtain the probability distribution for this node
                 for (long i = 0; i < samples.nc(); ++i)
                 {
@@ -1170,8 +1170,8 @@ namespace dlib
             >
         double node_probability (
             const T& bn,
-            unsigned long n 
-        ) 
+            unsigned long n
+        )
         /*!
             requires
                 - n < bn.number_of_nodes()
@@ -1191,7 +1191,7 @@ namespace dlib
         assignment v;
 
         dlib::rand rnd;
-        matrix<double,1> samples; 
+        matrix<double,1> samples;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -1251,7 +1251,7 @@ namespace dlib
 
             virtual const matrix<double,1> probability(
                 unsigned long idx
-            ) const 
+            ) const
             {
                 join_tree_values.node(cliques[idx]).data.marginalize(idx, table);
                 table.normalize();
@@ -1263,7 +1263,7 @@ namespace dlib
                 for (unsigned long i = 0; i < table.size(); ++i)
                 {
                     var[idx] = i;
-                    dist(i) = table.probability(var); 
+                    dist(i) = table.probability(var);
                 }
 
                 return dist;
@@ -1336,7 +1336,7 @@ namespace dlib
                 d.reset();
                 while (d.move_next())
                 {
-                    assignment a; 
+                    assignment a;
                     const assignment& asrc = d.element().key();
                     asrc.reset();
                     while (asrc.move_next())
@@ -1362,14 +1362,14 @@ namespace dlib
             void create_bayesian_network_join_tree (
                 const T& bn,
                 const U& join_tree,
-                V& bn_join_tree 
+                V& bn_join_tree
             )
             /*!
                 requires
                     - bn is a proper bayesian network
                     - join_tree is the join tree for that bayesian network
                 ensures
-                    - bn_join_tree == the output of the join tree algorithm for bayesian network inference.  
+                    - bn_join_tree == the output of the join tree algorithm for bayesian network inference.
                       So each node in this graph contains a joint_probability_table for the clique
                       in the corresponding node in the join_tree graph.
             !*/
@@ -1378,9 +1378,9 @@ namespace dlib
                 bn_join_tree.clear();
                 copy_graph_structure(join_tree, bn_join_tree);
 
-                // we need to keep track of which node is "in" each clique for the purposes of 
+                // we need to keep track of which node is "in" each clique for the purposes of
                 // initializing the tables in each clique.  So this vector will be used to do that
-                // and a value of join_tree.number_of_nodes() means that the node with 
+                // and a value of join_tree.number_of_nodes() means that the node with
                 // that index is unassigned.
                 std::vector<unsigned long> node_assigned_to(bn.number_of_nodes(),join_tree.number_of_nodes());
 
@@ -1404,7 +1404,7 @@ namespace dlib
                     std::vector<unsigned long> indices;
                     assignment value;
 
-                    // loop over all the nodes in this clique in the join tree.  In this loop 
+                    // loop over all the nodes in this clique in the join tree.  In this loop
                     // we are making an assignment with all the values of the nodes it represents set to 0
                     join_tree.node(i).data.reset();
                     while (join_tree.node(i).data.move_next())
@@ -1417,7 +1417,7 @@ namespace dlib
                             contains_evidence = true;
                     }
 
-                    // now loop over all possible combinations of values that the nodes this 
+                    // now loop over all possible combinations of values that the nodes this
                     // clique in the join tree can take on.  We do this by counting by one through all
                     // legal values
                     bool more_assignments = true;
@@ -1450,10 +1450,10 @@ namespace dlib
                             const unsigned long idx = join_tree.node(i).data.element();
                             // if this clique contains all the parents of this node and also hasn't
                             // been assigned to another clique
-                            if (set_contains_all_parents_of_node(join_tree.node(i).data,  bn.node(idx)) && 
+                            if (set_contains_all_parents_of_node(join_tree.node(i).data,  bn.node(idx)) &&
                                 (i == node_assigned_to[idx] || node_assigned_to[idx] == join_tree.number_of_nodes()) )
                             {
-                                // note that this node is now assigned to this clique 
+                                // note that this node is now assigned to this clique
                                 node_assigned_to[idx] = i;
                                 // node idx has all its parents in the cluster
                                 assignment parent_values;
@@ -1488,8 +1488,8 @@ namespace dlib
                             }
                         }
 
-                    } // end while (more_assignments) 
-                } 
+                    } // end while (more_assignments)
+                }
 
 
 
@@ -1638,8 +1638,8 @@ namespace dlib
             DLIB_ASSERT( idx < number_of_nodes() ,
                         "\tconst matrix<double,1> bayesian_network_join_tree::probability(idx)"
                         << "\n\tYou have specified an invalid node index"
-                        << "\n\tidx:               " << idx 
-                        << "\n\tnumber_of_nodes(): " << number_of_nodes() 
+                        << "\n\tidx:               " << idx
+                        << "\n\tnumber_of_nodes(): " << number_of_nodes()
                         << "\n\tthis:              " << this
                     );
 

@@ -1,6 +1,6 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SVm_MULTICLASS_LINEAR_TRAINER_Hh_ 
+#ifndef DLIB_SVm_MULTICLASS_LINEAR_TRAINER_Hh_
 #define DLIB_SVm_MULTICLASS_LINEAR_TRAINER_Hh_
 
 #include "svm_multiclass_linear_trainer_abstract.h"
@@ -23,12 +23,12 @@ namespace dlib
         typename label_type
         >
     class multiclass_svm_problem : public structural_svm_problem_threaded<matrix_type,
-                                                                 std::vector<std::pair<unsigned long,typename matrix_type::type> > > 
+                                                                 std::vector<std::pair<unsigned long,typename matrix_type::type> > >
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object defines the optimization problem for the multiclass SVM trainer
-                object at the bottom of this file.  
+                object at the bottom of this file.
 
                 The joint feature vectors used by this object, the PSI(x,y) vectors, are
                 defined as follows:
@@ -65,7 +65,7 @@ namespace dlib
         }
 
         virtual long get_num_samples (
-        ) const 
+        ) const
         {
             return static_cast<long>(samples.size());
         }
@@ -73,7 +73,7 @@ namespace dlib
         virtual void get_truth_joint_feature_vector (
             long idx,
             feature_vector_type& psi
-        ) const 
+        ) const
         {
             assign(psi, samples[idx]);
             // Add a constant -1 to account for the bias term.
@@ -98,7 +98,7 @@ namespace dlib
             const matrix_type& current_solution,
             scalar_type& loss,
             feature_vector_type& psi
-        ) const 
+        ) const
         {
             scalar_type best_val = -std::numeric_limits<scalar_type>::infinity();
             unsigned long best_idx = 0;
@@ -163,7 +163,7 @@ namespace dlib
 
     template <
         typename K,
-        typename label_type_ = typename K::scalar_type 
+        typename label_type_ = typename K::scalar_type
         >
     class svm_multiclass_linear_trainer
     {
@@ -215,7 +215,7 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\t void svm_multiclass_linear_trainer::set_epsilon()"
                 << "\n\t eps_ must be greater than 0"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 << "\n\t this: " << this
                 );
 
@@ -230,7 +230,7 @@ namespace dlib
 
         void set_max_iterations (
             unsigned long max_iter
-        ) 
+        )
         {
             max_iterations = max_iter;
         }
@@ -275,7 +275,7 @@ namespace dlib
         {
             learn_nonnegative_weights = value;
             if (learn_nonnegative_weights)
-                prior = trained_function_type(); 
+                prior = trained_function_type();
         }
 
         void set_c (
@@ -286,7 +286,7 @@ namespace dlib
             DLIB_ASSERT(C_ > 0,
                 "\t void svm_multiclass_linear_trainer::set_c()"
                 << "\n\t C must be greater than 0"
-                << "\n\t C_:   " << C_ 
+                << "\n\t C_:   " << C_
                 << "\n\t this: " << this
                 );
 
@@ -332,8 +332,8 @@ namespace dlib
             DLIB_ASSERT(is_learning_problem(all_samples,all_labels),
                 "\t trained_function_type svm_multiclass_linear_trainer::train(all_samples,all_labels)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t all_samples.size():     " << all_samples.size() 
-                << "\n\t all_labels.size():      " << all_labels.size() 
+                << "\n\t all_samples.size():     " << all_samples.size()
+                << "\n\t all_labels.size():      " << all_labels.size()
                 );
 
             trained_function_type df;
@@ -351,12 +351,12 @@ namespace dlib
             const long dims = std::max(df.weights.nc(),input_sample_dimensionality);
             if (is_matrix<sample_type>::value && has_prior())
             {
-                DLIB_ASSERT(input_sample_dimensionality == prior.weights.nc(), 
+                DLIB_ASSERT(input_sample_dimensionality == prior.weights.nc(),
                     "\t trained_function_type svm_multiclass_linear_trainer::train(all_samples,all_labels)"
                     << "\n\t The training samples given to this function are not the same kind of training "
                     << "\n\t samples used to create the prior."
-                    << "\n\t input_sample_dimensionality: " << input_sample_dimensionality 
-                    << "\n\t prior.weights.nc():          " << prior.weights.nc() 
+                    << "\n\t input_sample_dimensionality: " << input_sample_dimensionality
+                    << "\n\t prior.weights.nc():          " << prior.weights.nc()
                 );
             }
 

@@ -12,15 +12,15 @@ namespace dlib
         >
     class memory_manager_stateless
     {
-        /*!      
+        /*!
             REQUIREMENTS ON T
-                T must have a default constructor.      
+                T must have a default constructor.
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents some kind of stateless memory manager or memory pool.  
-                Stateless means that all instances (instances of the same kernel implementation that is) 
-                of this object are identical and can be used interchangeably.  Note that 
-                implementations are allowed to have some shared global state such as a 
+                This object represents some kind of stateless memory manager or memory pool.
+                Stateless means that all instances (instances of the same kernel implementation that is)
+                of this object are identical and can be used interchangeably.  Note that
+                implementations are allowed to have some shared global state such as a
                 global memory pool.
 
             THREAD SAFETY
@@ -41,14 +41,14 @@ namespace dlib
             memory_manager_stateless(
             );
             /*!
-                ensures 
+                ensures
                     - #*this is properly initialized
                 throws
                     - std::bad_alloc
             !*/
 
             virtual ~memory_manager_stateless(
-            ); 
+            );
             /*!
                 ensures
                     - frees any resources used by *this but has no effect on any shared global
@@ -62,7 +62,7 @@ namespace dlib
                     - allocates a new object of type T and returns a pointer to it.
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor.
-                        If this exception is thrown then the call to allocate() 
+                        If this exception is thrown then the call to allocate()
                         has no effect on #*this.
             !*/
 
@@ -85,11 +85,11 @@ namespace dlib
             );
             /*!
                 ensures
-                    - allocates a new array of size objects of type T and returns a 
+                    - allocates a new array of size objects of type T and returns a
                       pointer to it.
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor.
-                        If this exception is thrown then the call to allocate() 
+                        If this exception is thrown then the call to allocate()
                         has no effect on #*this.
             !*/
 
@@ -112,10 +112,10 @@ namespace dlib
             );
             /*!
                 ensures
-                    - this function has no effect on *this or item.  It is just provided 
-                      to make this object's interface more compatable with the other 
+                    - this function has no effect on *this or item.  It is just provided
+                      to make this object's interface more compatable with the other
                       memory managers.
-            !*/ 
+            !*/
 
         private:
 
@@ -128,9 +128,9 @@ namespace dlib
         typename T
         >
     inline void swap (
-        memory_manager_stateless<T>& a, 
-        memory_manager_stateless<T>& b 
-    ) { a.swap(b); }   
+        memory_manager_stateless<T>& a,
+        memory_manager_stateless<T>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/

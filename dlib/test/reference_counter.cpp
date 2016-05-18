@@ -10,7 +10,7 @@
 #include <dlib/reference_counter.h>
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -20,18 +20,18 @@ namespace
     logger dlog("test.reference_counter");
 
     template <
-        typename ref_counter 
+        typename ref_counter
         >
     void reference_counter_test (
     )
     /*!
         requires
-            - ref_counter is an implementation of reference_counter/reference_counter_kernel_abstract.h 
-              and is instantiated to contain an int 
+            - ref_counter is an implementation of reference_counter/reference_counter_kernel_abstract.h
+              and is instantiated to contain an int
         ensures
-            - runs tests on reference_counter for compliance with the specs 
+            - runs tests on reference_counter for compliance with the specs
     !*/
-    {        
+    {
 
         ref_counter a, b, c;
 

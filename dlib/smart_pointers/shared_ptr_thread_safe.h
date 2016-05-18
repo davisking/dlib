@@ -1,7 +1,7 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_SHARED_THREAD_SAFE_PTr_
-#define DLIB_SHARED_THREAD_SAFE_PTr_ 
+#define DLIB_SHARED_THREAD_SAFE_PTr_
 
 #include <algorithm>
 #include <memory>
@@ -19,7 +19,7 @@
 #endif
 
 
-namespace dlib 
+namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ namespace dlib
     struct shared_ptr_thread_safe_node
     {
         shared_ptr_thread_safe_node(
-        ) : 
+        ) :
             ref_count(1),
             del(0)
         {}
@@ -58,8 +58,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template<typename T> 
-    class shared_ptr_thread_safe 
+    template<typename T>
+    class shared_ptr_thread_safe
     {
         /*!
             CONVENTION
@@ -85,7 +85,7 @@ namespace dlib
             void del(const void* p) { d((T*)p); }
             D d;
 
-            void* get_deleter_void(const std::type_info& t) const 
+            void* get_deleter_void(const std::type_info& t) const
             {
                 if (typeid(D) == t)
                     return (void*)&d;
@@ -99,9 +99,9 @@ namespace dlib
         typedef T element_type;
 
         shared_ptr_thread_safe(
-        ) : data(0), shared_node(0) {} 
+        ) : data(0), shared_node(0) {}
 
-        template<typename Y> 
+        template<typename Y>
         explicit shared_ptr_thread_safe(
             Y* p
         ) : data(p)
@@ -122,11 +122,11 @@ namespace dlib
             }
         }
 
-        template<typename Y, typename D> 
+        template<typename Y, typename D>
         shared_ptr_thread_safe(
-            Y* p, 
+            Y* p,
             const D& d
-        ) : 
+        ) :
             data(p)
         {
             DLIB_ASSERT(p != 0,
@@ -148,8 +148,8 @@ namespace dlib
             }
         }
 
-        ~shared_ptr_thread_safe() 
-        { 
+        ~shared_ptr_thread_safe()
+        {
             if ( shared_node != 0)
             {
                 shared_node->m.lock();
@@ -172,7 +172,7 @@ namespace dlib
                     // finally delete the shared_node
                     delete shared_node;
                 }
-                else 
+                else
                 {
                     shared_node->ref_count -= 1;
                     shared_node->m.unlock();
@@ -180,10 +180,10 @@ namespace dlib
             }
         }
 
-        shared_ptr_thread_safe( 
+        shared_ptr_thread_safe(
             const shared_ptr_thread_safe& r
-        ) 
-        { 
+        )
+        {
             data = r.data;
             shared_node = r.shared_node;
             if (shared_node)
@@ -193,7 +193,7 @@ namespace dlib
             }
         }
 
-        template<typename Y> 
+        template<typename Y>
         shared_ptr_thread_safe(
             const shared_ptr_thread_safe<Y>& r,
             const shared_ptr_ts_static_cast&
@@ -212,7 +212,7 @@ namespace dlib
             }
         }
 
-        template<typename Y> 
+        template<typename Y>
         shared_ptr_thread_safe(
             const shared_ptr_thread_safe<Y>& r,
             const shared_ptr_ts_const_cast&
@@ -231,7 +231,7 @@ namespace dlib
             }
         }
 
-        template<typename Y> 
+        template<typename Y>
         shared_ptr_thread_safe(
             const shared_ptr_thread_safe<Y>& r,
             const shared_ptr_ts_dynamic_cast&
@@ -250,7 +250,7 @@ namespace dlib
             }
         }
 
-        template<typename Y> 
+        template<typename Y>
         shared_ptr_thread_safe(
             const shared_ptr_thread_safe<Y>& r
         )
@@ -286,7 +286,7 @@ namespace dlib
             return *this;
         }
 
-        template<typename Y> 
+        template<typename Y>
         shared_ptr_thread_safe& operator= (
             const shared_ptr_thread_safe<Y>& r
         )
@@ -295,7 +295,7 @@ namespace dlib
             return *this;
         }
 
-        template<typename Y> 
+        template<typename Y>
         shared_ptr_thread_safe& operator= (
             std::auto_ptr<Y>& r
         )
@@ -317,7 +317,7 @@ namespace dlib
             shared_ptr_thread_safe().swap(*this);
         }
 
-        template<typename Y> 
+        template<typename Y>
         void reset(Y* p)
         {
             DLIB_ASSERT(p != 0,
@@ -329,9 +329,9 @@ namespace dlib
             shared_ptr_thread_safe(p).swap(*this);
         }
 
-        template<typename Y, typename D> 
+        template<typename Y, typename D>
         void reset(
-            Y* p, 
+            Y* p,
             const D& d
         )
         {
@@ -345,39 +345,39 @@ namespace dlib
         }
 
         T& operator*(
-        ) const 
-        { 
+        ) const
+        {
             DLIB_ASSERT(get() != 0,
                 "\tshared_ptr::operator*()"
                 << "\n\tget() can't be null if you are going to dereference it"
                 << "\n\tthis: " << this
                 );
 
-            return *data; 
-        } 
+            return *data;
+        }
 
         T* operator->(
-        ) const 
-        { 
+        ) const
+        {
             DLIB_ASSERT(get() != 0,
                 "\tshared_ptr::operator->()"
                 << "\n\tget() can't be null"
                 << "\n\tthis: " << this
                 );
 
-            return data; 
-        } 
+            return data;
+        }
         
-        T* get() const { return data; } 
+        T* get() const { return data; }
 
-        bool unique() const 
-        {  
+        bool unique() const
+        {
             return use_count() == 1;
         }
 
         long use_count() const
         {
-            if (shared_node != 0) 
+            if (shared_node != 0)
             {
                 auto_mutex M(shared_node->m);
                 return shared_node->ref_count;
@@ -389,7 +389,7 @@ namespace dlib
         }
 
         operator bool(
-        ) const { return get() != 0; }  
+        ) const { return get() != 0; }
 
         void swap(shared_ptr_thread_safe& b)
         {
@@ -433,28 +433,28 @@ namespace dlib
 
     template<typename T, typename U>
     bool operator== (
-        const shared_ptr_thread_safe<T>& a, 
+        const shared_ptr_thread_safe<T>& a,
         const shared_ptr_thread_safe<U>& b
     ) { return a.get() == b.get(); }
 
     template<typename T, typename U>
     bool operator!= (
-        const shared_ptr_thread_safe<T>& a, 
+        const shared_ptr_thread_safe<T>& a,
         const shared_ptr_thread_safe<U>& b
     ) { return a.get() != b.get(); }
 
     template<typename T, typename U>
     bool operator< (
-        const shared_ptr_thread_safe<T>& a, 
+        const shared_ptr_thread_safe<T>& a,
         const shared_ptr_thread_safe<U>& b
     )
     {
         return a._private_less(b);
     }
 
-    template<typename T> 
+    template<typename T>
     void swap(
-        shared_ptr_thread_safe<T>& a, 
+        shared_ptr_thread_safe<T>& a,
         shared_ptr_thread_safe<T>& b
     ) { a.swap(b); }
 

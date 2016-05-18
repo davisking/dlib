@@ -16,7 +16,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename vector_type 
+        typename vector_type
         >
     class structural_graph_labeling_trainer
     {
@@ -25,7 +25,7 @@ namespace dlib
         typedef graph_labeler<vector_type> trained_function_type;
 
         structural_graph_labeling_trainer (
-        )  
+        )
         {
             C = 10;
             verbose = false;
@@ -57,7 +57,7 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\t void structural_graph_labeling_trainer::set_epsilon()"
                 << "\n\t eps_ must be greater than 0"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 << "\n\t this: " << this
                 );
 
@@ -77,7 +77,7 @@ namespace dlib
         unsigned long get_max_cache_size (
         ) const
         {
-            return max_cache_size; 
+            return max_cache_size;
         }
 
         void be_verbose (
@@ -106,14 +106,14 @@ namespace dlib
         }
 
         void set_c (
-            double C_ 
+            double C_
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C_ > 0,
                 "\t void structural_graph_labeling_trainer::set_c()"
                 << "\n\t C_ must be greater than 0"
-                << "\n\t C_:    " << C_ 
+                << "\n\t C_:    " << C_
                 << "\n\t this: " << this
                 );
 
@@ -135,7 +135,7 @@ namespace dlib
             DLIB_ASSERT(loss >= 0,
                     "\t structural_graph_labeling_trainer::set_loss_on_positive_class()"
                     << "\n\t Invalid inputs were given to this function."
-                    << "\n\t loss: " << loss 
+                    << "\n\t loss: " << loss
                     << "\n\t this: " << this );
 
             loss_pos = loss;
@@ -149,7 +149,7 @@ namespace dlib
             DLIB_ASSERT(loss >= 0,
                     "\t structural_graph_labeling_trainer::set_loss_on_negative_class()"
                     << "\n\t Invalid inputs were given to this function."
-                    << "\n\t loss: " << loss 
+                    << "\n\t loss: " << loss
                     << "\n\t this: " << this );
 
             loss_neg = loss;
@@ -165,7 +165,7 @@ namespace dlib
         template <
             typename graph_type
             >
-        const graph_labeler<vector_type> train (  
+        const graph_labeler<vector_type> train (
             const dlib::array<graph_type>& samples,
             const std::vector<label_type>& labels,
             const std::vector<std::vector<double> >& losses
@@ -176,18 +176,18 @@ namespace dlib
             DLIB_ASSERT(is_graph_labeling_problem(samples, labels, reason_for_failure) == true ,
                     "\t void structural_graph_labeling_trainer::train()"
                     << "\n\t Invalid inputs were given to this function."
-                    << "\n\t reason_for_failure: " << reason_for_failure 
-                    << "\n\t samples.size(): " << samples.size() 
-                    << "\n\t labels.size():  " << labels.size() 
+                    << "\n\t reason_for_failure: " << reason_for_failure
+                    << "\n\t samples.size(): " << samples.size()
+                    << "\n\t labels.size():  " << labels.size()
                     << "\n\t this: " << this );
             DLIB_ASSERT((losses.size() == 0 || sizes_match(labels, losses) == true) &&
                         all_values_are_nonnegative(losses) == true,
                     "\t void structural_graph_labeling_trainer::train()"
                     << "\n\t Invalid inputs were given to this function."
-                    << "\n\t labels.size():  " << labels.size() 
-                    << "\n\t losses.size():  " << losses.size() 
-                    << "\n\t sizes_match(labels,losses): " << sizes_match(labels,losses) 
-                    << "\n\t all_values_are_nonnegative(losses): " << all_values_are_nonnegative(losses) 
+                    << "\n\t labels.size():  " << labels.size()
+                    << "\n\t losses.size():  " << losses.size()
+                    << "\n\t sizes_match(labels,losses): " << sizes_match(labels,losses)
+                    << "\n\t all_values_are_nonnegative(losses): " << all_values_are_nonnegative(losses)
                     << "\n\t this: " << this );
 #endif
 
@@ -218,7 +218,7 @@ namespace dlib
         template <
             typename graph_type
             >
-        const graph_labeler<vector_type> train (  
+        const graph_labeler<vector_type> train (
             const dlib::array<graph_type>& samples,
             const std::vector<label_type>& labels
         ) const

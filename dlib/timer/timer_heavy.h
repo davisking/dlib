@@ -42,7 +42,7 @@ namespace dlib
                 - running && !stop_running == is_running()
                 - delay == delay_time()
                 - *ao == action_object()
-                - af == action_function()    
+                - af == action_function()
 
                 - if (running) then
                     - there is a thread running
@@ -58,7 +58,7 @@ namespace dlib
 
         typedef void (T::*af_type)();
 
-        timer_heavy(  
+        timer_heavy(
             T& ao_,
             af_type af_
         );
@@ -88,7 +88,7 @@ namespace dlib
             unsigned long milliseconds
         );
         
-        void start (            
+        void start (
         );
 
         void stop (
@@ -125,7 +125,7 @@ namespace dlib
         timer_heavy(const timer_heavy<T>&);        // copy constructor
         timer_heavy<T>& operator=(const timer_heavy<T>&);    // assignment operator
 
-    };    
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -137,10 +137,10 @@ namespace dlib
         typename T
         >
     timer_heavy<T>::
-    timer_heavy(  
+    timer_heavy(
         T& ao_,
         af_type af_
-    ) : 
+    ) :
         ao(ao_),
         af(af_),
         delay(1000),
@@ -173,7 +173,7 @@ namespace dlib
     {
         m.lock();
         stop_running = true;
-        delay = 1000;        
+        delay = 1000;
         s.broadcast();
         m.unlock();
     }
@@ -237,7 +237,7 @@ namespace dlib
     ) const
     {
         auto_mutex M(m);
-        return delay;        
+        return delay;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -270,12 +270,12 @@ namespace dlib
         typename T
         >
     void timer_heavy<T>::
-    start (            
+    start (
     )
     {
         auto_mutex M(m);
 
-        // if (is_running() == false) then reset the countdown to the next call 
+        // if (is_running() == false) then reset the countdown to the next call
         // to the action_function()
         if ( (running && !stop_running) == false)
             next_time_to_run = ts.get_timestamp() + delay*1000;
@@ -333,7 +333,7 @@ namespace dlib
                 s.wait_or_timeout(delay_remaining);
 
             if (stop_running)
-                break;            
+                break;
 
             current_time = ts.get_timestamp();
             if (current_time < next_time_to_run)
@@ -347,9 +347,9 @@ namespace dlib
                     continue;
             }
 
-            // call the action function 
+            // call the action function
             m.unlock();
-            (ao.*af)(); 
+            (ao.*af)();
             m.lock();
 
             current_time = ts.get_timestamp();
@@ -379,7 +379,7 @@ namespace dlib
             s.broadcast();
             // wait for the thread to quit
             while (running)
-                s.wait();          
+                s.wait();
         }
         m.unlock();
     }

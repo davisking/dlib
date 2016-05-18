@@ -16,14 +16,14 @@ namespace dlib
     {
         /*!
             INITIAL VALUE
-                The network is initially initialized with random weights 
+                The network is initially initialized with random weights
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a multilayer layer perceptron network that is
                 trained using the back propagation algorithm.  The training algorithm also
                 incorporates the momentum method.  That is, each round of back propagation
                 training also adds a fraction of the previous update.  This fraction
-                is controlled by the momentum term set in the constructor.  
+                is controlled by the momentum term set in the constructor.
 
                 The activation function used at each node is the sigmoid function.  I.e.
                 sigmoid(x) = 1/(1 + pow(e,-x)).  Thus the output of the network is
@@ -34,8 +34,8 @@ namespace dlib
 
         mlp (
             long nodes_in_input_layer,
-            long nodes_in_first_hidden_layer, 
-            long nodes_in_second_hidden_layer = 0, 
+            long nodes_in_first_hidden_layer,
+            long nodes_in_second_hidden_layer = 0,
             long nodes_in_output_layer = 1,
             double alpha = 0.1,
             double momentum = 0.8
@@ -47,7 +47,7 @@ namespace dlib
                 - nodes_in_second_hidden_layer >= 0
                 - nodes_in_output_layer > 0
             ensures
-                - #*this is properly initialized 
+                - #*this is properly initialized
                 - #input_layer_nodes() == nodes_in_input_layer
                 - #first_hidden_layer_nodes() == nodes_in_first_hidden_layer
                 - #second_hidden_layer_nodes() == nodes_in_second_hidden_layer
@@ -56,7 +56,7 @@ namespace dlib
                 - #get_momentum() == momentum
             throws
                 - std::bad_alloc
-                    if this is thrown the mlp will be unusable but 
+                    if this is thrown the mlp will be unusable but
                     will not leak memory
         !*/
 
@@ -94,7 +94,7 @@ namespace dlib
         /*!
             ensures
                 - if (this network has a second hidden layer) then
-                    - returns the number of nodes in the second hidden layer.  This is 
+                    - returns the number of nodes in the second hidden layer.  This is
                       the hidden layer that is directly connected to the output layer.
                 - else
                     - returns 0
@@ -119,13 +119,13 @@ namespace dlib
         /*!
             ensures
                 - returns the momentum term used by this object during back propagation
-                  training.  The momentum is is the fraction of a previous update to 
+                  training.  The momentum is is the fraction of a previous update to
                   carry forward to the next call to train()
         !*/
 
         template <typename EXP>
         const matrix<double> operator() (
-            const matrix_exp<EXP>& in 
+            const matrix_exp<EXP>& in
         ) const;
         /*!
             requires
@@ -141,7 +141,7 @@ namespace dlib
         template <typename EXP1, typename EXP2>
         void train (
             const matrix_exp<EXP1>& example_in,
-            const matrix_exp<EXP2>& example_out 
+            const matrix_exp<EXP2>& example_out
         );
         /*!
             requires
@@ -153,7 +153,7 @@ namespace dlib
                 - EXP1::type == double
                 - EXP2::type == double
             ensures
-                - trains the network that the correct output when given example_in 
+                - trains the network that the correct output when given example_in
                   should be example_out.
         !*/
 
@@ -170,7 +170,7 @@ namespace dlib
                 - example_out <= 1.0 && example_out >= 0.0
                 - EXP::type == double
             ensures
-                - trains the network that the correct output when given example_in 
+                - trains the network that the correct output when given example_in
                   should be example_out.
         !*/
 
@@ -190,36 +190,36 @@ namespace dlib
                 - swaps *this and item
         !*/
 
-    };   
+    };
    
     inline void swap (
-        mlp& a, 
-        mlp& b 
-    ) { a.swap(b); }   
+        mlp& a,
+        mlp& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
 
     void serialize (
-        const mlp& item, 
-        std::ostream& out 
-    );   
+        const mlp& item,
+        std::ostream& out
+    );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     void deserialize (
-        mlp& item, 
+        mlp& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
 
 }
 
-#endif // DLIB_MLp_ABSTRACT_ 
+#endif // DLIB_MLp_ABSTRACT_
 
 

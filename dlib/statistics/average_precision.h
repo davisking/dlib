@@ -55,7 +55,7 @@ namespace dlib
         if (relevant_count != 0)
             return precision_sum/relevant_count;
         else
-            return 1; 
+            return 1;
     }
 
 // ----------------------------------------------------------------------------------------

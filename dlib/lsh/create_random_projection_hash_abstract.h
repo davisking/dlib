@@ -23,12 +23,12 @@ namespace dlib
         requires
             - 0 < bits <= 32
             - v.size() > 1
-            - vector_type == a std::vector or compatible type containing dlib::matrix 
+            - vector_type == a std::vector or compatible type containing dlib::matrix
               objects, each representing a column vector of the same size.
             - for all valid i, j:
-                - is_col_vector(v[i]) == true 
+                - is_col_vector(v[i]) == true
                 - v[i].size() > 0
-                - v[i].size() == v[j].size() 
+                - v[i].size() == v[j].size()
                 - i.e. v contains only column vectors and all the column vectors
                   have the same non-zero length
             - rand_type == a type that implements the dlib/rand/rand_kernel_abstract.h interface
@@ -59,12 +59,12 @@ namespace dlib
         requires
             - 0 < bits <= 32
             - v.size() > 1
-            - vector_type == a std::vector or compatible type containing dlib::matrix 
+            - vector_type == a std::vector or compatible type containing dlib::matrix
               objects, each representing a column vector of the same size.
             - for all valid i, j:
-                - is_col_vector(v[i]) == true 
+                - is_col_vector(v[i]) == true
                 - v[i].size() > 0
-                - v[i].size() == v[j].size() 
+                - v[i].size() == v[j].size()
                 - i.e. v contains only column vectors and all the column vectors
                   have the same non-zero length
         ensures
@@ -87,12 +87,12 @@ namespace dlib
         requires
             - 0 < bits <= 32
             - v.size() > 1
-            - vector_type == a std::vector or compatible type containing dlib::matrix 
+            - vector_type == a std::vector or compatible type containing dlib::matrix
               objects, each representing a column vector of the same size.
             - for all valid i, j:
-                - is_col_vector(v[i]) == true 
+                - is_col_vector(v[i]) == true
                 - v[i].size() > 0
-                - v[i].size() == v[j].size() 
+                - v[i].size() == v[j].size()
                 - i.e. v contains only column vectors and all the column vectors
                   have the same non-zero length
             - rand_type == a type that implements the dlib/rand/rand_kernel_abstract.h interface
@@ -126,12 +126,12 @@ namespace dlib
         requires
             - 0 < bits <= 32
             - v.size() > 1
-            - vector_type == a std::vector or compatible type containing dlib::matrix 
+            - vector_type == a std::vector or compatible type containing dlib::matrix
               objects, each representing a column vector of the same size.
             - for all valid i, j:
-                - is_col_vector(v[i]) == true 
+                - is_col_vector(v[i]) == true
                 - v[i].size() > 0
-                - v[i].size() == v[j].size() 
+                - v[i].size() == v[j].size()
                 - i.e. v contains only column vectors and all the column vectors
                   have the same non-zero length
         ensures

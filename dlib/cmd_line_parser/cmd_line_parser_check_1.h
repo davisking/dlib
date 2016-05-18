@@ -1,7 +1,7 @@
 // Copyright (C) 2006  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_CMD_LINE_PARSER_CHECk_1_
-#define DLIB_CMD_LINE_PARSER_CHECk_1_ 
+#define DLIB_CMD_LINE_PARSER_CHECk_1_
 
 #include "cmd_line_parser_kernel_abstract.h"
 #include <sstream>
@@ -30,14 +30,14 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        class cmd_line_check_error : public dlib::error 
+        class cmd_line_check_error : public dlib::error
         {
             friend class cmd_line_parser_check_1;
 
             cmd_line_check_error(
                 error_type t,
                 const string_type& opt_,
-                const string_type& arg_ 
+                const string_type& arg_
             ) :
                 dlib::error(t),
                 opt(opt_),
@@ -91,7 +91,7 @@ namespace dlib
                 switch (type)
                 {
                     case EINVALID_OPTION_ARG:
-                        sout << "Command line error: '" << narrow(arg) << "' is not a valid argument to " 
+                        sout << "Command line error: '" << narrow(arg) << "' is not a valid argument to "
                              << "the '" << narrow(opt) << "' option.";
                         break;
                     case EMISSING_REQUIRED_OPTION:
@@ -116,7 +116,7 @@ namespace dlib
                         }
                         break;
                     case EINCOMPATIBLE_OPTIONS:
-                        sout << "Command line error: The '" << narrow(opt) << "' and '" << narrow(opt2) 
+                        sout << "Command line error: The '" << narrow(opt) << "' and '" << narrow(opt2)
                             << "' options cannot be given together on the command line.";
                         break;
                     case EMULTIPLE_OCCURANCES:
@@ -133,8 +133,8 @@ namespace dlib
         public:
             const string_type opt;
             const string_type opt2;
-            const string_type arg; 
-            const std::vector<string_type> required_opts; 
+            const string_type arg;
+            const std::vector<string_type> required_opts;
         };
 
     // ------------------------------------------------------------------------------------
@@ -226,9 +226,9 @@ namespace dlib
         typename clp_base
         >
     inline void swap (
-        cmd_line_parser_check_1<clp_base>& a, 
-        cmd_line_parser_check_1<clp_base>& b 
-    ) { a.swap(b); }  
+        cmd_line_parser_check_1<clp_base>& a,
+        cmd_line_parser_check_1<clp_base>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -302,7 +302,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename clp_base> 
+    template <typename clp_base>
     template < typename T, size_t length >
     void cmd_line_parser_check_1<clp_base>::
     check_option_arg_range (
@@ -480,7 +480,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename clp_base>
-    template < size_t length > 
+    template < size_t length >
     void cmd_line_parser_check_1<clp_base>::
     check_sub_options (
         const char_type* (&parent_option_set)[length],
@@ -512,7 +512,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename clp_base>
-    template < size_t parent_length, size_t sub_length > 
+    template < size_t parent_length, size_t sub_length >
     void cmd_line_parser_check_1<clp_base>::
     check_sub_options (
         const char_type* (&parent_option_set)[parent_length],
@@ -566,7 +566,7 @@ namespace dlib
         {
             throw cmd_line_check_error(
                 EMULTIPLE_OCCURANCES,
-                option_set[i] 
+                option_set[i]
             );
         }
     }
@@ -575,6 +575,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_CMD_LINE_PARSER_CHECk_1_ 
+#endif // DLIB_CMD_LINE_PARSER_CHECk_1_
 
 

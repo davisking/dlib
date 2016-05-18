@@ -9,7 +9,7 @@
 #include <dlib/base64.h>
 #include <dlib/image_io.h>
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -137,8 +137,8 @@ namespace
                                     const int rows = rnd.get_random_32bit_number()%11+1;
                                     const int cols = rnd.get_random_32bit_number()%11+1;
                                     DLIB_TEST_MSG(rect == image_to_fhog(fhog_to_image(rect,cell_size,rows,cols),cell_size,rows,cols),
-                                        " rows: "<< rows << 
-                                        " cols: "<< cols << 
+                                        " rows: "<< rows <<
+                                        " cols: "<< cols <<
                                         " cell_size: "<< cell_size  <<
                                         " rect: "<< rect <<
                                         " irect: "<<fhog_to_image(rect,cell_size,rows,cols) <<

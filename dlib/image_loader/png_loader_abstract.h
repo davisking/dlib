@@ -26,8 +26,8 @@ namespace dlib
 
     public:
 
-        png_loader( 
-            const char* filename 
+        png_loader(
+            const char* filename
         );
         /*!
             ensures
@@ -39,8 +39,8 @@ namespace dlib
                   us from loading the given PNG file.
         !*/
 
-        png_loader( 
-            const std::string& filename 
+        png_loader(
+            const std::string& filename
         );
         /*!
             ensures
@@ -52,8 +52,8 @@ namespace dlib
                   us from loading the given PNG file.
         !*/
 
-        png_loader( 
-            const dlib::file& f 
+        png_loader(
+            const dlib::file& f
         );
         /*!
             ensures
@@ -121,15 +121,15 @@ namespace dlib
         !*/
 
         template<
-            typename image_type 
+            typename image_type
             >
-        void get_image( 
+        void get_image(
             image_type& img
         ) const;
         /*!
             requires
                 - image_type == an image object that implements the interface defined in
-                  dlib/image_processing/generic_image.h 
+                  dlib/image_processing/generic_image.h
             ensures
                 - loads the PNG image stored in this object into img
         !*/
@@ -148,7 +148,7 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
         ensures
             - performs: png_loader(file_name).get_image(image);
     !*/

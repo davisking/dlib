@@ -1,7 +1,7 @@
 // Copyright (C) 2006  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_MATRIx_MATH_FUNCTIONS
-#define DLIB_MATRIx_MATH_FUNCTIONS 
+#define DLIB_MATRIx_MATH_FUNCTIONS
 
 #include "matrix_math_functions_abstract.h"
 #include "matrix_op.h"
@@ -99,9 +99,9 @@ namespace dlib
         {
             // you can only call pow() on matrices that contain floats, doubles or long doubles.
             COMPILE_TIME_ASSERT((
-                    is_same_type<type,float>::value == true || 
-                    is_same_type<type,double>::value == true || 
-                    is_same_type<type,long double>::value == true 
+                    is_same_type<type,float>::value == true ||
+                    is_same_type<type,double>::value == true ||
+                    is_same_type<type,long double>::value == true
             ));
 
             return std::pow(val,static_cast<type>(s));
@@ -112,9 +112,9 @@ namespace dlib
         {
             // you can only call pow() on matrices that contain floats, doubles or long doubles.
             COMPILE_TIME_ASSERT((
-                    is_same_type<type,float>::value == true || 
-                    is_same_type<type,double>::value == true || 
-                    is_same_type<type,long double>::value == true 
+                    is_same_type<type,float>::value == true ||
+                    is_same_type<type,double>::value == true ||
+                    is_same_type<type,long double>::value == true
             ));
 
             return std::pow(static_cast<type>(s),val);
@@ -125,12 +125,12 @@ namespace dlib
         {
             // you can only compute reciprocal matrices that contain floats, doubles or long doubles.
             COMPILE_TIME_ASSERT((
-                    is_same_type<type,float>::value == true || 
-                    is_same_type<type,double>::value == true || 
+                    is_same_type<type,float>::value == true ||
+                    is_same_type<type,double>::value == true ||
                     is_same_type<type,long double>::value == true  ||
-                    is_same_type<type,std::complex<float> >::value == true || 
-                    is_same_type<type,std::complex<double> >::value == true || 
-                    is_same_type<type,std::complex<long double> >::value == true 
+                    is_same_type<type,std::complex<float> >::value == true ||
+                    is_same_type<type,std::complex<double> >::value == true ||
+                    is_same_type<type,std::complex<long double> >::value == true
             ));
 
             if (val != static_cast<type>(0))
@@ -144,9 +144,9 @@ namespace dlib
         {
             // you can only compute reciprocal_max matrices that contain floats, doubles or long doubles.
             COMPILE_TIME_ASSERT((
-                    is_same_type<type,float>::value == true || 
-                    is_same_type<type,double>::value == true || 
-                    is_same_type<type,long double>::value == true 
+                    is_same_type<type,float>::value == true ||
+                    is_same_type<type,double>::value == true ||
+                    is_same_type<type,long double>::value == true
             ));
 
             if (val != static_cast<type>(0))
@@ -171,7 +171,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M, typename enabled = void>
-    struct op_round : basic_op_m<M> 
+    struct op_round : basic_op_m<M>
     {
         op_round( const M& m_) : basic_op_m<M>(m_){}
 
@@ -179,13 +179,13 @@ namespace dlib
         typedef typename M::type type;
         typedef const typename M::type const_ret_type;
         const_ret_type apply (long r, long c) const
-        { 
-            return static_cast<type>(std::floor(this->m(r,c)+0.5)); 
+        {
+            return static_cast<type>(std::floor(this->m(r,c)+0.5));
         }
     };
 
     template <typename M>
-    struct op_round<M,typename enable_if_c<std::numeric_limits<typename M::type>::is_integer>::type > 
+    struct op_round<M,typename enable_if_c<std::numeric_limits<typename M::type>::is_integer>::type >
     : basic_op_m<M>
     {
         op_round( const M& m_) : basic_op_m<M>(m_){}
@@ -194,7 +194,7 @@ namespace dlib
         typedef typename M::type type;
         typedef typename M::const_ret_type const_ret_type;
         const_ret_type apply (long r, long c) const
-        { 
+        {
             return this->m(r,c);
         }
     };
@@ -216,7 +216,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M>
-    struct op_normalize : basic_op_m<M> 
+    struct op_normalize : basic_op_m<M>
     {
         typedef typename M::type type;
 
@@ -227,7 +227,7 @@ namespace dlib
         const static long cost = M::cost+5;
         typedef const typename M::type const_ret_type;
         const_ret_type apply (long r, long c) const
-        { 
+        {
             return this->m(r,c)*s;
         }
     };
@@ -241,9 +241,9 @@ namespace dlib
     {
         // you can only compute normalized matrices that contain floats, doubles or long doubles.
         COMPILE_TIME_ASSERT((
-                is_same_type<typename EXP::type,float>::value == true || 
-                is_same_type<typename EXP::type,double>::value == true || 
-                is_same_type<typename EXP::type,long double>::value == true 
+                is_same_type<typename EXP::type,float>::value == true ||
+                is_same_type<typename EXP::type,double>::value == true ||
+                is_same_type<typename EXP::type,long double>::value == true
         ));
 
 
@@ -266,8 +266,8 @@ namespace dlib
         typedef typename M::type type;
         typedef const typename M::type const_ret_type;
         const_ret_type apply ( long r, long c) const
-        { 
-            return static_cast<type>(std::abs(this->m(r,c))); 
+        {
+            return static_cast<type>(std::abs(this->m(r,c)));
         }
     };
 
@@ -280,8 +280,8 @@ namespace dlib
         typedef T type;
         typedef const T const_ret_type;
         const_ret_type apply ( long r, long c) const
-        { 
-            return static_cast<type>(std::abs(this->m(r,c))); 
+        {
+            return static_cast<type>(std::abs(this->m(r,c)));
         }
     };
 
@@ -307,7 +307,7 @@ namespace dlib
         typedef std::complex<typename M::type> type;
         typedef const std::complex<typename M::type> const_ret_type;
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             return type(this->m(r,c));
         }
     };
@@ -344,7 +344,7 @@ namespace dlib
         >
     const matrix_op<op_complex_matrix2<EXP1,EXP2> > complex_matrix (
         const matrix_exp<EXP1>& real_part,
-        const matrix_exp<EXP2>& imag_part 
+        const matrix_exp<EXP2>& imag_part
     )
     {
         COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type,typename EXP2::type>::value == true));
@@ -352,13 +352,13 @@ namespace dlib
         COMPILE_TIME_ASSERT(EXP1::NC == EXP2::NC || EXP1::NC == 0 || EXP2::NC == 0);
 
         DLIB_ASSERT(real_part.nr() == imag_part.nr() &&
-               real_part.nc() == imag_part.nc(), 
+               real_part.nc() == imag_part.nc(),
             "\tconst matrix_exp::type complex_matrix(real_part, imag_part)"
             << "\n\tYou can only make a complex matrix from two equally sized matrices"
             << "\n\treal_part.nr(): " << real_part.nr()
-            << "\n\treal_part.nc(): " << real_part.nc() 
+            << "\n\treal_part.nc(): " << real_part.nc()
             << "\n\timag_part.nr(): " << imag_part.nr()
-            << "\n\timag_part.nc(): " << imag_part.nc() 
+            << "\n\timag_part.nc(): " << imag_part.nc()
             );
 
         typedef op_complex_matrix2<EXP1,EXP2> op;

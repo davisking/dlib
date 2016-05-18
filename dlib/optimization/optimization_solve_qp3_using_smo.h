@@ -11,22 +11,22 @@
 #include "../algs.h"
 
 
-namespace dlib 
+namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
 
-    class invalid_qp3_error : public dlib::error 
-    { 
+    class invalid_qp3_error : public dlib::error
+    {
 
-    public: 
+    public:
         invalid_qp3_error(
-            const std::string& msg, 
+            const std::string& msg,
             double B_,
             double Cp_,
             double Cn_
-        ) : 
-            dlib::error(msg), 
+        ) :
+            dlib::error(msg),
             B(B_),
             Cp(Cp_),
             Cn(Cn_)
@@ -58,7 +58,7 @@ namespace dlib
             typename EXP3,
             long NR
             >
-        unsigned long operator() ( 
+        unsigned long operator() (
             const matrix_exp<EXP1>& Q,
             const matrix_exp<EXP2>& p,
             const matrix_exp<EXP3>& y,
@@ -67,25 +67,25 @@ namespace dlib
             const scalar_type Cn,
             matrix<scalar_type,NR,1,mem_manager_type, layout_type>& alpha,
             scalar_type eps
-        ) 
+        )
         {
-            DLIB_ASSERT(Q.nr() == Q.nc() && y.size() == Q.nr() && p.size() == y.size() && 
+            DLIB_ASSERT(Q.nr() == Q.nc() && y.size() == Q.nr() && p.size() == y.size() &&
                         y.size() > 0 && is_col_vector(y) && is_col_vector(p) &&
                         sum((y == +1) + (y == -1)) == y.size() &&
                         Cp > 0 && Cn > 0 &&
                         eps > 0,
                 "\t void solve_qp3_using_smo::operator()"
                 << "\n\t invalid arguments were given to this function"
-                << "\n\t Q.nr():                     " << Q.nr() 
-                << "\n\t Q.nc():                     " << Q.nc() 
-                << "\n\t is_col_vector(p):           " << is_col_vector(p) 
-                << "\n\t p.size():                   " << p.size() 
-                << "\n\t is_col_vector(y):           " << is_col_vector(y) 
-                << "\n\t y.size():                   " << y.size() 
-                << "\n\t sum((y == +1) + (y == -1)): " << sum((y == +1) + (y == -1)) 
+                << "\n\t Q.nr():                     " << Q.nr()
+                << "\n\t Q.nc():                     " << Q.nc()
+                << "\n\t is_col_vector(p):           " << is_col_vector(p)
+                << "\n\t p.size():                   " << p.size()
+                << "\n\t is_col_vector(y):           " << is_col_vector(y)
+                << "\n\t y.size():                   " << y.size()
+                << "\n\t sum((y == +1) + (y == -1)): " << sum((y == +1) + (y == -1))
                 << "\n\t Cp:                         " << Cp
                 << "\n\t Cn:                         " << Cn
-                << "\n\t eps:                        " << eps 
+                << "\n\t eps:                        " << eps
                 );
 
 
@@ -177,7 +177,7 @@ namespace dlib
                         ++count;
                         alpha(i) = C;
                     }
-                    else 
+                    else
                     {
                         if (count < num_total)
                         {
@@ -280,7 +280,7 @@ namespace dlib
 
                         if (b > 0)
                         {
-                            scalar_type a = Q_ip(ip) + Q_diag(j) - 2*y(ip)*Q_ip(j); 
+                            scalar_type a = Q_ip(ip) + Q_diag(j) - 2*y(ip)*Q_ip(j);
                             if (a <= 0)
                                 a = tau;
                             scalar_type temp = -b*b/a;
@@ -302,7 +302,7 @@ namespace dlib
 
                         if (b > 0)
                         {
-                            scalar_type a = Q_ip(ip) + Q_diag(j) + 2*y(ip)*Q_ip(j); 
+                            scalar_type a = Q_ip(ip) + Q_diag(j) + 2*y(ip)*Q_ip(j);
                             if (a <= 0)
                                 a = tau;
                             scalar_type temp = -b*b/a;

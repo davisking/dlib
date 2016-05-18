@@ -9,7 +9,7 @@
 namespace dlib
 {
 
-    class compress_stream 
+    class compress_stream
     {
         /*!
             INITIAL VALUE
@@ -51,10 +51,10 @@ namespace dlib
                   and writes it to out
             throws
                 - std::ios_base::failure
-                    if there was a problem writing to out then this exception will 
-                    be thrown.                      
+                    if there was a problem writing to out then this exception will
+                    be thrown.
                 - any other exception
-                    this exception may be thrown if there is any other problem                    
+                    this exception may be thrown if there is any other problem
         !*/
 
 
@@ -65,18 +65,18 @@ namespace dlib
         /*!
             ensures
                 - reads data from in, decompresses it and writes it to out.  note that
-                  it stops reading data from in when it encounters the end of the 
-                  compressed data, not when it encounters EOF. 
+                  it stops reading data from in when it encounters the end of the
+                  compressed data, not when it encounters EOF.
             throws
                 - std::ios_base::failure
-                    if there was a problem writing to out then this exception will 
-                    be thrown.           
+                    if there was a problem writing to out then this exception will
+                    be thrown.
                 - decompression_error
                     if an error was detected in the compressed data that prevented
-                    it from being correctly decompressed then this exception is 
-                    thrown.  
+                    it from being correctly decompressed then this exception is
+                    thrown.
                 - any other exception
-                    this exception may be thrown if there is any other problem                    
+                    this exception may be thrown if there is any other problem
         !*/
 
 
@@ -86,7 +86,7 @@ namespace dlib
         compress_stream(compress_stream&);        // copy constructor
         compress_stream& operator=(compress_stream&);    // assignment operator
 
-    };   
+    };
    
 }
 

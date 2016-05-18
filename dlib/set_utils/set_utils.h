@@ -197,7 +197,7 @@ namespace dlib
     void set_difference (
         const T& a,
         const U& b,
-        V& d 
+        V& d
     )
     {
         typedef typename T::type type;

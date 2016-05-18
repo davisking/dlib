@@ -32,7 +32,7 @@ namespace dlib
         typename bit_stream_base
         >
     inline void swap (
-        bit_stream_multi_c<bit_stream_base>& a, 
+        bit_stream_multi_c<bit_stream_base>& a,
         bit_stream_multi_c<bit_stream_base>& b
     ) { a.swap(b); }
 
@@ -45,17 +45,17 @@ namespace dlib
     template <
         typename bit_stream_base
         >
-    void bit_stream_multi_c<bit_stream_base>:: 
+    void bit_stream_multi_c<bit_stream_base>::
     multi_write (
         unsigned long data,
         int num_to_write
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( (this->is_in_write_mode() == true) && (num_to_write >= 0 && num_to_write <=32), 
+        DLIB_CASSERT( (this->is_in_write_mode() == true) && (num_to_write >= 0 && num_to_write <=32),
             "\tvoid bit_stream::write"
             << "\n\tthe bit stream bust be in write mode and"
-            << "\n\tnum_to_write must be between 0 and 32 inclusive" 
+            << "\n\tnum_to_write must be between 0 and 32 inclusive"
             << "\n\tnum_to_write == " << num_to_write
             << "\n\tis_in_write_mode() == " << this->is_in_write_mode()
             << "\n\tthis: " << this
@@ -71,7 +71,7 @@ namespace dlib
     template <
         typename bit_stream_base
         >
-    int bit_stream_multi_c<bit_stream_base>:: 
+    int bit_stream_multi_c<bit_stream_base>::
     multi_read (
         unsigned long& data,
         int num_to_read
@@ -79,9 +79,9 @@ namespace dlib
     {
 
         // make sure requires clause is not broken
-        DLIB_CASSERT(( this->is_in_read_mode() == true && ( num_to_read >= 0 && num_to_read <=32 ) ), 
+        DLIB_CASSERT(( this->is_in_read_mode() == true && ( num_to_read >= 0 && num_to_read <=32 ) ),
             "\tvoid bit_stream::read"
-            << "\n\tyou can't read from a bit_stream that isn't in read mode and" 
+            << "\n\tyou can't read from a bit_stream that isn't in read mode and"
             << "\n\tnum_to_read must be between 0 and 32 inclusive"
             << "\n\tnum_to_read == " << num_to_read
             << "\n\tis_in_read_mode() == " << this->is_in_read_mode()

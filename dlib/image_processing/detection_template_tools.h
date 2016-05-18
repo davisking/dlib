@@ -25,7 +25,7 @@ namespace dlib
             "\t rectangle compute_box_dimensions()"
             << "\n\t Invalid arguments were given to this function. "
             << "\n\t width_to_height_ratio: " << width_to_height_ratio
-            << "\n\t area: " << area 
+            << "\n\t area: " << area
             );
 
         /*
@@ -43,7 +43,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline std::vector<rectangle> create_single_box_detection_template (
-        const rectangle& object_box 
+        const rectangle& object_box
     )
     {
         std::vector<rectangle> temp;
@@ -54,7 +54,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline std::vector<rectangle> create_overlapped_2x2_detection_template (
-        const rectangle& object_box 
+        const rectangle& object_box
     )
     {
         std::vector<rectangle> result;

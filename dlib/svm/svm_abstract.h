@@ -36,7 +36,7 @@ namespace dlib
             - returns true if all of the following are true and false otherwise:
                 - is_col_vector(x) == true
                 - is_col_vector(x_labels) == true
-                - x.size() == x_labels.size() 
+                - x.size() == x_labels.size()
                 - x.size() > 0
     !*/
 
@@ -67,7 +67,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename sequence_type 
+        typename sequence_type
         >
     bool is_sequence_labeling_problem (
         const std::vector<sequence_type>& samples,
@@ -79,14 +79,14 @@ namespace dlib
                 - is_learning_problem(samples, labels) == true
                 - for all valid i:
                     - samples[i].size() == labels[i].size()
-                      (i.e. The size of a label sequence need to match the size of 
+                      (i.e. The size of a label sequence need to match the size of
                       its corresponding sample sequence)
     !*/
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename sequence_type 
+        typename sequence_type
         >
     bool is_sequence_segmentation_problem (
         const std::vector<sequence_type>& samples,
@@ -112,7 +112,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename lhs_type, 
+        typename lhs_type,
         typename rhs_type
         >
     bool is_assignment_problem (
@@ -122,7 +122,7 @@ namespace dlib
     /*!
         ensures
             - Note that an assignment problem is a task to associate each element of samples[i].first
-              to an element of samples[i].second, or to indicate that the element doesn't associate 
+              to an element of samples[i].second, or to indicate that the element doesn't associate
               with anything.  Therefore, labels[i] should contain the association information for
               samples[i].
             - This function returns true if all of the following are true and false otherwise:
@@ -141,7 +141,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename lhs_type, 
+        typename lhs_type,
         typename rhs_type
         >
     bool is_forced_assignment_problem (
@@ -150,11 +150,11 @@ namespace dlib
     );
     /*!
         ensures
-            - A regular assignment problem is allowed to indicate that all elements of 
+            - A regular assignment problem is allowed to indicate that all elements of
               samples[i].first don't associate to anything.  However, a forced assignment
-              problem is required to always associate an element of samples[i].first to 
+              problem is required to always associate an element of samples[i].first to
               something in samples[i].second if there is an element of samples[i].second
-              that hasn't already been associated to something.  
+              that hasn't already been associated to something.
             - This function returns true if all of the following are true and false otherwise:
                 - is_assignment_problem(samples, labels) == true
                 - for all valid i:
@@ -187,7 +187,7 @@ namespace dlib
 
     template <
         typename detection_type_,
-        typename label_type_ 
+        typename label_type_
         >
     void serialize (const labeled_detection<detection_type_,label_type_>& item, std::ostream& out);
     /*!
@@ -196,7 +196,7 @@ namespace dlib
 
     template <
         typename detection_type_,
-        typename label_type_ 
+        typename label_type_
         >
     void deserialize (labeled_detection<detection_type_,label_type_>& item, std::istream& in);
     /*!
@@ -206,8 +206,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename detection_type, 
-        typename label_type 
+        typename detection_type,
+        typename label_type
         >
     bool is_track_association_problem (
         const std::vector<std::vector<labeled_detection<detection_type,label_type> > >& samples
@@ -218,7 +218,7 @@ namespace dlib
               expected to associate each detection with a track or have it spawn a new
               track.  Therefore, a track association problem is a machine learning problem
               where you are given a dataset of example input detections and are expected to
-              learn to perform the proper detection to track association.  
+              learn to perform the proper detection to track association.
             - This function checks if samples can form a valid dataset for this machine
               learning problem and returns true if this is the case.  This means we should
               interpret samples in the following way:
@@ -246,8 +246,8 @@ namespace dlib
     !*/
 
     template <
-        typename detection_type, 
-        typename label_type 
+        typename detection_type,
+        typename label_type
         >
     bool is_track_association_problem (
         const std::vector<std::vector<std::vector<labeled_detection<detection_type,label_type> > > >& samples
@@ -280,18 +280,18 @@ namespace dlib
     );
     /*!
         requires
-            - T should be either float, double, or long double 
+            - T should be either float, double, or long double
             - is_binary_classification_problem(scores,labels) == true
         ensures
             - This function learns to map scalar values into well calibrated probabilities
-              using Platt scaling.  In particular, it returns a params object such that, 
+              using Platt scaling.  In particular, it returns a params object such that,
               for all valid i:
                 - platt_scale(params,scores[i]) == the scaled version of the scalar value
                   scores[i].  That is, the output is a number between 0 and 1.  In
                   particular, platt_scale(params,scores[i]) is meant to represent the
                   probability that labels[i] == +1.
             - This function is an implementation of the algorithm described in the following
-              papers: 
+              papers:
                 Probabilistic Outputs for Support Vector Machines and Comparisons to
                 Regularized Likelihood Methods by John C. Platt.  March 26, 1999
 
@@ -306,7 +306,7 @@ namespace dlib
         typename sample_vector_type,
         typename label_vector_type
         >
-    const probabilistic_function<typename trainer_type::trained_function_type> 
+    const probabilistic_function<typename trainer_type::trained_function_type>
     train_probabilistic_decision_function (
         const trainer_type& trainer,
         const sample_vector_type& x,
@@ -320,10 +320,10 @@ namespace dlib
             - x and y must be std::vector objects or types with a compatible interface.
             - trainer_type == some kind of batch trainer object (e.g. svm_nu_trainer)
         ensures
-            - trains a classifier given the training samples in x and labels in y.  
+            - trains a classifier given the training samples in x and labels in y.
             - returns a probabilistic_decision_function that represents the trained classifier.
-            - The parameters of the probability model are estimated by performing k-fold 
-              cross validation. 
+            - The parameters of the probability model are estimated by performing k-fold
+              cross validation.
             - The number of folds used is given by the folds argument.
             - This function is implemented using learn_platt_scaling()
         throws
@@ -375,8 +375,8 @@ namespace dlib
         ensures
             - performs k-fold cross validation by using the given trainer to solve the
               given binary classification problem for the given number of folds.
-              Each fold is tested using the output of the trainer and the average 
-              classification accuracy from all folds is returned.  
+              Each fold is tested using the output of the trainer and the average
+              classification accuracy from all folds is returned.
             - The average accuracy is computed by running test_binary_decision_function()
               on each fold and its output is averaged and returned.
             - The number of folds used is given by the folds argument.
@@ -405,10 +405,10 @@ namespace dlib
             - Tests the given decision function by calling it on the x_test and y_test samples.
               The output of dec_funct is interpreted as a prediction for the +1 class
               if its output is >= 0 and as a prediction for the -1 class otherwise.
-            - The test accuracy is returned in a row vector, let us call it R.  Both 
-              quantities in R are numbers between 0 and 1 which represent the fraction 
-              of examples correctly classified.  R(0) is the fraction of +1 examples 
-              correctly classified and R(1) is the fraction of -1 examples correctly 
+            - The test accuracy is returned in a row vector, let us call it R.  Both
+              quantities in R are numbers between 0 and 1 which represent the fraction
+              of examples correctly classified.  R(0) is the fraction of +1 examples
+              correctly classified and R(1) is the fraction of -1 examples correctly
               classified.
         throws
             - std::bad_alloc
@@ -423,13 +423,13 @@ namespace dlib
         >
     void randomize_samples (
         T& samples,
-        U& labels 
+        U& labels
     );
     /*!
         requires
-            - T == a matrix object or an object compatible with std::vector that contains 
+            - T == a matrix object or an object compatible with std::vector that contains
               a swappable type.
-            - U == a matrix object or an object compatible with std::vector that contains 
+            - U == a matrix object or an object compatible with std::vector that contains
               a swappable type.
             - if samples or labels are matrix objects then is_vector(samples) == true and
               is_vector(labels) == true
@@ -438,7 +438,7 @@ namespace dlib
             - randomizes the order of the samples and labels but preserves
               the pairing between each sample and its label
             - A default initialized random number generator is used to perform the randomizing.
-              Note that this means that each call this this function does the same thing.  
+              Note that this means that each call this this function does the same thing.
               That is, the random number generator always uses the same seed.
             - for all valid i:
                 - let r == the random index samples(i) was moved to.  then:
@@ -459,9 +459,9 @@ namespace dlib
     );
     /*!
         requires
-            - T == a matrix object or an object compatible with std::vector that contains 
+            - T == a matrix object or an object compatible with std::vector that contains
               a swappable type.
-            - U == a matrix object or an object compatible with std::vector that contains 
+            - U == a matrix object or an object compatible with std::vector that contains
               a swappable type.
             - if samples or labels are matrix objects then is_vector(samples) == true and
               is_vector(labels) == true
@@ -486,14 +486,14 @@ namespace dlib
     );
     /*!
         requires
-            - T == a matrix object or an object compatible with std::vector that contains 
+            - T == a matrix object or an object compatible with std::vector that contains
               a swappable type.
-            - if (samples is a matrix) then 
-                - is_vector(samples) == true 
+            - if (samples is a matrix) then
+                - is_vector(samples) == true
         ensures
-            - randomizes the order of the elements inside samples 
+            - randomizes the order of the elements inside samples
             - A default initialized random number generator is used to perform the randomizing.
-              Note that this means that each call this this function does the same thing.  
+              Note that this means that each call this this function does the same thing.
               That is, the random number generator always uses the same seed.
     !*/
 
@@ -509,13 +509,13 @@ namespace dlib
     );
     /*!
         requires
-            - T == a matrix object or an object compatible with std::vector that contains 
+            - T == a matrix object or an object compatible with std::vector that contains
               a swappable type.
             - rand_type == a type that implements the dlib/rand/rand_kernel_abstract.h interface
-            - if (samples is a matrix) then 
-                - is_vector(samples) == true 
+            - if (samples is a matrix) then
+                - is_vector(samples) == true
         ensures
-            - randomizes the order of the elements inside samples 
+            - randomizes the order of the elements inside samples
             - the given rnd random number generator object is used to do the randomizing
     !*/
 
@@ -533,14 +533,14 @@ namespace dlib
     );
     /*!
         requires
-            - T == a matrix object or an object compatible with std::vector that contains 
+            - T == a matrix object or an object compatible with std::vector that contains
               a swappable type.
-            - U == a matrix object or an object compatible with std::vector that contains 
+            - U == a matrix object or an object compatible with std::vector that contains
               a swappable type.
-            - V == a matrix object or an object compatible with std::vector that contains 
+            - V == a matrix object or an object compatible with std::vector that contains
               a swappable type.
-            - if (samples, labels, or auxiliary are matrix objects) then 
-                - is_vector(samples) == true 
+            - if (samples, labels, or auxiliary are matrix objects) then
+                - is_vector(samples) == true
                 - is_vector(labels) == true
                 - is_vector(auxiliary) == true
             - samples.size() == labels.size() == auxiliary.size()
@@ -572,14 +572,14 @@ namespace dlib
     );
     /*!
         requires
-            - T == a matrix object or an object compatible with std::vector that contains 
+            - T == a matrix object or an object compatible with std::vector that contains
               a swappable type.
-            - U == a matrix object or an object compatible with std::vector that contains 
+            - U == a matrix object or an object compatible with std::vector that contains
               a swappable type.
-            - V == a matrix object or an object compatible with std::vector that contains 
+            - V == a matrix object or an object compatible with std::vector that contains
               a swappable type.
-            - if (samples, labels, or auxiliary are matrix objects) then 
-                - is_vector(samples) == true 
+            - if (samples, labels, or auxiliary are matrix objects) then
+                - is_vector(samples) == true
                 - is_vector(labels) == true
                 - is_vector(auxiliary) == true
             - samples.size() == labels.size() == auxiliary.size()

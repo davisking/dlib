@@ -72,14 +72,14 @@ namespace dlib
                     - probability_of_bit(i) == 0
         !*/
 
-        void append ( 
+        void append (
             const quantum_register& reg
         );
         /*!
             ensures
                 - #num_bits() == num_bits() + reg.num_bits()
                 - #this->state_vector() == tensor_product(this->state_vector(), reg.state_vector())
-                - The original bits in *this become the high order bits of the resulting 
+                - The original bits in *this become the high order bits of the resulting
                   register and all the bits in reg end up as the low order bits in the
                   resulting register.
         !*/
@@ -184,19 +184,19 @@ namespace dlib
                 version of operator() and compute_state_element().
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents an expression that evaluates to a quantum gate 
+                This object represents an expression that evaluates to a quantum gate
                 that operates on T::num_bits qubits.
 
                 This object makes it easy to create new types of gate objects. All
-                you need to do is inherit from gate_exp in the proper way and 
-                then you can use your new gate objects in conjunction with all the 
+                you need to do is inherit from gate_exp in the proper way and
+                then you can use your new gate objects in conjunction with all the
                 others.
         !*/
 
     public:
 
         static const long num_bits = T::num_bits;
-        static const long dims = T::dims; 
+        static const long dims = T::dims;
 
         gate_exp(
             T& exp
@@ -207,7 +207,7 @@ namespace dlib
         !*/
 
         const qc_scalar_type operator() (
-            long r, 
+            long r,
             long c
         ) const;
         /*!
@@ -241,7 +241,7 @@ namespace dlib
                 - reg.nc() == 1
                 - 0 <= row_idx < dims
             ensures
-                - Let M represent the matrix for this gate, then   
+                - Let M represent the matrix for this gate, then
                   this function returns rowm(M*reg, row_idx)
                   (i.e. returns the row_idx row of what you get when you apply this
                   gate to the given column vector in reg)
@@ -273,7 +273,7 @@ namespace dlib
                 Both must be gate expressions that inherit from gate_exp
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a quantum gate that is the tensor product of 
+                This object represents a quantum gate that is the tensor product of
                 two other quantum gates.
 
 
@@ -282,7 +282,7 @@ namespace dlib
                 so reg_all.state_vector() == tensor_product(reg_high.state_vector(),reg_low.state_vector()).
                 
                 Then applying a composite gate to reg_all would give you the same thing as
-                applying the lhs gate to reg_high and the rhs gate to reg_low and then appending 
+                applying the lhs gate to reg_high and the rhs gate to reg_low and then appending
                 the two resulting registers.  So the lhs gate of a composite_gate applies to
                 the high order bits of a regitser and the rhs gate applies to the lower order bits.
         !*/
@@ -297,9 +297,9 @@ namespace dlib
         !*/
 
         composite_gate(
-            const gate_exp<T>& lhs_, 
+            const gate_exp<T>& lhs_,
             const gate_exp<U>& rhs_
-        ): 
+        ):
         /*!
             ensures
                 - #lhs == lhs_.ref()
@@ -310,9 +310,9 @@ namespace dlib
         !*/
 
         const qc_scalar_type operator() (
-            long r, 
+            long r,
             long c
-        ) const; 
+        ) const;
         /*!
             requires
                 - 0 <= r < dims
@@ -339,7 +339,7 @@ namespace dlib
                   (i.e. returns the row_idx row of what you get when you apply this
                   gate to the given column vector in reg)
                 - This function works by calling rhs.compute_state_element() and using elements
-                  of the matrix in lhs.  
+                  of the matrix in lhs.
         !*/
 
         static const long num_bits;
@@ -359,8 +359,8 @@ namespace dlib
                 0 < bits <= 30
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a quantum gate that operates on bits qubits. 
-                It stores its gate matrix explicitly in a dense in-memory matrix. 
+                This object represents a quantum gate that operates on bits qubits.
+                It stores its gate matrix explicitly in a dense in-memory matrix.
         !*/
 
     public:
@@ -399,7 +399,7 @@ namespace dlib
         !*/
 
         const qc_scalar_type& operator() (
-            long r, 
+            long r,
             long c
         ) const;
         /*!
@@ -412,7 +412,7 @@ namespace dlib
         !*/
 
         qc_scalar_type& operator() (
-            long r, 
+            long r,
             long c
         );
         /*!
@@ -420,7 +420,7 @@ namespace dlib
                 - 0 <= r < dims
                 - 0 <= c < dims
             ensures
-                - Let M denote the matrix for this gate, then this function 
+                - Let M denote the matrix for this gate, then this function
                   returns a non-const reference to M(r,c)
         !*/
 
@@ -449,7 +449,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T, typename U>
-    const composite_gate<T,U> operator, ( 
+    const composite_gate<T,U> operator, (
         const gate_exp<T>& lhs,
         const gate_exp<U>& rhs
     ) { return composite_gate<T,U>(lhs,rhs); }
@@ -526,7 +526,7 @@ namespace dlib
 
                 WHAT THIS OBJECT REPRESENTS
                     This object represents the controlled-not quantum gate.  It is a gate that
-                    operates on abs(control_bit-target_bit)+1 qubits.   
+                    operates on abs(control_bit-target_bit)+1 qubits.
 
                     In terms of the computational basis vectors, this gate maps input
                     vectors to output vectors in the following way:
@@ -556,12 +556,12 @@ namespace dlib
                         - control_bit1 != control_bit2
                     - The target bit can't be in-between the control bits, i.e.:
                         - (control_bit1 < target_bit && control_bit2 < target_bit) ||
-                          (control_bit1 > target_bit && control_bit2 > target_bit) 
+                          (control_bit1 > target_bit && control_bit2 > target_bit)
 
                 WHAT THIS OBJECT REPRESENTS
-                    This object represents the toffoli variant of a controlled-not quantum gate.  
-                    It is a gate that operates on max(abs(control_bit2-target_bit),abs(control_bit1-target_bit))+1 
-                    qubits.   
+                    This object represents the toffoli variant of a controlled-not quantum gate.
+                    It is a gate that operates on max(abs(control_bit2-target_bit),abs(control_bit1-target_bit))+1
+                    qubits.
 
                     In terms of the computational basis vectors, this gate maps input
                     vectors to output vectors in the following way:

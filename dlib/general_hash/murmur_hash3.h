@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_MURMUR_HAsH_3_Hh_ 
-#define DLIB_MURMUR_HAsH_3_Hh_ 
+#ifndef DLIB_MURMUR_HAsH_3_Hh_
+#define DLIB_MURMUR_HAsH_3_Hh_
 
 #include "murmur_hash3_abstract.h"
 #include "../uintn.h"
@@ -11,7 +11,7 @@
 namespace dlib
 {
     //-----------------------------------------------------------------------------
-    // The original MurmurHash3 code was written by Austin Appleby, and is placed 
+    // The original MurmurHash3 code was written by Austin Appleby, and is placed
     // in the public domain. The author hereby disclaims copyright to this source code.
     // The code in this particular file was modified by Davis E. King.  In
     // particular, endian-swapping was added along with some other minor code
@@ -38,7 +38,7 @@ namespace dlib
 
 #else	// defined(_MSC_VER)
 
-#define	DLIB_FORCE_INLINE __attribute__((always_inline)) inline 
+#define	DLIB_FORCE_INLINE __attribute__((always_inline)) inline
 
     inline uint32 murmur_rotl32 ( uint32 x, int8 r )
     {
@@ -73,7 +73,7 @@ namespace dlib
 
     DLIB_FORCE_INLINE uint32 murmur_getblock_byte_swap ( const uint32 * p, int i )
     {
-        union 
+        union
         {
             uint8 bytes[4];
             uint32 val;
@@ -100,7 +100,7 @@ namespace dlib
 
     DLIB_FORCE_INLINE uint64 murmur_getblock_byte_swap ( const uint64 * p, int i )
     {
-        union 
+        union
         {
             uint8 bytes[8];
             uint64 val;
@@ -148,9 +148,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline uint32 murmur_hash3 ( 
-        const void * key, 
-        const int len, 
+    inline uint32 murmur_hash3 (
+        const void * key,
+        const int len,
         const uint32 seed = 0
     )
     {
@@ -184,7 +184,7 @@ namespace dlib
                 k1 *= c2;
 
                 h1 ^= k1;
-                h1 = DLIB_ROTL32(h1,13); 
+                h1 = DLIB_ROTL32(h1,13);
                 h1 = h1*5+0xe6546b64;
             }
         }
@@ -199,7 +199,7 @@ namespace dlib
                 k1 *= c2;
 
                 h1 ^= k1;
-                h1 = DLIB_ROTL32(h1,13); 
+                h1 = DLIB_ROTL32(h1,13);
                 h1 = h1*5+0xe6546b64;
             }
         }
@@ -227,13 +227,13 @@ namespace dlib
         h1 = murmur_fmix(h1);
 
         return h1;
-    } 
+    }
 
 // ----------------------------------------------------------------------------------------
 
-    inline uint32 murmur_hash3_2 ( 
+    inline uint32 murmur_hash3_2 (
         const uint32 v1,
-        const uint32 v2 
+        const uint32 v2
     )
     {
         uint32 h1 = v2;
@@ -252,7 +252,7 @@ namespace dlib
         k1 *= c2;
 
         h1 ^= k1;
-        h1 = DLIB_ROTL32(h1,13); 
+        h1 = DLIB_ROTL32(h1,13);
         h1 = h1*5+0xe6546b64;
 
 
@@ -264,14 +264,14 @@ namespace dlib
         h1 = murmur_fmix(h1);
 
         return h1;
-    } 
+    }
 
 // ----------------------------------------------------------------------------------------
 
-    inline uint32 murmur_hash3_3 ( 
+    inline uint32 murmur_hash3_3 (
         const uint32 v1,
-        const uint32 v2, 
-        const uint32 v3 
+        const uint32 v2,
+        const uint32 v3
     )
     {
 
@@ -291,7 +291,7 @@ namespace dlib
         k1 *= c2;
 
         h1 ^= k1;
-        h1 = DLIB_ROTL32(h1,13); 
+        h1 = DLIB_ROTL32(h1,13);
         h1 = h1*5+0xe6546b64;
 
         k1 = v2;
@@ -300,7 +300,7 @@ namespace dlib
         k1 *= c2;
 
         h1 ^= k1;
-        h1 = DLIB_ROTL32(h1,13); 
+        h1 = DLIB_ROTL32(h1,13);
         h1 = h1*5+0xe6546b64;
 
         //----------
@@ -311,12 +311,12 @@ namespace dlib
         h1 = murmur_fmix(h1);
 
         return h1;
-    } 
+    }
 
 // ----------------------------------------------------------------------------------------
 
-    inline std::pair<uint64,uint64> murmur_hash3_128bit ( 
-        const void* key, 
+    inline std::pair<uint64,uint64> murmur_hash3_128bit (
+        const void* key,
         const int len,
         const uint32 seed = 0
     )
@@ -423,11 +423,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline std::pair<uint64,uint64> murmur_hash3_128bit ( 
-        const uint32& v1, 
-        const uint32& v2, 
-        const uint32& v3, 
-        const uint32& v4 
+    inline std::pair<uint64,uint64> murmur_hash3_128bit (
+        const uint32& v1,
+        const uint32& v2,
+        const uint32& v3,
+        const uint32& v4
     )
     {
         uint64 h1 = 0;
@@ -439,14 +439,14 @@ namespace dlib
         //----------
         // body
 
-        uint64 k1 = (static_cast<uint64>(v2)<<32)|v1; 
-        uint64 k2 = (static_cast<uint64>(v4)<<32)|v3; 
+        uint64 k1 = (static_cast<uint64>(v2)<<32)|v1;
+        uint64 k2 = (static_cast<uint64>(v4)<<32)|v3;
 
         k1 *= c1; k1  = DLIB_ROTL64(k1,31); k1 *= c2;
 
         h1 = DLIB_ROTL64(k1,27); h1 = h1*5+0x52dce729;
 
-        k2 *= c2; k2  = DLIB_ROTL64(k2,33); k2 *= c1; 
+        k2 *= c2; k2  = DLIB_ROTL64(k2,33); k2 *= c1;
 
         h2 = DLIB_ROTL64(k2,31); h2 += h1; h2 = h2*5+0x38495ab5;
 
@@ -469,10 +469,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline std::pair<uint64,uint64> murmur_hash3_128bit_3 ( 
-        uint64 k1, 
+    inline std::pair<uint64,uint64> murmur_hash3_128bit_3 (
+        uint64 k1,
         uint64 k2,
-        uint64 k3 
+        uint64 k3
     )
     {
         uint64 h1 = k3;

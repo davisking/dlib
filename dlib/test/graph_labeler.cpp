@@ -9,7 +9,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -364,7 +364,7 @@ namespace
                 test1<node_vector_type,edge_vector_type,vector_type>(samples, labels);
             }
             print_spinner();
-            // test with dense vectors and sparse vectors together 
+            // test with dense vectors and sparse vectors together
             {
                 typedef matrix<double,3,1> node_vector_type;
                 typedef matrix<double,2,1> edge_vector_type;

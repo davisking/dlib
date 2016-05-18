@@ -27,13 +27,13 @@ namespace dlib
         );
         /*!
             ensures
-                - this object is properly initialized 
+                - this object is properly initialized
         !*/
 
         template <typename matrix_type>
         std::vector<matrix<double,0,1> > operator() (
-            const std::vector<matrix_type>& data,       
-            const long num_dims                      
+            const std::vector<matrix_type>& data,
+            const long num_dims
         );
         /*!
             requires
@@ -54,8 +54,8 @@ namespace dlib
                   num_dims dimensional space that preserves relative distances between the
                   input data points.
                 - This function returns a std::vector, OUT, such that:
-                    - OUT == a set of column vectors that represent the Sammon projection of 
-                      the input data vectors. 
+                    - OUT == a set of column vectors that represent the Sammon projection of
+                      the input data vectors.
                     - OUT.size() == data.size()
                     - for all valid i:
                         - OUT[i].size() == num_dims
@@ -64,12 +64,12 @@ namespace dlib
 
         template <typename matrix_type>
         void operator() (
-            const std::vector<matrix_type>& data,       
-            const long num_dims,                     
-            std::vector<matrix<double,0,1> >& result,   
-            double &err,                                
-            const unsigned long num_iters = 1000,             
-            const double err_delta = 1.0e-9            
+            const std::vector<matrix_type>& data,
+            const long num_dims,
+            std::vector<matrix<double,0,1> >& result,
+            double &err,
+            const unsigned long num_iters = 1000,
+            const double err_delta = 1.0e-9
         );
         /*!
             requires
@@ -100,8 +100,8 @@ namespace dlib
                   or the change in error from one iteration to the next is less than err_delta.
                 - Upon completion, the output of Sammon's projection is stored into #result, in
                   particular, we will have:
-                    - #result == a set of column vectors that represent the Sammon projection of 
-                      the input data vectors. 
+                    - #result == a set of column vectors that represent the Sammon projection of
+                      the input data vectors.
                     - #result.size() == data.size()
                     - for all valid i:
                         - #result[i].size() == num_dims
@@ -110,7 +110,7 @@ namespace dlib
 
     };
 
-} 
+}
 
 #endif // DLIB_SAMMoN_ABSTRACT_Hh_
 

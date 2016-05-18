@@ -15,15 +15,15 @@ namespace dlib
         typename matrix_type_,
         typename feature_vector_type_ = matrix_type_
         >
-    class structural_svm_problem_threaded : public structural_svm_problem<matrix_type_,feature_vector_type_> 
+    class structural_svm_problem_threaded : public structural_svm_problem<matrix_type_,feature_vector_type_>
     {
     public:
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object is identical to the structural_svm_problem object defined in 
+                This object is identical to the structural_svm_problem object defined in
                 dlib/svm/structural_svm_problem_abstract.h except that its constructor
                 takes a number which defines how many threads will be used to make concurrent
-                calls to the separation_oracle() routine.  
+                calls to the separation_oracle() routine.
 
                 So this object lets you take advantage of a multi-core system.  You should
                 set the num_threads parameter equal to the number of available cores.  Note
@@ -32,7 +32,7 @@ namespace dlib
                 particular, it must be safe to call separation_oracle() concurrently from
                 different threads.  However, it is guaranteed that different threads will
                 never make concurrent calls to separation_oracle() using the same idx value
-                (i.e. the first argument).  
+                (i.e. the first argument).
         !*/
 
         typedef matrix_type_ matrix_type;
@@ -49,7 +49,7 @@ namespace dlib
         !*/
 
         unsigned long get_num_threads (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - Returns the number of threads which will be used to make concurrent

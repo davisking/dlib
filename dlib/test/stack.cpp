@@ -10,7 +10,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -26,12 +26,12 @@ namespace
     )
     /*!
         requires
-            - stack is an implementation of stack/stack_sort_abstract.h 
+            - stack is an implementation of stack/stack_sort_abstract.h
               stack is instantiated with int
         ensures
             - runs tests on stack for compliance with the specs
     !*/
-    {        
+    {
 
 
         srand(static_cast<unsigned int>(time(0)));
@@ -52,7 +52,7 @@ namespace
         DLIB_TEST(a1.move_next() == false);
         DLIB_TEST(a1.current_element_valid() == false);
         DLIB_TEST(a1.size() == 0);
-        DLIB_TEST(a1.at_start() == false);            
+        DLIB_TEST(a1.at_start() == false);
         DLIB_TEST(a1.size() == 0);
 
         swap(a1,a2);
@@ -62,7 +62,7 @@ namespace
         DLIB_TEST(a2.move_next() == false);
         DLIB_TEST(a2.current_element_valid() == false);
         DLIB_TEST(a2.size() == 0);
-        DLIB_TEST(a2.at_start() == false);            
+        DLIB_TEST(a2.at_start() == false);
         DLIB_TEST(a2.size() == 0);
 
 
@@ -77,7 +77,7 @@ namespace
         DLIB_TEST(a1.move_next() == false);
         DLIB_TEST(a1.current_element_valid() == false);
         DLIB_TEST(a1.size() == 0);
-        DLIB_TEST(a1.at_start() == false);            
+        DLIB_TEST(a1.at_start() == false);
         DLIB_TEST(a1.size() == 0);
 
         a1.reset();
@@ -96,7 +96,7 @@ namespace
             DLIB_TEST(a1.move_next() == false);
             DLIB_TEST(a1.current_element_valid() == false);
             DLIB_TEST(a1.size() == 0);
-            DLIB_TEST(a1.at_start() == false);            
+            DLIB_TEST(a1.at_start() == false);
             DLIB_TEST(a1.size() == 0);
 
             swap(a1,a2);
@@ -106,7 +106,7 @@ namespace
             DLIB_TEST(a2.move_next() == false);
             DLIB_TEST(a2.current_element_valid() == false);
             DLIB_TEST(a2.size() == 0);
-            DLIB_TEST(a2.at_start() == false);            
+            DLIB_TEST(a2.at_start() == false);
             DLIB_TEST(a2.size() == 0);
 
 
@@ -121,7 +121,7 @@ namespace
             DLIB_TEST(a1.move_next() == false);
             DLIB_TEST(a1.current_element_valid() == false);
             DLIB_TEST(a1.size() == 0);
-            DLIB_TEST(a1.at_start() == false);            
+            DLIB_TEST(a1.at_start() == false);
             DLIB_TEST(a1.size() == 0);
 
             a1.clear();
@@ -138,7 +138,7 @@ namespace
             DLIB_TEST(a1.move_next() == false);
             DLIB_TEST(a1.current_element_valid() == false);
             DLIB_TEST(a1.size() == 0);
-            DLIB_TEST(a1.at_start() == false);            
+            DLIB_TEST(a1.at_start() == false);
             DLIB_TEST(a1.size() == 0);
 
             swap(a1,a2);
@@ -148,7 +148,7 @@ namespace
             DLIB_TEST(a2.move_next() == false);
             DLIB_TEST(a2.current_element_valid() == false);
             DLIB_TEST(a2.size() == 0);
-            DLIB_TEST(a2.at_start() == false);            
+            DLIB_TEST(a2.at_start() == false);
             DLIB_TEST(a2.size() == 0);
 
 
@@ -163,7 +163,7 @@ namespace
             DLIB_TEST(a1.move_next() == false);
             DLIB_TEST(a1.current_element_valid() == false);
             DLIB_TEST(a1.size() == 0);
-            DLIB_TEST(a1.at_start() == false);            
+            DLIB_TEST(a1.at_start() == false);
             DLIB_TEST(a1.size() == 0);
 
             a1.clear();
@@ -204,7 +204,7 @@ namespace
             while (a2.move_next())
             {
                 DLIB_TEST(a2.element() == count--);
-            }                
+            }
 
             DLIB_TEST(a2.current_element_valid() == false);
             DLIB_TEST(a2.at_start() == false);
@@ -256,7 +256,7 @@ namespace
                 int a = 3;
                 a1.push(a);
             }
-            DLIB_TEST(go.size() == 100);                
+            DLIB_TEST(go.size() == 100);
             for (int i = 0; i < 100; ++i)
             {
                 int a = 9;

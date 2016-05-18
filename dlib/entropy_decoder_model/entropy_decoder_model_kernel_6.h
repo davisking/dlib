@@ -14,7 +14,7 @@ namespace dlib
         unsigned long alphabet_size,
         typename entropy_decoder
         >
-    class entropy_decoder_model_kernel_6 
+    class entropy_decoder_model_kernel_6
     {
         /*!
             INITIAL VALUE
@@ -59,7 +59,7 @@ namespace dlib
         entropy_decoder_model_kernel_6(entropy_decoder_model_kernel_6<alphabet_size,entropy_decoder>&);        // copy constructor
         entropy_decoder_model_kernel_6<alphabet_size,entropy_decoder>& operator=(entropy_decoder_model_kernel_6<alphabet_size,entropy_decoder>&);    // assignment operator
 
-    };   
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ namespace dlib
     entropy_decoder_model_kernel_6<alphabet_size,entropy_decoder>::
     entropy_decoder_model_kernel_6 (
         entropy_decoder& coder_
-    ) : 
+    ) :
         coder(coder_)
     {
         COMPILE_TIME_ASSERT( 1 < alphabet_size && alphabet_size < 65535 );

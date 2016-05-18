@@ -23,9 +23,9 @@ namespace dlib
             This component is a collection of various windowing widgets such as buttons,
             labels, text boxes, and so on.  This component also includes the drawable
             interface, drawable_window, and font handling objects.  The file you are
-            currently viewing defines all the high level graphical widgets which are 
-            provided by this component that can appear in a drawable_window.  To view 
-            the specifications for the other members of this component look at 
+            currently viewing defines all the high level graphical widgets which are
+            provided by this component that can appear in a drawable_window.  To view
+            the specifications for the other members of this component look at
             fonts_abstract.h, base_widgets_abstract.h, and drawable_abstract.h
 
         THREAD SAFETY
@@ -36,7 +36,7 @@ namespace dlib
             Note that all event handlers, including the user registered callback
             functions, are executed in the event handling thread.   Additionally,
             the drawable::m mutex will always be locked while these event handlers
-            are running.  Also, don't rely on get_thread_id() always returning the 
+            are running.  Also, don't rely on get_thread_id() always returning the
             same ID from inside event handlers.
     !*/
 
@@ -51,14 +51,14 @@ namespace dlib
         >
     void open_file_box (
         T& object,
-        void (T::*event_handler)(const std::string&) 
+        void (T::*event_handler)(const std::string&)
     );
     /*!
         requires
             - event_handler == a valid pointer to a member function of object T.
         ensures
-            - Displays a window titled "Open File" that will allow the user to select a 
-              file.  
+            - Displays a window titled "Open File" that will allow the user to select a
+              file.
             - The displayed window will start out showing the directory get_current_dir()
               (i.e. it starts in the current working directory)
             - The event_handler function is called on object if the user selects
@@ -71,8 +71,8 @@ namespace dlib
     );
     /*!
         ensures
-            - Displays a window titled "Open File" that will allow the user to select a 
-              file.  
+            - Displays a window titled "Open File" that will allow the user to select a
+              file.
             - The displayed window will start out showing the directory get_current_dir()
               (i.e. it starts in the current working directory)
             - The event_handler function is called if the user selects
@@ -87,13 +87,13 @@ namespace dlib
         >
     void open_existing_file_box (
         T& object,
-        void (T::*event_handler)(const std::string&) 
+        void (T::*event_handler)(const std::string&)
     );
     /*!
         requires
             - event_handler == a valid pointer to a member function of object T.
         ensures
-            - Displays a window titled "Open File" that will allow the user to select 
+            - Displays a window titled "Open File" that will allow the user to select
               a file.  But only a file that already exists.
             - The displayed window will start out showing the directory get_current_dir()
               (i.e. it starts in the current working directory)
@@ -107,7 +107,7 @@ namespace dlib
     );
     /*!
         ensures
-            - Displays a window titled "Open File" that will allow the user to select 
+            - Displays a window titled "Open File" that will allow the user to select
               a file.  But only a file that already exists.
             - The displayed window will start out showing the directory get_current_dir()
               (i.e. it starts in the current working directory)
@@ -123,14 +123,14 @@ namespace dlib
         >
     void save_file_box (
         T& object,
-        void (T::*event_handler)(const std::string&) 
+        void (T::*event_handler)(const std::string&)
     );
     /*!
         requires
             - event_handler == a valid pointer to a member function of object T.
         ensures
-            - Displays a window titled "Save File" that will allow the user to select 
-              a file.  
+            - Displays a window titled "Save File" that will allow the user to select
+              a file.
             - The displayed window will start out showing the directory get_current_dir()
               (i.e. it starts in the current working directory)
             - The event_handler function is called on object if the user selects
@@ -143,8 +143,8 @@ namespace dlib
     );
     /*!
         ensures
-            - Displays a window titled "Save File" that will allow the user to select 
-              a file.  
+            - Displays a window titled "Save File" that will allow the user to select
+              a file.
             - The displayed window will start out showing the directory get_current_dir()
               (i.e. it starts in the current working directory)
             - The event_handler function is called if the user selects
@@ -154,7 +154,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // function message_box() 
+    // function message_box()
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -164,7 +164,7 @@ namespace dlib
     );
     /*!
         ensures
-            - displays a message box with the given title and message.  It will have a 
+            - displays a message box with the given title and message.  It will have a
               single button and when the user clicks it the message box will go away.
             - this function does not block but instead returns immediately.
     !*/
@@ -175,9 +175,9 @@ namespace dlib
     );
     /*!
         ensures
-            - displays a message box with the given title and message.  It will have a 
+            - displays a message box with the given title and message.  It will have a
               single button and when the user clicks it the message box will go away.
-            - this function blocks until the user clicks on the message box and 
+            - this function blocks until the user clicks on the message box and
               causes it to go away.
     !*/
 
@@ -188,16 +188,16 @@ namespace dlib
         const std::string& title,
         const std::string& message,
         T& object,
-        void (T::*event_handler)() 
+        void (T::*event_handler)()
     );
     /*!
         requires
             - event_handler == a valid pointer to a member function of object T.
         ensures
-            - Displays a message box with the given title and message.  It will have a 
+            - Displays a message box with the given title and message.  It will have a
               single button and when the user clicks it the message box will go away.
             - The event_handler function is called on object when the user clicks
-              ok or otherwise closes the message box window. 
+              ok or otherwise closes the message box window.
             - this function does not block but instead returns immediately.
     !*/
 
@@ -208,10 +208,10 @@ namespace dlib
     );
     /*!
         ensures
-            - Displays a message box with the given title and message.  It will have a 
+            - Displays a message box with the given title and message.  It will have a
               single button and when the user clicks it the message box will go away.
             - The event_handler function is called when the user clicks
-              ok or otherwise closes the message box window. 
+              ok or otherwise closes the message box window.
             - this function does not block but instead returns immediately.
     !*/
 
@@ -235,12 +235,12 @@ namespace dlib
 
     public:
 
-        label(  
+        label(
             drawable_window& w
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
             throws
@@ -288,7 +288,7 @@ namespace dlib
 
         const rgb_pixel text_color (
         ) const;
-        /*! 
+        /*!
             ensures
                 - returns the color used to draw the text in this widget
         !*/
@@ -306,7 +306,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class toggle_button : public button_action 
+    class toggle_button : public button_action
     {
         /*!
             INITIAL VALUE
@@ -323,12 +323,12 @@ namespace dlib
 
     public:
 
-        toggle_button(  
+        toggle_button(
             drawable_window& w
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
             throws
@@ -361,7 +361,7 @@ namespace dlib
             unsigned long width_,
             unsigned long height_
         );
-        /*! 
+        /*!
             ensures
                 - if (width and height are big enough to contain the name of this button) then
                     - #width() == width_
@@ -432,15 +432,15 @@ namespace dlib
         );
         /*!
             ensures
-                - #is_checked() == true 
+                - #is_checked() == true
         !*/
 
         void set_unchecked (
         );
-        /*! 
+        /*!
             ensures
-                - #is_checked() == false 
-        !*/ 
+                - #is_checked() == false
+        !*/
 
         template <
             typename T
@@ -451,13 +451,13 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
-                - the event_handler function is called on object when the toggle_button is 
-                  toggled by the user. 
+                - the event_handler function is called on object when the toggle_button is
+                  toggled by the user.
                 - this event is NOT triggered by calling set_checked() or set_unchecked().
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -468,11 +468,11 @@ namespace dlib
         );
         /*!
             ensures
-                - the event_handler function is called when the toggle_button is 
-                  toggled by the user. 
+                - the event_handler function is called when the toggle_button is
+                  toggled by the user.
                 - this event is NOT triggered by calling set_checked() or set_unchecked().
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -489,12 +489,12 @@ namespace dlib
             requires
                 - event_handler is a valid pointer to a member function in T.
             ensures
-                - the event_handler function is called on object when the toggle_button is 
+                - the event_handler function is called on object when the toggle_button is
                   toggled by the user. self will be a reference to the toggle_button object
                   that the user clicked.
                 - this event is NOT triggered by calling set_checked() or set_unchecked().
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -505,12 +505,12 @@ namespace dlib
         );
         /*!
             ensures
-                - the event_handler function is called when the toggle_button is 
+                - the event_handler function is called when the toggle_button is
                   toggled by the user. self will be a reference to the toggle_button object
                   that the user clicked.
                 - this event is NOT triggered by calling set_checked() or set_unchecked().
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -540,17 +540,17 @@ namespace dlib
                 - has_input_focus() == false
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a simple one line text input field.  
+                This object represents a simple one line text input field.
         !*/
 
     public:
 
-        text_field(  
+        text_field(
             drawable_window& w
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
             throws
@@ -573,7 +573,7 @@ namespace dlib
         );
         /*!
             requires
-                - style_type == a type that inherits from text_field_style 
+                - style_type == a type that inherits from text_field_style
             ensures
                 - this text_field object will draw itself using the given
                   text field style
@@ -586,7 +586,7 @@ namespace dlib
         );
         /*!
             requires
-                - text.find_first_of('\n') == std::string::npos 
+                - text.find_first_of('\n') == std::string::npos
                   (i.e. there aren't any new lines in text)
             ensures
                 - #text() == text
@@ -608,14 +608,14 @@ namespace dlib
         void set_width (
             unsigned long width_
         );
-        /*! 
+        /*!
             ensures
                 - if (width >= 10) then
                     - #width()  == width_
                     - #height() == height()
                     - #top()    == top()
                     - #left()   == left()
-                    - i.e. The width of this drawable is set to the given width but 
+                    - i.e. The width of this drawable is set to the given width but
                       nothing else changes.
         !*/
 
@@ -653,7 +653,7 @@ namespace dlib
 
         const rgb_pixel text_color (
         ) const;
-        /*! 
+        /*!
             ensures
                 - returns the color used to draw the text in this widget
         !*/
@@ -668,7 +668,7 @@ namespace dlib
 
         const rgb_pixel background_color (
         ) const;
-        /*! 
+        /*!
             ensures
                 - returns the color used to fill in the background of this widget
         !*/
@@ -682,12 +682,12 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
                 - the event_handler function is called on object when the text
                   in this text_field is modified by the user.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -698,10 +698,10 @@ namespace dlib
         );
         /*!
             ensures
-                - the event_handler function is called when the text in this text_field 
+                - the event_handler function is called when the text in this text_field
                   is modified by the user.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -716,12 +716,12 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
                 - the event_handler function is called on object when this text field
                   has input focus and the user hits the enter key on their keyboard.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -732,10 +732,10 @@ namespace dlib
         );
         /*!
             ensures
-                - the event_handler function is called when this text field has input 
+                - the event_handler function is called when this text field has input
                   focus and the user hits the enter key on their keyboard.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -750,12 +750,12 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
                 - the event_handler function is called on object when this object
                   loses input focus due to the user clicking outside the text field
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -766,10 +766,10 @@ namespace dlib
         );
         /*!
             ensures
-                - the event_handler function is called when this object loses input 
+                - the event_handler function is called when this object loses input
                   focus due to the user clicking outside the text field
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -788,7 +788,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class text_box : public scrollable_region 
+    class text_box : public scrollable_region
     {
         /*!
             INITIAL VALUE
@@ -798,17 +798,17 @@ namespace dlib
                 - height() == 100
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a simple multi-line text input box.  
+                This object represents a simple multi-line text input box.
         !*/
 
     public:
 
-        text_box(  
+        text_box(
             drawable_window& w
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
             throws
@@ -831,7 +831,7 @@ namespace dlib
         );
         /*!
             requires
-                - style_type == a type that inherits from text_box_style 
+                - style_type == a type that inherits from text_box_style
             ensures
                 - this text_box object will draw itself using the given
                   text box style
@@ -862,9 +862,9 @@ namespace dlib
 
         void set_size (
             unsigned long width,
-            unsigned long height 
+            unsigned long height
         );
-        /*! 
+        /*!
             ensures
                 - #width() == width_
                 - #height() == height_
@@ -884,7 +884,7 @@ namespace dlib
 
         const rgb_pixel text_color (
         ) const;
-        /*! 
+        /*!
             ensures
                 - returns the color used to draw the text in this widget
         !*/
@@ -899,7 +899,7 @@ namespace dlib
 
         const rgb_pixel background_color (
         ) const;
-        /*! 
+        /*!
             ensures
                 - returns the color used to fill in the background of this widget
         !*/
@@ -913,12 +913,12 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
                 - the event_handler function is called on object when the text
                   in this text_box is modified by the user.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -929,10 +929,10 @@ namespace dlib
         );
         /*!
             ensures
-                - the event_handler function is called when the text in this text_box 
+                - the event_handler function is called when the text in this text_box
                   is modified by the user.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -947,12 +947,12 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
                 - the event_handler function is called on object when this text box
                   has input focus and the user hits the enter key on their keyboard.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -963,10 +963,10 @@ namespace dlib
         );
         /*!
             ensures
-                - the event_handler function is called when this text box has input 
+                - the event_handler function is called when this text box has input
                   focus and the user hits the enter key on their keyboard.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -981,12 +981,12 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
                 - the event_handler function is called on object when this object
                   loses input focus due to the user clicking outside the text box
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -997,10 +997,10 @@ namespace dlib
         );
         /*!
             ensures
-                - the event_handler function is called when this object loses input 
+                - the event_handler function is called when this object loses input
                   focus due to the user clicking outside the text box
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -1019,10 +1019,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class check_box : public toggle_button 
+    class check_box : public toggle_button
     {
         /*!
-            This is just a toggle button with the style set to 
+            This is just a toggle button with the style set to
             toggle_button_style_check_box.
         !*/
     };
@@ -1033,10 +1033,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class radio_button : public toggle_button 
+    class radio_button : public toggle_button
     {
         /*!
-            This is just a toggle button with the style set to 
+            This is just a toggle button with the style set to
             toggle_button_style_radio_button.
         !*/
     };
@@ -1055,19 +1055,19 @@ namespace dlib
                 selected_tab() == 0
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a row of tabs that are user selectable.  
+                This object represents a row of tabs that are user selectable.
 
                 When this object is disabled it means it will not respond to user clicks.
         !*/
 
     public:
 
-        tabbed_display(  
+        tabbed_display(
             drawable_window& w
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
             throws
@@ -1086,7 +1086,7 @@ namespace dlib
             unsigned long width_,
             unsigned long height_
         );
-        /*! 
+        /*!
             ensures
                 - if (width and height are big enough to contain the tabs) then
                     - #width() == width_
@@ -1164,8 +1164,8 @@ namespace dlib
                 - if (is_hidden()) then
                     - group.is_hidden() == true
                 - else
-                    - whenever the tab with index idx is selected group.is_hidden() == false 
-                    - whenever the tab with index idx is deselected group.is_hidden() == true 
+                    - whenever the tab with index idx is selected group.is_hidden() == false
+                    - whenever the tab with index idx is deselected group.is_hidden() == true
                 - whenever the position of *this changes the position of group will be
                   updated so that it is still inside the tabbed_display.  The position of group
                   will also be updated after this call to set_tab_group().
@@ -1178,9 +1178,9 @@ namespace dlib
         );
         /*!
             ensures
-                - Adjusts the size this tabbed_display so that it nicely contains 
-                  all of its widget_group objects.   
-                - does not change the position of this object. 
+                - Adjusts the size this tabbed_display so that it nicely contains
+                  all of its widget_group objects.
+                - does not change the position of this object.
                   (i.e. the upper left corner of get_rect() remains at the same position)
         !*/
 
@@ -1193,14 +1193,14 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
                 - The event_handler function is called on object when the user clicks
-                  on a tab that isn't already selected.  new_idx will give the index of 
-                  the newly selected tab and old_idx will give the index of the tab 
-                  that was previously selected. 
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                  on a tab that isn't already selected.  new_idx will give the index of
+                  the newly selected tab and old_idx will give the index of the tab
+                  that was previously selected.
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -1211,12 +1211,12 @@ namespace dlib
         );
         /*!
             ensures
-                - The event_handler function is called when the user clicks on a tab 
-                  that isn't already selected.  new_idx will give the index of the 
-                  newly selected tab and old_idx will give the index of the tab that 
-                  was previously selected. 
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - The event_handler function is called when the user clicks on a tab
+                  that isn't already selected.  new_idx will give the index of the
+                  newly selected tab and old_idx will give the index of the tab that
+                  was previously selected.
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -1235,24 +1235,24 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class named_rectangle : public drawable 
+    class named_rectangle : public drawable
     {
         /*!
             INITIAL VALUE
                 name() == ""
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a simple named rectangle.  
+                This object represents a simple named rectangle.
         !*/
 
     public:
 
-        named_rectangle(  
+        named_rectangle(
             drawable_window& w
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
             throws
@@ -1271,7 +1271,7 @@ namespace dlib
             unsigned long width_,
             unsigned long height_
         );
-        /*! 
+        /*!
             ensures
                 - #width() == width_
                 - #height() == height_
@@ -1326,29 +1326,29 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class mouse_tracker : public draggable 
+    class mouse_tracker : public draggable
     {
         /*!
             INITIAL VALUE
                 draggable_area() == rectangle(0,0,500,500)
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a simple draggable box that displays the 
-                current location of the mouse.  
+                This object represents a simple draggable box that displays the
+                current location of the mouse.
 
-                Also, if you hold shift and left click on the parent window then the 
+                Also, if you hold shift and left click on the parent window then the
                 mouse_tracker will place a single red pixel where you clicked and will
                 display the mouse position relative to that point.
         !*/
 
     public:
 
-        mouse_tracker(  
+        mouse_tracker(
             drawable_window& w
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
             throws
@@ -1376,12 +1376,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class list_box : public scrollable_region, 
+    class list_box : public scrollable_region,
                      public enumerable<const std::string>
     {
         /*!
             INITIAL VALUE
-                multiple_select_enabled() == false 
+                multiple_select_enabled() == false
                 size() == 0
 
             ENUMERATION ORDER
@@ -1390,18 +1390,18 @@ namespace dlib
                 (*this)[size()-1].
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a simple textual list box.  It contains a 
+                This object represents a simple textual list box.  It contains a
                 vertical list of strings which the user may select from.
         !*/
 
     public:
 
-        list_box(  
+        list_box(
             drawable_window& w
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
             throws
@@ -1424,7 +1424,7 @@ namespace dlib
         );
         /*!
             requires
-                - style_type == a type that inherits from list_box_style 
+                - style_type == a type that inherits from list_box_style
             ensures
                 - this list_box object will draw itself using the given style
         !*/
@@ -1433,7 +1433,7 @@ namespace dlib
             unsigned long width_,
             unsigned long height_
         );
-        /*! 
+        /*!
             ensures
                 - #width() == width_
                 - #height() == height_
@@ -1457,7 +1457,7 @@ namespace dlib
         !*/
 
         void select (
-            unsigned long index 
+            unsigned long index
         );
         /*!
             requires
@@ -1467,7 +1467,7 @@ namespace dlib
         !*/
 
         void unselect (
-            unsigned long index 
+            unsigned long index
         );
         /*!
             requires
@@ -1482,7 +1482,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - T == an implementation of dlib/queue/queue_kernel_abstract.h 
+                - T == an implementation of dlib/queue/queue_kernel_abstract.h
                 - T::type == unsigned long
             ensures
                 - #list == a list of all the currently selected indices for this list_box.
@@ -1534,7 +1534,7 @@ namespace dlib
         !*/
 
         void enable_multiple_select (
-        ); 
+        );
         /*!
             ensures
                 - #multiple_select_enabled() == true
@@ -1558,11 +1558,11 @@ namespace dlib
             requires
                 - event_handler is a valid pointer to a member function in T.
             ensures
-                - The event_handler function is called on object when the user double 
-                  clicks on one of the rows in this list box.  index gives the row 
+                - The event_handler function is called on object when the user double
+                  clicks on one of the rows in this list box.  index gives the row
                   number for the item the user clicked.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -1570,14 +1570,14 @@ namespace dlib
 
         void set_double_click_handler (
             const any_function<void(unsigned long index)>& event_handler
-        ); 
+        );
         /*!
             ensures
-                - The event_handler function is called when the user double clicks on 
-                  one of the rows in this list box.  index gives the row number for 
+                - The event_handler function is called when the user double clicks on
+                  one of the rows in this list box.  index gives the row number for
                   the item the user clicked.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -1594,13 +1594,13 @@ namespace dlib
             requires
                 - event_handler is a valid pointer to a member function in T.
             ensures
-                - The event_handler function is called on object when the user  
-                  clicks on one of the rows in this list box.  index gives the row 
+                - The event_handler function is called on object when the user
+                  clicks on one of the rows in this list box.  index gives the row
                   number for the item the user clicked.  (Note that the second click
                   in a double click triggers the double click handler above instead
                   of this event)
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -1611,12 +1611,12 @@ namespace dlib
         );
         /*!
             ensures
-                - The event_handler function is called when the user clicks on one 
-                  of the rows in this list box.  index gives the row number for the 
-                  item the user clicked.  (Note that the second click in a double 
+                - The event_handler function is called when the user clicks on one
+                  of the rows in this list box.  index gives the row number for the
+                  item the user clicked.  (Note that the second click in a double
                   click triggers the double click handler above instead of this event)
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -1629,13 +1629,13 @@ namespace dlib
         list_box& operator=(list_box&);    // assignment operator
     };
 
-    class wlist_box : public scrollable_region, 
+    class wlist_box : public scrollable_region,
     public enumerable<const std::wstring>;
     /*!
         same as list_box except for std::wstring instead of std::string
     !*/
 
-    class ulist_box : public scrollable_region, 
+    class ulist_box : public scrollable_region,
     public enumerable<const dlib::ustring>;
     /*!
         same as list_box except for dlib::ustring instead of std::string
@@ -1643,7 +1643,7 @@ namespace dlib
     
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class menu_bar 
+    // class menu_bar
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -1664,8 +1664,8 @@ namespace dlib
             drawable_window& w
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
             throws
@@ -1708,7 +1708,7 @@ namespace dlib
             ensures
                 - #menu_name(idx) == name
                 - if (underline_ch is present in name) then
-                    - The menu with index idx will have the first underline_ch character 
+                    - The menu with index idx will have the first underline_ch character
                       in its name underlined and users will be able to activate the menu
                       by hitting alt+underline_char
         !*/
@@ -1760,7 +1760,7 @@ namespace dlib
     template <
         typename graph_type
         >
-    class directed_graph_drawer : public zoomable_region 
+    class directed_graph_drawer : public zoomable_region
     {
         /*!
             REQUIREMENTS ON graph_type
@@ -1771,11 +1771,11 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a graphical widget that allows the user to draw
-                a directed graph.  
+                a directed graph.
                 
-                The user can create nodes by right clicking on the draw area and add 
-                edges by selecting a node (via left clicking on it) and then holding 
-                shift and clicking on the node that is to be the child node of the 
+                The user can create nodes by right clicking on the draw area and add
+                edges by selecting a node (via left clicking on it) and then holding
+                shift and clicking on the node that is to be the child node of the
                 selected node.
         !*/
 
@@ -1785,8 +1785,8 @@ namespace dlib
             drawable_window& w
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
             throws
@@ -1851,21 +1851,21 @@ namespace dlib
         );
         /*!
             ensures
-                - saves the state of the graph to the output stream.  Does so in a 
+                - saves the state of the graph to the output stream.  Does so in a
                   way that not only preserves the state of the graph this->graph()
-                  but also preserves the graphical layout of the graph in this 
+                  but also preserves the graphical layout of the graph in this
                   GUI widget.
-                - Also, the first part of the saved state is a serialized 
+                - Also, the first part of the saved state is a serialized
                   version of this->graph().  Thus, you can deserialize just the
                   this->graph() object from the serialized data if you like.
         !*/
 
         void load_graph (
-            std::istream& in 
+            std::istream& in
         );
         /*!
             ensures
-                - loads a saved graph from the given input stream.  
+                - loads a saved graph from the given input stream.
         !*/
 
         void set_node_label (unsigned long i, const std::wstring& label);
@@ -1889,7 +1889,7 @@ namespace dlib
             requires
                 - i < number_of_nodes()
             ensures
-                - #node_color(i) == color 
+                - #node_color(i) == color
         !*/
 
         rgb_pixel node_color (
@@ -1923,13 +1923,13 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
                 - the event_handler function is called on object when the user selects
-                  a node.  
+                  a node.
                 - node_index == the index of the node that was selected
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -1941,10 +1941,10 @@ namespace dlib
         /*!
             ensures
                 - the event_handler function is called when the user selects
-                  a node.  
+                  a node.
                 - node_index == the index of the node that was selected
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -1959,13 +1959,13 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
-                - the event_handler function is called on object when the user 
-                  deselects a node.  
+                - the event_handler function is called on object when the user
+                  deselects a node.
                 - node_index == the index of the node that was deselected
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -1976,10 +1976,10 @@ namespace dlib
         );
         /*!
             ensures
-                - the event_handler function is called when the user deselects a node.  
+                - the event_handler function is called when the user deselects a node.
                 - node_index == the index of the node that was deselected
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -1994,12 +1994,12 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
-                - the event_handler function is called on object when the user 
-                  deletes a node.  
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - the event_handler function is called on object when the user
+                  deletes a node.
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -2010,9 +2010,9 @@ namespace dlib
         );
         /*!
             ensures
-                - the event_handler function is called when the user deletes a node.  
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - the event_handler function is called when the user deletes a node.
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -2027,16 +2027,16 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
-                - the event_handler function is called on object when the user 
+                - the event_handler function is called on object when the user
                   modifies the graph (i.e. adds or removes a node or edge)
                 - the event_handler function is not called when the user just
                   moves nodes around on the screen.
                 - This event is always dispatched before any more specific event
                   that results from the user modifying the graph.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -2047,14 +2047,14 @@ namespace dlib
         );
         /*!
             ensures
-                - the event_handler function is called when the user modifies 
+                - the event_handler function is called when the user modifies
                   the graph (i.e. adds or removes a node or edge)
                 - the event_handler function is not called when the user just
                   moves nodes around on the screen.
                 - This event is always dispatched before any more specific event
                   that results from the user modifying the graph.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -2069,7 +2069,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class text_grid : public scrollable_region 
+    class text_grid : public scrollable_region
     {
         /*!
             INITIAL VALUE
@@ -2079,8 +2079,8 @@ namespace dlib
                 - number_of_columns() == 0
                 - number_of_rows() == 0
 
-            WHAT THIS OBJECT REPRESENTS 
-                This object represents a simple grid of square text fields that 
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a simple grid of square text fields that
                 looks more or less like a spreadsheet grid.
         !*/
 
@@ -2088,10 +2088,10 @@ namespace dlib
 
         text_grid (
             drawable_window& w
-        ); 
+        );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
             throws
@@ -2201,7 +2201,7 @@ namespace dlib
                 - row < number_of_rows()
                 - col < number_of_columns()
             ensures
-                - #text_color(row,col) == color 
+                - #text_color(row,col) == color
         !*/
 
         const rgb_pixel background_color (
@@ -2220,13 +2220,13 @@ namespace dlib
             unsigned long row,
             unsigned long col,
             const rgb_pixel color
-        ); 
+        );
         /*!
             requires
                 - row < number_of_rows()
                 - col < number_of_columns()
             ensures
-                - #background_color(row,col) == color 
+                - #background_color(row,col) == color
         !*/
 
         bool is_editable (
@@ -2254,7 +2254,7 @@ namespace dlib
                 - row < number_of_rows()
                 - col < number_of_columns()
             ensures
-                - #is_editable(row,col) == editable 
+                - #is_editable(row,col) == editable
         !*/
 
         void set_column_width (
@@ -2270,7 +2270,7 @@ namespace dlib
 
         void set_row_height (
             unsigned long row,
-            unsigned long height 
+            unsigned long height
         );
         /*!
             requires
@@ -2288,14 +2288,14 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
                 - the event_handler function is called on object when the user selects
-                  a node.  
+                  a node.
                 - row == row will give the row of the grid item that was modified
                 - col == col will give the column of the grid item that was modified
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -2303,14 +2303,14 @@ namespace dlib
 
         void set_text_modified_handler (
             const any_function<void(unsigned long row, unsigned long col)>& event_handler
-        ); 
+        );
         /*!
             ensures
-                - the event_handler function is called when the user selects a node.  
+                - the event_handler function is called when the user selects a node.
                 - row == row will give the row of the grid item that was modified
                 - col == col will give the column of the grid item that was modified
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -2325,11 +2325,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class image_display : public scrollable_region 
+    class image_display : public scrollable_region
     {
         /*!
             INITIAL VALUE
-                - This object isn't displaying anything. 
+                - This object isn't displaying anything.
                 - get_overlay_rects().size() == 0
                 - get_default_overlay_rect_label() == ""
                 - get_default_overlay_rect_color() == rgb_alpha_pixel(255,0,0,255) (i.e. RED)
@@ -2337,10 +2337,10 @@ namespace dlib
                 - overlay_editing_is_enabled() == true
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents an image inside a scrollable region.  
+                This object represents an image inside a scrollable region.
                 You give it an image to display by calling set_image().
                 This widget also allows you to add rectangle and line overlays that
-                will be drawn on top of the image.  
+                will be drawn on top of the image.
                 
                 If you hold the Ctrl key you can zoom in and out using the mouse wheel.
                 You can also add new overlay rectangles by holding shift, left clicking,
@@ -2351,7 +2351,7 @@ namespace dlib
                 on the part.  If you want to move any rectangle or an object part then
                 shift+right click and drag it.
                 
-                Finally, if you hold Ctrl and left click an overlay rectangle it will 
+                Finally, if you hold Ctrl and left click an overlay rectangle it will
                 change its label to get_default_overlay_rect_label().
 
                 The image is drawn such that:
@@ -2363,12 +2363,12 @@ namespace dlib
 
     public:
 
-        image_display(  
+        image_display(
             drawable_window& w
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
         !*/
@@ -2390,7 +2390,7 @@ namespace dlib
             requires
                 - image_type == an implementation of array2d/array2d_kernel_abstract.h or
                   a dlib::matrix or something convertible to a matrix via mat()
-                - pixel_traits<typename image_type::type> must be defined 
+                - pixel_traits<typename image_type::type> must be defined
             ensures
                 - #*this widget is now displaying the given image new_img.
         !*/
@@ -2400,7 +2400,7 @@ namespace dlib
             /*!
                 WHAT THIS OBJECT REPRESENTS
                     This object represents a rectangle that is drawn on top of the
-                    image shown by this object.  Each rectangle is represented by 
+                    image shown by this object.  Each rectangle is represented by
                     a rectangle object as well as a color and text label.  The label
                     is drawn below the lower right corner of the rectangle.
 
@@ -2419,10 +2419,10 @@ namespace dlib
             bool crossed_out;
 
             overlay_rect(
-            ); 
+            );
             /*!
                 ensures
-                    - #color == rgb_alpha_pixel(0,0,0,0) 
+                    - #color == rgb_alpha_pixel(0,0,0,0)
                     - #rect == rectangle()
                     - #label.size() == 0
                     - #crossed_out == false
@@ -2430,13 +2430,13 @@ namespace dlib
 
             template <typename pixel_type>
             overlay_rect(
-                const rectangle& r, 
+                const rectangle& r,
                 pixel_type p
             );
             /*!
                 ensures
                     - #rect == r
-                    - performs assign_pixel(color, p) 
+                    - performs assign_pixel(color, p)
                     - #label.size() == 0
                     - #crossed_out == false
             !*/
@@ -2457,11 +2457,11 @@ namespace dlib
 
             template <typename pixel_type>
             overlay_rect(
-                const rectangle& r, 
-                pixel_type p, 
-                const std::string& l, 
+                const rectangle& r,
+                pixel_type p,
+                const std::string& l,
                 const std::map<std::string,point>& parts_
-            ); 
+            );
             /*!
                 ensures
                     - #rect == r
@@ -2478,7 +2478,7 @@ namespace dlib
             /*!
                 WHAT THIS OBJECT REPRESENTS
                     This object represents a line that is drawn on top of the
-                    image shown by this object.  Each line is represented by 
+                    image shown by this object.  Each line is represented by
                     its two end points (p1 and p2) as well as a color.
             !*/
 
@@ -2500,7 +2500,7 @@ namespace dlib
                 const point& p1_,
                 const point& p2_,
                 pixel_type p
-            ); 
+            );
             /*!
                 ensures
                     - performs assign_pixel(color, p)
@@ -2515,7 +2515,7 @@ namespace dlib
             /*!
                 WHAT THIS OBJECT REPRESENTS
                     This object represents a circle that is drawn on top of the
-                    image shown by this object.  Each circle is represented by 
+                    image shown by this object.  Each circle is represented by
                     its center, radius, and color.  It can also have an optional
                     text label which will appear below the circle.
             !*/
@@ -2537,10 +2537,10 @@ namespace dlib
 
             template <typename pixel_type>
             overlay_circle(
-                const point& center_, 
+                const point& center_,
                 const int radius_,
                 pixel_type p
-            ); 
+            );
             /*!
                 ensures
                     - performs assign_pixel(color, p)
@@ -2550,11 +2550,11 @@ namespace dlib
 
             template <typename pixel_type>
             overlay_circle(
-                const point& center_, 
+                const point& center_,
                 const int radius_,
                 pixel_type p,
                 const std::string& label_
-            ); 
+            );
             /*!
                 ensures
                     - performs assign_pixel(color, p)
@@ -2571,7 +2571,7 @@ namespace dlib
         /*!
             ensures
                 - adds the given overlay rectangle into this object such
-                  that it will be displayed. 
+                  that it will be displayed.
         !*/
 
         void add_overlay (
@@ -2580,7 +2580,7 @@ namespace dlib
         /*!
             ensures
                 - adds the given overlay line into this object such
-                  that it will be displayed. 
+                  that it will be displayed.
         !*/
 
         void add_overlay (
@@ -2589,7 +2589,7 @@ namespace dlib
         /*!
             ensures
                 - adds the given overlay circle into this object such
-                  that it will be displayed. 
+                  that it will be displayed.
         !*/
 
         void add_overlay (
@@ -2598,7 +2598,7 @@ namespace dlib
         /*!
             ensures
                 - adds the given set of overlay rectangles into this object such
-                  that they will be displayed. 
+                  that they will be displayed.
         !*/
 
         void add_overlay (
@@ -2607,7 +2607,7 @@ namespace dlib
         /*!
             ensures
                 - adds the given set of overlay lines into this object such
-                  that they will be displayed. 
+                  that they will be displayed.
         !*/
 
         void add_overlay (
@@ -2616,14 +2616,14 @@ namespace dlib
         /*!
             ensures
                 - adds the given set of overlay circles into this object such
-                  that they will be displayed. 
+                  that they will be displayed.
         !*/
 
         void clear_overlay (
         );
         /*!
             ensures
-                - removes all overlays from this object.  
+                - removes all overlays from this object.
                 - #get_overlay_rects().size() == 0
         !*/
 
@@ -2672,7 +2672,7 @@ namespace dlib
         /*!
             ensures
                 - adds a user labelable part with the given name.  If the name has
-                  already been added then this function has no effect.  
+                  already been added then this function has no effect.
                 - These parts can be added by the user by selecting an overlay box
                   and then right clicking anywhere in it.  A popup menu will appear
                   listing the parts.  The user can then click a part name and it will
@@ -2684,8 +2684,8 @@ namespace dlib
         );
         /*!
             ensures
-                - removes all use labelable parts.  Calling this function undoes 
-                  all previous calls to add_labelable_part_name().  Therefore, the 
+                - removes all use labelable parts.  Calling this function undoes
+                  all previous calls to add_labelable_part_name().  Therefore, the
                   user won't be able to label any parts after clear_labelable_part_names()
                   is called.
         !*/
@@ -2703,7 +2703,7 @@ namespace dlib
         !*/
 
         void enable_overlay_editing (
-        ); 
+        );
         /*!
             ensures
                 - #overlay_editing_is_enabled() == true
@@ -2713,11 +2713,11 @@ namespace dlib
         );
         /*!
             ensures
-                - #overlay_editing_is_enabled() == false 
+                - #overlay_editing_is_enabled() == false
         !*/
         
         bool overlay_editing_is_enabled (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - if this function returns true then it is possible for the user to add or
@@ -2734,12 +2734,12 @@ namespace dlib
         );
         /*
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
                 - the event_handler function is called on object when the user adds,
                   removes, or modifies an overlay rectangle.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -2750,10 +2750,10 @@ namespace dlib
         );
         /*
             ensures
-                - the event_handler function is called when the user adds or removes 
+                - the event_handler function is called when the user adds or removes
                   an overlay rectangle.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -2768,13 +2768,13 @@ namespace dlib
         );
         /*
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
                 - The event_handler function is called on object when the user selects
-                  an overlay rectangle by double clicking on it.  The selected rectangle 
+                  an overlay rectangle by double clicking on it.  The selected rectangle
                   will be passed to event_handler().
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -2785,11 +2785,11 @@ namespace dlib
         );
         /*
             ensures
-                - The event_handler function is called when the user selects an overlay 
-                  rectangle by double clicking on it.  The selected rectangle will be 
+                - The event_handler function is called when the user selects an overlay
+                  rectangle by double clicking on it.  The selected rectangle will be
                   passed to event_handler().
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -2804,14 +2804,14 @@ namespace dlib
         );
         /*
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
                 - The event_handler function is called on object when the user left clicks
                   anywhere on the image.  When they do so this callback is called with the
                   location of the image pixel which was clicked.  The is_double_click bool
                   will also tell you if it was a double click or single click.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -2842,7 +2842,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class image_window : public drawable_window 
+    class image_window : public drawable_window
     {
         /*!
             INITIAL VALUE
@@ -2850,8 +2850,8 @@ namespace dlib
                 - events_tied() == false
 
             WHAT THIS OBJECT REPRESENTS
-                This is a simple window that is just a container for an image_display.  
-                It exists to make it easy to throw image_displays onto the screen 
+                This is a simple window that is just a container for an image_display.
+                It exists to make it easy to throw image_displays onto the screen
                 without having to put together your own drawable_window objects.
         !*/
     public:
@@ -2861,7 +2861,7 @@ namespace dlib
         typedef image_display::overlay_circle overlay_circle;
 
         image_window(
-        ); 
+        );
         /*!
             ensures
                 - this object is properly initialized
@@ -2870,14 +2870,14 @@ namespace dlib
         template <typename image_type>
         image_window(
             const image_type& img
-        ); 
+        );
         /*!
             requires
                 - image_type == an implementation of array2d/array2d_kernel_abstract.h or
                   a dlib::matrix or something convertible to a matrix via mat()
-                - pixel_traits<typename image_type::type> must be defined 
+                - pixel_traits<typename image_type::type> must be defined
             ensures
-                - this object is properly initialized 
+                - this object is properly initialized
                 - #*this window is now displaying the given image img.
         !*/
 
@@ -2890,9 +2890,9 @@ namespace dlib
             requires
                 - image_type == an implementation of array2d/array2d_kernel_abstract.h or
                   a dlib::matrix or something convertible to a matrix via mat()
-                - pixel_traits<typename image_type::type> must be defined 
+                - pixel_traits<typename image_type::type> must be defined
             ensures
-                - this object is properly initialized 
+                - this object is properly initialized
                 - #*this window is now displaying the given image img.
                 - The title of the window will be set to the given title string.
         !*/
@@ -2911,7 +2911,7 @@ namespace dlib
         /*!
             requires
                 - image_type == an implementation of array2d/array2d_kernel_abstract.h
-                - pixel_traits<typename image_type::type> must be defined 
+                - pixel_traits<typename image_type::type> must be defined
             ensures
                 - #*this window is now displaying the given image img.
         !*/
@@ -2922,12 +2922,12 @@ namespace dlib
         /*!
             ensures
                 - adds the given overlay rectangle into this object such
-                  that it will be displayed. 
+                  that it will be displayed.
         !*/
 
         template <typename pixel_type>
         void add_overlay(
-            const rectangle& r, 
+            const rectangle& r,
             pixel_type p = rgb_pixel(255,0,0)
         );
         /*!
@@ -2937,8 +2937,8 @@ namespace dlib
 
         template <typename pixel_type>
         void add_overlay(
-            const rectangle& r, 
-            pixel_type p, 
+            const rectangle& r,
+            pixel_type p,
             const std::string& l
         );
         /*!
@@ -2954,7 +2954,7 @@ namespace dlib
         /*!
             ensures
                 - adds the given set of rectangles into this object such
-                  that they will be displayed with the color specific by p. 
+                  that they will be displayed with the color specific by p.
         !*/
 
         void add_overlay(
@@ -2984,7 +2984,7 @@ namespace dlib
         void add_overlay(
             const std::vector<full_object_detection>& objects,
             const std::vector<std::string>& part_names
-        ); 
+        );
         /*!
             ensures
                 - calling this function is equivalent to calling the following
@@ -3008,7 +3008,7 @@ namespace dlib
         /*!
             ensures
                 - adds the given overlay line into this object such
-                  that it will be displayed. 
+                  that it will be displayed.
         !*/
 
         void add_overlay (
@@ -3017,7 +3017,7 @@ namespace dlib
         /*!
             ensures
                 - adds the given overlay circle into this object such
-                  that it will be displayed. 
+                  that it will be displayed.
         !*/
 
         template <typename pixel_type>
@@ -3037,7 +3037,7 @@ namespace dlib
         /*!
             ensures
                 - adds the given set of overlay rectangles into this object such
-                  that they will be displayed. 
+                  that they will be displayed.
         !*/
 
         void add_overlay (
@@ -3046,7 +3046,7 @@ namespace dlib
         /*!
             ensures
                 - adds the given set of overlay lines into this object such
-                  that they will be displayed. 
+                  that they will be displayed.
         !*/
 
         void add_overlay (
@@ -3055,14 +3055,14 @@ namespace dlib
         /*!
             ensures
                 - adds the given set of overlay circles into this object such
-                  that they will be displayed. 
+                  that they will be displayed.
         !*/
 
         void clear_overlay (
         );
         /*!
             ensures
-                - removes all overlays from this object.  
+                - removes all overlays from this object.
         !*/
 
         void tie_events (
@@ -3076,7 +3076,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #events_tied() == false 
+                - #events_tied() == false
         !*/
 
         bool events_tied (
@@ -3098,7 +3098,7 @@ namespace dlib
 
         bool get_next_double_click (
             point& p
-        ); 
+        );
         /*!
             ensures
                 - This function blocks until the user double clicks on the image or the
@@ -3106,7 +3106,7 @@ namespace dlib
                   press if events_tied() == true.
                 - if (this function returns true) then
                     - This means the user double clicked the mouse.
-                    - #p == the next image pixel the user clicked.  
+                    - #p == the next image pixel the user clicked.
                 - else
                     - #p == point(-1,1)
         !*/
@@ -3114,7 +3114,7 @@ namespace dlib
         bool get_next_double_click (
             point& p,
             unsigned long& mouse_button
-        ); 
+        );
         /*!
             ensures
                 - This function blocks until the user double clicks on the image or the
@@ -3122,7 +3122,7 @@ namespace dlib
                   press if events_tied() == true.
                 - if (this function returns true) then
                     - This means the user double clicked the mouse.
-                    - #p == the next image pixel the user clicked.  
+                    - #p == the next image pixel the user clicked.
                     - #mouse_button == the mouse button which was used to double click.
                       This will be either dlib::base_window::LEFT,
                       dlib::base_window::MIDDLE, or dlib::base_window::RIGHT
@@ -3145,7 +3145,7 @@ namespace dlib
                     - This means the user pressed a keyboard key.
                     - The keyboard button press is recorded into #key, #is_printable, and
                       #state.  In particular, these variables are populated with the three
-                      identically named arguments to the base_window::on_keydown(key,is_printable,state) 
+                      identically named arguments to the base_window::on_keydown(key,is_printable,state)
                       event.
         !*/
 
@@ -3158,7 +3158,7 @@ namespace dlib
                 - This function blocks until the user presses a keyboard key or the
                   window is closed by the user.  It will also unblock for a mouse double
                   click if events_tied() == true.
-                - This function is the equivalent to calling get_next_keypress(key,is_printable,temp) 
+                - This function is the equivalent to calling get_next_keypress(key,is_printable,temp)
                   and then discarding temp.
         !*/
 
@@ -3183,12 +3183,12 @@ namespace dlib
 
     public:
 
-        perspective_display(  
+        perspective_display(
             drawable_window& w
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
         !*/
@@ -3202,9 +3202,9 @@ namespace dlib
 
         void set_size (
             unsigned long width,
-            unsigned long height 
+            unsigned long height
         );
-        /*! 
+        /*!
             ensures
                 - #width() == width
                 - #height() == height
@@ -3224,11 +3224,11 @@ namespace dlib
 
             overlay_line() { assign_pixel(color, 0);}
 
-            overlay_line(const vector<double>& p1_, const vector<double>& p2_) 
+            overlay_line(const vector<double>& p1_, const vector<double>& p2_)
                 : p1(p1_), p2(p2_) { assign_pixel(color, 255); }
 
             template <typename pixel_type>
-            overlay_line(const vector<double>& p1_, const vector<double>& p2_, pixel_type p) 
+            overlay_line(const vector<double>& p1_, const vector<double>& p2_, pixel_type p)
                 : p1(p1_), p2(p2_) { assign_pixel(color, p); }
 
             vector<double> p1;
@@ -3246,11 +3246,11 @@ namespace dlib
 
             overlay_dot() { assign_pixel(color, 0);}
 
-            overlay_dot(const vector<double>& p_) 
+            overlay_dot(const vector<double>& p_)
                 : p(p_) { assign_pixel(color, 255); }
 
             template <typename pixel_type>
-            overlay_dot(const vector<double>& p_, pixel_type color_) 
+            overlay_dot(const vector<double>& p_, pixel_type color_)
                 : p(p_) { assign_pixel(color, color_); }
 
             vector<double> p; // The location of the dot
@@ -3263,7 +3263,7 @@ namespace dlib
         /*!
             ensures
                 - Adds the given overlay lines into this object such that it will be
-                  displayed. 
+                  displayed.
         !*/
 
         void add_overlay (
@@ -3272,7 +3272,7 @@ namespace dlib
         /*!
             ensures
                 - Adds the given overlay dots into this object such that it will be
-                  displayed. 
+                  displayed.
         !*/
 
         void clear_overlay (
@@ -3289,13 +3289,13 @@ namespace dlib
         );
         /*
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
                 - The event_handler function is called on object when the user double
                   clicks on one of the overlay dots.  The selected dot will be passed to
                   event_handler().
-                - Any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - Any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
         */
 
@@ -3306,8 +3306,8 @@ namespace dlib
             ensures
                 - The event_handler function is called when the user double clicks on one
                   of the overlay dots.  The selected dot will be passed to event_handler().
-                - Any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - Any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
         */
     };
@@ -3369,7 +3369,7 @@ namespace dlib
         /*!
             ensures
                 - Adds the given overlay lines into this object such that it will be
-                  displayed. 
+                  displayed.
         !*/
 
         void add_overlay (
@@ -3378,7 +3378,7 @@ namespace dlib
         /*!
             ensures
                 - Adds the given overlay dots into this object such that it will be
-                  displayed. 
+                  displayed.
         !*/
 
         void clear_overlay (
@@ -3390,7 +3390,7 @@ namespace dlib
 
         void add_overlay(
             const std::vector<dlib::vector<double> >& d
-        ); 
+        );
         /*!
             ensures
                 - Adds the given dots into this object such that it will be
@@ -3399,7 +3399,7 @@ namespace dlib
 
         template <typename pixel_type>
         void add_overlay(
-            const std::vector<dlib::vector<double> >& d, 
+            const std::vector<dlib::vector<double> >& d,
             pixel_type p
         );
         /*!
@@ -3411,7 +3411,7 @@ namespace dlib
         template <typename pixel_type>
         void add_overlay(
             const vector<double>& p1,
-            const vector<double>& p2, 
+            const vector<double>& p2,
             pixel_type color
         );
         /*!
@@ -3426,13 +3426,13 @@ namespace dlib
         );
         /*
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
                 - The event_handler function is called on object when the user double
                   clicks on one of the overlay dots.  The selected dot will be passed to
                   event_handler().
-                - Any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - Any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
         */
 
@@ -3443,8 +3443,8 @@ namespace dlib
             ensures
                 - The event_handler function is called when the user double clicks on one
                   of the overlay dots.  The selected dot will be passed to event_handler().
-                - Any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - Any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
         */
 

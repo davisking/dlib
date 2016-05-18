@@ -18,22 +18,22 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename K 
+        typename K
         >
     class svm_c_trainer
     {
         /*!
-            REQUIREMENTS ON K 
-                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+            REQUIREMENTS ON K
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h
 
             WHAT THIS OBJECT REPRESENTS
-                This object implements a trainer for a C support vector machine for 
+                This object implements a trainer for a C support vector machine for
                 solving binary classification problems.  It is implemented using the SMO
                 algorithm.
 
                 The implementation of the C-SVM training algorithm used by this object is based
                 on the following paper:
-                    - Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
+                    - Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector
                       machines, 2001. Software available at http://www.csie.ntu.edu.tw/~cjlin/libsvm
 
         !*/
@@ -58,7 +58,7 @@ namespace dlib
         !*/
 
         svm_c_trainer (
-            const kernel_type& kernel, 
+            const kernel_type& kernel,
             const scalar_type& C
         );
         /*!
@@ -81,7 +81,7 @@ namespace dlib
             requires
                 - cache_size > 0
             ensures
-                - #get_cache_size() == cache_size 
+                - #get_cache_size() == cache_size
         !*/
 
         const long get_cache_size (
@@ -90,8 +90,8 @@ namespace dlib
             ensures
                 - returns the number of megabytes of cache this object will use
                   when it performs training via the this->train() function.
-                  (bigger values of this may make training go faster but won't affect 
-                  the result.  However, too big a value will cause you to run out of 
+                  (bigger values of this may make training go faster but won't affect
+                  the result.  However, too big a value will cause you to run out of
                   memory, obviously.)
         !*/
 
@@ -102,7 +102,7 @@ namespace dlib
             requires
                 - eps > 0
             ensures
-                - #get_epsilon() == eps 
+                - #get_epsilon() == eps
         !*/
 
         const scalar_type get_epsilon (
@@ -119,7 +119,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_kernel() == k 
+                - #get_kernel() == k
         !*/
 
         const kernel_type& get_kernel (
@@ -130,38 +130,38 @@ namespace dlib
         !*/
 
         void set_c (
-            scalar_type C 
+            scalar_type C
         );
         /*!
             requires
                 - C > 0
             ensures
-                - #get_c_class1() == C 
-                - #get_c_class2() == C 
+                - #get_c_class1() == C
+                - #get_c_class2() == C
         !*/
 
         const scalar_type get_c_class1 (
         ) const;
         /*!
             ensures
-                - returns the SVM regularization parameter for the +1 class.  
+                - returns the SVM regularization parameter for the +1 class.
                   It is the parameter that determines the trade off between
-                  trying to fit the +1 training data exactly or allowing more errors 
-                  but hopefully improving the generalization ability of the 
-                  resulting classifier.  Larger values encourage exact fitting 
-                  while smaller values of C may encourage better generalization. 
+                  trying to fit the +1 training data exactly or allowing more errors
+                  but hopefully improving the generalization ability of the
+                  resulting classifier.  Larger values encourage exact fitting
+                  while smaller values of C may encourage better generalization.
         !*/
 
         const scalar_type get_c_class2 (
         ) const;
         /*!
             ensures
-                - returns the SVM regularization parameter for the -1 class.  
+                - returns the SVM regularization parameter for the -1 class.
                   It is the parameter that determines the trade off between
-                  trying to fit the -1 training data exactly or allowing more errors 
-                  but hopefully improving the generalization ability of the 
-                  resulting classifier.  Larger values encourage exact fitting 
-                  while smaller values of C may encourage better generalization. 
+                  trying to fit the -1 training data exactly or allowing more errors
+                  but hopefully improving the generalization ability of the
+                  resulting classifier.  Larger values encourage exact fitting
+                  while smaller values of C may encourage better generalization.
         !*/
 
         void set_c_class1 (
@@ -200,7 +200,7 @@ namespace dlib
                 - y == a matrix or something convertible to a matrix via mat().
                   Also, y should contain scalar_type objects.
             ensures
-                - trains a C support vector classifier given the training samples in x and 
+                - trains a C support vector classifier given the training samples in x and
                   labels in y.  Training is done when the error is less than get_epsilon().
                 - returns a decision function F with the following properties:
                     - if (new_x is a sample predicted have +1 label) then
@@ -216,7 +216,7 @@ namespace dlib
             ensures
                 - swaps *this and item
         !*/
-    }; 
+    };
 
     template <typename K>
     void swap (

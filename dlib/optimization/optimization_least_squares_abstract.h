@@ -23,12 +23,12 @@ namespace dlib
         const funct_type& f,
         const funct_der_type& der,
         const vector_type& list,
-        T& x, 
+        T& x,
         double radius = 1
     );
     /*!
         requires
-            - stop_strategy == an object that defines a stop strategy such as one of 
+            - stop_strategy == an object that defines a stop strategy such as one of
               the objects from dlib/optimization/optimization_stop_strategies_abstract.h
             - list == a matrix or something convertible to a matrix via mat()
               such as a std::vector.
@@ -38,7 +38,7 @@ namespace dlib
             - radius > 0
             - for all valid i:
                 - f(list(i),x) must be a valid expression that evaluates to a floating point value.
-                - der(list(i),x) must be a valid expression that evaluates to the derivative of f(list(i),x) 
+                - der(list(i),x) must be a valid expression that evaluates to the derivative of f(list(i),x)
                   with respect to x. This derivative must take the form of a column vector.
         ensures
             - This function performs an unconstrained minimization of the least squares
@@ -46,15 +46,15 @@ namespace dlib
                 - g(x) = sum over all i: 0.5*pow( f(list(i),x), 2 )
             - This method combines the Levenberg-Marquardt method with a quasi-newton method
               for approximating the second order terms of the hessian and is appropriate for
-              large residual problems (i.e. problems where the f() function isn't driven to 0).  
-              In particular, it uses the method of Dennis, Gay, and Welsch as described in 
+              large residual problems (i.e. problems where the f() function isn't driven to 0).
+              In particular, it uses the method of Dennis, Gay, and Welsch as described in
               Numerical Optimization by Nocedal and Wright (second edition).
-            - Since this is a trust region algorithm, the radius parameter defines the initial 
-              size of the trust region.  
-            - The function is optimized until stop_strategy decides that an acceptable 
+            - Since this is a trust region algorithm, the radius parameter defines the initial
+              size of the trust region.
+            - The function is optimized until stop_strategy decides that an acceptable
               point has been found or the trust region subproblem fails to make progress.
             - #x == the value of x that was found to minimize g()
-            - returns g(#x). 
+            - returns g(#x).
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -71,12 +71,12 @@ namespace dlib
         const funct_type& f,
         const funct_der_type& der,
         const vector_type& list,
-        T& x, 
+        T& x,
         double radius = 1
     );
     /*!
         requires
-            - stop_strategy == an object that defines a stop strategy such as one of 
+            - stop_strategy == an object that defines a stop strategy such as one of
               the objects from dlib/optimization/optimization_stop_strategies_abstract.h
             - list == a matrix or something convertible to a matrix via mat()
               such as a std::vector.
@@ -86,7 +86,7 @@ namespace dlib
             - radius > 0
             - for all valid i:
                 - f(list(i),x) must be a valid expression that evaluates to a floating point value.
-                - der(list(i),x) must be a valid expression that evaluates to the derivative of f(list(i),x) 
+                - der(list(i),x) must be a valid expression that evaluates to the derivative of f(list(i),x)
                   with respect to x.  This derivative must take the form of a column vector.
         ensures
             - This function performs an unconstrained minimization of the least squares
@@ -95,12 +95,12 @@ namespace dlib
             - This method implements a plain Levenberg-Marquardt approach for approximating
               the hessian of g().  Therefore, it is most appropriate for small residual problems
               (i.e. problems where f() goes to 0 at the solution).
-            - Since this is a trust region algorithm, the radius parameter defines the initial 
-              size of the trust region.  
-            - The function is optimized until stop_strategy decides that an acceptable 
+            - Since this is a trust region algorithm, the radius parameter defines the initial
+              size of the trust region.
+            - The function is optimized until stop_strategy decides that an acceptable
               point has been found or the trust region subproblem fails to make progress.
             - #x == the value of x that was found to minimize g()
-            - returns g(#x). 
+            - returns g(#x).
     !*/
 
 // ----------------------------------------------------------------------------------------

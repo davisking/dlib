@@ -41,7 +41,7 @@ namespace dlib
 
                 if instead of calling rotate_left we call rotate_right(3) instead we would have
                 "ta!some da"
-                 9876543210                              
+                 9876543210
 
                 Also note that unless specified otherwise, no member functions
                 of this object throw exceptions.
@@ -54,8 +54,8 @@ namespace dlib
         sliding_buffer (
         );
         /*!
-            ensures                
-                - #*this is properly initialized           
+            ensures
+                - #*this is properly initialized
             throws
                 - std::bad_alloc or any exception thrown by T's constructor.
         !*/
@@ -74,7 +74,7 @@ namespace dlib
                 - #*this has its initial value
             throws
                 - std::bad_alloc or any exception thrown by T's constructor.
-                    if this exception is thrown then #*this is unusable 
+                    if this exception is thrown then #*this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -121,15 +121,15 @@ namespace dlib
         /*!
             requires
                 - index < size()
-            ensures 
-                - returns an element id number that uniquely references the element at 
-                  the given index.  (you can use this id to locate the new position of 
+            ensures
+                - returns an element id number that uniquely references the element at
+                  the given index.  (you can use this id to locate the new position of
                   an element after the buffer has been rotated)
                 - returned value is < size()
         !*/
 
         unsigned long get_element_index (
-            unsigned long element_id 
+            unsigned long element_id
         ) const;
         /*!
             require
@@ -167,7 +167,7 @@ namespace dlib
         /*!
             ensures
                 - swaps *this and item
-        !*/ 
+        !*/
 
     private:
 
@@ -175,15 +175,15 @@ namespace dlib
         sliding_buffer(sliding_buffer<T>&);        // copy constructor
         sliding_buffer<T>& operator=(sliding_buffer<T>&);    // assignment operator
 
-    };      
+    };
 
     template <
         typename T
         >
     void swap (
-        sliding_buffer<T>& a, 
-        sliding_buffer<T>& b 
-    ) { a.swap(b); }   
+        sliding_buffer<T>& a,
+        sliding_buffer<T>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
@@ -192,11 +192,11 @@ namespace dlib
         typename T
         >
     void deserialize (
-        sliding_buffer<T>& item, 
+        sliding_buffer<T>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 }

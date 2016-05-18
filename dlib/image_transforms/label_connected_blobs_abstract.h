@@ -12,11 +12,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct neighbors_8 
+    struct neighbors_8
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object is a pixel neighborhood generating functor for 
+                This object is a pixel neighborhood generating functor for
                 use with the label_connected_blobs() routine defined below.
         !*/
 
@@ -30,11 +30,11 @@ namespace dlib
         !*/
     };
 
-    struct neighbors_4 
+    struct neighbors_4
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object is a pixel neighborhood generating functor for 
+                This object is a pixel neighborhood generating functor for
                 use with the label_connected_blobs() routine defined below.
         !*/
 
@@ -110,7 +110,7 @@ namespace dlib
 
     };
 
-    struct nothing_is_background 
+    struct nothing_is_background
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -120,8 +120,8 @@ namespace dlib
 
         template <typename image_view_type>
         bool operator() (
-            const image_view_type&, 
-            const point& 
+            const image_view_type&,
+            const point&
         ) const
         {
             return false;
@@ -148,46 +148,46 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - label_image_type == an image object that implements the interface defined in
               dlib/image_processing/generic_image.h and it must contain integer pixels.
             - is_background(img, point(c,r)) is a legal expression that evaluates to a bool.
             - is_connected(img, point(c,r), point(c2,r2)) is a legal expression that
               evaluates to a bool.
-            - get_neighbors(point(c,r), neighbors) is a legal expression where neighbors 
+            - get_neighbors(point(c,r), neighbors) is a legal expression where neighbors
               is of type std::vector<point>.
             - is_same_object(img, label_img) == false
         ensures
-            - This function labels each of the connected blobs in img with a unique integer 
-              label.  
-            - An image can be thought of as a graph where pixels A and B are connected if 
+            - This function labels each of the connected blobs in img with a unique integer
+              label.
+            - An image can be thought of as a graph where pixels A and B are connected if
               and only if the following two statements are satisfied:
                 - is_connected(img,A,B) == true
                 - get_neighbors(A, neighbors) results in neighbors containing B or
                   get_neighbors(B, neighbors) results in neighbors containing A.
-              Then this function can be understood as labeling all the connected components 
+              Then this function can be understood as labeling all the connected components
               of this pixel graph such that all pixels in a component get the same label while
-              pixels in different components get different labels.  Note that there is a 
-              special "background" component determined by is_background().  Any pixels which 
+              pixels in different components get different labels.  Note that there is a
+              special "background" component determined by is_background().  Any pixels which
               are "background" always get a blob id of 0 regardless of any other considerations.
             - #label_img.nr() == img.nr()
             - #label_img.nc() == img.nc()
             - for all valid r and c:
-                - #label_img[r][c] == the blob label number for pixel img[r][c].  
+                - #label_img[r][c] == the blob label number for pixel img[r][c].
                 - #label_img[r][c] >= 0
                 - if (is_background(img, point(c,r))) then
                     - #label_img[r][c] == 0
                 - else
                     - #label_img[r][c] != 0
-            - if (img.size() != 0) then 
+            - if (img.size() != 0) then
                 - returns max(mat(#label_img))+1
-                  (i.e. returns a number one greater than the maximum blob id number, 
+                  (i.e. returns a number one greater than the maximum blob id number,
                   this is the number of blobs found.)
             - else
                 - returns 0
             - blob labels are contiguous, therefore, the number returned by this function is
               the number of blobs in the image (including the background blob).
-            - It is guaranteed that is_connected() and is_background() will never be 
+            - It is guaranteed that is_connected() and is_background() will never be
               called with points outside the image.
     !*/
 

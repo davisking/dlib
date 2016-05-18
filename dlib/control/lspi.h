@@ -45,7 +45,7 @@ namespace dlib
             DLIB_ASSERT(0 < value && value <= 1,
                 "\t void lspi::set_discount(value)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t value: " << value 
+                << "\n\t value: " << value
                 );
             discount = value;
         }
@@ -73,34 +73,34 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\t void lspi::set_epsilon(eps_)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 );
             eps = eps_;
         }
 
         double get_epsilon (
         ) const
-        { 
+        {
             return eps;
         }
 
         void set_lambda (
-            double lambda_ 
-        ) 
+            double lambda_
+        )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(lambda_ >= 0,
                 "\t void lspi::set_lambda(lambda_)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t lambda_: " << lambda_ 
+                << "\n\t lambda_: " << lambda_
                 );
             lambda = lambda_;
         }
 
         double get_lambda (
-        ) const 
-        { 
-            return lambda; 
+        ) const
+        {
+            return lambda;
         }
 
         void set_max_iterations (
@@ -127,7 +127,7 @@ namespace dlib
 
             matrix<double> A;
 
-            double change; 
+            double change;
             unsigned long iter = 0;
             do
             {
@@ -136,8 +136,8 @@ namespace dlib
                 for (unsigned long i = 0; i < samples.size(); ++i)
                 {
                     fe.get_features(samples[i].state, samples[i].action, f1);
-                    fe.get_features(samples[i].next_state, 
-                                    fe.find_best_action(samples[i].next_state,w), 
+                    fe.get_features(samples[i].next_state,
+                                    fe.find_best_action(samples[i].next_state,w),
                                     f2);
                     A += f1*trans(f1 - discount*f2);
                     b += f1*samples[i].reward;

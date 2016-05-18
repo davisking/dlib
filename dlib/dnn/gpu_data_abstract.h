@@ -11,7 +11,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class gpu_data 
+    class gpu_data
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -28,7 +28,7 @@ namespace dlib
                 to the host do not happen before the relevant computations have completed.
 
                 If DLIB_USE_CUDA is not #defined then this object will not use CUDA at all.
-                Instead, it will simply store one host side memory block of floats.  
+                Instead, it will simply store one host side memory block of floats.
 
             THREAD SAFETY
                 Instances of this object are not thread-safe.  So don't touch one from
@@ -41,8 +41,8 @@ namespace dlib
         /*!
             ensures
                 - #size() == 0
-                - #host() == nullptr 
-                - #device() == nullptr 
+                - #host() == nullptr
+                - #device() == nullptr
                 - #host_ready() == true
                 - #device_ready() == true
                 - #device_id() == 0
@@ -55,7 +55,7 @@ namespace dlib
         gpu_data& operator=(gpu_data&& item);
 
         int device_id(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the ID of the CUDA device that allocated this memory. I.e. the
@@ -64,7 +64,7 @@ namespace dlib
         !*/
 
         void async_copy_to_device(
-        ); 
+        );
         /*!
             ensures
                 - if (!device_ready()) then
@@ -96,7 +96,7 @@ namespace dlib
         !*/
 
         bool device_ready (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns true if and only if the device's copy of the data is current.
@@ -113,8 +113,8 @@ namespace dlib
                   values or nullptr if size()==0.
                 - if (!host_ready()) then
                     - copies the data from the device to the host, while this is happening
-                      the call to host() blocks. 
-                - #host_ready() == true 
+                      the call to host() blocks.
+                - #host_ready() == true
         !*/
 
         float* host(
@@ -125,8 +125,8 @@ namespace dlib
                   values or nullptr if size()==0.
                 - if (!host_ready()) then
                     - copies the data from the device to the host, while this is happening
-                      the call to host() blocks. 
-                - #host_ready() == true 
+                      the call to host() blocks.
+                - #host_ready() == true
                 - #device_ready() == false
                   I.e. Marks the device side data as out of date so that the next call to
                   device() will perform a host to device transfer.  If you want to begin
@@ -143,9 +143,9 @@ namespace dlib
                   device side data as out of date, effectively discarding it.  Therefore,
                   the values in the data pointed to by host_write_only() are undefined and
                   you should only call host_write_only() if you are going to assign to
-                  every memory location in the returned memory block.  
+                  every memory location in the returned memory block.
                 - #host_ready() == true
-                - #device_ready() == false 
+                - #device_ready() == false
         !*/
 
         const float* device(
@@ -158,7 +158,7 @@ namespace dlib
                   values or nullptr if size()==0.
                 - if (!device_ready()) then
                     - copies the data from the host to the device, while this is happening
-                      the call to device() blocks. 
+                      the call to device() blocks.
                 - #device_ready() == true
         !*/
 
@@ -172,7 +172,7 @@ namespace dlib
                   values or nullptr if size()==0.
                 - if (!device_ready()) then
                     - copies the data from the host to the device, while this is happening
-                      the call to device() blocks. 
+                      the call to device() blocks.
                 - #host_ready() == false
                 - #device_ready() == true
         !*/
@@ -188,14 +188,14 @@ namespace dlib
                   host side data as out of date, effectively discarding it.  Therefore, the
                   values in the data pointed to by device_write_only() are undefined and
                   you should only call device_write_only() if you are going to assign to
-                  every memory location in the returned memory block.  
-                - #host_ready() == false 
-                - #device_ready() == true 
+                  every memory location in the returned memory block.
+                - #host_ready() == false
+                - #device_ready() == true
         !*/
 
 
         size_t size(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of floats contained in this object.
@@ -218,7 +218,7 @@ namespace dlib
     !*/
 
     void memcpy (
-        gpu_data& dest, 
+        gpu_data& dest,
         const gpu_data& src
     );
     /*!

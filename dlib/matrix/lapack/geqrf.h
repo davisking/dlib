@@ -15,15 +15,15 @@ namespace dlib
             extern "C"
             {
                 void DLIB_FORTRAN_ID(dgeqrf) (integer *m, integer *n, double *a, integer *
-                                              lda, double *tau, double *work, integer *lwork, 
+                                              lda, double *tau, double *work, integer *lwork,
                                               integer *info);
 
                 void DLIB_FORTRAN_ID(sgeqrf) (integer *m, integer *n, float *a, integer *
-                                              lda, float *tau, float *work, integer *lwork, 
+                                              lda, float *tau, float *work, integer *lwork,
                                               integer *info);
             }
 
-            inline int geqrf (integer m, integer n, double *a, integer lda, 
+            inline int geqrf (integer m, integer n, double *a, integer lda,
                               double *tau, double *work, integer lwork)
             {
                 integer info = 0;
@@ -32,7 +32,7 @@ namespace dlib
                 return info;
             }
 
-            inline int geqrf (integer m, integer n, float *a, integer lda, 
+            inline int geqrf (integer m, integer n, float *a, integer lda,
                               float *tau, float *work, integer lwork)
             {
                 integer info = 0;
@@ -122,7 +122,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <
-            typename T, 
+            typename T,
             long NR1, long NR2,
             long NC1, long NC2,
             typename MM
@@ -147,7 +147,7 @@ namespace dlib
             if (work.size() < work_size)
                 work.set_size(static_cast<long>(work_size), 1);
 
-            // compute the actual decomposition 
+            // compute the actual decomposition
             info = binding::geqrf(a.nr(), a.nc(), &a(0,0), a.nr(),
                                   &tau(0,0), &work(0,0), work.size());
 

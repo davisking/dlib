@@ -19,10 +19,10 @@ namespace dlib
         typename config_reader_base,
         typename map_string_void
         >
-    class config_reader_thread_safe_1 
+    class config_reader_thread_safe_1
     {
 
-        /*!                
+        /*!
             CONVENTION
                 - get_mutex() == *m
                 - *cr == the config reader being extended
@@ -30,7 +30,7 @@ namespace dlib
                 - block_table.size() == the number of blocks in *cr
                 - block_table[key] == a config_reader_thread_safe_1 that contains &cr.block(key)
                 - if (own_pointers) then
-                    - this object owns the m and cr pointers and should delete them when destructed 
+                    - this object owns the m and cr pointers and should delete them when destructed
         !*/
         
     public:
@@ -50,11 +50,11 @@ namespace dlib
         );
 
         config_reader_thread_safe_1(
-            const std::string& config_file 
+            const std::string& config_file
         );
 
         virtual ~config_reader_thread_safe_1(
-        ); 
+        );
 
         void clear (
         );
@@ -64,7 +64,7 @@ namespace dlib
         );
 
         void load_from (
-            const std::string& config_file 
+            const std::string& config_file
         );
 
         bool is_key_defined (
@@ -107,7 +107,7 @@ namespace dlib
         );
         /*!
             ensures
-                - block_table.size() == the number of blocks in cr 
+                - block_table.size() == the number of blocks in cr
                 - block_table[key] == a config_reader_thread_safe_1 that contains &cr.block(key)
         !*/
 
@@ -117,7 +117,7 @@ namespace dlib
         const bool own_pointers;
 
         // restricted functions
-        config_reader_thread_safe_1(config_reader_thread_safe_1&);     
+        config_reader_thread_safe_1(config_reader_thread_safe_1&);
         config_reader_thread_safe_1& operator=(config_reader_thread_safe_1&);
 
     };
@@ -281,7 +281,7 @@ namespace dlib
         >
     config_reader_thread_safe_1<config_reader_base,map_string_void>::
     ~config_reader_thread_safe_1(
-    ) 
+    )
     {
         if (own_pointers)
         {
@@ -424,7 +424,7 @@ namespace dlib
         >
     void config_reader_thread_safe_1<config_reader_base,map_string_void>::
     fill_block_table (
-    ) 
+    )
     {
         using namespace std;
         // first empty out the block table

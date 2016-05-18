@@ -12,7 +12,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -25,9 +25,9 @@ namespace
     )
     /*!
         ensures
-            - runs tests on pixel objects and functions for compliance with the specs 
+            - runs tests on pixel objects and functions for compliance with the specs
     !*/
-    {        
+    {
 
         print_spinner();
 

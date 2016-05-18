@@ -9,9 +9,9 @@
 namespace dlib
 {
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
     // output functions
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     sockstreambuf_unbuffered::int_type sockstreambuf_unbuffered::
     overflow (
@@ -30,7 +30,7 @@ namespace dlib
         return c;
     }
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     std::streamsize sockstreambuf_unbuffered::
     xsputn (
@@ -42,16 +42,16 @@ namespace dlib
         {
             // the write was not successful so return that 0 bytes were written
             return 0;
-        } 
+        }
         return num;
     }
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
     // input functions
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     sockstreambuf_unbuffered::int_type sockstreambuf_unbuffered::
-    underflow( 
+    underflow(
     )
     {
         if (lastread_next)
@@ -75,12 +75,12 @@ namespace dlib
         }
     }
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     sockstreambuf_unbuffered::int_type sockstreambuf_unbuffered::
-    uflow( 
+    uflow(
     )
-    {   
+    {
         if (lastread_next)
         {
             lastread_next = false;
@@ -99,19 +99,19 @@ namespace dlib
             {
                 // some error occurred
                 return EOF;
-            }      
+            }
             lastread = static_cast<unsigned char>(temp);
             return lastread;
         }
     }
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     sockstreambuf_unbuffered::int_type sockstreambuf_unbuffered::
     pbackfail(
         int_type c
     )
-    {  
+    {
         // if they are trying to push back a character that they didn't read last
         // that is an error
         if (c != EOF && c != lastread)
@@ -125,14 +125,14 @@ namespace dlib
         return 1;
     }
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     std::streamsize sockstreambuf_unbuffered::
     xsgetn (
-        char_type* s, 
+        char_type* s,
         std::streamsize n
     )
-    { 
+    {
         std::streamsize temp = n;
         if (lastread_next && n > 0)
         {
@@ -158,10 +158,10 @@ namespace dlib
             s += status;
         }
 
-        return temp-n;       
+        return temp-n;
     }
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
 }
 #endif // DLIB_SOCKSTrEAMBUF_UNBUFFERED_CPp_

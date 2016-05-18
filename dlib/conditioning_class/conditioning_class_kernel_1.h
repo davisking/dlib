@@ -13,7 +13,7 @@ namespace dlib
     template <
         unsigned long alphabet_size
         >
-    class conditioning_class_kernel_1 
+    class conditioning_class_kernel_1
     {
         /*!
             INITIAL VALUE
@@ -76,7 +76,7 @@ namespace dlib
 
         void get_symbol (
             unsigned long target,
-            unsigned long& symbol,            
+            unsigned long& symbol,
             unsigned long& low_count,
             unsigned long& high_count
         ) const;
@@ -102,7 +102,7 @@ namespace dlib
         unsigned short* counts;
         global_state_type& global_state;
 
-    };   
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -133,7 +133,7 @@ namespace dlib
         *start = 1;
 
         // update memory usage
-        global_state.memory_usage += sizeof(unsigned short)*alphabet_size + 
+        global_state.memory_usage += sizeof(unsigned short)*alphabet_size +
                                      sizeof(conditioning_class_kernel_1);
     }
 
@@ -148,7 +148,7 @@ namespace dlib
     {
         delete [] counts;
         // update memory usage
-        global_state.memory_usage -= sizeof(unsigned short)*alphabet_size + 
+        global_state.memory_usage -= sizeof(unsigned short)*alphabet_size +
                                      sizeof(conditioning_class_kernel_1);
     }
 
@@ -206,7 +206,7 @@ namespace dlib
         unsigned long symbol,
         unsigned short amount
     )
-    {        
+    {
         // if we are going over a total of 65535 then scale down all counts by 2
         if (static_cast<unsigned long>(total)+static_cast<unsigned long>(amount) >= 65536)
         {
@@ -218,7 +218,7 @@ namespace dlib
                 *start >>= 1;
                 total += *start;
                 ++start;
-            }    
+            }
             // make sure it is at least one
             if (counts[alphabet_size-1]==0)
             {
@@ -250,8 +250,8 @@ namespace dlib
         unsigned long alphabet_size
         >
     unsigned long conditioning_class_kernel_1<alphabet_size>::
-    get_alphabet_size (        
-    ) 
+    get_alphabet_size (
+    )
     {
         return alphabet_size;
     }
@@ -292,8 +292,8 @@ namespace dlib
         while (start != end)
         {
             ++start;
-            high_count_temp += *start;            
-        }  
+            high_count_temp += *start;
+        }
         low_count = high_count_temp - *start;
         high_count = high_count_temp;
         return *start;
@@ -307,18 +307,18 @@ namespace dlib
     void conditioning_class_kernel_1<alphabet_size>::
     get_symbol (
         unsigned long target,
-        unsigned long& symbol,            
+        unsigned long& symbol,
         unsigned long& low_count,
         unsigned long& high_count
     ) const
     {
         unsigned long high_count_temp = *counts;
-        const unsigned short* start = counts;        
+        const unsigned short* start = counts;
         while (target >= high_count_temp)
         {
             ++start;
-            high_count_temp += *start;            
-        } 
+            high_count_temp += *start;
+        }
 
         low_count = high_count_temp - *start;
         high_count = high_count_temp;

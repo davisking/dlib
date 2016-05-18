@@ -30,7 +30,7 @@ namespace dlib
             - #dest_img.nc() == src_img.nc()
             - #dest_img.nr() == src_img.nr()
             - for all valid r and c:
-                - performs assign_pixel(#dest_img[r][c],src_img[r][c]) 
+                - performs assign_pixel(#dest_img[r][c],src_img[r][c])
                   (i.e. copies the src image to dest image)
     !*/
 
@@ -57,15 +57,15 @@ namespace dlib
             - #dest_img.nc() == src_img.nc()
             - #dest_img.nr() == src_img.nr()
             - if (dest_img's pixels have a wide enough dynamic range to contain all the
-              pixels in src_img.  (Note that dynamic range is determined by the min() and 
+              pixels in src_img.  (Note that dynamic range is determined by the min() and
               max() pixel_traits properties)) then
-                - performs: assign_image(dest_img, src_img) 
-                  (i.e. in this case, no scaling is performed.  Just a normal color space 
+                - performs: assign_image(dest_img, src_img)
+                  (i.e. in this case, no scaling is performed.  Just a normal color space
                   conversion and copy )
             - else
                 - #dest_img will be converted to a grayscale image
                 - scales the contents of src_img into the dynamic range of dest_img and then
-                  assigns the result into dest_img.  The thresh parameter is used to filter 
+                  assigns the result into dest_img.  The thresh parameter is used to filter
                   source pixel values which are outliers.  These outliers will saturate
                   at the edge of the destination image's dynamic range.
                 - Specifically, for all valid r and c:
@@ -102,13 +102,13 @@ namespace dlib
         requires
             - dest_image_type == an image object that implements the interface defined in
               dlib/image_processing/generic_image.h or an image_view.
-            - pixel_traits<src_pixel_type> is defined  
+            - pixel_traits<src_pixel_type> is defined
         ensures
             - #dest_img.nc() == dest_img.nc()
             - #dest_img.nr() == dest_img.nr()
               (i.e. the size of dest_img isn't changed by this function)
             - for all valid r and c:
-                - performs assign_pixel(#dest_img[r][c],src_pixel) 
+                - performs assign_pixel(#dest_img[r][c],src_pixel)
                   (i.e. assigns the src pixel to every pixel in the dest image)
     !*/
 
@@ -134,8 +134,8 @@ namespace dlib
             - #img.nr() == img.nr()
               (i.e. the size of img isn't changed by this function)
             - for all valid r such that r+y_border_size or r-y_border_size gives an invalid row
-                - for all valid c such that c+x_border_size or c-x_border_size gives an invalid column 
-                    - performs assign_pixel(#img[r][c],p) 
+                - for all valid c such that c+x_border_size or c-x_border_size gives an invalid column
+                    - performs assign_pixel(#img[r][c],p)
                       (i.e. assigns the given pixel to every pixel in the border of img)
     !*/
 
@@ -160,8 +160,8 @@ namespace dlib
             - #img.nr() == img.nr()
               (i.e. the size of img isn't changed by this function)
             - for all valid r such that r+y_border_size or r-y_border_size gives an invalid row
-                - for all valid c such that c+x_border_size or c-x_border_size gives an invalid column 
-                    - performs assign_pixel(#img[r][c], 0 ) 
+                - for all valid c such that c+x_border_size or c-x_border_size gives an invalid column
+                    - performs assign_pixel(#img[r][c], 0 )
                       (i.e. assigns 0 to every pixel in the border of img)
     !*/
 

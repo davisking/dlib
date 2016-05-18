@@ -182,7 +182,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <
-            typename T, 
+            typename T,
             long NR1, long NR2, long NR3, long NR4,
             long NC1, long NC2, long NC3, long NC4,
             typename MM
@@ -246,7 +246,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <
-            typename T, 
+            typename T,
             long NR1, long NR2, long NR3, long NR4,
             long NC1, long NC2, long NC3, long NC4,
             typename MM

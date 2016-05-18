@@ -25,7 +25,7 @@ namespace dlib
         long y2,
         image_type& c_,
         const pixel_type& val
-    ) 
+    )
     {
         image_view<image_type> c(c_);
         if (x1 == x2)
@@ -85,7 +85,7 @@ namespace dlib
                 double first, last;
 
 
-                if (x1 > x2)                
+                if (x1 > x2)
                 {
                     first = std::max(x2,valid_area.left());
                     last = std::min(x1,valid_area.right());
@@ -94,14 +94,14 @@ namespace dlib
                 {
                     first = std::max(x1,valid_area.left());
                     last = std::min(x2,valid_area.right());
-                }                             
+                }
 
                 long y;
                 long x;
                 const double x1f = x1;
                 const double y1f = y1;
                 for (double i = first; i <= last; ++i)
-                {   
+                {
                     const double dy = slope*(i-x1f) + y1f;
                     const double dx = i;
 
@@ -119,7 +119,7 @@ namespace dlib
                         alpha_pixel.alpha = static_cast<unsigned char>((dy-y)*max_alpha);
                         assign_pixel(c[y+1][x], alpha_pixel);
                     }
-                }         
+                }
             }
             else
             {
@@ -129,7 +129,7 @@ namespace dlib
                 double first, last;
 
 
-                if (y1 > y2)                
+                if (y1 > y2)
                 {
                     first = std::max(y2,valid_area.top());
                     last = std::min(y1,valid_area.bottom());
@@ -138,14 +138,14 @@ namespace dlib
                 {
                     first = std::max(y1,valid_area.top());
                     last = std::min(y2,valid_area.bottom());
-                }                             
+                }
 
                 long x;
                 long y;
                 const double x1f = x1;
                 const double y1f = y1;
                 for (double i = first; i <= last; ++i)
-                {   
+                {
                     const double dx = slope*(i-y1f) + x1f;
                     const double dy = i;
 
@@ -162,7 +162,7 @@ namespace dlib
                         alpha_pixel.alpha = static_cast<unsigned char>((dx-x)*max_alpha);
                         assign_pixel(c[y][x+1], alpha_pixel);
                     }
-                } 
+                }
             }
         }
 
@@ -179,7 +179,7 @@ namespace dlib
         const point& p1,
         const point& p2,
         const pixel_type& val
-    ) 
+    )
     {
         draw_line(p1.x(),p1.y(),p2.x(),p2.y(),c,val);
     }
@@ -194,7 +194,7 @@ namespace dlib
         image_type& c,
         const rectangle& rect,
         const pixel_type& val
-    ) 
+    )
     {
         draw_line(c, rect.tl_corner(), rect.tr_corner(), val);
         draw_line(c, rect.bl_corner(), rect.br_corner(), val);
@@ -213,7 +213,7 @@ namespace dlib
         const rectangle& rect,
         const pixel_type& val,
         unsigned int thickness
-    ) 
+    )
     {
         for (unsigned int i = 0; i < thickness; ++i)
         {
@@ -341,7 +341,7 @@ namespace dlib
                 top += y;
                 long temp = top;
 
-                while(top >= last) 
+                while(top >= last)
                 {
                     bottom = y - top + y;
                     draw_line(img_, point(i,top),point(i,bottom),pixel);
@@ -364,7 +364,7 @@ namespace dlib
                 top += y;
                 long temp = top;
 
-                while(top >= last) 
+                while(top >= last)
                 {
                     bottom = y - top + y;
                     draw_line(img_, point(i,top),point(i,bottom),pixel);

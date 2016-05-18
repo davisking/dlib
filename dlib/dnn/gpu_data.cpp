@@ -19,7 +19,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void memcpy (
-        gpu_data& dest, 
+        gpu_data& dest,
         const gpu_data& src
     )
     {
@@ -34,7 +34,7 @@ namespace dlib
             CHECK_CUDA(cudaMemcpy(dest.host_write_only(), src.device(), src.size()*sizeof(float), cudaMemcpyDeviceToHost));
         else if (dest.device_ready() && !src.device_ready())
             CHECK_CUDA(cudaMemcpy(dest.device(), src.host(),            src.size()*sizeof(float), cudaMemcpyHostToDevice));
-        else 
+        else
             CHECK_CUDA(cudaMemcpy(dest.host_write_only(), src.host(),   src.size()*sizeof(float), cudaMemcpyHostToHost));
     }
 
@@ -71,7 +71,7 @@ namespace dlib
             CHECK_CUDA(cudaMemcpy(data_host.get(), data_device.get(), data_size*sizeof(float), cudaMemcpyDeviceToHost));
             host_current = true;
             // At this point we know our RAM block isn't in use because cudaMemcpy()
-            // implicitly syncs with the device. 
+            // implicitly syncs with the device.
             device_in_use = false;
             // Check for errors.  These calls to cudaGetLastError() are what help us find
             // out if our kernel launches have been failing.

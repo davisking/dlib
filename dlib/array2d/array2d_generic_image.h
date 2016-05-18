@@ -28,7 +28,7 @@ namespace dlib
     inline void set_image_size(
         array2d<T,mm>& img,
         long rows,
-        long cols 
+        long cols
     ) { img.set_size(rows,cols); }
 
     template <typename T, typename mm>
@@ -56,9 +56,9 @@ namespace dlib
     template <typename T, typename mm>
     inline long width_step(
         const array2d<T,mm>& img
-    ) 
-    { 
-        return img.width_step(); 
+    )
+    {
+        return img.width_step();
     }
 
 }

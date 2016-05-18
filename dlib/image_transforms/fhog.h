@@ -32,27 +32,27 @@ namespace dlib
         {
             matrix<T, 2, 1> grad2, grad3;
             // get the red gradient
-            grad(0) = (int)img[r][c+1].red-(int)img[r][c-1].red; 
+            grad(0) = (int)img[r][c+1].red-(int)img[r][c-1].red;
             grad(1) = (int)img[r+1][c].red-(int)img[r-1][c].red;
             len = length_squared(grad);
 
             // get the green gradient
-            grad2(0) = (int)img[r][c+1].green-(int)img[r][c-1].green; 
+            grad2(0) = (int)img[r][c+1].green-(int)img[r][c-1].green;
             grad2(1) = (int)img[r+1][c].green-(int)img[r-1][c].green;
             T v2 = length_squared(grad2);
 
             // get the blue gradient
-            grad3(0) = (int)img[r][c+1].blue-(int)img[r][c-1].blue; 
+            grad3(0) = (int)img[r][c+1].blue-(int)img[r][c-1].blue;
             grad3(1) = (int)img[r+1][c].blue-(int)img[r-1][c].blue;
             T v3 = length_squared(grad3);
 
             // pick color with strongest gradient
-            if (v2 > len) 
+            if (v2 > len)
             {
                 len = v2;
                 grad = grad2;
-            } 
-            if (v3 > len) 
+            }
+            if (v3 > len)
             {
                 len = v3;
                 grad = grad3;
@@ -69,11 +69,11 @@ namespace dlib
             simd4f& len
         )
         {
-            simd4i rleft((int)img[r][c-1].red, 
+            simd4i rleft((int)img[r][c-1].red,
                         (int)img[r][c].red,
                         (int)img[r][c+1].red,
                         (int)img[r][c+2].red);
-            simd4i rright((int)img[r][c+1].red, 
+            simd4i rright((int)img[r][c+1].red,
                          (int)img[r][c+2].red,
                          (int)img[r][c+3].red,
                          (int)img[r][c+4].red);
@@ -86,11 +86,11 @@ namespace dlib
                           (int)img[r+1][c+2].red,
                           (int)img[r+1][c+3].red);
 
-            simd4i gleft((int)img[r][c-1].green, 
+            simd4i gleft((int)img[r][c-1].green,
                         (int)img[r][c].green,
                         (int)img[r][c+1].green,
                         (int)img[r][c+2].green);
-            simd4i gright((int)img[r][c+1].green, 
+            simd4i gright((int)img[r][c+1].green,
                          (int)img[r][c+2].green,
                          (int)img[r][c+3].green,
                          (int)img[r][c+4].green);
@@ -103,11 +103,11 @@ namespace dlib
                           (int)img[r+1][c+2].green,
                           (int)img[r+1][c+3].green);
 
-            simd4i bleft((int)img[r][c-1].blue, 
+            simd4i bleft((int)img[r][c-1].blue,
                         (int)img[r][c].blue,
                         (int)img[r][c+1].blue,
                         (int)img[r][c+2].blue);
-            simd4i bright((int)img[r][c+1].blue, 
+            simd4i bright((int)img[r][c+1].blue,
                          (int)img[r][c+2].blue,
                          (int)img[r][c+3].blue,
                          (int)img[r][c+4].blue);
@@ -286,7 +286,7 @@ namespace dlib
             T& len
         )
         {
-            grad(0) = (int)get_pixel_intensity(img[r][c+1])-(int)get_pixel_intensity(img[r][c-1]); 
+            grad(0) = (int)get_pixel_intensity(img[r][c+1])-(int)get_pixel_intensity(img[r][c-1]);
             grad(1) = (int)get_pixel_intensity(img[r+1][c])-(int)get_pixel_intensity(img[r-1][c]);
             len = length_squared(grad);
         }
@@ -301,11 +301,11 @@ namespace dlib
             simd4f& len
         )
         {
-            simd4i left((int)get_pixel_intensity(img[r][c-1]), 
+            simd4i left((int)get_pixel_intensity(img[r][c-1]),
                         (int)get_pixel_intensity(img[r][c]),
                         (int)get_pixel_intensity(img[r][c+1]),
                         (int)get_pixel_intensity(img[r][c+2]));
-            simd4i right((int)get_pixel_intensity(img[r][c+1]), 
+            simd4i right((int)get_pixel_intensity(img[r][c+1]),
                          (int)get_pixel_intensity(img[r][c+2]),
                          (int)get_pixel_intensity(img[r][c+3]),
                          (int)get_pixel_intensity(img[r][c+4]));
@@ -383,7 +383,7 @@ namespace dlib
         inline void set_hog (
             dlib::array<array2d<T,mm1>,mm2>& hog,
             int o,
-            int x, 
+            int x,
             int y,
             const float& value
         )
@@ -438,7 +438,7 @@ namespace dlib
         inline void set_hog (
             array2d<matrix<T,31,1>,mm>& hog,
             int o,
-            int x, 
+            int x,
             int y,
             const float& value
         )
@@ -467,7 +467,7 @@ namespace dlib
             while (be.move_next())
             {
                 const point p = be.element();
-                set_all_elements(hog[p.y()][p.x()], 0); 
+                set_all_elements(hog[p.y()][p.x()], 0);
             }
         }
 
@@ -486,7 +486,7 @@ namespace dlib
             {
                 for (long c = 0; c < hog.nc(); ++c)
                 {
-                    set_all_elements(hog[r][c], 0); 
+                    set_all_elements(hog[r][c], 0);
                 }
             }
         }
@@ -494,15 +494,15 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <
-            typename image_type, 
+            typename image_type,
             typename out_type
             >
         void impl_extract_fhog_features_cell_size_1(
-            const image_type& img_, 
-            out_type& hog, 
+            const image_type& img_,
+            out_type& hog,
             int filter_rows_padding,
             int filter_cols_padding
-        ) 
+        )
         {
             const_image_view<image_type> img(img_);
             // make sure requires clause is not broken
@@ -510,8 +510,8 @@ namespace dlib
                          filter_cols_padding > 0 ,
                 "\t void extract_fhog_features()"
                 << "\n\t Invalid inputs were given to this function. "
-                << "\n\t filter_rows_padding: " << filter_rows_padding 
-                << "\n\t filter_cols_padding: " << filter_cols_padding 
+                << "\n\t filter_rows_padding: " << filter_rows_padding
+                << "\n\t filter_cols_padding: " << filter_cols_padding
                 );
 
             /*
@@ -522,7 +522,7 @@ namespace dlib
 
             // unit vectors used to compute gradient orientation
             matrix<float,2,1> directions[9];
-            directions[0] =  1.0000, 0.0000; 
+            directions[0] =  1.0000, 0.0000;
             directions[1] =  0.9397, 0.3420;
             directions[2] =  0.7660, 0.6428;
             directions[3] =  0.500,  0.8660;
@@ -558,7 +558,7 @@ namespace dlib
             const int visible_nc = img.nc()-1;
 
             // First populate the gradient histograms
-            for (int y = 1; y < visible_nr; y++) 
+            for (int y = 1; y < visible_nr; y++)
             {
                 int x;
                 for (x = 1; x < visible_nc - 7; x += 8)
@@ -607,7 +607,7 @@ namespace dlib
                     angle[y][x + 7] = _best_o[7];
                 }
                 // Now process the right columns that don't fit into simd registers.
-                for (; x < visible_nc; x++) 
+                for (; x < visible_nc; x++)
                 {
                     matrix<float,2,1> grad;
                     float v;
@@ -616,15 +616,15 @@ namespace dlib
                     // snap to one of 18 orientations
                     float best_dot = 0;
                     int best_o = 0;
-                    for (int o = 0; o < 9; o++) 
+                    for (int o = 0; o < 9; o++)
                     {
                         const float dot = dlib::dot(directions[o], grad);
-                        if (dot > best_dot) 
+                        if (dot > best_dot)
                         {
                             best_dot = dot;
                             best_o = o;
-                        } 
-                        else if (-dot > best_dot) 
+                        }
+                        else if (-dot > best_dot)
                         {
                             best_dot = -dot;
                             best_o = o+9;
@@ -638,14 +638,14 @@ namespace dlib
 
             const float eps = 0.0001;
             // compute features
-            for (int y = 0; y < hog_nr; y++) 
+            for (int y = 0; y < hog_nr; y++)
             {
-                const int yy = y+padding_rows_offset; 
-                for (int x = 0; x < hog_nc; x++) 
+                const int yy = y+padding_rows_offset;
+                for (int x = 0; x < hog_nc; x++)
                 {
                     const simd4f z1(norm[y+1][x+1],
-                                    norm[y][x+1], 
-                                    norm[y+1][x],  
+                                    norm[y][x+1],
+                                    norm[y+1][x],
                                     norm[y][x]);
 
                     const simd4f z2(norm[y+1][x+2],
@@ -669,7 +669,7 @@ namespace dlib
 
                     simd4f t = 0;
 
-                    const int xx = x+padding_cols_offset; 
+                    const int xx = x+padding_cols_offset;
 
                     simd4f h0 = min(temp0,nn)*n;
                     const float vv = sum(h0);
@@ -697,16 +697,16 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <
-            typename image_type, 
+            typename image_type,
             typename out_type
             >
         void impl_extract_fhog_features(
-            const image_type& img_, 
-            out_type& hog, 
+            const image_type& img_,
+            out_type& hog,
             int cell_size,
             int filter_rows_padding,
             int filter_cols_padding
-        ) 
+        )
         {
             const_image_view<image_type> img(img_);
             // make sure requires clause is not broken
@@ -715,13 +715,13 @@ namespace dlib
                          filter_cols_padding > 0 ,
                 "\t void extract_fhog_features()"
                 << "\n\t Invalid inputs were given to this function. "
-                << "\n\t cell_size: " << cell_size 
-                << "\n\t filter_rows_padding: " << filter_rows_padding 
-                << "\n\t filter_cols_padding: " << filter_cols_padding 
+                << "\n\t cell_size: " << cell_size
+                << "\n\t filter_rows_padding: " << filter_rows_padding
+                << "\n\t filter_cols_padding: " << filter_cols_padding
                 );
 
             /*
-                This function implements the HOG feature extraction method described in 
+                This function implements the HOG feature extraction method described in
                 the paper:
                     P. Felzenszwalb, R. Girshick, D. McAllester, D. Ramanan
                     Object Detection with Discriminatively Trained Part Based Models
@@ -765,7 +765,7 @@ namespace dlib
 
             // unit vectors used to compute gradient orientation
             matrix<float,2,1> directions[9];
-            directions[0] =  1.0000, 0.0000; 
+            directions[0] =  1.0000, 0.0000;
             directions[1] =  0.9397, 0.3420;
             directions[2] =  0.7660, 0.6428;
             directions[3] =  0.500,  0.8660;
@@ -819,7 +819,7 @@ namespace dlib
             const int visible_nc = std::min((long)cells_nc*cell_size,img.nc())-1;
 
             // First populate the gradient histograms
-            for (int y = 1; y < visible_nr; y++) 
+            for (int y = 1; y < visible_nr; y++)
             {
                 const float yp = ((float)y+0.5)/(float)cell_size - 0.5;
                 const int iyp = (int)std::floor(yp);
@@ -918,7 +918,7 @@ namespace dlib
                     hist[iyp + 1 + 1][_ixp[7] + 1](_best_o[7]) += _v00[7];
                 }
                 // Now process the right columns that don't fit into simd registers.
-                for (; x < visible_nc; x++) 
+                for (; x < visible_nc; x++)
                 {
                     matrix<float, 2, 1> grad;
                     float v;
@@ -927,15 +927,15 @@ namespace dlib
                     // snap to one of 18 orientations
                     float best_dot = 0;
                     int best_o = 0;
-                    for (int o = 0; o < 9; o++) 
+                    for (int o = 0; o < 9; o++)
                     {
                         const float dot = dlib::dot(directions[o], grad);
-                        if (dot > best_dot) 
+                        if (dot > best_dot)
                         {
                             best_dot = dot;
                             best_o = o;
-                        } 
-                        else if (-dot > best_dot) 
+                        }
+                        else if (-dot > best_dot)
                         {
                             best_dot = -dot;
                             best_o = o+9;
@@ -961,7 +961,7 @@ namespace dlib
             {
                 for (int c = 0; c < cells_nc; ++c)
                 {
-                    for (int o = 0; o < 9; o++) 
+                    for (int o = 0; o < 9; o++)
                     {
                         norm[r][c] += (hist[r+1][c+1](o) + hist[r+1][c+1](o+9)) * (hist[r+1][c+1](o) + hist[r+1][c+1](o+9));
                     }
@@ -970,14 +970,14 @@ namespace dlib
 
             const float eps = 0.0001;
             // compute features
-            for (int y = 0; y < hog_nr; y++) 
+            for (int y = 0; y < hog_nr; y++)
             {
-                const int yy = y+padding_rows_offset; 
-                for (int x = 0; x < hog_nc; x++) 
+                const int yy = y+padding_rows_offset;
+                for (int x = 0; x < hog_nc; x++)
                 {
                     const simd4f z1(norm[y+1][x+1],
-                                    norm[y][x+1], 
-                                    norm[y+1][x],  
+                                    norm[y][x+1],
+                                    norm[y+1][x],
                                     norm[y][x]);
 
                     const simd4f z2(norm[y+1][x+2],
@@ -1000,10 +1000,10 @@ namespace dlib
 
                     simd4f t = 0;
 
-                    const int xx = x+padding_cols_offset; 
+                    const int xx = x+padding_cols_offset;
 
                     // contrast-sensitive features
-                    for (int o = 0; o < 18; o+=3) 
+                    for (int o = 0; o < 18; o+=3)
                     {
                         simd4f temp0(hist[y+1+1][x+1+1](o));
                         simd4f temp1(hist[y+1+1][x+1+1](o+1));
@@ -1020,7 +1020,7 @@ namespace dlib
                     t *= 2*0.2357;
 
                     // contrast-insensitive features
-                    for (int o = 0; o < 9; o+=3) 
+                    for (int o = 0; o < 9; o+=3)
                     {
                         simd4f temp0 = hist[y+1+1][x+1+1](o)   + hist[y+1+1][x+1+1](o+9);
                         simd4f temp1 = hist[y+1+1][x+1+1](o+1) + hist[y+1+1][x+1+1](o+9+1);
@@ -1076,18 +1076,18 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
-        typename T, 
-        typename mm1, 
+        typename image_type,
+        typename T,
+        typename mm1,
         typename mm2
         >
     void extract_fhog_features(
-        const image_type& img, 
-        dlib::array<array2d<T,mm1>,mm2>& hog, 
+        const image_type& img,
+        dlib::array<array2d<T,mm1>,mm2>& hog,
         int cell_size = 8,
         int filter_rows_padding = 1,
         int filter_cols_padding = 1
-    ) 
+    )
     {
         impl_fhog::impl_extract_fhog_features(img, hog, cell_size, filter_rows_padding, filter_cols_padding);
         // If the image is too small then the above function outputs an empty feature map.
@@ -1098,17 +1098,17 @@ namespace dlib
     }
 
     template <
-        typename image_type, 
-        typename T, 
+        typename image_type,
+        typename T,
         typename mm
         >
     void extract_fhog_features(
-        const image_type& img, 
-        array2d<matrix<T,31,1>,mm>& hog, 
+        const image_type& img,
+        array2d<matrix<T,31,1>,mm>& hog,
         int cell_size = 8,
         int filter_rows_padding = 1,
         int filter_cols_padding = 1
-    ) 
+    )
     {
         impl_fhog::impl_extract_fhog_features(img, hog, cell_size, filter_rows_padding, filter_cols_padding);
     }
@@ -1120,7 +1120,7 @@ namespace dlib
         typename T
         >
     void extract_fhog_features(
-        const image_type& img, 
+        const image_type& img,
         matrix<T,0,1>& feats,
         int cell_size = 8,
         int filter_rows_padding = 1,
@@ -1143,7 +1143,7 @@ namespace dlib
         typename image_type
         >
     matrix<double,0,1> extract_fhog_features(
-        const image_type& img, 
+        const image_type& img,
         int cell_size = 8,
         int filter_rows_padding = 1,
         int filter_cols_padding = 1
@@ -1170,9 +1170,9 @@ namespace dlib
             filter_cols_padding > 0 ,
             "\t point image_to_fhog()"
             << "\n\t Invalid inputs were given to this function. "
-            << "\n\t cell_size: " << cell_size 
-            << "\n\t filter_rows_padding: " << filter_rows_padding 
-            << "\n\t filter_cols_padding: " << filter_cols_padding 
+            << "\n\t cell_size: " << cell_size
+            << "\n\t filter_rows_padding: " << filter_rows_padding
+            << "\n\t filter_cols_padding: " << filter_cols_padding
         );
 
         // There is a one pixel border around the image.
@@ -1188,7 +1188,7 @@ namespace dlib
         int cell_size = 8,
         int filter_rows_padding = 1,
         int filter_cols_padding = 1
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_ASSERT( cell_size > 0 &&
@@ -1196,9 +1196,9 @@ namespace dlib
             filter_cols_padding > 0 ,
             "\t rectangle image_to_fhog()"
             << "\n\t Invalid inputs were given to this function. "
-            << "\n\t cell_size: " << cell_size 
-            << "\n\t filter_rows_padding: " << filter_rows_padding 
-            << "\n\t filter_cols_padding: " << filter_cols_padding 
+            << "\n\t cell_size: " << cell_size
+            << "\n\t filter_rows_padding: " << filter_rows_padding
+            << "\n\t filter_cols_padding: " << filter_cols_padding
         );
 
         return rectangle(image_to_fhog(rect.tl_corner(),cell_size,filter_rows_padding,filter_cols_padding),
@@ -1220,9 +1220,9 @@ namespace dlib
             filter_cols_padding > 0 ,
             "\t point fhog_to_image()"
             << "\n\t Invalid inputs were given to this function. "
-            << "\n\t cell_size: " << cell_size 
-            << "\n\t filter_rows_padding: " << filter_rows_padding 
-            << "\n\t filter_cols_padding: " << filter_cols_padding 
+            << "\n\t cell_size: " << cell_size
+            << "\n\t filter_rows_padding: " << filter_rows_padding
+            << "\n\t filter_cols_padding: " << filter_cols_padding
         );
 
         // Convert to image space and then set to the center of the cell.
@@ -1243,7 +1243,7 @@ namespace dlib
         int cell_size = 8,
         int filter_rows_padding = 1,
         int filter_cols_padding = 1
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_ASSERT( cell_size > 0 &&
@@ -1251,9 +1251,9 @@ namespace dlib
             filter_cols_padding > 0 ,
             "\t rectangle fhog_to_image()"
             << "\n\t Invalid inputs were given to this function. "
-            << "\n\t cell_size: " << cell_size 
-            << "\n\t filter_rows_padding: " << filter_rows_padding 
-            << "\n\t filter_cols_padding: " << filter_cols_padding 
+            << "\n\t cell_size: " << cell_size
+            << "\n\t filter_rows_padding: " << filter_rows_padding
+            << "\n\t filter_cols_padding: " << filter_cols_padding
         );
 
         return rectangle(fhog_to_image(rect.tl_corner(),cell_size,filter_rows_padding,filter_cols_padding),
@@ -1264,8 +1264,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
-        typename mm1, 
+        typename T,
+        typename mm1,
         typename mm2
         >
     matrix<unsigned char> draw_fhog(
@@ -1278,8 +1278,8 @@ namespace dlib
         DLIB_ASSERT( cell_draw_size > 0 && hog.size()==31,
             "\t matrix<unsigned char> draw_fhog()"
             << "\n\t Invalid inputs were given to this function. "
-            << "\n\t cell_draw_size: " << cell_draw_size 
-            << "\n\t hog.size(): " << hog.size() 
+            << "\n\t cell_draw_size: " << cell_draw_size
+            << "\n\t hog.size(): " << hog.size()
         );
 
         dlib::array<matrix<float> > mbars;
@@ -1327,8 +1327,8 @@ namespace dlib
         DLIB_ASSERT( cell_draw_size > 0 && hog.size()==31,
             "\t matrix<unsigned char> draw_fhog()"
             << "\n\t Invalid inputs were given to this function. "
-            << "\n\t cell_draw_size: " << cell_draw_size 
-            << "\n\t hog.size(): " << hog.size() 
+            << "\n\t cell_draw_size: " << cell_draw_size
+            << "\n\t hog.size(): " << hog.size()
         );
 
         // Just convert the input into the right object and then call the above draw_fhog()
@@ -1351,7 +1351,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
+        typename T,
         typename mm
         >
     matrix<unsigned char> draw_fhog(
@@ -1364,7 +1364,7 @@ namespace dlib
         DLIB_ASSERT( cell_draw_size > 0,
             "\t matrix<unsigned char> draw_fhog()"
             << "\n\t Invalid inputs were given to this function. "
-            << "\n\t cell_draw_size: " << cell_draw_size 
+            << "\n\t cell_draw_size: " << cell_draw_size
         );
 
         dlib::array<matrix<float> > mbars;

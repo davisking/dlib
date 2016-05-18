@@ -12,28 +12,28 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename dec_funct_type 
+        typename dec_funct_type
         >
     class null_trainer_type
     {
         /*!
             REQUIREMENTS ON dec_funct_type
-                dec_funct_type can be any copyable type that provides the needed 
+                dec_funct_type can be any copyable type that provides the needed
                 typedefs used below (e.g. kernel_type, scalar_type, etc.).
 
             WHAT THIS OBJECT REPRESENTS
-                This object is a simple tool for turning a decision function 
+                This object is a simple tool for turning a decision function
                 into a trainer object that always returns the original decision
-                function when you try to train with it.  
+                function when you try to train with it.
 
-                dlib contains a few "training post processing" algorithms (e.g. 
+                dlib contains a few "training post processing" algorithms (e.g.
                 reduced() and reduced2()).  These tools take in a trainer object,
                 tell it to perform training, and then they take the output decision
-                function and do some kind of post processing to it.  The null_trainer_type 
+                function and do some kind of post processing to it.  The null_trainer_type
                 object is useful because you can use it to run an already
                 learned decision function through the training post processing
                 algorithms by turning a decision function into a null_trainer_type
-                and then giving it to a post processor.  
+                and then giving it to a post processor.
         !*/
 
     public:
@@ -74,7 +74,7 @@ namespace dlib
                   this object's constructor.
         !*/
 
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -86,9 +86,9 @@ namespace dlib
     ) { return null_trainer_type<dec_funct_type>(dec_funct); }
     /*!
         ensures
-            - returns a null_trainer_type object that has been instantiated with 
+            - returns a null_trainer_type object that has been instantiated with
               the given arguments.  That is, this function returns a null_trainer_type
-              trainer that will return a copy of the given dec_funct object every time 
+              trainer that will return a copy of the given dec_funct object every time
               someone calls its train() function.
     !*/
 

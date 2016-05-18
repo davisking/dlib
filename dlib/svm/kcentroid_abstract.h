@@ -17,7 +17,7 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON kernel_type
-                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h
 
             INITIAL VALUE
                 - dictionary_size() == 0
@@ -27,21 +27,21 @@ namespace dlib
                 This object represents a weighted sum of sample points in a kernel induced
                 feature space.  It can be used to kernelize any algorithm that requires only
                 the ability to perform vector addition, subtraction, scalar multiplication,
-                and inner products.  
+                and inner products.
 
-                An example use of this object is as an online algorithm for recursively estimating 
-                the centroid of a sequence of training points.  This object then allows you to 
-                compute the distance between the centroid and any test points.  So you can use 
-                this object to predict how similar a test point is to the data this object has 
-                been trained on (larger distances from the centroid indicate dissimilarity/anomalous 
-                points).  
+                An example use of this object is as an online algorithm for recursively estimating
+                the centroid of a sequence of training points.  This object then allows you to
+                compute the distance between the centroid and any test points.  So you can use
+                this object to predict how similar a test point is to the data this object has
+                been trained on (larger distances from the centroid indicate dissimilarity/anomalous
+                points).
 
-                Also note that the algorithm internally keeps a set of "dictionary vectors" 
-                that are used to represent the centroid.  You can force the algorithm to use 
-                no more than a set number of vectors by setting the 3rd constructor argument 
-                to whatever you want.  
+                Also note that the algorithm internally keeps a set of "dictionary vectors"
+                that are used to represent the centroid.  You can force the algorithm to use
+                no more than a set number of vectors by setting the 3rd constructor argument
+                to whatever you want.
 
-                This object uses the sparsification technique described in the paper The 
+                This object uses the sparsification technique described in the paper The
                 Kernel Recursive Least Squares Algorithm by Yaakov Engel.  This technique
                 allows us to keep the number of dictionary vectors down to a minimum.  In fact,
                 the object has a user selectable tolerance parameter that controls the trade off
@@ -58,17 +58,17 @@ namespace dlib
         /*!
             ensures
                 - this object is properly initialized
-                - #tolerance() == 0.001 
-                - #get_kernel() == kernel_type() (i.e. whatever the kernel's default value is) 
+                - #tolerance() == 0.001
+                - #get_kernel() == kernel_type() (i.e. whatever the kernel's default value is)
                 - #max_dictionary_size() == 1000000
-                - #remove_oldest_first() == false 
+                - #remove_oldest_first() == false
         !*/
 
         explicit kcentroid (
-            const kernel_type& kernel_, 
+            const kernel_type& kernel_,
             scalar_type tolerance_ = 0.001,
             unsigned long max_dictionary_size_ = 1000000,
-            bool remove_oldest_first_ = false 
+            bool remove_oldest_first_ = false
         );
         /*!
             requires
@@ -93,8 +93,8 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the maximum number of dictionary vectors this object will 
-                  use at a time.  That is, dictionary_size() will never be greater 
+                - returns the maximum number of dictionary vectors this object will
+                  use at a time.  That is, dictionary_size() will never be greater
                   than max_dictionary_size().
         !*/
 
@@ -104,17 +104,17 @@ namespace dlib
             ensures
                 - When the maximum dictionary size is reached this object sometimes
                   needs to discard dictionary vectors when new samples are added via
-                  one of the train functions.  When this happens this object chooses 
+                  one of the train functions.  When this happens this object chooses
                   the dictionary vector to discard based on the setting of the
                   remove_oldest_first() parameter.
                 - if (remove_oldest_first() == true) then
-                    - This object discards the oldest dictionary vectors when necessary.  
+                    - This object discards the oldest dictionary vectors when necessary.
                       This is an appropriate mode when using this object in an online
-                      setting and the input training samples come from a slowly 
+                      setting and the input training samples come from a slowly
                       varying distribution.
                 - else (remove_oldest_first() == false) then
-                    - This object discards the most linearly dependent dictionary vectors 
-                      when necessary.  This it the default behavior and should be used 
+                    - This object discards the most linearly dependent dictionary vectors
+                      when necessary.  This it the default behavior and should be used
                       in most cases.
         !*/
 
@@ -138,16 +138,16 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the tolerance to use for the approximately linearly dependent 
-                  test used for sparsification (see the KRLS paper for details).  This is 
-                  a number which governs how accurately this object will approximate the 
-                  centroid it is learning.  Smaller values generally result in a more 
-                  accurate estimate while also resulting in a bigger set of vectors in 
-                  the dictionary.  Bigger tolerances values result in a less accurate 
-                  estimate but also in less dictionary vectors.  (Note that in any case, 
-                  the max_dictionary_size() limits the number of dictionary vectors no 
+                - returns the tolerance to use for the approximately linearly dependent
+                  test used for sparsification (see the KRLS paper for details).  This is
+                  a number which governs how accurately this object will approximate the
+                  centroid it is learning.  Smaller values generally result in a more
+                  accurate estimate while also resulting in a bigger set of vectors in
+                  the dictionary.  Bigger tolerances values result in a less accurate
+                  estimate but also in less dictionary vectors.  (Note that in any case,
+                  the max_dictionary_size() limits the number of dictionary vectors no
                   matter the setting of the tolerance)
-                - The exact meaning of the tolerance parameter is the following: 
+                - The exact meaning of the tolerance parameter is the following:
                   Imagine that we have an empirical_kernel_map that contains all
                   the current dictionary vectors.  Then the tolerance is the minimum
                   projection error (as given by empirical_kernel_map::project()) required
@@ -173,7 +173,7 @@ namespace dlib
                 - x.get_kernel() == get_kernel()
             ensures
                 - returns the distance in kernel feature space between this centroid and the
-                  centroid represented by x.  
+                  centroid represented by x.
         !*/
 
         scalar_type operator() (
@@ -221,7 +221,7 @@ namespace dlib
             ensures
                 - adds the sample x into the current estimate of the centroid
                 - also note that calling this function is equivalent to calling
-                  train(x, samples_trained()/(samples_trained()+1.0, 1.0/(samples_trained()+1.0).  
+                  train(x, samples_trained()/(samples_trained()+1.0, 1.0/(samples_trained()+1.0).
                   That is, this function finds the normal unweighted centroid of all training points.
         !*/
 
@@ -235,7 +235,7 @@ namespace dlib
                 - adds the sample x into the current estimate of the centroid but
                   uses a user given scale.  That is, this function performs:
                     - new_centroid = cscale*old_centroid + xscale*x
-                - This function allows you to weight different samples however 
+                - This function allows you to weight different samples however
                   you want.
         !*/
 
@@ -244,9 +244,9 @@ namespace dlib
         );
         /*!
             ensures
-                - multiplies the current centroid vector by the given scale value.  
+                - multiplies the current centroid vector by the given scale value.
                   This function is equivalent to calling train(some_x_value, cscale, 0).
-                  So it performs:   
+                  So it performs:
                     - new_centroid == cscale*old_centroid
         !*/
 
@@ -257,7 +257,7 @@ namespace dlib
             ensures
                 - calls train(x)
                 - returns (*this)(x)
-                - The reason this function exists is because train() and operator() 
+                - The reason this function exists is because train() and operator()
                   both compute some of the same things.  So this function is more efficient
                   than calling both individually.
         !*/
@@ -271,7 +271,7 @@ namespace dlib
             ensures
                 - calls train(x,cscale,xscale)
                 - returns (*this)(x)
-                - The reason this function exists is because train() and operator() 
+                - The reason this function exists is because train() and operator()
                   both compute some of the same things.  So this function is more efficient
                   than calling both individually.
         !*/
@@ -302,7 +302,7 @@ namespace dlib
         typename kernel_type
         >
     void swap(
-        kcentroid<kernel_type>& a, 
+        kcentroid<kernel_type>& a,
         kcentroid<kernel_type>& b
     ) { a.swap(b); }
     /*!
@@ -321,11 +321,11 @@ namespace dlib
     !*/
 
     template <
-        typename kernel_type 
+        typename kernel_type
         >
     void deserialize (
         kcentroid<kernel_type>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides serialization support for kcentroid objects

@@ -215,7 +215,7 @@ namespace dlib
 
 #ifdef NO_MAKEFILE
 #include "png_loader.cpp"
-#endif 
+#endif
 
-#endif // DLIB_PNG_IMPORT 
+#endif // DLIB_PNG_IMPORT
 

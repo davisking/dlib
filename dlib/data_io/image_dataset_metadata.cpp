@@ -135,7 +135,7 @@ namespace dlib
             doc_handler(
                 dataset& metadata_
             ):
-                meta(metadata_) 
+                meta(metadata_)
             {}
 
 
@@ -153,7 +153,7 @@ namespace dlib
             {
             }
 
-            virtual void start_element ( 
+            virtual void start_element (
                 const unsigned long line_number,
                 const std::string& name,
                 const dlib::attribute_list& atts
@@ -161,7 +161,7 @@ namespace dlib
             {
                 try
                 {
-                    if (ts.size() == 0) 
+                    if (ts.size() == 0)
                     {
                         if (name != "dataset")
                         {
@@ -211,7 +211,7 @@ namespace dlib
                         if (atts.is_in_list("y")) temp.y() = sa = atts["y"];
                         else throw dlib::error("<part> missing required attribute 'y'");
 
-                        if (atts.is_in_list("name")) 
+                        if (atts.is_in_list("name"))
                         {
                             if (temp_box.parts.count(atts["name"])==0)
                             {
@@ -222,7 +222,7 @@ namespace dlib
                                 throw dlib::error("<part> with name '" + atts["name"] + "' is defined more than one time in a single box.");
                             }
                         }
-                        else 
+                        else
                         {
                             throw dlib::error("<part> missing required attribute 'name'");
                         }
@@ -243,7 +243,7 @@ namespace dlib
                 }
             }
 
-            virtual void end_element ( 
+            virtual void end_element (
                 const unsigned long ,
                 const std::string& name
             )
@@ -264,7 +264,7 @@ namespace dlib
                 }
             }
 
-            virtual void characters ( 
+            virtual void characters (
                 const std::string& data
             )
             {
@@ -276,7 +276,7 @@ namespace dlib
                 {
                     meta.comment = trim(data);
                 }
-                else if (ts.size() >= 2 && ts[ts.size()-1] == "label" && 
+                else if (ts.size() >= 2 && ts[ts.size()-1] == "label" &&
                                            ts[ts.size()-2] == "box")
                 {
                     temp_box.label = trim(data);
@@ -286,7 +286,7 @@ namespace dlib
             virtual void processing_instruction (
                 const unsigned long ,
                 const std::string& ,
-                const std::string& 
+                const std::string&
             )
             {
             }
@@ -298,7 +298,7 @@ namespace dlib
         {
         public:
             virtual void error (
-                const unsigned long 
+                const unsigned long
             ) { }
 
             virtual void fatal_error (

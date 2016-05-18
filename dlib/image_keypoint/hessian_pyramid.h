@@ -34,7 +34,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline void serialize(
-        const interest_point& item,  
+        const interest_point& item,
         std::ostream& out
     )
     {
@@ -46,16 +46,16 @@ namespace dlib
             serialize(item.laplacian,out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type interest_point"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type interest_point");
         }
     }
 
 // ----------------------------------------------------------------------------------------
 
     inline void deserialize(
-        interest_point& item,  
-        std::istream& in 
+        interest_point& item,
+        std::istream& in
     )
     {
         try
@@ -66,8 +66,8 @@ namespace dlib
             deserialize(item.laplacian,in);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while deserializing object of type interest_point"); 
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type interest_point");
         }
     }
 
@@ -95,9 +95,9 @@ namespace dlib
                 "\tvoid build_pyramid()"
                 << "\n\tAll arguments to this function must be > 0"
                 << "\n\t this:              " << this
-                << "\n\t num_octaves:       " << num_octaves 
-                << "\n\t num_intervals:     " << num_intervals 
-                << "\n\t initial_step_size: " << initial_step_size 
+                << "\n\t num_octaves:       " << num_octaves
+                << "\n\t num_intervals:     " << num_intervals
+                << "\n\t initial_step_size: " << initial_step_size
             );
 
             this->num_octaves = num_octaves;
@@ -138,13 +138,13 @@ namespace dlib
                         {
                             const point p(c,r);
 
-                            double Dxx = img.get_sum_of_area(centered_rect(p, lobe_size*3, 2*lobe_size-1)) - 
+                            double Dxx = img.get_sum_of_area(centered_rect(p, lobe_size*3, 2*lobe_size-1)) -
                                          img.get_sum_of_area(centered_rect(p, lobe_size,   2*lobe_size-1))*3.0;
 
-                            double Dyy = img.get_sum_of_area(centered_rect(p, 2*lobe_size-1, lobe_size*3)) - 
+                            double Dyy = img.get_sum_of_area(centered_rect(p, 2*lobe_size-1, lobe_size*3)) -
                                          img.get_sum_of_area(centered_rect(p, 2*lobe_size-1, lobe_size))*3.0;
 
-                            double Dxy = img.get_sum_of_area(centered_rect(p+bl, lobe_size, lobe_size)) + 
+                            double Dxy = img.get_sum_of_area(centered_rect(p+bl, lobe_size, lobe_size)) +
                                          img.get_sum_of_area(centered_rect(p+tr, lobe_size, lobe_size)) -
                                          img.get_sum_of_area(centered_rect(p+tl, lobe_size, lobe_size)) -
                                          img.get_sum_of_area(centered_rect(p+br, lobe_size, lobe_size));
@@ -178,14 +178,14 @@ namespace dlib
         }
 
         long get_border_size (
-            long interval 
+            long interval
         ) const
         {
             DLIB_ASSERT(0 <= interval && interval < intervals(),
                 "\tlong get_border_size(interval)"
                 << "\n\tInvalid interval value"
                 << "\n\t this:   " << this
-                << "\n\t interval: " << interval 
+                << "\n\t interval: " << interval
             );
 
             const double lobe_size = 2.0*(interval+1) + 1;
@@ -203,7 +203,7 @@ namespace dlib
                 "\tlong get_step_size(octave)"
                 << "\n\tInvalid octave value"
                 << "\n\t this:   " << this
-                << "\n\t octave: " << octave 
+                << "\n\t octave: " << octave
             );
 
             return initial_step_size*static_cast<long>(std::pow(2.0, (double)octave)+0.5);
@@ -217,7 +217,7 @@ namespace dlib
                 "\tlong nr(octave)"
                 << "\n\tInvalid octave value"
                 << "\n\t this:   " << this
-                << "\n\t octave: " << octave 
+                << "\n\t octave: " << octave
             );
 
             return pyramid[num_intervals*octave].nr();
@@ -231,7 +231,7 @@ namespace dlib
                 "\tlong nc(octave)"
                 << "\n\tInvalid octave value"
                 << "\n\t this:   " << this
-                << "\n\t octave: " << octave 
+                << "\n\t octave: " << octave
             );
 
             return pyramid[num_intervals*octave].nc();
@@ -251,15 +251,15 @@ namespace dlib
                 "\tdouble get_value(octave, interval, r, c)"
                 << "\n\tInvalid inputs to this function"
                 << "\n\t this:      " << this
-                << "\n\t octave:    " << octave 
-                << "\n\t interval:  " << interval 
-                << "\n\t octaves:   " << octaves() 
+                << "\n\t octave:    " << octave
+                << "\n\t interval:  " << interval
+                << "\n\t octaves:   " << octaves()
                 << "\n\t intervals: " << intervals()
-                << "\n\t r:         " << r  
-                << "\n\t c:         " << c 
-                << "\n\t nr(octave): " << nr(octave)  
-                << "\n\t nc(octave): " << nc(octave) 
-                << "\n\t get_border_size(interval): " << get_border_size(interval) 
+                << "\n\t r:         " << r
+                << "\n\t c:         " << c
+                << "\n\t nr(octave): " << nr(octave)
+                << "\n\t nc(octave): " << nc(octave)
+                << "\n\t get_border_size(interval): " << get_border_size(interval)
             );
 
             return std::abs(pyramid[num_intervals*octave + interval][r][c]);
@@ -279,15 +279,15 @@ namespace dlib
                 "\tdouble get_laplacian(octave, interval, r, c)"
                 << "\n\tInvalid inputs to this function"
                 << "\n\t this:      " << this
-                << "\n\t octave:    " << octave 
-                << "\n\t interval:  " << interval 
-                << "\n\t octaves:   " << octaves() 
+                << "\n\t octave:    " << octave
+                << "\n\t interval:  " << interval
+                << "\n\t octaves:   " << octaves()
                 << "\n\t intervals: " << intervals()
-                << "\n\t r:         " << r  
-                << "\n\t c:         " << c 
-                << "\n\t nr(octave): " << nr(octave)  
-                << "\n\t nc(octave): " << nc(octave) 
-                << "\n\t get_border_size(interval): " << get_border_size(interval) 
+                << "\n\t r:         " << r
+                << "\n\t c:         " << c
+                << "\n\t nr(octave): " << nr(octave)
+                << "\n\t nc(octave): " << nc(octave)
+                << "\n\t get_border_size(interval): " << get_border_size(interval)
             );
 
             // return the sign of the laplacian
@@ -323,13 +323,13 @@ namespace dlib
     {
         inline bool is_maximum_in_region(
             const hessian_pyramid& pyr,
-            long o, 
-            long i, 
-            long r, 
+            long o,
+            long i,
+            long r,
             long c
         )
         {
-            // First check if this point is near the edge of the octave 
+            // First check if this point is near the edge of the octave
             // If it is then we say it isn't a maximum as these points are
             // not as reliable.
             if (i <= 0 || i+1 >= pyr.intervals())
@@ -359,9 +359,9 @@ namespace dlib
 
         inline const matrix<double,3,1> get_hessian_gradient (
             const hessian_pyramid& pyr,
-            long o, 
-            long i, 
-            long r, 
+            long o,
+            long i,
+            long r,
             long c
         )
         {
@@ -376,9 +376,9 @@ namespace dlib
 
         inline const matrix<double,3,3> get_hessian_hessian (
             const hessian_pyramid& pyr,
-            long o, 
-            long i, 
-            long r, 
+            long o,
+            long i,
+            long r,
             long c
         )
         {
@@ -409,10 +409,10 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         inline const interest_point interpolate_point (
-            const hessian_pyramid& pyr, 
-            long o, 
-            long i, 
-            long r, 
+            const hessian_pyramid& pyr,
+            long o,
+            long i,
+            long r,
             long c
         )
         {
@@ -459,7 +459,7 @@ namespace dlib
         DLIB_ASSERT(threshold >= 0,
             "\tvoid get_interest_points()"
             << "\n\t Invalid arguments to this function"
-            << "\n\t threshold: " << threshold 
+            << "\n\t threshold: " << threshold
         );
         using namespace std;
         using namespace hessian_pyramid_helpers;
@@ -471,7 +471,7 @@ namespace dlib
             const long nr = pyr.nr(o);
             const long nc = pyr.nc(o);
 
-            // do non-maximum suppression on all the intervals in the current octave and 
+            // do non-maximum suppression on all the intervals in the current octave and
             // accumulate the results in result_points
             for (long i = 1; i < pyr.intervals()-1;  i += 1)
             {

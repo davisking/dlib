@@ -22,7 +22,7 @@ namespace dlib
         const matrix_exp<T>& R
     )
     {
-        DLIB_ASSERT( L.size() > 0 && R.size() > 0 && L.nr() == R.nr(), 
+        DLIB_ASSERT( L.size() > 0 && R.size() > 0 && L.nr() == R.nr(),
             "\t matrix compute_correlations()"
             << "\n\t Invalid inputs were given to this function."
             << "\n\t L.size(): " << L.size()
@@ -43,7 +43,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename matrix_type, 
+        typename matrix_type,
         typename T
         >
     matrix<T,0,1> impl_cca (
@@ -94,7 +94,7 @@ namespace dlib
         // Note that the D matrix contains the correlation values for the transformed
         // vectors.  However, when the L and R matrices have rank higher than
         // num_correlations+extra_rank then the values in D become only approximate.
-        return D; 
+        return D;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -112,11 +112,11 @@ namespace dlib
     )
     {
         DLIB_ASSERT( num_correlations > 0 && L.size() > 0 && R.size() > 0 && L.nr() == R.nr() &&
-            regularization >= 0, 
+            regularization >= 0,
             "\t matrix cca()"
             << "\n\t Invalid inputs were given to this function."
-            << "\n\t num_correlations: " << num_correlations 
-            << "\n\t regularization:   " << regularization 
+            << "\n\t num_correlations: " << num_correlations
+            << "\n\t regularization:   " << regularization
             << "\n\t L.size(): " << L.size()
             << "\n\t R.size(): " << R.size()
             << "\n\t L.nr():   " << L.nr()
@@ -125,7 +125,7 @@ namespace dlib
 
         using std::min;
         const unsigned long n = min(num_correlations, (unsigned long)min(R.nr(),min(L.nc(), R.nc())));
-        return impl_cca(L,R,Ltrans, Rtrans, num_correlations, extra_rank, q, n, regularization); 
+        return impl_cca(L,R,Ltrans, Rtrans, num_correlations, extra_rank, q, n, regularization);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -142,13 +142,13 @@ namespace dlib
         double regularization = 0
     )
     {
-        DLIB_ASSERT( num_correlations > 0 && L.size() == R.size() && 
+        DLIB_ASSERT( num_correlations > 0 && L.size() == R.size() &&
                      max_index_plus_one(L) > 0 && max_index_plus_one(R) > 0 &&
-                     regularization >= 0, 
+                     regularization >= 0,
             "\t matrix cca()"
             << "\n\t Invalid inputs were given to this function."
-            << "\n\t num_correlations: " << num_correlations 
-            << "\n\t regularization:   " << regularization 
+            << "\n\t num_correlations: " << num_correlations
+            << "\n\t regularization:   " << regularization
             << "\n\t L.size(): " << L.size()
             << "\n\t R.size(): " << R.size()
             << "\n\t max_index_plus_one(L):   " << max_index_plus_one(L)
@@ -158,7 +158,7 @@ namespace dlib
         using std::min;
         const unsigned long n = min(max_index_plus_one(L), max_index_plus_one(R));
         const unsigned long num_output_correlations = min(num_correlations, std::min<unsigned long>(R.size(),n));
-        return impl_cca(L,R,Ltrans, Rtrans, num_correlations, extra_rank, q, num_output_correlations, regularization); 
+        return impl_cca(L,R,Ltrans, Rtrans, num_correlations, extra_rank, q, num_output_correlations, regularization);
     }
 
 // ----------------------------------------------------------------------------------------

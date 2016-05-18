@@ -21,7 +21,7 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object represents a mechanism for automatically unlocking
                 a mutex object.  It is useful when you already have a locked mutex
-                and want to make sure it gets unlocked even if an exception is thrown 
+                and want to make sure it gets unlocked even if an exception is thrown
                 or you quit the function at a weird spot.
         !*/
     public:
@@ -32,7 +32,7 @@ namespace dlib
         /*!
             ensures
                 - #*this is properly initialized
-                - does not modify m in any way 
+                - does not modify m in any way
         !*/
 
         explicit auto_unlock (
@@ -41,7 +41,7 @@ namespace dlib
         /*!
             ensures
                 - #*this is properly initialized
-                - does not modify m in any way 
+                - does not modify m in any way
         !*/
 
         explicit auto_unlock (
@@ -50,7 +50,7 @@ namespace dlib
         /*!
             ensures
                 - #*this is properly initialized
-                - does not modify m in any way 
+                - does not modify m in any way
         !*/
 
         ~auto_unlock (
@@ -78,7 +78,7 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object represents a mechanism for automatically unlocking
                 a read_write_mutex object.  It is useful when you already have a locked mutex
-                and want to make sure it gets unlocked even if an exception is thrown 
+                and want to make sure it gets unlocked even if an exception is thrown
                 or you quit the function at a weird spot.  Note that the mutex
                 is unlocked by calling unlock_readonly() on it.
         !*/
@@ -90,7 +90,7 @@ namespace dlib
         /*!
             ensures
                 - #*this is properly initialized
-                - does not modify m in any way 
+                - does not modify m in any way
         !*/
 
         ~auto_unlock_readonly (

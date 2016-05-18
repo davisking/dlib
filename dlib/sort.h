@@ -19,22 +19,22 @@ namespace dlib
         T& array,
         unsigned long left,
         unsigned long right,
-        const compare& comp 
+        const compare& comp
     );
     /*!
         requires
-            - T implements operator[]                                 
+            - T implements operator[]
             - the items in array must be comparable by comp where comp is a function
               object with the same syntax as std::less<>
-            - the items in array must be swappable by a global swap()   
+            - the items in array must be swappable by a global swap()
             - left and right are within the bounds of array
               i.e. array[left] and array[right] are valid elements
             - left <= right
         ensures
-            - for all elements in #array between and including left and right the 
+            - for all elements in #array between and including left and right the
               ith element is < the i+1 element
             - sorts using a quick sort algorithm
-    !*/ 
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
@@ -46,22 +46,22 @@ namespace dlib
         T& array,
         unsigned long left,
         unsigned long right,
-        const compare& comp 
+        const compare& comp
     );
     /*!
         requires
-            - T implements operator[]                                 
+            - T implements operator[]
             - the items in array must be comparable by comp where comp is a function
               object with the same syntax as std::less<>
-            - the items in array must be swappable by a global swap()   
+            - the items in array must be swappable by a global swap()
             - left and right are within the bounds of array
               i.e. array[left] and array[right] are valid elements
             - left <= right
         ensures
-            - for all elements in #array between and including left and right the 
+            - for all elements in #array between and including left and right the
               ith element is < the i+1 element
             - sorts using a heapsort algorithm
-    !*/ 
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
@@ -73,19 +73,19 @@ namespace dlib
         T& array,
         unsigned long left,
         unsigned long right,
-        const compare& comp 
+        const compare& comp
     );
     /*!
         requires
-            - T implements operator[]                                 
+            - T implements operator[]
             - the items in array must be comparable by comp where comp is a function
               object with the same syntax as std::less<>
-            - the items in array must be swappable by a global swap()   
+            - the items in array must be swappable by a global swap()
             - left and right are within the bounds of array
               i.e. array[left] and array[right] are valid elements
             - left <= right
         ensures
-            - for all elements in #array between and including left and right the 
+            - for all elements in #array between and including left and right the
               ith element is < the i+1 element
             - sorts using an insertion sort algorithm
     !*/
@@ -99,20 +99,20 @@ namespace dlib
         T& array,
         unsigned long left,
         unsigned long right
-    ); 
+    );
     /*!
         requires
-            - T implements operator[]                                 
-            - the items in array must be comparable by std::less         
-            - the items in array must be swappable by a global swap()   
+            - T implements operator[]
+            - the items in array must be comparable by std::less
+            - the items in array must be swappable by a global swap()
             - left and right are within the bounds of array
               i.e. array[left] and array[right] are valid elements
             - left <= right
         ensures
-            - for all elements in #array between and including left and right the 
+            - for all elements in #array between and including left and right the
               ith element is < the i+1 element
             - sorts using a quick sort algorithm
-    !*/ 
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
@@ -126,17 +126,17 @@ namespace dlib
     );
     /*!
         requires
-            - T implements operator[]                                 
-            - the items in array must be comparable by std::less         
-            - the items in array must be swappable by a global swap()   
+            - T implements operator[]
+            - the items in array must be comparable by std::less
+            - the items in array must be swappable by a global swap()
             - left and right are within the bounds of array
               i.e. array[left] and array[right] are valid elements
             - left <= right
         ensures
-            - for all elements in #array between and including left and right the 
+            - for all elements in #array between and including left and right the
               ith element is < the i+1 element
             - sorts using a heapsort algorithm
-    !*/ 
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
@@ -147,17 +147,17 @@ namespace dlib
         T& array,
         unsigned long left,
         unsigned long right
-    ); 
+    );
     /*!
         requires
-            - T implements operator[]                                 
-            - the items in array must be comparable by std::less      
-            - the items in array must be swappable by a global swap()   
+            - T implements operator[]
+            - the items in array must be comparable by std::less
+            - the items in array must be swappable by a global swap()
             - left and right are within the bounds of array
               i.e. array[left] and array[right] are valid elements
             - left <= right
         ensures
-            - for all elements in #array between and including left and right the 
+            - for all elements in #array between and including left and right the
               ith element is < the i+1 element
             - sorts using an insertion sort algorithm
     !*/
@@ -191,16 +191,16 @@ namespace dlib
         /*!
             requires
                 - &pivot == &array[right]
-                - T implements operator[]                             
-                - the items in array must be comparable by comp     
+                - T implements operator[]
+                - the items in array must be comparable by comp
                 - left and right are within the bounts of the array
                 - left < right
             ensures
                 - returns a number called partition_element such that:
-                    - left <= partition_element <= right                              
-                    - all elements in #array < #array[partition_element] have 
-                    indices >= left and < partition_element                         
-                    - all elements in #array > #array[partition_element] have 
+                    - left <= partition_element <= right
+                    - all elements in #array < #array[partition_element] have
+                    indices >= left and < partition_element
+                    - all elements in #array > #array[partition_element] have
                     indices > partition_element and <= right
         !*/
         {
@@ -242,17 +242,17 @@ namespace dlib
         )
         /*!
             requires
-                - T implements operator[]                                 
-                - the items in array must be comparable by comp         
-                - the items in array must be swappable by a global swap()   
+                - T implements operator[]
+                - the items in array must be comparable by comp
+                - the items in array must be swappable by a global swap()
                 - left and right are within the bounds of array
                   i.e. array[left] and array[right] are valid elements
             ensures
-                - for all elements in #array between and including left and right the 
+                - for all elements in #array between and including left and right the
                   ith element is < the i+1 element
                 - will only recurse about as deep as log(depth_check) calls
                 - sorts using a quick sort algorithm
-        !*/ 
+        !*/
         {
             if ( left < right)
             {
@@ -267,7 +267,7 @@ namespace dlib
                     depth_check >>= 1;
                     depth_check += (depth_check>>4);
 
-                    unsigned long partition_element = 
+                    unsigned long partition_element =
                         qsort_partition(array,array[right],left,right,comp);
                     
                     if (partition_element > 0)
@@ -292,9 +292,9 @@ namespace dlib
         )
         /*!
             requires
-                - T implements operator[]                                 
-                - the items in array must be comparable by comp        
-                - the items in array must be swappable by a global swap()   
+                - T implements operator[]
+                - the items in array must be comparable by comp
+                - the items in array must be swappable by a global swap()
                 - start, end, and i are within the bounds of array
                   i.e. array[start], array[end], and array[i] are valid elements
                 - start <= i <= end
@@ -307,14 +307,14 @@ namespace dlib
         {
             DLIB_ASSERT (start <= i && i <= end,
                     "\tvoid heapify()"
-                    << "\n\tstart:   " << start 
-                    << "\n\tend:     " << end 
+                    << "\n\tstart:   " << start
+                    << "\n\tend:     " << end
                     << "\n\ti:       " << i );
 
-            bool keep_going = true;            
+            bool keep_going = true;
             unsigned long left;
-            unsigned long right;   
-            unsigned long largest; 
+            unsigned long right;
+            unsigned long largest;
             while (keep_going)
             {
                 keep_going = false;
@@ -350,7 +350,7 @@ namespace dlib
         T& array,
         unsigned long left,
         unsigned long right
-    ) 
+    )
     {
         using namespace sort_helpers;
         qsort_array(array,left,right,comp(array[left]));
@@ -380,7 +380,7 @@ namespace dlib
         T& array,
         unsigned long left,
         unsigned long right
-    ) 
+    )
     {
         using namespace sort_helpers;
         isort_array(array,left,right,comp(array[left]));
@@ -433,7 +433,7 @@ namespace dlib
         const unsigned long right,
         const compare& comp
     )
-    {      
+    {
         DLIB_ASSERT (left <= right,
                 "\tvoid qsort_array()"
                 << "\n\tleft:          " << left

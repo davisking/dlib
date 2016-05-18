@@ -38,7 +38,7 @@ namespace dlib
             const sample_type& a,
             const sample_type& b
         ) const
-        { 
+        {
             const scalar_type d = distance_squared(a,b);
             return std::exp(-gamma*d);
         }
@@ -72,8 +72,8 @@ namespace dlib
             serialize(item.gamma, out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type sparse_radial_basis_kernel"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type sparse_radial_basis_kernel");
         }
     }
 
@@ -82,7 +82,7 @@ namespace dlib
         >
     void deserialize (
         sparse_radial_basis_kernel<T>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         typedef typename T::value_type::second_type scalar_type;
@@ -91,8 +91,8 @@ namespace dlib
             deserialize(const_cast<scalar_type&>(item.gamma), in);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while deserializing object of type sparse_radial_basis_kernel"); 
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type sparse_radial_basis_kernel");
         }
     }
 
@@ -122,7 +122,7 @@ namespace dlib
             const sample_type& a,
             const sample_type& b
         ) const
-        { 
+        {
             return std::pow(gamma*(dot(a,b)) + coef, degree);
         }
 
@@ -159,8 +159,8 @@ namespace dlib
             serialize(item.degree, out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type sparse_polynomial_kernel"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type sparse_polynomial_kernel");
         }
     }
 
@@ -169,7 +169,7 @@ namespace dlib
         >
     void deserialize (
         sparse_polynomial_kernel<T>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         typedef typename T::value_type::second_type scalar_type;
@@ -180,8 +180,8 @@ namespace dlib
             deserialize(const_cast<scalar_type&>(item.degree), in);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while deserializing object of type sparse_polynomial_kernel"); 
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type sparse_polynomial_kernel");
         }
     }
 
@@ -210,7 +210,7 @@ namespace dlib
             const sample_type& a,
             const sample_type& b
         ) const
-        { 
+        {
             return std::tanh(gamma*(dot(a,b)) + coef);
         }
 
@@ -245,8 +245,8 @@ namespace dlib
             serialize(item.coef, out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type sparse_sigmoid_kernel"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type sparse_sigmoid_kernel");
         }
     }
 
@@ -255,7 +255,7 @@ namespace dlib
         >
     void deserialize (
         sparse_sigmoid_kernel<T>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         typedef typename T::value_type::second_type scalar_type;
@@ -265,8 +265,8 @@ namespace dlib
             deserialize(const_cast<scalar_type&>(item.coef), in);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while deserializing object of type sparse_sigmoid_kernel"); 
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type sparse_sigmoid_kernel");
         }
     }
 
@@ -283,12 +283,12 @@ namespace dlib
             const sample_type& a,
             const sample_type& b
         ) const
-        { 
+        {
             return dot(a,b);
         }
 
         bool operator== (
-            const sparse_linear_kernel& 
+            const sparse_linear_kernel&
         ) const
         {
             return true;
@@ -300,7 +300,7 @@ namespace dlib
         >
     void serialize (
         const sparse_linear_kernel<T>& ,
-        std::ostream& 
+        std::ostream&
     ){}
 
     template <
@@ -308,7 +308,7 @@ namespace dlib
         >
     void deserialize (
         sparse_linear_kernel<T>& ,
-        std::istream&  
+        std::istream&
     ){}
 
 // ----------------------------------------------------------------------------------------
@@ -324,7 +324,7 @@ namespace dlib
             const sample_type& a,
             const sample_type& b
         ) const
-        { 
+        {
             typename sample_type::const_iterator ai = a.begin();
             typename sample_type::const_iterator bi = b.begin();
 
@@ -341,7 +341,7 @@ namespace dlib
                 {
                     ++ai;
                 }
-                else 
+                else
                 {
                     ++bi;
                 }
@@ -351,7 +351,7 @@ namespace dlib
         }
 
         bool operator== (
-            const sparse_histogram_intersection_kernel& 
+            const sparse_histogram_intersection_kernel&
         ) const
         {
             return true;
@@ -363,7 +363,7 @@ namespace dlib
         >
     void serialize (
         const sparse_histogram_intersection_kernel<T>& ,
-        std::ostream& 
+        std::ostream&
     ){}
 
     template <
@@ -371,7 +371,7 @@ namespace dlib
         >
     void deserialize (
         sparse_histogram_intersection_kernel<T>& ,
-        std::istream&  
+        std::istream&
     ){}
 
 // ----------------------------------------------------------------------------------------

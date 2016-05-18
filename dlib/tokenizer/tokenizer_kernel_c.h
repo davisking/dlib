@@ -42,9 +42,9 @@ namespace dlib
         typename tokenizer
         >
     inline void swap (
-        tokenizer_kernel_c<tokenizer>& a, 
-        tokenizer_kernel_c<tokenizer>& b 
-    ) { a.swap(b); }  
+        tokenizer_kernel_c<tokenizer>& a,
+        tokenizer_kernel_c<tokenizer>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ namespace dlib
     set_identifier_token (
         const std::string& head,
         const std::string& body
-    ) 
+    )
     {
         using namespace std;
         // make sure requires clause is not broken

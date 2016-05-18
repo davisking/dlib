@@ -13,17 +13,17 @@ namespace dlib
     class xml_parser
     {
 
-        /*!                
+        /*!
             INITIAL VALUE
-                no objects are registered to receive events 
+                no objects are registered to receive events
 
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a simple SAX style event driven XML parser.  
-                It takes its input from an input stream object and sends events to all 
+                This object represents a simple SAX style event driven XML parser.
+                It takes its input from an input stream object and sends events to all
                 registered document_handler and error_handler objects.
 
-                note that this xml parser ignores all DTD related XML markup.  It will 
+                note that this xml parser ignores all DTD related XML markup.  It will
                 parse XML documents with DTD's but it just won't check if the document
                 is valid.  This also means that entity references may not be used except
                 for the predefined ones which are as follows:
@@ -34,15 +34,15 @@ namespace dlib
                     &quot;
 
                 also note that there is no interpreting of entity references inside
-                a CDATA section or inside of tags, they are only interpreted inside 
+                a CDATA section or inside of tags, they are only interpreted inside
                 normal non-markup data.
 
-                This parser considers the end of the xml document to be the closing 
+                This parser considers the end of the xml document to be the closing
                 tag of the root tag (as opposed to using EOF as the end of the
                 document).  This is a deviation from the xml standard.
 
                 Aside from ignoring DTD stuff and entity references everywhere but
-                data, and the above comment regarding EOF, this parser should conform 
+                data, and the above comment regarding EOF, this parser should conform
                 to the rest of the XML standard.
         !*/
         
@@ -52,14 +52,14 @@ namespace dlib
             xml_parser(
             );
             /*!
-                ensures 
+                ensures
                     - #*this is properly initialized
                 throws
                     - std::bad_alloc
             !*/
 
             virtual ~xml_parser(
-            ); 
+            );
             /*!
                 ensures
                     - all memory associated with *this has been released
@@ -72,7 +72,7 @@ namespace dlib
                     - #*this has its initial value
                 throws
                     - std::bad_alloc
-                        if this exception is thrown then *this is unusable 
+                        if this exception is thrown then *this is unusable
                         until clear() is called and succeeds
             !*/
 
@@ -84,18 +84,18 @@ namespace dlib
                     - in.fail() == false
                 ensures
                     - the data from the input stream in will be parsed and the appropriate
-                      events will be generated 
+                      events will be generated
                     - parsing will stop when the parser has reached the closing tag
                       for the xml document or EOF (which ever comes first). Note that
                       hitting EOF first is a fatal error.
                 throws
                     - std::bad_alloc
-                        if parse() throws then it will be unusable until clear() is 
+                        if parse() throws then it will be unusable until clear() is
                         called and succeeds
                     - other exceptions
-                        document_handlers and error_handlers my throw any exception.  If 
-                        they throw while parse() is running then parse() will let the 
-                        exception propagate out and the xml_parser object will be unusable 
+                        document_handlers and error_handlers my throw any exception.  If
+                        they throw while parse() is running then parse() will let the
+                        exception propagate out and the xml_parser object will be unusable
                         until clear() is called and succeeds.    note that end_document()
                         is still called.
             !*/
@@ -129,7 +129,7 @@ namespace dlib
             /*!
                 ensures
                     - swaps *this and item
-            !*/ 
+            !*/
     
 
         private:
@@ -142,9 +142,9 @@ namespace dlib
 
 
     inline void swap (
-        xml_parser& a, 
-        xml_parser& b 
-    ) { a.swap(b); }   
+        xml_parser& a,
+        xml_parser& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/

@@ -31,24 +31,24 @@ namespace dlib
               capable of containing column vectors or both some kind of sparse vector type
               as defined in dlib/svm/sparse_vector_abstract.h.
         ensures
-            - Note that a graph labeling problem is a task to learn a binary classifier which 
-              predicts the correct label for each node in the provided graphs.  Additionally, 
-              we have information in the form of edges between nodes where edges are present 
-              when we believe the linked nodes are likely to have the same label.  Therefore, 
-              part of a graph labeling problem is to learn to score each edge in terms of how 
-              strongly the edge should enforce labeling consistency between its two nodes.  
-              Thus, to be a valid graph labeling problem, samples should contain example graphs 
-              of connected nodes while labels should indicate the desired label of each node.  
+            - Note that a graph labeling problem is a task to learn a binary classifier which
+              predicts the correct label for each node in the provided graphs.  Additionally,
+              we have information in the form of edges between nodes where edges are present
+              when we believe the linked nodes are likely to have the same label.  Therefore,
+              part of a graph labeling problem is to learn to score each edge in terms of how
+              strongly the edge should enforce labeling consistency between its two nodes.
+              Thus, to be a valid graph labeling problem, samples should contain example graphs
+              of connected nodes while labels should indicate the desired label of each node.
               The precise requirements for a valid graph labeling problem are listed below.
             - This function returns true if all of the following are true and false otherwise:
                 - is_learning_problem(samples, labels) == true
-                - All the vectors stored on the edges of each graph in samples 
-                  contain only values which are >= 0. 
+                - All the vectors stored on the edges of each graph in samples
+                  contain only values which are >= 0.
                 - for all valid i:
-                    - graph_contains_length_one_cycle(samples[i]) == false 
+                    - graph_contains_length_one_cycle(samples[i]) == false
                     - samples[i].number_of_nodes() == labels[i].size()
                       (i.e. Every graph node gets its own label)
-                - if (graph_type::edge_type is a dlib::matrix) then     
+                - if (graph_type::edge_type is a dlib::matrix) then
                     - All the nodes must contain vectors with the same number of dimensions.
                     - All the edges must contain vectors with the same number of dimensions.
                       (However, edge vectors may differ in dimension from node vectors.)
@@ -103,14 +103,14 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename graph_type 
+        typename graph_type
         >
     class structural_svm_graph_labeling_problem : noncopyable,
-                                                  public structural_svm_problem_threaded<matrix<double,0,1>, 
+                                                  public structural_svm_problem_threaded<matrix<double,0,1>,
                                                          typename graph_type::type >
     {
         /*!
-            REQUIREMENTS ON graph_type 
+            REQUIREMENTS ON graph_type
                 - graph_type is an implementation of dlib/graph/graph_kernel_abstract.h
                 - graph_type::type and graph_type::edge_type must be either matrix objects
                   capable of representing column vectors or some kind of sparse vector
@@ -118,8 +118,8 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for learning the weight vectors needed to use
-                a graph_labeler object.  It learns the parameter vectors by formulating 
-                the problem as a structural SVM problem.  
+                a graph_labeler object.  It learns the parameter vectors by formulating
+                the problem as a structural SVM problem.
         !*/
 
     public:
@@ -132,7 +132,7 @@ namespace dlib
             const dlib::array<sample_type>& samples,
             const std::vector<label_type>& labels,
             const std::vector<std::vector<double> >& losses,
-            unsigned long num_threads 
+            unsigned long num_threads
         );
         /*!
             requires
@@ -141,9 +141,9 @@ namespace dlib
                     - sizes_match(labels, losses) == true
                     - all_values_are_nonnegative(losses) == true
             ensures
-                - This object attempts to learn a mapping from the given samples to the 
-                  given labels.  In particular, it attempts to learn to predict labels[i] 
-                  based on samples[i].  Or in other words, this object can be used to learn 
+                - This object attempts to learn a mapping from the given samples to the
+                  given labels.  In particular, it attempts to learn to predict labels[i]
+                  based on samples[i].  Or in other words, this object can be used to learn
                   parameter vectors, E and W, such that a graph_labeler declared as:
                     graph_labeler<feature_vector_type> labeler(E,W)
                   results in a labeler object which attempts to compute the following mapping:
@@ -152,8 +152,8 @@ namespace dlib
                   big parameter vector as the solution.  Therefore, note that this single
                   big vector is the concatenation of E and W.  The first get_num_edge_weights()
                   elements of this vector correspond to E and the rest is W.
-                - This object will use num_threads threads during the optimization 
-                  procedure.  You should set this parameter equal to the number of 
+                - This object will use num_threads threads during the optimization
+                  procedure.  You should set this parameter equal to the number of
                   available processing cores on your machine.
                 - if (losses.size() == 0) then
                     - #get_loss_on_positive_class() == 1.0
@@ -163,8 +163,8 @@ namespace dlib
                 - else
                     - #get_losses() == losses
                     - Each node in the training data has its own loss value defined by
-                      the corresponding entry of losses.  In particular, this means that 
-                      the node with label labels[i][j] incurs a loss of losses[i][j] if 
+                      the corresponding entry of losses.  In particular, this means that
+                      the node with label labels[i][j] incurs a loss of losses[i][j] if
                       it is incorrectly labeled.
                     - The get_loss_on_positive_class() and get_loss_on_negative_class()
                       parameters are ignored.  Only get_losses() is used in this case.
@@ -174,7 +174,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the losses vector given to this object's constructor. 
+                - returns the losses vector given to this object's constructor.
                   This vector defines the per sample loss values used.  If the vector
                   is empty then the loss values defined by get_loss_on_positive_class() and
                   get_loss_on_positive_class() are used instead.
@@ -220,8 +220,8 @@ namespace dlib
                 - get_losses().size() == 0
             ensures
                 - returns the loss incurred when a graph node which is supposed to have
-                  a label of true gets misclassified.  This value controls how much we care 
-                  about correctly classifying nodes which should be labeled as true.  Larger 
+                  a label of true gets misclassified.  This value controls how much we care
+                  about correctly classifying nodes which should be labeled as true.  Larger
                   loss values indicate that we care more strongly than smaller values.
         !*/
 
@@ -232,8 +232,8 @@ namespace dlib
                 - get_losses().size() == 0
             ensures
                 - returns the loss incurred when a graph node which is supposed to have
-                  a label of false gets misclassified.  This value controls how much we care 
-                  about correctly classifying nodes which should be labeled as false.  Larger 
+                  a label of false gets misclassified.  This value controls how much we care
+                  about correctly classifying nodes which should be labeled as false.  Larger
                   loss values indicate that we care more strongly than smaller values.
         !*/
     };

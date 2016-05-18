@@ -1,6 +1,6 @@
 // Copyright (C) 2009  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_TYPE_SAFE_UNIOn_h_ 
+#ifndef DLIB_TYPE_SAFE_UNIOn_h_
 #define DLIB_TYPE_SAFE_UNIOn_h_
 
 #include "type_safe_union_kernel_abstract.h"
@@ -15,7 +15,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class bad_type_safe_union_cast : public std::bad_cast 
+    class bad_type_safe_union_cast : public std::bad_cast
     {
     public:
           virtual const char * what() const throw()
@@ -37,7 +37,7 @@ namespace dlib
         typename T2 = _void,
         typename T3 = _void,
         typename T4 = _void,
-        typename T5 = _void, 
+        typename T5 = _void,
         typename T6 = _void,
         typename T7 = _void,
         typename T8 = _void,
@@ -79,7 +79,7 @@ namespace dlib
         template <typename T>
         void invoke_on (
             T& ,
-            _void 
+            _void
         ) const
         {
         }
@@ -142,7 +142,7 @@ namespace dlib
                                  is_same_type<T,T17>::value ||
                                  is_same_type<T,T18>::value ||
                                  is_same_type<T,T19>::value ||
-                                 is_same_type<T,T20>::value 
+                                 is_same_type<T,T20>::value
                                     ));
 
         }
@@ -158,7 +158,7 @@ namespace dlib
         };
 
         void destruct (
-        ) 
+        )
         /*!
             ensures
                 - #is_empty() == true
@@ -173,12 +173,12 @@ namespace dlib
 
         template <typename T>
         void construct (
-        )  
-        { 
+        )
+        {
             if (type_identity != get_type_id<T>())
             {
-                destruct(); 
-                new(mem.get()) T(); 
+                destruct();
+                new(mem.get()) T();
                 type_identity = get_type_id<T>();
             }
         }
@@ -186,30 +186,30 @@ namespace dlib
         template <typename T>
         void construct (
             const T& item
-        )  
-        { 
+        )
+        {
             if (type_identity != get_type_id<T>())
             {
-                destruct(); 
-                new(mem.get()) T(item); 
+                destruct();
+                new(mem.get()) T(item);
                 type_identity = get_type_id<T>();
             }
         }
 
-        template <typename T> 
+        template <typename T>
         T& unchecked_get(
-        ) 
+        )
         /*!
             requires
                 - contains<T>() == true
             ensures
                 - returns a non-const reference to the T object
         !*/
-        { 
-            return *static_cast<T*>(mem.get()); 
+        {
+            return *static_cast<T*>(mem.get());
         }
 
-        template <typename T> 
+        template <typename T>
         const T& unchecked_get(
         ) const
         /*!
@@ -218,12 +218,12 @@ namespace dlib
             ensures
                 - returns a const reference to the T object
         !*/
-        { 
-            return *static_cast<const T*>(mem.get()); 
+        {
+            return *static_cast<const T*>(mem.get());
         }
 
         template <typename T>
-        void operator() (T& item) 
+        void operator() (T& item)
         /*
             This function is used by the swap function of this class.  See that
             function to see how this works.
@@ -256,8 +256,8 @@ namespace dlib
         typedef T20 type20;
 
 
-        type_safe_union() : type_identity(0) 
-        { 
+        type_safe_union() : type_identity(0)
+        {
         }
 
         template <typename T>
@@ -276,7 +276,7 @@ namespace dlib
 
         template <typename T>
         static int get_type_id (
-        ) 
+        )
         {
             if (is_same_type<T,T1>::value) return 1;
             if (is_same_type<T,T2>::value) return 2;
@@ -340,7 +340,7 @@ namespace dlib
             >
         void apply_to_contents (
             T& obj
-        ) 
+        )
         {
             switch (type_identity)
             {
@@ -378,7 +378,7 @@ namespace dlib
             >
         void apply_to_contents (
             const T& obj
-        ) 
+        )
         {
             switch (type_identity)
             {
@@ -494,7 +494,7 @@ namespace dlib
             // if both *this and item contain the same type of thing
             if (type_identity == item.type_identity)
             {
-                // swap the things in this and item.  
+                // swap the things in this and item.
                 item.apply_to_contents(*this);
             }
             else if (type_identity == 0)
@@ -523,13 +523,13 @@ namespace dlib
             }
         }
 
-        template <typename T> 
+        template <typename T>
         T& get(
-        ) 
-        { 
+        )
+        {
             validate_type<T>();
-            construct<T>();  
-            return *static_cast<T*>(mem.get()); 
+            construct<T>();
+            return *static_cast<T*>(mem.get());
         }
 
         template <typename T>
@@ -545,7 +545,7 @@ namespace dlib
 
         template <typename T>
         T& cast_to (
-        ) 
+        )
         {
             validate_type<T>();
             if (contains<T>())
@@ -568,14 +568,14 @@ namespace dlib
         typename T16, typename T17, typename T18, typename T19, typename T20
         >
     inline void swap (
-        type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>& a, 
-        type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>& b 
-    ) { a.swap(b); }   
+        type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>& a,
+        type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename from, 
+        typename from,
         typename T1, typename T2, typename T3, typename T4, typename T5,
         typename T6, typename T7, typename T8, typename T9, typename T10,
         typename T11, typename T12, typename T13, typename T14, typename T15,
@@ -619,7 +619,7 @@ namespace dlib
             std::ostream& out;
             serialize_helper(std::ostream& out_): out(out_) {}
             template <typename T>
-            void operator() (const T& item) const { serialize(item, out); } 
+            void operator() (const T& item) const { serialize(item, out); }
         };
     }
 

@@ -7,7 +7,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include "../serialize.h" 
+#include "../serialize.h"
 #include "../array2d.h"
 
 namespace dlib
@@ -16,10 +16,10 @@ namespace dlib
 // -----------------------------------------------------------------------------------------
 
     template <typename T>
-    struct constituent 
+    struct constituent
     {
         unsigned long begin, end, k;
-        T left_tag; 
+        T left_tag;
         T right_tag;
     };
 
@@ -39,7 +39,7 @@ namespace dlib
     template <typename T>
     void deserialize(
         constituent<T>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         deserialize(item.begin, in);
@@ -62,8 +62,8 @@ namespace dlib
         T tag; // id for the constituent corresponding to this level of the tree
 
         unsigned long left;
-        unsigned long right; 
-        double score; 
+        unsigned long right;
+        double score;
     };
 
     template <typename T>
@@ -82,7 +82,7 @@ namespace dlib
     template <typename T>
     void deserialize (
         parse_tree_element<T>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         deserialize(item.c, in);
@@ -98,9 +98,9 @@ namespace dlib
     {
         template <typename T>
         unsigned long fill_parse_tree(
-            std::vector<parse_tree_element<T> >& parse_tree, 
+            std::vector<parse_tree_element<T> >& parse_tree,
             const T& tag,
-            const array2d<std::map<T, parse_tree_element<T> > >& back, 
+            const array2d<std::map<T, parse_tree_element<T> > >& back,
             long r, long c
         )
         /*!
@@ -108,7 +108,7 @@ namespace dlib
                 - back[r][c].size() == 0 || back[r][c].count(tag) != 0
         !*/
         {
-            // base case of the recursion 
+            // base case of the recursion
             if (back[r][c].size() == 0)
             {
                 return END_OF_TREE;
@@ -119,8 +119,8 @@ namespace dlib
             parse_tree.push_back(item);
 
             const long k = item.c.k;
-            const unsigned long idx_left  = fill_parse_tree(parse_tree, item.c.left_tag, back, r, k-1); 
-            const unsigned long idx_right = fill_parse_tree(parse_tree, item.c.right_tag, back, k, c); 
+            const unsigned long idx_left  = fill_parse_tree(parse_tree, item.c.left_tag, back, r, k-1);
+            const unsigned long idx_right = fill_parse_tree(parse_tree, item.c.right_tag, back, k, c);
             parse_tree[idx].left = idx_left;
             parse_tree[idx].right = idx_right;
             return idx;
@@ -229,7 +229,7 @@ namespace dlib
         template <bool enabled, typename T>
         typename disable_if_c<enabled>::type conditional_print(
             const T& ,
-            std::ostream& 
+            std::ostream&
         ) {  }
 
         template <bool print_tag, bool skip_tag, typename T, typename U >
@@ -266,7 +266,7 @@ namespace dlib
                 else
                 {
                     std::ostringstream sout;
-                    sout << "Parse tree refers to element " << tree[i].c.begin 
+                    sout << "Parse tree refers to element " << tree[i].c.begin
                          << " of sequence which is only of size " << words.size() << ".";
                     throw parse_tree_to_string_error(sout.str());
                 }
@@ -288,7 +288,7 @@ namespace dlib
                 else
                 {
                     std::ostringstream sout;
-                    sout << "Parse tree refers to element " << tree[i].c.k 
+                    sout << "Parse tree refers to element " << tree[i].c.k
                          << " of sequence which is only of size " << words.size() << ".";
                     throw parse_tree_to_string_error(sout.str());
                 }
@@ -399,7 +399,7 @@ namespace dlib
     void find_trees_not_rooted_with_tag (
         const std::vector<parse_tree_element<T> >& tree,
         const T& tag,
-        std::vector<unsigned long>& tree_roots 
+        std::vector<unsigned long>& tree_roots
     )
     {
         tree_roots.clear();

@@ -18,7 +18,7 @@
 #include <dlib/svm_threaded.h>
 
 
-namespace  
+namespace
 {
 
     using namespace test;

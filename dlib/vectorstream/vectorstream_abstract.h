@@ -17,7 +17,7 @@ namespace dlib
                 However, while the std::stringstream holds its buffer internally and it can
                 only be accessed by copying it out, the vectorstream uses an external
                 std::vector<char> as its buffer.  That is, it holds a reference to an
-                external vector and does not contain any internal buffers of its own.  
+                external vector and does not contain any internal buffers of its own.
 
                 This object is useful as a slightly more efficient alternative to the
                 std::stringstream since you can avoid the overhead of copying buffer

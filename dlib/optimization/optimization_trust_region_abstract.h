@@ -15,7 +15,7 @@ namespace dlib
         typename EXP2,
         typename T, long NR, long NC, typename MM, typename L
         >
-    unsigned long solve_trust_region_subproblem ( 
+    unsigned long solve_trust_region_subproblem (
         const matrix_exp<EXP1>& B,
         const matrix_exp<EXP2>& g,
         const typename EXP1::type radius,
@@ -43,13 +43,13 @@ namespace dlib
             - returns the number of iterations performed.  If this method fails to converge
               to eps accuracy then the number returned will be max_iter+1.
             - if (this function didn't terminate due to hitting the max_iter iteration limit) then
-                - if this function returns 0 or 1 then we are not hitting the radius bound Otherwise, 
+                - if this function returns 0 or 1 then we are not hitting the radius bound Otherwise,
                   the radius constraint is active and std::abs(length(#p)-radius)/radius <= eps.
     !*/
 
 // ----------------------------------------------------------------------------------------
 
-    class function_model 
+    class function_model
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -68,7 +68,7 @@ namespace dlib
         // Define the type used to represent the hessian matrix
         typedef matrix<double> general_matrix;
 
-        double operator() ( 
+        double operator() (
             const column_vector& x
         ) const;
         /*!
@@ -101,31 +101,31 @@ namespace dlib
         >
     double find_min_trust_region (
         stop_strategy_type stop_strategy,
-        const funct_model& model, 
-        typename funct_model::column_vector& x, 
+        const funct_model& model,
+        typename funct_model::column_vector& x,
         double radius = 1
     );
     /*!
         requires
-            - stop_strategy == an object that defines a stop strategy such as one of 
+            - stop_strategy == an object that defines a stop strategy such as one of
               the objects from dlib/optimization/optimization_stop_strategies_abstract.h
             - is_col_vector(x) == true
             - radius > 0
             - model must be an object with an interface as defined by the function_model
               example object shown above.
         ensures
-            - Performs an unconstrained minimization of the function defined by model 
+            - Performs an unconstrained minimization of the function defined by model
               starting from the initial point x.  This function uses a trust region
               algorithm to perform the minimization.  The radius parameter defines
               the initial size of the trust region.
-            - The function is optimized until stop_strategy decides that an acceptable 
+            - The function is optimized until stop_strategy decides that an acceptable
               point has been found or the trust region subproblem fails to make progress.
             - #x == the value of x that was found to minimize model()
-            - returns model(#x). 
-            - When this function makes calls to model.get_derivative_and_hessian() it always 
-              does so by first calling model() and then calling model.get_derivative_and_hessian().  
-              That is, any call to model.get_derivative_and_hessian(val) will always be 
-              preceded by a call to model(val) with the same value.  This way you can reuse 
+            - returns model(#x).
+            - When this function makes calls to model.get_derivative_and_hessian() it always
+              does so by first calling model() and then calling model.get_derivative_and_hessian().
+              That is, any call to model.get_derivative_and_hessian(val) will always be
+              preceded by a call to model(val) with the same value.  This way you can reuse
               any redundant computations performed by model() and model.get_derivative_and_hessian()
               as appropriate.
     !*/
@@ -138,37 +138,37 @@ namespace dlib
         >
     double find_max_trust_region (
         stop_strategy_type stop_strategy,
-        const funct_model& model, 
-        typename funct_model::column_vector& x, 
+        const funct_model& model,
+        typename funct_model::column_vector& x,
         double radius = 1
     );
     /*!
         requires
-            - stop_strategy == an object that defines a stop strategy such as one of 
+            - stop_strategy == an object that defines a stop strategy such as one of
               the objects from dlib/optimization/optimization_stop_strategies_abstract.h
             - is_col_vector(x) == true
             - radius > 0
             - model must be an object with an interface as defined by the function_model
               example object shown above.
         ensures
-            - Performs an unconstrained maximization of the function defined by model 
+            - Performs an unconstrained maximization of the function defined by model
               starting from the initial point x.  This function uses a trust region
               algorithm to perform the maximization.  The radius parameter defines
               the initial size of the trust region.
-            - The function is optimized until stop_strategy decides that an acceptable 
+            - The function is optimized until stop_strategy decides that an acceptable
               point has been found or the trust region subproblem fails to make progress.
             - #x == the value of x that was found to maximize model()
-            - returns model(#x). 
-            - When this function makes calls to model.get_derivative_and_hessian() it always 
-              does so by first calling model() and then calling model.get_derivative_and_hessian().  
-              That is, any call to model.get_derivative_and_hessian(val) will always be 
-              preceded by a call to model(val) with the same value.  This way you can reuse 
+            - returns model(#x).
+            - When this function makes calls to model.get_derivative_and_hessian() it always
+              does so by first calling model() and then calling model.get_derivative_and_hessian().
+              That is, any call to model.get_derivative_and_hessian(val) will always be
+              preceded by a call to model(val) with the same value.  This way you can reuse
               any redundant computations performed by model() and model.get_derivative_and_hessian()
               as appropriate.
-            - Note that this function solves the maximization problem by converting it 
+            - Note that this function solves the maximization problem by converting it
               into a minimization problem.  Therefore, the values of model() and its derivative
               reported to the stopping strategy will be negated.  That is, stop_strategy
-              will see -model() and -derivative.  All this really means is that the status 
+              will see -model() and -derivative.  All this really means is that the status
               messages from a stopping strategy in verbose mode will display a negated objective
               value.
     !*/

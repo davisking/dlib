@@ -22,7 +22,7 @@ namespace dlib
                 that is specific to its own thread.  Each subsequent call to data() from that
                 thread returns the same instance.  Also note that when a thread ends
                 the instance of its data() object gets destroyed and freed (if the thread
-                was created by the dlib library).  So any pointers or references to the object 
+                was created by the dlib library).  So any pointers or references to the object
                 will be invalid after the thread has ended.
         !*/
     public:
@@ -49,7 +49,7 @@ namespace dlib
                 - if (the calling thread has NOT called this->data() before) then
                     - constructs an instance of T that is specific to the calling
                       thread.
-                - returns a reference to the T instance that was constructed for 
+                - returns a reference to the T instance that was constructed for
                   the calling thread.
             throws
                 - std::bad_alloc or any exception thrown by T's constructor
@@ -64,7 +64,7 @@ namespace dlib
                 - if (the calling thread has NOT called this->data() before) then
                     - constructs an instance of T that is specific to the calling
                       thread.
-                - returns a const reference to the T instance that was constructed for 
+                - returns a const reference to the T instance that was constructed for
                   the calling thread.
             throws
                 - std::bad_alloc or any exception thrown by T's constructor

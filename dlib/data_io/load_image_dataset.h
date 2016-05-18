@@ -84,7 +84,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
+        typename image_type,
         typename MM
         >
     std::vector<std::vector<rectangle> > load_image_dataset (
@@ -145,7 +145,7 @@ namespace dlib
 
 // ******* THIS FUNCTION IS DEPRECATED, you should use another version of load_image_dataset() *******
     template <
-        typename image_type, 
+        typename image_type,
         typename MM
         >
     std::vector<std::vector<rectangle> > load_image_dataset (
@@ -167,7 +167,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
+        typename image_type,
         typename MM
         >
     std::vector<std::vector<rectangle> > load_image_dataset (
@@ -184,7 +184,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
+        typename image_type,
         typename MM
         >
     std::vector<std::vector<rectangle> > load_image_dataset (
@@ -287,13 +287,13 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
+        typename image_type,
         typename MM
         >
     std::vector<std::vector<rectangle> > load_image_dataset (
         array<image_type,MM>& images,
         std::vector<std::vector<full_object_detection> >& object_locations,
-        const image_dataset_file& source 
+        const image_dataset_file& source
     )
     {
         std::vector<std::string> parts_list;
@@ -303,7 +303,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
+        typename image_type,
         typename MM
         >
     std::vector<std::vector<rectangle> > load_image_dataset (

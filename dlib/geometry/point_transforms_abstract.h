@@ -16,7 +16,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is an object that takes 2D points or vectors and 
+                This is an object that takes 2D points or vectors and
                 applies an affine transformation to them.
 
             THREAD SAFETY
@@ -96,7 +96,7 @@ namespace dlib
     /*!
         ensures
             - If trans is an invertible transformation then this function returns a new
-              transformation that is the inverse of trans. 
+              transformation that is the inverse of trans.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -152,7 +152,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is an object that takes 2D points or vectors and 
+                This is an object that takes 2D points or vectors and
                 applies a projective transformation to them.
 
             THREAD SAFETY
@@ -197,8 +197,8 @@ namespace dlib
                     - let p_h == the point p in homogeneous coordinates.  That is:
                         - p_h.x() == p.x()
                         - p_h.y() == p.y()
-                        - p_h.z() == 1 
-                    - let x == get_m()*p_h 
+                        - p_h.z() == 1
+                    - let x == get_m()*p_h
                     - Then this function returns the value x/x.z()
         !*/
 
@@ -237,7 +237,7 @@ namespace dlib
     /*!
         ensures
             - If trans is an invertible transformation then this function returns a new
-              transformation that is the inverse of trans. 
+              transformation that is the inverse of trans.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -256,7 +256,7 @@ namespace dlib
               is minimized as often as possible.  That is, this function finds the projective
               transform that maps points in from_points to points in to_points.  If no
               projective transform exists which performs this mapping exactly then the one
-              which minimizes the mean squared error is selected. 
+              which minimizes the mean squared error is selected.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -265,7 +265,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is an object that takes 2D points or vectors and 
+                This is an object that takes 2D points or vectors and
                 rotates them around the origin by a given angle and then
                 translates them.
 
@@ -290,7 +290,7 @@ namespace dlib
         /*!
             ensures
                 - When (*this)(p) is invoked it will return a point P such that:
-                    - P is the point p rotated counter-clockwise around the origin 
+                    - P is the point p rotated counter-clockwise around the origin
                       angle radians and then shifted by having translate added to it.
                       (Note that this is counter clockwise with respect to the normal
                       coordinate system with positive y going up and positive x going
@@ -335,7 +335,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is an object that takes 2D points or vectors and 
+                This is an object that takes 2D points or vectors and
                 rotates them around the origin by a given angle.
 
             THREAD SAFETY
@@ -358,7 +358,7 @@ namespace dlib
         /*!
             ensures
                 - When (*this)(p) is invoked it will return a point P such that:
-                    - P is the point p rotated counter-clockwise around the origin 
+                    - P is the point p rotated counter-clockwise around the origin
                       angle radians.
                       (Note that this is counter clockwise with respect to the normal
                       coordinate system with positive y going up and positive x going
@@ -430,7 +430,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is an object that takes 3D points or vectors and 
+                This is an object that takes 3D points or vectors and
                 applies an affine transformation to them.
 
             THREAD SAFETY
@@ -522,7 +522,7 @@ namespace dlib
     /*!
         ensures
             - If trans is an invertible transformation then this function returns a new
-              transformation that is the inverse of trans. 
+              transformation that is the inverse of trans.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -607,18 +607,18 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_camera_pos()           == vector<double>(1,1,1) 
-                - #get_camera_looking_at()    == vector<double>(0,0,0) 
-                - #get_camera_up_direction()  == vector<double>(0,0,1) 
+                - #get_camera_pos()           == vector<double>(1,1,1)
+                - #get_camera_looking_at()    == vector<double>(0,0,0)
+                - #get_camera_up_direction()  == vector<double>(0,0,1)
                 - #get_camera_field_of_view() == 90
-                - #get_num_pixels()           == 1 
+                - #get_num_pixels()           == 1
         !*/
 
         camera_transform (
             const vector<double>& camera_pos,
             const vector<double>& camera_looking_at,
             const vector<double>& camera_up_direction,
-            const double camera_field_of_view, 
+            const double camera_field_of_view,
             const unsigned long num_pixels
         );
         /*!
@@ -672,7 +672,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the point in 3D space the camera is pointed at.  
+                - returns the point in 3D space the camera is pointed at.
         !*/
 
         vector<double> get_camera_up_direction(

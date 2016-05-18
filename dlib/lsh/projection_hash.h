@@ -23,14 +23,14 @@ namespace dlib
         projection_hash(
             const matrix_exp<EXP1>& proj_,
             const matrix_exp<EXP2>& offset_
-        ) : proj(proj_), offset(offset_) 
+        ) : proj(proj_), offset(offset_)
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(proj.nr() == offset.nr(),
                 "\t projection_hash::projection_hash()"
                 << "\n\t Invalid arguments were given to this function."
-                << "\n\t proj.nr():   " << proj.nr() 
-                << "\n\t offset.nr(): " << offset.nr() 
+                << "\n\t proj.nr():   " << proj.nr()
+                << "\n\t offset.nr(): " << offset.nr()
                 );
 
         }
@@ -53,14 +53,14 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(is_col_vector(v) && 
+            DLIB_ASSERT(is_col_vector(v) &&
                         v.size() == get_projection_matrix().nc() &&
                         v.size() > 0,
                 "\t unsigned long projection_hash::operator()(v)"
                 << "\n\t Invalid arguments were given to this function."
-                << "\n\t is_col_vector(v):             " << is_col_vector(v) 
-                << "\n\t get_projection_matrix().nc(): " << get_projection_matrix().nc() 
-                << "\n\t v.size():                     " << v.size() 
+                << "\n\t is_col_vector(v):             " << is_col_vector(v)
+                << "\n\t get_projection_matrix().nc(): " << get_projection_matrix().nc()
+                << "\n\t v.size():                     " << v.size()
                 );
 
             return do_hash(proj*matrix_cast<double>(v) + offset);
@@ -100,7 +100,7 @@ namespace dlib
 
     inline void deserialize (
         projection_hash& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         matrix<double> proj;

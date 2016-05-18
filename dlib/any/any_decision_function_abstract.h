@@ -23,9 +23,9 @@ namespace dlib
                 - for all T: contains<T>() == false
 
             WHAT THIS OBJECT REPRESENTS
-                This object is a version of dlib::any that is restricted to containing 
-                elements which are some kind of function object with an operator() with 
-                the following signature: 
+                This object is a version of dlib::any that is restricted to containing
+                elements which are some kind of function object with an operator() with
+                the following signature:
                     result_type operator()(const sample_type&) const
 
                 It is intended to be used to contain dlib::decision_function objects and
@@ -52,7 +52,7 @@ namespace dlib
         );
         /*!
             ensures
-                - copies the state of item into *this.  
+                - copies the state of item into *this.
                 - Note that *this and item will contain independent copies of the
                   contents of item.  That is, this function performs a deep
                   copy and therefore does not result in *this containing
@@ -93,7 +93,7 @@ namespace dlib
         /*!
             ensures
                 - if (this object contains any kind of object) then
-                    - returns false 
+                    - returns false
                 - else
                     - returns true
         !*/
@@ -153,7 +153,7 @@ namespace dlib
         );
         /*!
             ensures
-                - copies the state of item into *this.  
+                - copies the state of item into *this.
                 - Note that *this and item will contain independent copies of the
                   contents of item.  That is, this function performs a deep
                   copy and therefore does not result in *this containing
@@ -190,7 +190,7 @@ namespace dlib
         typename T,
         typename sample_type,
         typename result_type
-        > 
+        >
     T& any_cast(
         any_decision_function<sample_type,result_type>& a
     ) { return a.cast_to<T>(); }
@@ -205,7 +205,7 @@ namespace dlib
         typename T,
         typename sample_type,
         typename result_type
-        > 
+        >
     const T& any_cast(
         const any_decision_function<sample_type,result_type>& a
     ) { return a.cast_to<T>(); }

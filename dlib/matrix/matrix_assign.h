@@ -23,7 +23,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    namespace blas_bindings 
+    namespace blas_bindings
     {
 
     // ------------------------------------------------------------------------------------
@@ -51,40 +51,40 @@ namespace dlib
             const static bool value = false;
         };
 
-        template <typename T, typename U> 
-        struct has_matrix_multiply<matrix_multiply_exp<T,U> > 
+        template <typename T, typename U>
+        struct has_matrix_multiply<matrix_multiply_exp<T,U> >
         { const static bool value = true; };
 
-        template <typename T, typename U> 
-        struct has_matrix_multiply<matrix_add_exp<T,U> >  
+        template <typename T, typename U>
+        struct has_matrix_multiply<matrix_add_exp<T,U> >
         { const static bool value = has_matrix_multiply<T>::value || has_matrix_multiply<U>::value; };
 
-        template <typename T, typename U> 
-        struct has_matrix_multiply<matrix_subtract_exp<T,U> >  
+        template <typename T, typename U>
+        struct has_matrix_multiply<matrix_subtract_exp<T,U> >
         { const static bool value = has_matrix_multiply<T>::value || has_matrix_multiply<U>::value; };
 
-        template <typename T, bool Tb> 
-        struct has_matrix_multiply<matrix_mul_scal_exp<T,Tb> >  
+        template <typename T, bool Tb>
+        struct has_matrix_multiply<matrix_mul_scal_exp<T,Tb> >
         { const static bool value = true; };
 
-        template <typename T> 
-        struct has_matrix_multiply<matrix_div_scal_exp<T> >  
+        template <typename T>
+        struct has_matrix_multiply<matrix_div_scal_exp<T> >
         { const static bool value = has_matrix_multiply<T>::value; };
 
-        template <typename T> 
-        struct has_matrix_multiply<matrix_op<T> >  
+        template <typename T>
+        struct has_matrix_multiply<matrix_op<T> >
         { const static bool value = has_matrix_multiply<T>::value; };
 
-        template <typename T> 
-        struct has_matrix_multiply<op_trans<T> >  
+        template <typename T>
+        struct has_matrix_multiply<op_trans<T> >
         { const static bool value = has_matrix_multiply<T>::value; };
 
-        template <typename T> 
-        struct has_matrix_multiply<op_conj_trans<T> >  
+        template <typename T>
+        struct has_matrix_multiply<op_conj_trans<T> >
         { const static bool value = has_matrix_multiply<T>::value; };
 
-        template <typename T> 
-        struct has_matrix_multiply<op_conj<T> >  
+        template <typename T>
+        struct has_matrix_multiply<op_conj<T> >
         { const static bool value = has_matrix_multiply<T>::value; };
 
     // ------------------------------------------------------------------------------------
@@ -203,7 +203,7 @@ namespace dlib
 
     // This template struct is used to tell us if two matrix expressions both contain the same
     // sequence of operators, expressions.    It also only has a value of true if the T expression
-    // contains only matrices with the given layout. 
+    // contains only matrices with the given layout.
         template <typename T, typename U, typename layout>
         struct same_exp
         {
@@ -213,18 +213,18 @@ namespace dlib
 
         };
 
-        // Used only below.  They help strip off the const and & qualifiers that can show up 
+        // Used only below.  They help strip off the const and & qualifiers that can show up
         // in the LHS_ref_type and RHS_ref_type typedefs.
         template <typename T> struct noref{ typedef T type;};
-        template <typename T> struct noref<T&>{ typedef T type;}; 
-        template <typename T> struct noref<const T&>{ typedef T type;}; 
-        template <typename T> struct noref<const T>{ typedef T type;}; 
+        template <typename T> struct noref<T&>{ typedef T type;};
+        template <typename T> struct noref<const T&>{ typedef T type;};
+        template <typename T> struct noref<const T>{ typedef T type;};
 
-        template <typename Tlhs, typename Ulhs, typename Trhs, typename Urhs, typename layout> 
-        struct same_exp<matrix_multiply_exp<Tlhs,Trhs>, matrix_multiply_exp<Ulhs,Urhs>,layout > 
-        { 
-            // The reason this case is more complex than the others is because the matrix_multiply_exp 
-            // will use a temporary matrix instead of Tlhs or Trhs in the event that one of these 
+        template <typename Tlhs, typename Ulhs, typename Trhs, typename Urhs, typename layout>
+        struct same_exp<matrix_multiply_exp<Tlhs,Trhs>, matrix_multiply_exp<Ulhs,Urhs>,layout >
+        {
+            // The reason this case is more complex than the others is because the matrix_multiply_exp
+            // will use a temporary matrix instead of Tlhs or Trhs in the event that one of these
             // types corresponds to an expensive expression.  So we have to use the type that really
             // gets used.  The following typedefs are here to pick out that true type.
             typedef typename matrix_multiply_exp<Tlhs,Trhs>::LHS_ref_type T_LHS_ref_type;
@@ -237,36 +237,36 @@ namespace dlib
             typedef typename noref<U_LHS_ref_type>::type U_lhs_type;
             typedef typename noref<U_RHS_ref_type>::type U_rhs_type;
 
-            const static bool value = same_exp<T_lhs_type,U_lhs_type,layout>::value && 
-                                      same_exp<T_rhs_type,U_rhs_type,layout>::value; 
+            const static bool value = same_exp<T_lhs_type,U_lhs_type,layout>::value &&
+                                      same_exp<T_rhs_type,U_rhs_type,layout>::value;
         };
 
-        template <typename Tlhs, typename Ulhs, typename Trhs, typename Urhs, typename layout> 
-        struct same_exp<matrix_add_exp<Tlhs,Trhs>, matrix_add_exp<Ulhs,Urhs>, layout > 
+        template <typename Tlhs, typename Ulhs, typename Trhs, typename Urhs, typename layout>
+        struct same_exp<matrix_add_exp<Tlhs,Trhs>, matrix_add_exp<Ulhs,Urhs>, layout >
         { const static bool value = same_exp<Tlhs,Ulhs,layout>::value && same_exp<Trhs,Urhs,layout>::value; };
 
-        template <typename Tlhs, typename Ulhs, typename Trhs, typename Urhs, typename layout> 
-        struct same_exp<matrix_subtract_exp<Tlhs,Trhs>, matrix_subtract_exp<Ulhs,Urhs>, layout > 
+        template <typename Tlhs, typename Ulhs, typename Trhs, typename Urhs, typename layout>
+        struct same_exp<matrix_subtract_exp<Tlhs,Trhs>, matrix_subtract_exp<Ulhs,Urhs>, layout >
         { const static bool value = same_exp<Tlhs,Ulhs,layout>::value && same_exp<Trhs,Urhs,layout>::value; };
 
-        template <typename T, typename U, bool Tb, bool Ub, typename layout> 
-        struct same_exp<matrix_mul_scal_exp<T,Tb>, matrix_mul_scal_exp<U,Ub>, layout > 
+        template <typename T, typename U, bool Tb, bool Ub, typename layout>
+        struct same_exp<matrix_mul_scal_exp<T,Tb>, matrix_mul_scal_exp<U,Ub>, layout >
         { const static bool value = same_exp<T,U,layout>::value; };
 
-        template <typename T, typename U, typename layout> 
-        struct same_exp<matrix_div_scal_exp<T>, matrix_div_scal_exp<U>, layout > 
+        template <typename T, typename U, typename layout>
+        struct same_exp<matrix_div_scal_exp<T>, matrix_div_scal_exp<U>, layout >
         { const static bool value = same_exp<T,U,layout>::value; };
 
-        template <typename T, typename U, typename layout> 
-        struct same_exp<matrix_op<op_trans<T> >, matrix_op<op_trans<U> >, layout > 
+        template <typename T, typename U, typename layout>
+        struct same_exp<matrix_op<op_trans<T> >, matrix_op<op_trans<U> >, layout >
         { const static bool value = same_exp<T,U,layout>::value; };
 
-        template <typename T, typename U, typename layout> 
-        struct same_exp<matrix_op<op_conj<T> >, matrix_op<op_conj<U> >, layout > 
+        template <typename T, typename U, typename layout>
+        struct same_exp<matrix_op<op_conj<T> >, matrix_op<op_conj<U> >, layout >
         { const static bool value = same_exp<T,U,layout>::value; };
 
-        template <typename T, typename U, typename layout> 
-        struct same_exp<matrix_op<op_conj_trans<T> >, matrix_op<op_conj_trans<U> >, layout > 
+        template <typename T, typename U, typename layout>
+        struct same_exp<matrix_op<op_conj_trans<T> >, matrix_op<op_conj_trans<U> >, layout >
         { const static bool value = same_exp<T,U,layout>::value; };
 
     // ------------------------------------------------------------------------------------
@@ -325,7 +325,7 @@ namespace dlib
                 bool transpose
             )
             {
-                // At some point I need to improve the default (i.e. non BLAS) matrix 
+                // At some point I need to improve the default (i.e. non BLAS) matrix
                 // multiplication algorithm...
 
                 if (alpha == static_cast<typename src_exp::type>(1))
@@ -369,7 +369,7 @@ namespace dlib
             }
         };
 
-        // This is a macro to help us add overloads for the matrix_assign_blas_helper template.  
+        // This is a macro to help us add overloads for the matrix_assign_blas_helper template.
         // Using this macro it is easy to add overloads for arbitrary matrix expressions.
 #define DLIB_ADD_BLAS_BINDING(src_expression)                                               \
     template <typename T, typename L> struct BOOST_JOIN(blas,__LINE__)                      \
@@ -385,7 +385,7 @@ namespace dlib
             bool add_to,                                                                    \
             bool DLIB_NO_WARN_UNUSED transpose                      \
         ) {                                                                                 \
-            DLIB_NO_WARN_UNUSED typedef typename dest_exp::type T;                                             
+            DLIB_NO_WARN_UNUSED typedef typename dest_exp::type T;
 
 #define DLIB_END_BLAS_BINDING }};
 
@@ -397,7 +397,7 @@ namespace dlib
 
         template <
             typename dest_exp,
-            typename src_exp 
+            typename src_exp
             >
         void matrix_assign_blas_proxy (
             dest_exp& dest,
@@ -415,7 +415,7 @@ namespace dlib
 
         template <
             typename dest_exp,
-            typename src_exp, typename src_exp2 
+            typename src_exp, typename src_exp2
             >
         void matrix_assign_blas_proxy (
             dest_exp& dest,
@@ -433,7 +433,7 @@ namespace dlib
 
         template <
             typename dest_exp,
-            typename src_exp, bool Sb 
+            typename src_exp, bool Sb
             >
         void matrix_assign_blas_proxy (
             dest_exp& dest,
@@ -469,7 +469,7 @@ namespace dlib
 
         template <
             typename dest_exp,
-            typename src_exp, typename src_exp2 
+            typename src_exp, typename src_exp2
             >
         void matrix_assign_blas_proxy (
             dest_exp& dest,
@@ -489,7 +489,7 @@ namespace dlib
 
         template <
             typename T, long NR, long NC, typename MM, typename L,
-            typename src_exp 
+            typename src_exp
             >
         void matrix_assign_blas (
             matrix<T,NR,NC,MM,L>& dest,
@@ -498,15 +498,15 @@ namespace dlib
 
         template <
             typename T, long NR, long NC, typename MM, typename L,
-            typename src_exp 
+            typename src_exp
             >
         void matrix_assign_blas (
             matrix<T,NR,NC,MM,L>& dest,
             const matrix_add_exp<matrix<T,NR,NC,MM,L> ,src_exp>& src
         );
         /*!
-            This function catches the expressions of the form:  
-                M = M + exp; 
+            This function catches the expressions of the form:
+                M = M + exp;
             and converts them into the appropriate matrix_assign_blas() call.
             This is an important case to catch because it is the expression used
             to represent the += matrix operator.
@@ -514,15 +514,15 @@ namespace dlib
 
         template <
             typename T, long NR, long NC, typename MM, typename L,
-            typename src_exp 
+            typename src_exp
             >
         void matrix_assign_blas (
             matrix<T,NR,NC,MM,L>& dest,
             const matrix_add_exp<src_exp, matrix<T,NR,NC,MM,L> >& src
         );
         /*!
-            This function catches the expressions of the form:  
-                M = exp + M; 
+            This function catches the expressions of the form:
+                M = exp + M;
             and converts them into the appropriate matrix_assign_blas() call.
             This is an important case to catch because it is the expression used
             to represent the += matrix operator.
@@ -530,15 +530,15 @@ namespace dlib
             
         template <
             typename T, long NR, long NC, typename MM, typename L,
-            typename src_exp 
+            typename src_exp
             >
         void matrix_assign_blas (
             matrix<T,NR,NC,MM,L>& dest,
             const matrix_subtract_exp<matrix<T,NR,NC,MM,L> ,src_exp>& src
         );
         /*!
-            This function catches the expressions of the form:  
-                M = M - exp; 
+            This function catches the expressions of the form:
+                M = M - exp;
             and converts them into the appropriate matrix_assign_blas() call.
             This is an important case to catch because it is the expression used
             to represent the -= matrix operator.
@@ -553,7 +553,7 @@ namespace dlib
 
         template <
             typename dest_exp,
-            typename src_exp 
+            typename src_exp
             >
         void matrix_assign_blas_proxy (
             dest_exp& dest,
@@ -570,7 +570,7 @@ namespace dlib
 
         template <
             typename dest_exp,
-            typename src_exp, typename src_exp2 
+            typename src_exp, typename src_exp2
             >
         void matrix_assign_blas_proxy (
             dest_exp& dest,
@@ -598,7 +598,7 @@ namespace dlib
 
         template <
             typename dest_exp,
-            typename src_exp, bool Sb 
+            typename src_exp, bool Sb
             >
         void matrix_assign_blas_proxy (
             dest_exp& dest,
@@ -632,7 +632,7 @@ namespace dlib
 
         template <
             typename dest_exp,
-            typename src_exp, typename src_exp2 
+            typename src_exp, typename src_exp2
             >
         void matrix_assign_blas_proxy (
             dest_exp& dest,
@@ -682,7 +682,7 @@ namespace dlib
 
         template <
             typename T, long NR, long NC, typename MM, typename L,
-            typename src_exp 
+            typename src_exp
             >
         void matrix_assign_blas (
             matrix<T,NR,NC,MM,L>& dest,
@@ -705,7 +705,7 @@ namespace dlib
 
         template <
             typename T, long NR, long NC, typename MM, typename L,
-            typename src_exp 
+            typename src_exp
             >
         void matrix_assign_blas (
             assignable_sub_matrix<T,NR,NC,MM,L>& dest,
@@ -728,7 +728,7 @@ namespace dlib
 
         template <
             typename T,
-            typename src_exp 
+            typename src_exp
             >
         void matrix_assign_blas (
             assignable_ptr_matrix<T>& dest,
@@ -751,7 +751,7 @@ namespace dlib
 
         template <
             typename T, long NR, long NC, typename MM, typename L,
-            typename src_exp 
+            typename src_exp
             >
         void matrix_assign_blas (
             assignable_row_matrix<T,NR,NC,MM,L>& dest,
@@ -774,7 +774,7 @@ namespace dlib
 
         template <
             typename T, long NR, long NC, typename MM, typename L,
-            typename src_exp 
+            typename src_exp
             >
         void matrix_assign_blas (
             assignable_col_matrix<T,NR,NC,MM,L>& dest,
@@ -797,7 +797,7 @@ namespace dlib
 
         template <
             typename T, long NR, long NC, typename MM, typename L,
-            typename src_exp 
+            typename src_exp
             >
         void matrix_assign_blas (
             matrix<T,NR,NC,MM,L>& dest,
@@ -825,25 +825,25 @@ namespace dlib
 
         template <
             typename T, long NR, long NC, typename MM, typename L,
-            typename src_exp 
+            typename src_exp
             >
         void matrix_assign_blas (
             matrix<T,NR,NC,MM,L>& dest,
             const matrix_add_exp<src_exp, matrix<T,NR,NC,MM,L> >& src
         )
         {
-            // Just switch around the left and right hand sides of the incoming 
+            // Just switch around the left and right hand sides of the incoming
             // add expression and pass it back into matrix_assign_blas() so that
             // the above function will be called.
             typedef matrix_add_exp<matrix<T,NR,NC,MM,L> ,src_exp> swapped_add_exp;
-            matrix_assign_blas(dest, swapped_add_exp(src.rhs, src.lhs)); 
+            matrix_assign_blas(dest, swapped_add_exp(src.rhs, src.lhs));
         }
             
     // ------------------------------------------------------------------------------------
 
         template <
             typename T, long NR, long NC, typename MM, typename L,
-            typename src_exp 
+            typename src_exp
             >
         void matrix_assign_blas (
             matrix<T,NR,NC,MM,L>& dest,
@@ -871,13 +871,13 @@ namespace dlib
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
 
-    } // end of namespace blas_bindings 
+    } // end of namespace blas_bindings
 
     // ------------------------------------------------------------------------------------
 
     template <
         typename T, long NR, long NC, typename MM, typename L,
-        typename src_exp 
+        typename src_exp
         >
     inline typename enable_if_c<(is_same_type<T,float>::value ||
                                 is_same_type<T,double>::value ||
@@ -896,7 +896,7 @@ namespace dlib
 
     template <
         typename T, long NR, long NC, typename MM, typename L,
-        typename src_exp 
+        typename src_exp
         >
     inline typename enable_if_c<(is_same_type<T,float>::value ||
                                 is_same_type<T,double>::value ||
@@ -914,8 +914,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
-        typename src_exp 
+        typename T,
+        typename src_exp
         >
     inline typename enable_if_c<(is_same_type<T,float>::value ||
                                 is_same_type<T,double>::value ||
@@ -934,7 +934,7 @@ namespace dlib
 
     template <
         typename T, long NR, long NC, typename MM, typename L,
-        typename src_exp 
+        typename src_exp
         >
     inline typename enable_if_c<(is_same_type<T,float>::value ||
                                 is_same_type<T,double>::value ||
@@ -953,7 +953,7 @@ namespace dlib
 
     template <
         typename T, long NR, long NC, typename MM, typename L,
-        typename src_exp 
+        typename src_exp
         >
     inline typename enable_if_c<(is_same_type<T,float>::value ||
                                 is_same_type<T,double>::value ||

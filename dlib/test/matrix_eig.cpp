@@ -15,7 +15,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -36,7 +36,7 @@ namespace
         {
             for (long col = 0; col < m.nc(); ++col)
             {
-                m(row,col) = static_cast<type>(rnd.get_random_double()); 
+                m(row,col) = static_cast<type>(rnd.get_random_double());
             }
         }
 
@@ -51,7 +51,7 @@ namespace
         {
             for (long col = 0; col < m.nc(); ++col)
             {
-                m(row,col) = static_cast<type>(rnd.get_random_double()); 
+                m(row,col) = static_cast<type>(rnd.get_random_double());
             }
         }
 
@@ -73,10 +73,10 @@ namespace
 
         // make sure all the various ways of asking for the eigenvalues are actually returning a
         // consistent set of eigenvalues.
-        DLIB_TEST(equal(real(test.get_eigenvalues()), test.get_real_eigenvalues(), eps)); 
-        DLIB_TEST(equal(imag(test.get_eigenvalues()), test.get_imag_eigenvalues(), eps)); 
-        DLIB_TEST(equal(real(diag(test.get_d())), test.get_real_eigenvalues(), eps)); 
-        DLIB_TEST(equal(imag(diag(test.get_d())), test.get_imag_eigenvalues(), eps)); 
+        DLIB_TEST(equal(real(test.get_eigenvalues()), test.get_real_eigenvalues(), eps));
+        DLIB_TEST(equal(imag(test.get_eigenvalues()), test.get_imag_eigenvalues(), eps));
+        DLIB_TEST(equal(real(diag(test.get_d())), test.get_real_eigenvalues(), eps));
+        DLIB_TEST(equal(imag(diag(test.get_d())), test.get_imag_eigenvalues(), eps));
 
         matrix<type> eig1 ( real_eigenvalues(m));
         matrix<type> eig2 ( test.get_real_eigenvalues());
@@ -106,13 +106,13 @@ namespace
         if (max(abs(m-trans(m))) < 1e-5)
         {
             dlog << LTRACE << "m is symmetric";
-            // there aren't any imaginary eigenvalues 
-            DLIB_TEST(max(abs(test.get_imag_eigenvalues())) < eps); 
+            // there aren't any imaginary eigenvalues
+            DLIB_TEST(max(abs(test.get_imag_eigenvalues())) < eps);
             DLIB_TEST(diagm(diag(D)) == D);
 
             // only check the determinant against the eigenvalues for small matrices
             // because for huge ones the determinant might be so big it overflows a floating point number.
-            if (m.nr() < 50) 
+            if (m.nr() < 50)
             {
                 const type mdet = det(m);
                 DLIB_TEST_MSG(std::abs(prod(test.get_real_eigenvalues()) - mdet) < std::abs(mdet)*sqrt(std::numeric_limits<type>::epsilon()),
@@ -139,8 +139,8 @@ namespace
     {
         typedef typename matrix_type::type type;
         typedef typename matrix_type::mem_manager_type MM;
-        matrix<type,matrix_type::NR, matrix_type::NC, MM, row_major_layout> mr(m); 
-        matrix<type,matrix_type::NR, matrix_type::NC, MM, column_major_layout> mc(m); 
+        matrix<type,matrix_type::NR, matrix_type::NC, MM, row_major_layout> mr(m);
+        matrix<type,matrix_type::NR, matrix_type::NC, MM, column_major_layout> mc(m);
 
         {
         eigenvalue_decomposition<matrix_type> test(mr);
@@ -204,7 +204,7 @@ namespace
 
             eigenvalue_decomposition<matrix<double> > eig(H);
             matrix<double> HH = eig.get_pseudo_v()*diagm(eig.get_real_eigenvalues())*trans(eig.get_pseudo_v());
-            DLIB_TEST_MSG(max(abs(H - HH))<1e-12, "dims: " << dims << "  error: " << max(abs(H - HH))); 
+            DLIB_TEST_MSG(max(abs(H - HH))<1e-12, "dims: " << dims << "  error: " << max(abs(H - HH)));
         }
     }
 

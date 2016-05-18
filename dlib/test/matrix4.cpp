@@ -16,7 +16,7 @@
 #include <dlib/memory_manager_stateless.h>
 #include <dlib/array2d.h>
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -31,7 +31,7 @@ namespace
         ensures
             - runs tests on the matrix stuff compliance with the specs
     !*/
-    {        
+    {
         print_spinner();
 
         {
@@ -41,8 +41,8 @@ namespace
             DLIB_TEST(equal( m*diagm(v) , m*tmp(diagm(v)) ));
             DLIB_TEST(equal( scale_columns(m,v) , m*tmp(diagm(v)) ));
 
-            DLIB_TEST(equal( diagm(v)*m , tmp(diagm(v))*m )); 
-            DLIB_TEST(equal( scale_rows(m,v) , tmp(diagm(v))*m )); 
+            DLIB_TEST(equal( diagm(v)*m , tmp(diagm(v))*m ));
+            DLIB_TEST(equal( scale_rows(m,v) , tmp(diagm(v))*m ));
         }
 
         {
@@ -52,8 +52,8 @@ namespace
             DLIB_TEST(equal( m*diagm(v) , m*tmp(diagm(v)) ));
             DLIB_TEST(equal( scale_columns(m,v) , m*tmp(diagm(v)) ));
 
-            DLIB_TEST(equal( diagm(v)*m , tmp(diagm(v))*m )); 
-            DLIB_TEST(equal( scale_rows(m,v) , tmp(diagm(v))*m )); 
+            DLIB_TEST(equal( diagm(v)*m , tmp(diagm(v))*m ));
+            DLIB_TEST(equal( scale_rows(m,v) , tmp(diagm(v))*m ));
         }
 
         {
@@ -63,8 +63,8 @@ namespace
             DLIB_TEST(equal( m*diagm(v) , m*tmp(diagm(v)) ));
             DLIB_TEST(equal( scale_columns(m,v) , m*tmp(diagm(v)) ));
 
-            DLIB_TEST(equal( diagm(v)*m , tmp(diagm(v))*m )); 
-            DLIB_TEST(equal( scale_rows(m,v) , tmp(diagm(v))*m )); 
+            DLIB_TEST(equal( diagm(v)*m , tmp(diagm(v))*m ));
+            DLIB_TEST(equal( scale_rows(m,v) , tmp(diagm(v))*m ));
         }
 
         {
@@ -74,8 +74,8 @@ namespace
             DLIB_TEST(equal( m*diagm(v) , m*tmp(diagm(v)) ));
             DLIB_TEST(equal( scale_columns(m,v) , m*tmp(diagm(v)) ));
 
-            DLIB_TEST(equal( diagm(v)*m , tmp(diagm(v))*m )); 
-            DLIB_TEST(equal( scale_rows(m,v) , tmp(diagm(v))*m )); 
+            DLIB_TEST(equal( diagm(v)*m , tmp(diagm(v))*m ));
+            DLIB_TEST(equal( scale_rows(m,v) , tmp(diagm(v))*m ));
         }
 
 
@@ -86,8 +86,8 @@ namespace
             DLIB_TEST(equal( m*diagm(v) , m*tmp(diagm(v)) ));
             DLIB_TEST(equal( scale_columns(m,v) , m*tmp(diagm(v)) ));
 
-            DLIB_TEST(equal( diagm(v)*m , tmp(diagm(v))*m )); 
-            DLIB_TEST(equal( scale_rows(m,v) , tmp(diagm(v))*m )); 
+            DLIB_TEST(equal( diagm(v)*m , tmp(diagm(v))*m ));
+            DLIB_TEST(equal( scale_rows(m,v) , tmp(diagm(v))*m ));
         }
 
         {
@@ -97,8 +97,8 @@ namespace
             DLIB_TEST(equal( m*diagm(v) , m*tmp(diagm(v)) ));
             DLIB_TEST(equal( scale_columns(m,v) , m*tmp(diagm(v)) ));
 
-            DLIB_TEST(equal( diagm(v)*m , tmp(diagm(v))*m )); 
-            DLIB_TEST(equal( scale_rows(m,v) , tmp(diagm(v))*m )); 
+            DLIB_TEST(equal( diagm(v)*m , tmp(diagm(v))*m ));
+            DLIB_TEST(equal( scale_rows(m,v) , tmp(diagm(v))*m ));
         }
 
 
@@ -109,8 +109,8 @@ namespace
             DLIB_TEST(equal( m*diagm(v) , m*tmp(diagm(v)) ));
             DLIB_TEST(equal( scale_columns(m,v) , m*tmp(diagm(v)) ));
 
-            DLIB_TEST(equal( diagm(v)*m , tmp(diagm(v))*m )); 
-            DLIB_TEST(equal( scale_rows(m,v) , tmp(diagm(v))*m )); 
+            DLIB_TEST(equal( diagm(v)*m , tmp(diagm(v))*m ));
+            DLIB_TEST(equal( scale_rows(m,v) , tmp(diagm(v))*m ));
         }
 
         {
@@ -120,8 +120,8 @@ namespace
             DLIB_TEST(equal( m*diagm(v) , m*tmp(diagm(v)) ));
             DLIB_TEST(equal( scale_columns(m,v) , m*tmp(diagm(v)) ));
 
-            DLIB_TEST(equal( diagm(v)*m , tmp(diagm(v))*m )); 
-            DLIB_TEST(equal( scale_rows(m,v) , tmp(diagm(v))*m )); 
+            DLIB_TEST(equal( diagm(v)*m , tmp(diagm(v))*m ));
+            DLIB_TEST(equal( scale_rows(m,v) , tmp(diagm(v))*m ));
         }
 
 
@@ -132,8 +132,8 @@ namespace
             DLIB_TEST(equal( m*diagm(v) , m*tmp(diagm(v)) ));
             DLIB_TEST(equal( scale_columns(m,v) , m*tmp(diagm(v)) ));
 
-            DLIB_TEST(equal( diagm(v)*m , tmp(diagm(v))*m )); 
-            DLIB_TEST(equal( scale_rows(m,v) , tmp(diagm(v))*m )); 
+            DLIB_TEST(equal( diagm(v)*m , tmp(diagm(v))*m ));
+            DLIB_TEST(equal( scale_rows(m,v) , tmp(diagm(v))*m ));
         }
 
         {
@@ -144,8 +144,8 @@ namespace
             DLIB_TEST(equal( m*diagm(v1) , m*tmp(diagm(v1)) ));
             DLIB_TEST(equal( scale_columns(m,v1) , m*tmp(diagm(v1)) ));
 
-            DLIB_TEST(equal( diagm(v2)*m , tmp(diagm(v2))*m )); 
-            DLIB_TEST(equal( scale_rows(m,v2) , tmp(diagm(v2))*m )); 
+            DLIB_TEST(equal( diagm(v2)*m , tmp(diagm(v2))*m ));
+            DLIB_TEST(equal( scale_rows(m,v2) , tmp(diagm(v2))*m ));
         }
 
         {
@@ -156,8 +156,8 @@ namespace
             DLIB_TEST(equal( m*diagm(v1) , m*tmp(diagm(v1)) ));
             DLIB_TEST(equal( scale_columns(m,v1) , m*tmp(diagm(v1)) ));
 
-            DLIB_TEST(equal( diagm(v2)*m , tmp(diagm(v2))*m )); 
-            DLIB_TEST(equal( scale_rows(m,v2) , tmp(diagm(v2))*m )); 
+            DLIB_TEST(equal( diagm(v2)*m , tmp(diagm(v2))*m ));
+            DLIB_TEST(equal( scale_rows(m,v2) , tmp(diagm(v2))*m ));
         }
 
     }
@@ -419,7 +419,7 @@ namespace
             DLIB_TEST(equal(inv(diagm(d))*m , tmp(diagm(di))*m));
             DLIB_TEST(equal(m*inv(diagm(d)) , m*tmp(diagm(di))));
 
-            DLIB_TEST_MSG(equal(inv(diagm(d)) + m , tmp(diagm(di)) + m), 
+            DLIB_TEST_MSG(equal(inv(diagm(d)) + m , tmp(diagm(di)) + m),
                           (inv(diagm(d)) + m) - (tmp(diagm(di)) + m) );
             DLIB_TEST(equal(m + inv(diagm(d)) , tmp(diagm(di)) + m));
 
@@ -647,7 +647,7 @@ namespace
 
     template <
         long D1,
-        long D2, 
+        long D2,
         long D3,
         long D4
         >
@@ -655,8 +655,8 @@ namespace
     {
         dlog << LINFO << D1 << " " << D2 << " " << D3 << " " << D4;
         matrix<int,D1,D1> a(1,1);
-        matrix<int,D2,D2> b(2,2); 
-        matrix<int,D3,D3> c(3,3); 
+        matrix<int,D2,D2> b(2,2);
+        matrix<int,D3,D3> c(3,3);
         matrix<int,D4,D1> d(4,1);
 
         a = 4;
@@ -798,9 +798,9 @@ namespace
         {
             dlib::rand rnd;
             matrix<complex<int> > a, b;
-            a = complex_matrix(matrix_cast<int>(round(20*randm(2,7,rnd))), 
+            a = complex_matrix(matrix_cast<int>(round(20*randm(2,7,rnd))),
                                matrix_cast<int>(round(20*randm(2,7,rnd))));
-            b = complex_matrix(matrix_cast<int>(round(20*randm(3,2,rnd))), 
+            b = complex_matrix(matrix_cast<int>(round(20*randm(3,2,rnd))),
                                matrix_cast<int>(round(20*randm(3,2,rnd))));
 
             DLIB_TEST(xcorr(a,b)       == conv(a, flip(conj(b))));
@@ -831,7 +831,7 @@ namespace
 
             matrix<double> m2(3,3);
             m2 = 2, 1, 1,
-                 1, 5, 5, 
+                 1, 5, 5,
                  1, 5, 5;
 
             DLIB_TEST(m == m2);

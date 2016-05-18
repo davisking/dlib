@@ -12,19 +12,19 @@
 namespace dlib
 {
 
-    class server_iostream : public server 
+    class server_iostream : public server
     {
 
         /*!
-            WHAT THIS EXTENSION DOES FOR server 
+            WHAT THIS EXTENSION DOES FOR server
                 This extension redefines the on_connect() function so that
-                instead of giving you a connection object you get an istream 
+                instead of giving you a connection object you get an istream
                 and ostream object.
 
             THREAD SAFETY
-                Note that in on_connect() the input stream in is tied to the output stream 
-                out.  This means that when you read from in it will modify out and thus 
-                it is not safe to touch in and out concurrently from different threads 
+                Note that in on_connect() the input stream in is tied to the output stream
+                out.  This means that when you read from in it will modify out and thus
+                it is not safe to touch in and out concurrently from different threads
                 unless you untie them (which you do by saying in.tie(0);)
         !*/
 
@@ -58,19 +58,19 @@ namespace dlib
                 - in == the input stream that reads data from the new connection
                 - out == the output stream that writes data to the new connection
                 - in.tie() == &out (i.e. when you read from in it automatically calls out.flush())
-                - foreign_ip == the foreign ip address for this connection 
-                - foreign_port == the foreign port number for this connection 
+                - foreign_ip == the foreign ip address for this connection
+                - foreign_port == the foreign port number for this connection
                 - local_ip == the IP of the local interface this connection is using
                 - local_port == the local port number for this connection
-                - on_connect() is run in its own thread 
-                - is_running() == true 
-                - the number of current connections < get_max_connection() 
-                - connection_id == an integer that uniquely identifies this connection. 
+                - on_connect() is run in its own thread
+                - is_running() == true
+                - the number of current connections < get_max_connection()
+                - connection_id == an integer that uniquely identifies this connection.
                   It can be used by shutdown_connection() to terminate this connection.
             ensures
-                - when the iostreams hit EOF on_connect() will terminate.  
+                - when the iostreams hit EOF on_connect() will terminate.
                   (because this is how clear() signals you the server is shutting down)
-                - this function will not call clear()  
+                - this function will not call clear()
             throws
                 - does not throw any exceptions
         !*/
@@ -79,6 +79,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_SERVER_IOSTREAm_ABSTRACT_ 
+#endif // DLIB_SERVER_IOSTREAm_ABSTRACT_
 
 

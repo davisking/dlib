@@ -26,8 +26,8 @@ namespace dlib
 
     public:
 
-        jpeg_loader( 
-            const char* filename 
+        jpeg_loader(
+            const char* filename
         );
         /*!
             ensures
@@ -39,8 +39,8 @@ namespace dlib
                   us from loading the given JPEG file.
         !*/
 
-        jpeg_loader( 
-            const std::string& filename 
+        jpeg_loader(
+            const std::string& filename
         );
         /*!
             ensures
@@ -52,8 +52,8 @@ namespace dlib
                   us from loading the given JPEG file.
         !*/
 
-        jpeg_loader( 
-            const dlib::file& f 
+        jpeg_loader(
+            const dlib::file& f
         );
         /*!
             ensures
@@ -93,15 +93,15 @@ namespace dlib
         !*/
 
         template<
-            typename image_type 
+            typename image_type
             >
-        void get_image( 
+        void get_image(
             image_type& img
         ) const;
         /*!
             requires
                 - image_type == an image object that implements the interface defined in
-                  dlib/image_processing/generic_image.h 
+                  dlib/image_processing/generic_image.h
             ensures
                 - loads the JPEG image stored in this object into img
         !*/
@@ -120,7 +120,7 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
         ensures
             - performs: jpeg_loader(file_name).get_image(image);
     !*/

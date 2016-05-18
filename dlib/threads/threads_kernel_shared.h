@@ -3,7 +3,7 @@
 #ifndef DLIB_THREADS_KERNEl_SHARED_
 #define DLIB_THREADS_KERNEl_SHARED_
 
-// this file should be included at the bottom of one of the thread kernel headers for a 
+// this file should be included at the bottom of one of the thread kernel headers for a
 // specific platform.
 //#include "../threads.h"
 #include "auto_mutex_extension.h"
@@ -76,7 +76,7 @@ namespace dlib
             /*!
                 INITIAL VALUE
                     - pool_count == 0 and
-                    - data_ready is associated with the mutex data_mutex 
+                    - data_ready is associated with the mutex data_mutex
                     - data_empty is associated with the mutex data_mutex
                     - destructed is associated with the mutex data_mutex
                     - destruct == false
@@ -85,18 +85,18 @@ namespace dlib
                     - do_not_ever_destruct == false
 
                 CONVENTION
-                    - data_ready is associated with the mutex data_mutex 
-                    - data_empty is associated with the mutex data_mutex 
-                    - data_ready == a signaler used signal when there is new data waiting 
+                    - data_ready is associated with the mutex data_mutex
+                    - data_empty is associated with the mutex data_mutex
+                    - data_ready == a signaler used signal when there is new data waiting
                       to start a thread with.
-                    - data_empty == a signaler used to signal when the data is now empty 
-                    - pool_count == the number of suspended threads in the thread pool 
+                    - data_empty == a signaler used to signal when the data is now empty
+                    - pool_count == the number of suspended threads in the thread pool
                     - total_count == the number of threads that are executing anywhere.  i.e.
                       pool_count + the ones that are currently running some user function.
                     - if (function_pointer != 0) then
-                        - parameter == a void pointer pointing to the parameter which 
-                          should be used to start the next thread 
-                        - function_pointer == a pointer to the next function to make a 
+                        - parameter == a void pointer pointing to the parameter which
+                          should be used to start the next thread
+                        - function_pointer == a pointer to the next function to make a
                           new thread with
 
                     - if (the destructor is running) then
@@ -203,7 +203,7 @@ namespace dlib
             signaler data_ready;        // signaler to signal when there is new data
             signaler data_empty;        // signaler to signal when the data is empty
             bool destruct;
-            signaler destructed;        // signaler to signal when a thread has ended 
+            signaler destructed;        // signaler to signal when a thread has ended
             bool do_not_ever_destruct;
 
             struct registry_type
@@ -216,7 +216,7 @@ namespace dlib
                     >::kernel_2a_c reg;
             };
 
-            // stuff for the register_thread_end_handler 
+            // stuff for the register_thread_end_handler
             registry_type reg;
 
 
@@ -229,7 +229,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         threader& thread_pool (
-        ); 
+        );
         /*!
             ensures
                 - returns a reference to the global threader object
@@ -241,7 +241,7 @@ namespace dlib
     }
 
     bool is_dlib_thread (
-        thread_id_type id 
+        thread_id_type id
     );
 
     bool is_dlib_thread (
@@ -275,7 +275,7 @@ namespace dlib
         void (T::*handler)()
     )
     {
-        DLIB_ASSERT(is_dlib_thread(),            
+        DLIB_ASSERT(is_dlib_thread(),
                "\tvoid register_thread_end_handler"
             << "\n\tYou can't register a thread end handler for a thread dlib didn't spawn."
             );
@@ -296,7 +296,7 @@ namespace dlib
         // Check if the thread pool has been destroyed and if it has then don't do anything.
         // This bool here is always true except when the program has started to terminate and
         // the thread pool object has been destroyed.  This if is here to catch other global
-        // objects that have destructors that try to call unregister_thread_end_handler().  
+        // objects that have destructors that try to call unregister_thread_end_handler().
         // Without this check we get into trouble if the thread pool is destroyed before these
         // objects.
         if (threads_kernel_shared::thread_pool_has_been_destroyed == false)

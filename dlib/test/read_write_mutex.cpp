@@ -11,7 +11,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -166,7 +166,7 @@ namespace
             max_read = 0;
             failure = false;
 
-            // doing this big block of weird stuff should have no effect.  
+            // doing this big block of weird stuff should have no effect.
             {
                 m.unlock();
 

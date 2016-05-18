@@ -23,7 +23,7 @@ namespace dlib
         /*!
             REQUIREMENTS ON domain
                 domain must be comparable by compare where compare is a functor compatible with std::less and
-                domain is swappable by a global swap() and                
+                domain is swappable by a global swap() and
                 domain must have a default constructor
 
             REQUIREMENTS ON range
@@ -31,22 +31,22 @@ namespace dlib
                 range must have a default constructor
 
             POINTERS AND REFERENCES TO INTERNAL DATA
-                Only the destructor and load_from() will invalidate pointers or 
-                references to internal data.  
+                Only the destructor and load_from() will invalidate pointers or
+                references to internal data.
 
             INITIAL VALUE
                 size() == 0
 
             ENUMERATION ORDER
                 The enumerator will iterate over the domain (and each associated
-                range element) elements in ascending order according to the compare functor. 
+                range element) elements in ascending order according to the compare functor.
                 (i.e. the elements are enumerated in sorted order)
 
             WHAT THIS OBJECT REPRESENTS
                 static_map contains items of type domain and range
 
-                This object is similar an array.  It maps items of type domain on to 
-                items of type range.  
+                This object is similar an array.  It maps items of type domain on to
+                items of type range.
 
                 Also note that unless specified otherwise, no member functions
                 of this object throw exceptions.
@@ -67,15 +67,15 @@ namespace dlib
             static_map (
             );
             /*!
-                ensures 
+                ensures
                     - #*this is properly initialized
                 throws
-                    - std::bad_alloc or any exception thrown by domain's or range's 
+                    - std::bad_alloc or any exception thrown by domain's or range's
                       constructor.
             !*/
 
             virtual ~static_map(
-            ); 
+            );
             /*!
                 ensures
                     - all memory associated with *this has been released
@@ -87,9 +87,9 @@ namespace dlib
                 ensures
                     - #*this has its initial value
                 throws
-                    - std::bad_alloc or any exception thrown by domain's or range's 
+                    - std::bad_alloc or any exception thrown by domain's or range's
                       constructor.
-                        If this exception is thrown then #*this is unusable 
+                        If this exception is thrown then #*this is unusable
                         until clear() is called and succeeds.
             !*/
 
@@ -97,13 +97,13 @@ namespace dlib
                 pair_remover<domain,range>& source
             );
             /*!
-                ensures                  
+                ensures
                     - #size() == source.size()
-                    - #source.size() == 0                    
+                    - #source.size() == 0
                     - all the pairs in source are removed and placed into #*this
                     - #at_start() == true
                 throws
-                    - std::bad_alloc or any exception thrown by domain's or range's 
+                    - std::bad_alloc or any exception thrown by domain's or range's
                       constructor.
                         If this exception is thrown then the call to load() will have
                         no effect on #*this.
@@ -116,7 +116,7 @@ namespace dlib
                 ensures
                     - if (there is an element in the domain equivalent to d) then
                         - returns a pointer to an element in the range of *this that
-                          is associated with an element in the domain of *this 
+                          is associated with an element in the domain of *this
                           equivalent to d.
                     - else
                         - returns 0
@@ -129,7 +129,7 @@ namespace dlib
                 ensures
                     - if (there is an element in the domain equivalent to d) then
                         - returns a pointer to an element in the range of *this that
-                          is associated with an element in the domain of *this 
+                          is associated with an element in the domain of *this
                           equivalent to d.
                     - else
                         - returns 0
@@ -141,7 +141,7 @@ namespace dlib
             /*!
                 ensures
                     - swaps *this and item
-            !*/ 
+            !*/
     
         private:
 
@@ -156,9 +156,9 @@ namespace dlib
         typename compare
         >
     inline void swap (
-        static_map<domain,range,compare>& a, 
-        static_map<domain,range,compare>& b 
-    ) { a.swap(b); }   
+        static_map<domain,range,compare>& a,
+        static_map<domain,range,compare>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
@@ -169,11 +169,11 @@ namespace dlib
         typename compare
         >
     void deserialize (
-        static_map<domain,range,compare>& item, 
+        static_map<domain,range,compare>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 }
 

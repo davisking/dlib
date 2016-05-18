@@ -49,7 +49,7 @@ namespace dlib
 
     bool threaded_object::
     is_running (
-    ) const 
+    ) const
     {
         auto_mutex M(m_);
 

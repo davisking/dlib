@@ -38,32 +38,32 @@ namespace dlib
 
         const point& part(
             unsigned long idx
-        ) const 
-        { 
+        ) const
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(idx < num_parts(),
                 "\t point full_object_detection::part()"
                 << "\n\t Invalid inputs were given to this function "
-                << "\n\t idx:         " << idx  
-                << "\n\t num_parts(): " << num_parts()  
+                << "\n\t idx:         " << idx
+                << "\n\t num_parts(): " << num_parts()
                 << "\n\t this:        " << this
                 );
-            return parts[idx]; 
+            return parts[idx];
         }
 
         point& part(
             unsigned long idx
-        )  
-        { 
+        )
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(idx < num_parts(),
                 "\t point full_object_detection::part()"
                 << "\n\t Invalid inputs were given to this function "
-                << "\n\t idx:         " << idx  
-                << "\n\t num_parts(): " << num_parts()  
+                << "\n\t idx:         " << idx
+                << "\n\t num_parts(): " << num_parts()
                 << "\n\t this:        " << this
                 );
-            return parts[idx]; 
+            return parts[idx];
         }
 
         friend void serialize (
@@ -93,7 +93,7 @@ namespace dlib
 
     private:
         rectangle rect;
-        std::vector<point> parts;  
+        std::vector<point> parts;
     };
 
 // ----------------------------------------------------------------------------------------

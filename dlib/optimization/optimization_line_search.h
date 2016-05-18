@@ -16,18 +16,18 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename funct, typename T>
-    class line_search_funct 
+    class line_search_funct
     {
     public:
-        line_search_funct(const funct& f_, const T& start_, const T& direction_) 
+        line_search_funct(const funct& f_, const T& start_, const T& direction_)
             : f(f_),start(start_), direction(direction_), matrix_r(0), scalar_r(0)
         {}
 
-        line_search_funct(const funct& f_, const T& start_, const T& direction_, T& r) 
+        line_search_funct(const funct& f_, const T& start_, const T& direction_, T& r)
             : f(f_),start(start_), direction(direction_), matrix_r(&r), scalar_r(0)
         {}
 
-        line_search_funct(const funct& f_, const T& start_, const T& direction_, double& r) 
+        line_search_funct(const funct& f_, const T& start_, const T& direction_, double& r)
             : f(f_),start(start_), direction(direction_), matrix_r(0), scalar_r(&r)
         {}
 
@@ -68,8 +68,8 @@ namespace dlib
     };
 
     template <typename funct, typename T>
-    const line_search_funct<funct,T> make_line_search_function(const funct& f, const T& start, const T& direction) 
-    { 
+    const line_search_funct<funct,T> make_line_search_function(const funct& f, const T& start, const T& direction)
+    {
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
         DLIB_ASSERT (
             is_col_vector(start) && is_col_vector(direction) && start.size() == direction.size(),
@@ -80,14 +80,14 @@ namespace dlib
             << "\n\tstart.nr():     " << start.nr()
             << "\n\tdirection.nr(): " << direction.nr()
         );
-        return line_search_funct<funct,T>(f,start,direction); 
+        return line_search_funct<funct,T>(f,start,direction);
     }
 
 // ----------------------------------------------------------------------------------------
 
     template <typename funct, typename T>
-    const line_search_funct<funct,T> make_line_search_function(const funct& f, const T& start, const T& direction, double& f_out) 
-    { 
+    const line_search_funct<funct,T> make_line_search_function(const funct& f, const T& start, const T& direction, double& f_out)
+    {
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
         DLIB_ASSERT (
             is_col_vector(start) && is_col_vector(direction) && start.size() == direction.size(),
@@ -98,14 +98,14 @@ namespace dlib
             << "\n\tstart.nr():     " << start.nr()
             << "\n\tdirection.nr(): " << direction.nr()
         );
-        return line_search_funct<funct,T>(f,start,direction, f_out); 
+        return line_search_funct<funct,T>(f,start,direction, f_out);
     }
 
 // ----------------------------------------------------------------------------------------
 
     template <typename funct, typename T>
-    const line_search_funct<funct,T> make_line_search_function(const funct& f, const T& start, const T& direction, T& grad_out) 
-    { 
+    const line_search_funct<funct,T> make_line_search_function(const funct& f, const T& start, const T& direction, T& grad_out)
+    {
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
         DLIB_ASSERT (
             is_col_vector(start) && is_col_vector(direction) && start.size() == direction.size(),
@@ -116,7 +116,7 @@ namespace dlib
             << "\n\tstart.nr():     " << start.nr()
             << "\n\tdirection.nr(): " << direction.nr()
         );
-        return line_search_funct<funct,T>(f,start,direction,grad_out); 
+        return line_search_funct<funct,T>(f,start,direction,grad_out);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -162,7 +162,7 @@ namespace dlib
         else
             x = x2;
 
-        // now make sure the minimum is within the allowed range of [0,limit] 
+        // now make sure the minimum is within the allowed range of [0,limit]
         return put_in_range(0,limit,x);
     }
 
@@ -180,7 +180,7 @@ namespace dlib
 
         const double alpha = -d0/temp;
 
-        // now make sure the minimum is within the allowed range of (0,1) 
+        // now make sure the minimum is within the allowed range of (0,1)
         return put_in_range(0,1,alpha);
     }
 
@@ -204,7 +204,7 @@ namespace dlib
         const double aa2 = x2*x2;
         const double aa1 = x1*x1;
         m =  aa2,       -aa1,
-            -aa2*x2, aa1*x1;   
+            -aa2*x2, aa1*x1;
         v = f_x1 - f0 - d0*x1,
             f_x2 - f0 - d0*x2;
 
@@ -238,7 +238,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline double lagrange_poly_min_extrap (
-        double p1, 
+        double p1,
         double p2,
         double p3,
         double f1,
@@ -247,11 +247,11 @@ namespace dlib
     )
     {
         DLIB_ASSERT(p1 < p2 && p2 < p3 && f1 >= f2 && f2 <= f3,
-                     "   p1: " << p1 
-                     << "   p2: " << p2 
-                     << "   p3: " << p3  
-                     << "   f1: " << f1 
-                     << "   f2: " << f2 
+                     "   p1: " << p1
+                     << "   p2: " << p2
+                     << "   p3: " << p3
+                     << "   f1: " << f1
+                     << "   f2: " << f2
                      << "   f3: " << f3);
 
         // This formula is out of the book Nonlinear Optimization by Andrzej Ruszczynski.  See section 5.2.
@@ -279,18 +279,18 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename funct, 
+        typename funct,
         typename funct_der
         >
     double line_search (
-        const funct& f, 
+        const funct& f,
         const double f0,
-        const funct_der& der, 
+        const funct_der& der,
         const double d0,
-        double rho, 
-        double sigma, 
+        double rho,
+        double sigma,
         double min_f,
-        unsigned long max_iter 
+        unsigned long max_iter
     )
     {
         DLIB_ASSERT (
@@ -298,12 +298,12 @@ namespace dlib
             "\tdouble line_search()"
             << "\n\tYou have given invalid arguments to this function"
             << "\n\t sigma:    " << sigma
-            << "\n\t rho:      " << rho 
-            << "\n\t max_iter: " << max_iter 
+            << "\n\t rho:      " << rho
+            << "\n\t max_iter: " << max_iter
         );
 
         // The bracketing phase of this function is implemented according to block 2.6.2 from
-        // the book Practical Methods of Optimization by R. Fletcher.   The sectioning 
+        // the book Practical Methods of Optimization by R. Fletcher.   The sectioning
         // phase is an implementation of 2.6.4 from the same book.
 
         // 1 <= tau1a < tau1b. Controls the alpha jump size during the bracketing phase of
@@ -447,7 +447,7 @@ namespace dlib
             if (val <= min_f || itr >= max_iter)
                 return alpha;
 
-            // stop if the interval gets so small that it isn't shrinking any more due to rounding error 
+            // stop if the interval gets so small that it isn't shrinking any more due to rounding error
             if (a == first || b == last)
             {
                 return b;
@@ -493,20 +493,20 @@ namespace dlib
         typename funct
         >
     double backtracking_line_search (
-        const funct& f, 
+        const funct& f,
         double f0,
         double d0,
         double alpha,
-        double rho, 
-        unsigned long max_iter 
+        double rho,
+        unsigned long max_iter
     )
     {
         DLIB_ASSERT (
             0 < rho && rho < 1 && max_iter > 0,
             "\tdouble backtracking_line_search()"
             << "\n\tYou have given invalid arguments to this function"
-            << "\n\t rho:      " << rho 
-            << "\n\t max_iter: " << max_iter 
+            << "\n\t rho:      " << rho
+            << "\n\t max_iter: " << max_iter
         );
 
         // make sure alpha is going in the right direction.  That is, it should be opposite
@@ -579,14 +579,14 @@ namespace dlib
     {
         DLIB_CASSERT( eps > 0 &&
                       max_iter > 1 &&
-                      begin <= starting_point && starting_point <= end && 
+                      begin <= starting_point && starting_point <= end &&
                       initial_search_radius > 0,
                       "eps: " << eps
-                      << "\n max_iter: "<< max_iter 
-                      << "\n begin: "<< begin 
-                      << "\n end:   "<< end 
-                      << "\n starting_point: "<< starting_point 
-                      << "\n initial_search_radius: "<< initial_search_radius 
+                      << "\n max_iter: "<< max_iter
+                      << "\n begin: "<< begin
+                      << "\n end:   "<< end
+                      << "\n starting_point: "<< starting_point
+                      << "\n initial_search_radius: "<< initial_search_radius
         );
 
         double search_radius = initial_search_radius;
@@ -641,13 +641,13 @@ namespace dlib
             }
             if (p3-p1 < eps)
             {
-                if (f1 < min(f2,f3)) 
+                if (f1 < min(f2,f3))
                 {
                     starting_point = p1;
                     return f1;
                 }
 
-                if (f2 < min(f1,f3)) 
+                if (f2 < min(f1,f3))
                 {
                     starting_point = p2;
                     return f2;
@@ -680,7 +680,7 @@ namespace dlib
 
             // if f1 is small then take a step to the left
             if (f1 <= f3)
-            { 
+            {
                 // check if the minimum is butting up against the bounds and if so then pick
                 // a point between p1 and p2 in the hopes that shrinking the interval will
                 // be a good thing to do.  Or if p1 and p2 aren't differentiated then try and
@@ -710,7 +710,7 @@ namespace dlib
 
             }
             // otherwise f3 is small and we should take a step to the right
-            else 
+            else
             {
                 // check if the minimum is butting up against the bounds and if so then pick
                 // a point between p2 and p3 in the hopes that shrinking the interval will
@@ -757,7 +757,7 @@ namespace dlib
             if (p_min < p2)
             {
                 const double min_dist = (p2-p1)*tau;
-                if (abs(p1-p_min) < min_dist) 
+                if (abs(p1-p_min) < min_dist)
                 {
                     p_min = p1 + min_dist;
                 }
@@ -769,7 +769,7 @@ namespace dlib
             else
             {
                 const double min_dist = (p3-p2)*tau;
-                if (abs(p2-p_min) < min_dist) 
+                if (abs(p2-p_min) < min_dist)
                 {
                     p_min = p2 + min_dist;
                 }
@@ -846,7 +846,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename funct>
-    class negate_function_object 
+    class negate_function_object
     {
     public:
         negate_function_object(const funct& f_) : f(f_){}

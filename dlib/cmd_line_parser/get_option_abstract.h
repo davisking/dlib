@@ -10,8 +10,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class option_parse_error : public error 
-    { 
+    class option_parse_error : public error
+    {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is the exception thrown by the get_option() functions.  It is
@@ -23,7 +23,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename config_reader_type, 
+        typename config_reader_type,
         typename T
         >
     T get_option (
@@ -36,7 +36,7 @@ namespace dlib
             - T is a type which can be read from an input stream
             - config_reader_type == an implementation of config_reader/config_reader_kernel_abstract.h
         ensures
-            - option_name is used to index into the given config_reader.  
+            - option_name is used to index into the given config_reader.
             - if (cr contains an entry corresponding to option_name) then
                 - converts the string value in cr corresponding to option_name into
                   an object of type T and returns it.
@@ -67,11 +67,11 @@ namespace dlib
     /*!
         requires
             - parser.option_is_defined(option_name) == true
-            - parser.option(option_name).number_of_arguments() == 1   
+            - parser.option(option_name).number_of_arguments() == 1
             - T is a type which can be read from an input stream
             - command_line_parser_type == an implementation of cmd_line_parser/cmd_line_parser_kernel_abstract.h
         ensures
-            - if (parser.option(option_name)) then 
+            - if (parser.option(option_name)) then
                 - converts parser.option(option_name).argument() into an object
                   of type T and returns it.  That is, the string argument to this
                   command line option is converted into a T and returned.
@@ -86,8 +86,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename command_line_parser_type, 
-        typename config_reader_type, 
+        typename command_line_parser_type,
+        typename config_reader_type,
         typename T
         >
     T get_option (
@@ -99,12 +99,12 @@ namespace dlib
     /*!
         requires
             - parser.option_is_defined(option_name) == true
-            - parser.option(option_name).number_of_arguments() == 1   
+            - parser.option(option_name).number_of_arguments() == 1
             - T is a type which can be read from an input stream
             - command_line_parser_type == an implementation of cmd_line_parser/cmd_line_parser_kernel_abstract.h
             - config_reader_type == an implementation of config_reader/config_reader_kernel_abstract.h
         ensures
-            - if (parser.option(option_name)) then 
+            - if (parser.option(option_name)) then
                 - returns get_option(parser, option_name, default_value)
             - else
                 - returns get_option(cr, option_name, default_value)
@@ -113,8 +113,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename command_line_parser_type, 
-        typename config_reader_type, 
+        typename command_line_parser_type,
+        typename config_reader_type,
         typename T
         >
     T get_option (
@@ -126,12 +126,12 @@ namespace dlib
     /*!
         requires
             - parser.option_is_defined(option_name) == true
-            - parser.option(option_name).number_of_arguments() == 1   
+            - parser.option(option_name).number_of_arguments() == 1
             - T is a type which can be read from an input stream
             - command_line_parser_type == an implementation of cmd_line_parser/cmd_line_parser_kernel_abstract.h
             - config_reader_type == an implementation of config_reader/config_reader_kernel_abstract.h
         ensures
-            - if (parser.option(option_name)) then 
+            - if (parser.option(option_name)) then
                 - returns get_option(parser, option_name, default_value)
             - else
                 - returns get_option(cr, option_name, default_value)

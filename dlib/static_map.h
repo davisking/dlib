@@ -26,7 +26,7 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1a        
+        // kernel_1a
         typedef     static_map_kernel_1<domain,range,compare>
                     kernel_1a;
         typedef     static_map_kernel_c<kernel_1a>

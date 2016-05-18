@@ -15,11 +15,11 @@ namespace dlib
             extern "C"
             {
                 void DLIB_FORTRAN_ID(dsyev) (char *jobz, char *uplo, integer *n, double *a,
-                                             integer *lda, double *w, double *work, integer *lwork, 
+                                             integer *lda, double *w, double *work, integer *lwork,
                                              integer *info);
 
                 void DLIB_FORTRAN_ID(ssyev) (char *jobz, char *uplo, integer *n, float *a,
-                                             integer *lda, float *w, float *work, integer *lwork, 
+                                             integer *lda, float *w, float *work, integer *lwork,
                                              integer *info);
 
             }
@@ -118,8 +118,8 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <
-            typename T, 
-            long NR1, long NR2, 
+            typename T,
+            long NR1, long NR2,
             long NC1, long NC2,
             typename MM
             >
@@ -148,7 +148,7 @@ namespace dlib
             if (work.size() < work_size)
                 work.set_size(static_cast<long>(work_size), 1);
 
-            // compute the actual decomposition 
+            // compute the actual decomposition
             info = binding::syev(jobz, uplo, n, &a(0,0),
                                  a.nr(), &w(0,0), &work(0,0), work.size());
 
@@ -158,8 +158,8 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <
-            typename T, 
-            long NR1, long NR2, 
+            typename T,
+            long NR1, long NR2,
             long NC1, long NC2,
             typename MM
             >
@@ -193,7 +193,7 @@ namespace dlib
             if (work.size() < work_size)
                 work.set_size(static_cast<long>(work_size), 1);
 
-            // compute the actual decomposition 
+            // compute the actual decomposition
             info = binding::syev(jobz, uplo, n, &a(0,0),
                                  a.nc(), &w(0,0), &work(0,0), work.size());
 

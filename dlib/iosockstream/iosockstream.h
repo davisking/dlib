@@ -12,7 +12,7 @@
 
 #ifdef _MSC_VER
 // Disable the warning about inheriting from std::iostream 'via dominance' since this warning is a warning about
-// visual studio conforming to the standard and is ignorable.  
+// visual studio conforming to the standard and is ignorable.
 // See http://connect.microsoft.com/VisualStudio/feedback/details/733720/inheriting-from-std-fstream-produces-c4250-warning
 // for further details if interested.
 #pragma warning(disable : 4250)
@@ -21,7 +21,7 @@
 namespace dlib
 {
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     class iosockstream : public std::iostream
     {
@@ -33,21 +33,21 @@ namespace dlib
         {
         }
 
-        iosockstream( 
+        iosockstream(
             const network_address& addr
         ) :
             std::iostream(0)
-        { 
-            open(addr); 
+        {
+            open(addr);
         }
 
-        iosockstream( 
+        iosockstream(
             const network_address& addr,
-            unsigned long timeout 
+            unsigned long timeout
         ) :
             std::iostream(0)
-        { 
-            open(addr, timeout); 
+        {
+            open(addr, timeout);
         }
 
         ~iosockstream()
@@ -63,7 +63,7 @@ namespace dlib
             close();
             con.reset(connect(addr));
             buf.reset(new sockstreambuf(con.get()));
-            // Note that we use the sockstreambuf's ability to autoflush instead of 
+            // Note that we use the sockstreambuf's ability to autoflush instead of
             // telling the iostream::tie() function to tie the stream to itself even though
             // that should work fine.  The reason we do it this way is because there is a
             // bug in visual studio 2012 that causes a program to crash when a stream is
@@ -137,7 +137,7 @@ namespace dlib
         }
 
         void shutdown (
-        ) 
+        )
         {
             auto_mutex lock(class_mutex);
             if (con)
@@ -154,13 +154,13 @@ namespace dlib
         }
 
         scoped_ptr<timeout> con_timeout;
-        rmutex class_mutex; 
+        rmutex class_mutex;
         shared_ptr_thread_safe<connection> con;
         scoped_ptr<sockstreambuf> buf;
 
     };
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
 }
 

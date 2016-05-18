@@ -44,7 +44,7 @@ namespace dlib
         typename bit_stream_base
         >
     inline void swap (
-        bit_stream_kernel_c<bit_stream_base>& a, 
+        bit_stream_kernel_c<bit_stream_base>& a,
         bit_stream_kernel_c<bit_stream_base>& b
     ) { a.swap(b); }
 
@@ -57,15 +57,15 @@ namespace dlib
     template <
         typename bit_stream_base
         >
-    void bit_stream_kernel_c<bit_stream_base>:: 
+    void bit_stream_kernel_c<bit_stream_base>::
     set_input_stream (
         std::istream& is
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT(( this->is_in_write_mode() == false ) && ( this->is_in_read_mode() == false ), 
+        DLIB_CASSERT(( this->is_in_write_mode() == false ) && ( this->is_in_read_mode() == false ),
             "\tvoid bit_stream::set_intput_stream"
-            << "\n\tbit_stream must not be in write or read mode" 
+            << "\n\tbit_stream must not be in write or read mode"
             << "\n\tthis: " << this
             );
 
@@ -79,16 +79,16 @@ namespace dlib
     template <
         typename bit_stream_base
         >
-    void bit_stream_kernel_c<bit_stream_base>:: 
+    void bit_stream_kernel_c<bit_stream_base>::
     set_output_stream (
         std::ostream& os
     )
     {
 
         // make sure requires clause is not broken
-        DLIB_CASSERT(( this->is_in_write_mode() == false ) && ( this->is_in_read_mode() == false ), 
+        DLIB_CASSERT(( this->is_in_write_mode() == false ) && ( this->is_in_read_mode() == false ),
             "\tvoid bit_stream::set_output_stream"
-            << "\n\tbit_stream must not be in write or read mode" 
+            << "\n\tbit_stream must not be in write or read mode"
             << "\n\tthis: " << this
             );
 
@@ -101,15 +101,15 @@ namespace dlib
     template <
         typename bit_stream_base
         >
-    void bit_stream_kernel_c<bit_stream_base>:: 
+    void bit_stream_kernel_c<bit_stream_base>::
     close (
     )
     {
 
         // make sure requires clause is not broken
-        DLIB_CASSERT(( this->is_in_write_mode() == true ) || ( this->is_in_read_mode() == true ), 
+        DLIB_CASSERT(( this->is_in_write_mode() == true ) || ( this->is_in_read_mode() == true ),
             "\tvoid bit_stream::close"
-            << "\n\tyou can't close a bit_stream that isn't open" 
+            << "\n\tyou can't close a bit_stream that isn't open"
             << "\n\tthis: " << this
             );
 
@@ -122,15 +122,15 @@ namespace dlib
     template <
         typename bit_stream_base
         >
-    void bit_stream_kernel_c<bit_stream_base>:: 
+    void bit_stream_kernel_c<bit_stream_base>::
     write (
         int bit
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT(( this->is_in_write_mode() == true ) && ( bit == 0 || bit == 1 ), 
+        DLIB_CASSERT(( this->is_in_write_mode() == true ) && ( bit == 0 || bit == 1 ),
             "\tvoid bit_stream::write"
-            << "\n\tthe bit stream bust be in write mode and bit must be either 1 or 0" 
+            << "\n\tthe bit stream bust be in write mode and bit must be either 1 or 0"
             << "\n\tis_in_write_mode() == " << this->is_in_write_mode()
             << "\n\tbit == " << bit
             << "\n\tthis: " << this
@@ -146,16 +146,16 @@ namespace dlib
     template <
         typename bit_stream_base
         >
-    bool bit_stream_kernel_c<bit_stream_base>:: 
+    bool bit_stream_kernel_c<bit_stream_base>::
     read (
         int& bit
     )
     {
 
         // make sure requires clause is not broken
-        DLIB_CASSERT(( this->is_in_read_mode() == true ), 
+        DLIB_CASSERT(( this->is_in_read_mode() == true ),
             "\tbool bit_stream::read"
-            << "\n\tyou can't read from a bit_stream that isn't in read mode" 
+            << "\n\tyou can't read from a bit_stream that isn't in read mode"
             << "\n\tthis: " << this
             );
 

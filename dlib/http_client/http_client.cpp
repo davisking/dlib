@@ -96,7 +96,7 @@ namespace dlib
 
     http_client::
     http_client(
-    ) : 
+    ) :
         http_return(0),
         timeout(DEFAULT_TIMEOUT),
         OnDownload(0)

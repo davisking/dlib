@@ -28,14 +28,14 @@ namespace dlib
         {
             Q = i1;
         }
-        else 
+        else
         {
             if(cnt < maxint)
             {
                 cnt = cnt + 1;
 
-                Q = impl_adapt_simp_stop(f,a,m,fa,fml,fm,is,cnt) 
-                    + impl_adapt_simp_stop(f,m,b,fm,fmr,fb,is,cnt); 
+                Q = impl_adapt_simp_stop(f,a,m,fa,fml,fm,is,cnt)
+                    + impl_adapt_simp_stop(f,m,b,fm,fmr,fb,is,cnt);
             }
         }
 
@@ -58,7 +58,7 @@ namespace dlib
             << "\n\t Invalid arguments were given to this function."
             << "\n\t a:   " << a
             << "\n\t b:   " << b
-            << "\n\t tol: " << tol 
+            << "\n\t tol: " << tol
             );
 
         T eps = std::numeric_limits<T>::epsilon();

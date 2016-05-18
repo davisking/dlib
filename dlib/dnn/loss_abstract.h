@@ -16,7 +16,7 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 A loss layer is the final layer in a deep neural network.  It computes the
                 task loss.  That is, it computes a number that tells us how well the
-                network is performing on some task, such as predicting a binary label.  
+                network is performing on some task, such as predicting a binary label.
 
                 You can use one of the loss layers that comes with dlib (defined below).
                 But importantly, you are able to define your own loss layers to suit your
@@ -93,7 +93,7 @@ namespace dlib
             >
         double compute_loss_value_and_gradient (
             const tensor& input_tensor,
-            const_label_iterator truth, 
+            const_label_iterator truth,
             SUBNET& sub
         ) const;
         /*!
@@ -116,11 +116,11 @@ namespace dlib
             ensures
                 - This function computes a loss function that describes how well the output
                   of sub matches the expected labels given by truth.  Let's write the loss
-                  function as L(input_tensor, truth, sub).  
+                  function as L(input_tensor, truth, sub).
                 - Then compute_loss_value_and_gradient() computes the gradient of L() with
-                  respect to the outputs in sub.  Specifically, compute_loss_value_and_gradient() 
+                  respect to the outputs in sub.  Specifically, compute_loss_value_and_gradient()
                   assigns the gradients into sub by performing the following tensor
-                  assignments, for all valid i: 
+                  assignments, for all valid i:
                     - layer<i>(sub).get_gradient_input() = the gradient of
                       L(input_tensor,truth,sub) with respect to layer<i>(sub).get_output().
                 - returns L(input_tensor,truth,sub)
@@ -135,7 +135,7 @@ namespace dlib
     void serialize(const EXAMPLE_LOSS_LAYER_& item, std::ostream& out);
     void deserialize(EXAMPLE_LOSS_LAYER_& item, std::istream& in);
     /*!
-        provides serialization support  
+        provides serialization support
     !*/
 
     // For each loss layer you define, always define an add_loss_layer template so that
@@ -149,7 +149,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class loss_binary_hinge_ 
+    class loss_binary_hinge_
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -176,7 +176,7 @@ namespace dlib
         ) const;
         /*!
             This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
-            it has the additional calling requirements that: 
+            it has the additional calling requirements that:
                 - sub.get_output().nr() == 1
                 - sub.get_output().nc() == 1
                 - sub.get_output().k() == 1
@@ -192,12 +192,12 @@ namespace dlib
             >
         double compute_loss_value_and_gradient (
             const tensor& input_tensor,
-            const_label_iterator truth, 
+            const_label_iterator truth,
             SUBNET& sub
         ) const;
         /*!
-            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient() 
-            except it has the additional calling requirements that: 
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient()
+            except it has the additional calling requirements that:
                 - sub.get_output().nr() == 1
                 - sub.get_output().nc() == 1
                 - sub.get_output().k() == 1
@@ -212,7 +212,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class loss_binary_log_ 
+    class loss_binary_log_
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -223,8 +223,8 @@ namespace dlib
                 network to produce outputs > 0 when predicting a member of the +1 class and
                 values < 0 otherwise.
 
-                To be more specific, this object contains a sigmoid layer followed by a 
-                cross-entropy layer.  
+                To be more specific, this object contains a sigmoid layer followed by a
+                cross-entropy layer.
         !*/
     public:
 
@@ -242,7 +242,7 @@ namespace dlib
         ) const;
         /*!
             This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
-            it has the additional calling requirements that: 
+            it has the additional calling requirements that:
                 - sub.get_output().nr() == 1
                 - sub.get_output().nc() == 1
                 - sub.get_output().k() == 1
@@ -258,12 +258,12 @@ namespace dlib
             >
         double compute_loss_value_and_gradient (
             const tensor& input_tensor,
-            const_label_iterator truth, 
+            const_label_iterator truth,
             SUBNET& sub
         ) const;
         /*!
-            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient() 
-            except it has the additional calling requirements that: 
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient()
+            except it has the additional calling requirements that:
                 - sub.get_output().nr() == 1
                 - sub.get_output().nc() == 1
                 - sub.get_output().k() == 1
@@ -278,7 +278,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class loss_multiclass_log_ 
+    class loss_multiclass_log_
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -286,7 +286,7 @@ namespace dlib
                 EXAMPLE_LOSS_LAYER_.  In particular, it implements the multiclass logistic
                 regression loss (e.g. negative log-likelihood loss), which is appropriate
                 for multiclass classification problems.  This means that the possible
-                labels when using this loss are integers >= 0.  
+                labels when using this loss are integers >= 0.
                 
                 Moreover, if after training you were to replace the loss layer of the
                 network with a softmax layer, the network outputs would give the
@@ -313,7 +313,7 @@ namespace dlib
         ) const;
         /*!
             This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
-            it has the additional calling requirements that: 
+            it has the additional calling requirements that:
                 - sub.get_output().nr() == 1
                 - sub.get_output().nc() == 1
                 - sub.get_output().num_samples() == input_tensor.num_samples()
@@ -327,12 +327,12 @@ namespace dlib
             >
         double compute_loss_value_and_gradient (
             const tensor& input_tensor,
-            const_label_iterator truth, 
+            const_label_iterator truth,
             SUBNET& sub
         ) const;
         /*!
-            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient() 
-            except it has the additional calling requirements that: 
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient()
+            except it has the additional calling requirements that:
                 - sub.get_output().nr() == 1
                 - sub.get_output().nc() == 1
                 - sub.get_output().num_samples() == input_tensor.num_samples()

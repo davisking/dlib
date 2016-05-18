@@ -5,7 +5,7 @@
 
 #include <cmath>
 #include "algs.h"
-#include <limits> 
+#include <limits>
 
 namespace dlib
 {
@@ -29,7 +29,7 @@ namespace dlib
 
                 In more detail, this object represents a floating point value equal to
                 mantissa*pow(2,exponent), except when exponent takes on any of the
-                following special values: 
+                following special values:
                     - is_inf
                     - is_ninf
                     - is_nan
@@ -60,7 +60,7 @@ namespace dlib
         float_details ( const long double& val) { *this = val; }
         /*!
             ensures
-                - converts the given value into a float_details representation.  This 
+                - converts the given value into a float_details representation.  This
                   means that converting #*this back into a floating point number should
                   recover the input val.
         !*/
@@ -70,7 +70,7 @@ namespace dlib
         float_details& operator= ( const long double& val) { convert_from_T(val); return *this; }
         /*!
             ensures
-                - converts the given value into a float_details representation.  This 
+                - converts the given value into a float_details representation.  This
                   means that converting #*this back into a floating point number should
                   recover the input val.
         !*/
@@ -96,7 +96,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-//                                  IMPLEMENTATION DETAILS 
+//                                  IMPLEMENTATION DETAILS
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -123,7 +123,7 @@ namespace dlib
                 mantissa = static_cast<int64>(std::frexp(val, &exp)*(((uint64)1)<<digits));
                 exponent = exp - digits;
 
-                // Compact the representation a bit by shifting off any low order bytes 
+                // Compact the representation a bit by shifting off any low order bytes
                 // which are zero in the mantissa.  This makes the numbers in mantissa and
                 // exponent generally smaller which can make serialization and other things
                 // more efficient in some cases.

@@ -15,7 +15,7 @@
 #include "tester.h"
 #include "binary_search_tree.h"
 
-namespace  
+namespace
 {
 
     class binary_search_tree_tester : public tester
@@ -49,13 +49,13 @@ namespace
         )
         {
             dlog << LINFO << "testing kernel_1a /w memory_manager_global";
-            binary_search_tree_kernel_test<binary_search_tree<int,int, 
+            binary_search_tree_kernel_test<binary_search_tree<int,int,
             memory_manager_global<char,factory>::kernel_1a>::kernel_1a>();
             print_spinner();
 
 
             dlog << LINFO << "testing kernel_1a /w memory_manager_stateless";
-            binary_search_tree_kernel_test<binary_search_tree<int,int, 
+            binary_search_tree_kernel_test<binary_search_tree<int,int,
             memory_manager_stateless<char>::kernel_1a>::kernel_1a>();
             print_spinner();
         }

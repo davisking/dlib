@@ -8,7 +8,7 @@
 #include <dlib/threads.h>
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace std;
@@ -183,7 +183,7 @@ namespace
             DLIB_TEST(is_running() == false);
         }
 
-        ~test4_c2() 
+        ~test4_c2()
         {
             try
             {
@@ -263,9 +263,9 @@ namespace
     )
     /*!
         ensures
-            - runs tests on dlib::multithreaded_object for compliance with the specs 
+            - runs tests on dlib::multithreaded_object for compliance with the specs
     !*/
-    {        
+    {
 
         count = 0;
 

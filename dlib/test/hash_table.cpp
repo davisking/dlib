@@ -10,7 +10,7 @@
 #include <dlib/hash_table.h>
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -26,12 +26,12 @@ namespace
     )
     /*!
         requires
-            - hash_table is an implementation of hash_table/hash_table_kernel_abstract.h 
+            - hash_table is an implementation of hash_table/hash_table_kernel_abstract.h
               and is instantiated to map ints to ints
         ensures
-            - runs tests on hash_table for compliance with the specs 
+            - runs tests on hash_table for compliance with the specs
     !*/
-    {        
+    {
 
         srand(static_cast<unsigned int>(time(0)));
 
@@ -75,7 +75,7 @@ namespace
 
                 test.swap(test2);
 
-                a = 99; 
+                a = 99;
                 b = 35;
                 test2.add(a,b);
                 DLIB_TEST(test2.size() == 2);
@@ -95,7 +95,7 @@ namespace
 
                 test2.destroy(99);
                 DLIB_TEST(test2.size() == 0);
-                DLIB_TEST(test2[4] == 0);                
+                DLIB_TEST(test2[4] == 0);
                 DLIB_TEST(test2[99] == 0);
                 DLIB_TEST(test2[949] == 0);
 
@@ -166,7 +166,7 @@ namespace
                 DLIB_TEST(test.at_start() == false);
                 DLIB_TEST(test.current_element_valid() == true);
                 DLIB_TEST(test.move_next() == true);
-                DLIB_TEST(test.move_next() == true);            
+                DLIB_TEST(test.move_next() == true);
                 DLIB_TEST(test.current_element_valid() == true);
 
 
@@ -187,7 +187,7 @@ namespace
                     {
                         ++count;
                         *tmp = test.element().key();
-                        DLIB_TEST(test[*tmp] != 0);                    
+                        DLIB_TEST(test[*tmp] != 0);
                         DLIB_TEST(*tmp == test.element().key());
                         DLIB_TEST(*tmp == test.element().value());
                         DLIB_TEST(*tmp == test.element().key());
@@ -393,7 +393,7 @@ namespace
 
                     test.swap(test2);
 
-                    a = 99; 
+                    a = 99;
                     b = 35;
                     test2.add(a,b);
                     DLIB_TEST(test2.size() == 2);
@@ -413,7 +413,7 @@ namespace
 
                     test2.destroy(99);
                     DLIB_TEST(test2.size() == 0);
-                    DLIB_TEST(test2[4] == 0);                
+                    DLIB_TEST(test2[4] == 0);
                     DLIB_TEST(test2[99] == 0);
                     DLIB_TEST(test2[949] == 0);
 
@@ -484,7 +484,7 @@ namespace
                     DLIB_TEST(test.at_start() == false);
                     DLIB_TEST(test.current_element_valid() == true);
                     DLIB_TEST(test.move_next() == true);
-                    DLIB_TEST(test.move_next() == true);            
+                    DLIB_TEST(test.move_next() == true);
                     DLIB_TEST(test.current_element_valid() == true);
 
 
@@ -505,7 +505,7 @@ namespace
                         {
                             ++count;
                             *tmp = test.element().key();
-                            DLIB_TEST(test[*tmp] != 0);                    
+                            DLIB_TEST(test[*tmp] != 0);
                             DLIB_TEST(*tmp == test.element().key());
                             DLIB_TEST(*tmp == test.element().value());
                             DLIB_TEST(*tmp == test.element().key());

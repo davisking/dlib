@@ -20,7 +20,7 @@ namespace dlib
     public:
 
         tensor (
-        ) : 
+        ) :
             m_n(0), m_k(0), m_nr(0), m_nc(0), m_size(0)
         {
         }
@@ -46,7 +46,7 @@ namespace dlib
         }
 
         virtual const float* host() const = 0;
-        virtual float*       host() = 0; 
+        virtual float*       host() = 0;
         virtual float*       host_write_only() = 0;
         virtual const float* device() const = 0;
         virtual float*       device() = 0;
@@ -157,11 +157,11 @@ namespace dlib
 
 #ifdef DLIB_USE_CUDA
         virtual const cuda::tensor_descriptor& get_cudnn_tensor_descriptor (
-        ) const = 0; 
+        ) const = 0;
 #endif
 
         friend void memcpy (
-            tensor& dest, 
+            tensor& dest,
             const tensor& src
         )
         {
@@ -192,13 +192,13 @@ namespace dlib
         long nc
     )
     {
-        DLIB_ASSERT(nr > 0 && nc > 0 , 
+        DLIB_ASSERT(nr > 0 && nc > 0 ,
                     "\tconst matrix_exp mat(tensor, nr, nc)"
                     << "\n\t nr and nc must be bigger than 0"
                     << "\n\t nr: " << nr
                     << "\n\t nc: " << nc
         );
-        DLIB_ASSERT(nr*nc == (long)t.size() , 
+        DLIB_ASSERT(nr*nc == (long)t.size() ,
                     "\tconst matrix_exp mat(tensor, nr, nc)"
                     << "\n\t The sizes don't match up."
                     << "\n\t nr*nc:    " << nr*nc
@@ -212,7 +212,7 @@ namespace dlib
         const tensor& t
     )
     {
-        DLIB_ASSERT(t.size() != 0, 
+        DLIB_ASSERT(t.size() != 0,
                     "\tconst matrix_exp mat(tensor)"
                     << "\n\t The tensor can't be empty."
         );
@@ -228,20 +228,20 @@ namespace dlib
     {
         DLIB_ASSERT(0 <= sample && sample < t.num_samples() &&
                     0 <= k && k < t.k() &&
-                    t.size() != 0, 
+                    t.size() != 0,
                     "\tconst matrix_exp image_plane(tensor,sample,k)"
                     << "\n\t Invalid arguments were given to this function."
                     << "\n\t sample: " << sample
-                    << "\n\t k:      " << k 
-                    << "\n\t t.num_samples(): " << t.num_samples() 
-                    << "\n\t t.k():           " << t.k() 
-                    << "\n\t t.size():        " << t.size() 
+                    << "\n\t k:      " << k
+                    << "\n\t t.num_samples(): " << t.num_samples()
+                    << "\n\t t.k():           " << t.k()
+                    << "\n\t t.size():        " << t.size()
         );
 
 
         typedef op_pointer_to_mat<float> op;
-        return matrix_op<op>(op(t.host() + ((sample*t.k() + k)*t.nr())*t.nc(), 
-                                t.nr(), 
+        return matrix_op<op>(op(t.host() + ((sample*t.k() + k)*t.nr())*t.nc(),
+                                t.nr(),
                                 t.nc()));
     }
 
@@ -269,20 +269,20 @@ namespace dlib
 
         explicit resizable_tensor(
             long n_, long k_ = 1, long nr_ = 1, long nc_ = 1
-        ) 
+        )
         {
             DLIB_ASSERT( n_ >= 0 && k_ >= 0 && nr_ >= 0 && nc_ >= 0,"");
 
             set_size(n_,k_,nr_,nc_);
         }
 
-        resizable_tensor(const resizable_tensor& item) 
+        resizable_tensor(const resizable_tensor& item)
         {
             // TODO, do the copy with cuda?
             copy_size(item);
             std::memcpy(data_instance.host(), item.host(), data_instance.size()*sizeof(float));
         }
-        resizable_tensor(const tensor& item) 
+        resizable_tensor(const tensor& item)
         {
             // TODO, do the copy with cuda?
             copy_size(item);
@@ -344,14 +344,14 @@ namespace dlib
         }
 
 
-        resizable_tensor& operator= (const resizable_tensor& item) 
+        resizable_tensor& operator= (const resizable_tensor& item)
         {
             resizable_tensor temp(item);
             temp.swap(*this);
             return *this;
         }
 
-        resizable_tensor& operator= (const tensor& item) 
+        resizable_tensor& operator= (const tensor& item)
         {
             resizable_tensor temp(item);
             temp.swap(*this);
@@ -381,7 +381,7 @@ namespace dlib
 
 #ifdef DLIB_USE_CUDA
         cuda::tensor_descriptor cudnn_descriptor;
-#endif 
+#endif
 
         gpu_data data_instance;
         virtual gpu_data& data() { return data_instance; }
@@ -492,7 +492,7 @@ namespace dlib
 #endif
     private:
 
-        virtual size_t get_alias_offset() const { return data_offset; } 
+        virtual size_t get_alias_offset() const { return data_offset; }
 
 #ifdef DLIB_USE_CUDA
         std::shared_ptr<cuda::tensor_descriptor> cudnn_descriptor;
@@ -503,7 +503,7 @@ namespace dlib
         virtual const gpu_data& data() const { return *data_instance; }
     };
 
-    class alias_tensor 
+    class alias_tensor
     {
     public:
 
@@ -512,7 +512,7 @@ namespace dlib
 
         alias_tensor (
             long n_, long k_ = 1, long nr_ = 1, long nc_ = 1
-        ) 
+        )
         {
             DLIB_ASSERT( n_ >= 0 && k_ >= 0 && nr_ >= 0 && nc_ >= 0,"");
 
@@ -541,7 +541,7 @@ namespace dlib
         alias_tensor_instance operator() (
             tensor& t,
             size_t offset
-        ) 
+        )
         {
             DLIB_CASSERT(offset+size() <= t.size(),"");
 

@@ -17,7 +17,7 @@ namespace dlib
         template <
             typename graph_type
             >
-        class general_potts_problem 
+        class general_potts_problem
         {
 
             const graph_type& g;
@@ -40,7 +40,7 @@ namespace dlib
 
             unsigned long get_neighbor (
                 unsigned long idx,
-                unsigned long n 
+                unsigned long n
             ) const { return g.node(idx).neighbor(n).index(); }
 
             unsigned long get_neighbor_idx (
@@ -80,7 +80,7 @@ namespace dlib
             }
 
             value_type factor_value_disagreement (
-                unsigned long idx1, 
+                unsigned long idx1,
                 unsigned long idx2
             ) const
             {

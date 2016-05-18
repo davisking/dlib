@@ -14,20 +14,20 @@ namespace dlib
         {
             extern "C"
             {
-                void DLIB_FORTRAN_ID(dormqr) (char *side, char *trans, integer *m, integer *n, 
-                                              integer *k, const double *a, integer *lda, const double *tau, 
-                                              double * c_, integer *ldc, double *work, integer *lwork, 
+                void DLIB_FORTRAN_ID(dormqr) (char *side, char *trans, integer *m, integer *n,
+                                              integer *k, const double *a, integer *lda, const double *tau,
+                                              double * c_, integer *ldc, double *work, integer *lwork,
                                               integer *info);
 
-                void DLIB_FORTRAN_ID(sormqr) (char *side, char *trans, integer *m, integer *n, 
-                                              integer *k, const float *a, integer *lda, const float *tau, 
-                                              float * c_, integer *ldc, float *work, integer *lwork, 
+                void DLIB_FORTRAN_ID(sormqr) (char *side, char *trans, integer *m, integer *n,
+                                              integer *k, const float *a, integer *lda, const float *tau,
+                                              float * c_, integer *ldc, float *work, integer *lwork,
                                               integer *info);
 
             }
 
-            inline int ormqr (char side, char trans, integer m, integer n, 
-                              integer k, const double *a, integer lda, const double *tau, 
+            inline int ormqr (char side, char trans, integer m, integer n,
+                              integer k, const double *a, integer lda, const double *tau,
                               double *c_, integer ldc, double *work, integer lwork)
             {
                 integer info = 0;
@@ -37,8 +37,8 @@ namespace dlib
                 return info;
             }
 
-            inline int ormqr (char side, char trans, integer m, integer n, 
-                              integer k, const float *a, integer lda, const float *tau, 
+            inline int ormqr (char side, char trans, integer m, integer n,
+                              integer k, const float *a, integer lda, const float *tau,
                               float *c_, integer ldc, float *work, integer lwork)
             {
                 integer info = 0;
@@ -148,18 +148,18 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <
-            typename T, 
+            typename T,
             long NR1, long NR2, long NR3,
             long NC1, long NC2, long NC3,
             typename MM,
             typename C_LAYOUT
             >
         int ormqr (
-            char side, 
+            char side,
             char trans,
             const matrix<T,NR1,NC1,MM,column_major_layout>& a,
             const matrix<T,NR2,NC2,MM,column_major_layout>& tau,
-            matrix<T,NR3,NC3,MM,C_LAYOUT>& c 
+            matrix<T,NR3,NC3,MM,C_LAYOUT>& c
         )
         {
             long m = c.nr();
@@ -172,7 +172,7 @@ namespace dlib
             }
             else
             {
-                // Since lapack expects c to be in column major layout we have to 
+                // Since lapack expects c to be in column major layout we have to
                 // do something to make this work.  Since a row major layout matrix
                 // will look just like a transposed C we can just swap a few things around.
 
@@ -194,7 +194,7 @@ namespace dlib
 
             // figure out how big the workspace needs to be.
             T work_size = 1;
-            int info = binding::ormqr(side, trans, m, n, 
+            int info = binding::ormqr(side, trans, m, n,
                                       k, &a(0,0), a.nr(), &tau(0,0),
                                       &c(0,0), ldc, &work_size, -1);
 
@@ -204,8 +204,8 @@ namespace dlib
             if (work.size() < work_size)
                 work.set_size(static_cast<long>(work_size), 1);
 
-            // compute the actual result 
-            info = binding::ormqr(side, trans, m, n, 
+            // compute the actual result
+            info = binding::ormqr(side, trans, m, n,
                                   k, &a(0,0), a.nr(), &tau(0,0),
                                   &c(0,0), ldc, &work(0,0), work.size());
 

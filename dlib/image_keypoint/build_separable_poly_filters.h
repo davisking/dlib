@@ -21,7 +21,7 @@ namespace dlib
     inline std::vector<std::vector<separable_filter_type> > build_separable_poly_filters (
         const long order,
         const long window_size
-    ) 
+    )
     /*!
         requires
             - 1 <= order <= 6
@@ -140,7 +140,7 @@ namespace dlib
         const long order,
         const long window_size,
         const double max_range = 300.0
-    ) 
+    )
     /*!
         requires
             - 1 <= order <= 6

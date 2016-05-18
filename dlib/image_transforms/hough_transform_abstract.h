@@ -31,12 +31,12 @@ namespace dlib
 
         explicit hough_transform (
             unsigned long size_
-        ); 
+        );
         /*!
             requires
                 - size_ > 0
             ensures
-                - This object will compute Hough transforms that are size_ by size_ pixels.  
+                - This object will compute Hough transforms that are size_ by size_ pixels.
                   This is in terms of both the Hough accumulator array size as well as the
                   input image size.
                 - #size() == size_
@@ -74,7 +74,7 @@ namespace dlib
                   (i.e. p must be a point inside the Hough accumulator array)
             ensures
                 - returns the line segment in the original image space corresponding
-                  to Hough transform point p. 
+                  to Hough transform point p.
                 - The returned points are inside rectangle(0,0,size()-1,size()-1).
         !*/
 
@@ -97,7 +97,7 @@ namespace dlib
                   original image space.  Given this, it finds the maximum scoring line that
                   passes though p.  That is, it checks all the Hough accumulator bins in
                   himg corresponding to lines though p and returns the location with the
-                  largest score.  
+                  largest score.
                 - returns a point X such that get_rect(himg).contains(X) == true
         !*/
 

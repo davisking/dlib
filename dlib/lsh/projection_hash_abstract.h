@@ -14,8 +14,8 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is a tool for hashing elements of a vector space into the integers.  
-                It is intended to represent locality sensitive hashing functions such as 
+                This is a tool for hashing elements of a vector space into the integers.
+                It is intended to represent locality sensitive hashing functions such as
                 the popular random projection hashing method.
                 
                 In particular, it represents hash functions of the form:
@@ -24,7 +24,7 @@ namespace dlib
                     hash bit 2 = sign(rowm(P*v + O,2))
                     ...
                 Where v is the vector to be hashed.  The parameters of the projection
-                hash are the P and O matrices.  
+                hash are the P and O matrices.
 
             THREAD SAFETY
                 The const members of this object can be called concurrently from multiple
@@ -45,7 +45,7 @@ namespace dlib
         projection_hash(
             const matrix_exp<EXP1>& proj,
             const matrix_exp<EXP2>& offset
-        ); 
+        );
         /*!
             requires
                 - proj.nr() == offset.nr()
@@ -63,7 +63,7 @@ namespace dlib
         !*/
 
         const matrix<double,0,1>& get_offset_matrix (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the O matrix discussed above in the WHAT THIS OBJECT REPRESENTS
@@ -100,15 +100,15 @@ namespace dlib
         std::ostream& out
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     void deserialize (
         projection_hash& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

@@ -14,7 +14,7 @@ namespace dlib
     template <
         typename sliding_buffer
         >
-    class lz77_buffer_kernel_2 
+    class lz77_buffer_kernel_2
     {
         /*!
             REQUIREMENTS ON sliding_buffer
@@ -36,7 +36,7 @@ namespace dlib
                 next_free_node == 0
 
 
-            CONVENTION           
+            CONVENTION
                 history_limit == get_history_buffer_limit()
                 lookahead_limit == get_lookahead_buffer_limit()
                 history_size == get_history_buffer_size()
@@ -61,7 +61,7 @@ namespace dlib
                 When adding a node to hash_table:
                     if (if all nodes aren't already in the hash_table) then
                     {
-                        the next node to use is nodes[next_free_node].                
+                        the next node to use is nodes[next_free_node].
                     }
                     else
                     {
@@ -82,7 +82,7 @@ namespace dlib
 
         lz77_buffer_kernel_2 (
             unsigned long total_limit_,
-            unsigned long lookahead_limit_  
+            unsigned long lookahead_limit_
         );
 
         virtual ~lz77_buffer_kernel_2 (
@@ -167,12 +167,12 @@ namespace dlib
                 - for all i where 0 <= i < #history_size-N:
                   #history_buffer(N+i) == history_buffer(i)
                 - for all i where 0 <= i < #lookahead_size
-                  #lookahead_buffer(i) == lookahead_buffer(N+i)                
+                  #lookahead_buffer(i) == lookahead_buffer(N+i)
         !*/
 
 
 
-        // member data        
+        // member data
         sliding_buffer buffer;
         unsigned long lookahead_limit;
         unsigned long history_limit;
@@ -196,7 +196,7 @@ namespace dlib
         // restricted functions
         lz77_buffer_kernel_2(lz77_buffer_kernel_2<sliding_buffer>&);        // copy constructor
         lz77_buffer_kernel_2<sliding_buffer>& operator=(lz77_buffer_kernel_2<sliding_buffer>&);    // assignment operator
-    };   
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -210,9 +210,9 @@ namespace dlib
     lz77_buffer_kernel_2<sliding_buffer>::
     lz77_buffer_kernel_2 (
         unsigned long total_limit_,
-        unsigned long lookahead_limit_  
-    ) :        
-        lookahead_size(0),       
+        unsigned long lookahead_limit_
+    ) :
+        lookahead_size(0),
         history_size(0)
     {
         buffer.set_size(total_limit_);
@@ -251,7 +251,7 @@ namespace dlib
         >
     lz77_buffer_kernel_2<sliding_buffer>::
     ~lz77_buffer_kernel_2 (
-    )      
+    )
     {
         delete [] nodes;
         delete [] hash_table;
@@ -284,19 +284,19 @@ namespace dlib
       
     template <
         typename sliding_buffer
-        >      
+        >
     void lz77_buffer_kernel_2<sliding_buffer>::
     shift_buffer (
         unsigned long N
-    )        
+    )
     {
         unsigned long old_history_size = history_size;
-        unsigned long temp = history_size+N;    
+        unsigned long temp = history_size+N;
         unsigned long new_nodes; // the number of nodes to pull from the nodes array
         unsigned long recycled_nodes; // the number of nodes to pull from hash_table
         lookahead_size -= N;
         if (temp <= history_limit)
-        {               
+        {
             if (history_size <= 3)
             {
                 if ((3-history_size) >= N)
@@ -318,7 +318,7 @@ namespace dlib
             {
                 new_nodes = history_limit - history_size;
                 recycled_nodes = temp - history_limit;
-                history_size = history_limit;                
+                history_size = history_limit;
             }
             else
             {
@@ -329,10 +329,10 @@ namespace dlib
 
         unsigned long i = lookahead_limit + 2;
     
-        // if there are any "new" nodes to add to the hash table 
+        // if there are any "new" nodes to add to the hash table
         if (new_nodes != 0)
         {
-            unsigned long stop = i - new_nodes;             
+            unsigned long stop = i - new_nodes;
             for (; i > stop; --i)
             {
                 nodes[next_free_node].next = 0;
@@ -346,23 +346,23 @@ namespace dlib
                 nodes[next_free_node].next = hash_table[new_hash];
                 hash_table[new_hash] = &nodes[next_free_node];
 
-                ++next_free_node;                
+                ++next_free_node;
             }
         } // if (new_nodes != 0)
 
 
     
-        unsigned long stop = i - recycled_nodes;     
+        unsigned long stop = i - recycled_nodes;
         unsigned long old = old_history_size-1+lookahead_limit;
         for (; i > stop; --i)
-        {            
+        {
             // find the next node to recycle in hash_table
             node* recycled_node;
             
             
             unsigned long old_id = buffer.get_element_id(old);
             
-            // find the node with id old_id  
+            // find the node with id old_id
             if (id_table[old_id] == 0)
             {
                 unsigned long old_hash = hash(buffer[old],buffer[old-1],buffer[old-2],buffer[old-3]);
@@ -392,7 +392,7 @@ namespace dlib
 
             unsigned long new_hash = hash(buffer[i],buffer[i-1],buffer[i-2],buffer[i-3]);
 
-            if (hash_table[new_hash] != 0) 
+            if (hash_table[new_hash] != 0)
                 id_table[hash_table[new_hash]->id] = recycled_node;
 
             recycled_node->next = hash_table[new_hash];
@@ -418,7 +418,7 @@ namespace dlib
     {
         if (lookahead_size == lookahead_limit)
         {
-            shift_buffer(1);            
+            shift_buffer(1);
         }
         buffer[lookahead_limit-1-lookahead_size] = symbol;
         ++lookahead_size;
@@ -450,11 +450,11 @@ namespace dlib
  
         node* temp = hash_table[hash_value];
         while (temp != 0)
-        {             
+        {
             // current position in the history buffer
-            unsigned long hpos = buffer.get_element_index(temp->id)-lookahead_limit;  
+            unsigned long hpos = buffer.get_element_index(temp->id)-lookahead_limit;
             // current position in the lookahead buffer
-            unsigned long lpos = 0;             
+            unsigned long lpos = 0;
 
             // find length of this match
             while (history_buffer(hpos) == lookahead_buffer(lpos))
@@ -464,7 +464,7 @@ namespace dlib
                     break;
                 --hpos;
                 if (lpos == lookahead_size)
-                    break;                    
+                    break;
             }
 
             if (lpos > match_length)

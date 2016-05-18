@@ -12,11 +12,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class ordered_sample_pair 
+    class ordered_sample_pair
     {
     public:
         ordered_sample_pair(
-        ) : 
+        ) :
             _index1(0),
             _index2(0)
         {
@@ -64,7 +64,7 @@ namespace dlib
     inline bool operator == (
         const ordered_sample_pair& a,
         const ordered_sample_pair& b
-    ) 
+    )
     {
         return a.index1() == b.index1() && a.index2() == b.index2();
     }
@@ -72,9 +72,9 @@ namespace dlib
     inline bool operator != (
         const ordered_sample_pair& a,
         const ordered_sample_pair& b
-    ) 
+    )
     {
-        return !(a == b); 
+        return !(a == b);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -91,14 +91,14 @@ namespace dlib
             serialize(item.distance(),out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type ordered_sample_pair"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type ordered_sample_pair");
         }
     }
 
     inline void deserialize (
         ordered_sample_pair& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         try
@@ -112,8 +112,8 @@ namespace dlib
             item = ordered_sample_pair(idx1, idx2, dist);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while deserializing object of type ordered_sample_pair"); 
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type ordered_sample_pair");
         }
     }
 

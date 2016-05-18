@@ -27,9 +27,9 @@ namespace dlib
     {
     public:
         log_level(
-            int priority_, 
+            int priority_,
             const char* name_
-        ) : 
+        ) :
             priority(priority_)
         {
             strncpy(name,name_,19);
@@ -71,8 +71,8 @@ namespace dlib
     );
 
     typedef void (*print_header_type)(
-        std::ostream& out, 
-        const std::string& logger_name, 
+        std::ostream& out,
+        const std::string& logger_name,
         const log_level& l,
         const uint64 thread_id
     );
@@ -95,7 +95,7 @@ namespace dlib
         >
     void set_all_logging_output_hooks (
         T& object,
-        void (T::*hook_)(const std::string& logger_name, 
+        void (T::*hook_)(const std::string& logger_name,
                          const log_level& l,
                          const uint64 thread_id,
                          const char* message_to_log)
@@ -113,14 +113,14 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class logger 
+    class logger
     {
         /*!
             INITIAL VALUE
                 - print_header == print_default_logger_header
                 - out.rdbuf() == std::cout.rdbuf()
                 - cur_level == LERROR
-                - auto_flush_enabled == true 
+                - auto_flush_enabled == true
                 - hook.is_set() == false
 
             CONVENTION
@@ -137,7 +137,7 @@ namespace dlib
 
                 - logger::gd::loggers == a set containing all currently existing loggers.
                 - logger::gd::m == the mutex used to lock everything in the logger
-                - logger::gd::thread_names == a map of thread ids to thread names.  
+                - logger::gd::thread_names == a map of thread ids to thread names.
                 - logger::gd::next_thread_name == the next thread name that will be given out
                   to a thread when we find that it isn't already in thread_names.
         !*/
@@ -209,7 +209,7 @@ namespace dlib
             /*!
                 ensures
                     - if (!been_used) then
-                        - prints the logger header 
+                        - prints the logger header
                         - locks log.gd.m
                         - #been_used == true
             !*/
@@ -234,15 +234,15 @@ namespace dlib
         friend class logger_stream;
     public:
 
-        typedef member_function_pointer<const std::string&, const log_level&, 
+        typedef member_function_pointer<const std::string&, const log_level&,
                                         const uint64, const char*> hook_mfp;
 
-        logger (  
+        logger (
             const std::string& name_
         );
 
         virtual ~logger (
-        ); 
+        );
 
         const std::string& name (
         ) const { return logger_name; }
@@ -259,10 +259,10 @@ namespace dlib
         }
 
         const log_level level (
-        ) const 
-        { 
+        ) const
+        {
             auto_mutex M(gd.m);
-            return log_level(cur_level); 
+            return log_level(cur_level);
         };
 
         void set_level (
@@ -281,8 +281,8 @@ namespace dlib
         }
 
         bool auto_flush (
-        ) const 
-        { 
+        ) const
+        {
             auto_mutex M(gd.m);
             return auto_flush_enabled;
         };
@@ -319,7 +319,7 @@ namespace dlib
             >
         void set_output_hook (
             T& object,
-            void (T::*hook_)(const std::string& logger_name, 
+            void (T::*hook_)(const std::string& logger_name,
                             const log_level& l,
                             const uint64 thread_id,
                             const char* message_to_log)
@@ -344,7 +344,7 @@ namespace dlib
 
         void set_output_stream (
             std::ostream& out_
-        ) 
+        )
         {
             auto_mutex M(gd.m);
             gd.loggers.reset();
@@ -450,10 +450,10 @@ namespace dlib
 
             const log_level level (
                 const std::string& name
-            ) const; 
+            ) const;
             /*!
                 ensures
-                    - returns the level loggers with the given name are supposed 
+                    - returns the level loggers with the given name are supposed
                       to have
             !*/
 
@@ -481,7 +481,7 @@ namespace dlib
             ) const;
             /*!
                 ensures
-                    - returns the auto_flush value loggers with the given name are supposed 
+                    - returns the auto_flush value loggers with the given name are supposed
                       to have
             !*/
 
@@ -492,10 +492,10 @@ namespace dlib
             /*!
                 ensures
                     - for all children C of name:
-                        - #auto_flush_enabled(C) == enabled 
+                        - #auto_flush_enabled(C) == enabled
                     - if name == "" then
                         - for all loggers L:
-                            - #auto_flush_enabled(L) == enabled 
+                            - #auto_flush_enabled(L) == enabled
             !*/
 
             struct output_streambuf_container
@@ -509,7 +509,7 @@ namespace dlib
             );
             /*!
                 ensures
-                    - returns the streambuf loggers with the given name are supposed 
+                    - returns the streambuf loggers with the given name are supposed
                       to have
             !*/
 
@@ -520,23 +520,23 @@ namespace dlib
             /*!
                 ensures
                     - for all children C of name:
-                        - #output_streambuf(C) == out_.rdbuf() 
+                        - #output_streambuf(C) == out_.rdbuf()
                     - if name == "" then
                         - for all loggers L:
-                            - #output_streambuf(L) == out_.rdbuf() 
+                            - #output_streambuf(L) == out_.rdbuf()
             !*/
 
             void set_output_stream (
                 const std::string& name,
-                std::streambuf& buf 
+                std::streambuf& buf
             );
             /*!
                 ensures
                     - for all children C of name:
-                        - #output_streambuf(C) == &buf 
+                        - #output_streambuf(C) == &buf
                     - if name == "" then
                         - for all loggers L:
-                            - #output_streambuf(L) == &buf 
+                            - #output_streambuf(L) == &buf
             !*/
 
             struct output_hook_container
@@ -550,7 +550,7 @@ namespace dlib
             );
             /*!
                 ensures
-                    - returns the hook loggers with the given name are supposed 
+                    - returns the hook loggers with the given name are supposed
                       to have
             !*/
 
@@ -561,10 +561,10 @@ namespace dlib
             /*!
                 ensures
                     - for all children C of name:
-                        - #output_hook(C) == hook 
+                        - #output_hook(C) == hook
                     - if name == "" then
                         - for all loggers L:
-                            - #output_hook(L) == hook 
+                            - #output_hook(L) == hook
             !*/
 
             struct logger_header_container
@@ -578,7 +578,7 @@ namespace dlib
             );
             /*!
                 ensures
-                    - returns the header function loggers with the given name are supposed 
+                    - returns the header function loggers with the given name are supposed
                       to have
             !*/
 
@@ -589,10 +589,10 @@ namespace dlib
             /*!
                 ensures
                     - for all children C of name:
-                        - #logger_header(C) == ph 
+                        - #logger_header(C) == ph
                     - if name == "" then
                         - for all loggers L:
-                            - #logger_header(L) == ph 
+                            - #logger_header(L) == ph
             !*/
 
         }; // end of struct global_data
@@ -607,7 +607,7 @@ namespace dlib
         );
 
         friend void set_all_logging_headers (
-            const print_header_type& new_header 
+            const print_header_type& new_header
         );
 
         friend void set_all_logging_output_streams (
@@ -619,7 +619,7 @@ namespace dlib
             >
         friend void set_all_logging_output_hooks (
             T& object,
-            void (T::*hook_)(const std::string& logger_name, 
+            void (T::*hook_)(const std::string& logger_name,
                             const log_level& l,
                             const uint64 thread_id,
                             const char* message_to_log)
@@ -627,9 +627,9 @@ namespace dlib
         {
             logger::hook_mfp hook;
 
-            // There is a bug in one of the versions (but not all apparently) of 
+            // There is a bug in one of the versions (but not all apparently) of
             // Visual studio 2005 that causes it to error out if <T> isn't in the
-            // following line of code.  However, there is also a bug in gcc-3.3 
+            // following line of code.  However, there is also a bug in gcc-3.3
             // that causes it to error out if <T> is present.  So this works around
             // this problem.
 #if defined(_MSC_VER) && _MSC_VER == 1400
@@ -669,7 +669,7 @@ namespace dlib
         logger(const logger&);        // copy constructor
         logger& operator=(const logger&);    // assignment operator
 
-    };    
+    };
 
 // ----------------------------------------------------------------------------------------
 

@@ -7,11 +7,11 @@
 
 // figure out which SIMD instructions we can use.
 #ifndef DLIB_DO_NOT_USE_SIMD
-    #if defined(_MSC_VER) 
+    #if defined(_MSC_VER)
         #ifdef __AVX__
             #ifndef DLIB_HAVE_SSE2
                 #define DLIB_HAVE_SSE2
-            #endif 
+            #endif
             #ifndef DLIB_HAVE_SSE3
                 #define DLIB_HAVE_SSE3
             #endif
@@ -29,7 +29,7 @@
         #ifdef __SSE2__
             #ifndef DLIB_HAVE_SSE2
                 #define DLIB_HAVE_SSE2
-            #endif 
+            #endif
         #endif
         #ifdef __SSSE3__
             #ifndef DLIB_HAVE_SSE3

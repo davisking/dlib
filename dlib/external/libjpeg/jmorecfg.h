@@ -53,7 +53,7 @@
 #ifdef _MSC_VER
 // Disable the following warnings for Visual Studio
 // This is a warning you get from visual studio 2005 about things in the standard C++
-// library being "deprecated."  I checked the C++ standard and it doesn't say jack 
+// library being "deprecated."  I checked the C++ standard and it doesn't say jack
 // about any of them (I checked the searchable PDF).   So this warning is total Bunk.
 #pragma warning(disable : 4996)
 #endif
@@ -171,7 +171,7 @@ typedef unsigned int JDIMENSION;
 #define LOCAL(type)		static type
 /* a function referenced thru EXTERNs: */
 #define GLOBAL(type)		type
-/*  
+/*
     Use C linking unless we are supposed to be compiling our own copy of
     libjpeg.  Then let it use C++ linking so that we are less likely to get
     linker name conflicts with other libraries that happen to statically include
@@ -206,7 +206,7 @@ typedef unsigned int JDIMENSION;
 #ifdef NEED_FAR_POINTERS
 #define FAR  far
 #else
-#ifndef FAR 
+#ifndef FAR
     #define FAR
 #endif
 #endif

@@ -18,7 +18,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for reporting how long a task will take
-                to complete.  
+                to complete.
 
                 For example, consider the following bit of code:
 
@@ -36,8 +36,8 @@ namespace dlib
     public:
 
         inline explicit console_progress_indicator (
-            double target_value 
-        ); 
+            double target_value
+        );
         /*!
             ensures
                 - #target() == target_value
@@ -70,8 +70,8 @@ namespace dlib
         );
         /*!
             ensures
-                - print_status() assumes it is called with values which are linearly 
-                  approaching target().  It will attempt to predict how much time is 
+                - print_status() assumes it is called with values which are linearly
+                  approaching target().  It will attempt to predict how much time is
                   remaining until cur becomes equal to target().
                 - prints a status message to the screen which indicates how much
                   more time is left until cur is equal to target()
@@ -83,7 +83,7 @@ namespace dlib
                       until about one second has elapsed.  This means that the first call
                       to print_status() never prints to the screen.
                 - This function returns true if it prints to the screen and false
-                  otherwise. 
+                  otherwise.
         !*/
 
     private:
@@ -105,7 +105,7 @@ namespace dlib
 
     console_progress_indicator::
     console_progress_indicator (
-        double target_value 
+        double target_value
     ) :
         target_val(target_value),
         start_time(0),
@@ -149,30 +149,30 @@ namespace dlib
 
             double seconds = delta_t/delta_val * std::abs(target_val - cur);
 
-            std::ios::fmtflags oldflags = std::cout.flags();  
-            std::cout.flags(); 
+            std::ios::fmtflags oldflags = std::cout.flags();
+            std::cout.flags();
             std::cout.setf(std::ios::fixed,std::ios::floatfield);
             std::streamsize ss;
 
             if (seconds < 60)
             {
-                ss = std::cout.precision(0); 
+                ss = std::cout.precision(0);
                 std::cout << "Time remaining: " << seconds << " seconds.                 \r" << std::flush;
             }
             else if (seconds < 60*60)
             {
-                ss = std::cout.precision(2); 
+                ss = std::cout.precision(2);
                 std::cout << "Time remaining: " << seconds/60 << " minutes.                 \r" << std::flush;
             }
-            else 
+            else
             {
-                ss = std::cout.precision(2); 
+                ss = std::cout.precision(2);
                 std::cout << "Time remaining: " << seconds/60/60 << " hours.                 \r" << std::flush;
             }
 
             // restore previous output flags and precision settings
-            std::cout.flags(oldflags); 
-            std::cout.precision(ss); 
+            std::cout.flags(oldflags);
+            std::cout.precision(ss);
 
             return true;
         }
@@ -194,7 +194,7 @@ namespace dlib
     void console_progress_indicator::
     reset (
         double target_value
-    ) 
+    )
     {
         *this = console_progress_indicator(target_value);
     }

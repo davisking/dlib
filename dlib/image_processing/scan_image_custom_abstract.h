@@ -19,7 +19,7 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object defines the interface a feature extractor must implement if it
                 is to be used with the scan_image_custom object defined at the bottom of
-                this file.  
+                this file.
 
                 In this case, the purpose of a feature extractor is to associated a
                 complete feature vector with each rectangle in an image.  In particular,
@@ -82,7 +82,7 @@ namespace dlib
             ensures
                 - This function computes the feature vector associated with the given rectangle
                   in obj.  This rectangle is interpreted as a bounding box within the last image
-                  given to this->load() and a feature vector describing that bounding box is 
+                  given to this->load() and a feature vector describing that bounding box is
                   output into psi.
                 - The feature vector is added into psi.  That is, it does not overwrite the
                   previous contents of psi, but instead, it adds the vector to psi.
@@ -124,20 +124,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
     
-    void serialize( 
-        const feature_extractor& item, 
+    void serialize(
+        const feature_extractor& item,
         std::ostream& out
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
-    void deserialize( 
-        feature_extractor& item, 
+    void deserialize(
+        feature_extractor& item,
         std::istream& in
     );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -160,7 +160,7 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for running a classifier over an image with the goal
                 of localizing each object present.  The localization is in the form of the
-                bounding box around each object of interest.  
+                bounding box around each object of interest.
 
                 Unlike the scan_image_pyramid and scan_image_boxes objects, this image
                 scanner delegates all the work of constructing the object feature vector to
@@ -187,7 +187,7 @@ namespace dlib
         typedef Feature_extractor_type feature_extractor_type;
 
         scan_image_custom (
-        );  
+        );
         /*!
             ensures
                 - this object is properly initialized
@@ -224,11 +224,11 @@ namespace dlib
         !*/
 
         const feature_extractor_type& get_feature_extractor (
-        ) const; 
+        ) const;
         /*!
             ensures
-                - returns a const reference to the feature_extractor_type object used 
-                  internally for local feature extraction.  
+                - returns a const reference to the feature_extractor_type object used
+                  internally for local feature extraction.
         !*/
 
         void copy_configuration(
@@ -279,11 +279,11 @@ namespace dlib
                   extractor during image loading and stores all detections into #dets.
                 - for all valid i:
                     - #dets[i].second == The candidate object location which produced this
-                      detection.  This rectangle gives the location of the detection.  
+                      detection.  This rectangle gives the location of the detection.
                     - #dets[i].first == The score for this detection.  This value is equal
                       to dot(w, feature vector for this candidate object location).
                     - #dets[i].first >= thresh
-                - #dets will be sorted in descending order. 
+                - #dets will be sorted in descending order.
                   (i.e.  #dets[i].first >= #dets[j].first for all i, and j>i)
                 - Elements of w beyond index get_num_dimensions()-1 are ignored.  I.e. only
                   the first get_num_dimensions() are used.
@@ -297,7 +297,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - obj.num_parts() == 0 
+                - obj.num_parts() == 0
                 - is_loaded_with_image() == true
                 - psi.size() >= get_num_dimensions()
                   (i.e. psi must have preallocated its memory before this function is called)
@@ -370,16 +370,16 @@ namespace dlib
         std::ostream& out
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     template <typename T>
     void deserialize (
         scan_image_custom<T>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

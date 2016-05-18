@@ -37,7 +37,7 @@ namespace dlib
     {
         /*!
             This object sets up a timer that triggers the action function
-            for timer objects that are tracked inside this object. 
+            for timer objects that are tracked inside this object.
             INITIAL VALUE
                 - shutdown == false
                 - running == false
@@ -48,7 +48,7 @@ namespace dlib
                 - else (running) then
                     - thread() is running
 
-                - tm[time] == pointer to a timer_base object 
+                - tm[time] == pointer to a timer_base object
         !*/
         typedef binary_search_tree<uint64,timer_base*,memory_manager<char>::kernel_2b>::kernel_2a_c time_map;
     public:
@@ -101,7 +101,7 @@ namespace dlib
     private:
         timer_global_clock();
 
-        time_map tm;  
+        time_map tm;
         signaler s;
         bool shutdown;
         bool running;
@@ -124,7 +124,7 @@ namespace dlib
     template <
         typename T
         >
-    class timer : private timer_base 
+    class timer : private timer_base
     {
         /*!
             INITIAL VALUE
@@ -141,10 +141,10 @@ namespace dlib
                 - running == is_running()
                 - delay == delay_time()
                 - *ao == action_object()
-                - af == action_function()    
+                - af == action_function()
                 - if (!running) then
                     - in_global_clock == false
-                - else 
+                - else
                     - next_time_to_run == the next time this timer should run according
                       to the timestamper in the global_clock
         !*/
@@ -158,7 +158,7 @@ namespace dlib
 
         typedef void (T::*af_type)();
 
-        timer(  
+        timer(
             T& ao_,
             af_type af_
         );
@@ -188,7 +188,7 @@ namespace dlib
             unsigned long milliseconds
         );
         
-        void start (            
+        void start (
         );
 
         void stop (
@@ -197,7 +197,7 @@ namespace dlib
         void stop_and_wait (
         );
 
-    private: 
+    private:
 
         void thread (
         );
@@ -215,7 +215,7 @@ namespace dlib
         timer(const timer&);        // copy constructor
         timer& operator=(const timer&);    // assignment operator
 
-    };    
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -227,10 +227,10 @@ namespace dlib
         typename T
         >
     timer<T>::
-    timer(  
+    timer(
         T& ao_,
         af_type af_
-    ) : 
+    ) :
         ao(ao_),
         af(af_),
         gc(get_global_clock())
@@ -266,7 +266,7 @@ namespace dlib
         auto_mutex M(gc->m);
         running = false;
         gc->remove(this);
-        delay = 1000;        
+        delay = 1000;
         next_time_to_run = 0;
     }
 
@@ -329,7 +329,7 @@ namespace dlib
     ) const
     {
         auto_mutex M(gc->m);
-        return delay;        
+        return delay;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -352,7 +352,7 @@ namespace dlib
         typename T
         >
     void timer<T>::
-    start (            
+    start (
     )
     {
         auto_mutex M(gc->m);
@@ -388,7 +388,7 @@ namespace dlib
     )
     {
         // call the action function
-        (ao.*af)(); 
+        (ao.*af)();
         auto_mutex M(gc->m);
         if (running)
         {

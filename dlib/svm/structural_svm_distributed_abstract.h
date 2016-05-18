@@ -17,7 +17,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for distributing the work involved in solving
-                a dlib::structural_svm_problem across many computers.  It is used in 
+                a dlib::structural_svm_problem across many computers.  It is used in
                 conjunction with the svm_struct_controller_node defined below.
         !*/
 
@@ -25,7 +25,7 @@ namespace dlib
 
         template <
             typename T,
-            typename U 
+            typename U
             >
         svm_struct_processing_node (
             const structural_svm_problem<T,U>& problem,
@@ -38,11 +38,11 @@ namespace dlib
                 - problem.get_num_samples() != 0
                 - problem.get_num_dimensions() != 0
             ensures
-                - This object will listen on the given port for a TCP connection from a 
-                  svm_struct_controller_node.  Once connected, the controller node will 
+                - This object will listen on the given port for a TCP connection from a
+                  svm_struct_controller_node.  Once connected, the controller node will
                   be able to access the given problem.
-                - Will use num_threads threads at a time to make concurrent calls to the 
-                  problem.separation_oracle() routine.  You should set this parameter equal 
+                - Will use num_threads threads at a time to make concurrent calls to the
+                  problem.separation_oracle() routine.  You should set this parameter equal
                   to the number of available processing cores.
                 - Note that the following parameters within the given problem are ignored:
                     - problem.get_c()
@@ -69,24 +69,24 @@ namespace dlib
                 - This object will not be verbose
 
             WHAT THIS OBJECT REPRESENTS
-                This object is a tool for distributing the work involved in solving a 
+                This object is a tool for distributing the work involved in solving a
                 dlib::structural_svm_problem across many computers.  The best way to understand
                 its use is via example:
 
-                First, suppose you have defined a structural_svm_problem object by inheriting from 
-                it and defining the appropriate virtual functions.  You could solve it by passing 
-                an instance to the oca optimizer.  However, if your separation oracle takes a long 
-                time to evaluate then the optimization will take a long time to solve.  To speed 
-                this up we can distribute the calls to the separation oracle across many computers.  
+                First, suppose you have defined a structural_svm_problem object by inheriting from
+                it and defining the appropriate virtual functions.  You could solve it by passing
+                an instance to the oca optimizer.  However, if your separation oracle takes a long
+                time to evaluate then the optimization will take a long time to solve.  To speed
+                this up we can distribute the calls to the separation oracle across many computers.
                 
-                To make this concrete, lets imagine you want to distribute the work across three 
-                computers. You can accomplish this by creating four programs.  One containing a 
+                To make this concrete, lets imagine you want to distribute the work across three
+                computers. You can accomplish this by creating four programs.  One containing a
                 svm_struct_controller_node and three containing svm_struct_processing_nodes.
 
                 The programs might look like this:
 
                 Controller program:
-                    int main() 
+                    int main()
                     {
                         svm_struct_controller_node cont;
                         cont.set_c(100);
@@ -137,14 +137,14 @@ namespace dlib
         /*!
             ensures
                 - returns the error epsilon that determines when training should stop.
-                  Smaller values may result in a more accurate solution but take longer 
+                  Smaller values may result in a more accurate solution but take longer
                   to execute.  Specifically, the algorithm stops when the average sample
-                  risk (i.e. R(w) as defined by the dlib::structural_svm_problem object) is 
+                  risk (i.e. R(w) as defined by the dlib::structural_svm_problem object) is
                   within epsilon of its optimal value.
 
                   Also note that sample risk is an upper bound on a sample's loss.  So
                   you can think of this epsilon value as saying "solve the optimization
-                  problem until the average loss per sample is within epsilon of it's 
+                  problem until the average loss per sample is within epsilon of it's
                   optimal value".
         !*/
 
@@ -168,7 +168,7 @@ namespace dlib
                       problem to a high accuracy or their ranks may be difficult to
                       determine, so the extra accuracy given by the cache based refinement
                       is very useful.  Finally, note that we include the nuclear norm term
-                      as part of the "risk" for the purposes of determining when to stop.  
+                      as part of the "risk" for the purposes of determining when to stop.
                 - else
                     - The value of #get_cache_based_epsilon() has no effect.
         !*/
@@ -192,7 +192,7 @@ namespace dlib
         !*/
 
         unsigned long get_max_iterations (
-        ); 
+        );
         /*!
             ensures
                 - returns the maximum number of iterations the SVM optimizer is allowed to
@@ -207,7 +207,7 @@ namespace dlib
         );
         /*!
             requires
-                - 0 <= first_dimension < number of dimensions in problem 
+                - 0 <= first_dimension < number of dimensions in problem
                 - 0 <= rows
                 - 0 <= cols
                 - first_dimension+rows*cols <= number of dimensions in problem
@@ -222,13 +222,13 @@ namespace dlib
                   function. In particular, the part of w included in the nuclear norm is
                   exactly the matrix reshape(rowm(w, range(first_dimension, first_dimension+rows*cols-1)), rows, cols).
                   Therefore, if you think of the w vector as being the concatenation of a
-                  bunch of matrices then you can use multiple calls to add_nuclear_norm_regularizer() 
+                  bunch of matrices then you can use multiple calls to add_nuclear_norm_regularizer()
                   to add nuclear norm regularization terms to any of the matrices packed into w.
                 - #num_nuclear_norm_regularizers() == num_nuclear_norm_regularizers() + 1
         !*/
 
         unsigned long num_nuclear_norm_regularizers (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of nuclear norm regularizers that are currently a part
@@ -249,7 +249,7 @@ namespace dlib
         );
         /*!
             ensures
-                - This object will print status messages to standard out so that a 
+                - This object will print status messages to standard out so that a
                   user can observe the progress of the algorithm.
         !*/
 
@@ -264,12 +264,12 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the SVM regularization parameter.  It is the parameter that 
-                  determines the trade off between trying to fit the training data 
-                  exactly or allowing more errors but hopefully improving the 
-                  generalization of the resulting classifier.  Larger values encourage 
-                  exact fitting while smaller values of C may encourage better 
-                  generalization. 
+                - returns the SVM regularization parameter.  It is the parameter that
+                  determines the trade off between trying to fit the training data
+                  exactly or allowing more errors but hopefully improving the
+                  generalization of the resulting classifier.  Larger values encourage
+                  exact fitting while smaller values of C may encourage better
+                  generalization.
         !*/
 
         void set_c (

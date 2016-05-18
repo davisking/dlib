@@ -25,8 +25,8 @@ namespace dlib
                         XX.nr() == XX.nc(),
                 "\t elastic_net::elastic_net(XX)"
                 << " \n\t XX must be a non-empty square matrix."
-                << " \n\t XX.nr():   " << XX.nr() 
-                << " \n\t XX.nc():   " << XX.nc() 
+                << " \n\t XX.nr():   " << XX.nr()
+                << " \n\t XX.nc():   " << XX.nc()
                 << " \n\t this: " << this
                 );
 
@@ -71,17 +71,17 @@ namespace dlib
         ) : elastic_net(XX)
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(XX.size() > 0 && 
+            DLIB_ASSERT(XX.size() > 0 &&
                         XX.nr() == XX.nc() &&
-                        is_col_vector(XY) && 
+                        is_col_vector(XY) &&
                         XX.nc() == XY.size() ,
                 "\t elastic_net::elastic_net(XX,XY)"
                 << " \n\t Invalid inputs were given to this function."
-                << " \n\t XX.size(): " << XX.size() 
-                << " \n\t is_col_vector(XY): " << is_col_vector(XY) 
-                << " \n\t XX.nr():   " << XX.nr() 
-                << " \n\t XX.nc():   " << XX.nc() 
-                << " \n\t XY.size(): " << XY.size() 
+                << " \n\t XX.size(): " << XX.size()
+                << " \n\t is_col_vector(XY): " << is_col_vector(XY)
+                << " \n\t XX.nr():   " << XX.nr()
+                << " \n\t XX.nc():   " << XX.nc()
+                << " \n\t XY.size(): " << XY.size()
                 << " \n\t this: " << this
                 );
 
@@ -97,13 +97,13 @@ namespace dlib
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(is_col_vector(XY) && 
+            DLIB_ASSERT(is_col_vector(XY) &&
                         XY.size() == size(),
                 "\t void elastic_net::set_y(Y)"
                 << " \n\t Invalid inputs were given to this function."
-                << " \n\t is_col_vector(XY): " << is_col_vector(XY) 
-                << " \n\t size():    " << size() 
-                << " \n\t XY.size(): " << XY.size() 
+                << " \n\t is_col_vector(XY): " << is_col_vector(XY)
+                << " \n\t size():    " << size()
+                << " \n\t XY.size(): " << XY.size()
                 << " \n\t this: " << this
                 );
 
@@ -113,7 +113,7 @@ namespace dlib
             // But those vectors are always in the span of X and therefore we only see the
             // part of the norm of Y that is in the span of X (and hence u since u and X
             // have the same span by construction)
-            ynorm = length_squared(Y); 
+            ynorm = length_squared(Y);
             xdoty = X*Y;
             eig_vects_xdoty = trans(eig_vects)*xdoty;
 
@@ -127,13 +127,13 @@ namespace dlib
 
         void set_epsilon(
             double eps_
-        ) 
+        )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(eps_ > 0,
                 "\t void elastic_net::set_epsilon()"
                 << " \n\t eps_ must be greater than 0"
-                << " \n\t eps_: " << eps_ 
+                << " \n\t eps_: " << eps_
                 << " \n\t this: " << this
                 );
 
@@ -145,7 +145,7 @@ namespace dlib
 
         void set_max_iterations (
             unsigned long max_iter
-        ) 
+        )
         {
             max_iterations = max_iter;
         }
@@ -171,14 +171,14 @@ namespace dlib
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(have_target_values() && 
-                        ridge_lambda > 0 && 
+            DLIB_ASSERT(have_target_values() &&
+                        ridge_lambda > 0 &&
                         lasso_budget > 0 ,
                 "\t matrix<double,0,1> elastic_net::operator()()"
                 << " \n\t Invalid inputs were given to this function."
-                << " \n\t have_target_values(): " << have_target_values() 
-                << " \n\t ridge_lambda: " << ridge_lambda 
-                << " \n\t lasso_budget: " << lasso_budget 
+                << " \n\t have_target_values(): " << have_target_values()
+                << " \n\t ridge_lambda: " << ridge_lambda
+                << " \n\t lasso_budget: " << lasso_budget
                 << " \n\t this: " << this
                 );
 
@@ -280,9 +280,9 @@ namespace dlib
                         PG = G;
                     }
 
-                    if (PG > PG_max) 
+                    if (PG > PG_max)
                         PG_max = PG;
-                    if (PG < PG_min) 
+                    if (PG < PG_min)
                         PG_min = PG;
 
                     // if PG != 0
@@ -364,7 +364,7 @@ namespace dlib
         double wdoty;
         double wy_mult; // logically, the real w is what is in the w vector + wy_mult*Y
         matrix<double,0,1> w;
-        std::vector<long> index; 
+        std::vector<long> index;
         unsigned long active_size;
 
         matrix<double,0,1> eig_vects_xdoty;

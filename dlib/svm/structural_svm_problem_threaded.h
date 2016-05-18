@@ -23,7 +23,7 @@ namespace dlib
         typename matrix_type_,
         typename feature_vector_type_ = matrix_type_
         >
-    class structural_svm_problem_threaded : public structural_svm_problem<matrix_type_,feature_vector_type_> 
+    class structural_svm_problem_threaded : public structural_svm_problem<matrix_type_,feature_vector_type_>
     {
     public:
 
@@ -57,7 +57,7 @@ namespace dlib
             void call_oracle (
                 long begin,
                 long end
-            ) 
+            )
             {
                 // If we are only going to call the separation oracle once then don't run
                 // the slightly more complex for loop version of this code.  Or if we just
@@ -122,7 +122,7 @@ namespace dlib
             bool buffer_subgradients_locally = with_buffer_time.mean() < without_buffer_time.mean();
 
             // every 50 iterations we should try to flip the buffering scheme to see if
-            // doing it the other way might be better.  
+            // doing it the other way might be better.
             if ((num_iterations_executed%50) == 0)
             {
                 buffer_subgradients_locally = !buffer_subgradients_locally;

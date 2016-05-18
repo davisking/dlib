@@ -14,24 +14,24 @@ namespace dlib
     
     using namespace dlib::relational_operators; // defined in algs.h
 
-    class bigint_kernel_1 
+    class bigint_kernel_1
     {
         /*!
             INITIAL VALUE
                 slack               == 25
-                data->number[0]     == 0 
-                data->size          == slack 
-                data->references    == 1 
+                data->number[0]     == 0
+                data->size          == slack
+                data->references    == 1
                 data->digits_used   == 1
                 
 
             CONVENTION
-                slack  == the number of extra digits placed into the number when it is 
+                slack  == the number of extra digits placed into the number when it is
                     created.  the slack value should never be less than 1
 
                 data->number == pointer to an array of data->size uint16s.
                     data represents a string of base 65535 numbers with data[0] being
-                    the least significant bit and data[data->digits_used-1] being the most 
+                    the least significant bit and data[data->digits_used-1] being the most
                     significant
 
 
@@ -39,8 +39,8 @@ namespace dlib
 
 
                 data->digits_used == the number of significant digits in the number.
-                    data->digits_used tells us the number of used elements in the 
-                    data->number array so everything beyond data->number[data->digits_used-1] 
+                    data->digits_used tells us the number of used elements in the
+                    data->number array so everything beyond data->number[data->digits_used-1]
                     is undefined
 
                 data->references == the number of bigint_kernel_1 objects which refer
@@ -57,7 +57,7 @@ namespace dlib
 
             explicit data_record(
                 uint32 size_
-            ) : 
+            ) :
                 size(size_),
                 number(new uint16[size_]),
                 references(1),
@@ -89,7 +89,7 @@ namespace dlib
             }
             /*!
                 ensures
-                    - *this is a copy of item except with 
+                    - *this is a copy of item except with
                       size == item.digits_used + additional_size
             !*/
 
@@ -102,7 +102,7 @@ namespace dlib
 
             const uint32 size;
             uint16* number;
-            uint32 references;            
+            uint32 references;
             uint32 digits_used;
 
         private:
@@ -112,8 +112,8 @@ namespace dlib
 
 
 
-        // note that the second parameter is just there 
-        // to resolve the ambiguity between this constructor and 
+        // note that the second parameter is just there
+        // to resolve the ambiguity between this constructor and
         // bigint_kernel_1(uint32)
         explicit bigint_kernel_1 (
             data_record* data_, int
@@ -337,7 +337,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - lhs >= rhs 
+                - lhs >= rhs
                 - result->size >= lhs->digits_used
             ensures
                 - result == lhs - rhs
@@ -350,10 +350,10 @@ namespace dlib
             data_record* remainder
         ) const;
         /*!
-            requires 
-                - rhs != 0 
-                - result->size >= lhs->digits_used 
-                - remainder->size >= lhs->digits_used 
+            requires
+                - rhs != 0
+                - result->size >= lhs->digits_used
+                - remainder->size >= lhs->digits_used
                 - each parameter is unique (i.e. lhs != result, lhs != remainder, etc.)
             ensures
                 - result == lhs / rhs
@@ -367,8 +367,8 @@ namespace dlib
         ) const;
         /*!
             requires
-                - result->size >= lhs->digits_used + rhs->digits_used 
-                - result != lhs 
+                - result->size >= lhs->digits_used + rhs->digits_used
+                - result != lhs
                 - result != rhs
             ensures
                 - result == lhs * rhs
@@ -377,7 +377,7 @@ namespace dlib
         void short_add (
             const data_record* data,
             uint16 value,
-            data_record* result            
+            data_record* result
         ) const;
         /*!
             requires
@@ -393,7 +393,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - data >= value 
+                - data >= value
                 - result->size >= data->digits_used
             ensures
                 - result == data - value
@@ -402,7 +402,7 @@ namespace dlib
         void short_mul (
             const data_record* data,
             uint16 value,
-            data_record* result            
+            data_record* result
         ) const;
         /*!
             requires
@@ -412,17 +412,17 @@ namespace dlib
         !*/
 
         void short_div (
-            const data_record* data,            
+            const data_record* data,
             uint16 value,
             data_record* result,
             uint16& remainder
         ) const;
         /*!
             requires
-                - value != 0 
+                - value != 0
                 - result->size >= data->digits_used
             ensures
-                - result = data*value 
+                - result = data*value
                 - remainder = data%value
         !*/
 
@@ -444,7 +444,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - result->size >= data->digits_used 
+                - result->size >= data->digits_used
             ensures
                 - result == data >> 1
         !*/
@@ -453,11 +453,11 @@ namespace dlib
             const data_record* lhs,
             const data_record* rhs
         ) const;
-        /*! 
+        /*!
             ensures
-                - returns true if lhs < rhs 
+                - returns true if lhs < rhs
                 - returns false otherwise
-        !*/ 
+        !*/
 
         bool is_equal_to (
             const data_record* lhs,
@@ -465,7 +465,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns true if lhs == rhs 
+                - returns true if lhs == rhs
                 - returns false otherwise
         !*/
 
@@ -493,7 +493,7 @@ namespace dlib
 
         // member data
         const uint32 slack;
-        data_record* data;     
+        data_record* data;
         
         
 
@@ -505,31 +505,31 @@ namespace dlib
     ) { a.swap(b); }
 
     inline void serialize (
-        const bigint_kernel_1& item, 
+        const bigint_kernel_1& item,
         std::ostream& out
     )
-    { 
-        std::ios::fmtflags oldflags = out.flags();  
-        out.flags(); 
-        out << item << ' '; 
-        out.flags(oldflags); 
-        if (!out) throw serialization_error("Error serializing object of type bigint_kernel_c"); 
-    }   
+    {
+        std::ios::fmtflags oldflags = out.flags();
+        out.flags();
+        out << item << ' ';
+        out.flags(oldflags);
+        if (!out) throw serialization_error("Error serializing object of type bigint_kernel_c");
+    }
 
     inline void deserialize (
-        bigint_kernel_1& item, 
+        bigint_kernel_1& item,
         std::istream& in
-    ) 
-    { 
-        std::ios::fmtflags oldflags = in.flags();  
-        in.flags(); 
-        in >> item; in.flags(oldflags); 
+    )
+    {
+        std::ios::fmtflags oldflags = in.flags();
+        in.flags();
+        in >> item; in.flags(oldflags);
         if (in.get() != ' ')
         {
             item = 0;
-            throw serialization_error("Error deserializing object of type bigint_kernel_c"); 
+            throw serialization_error("Error deserializing object of type bigint_kernel_c");
         }
-    }   
+    }
 
 }
 

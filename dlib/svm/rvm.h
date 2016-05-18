@@ -29,11 +29,11 @@ namespace dlib
             const matrix<long,0,1,mem_manager_type>& active_bases,
             const bool search_all_alphas,
             typename scalar_vector_type::type eps
-        ) 
+        )
         /*!
             ensures
                 - if (we can find another alpha to update) then
-                    - returns the index of said alpha 
+                    - returns the index of said alpha
                 - else
                     - returns -1
         !*/
@@ -60,27 +60,27 @@ namespace dlib
                         // only update an existing alpha if this is a narrow search
                         if (search_all_alphas == false)
                         {
-                            // choosing this sample would mean doing an update of an 
+                            // choosing this sample would mean doing an update of an
                             // existing alpha value.
                             scalar_type new_alpha = s*s/(q*q-s);
                             scalar_type cur_alpha = alpha(idx);
                             new_alpha = 1/new_alpha;
                             cur_alpha = 1/cur_alpha;
 
-                            // from equation 32 in the Tipping paper 
-                            value = Q(i)*Q(i)/(S(i) +  1/(new_alpha - cur_alpha) ) - 
+                            // from equation 32 in the Tipping paper
+                            value = Q(i)*Q(i)/(S(i) +  1/(new_alpha - cur_alpha) ) -
                                 std::log(1 + S(i)*(new_alpha - cur_alpha));
                         }
 
                     }
-                    // we only pick an alpha to remove if this is a wide search and it wasn't one of the recently added ones 
-                    else if (search_all_alphas && idx+2 < alpha.size() )  
+                    // we only pick an alpha to remove if this is a wide search and it wasn't one of the recently added ones
+                    else if (search_all_alphas && idx+2 < alpha.size() )
                     {
-                        // choosing this sample would mean the alpha value is infinite 
+                        // choosing this sample would mean the alpha value is infinite
                         // so we would remove the selected sample from our model.
 
-                        // from equation 37 in the Tipping paper 
-                        value = Q(i)*Q(i)/(S(i) - alpha(idx)) - 
+                        // from equation 37 in the Tipping paper
+                        value = Q(i)*Q(i)/(S(i) - alpha(idx)) -
                             std::log(1-S(i)/alpha(idx));
 
                     }
@@ -92,10 +92,10 @@ namespace dlib
 
                     if (q*q-s > 0)
                     {
-                        // choosing this sample would mean we would add the selected 
+                        // choosing this sample would mean we would add the selected
                         // sample to our model.
 
-                        // from equation 27 in the Tipping paper 
+                        // from equation 27 in the Tipping paper
                         value = (Q(i)*Q(i)-S(i))/S(i) + std::log(S(i)/(Q(i)*Q(i)));
                     }
                 }
@@ -122,19 +122,19 @@ namespace dlib
 
 
     template <
-        typename kern_type 
+        typename kern_type
         >
-    class rvm_trainer 
+    class rvm_trainer
     {
         /*!
             This is an implementation of the binary classifier version of the
             relevance vector machine algorithm described in the paper:
-                Tipping, M. E. and A. C. Faul (2003). Fast marginal likelihood maximisation 
-                for sparse Bayesian models. In C. M. Bishop and B. J. Frey (Eds.), Proceedings 
-                of the Ninth International Workshop on Artificial Intelligence and Statistics, 
+                Tipping, M. E. and A. C. Faul (2003). Fast marginal likelihood maximisation
+                for sparse Bayesian models. In C. M. Bishop and B. J. Frey (Eds.), Proceedings
+                of the Ninth International Workshop on Artificial Intelligence and Statistics,
                 Key West, FL, Jan 3-6.
 
-            This code mostly does what is described in the above paper with the exception 
+            This code mostly does what is described in the above paper with the exception
             that here we use a different stopping condition as well as a modified alpha
             selection rule.  See the code for the exact details.
         !*/
@@ -160,7 +160,7 @@ namespace dlib
 
         unsigned long get_max_iterations (
         ) const
-        { 
+        {
             return max_iterations;
         }
 
@@ -172,14 +172,14 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\tvoid rvm_trainer::set_epsilon(eps_)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t eps: " << eps_ 
+                << "\n\t eps: " << eps_
                 );
             eps = eps_;
         }
 
         const scalar_type get_epsilon (
         ) const
-        { 
+        {
             return eps;
         }
 
@@ -237,10 +237,10 @@ namespace dlib
             DLIB_ASSERT(is_binary_classification_problem(x,y) == true,
                 "\tdecision_function rvm_trainer::train(x,y)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t x.nr(): " << x.nr() 
-                << "\n\t y.nr(): " << y.nr() 
-                << "\n\t x.nc(): " << x.nc() 
-                << "\n\t y.nc(): " << y.nc() 
+                << "\n\t x.nr(): " << x.nr()
+                << "\n\t y.nr(): " << y.nr()
+                << "\n\t x.nc(): " << x.nc()
+                << "\n\t y.nc(): " << y.nc()
                 << "\n\t is_binary_classification_problem(x,y): " << ((is_binary_classification_problem(x,y))? "true":"false")
                 );
 
@@ -260,7 +260,7 @@ namespace dlib
                     - alpha(active_bases(i)) == the alpha value associated with sample x(i)
                     - weights(active_bases(i)) == the weight value associated with sample x(i)
                     - colm(phi, active_bases(i)) == the column of phi associated with sample x(i)
-                    - colm(phi, active_bases(i)) == kernel column i (from get_kernel_colum()) 
+                    - colm(phi, active_bases(i)) == kernel column i (from get_kernel_colum())
                 - else
                     - the i'th sample isn't in the model and notionally has an alpha of infinity and
                       a weight of 0.
@@ -270,7 +270,7 @@ namespace dlib
             scalar_vector_type alpha(1), prev_alpha;
             scalar_vector_type weights(1), prev_weights;
 
-            scalar_vector_type tempv, K_col; 
+            scalar_vector_type tempv, K_col;
 
             // set the initial values of these guys
             set_all_elements(active_bases, -1);
@@ -283,7 +283,7 @@ namespace dlib
 
 
             // now declare a bunch of other variables we will be using below
-            scalar_vector_type mu, t_hat, Q, S; 
+            scalar_vector_type mu, t_hat, Q, S;
             scalar_matrix_type sigma;
             
             matrix<scalar_type,1,0,mem_manager_type> tempv2, tempv3;
@@ -319,17 +319,17 @@ namespace dlib
                 }
 
                 // Compute optimal weights and sigma for current alpha using IRLS.  This is the same
-                // technique documented in the paper by equations 12-14. 
+                // technique documented in the paper by equations 12-14.
                 scalar_type weight_delta = std::numeric_limits<scalar_type>::max();
                 int count = 0;
                 while (weight_delta > 0.0001)
                 {
                     // This is a sanity check to make sure we never get stuck in this
-                    // loop to do some degenerate numerical condition 
+                    // loop to do some degenerate numerical condition
                     ++count;
                     if (count > 100)
                     {
-                        // jump us to where search_all_alphas will be set to true 
+                        // jump us to where search_all_alphas will be set to true
                         ticker = rounds_of_narrow_search;
                         break;
                     }
@@ -342,10 +342,10 @@ namespace dlib
 
 
                     // compute the updated weights vector (t_hat = phi*mu_mp + inv(B)*(t-y))
-                    t_hat = t_estimate + trans(scale_columns(trans(t-sigmoid(t_estimate)),reciprocal(beta))); 
+                    t_hat = t_estimate + trans(scale_columns(trans(t-sigmoid(t_estimate)),reciprocal(beta)));
 
                     // mu = sigma*trans(phi)*b*t_hat
-                    mu = sigma*tmp(trans(phi)* trans(scale_columns(trans(t_hat), beta)));  
+                    mu = sigma*tmp(trans(phi)* trans(scale_columns(trans(t_hat), beta)));
 
                     // now compute how much the weights vector changed during this iteration
                     // through this loop.
@@ -385,7 +385,7 @@ namespace dlib
                 ++ticker;
 
                 // compute S and Q using equations 24 and 25 (tempv = phi*sigma*trans(phi)*B*t_hat)
-                tempv = phi*tmp(sigma*tmp(trans(phi)*trans(scale_columns(trans(t_hat),beta)))); 
+                tempv = phi*tmp(sigma*tmp(trans(phi)*trans(scale_columns(trans(t_hat),beta))));
                 for (long i = 0; i < S.size(); ++i)
                 {
                     // if we are currently limiting the search for the next alpha to update
@@ -393,8 +393,8 @@ namespace dlib
                     if (search_all_alphas == false && active_bases(i) == -1)
                         continue;
 
-                    // get the column for this sample out of the kernel matrix.  If it is 
-                    // something in the active set then just get it right out of phi, otherwise 
+                    // get the column for this sample out of the kernel matrix.  If it is
+                    // something in the active set then just get it right out of phi, otherwise
                     // we have to calculate it.
                     if (active_bases(i) != -1)
                         K_col = colm(phi,active_bases(i));
@@ -402,10 +402,10 @@ namespace dlib
                         get_kernel_colum(i, x, K_col);
 
                     // tempv2 = trans(phi_m)*B
-                    tempv2 = scale_columns(trans(K_col), beta);  
+                    tempv2 = scale_columns(trans(K_col), beta);
                     tempv3 = tempv2*phi;
                     S(i) = tempv2*K_col - tempv3*sigma*trans(tempv3);
-                    Q(i) = tempv2*t_hat - tempv2*tempv; 
+                    Q(i) = tempv2*t_hat - tempv2*tempv;
                 }
 
                 const long selected_idx = rvm_helpers::find_next_best_alpha_to_update(S,Q,alpha,active_bases, search_all_alphas, eps);
@@ -443,10 +443,10 @@ namespace dlib
                         alpha(idx) = s*s/(q*q-s);
 
                     }
-                    else 
+                    else
                     {
                         // the new alpha value is infinite so remove the selected alpha from our model
-                        active_bases(selected_idx) = -1; 
+                        active_bases(selected_idx) = -1;
                         phi = remove_col(phi, idx);
                         weights = remove_row(weights, idx);
                         alpha = remove_row(alpha, idx);
@@ -460,7 +460,7 @@ namespace dlib
                             }
                         }
 
-                        // we changed the number of weights so we need to remember to 
+                        // we changed the number of weights so we need to remember to
                         // recompute the beta vector next time around the main loop.
                         recompute_beta = true;
                     }
@@ -482,7 +482,7 @@ namespace dlib
                         tempv(phi.nc()) = s*s/(q*q-s);
                         tempv.swap(alpha);
 
-                        // update weights 
+                        // update weights
                         tempv.set_size(weights.size()+1);
                         set_subm(tempv, get_rect(weights)) = weights;
                         tempv(phi.nc()) = 0;
@@ -496,7 +496,7 @@ namespace dlib
                         tempm.swap(phi);
 
 
-                        // we changed the number of weights so we need to remember to 
+                        // we changed the number of weights so we need to remember to
                         // recompute the beta vector next time around the main loop.
                         recompute_beta = true;
                     }
@@ -518,7 +518,7 @@ namespace dlib
             }
 
             return decision_function<kernel_type> ( mat(final_weights),
-                                                    -sum(mat(final_weights))*tau, 
+                                                    -sum(mat(final_weights))*tau,
                                                     kernel,
                                                     mat(dictionary));
 
@@ -591,7 +591,7 @@ namespace dlib
 
         const static scalar_type tau;
 
-    }; // end of class rvm_trainer 
+    }; // end of class rvm_trainer
 
     template <typename kernel_type>
     const typename kernel_type::scalar_type rvm_trainer<kernel_type>::tau = static_cast<typename kernel_type::scalar_type>(0.001);
@@ -610,19 +610,19 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename kern_type 
+        typename kern_type
         >
-    class rvm_regression_trainer 
+    class rvm_regression_trainer
     {
         /*!
             This is an implementation of the regression version of the
             relevance vector machine algorithm described in the paper:
-                Tipping, M. E. and A. C. Faul (2003). Fast marginal likelihood maximisation 
-                for sparse Bayesian models. In C. M. Bishop and B. J. Frey (Eds.), Proceedings 
-                of the Ninth International Workshop on Artificial Intelligence and Statistics, 
+                Tipping, M. E. and A. C. Faul (2003). Fast marginal likelihood maximisation
+                for sparse Bayesian models. In C. M. Bishop and B. J. Frey (Eds.), Proceedings
+                of the Ninth International Workshop on Artificial Intelligence and Statistics,
                 Key West, FL, Jan 3-6.
 
-            This code mostly does what is described in the above paper with the exception 
+            This code mostly does what is described in the above paper with the exception
             that here we use a different stopping condition as well as a modified alpha
             selection rule.  See the code for the exact details.
         !*/
@@ -647,14 +647,14 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\tvoid rvm_regression_trainer::set_epsilon(eps_)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t eps: " << eps_ 
+                << "\n\t eps: " << eps_
                 );
             eps = eps_;
         }
 
         const scalar_type get_epsilon (
         ) const
-        { 
+        {
             return eps;
         }
 
@@ -712,10 +712,10 @@ namespace dlib
             DLIB_ASSERT(is_learning_problem(x,t) && x.size() > 0,
                 "\tdecision_function rvm_regression_trainer::train(x,t)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t x.nr(): " << x.nr() 
-                << "\n\t t.nr(): " << t.nr() 
-                << "\n\t x.nc(): " << x.nc() 
-                << "\n\t t.nc(): " << t.nc() 
+                << "\n\t x.nr(): " << x.nr()
+                << "\n\t t.nr(): " << t.nr()
+                << "\n\t x.nc(): " << x.nc()
+                << "\n\t t.nc(): " << t.nc()
                 );
 
 
@@ -724,7 +724,7 @@ namespace dlib
                     - alpha(active_bases(i)) == the alpha value associated with sample x(i)
                     - weights(active_bases(i)) == the weight value associated with sample x(i)
                     - colm(phi, active_bases(i)) == the column of phi associated with sample x(i)
-                    - colm(phi, active_bases(i)) == kernel column i (from get_kernel_colum()) 
+                    - colm(phi, active_bases(i)) == kernel column i (from get_kernel_colum())
                 - else
                     - the i'th sample isn't in the model and notionally has an alpha of infinity and
                       a weight of 0.
@@ -734,7 +734,7 @@ namespace dlib
             scalar_vector_type alpha(1), prev_alpha;
             scalar_vector_type weights(1), prev_weights;
 
-            scalar_vector_type tempv, K_col; 
+            scalar_vector_type tempv, K_col;
             scalar_type var = variance(t)*0.1;
 
             // set the initial values of these guys
@@ -748,7 +748,7 @@ namespace dlib
 
 
             // now declare a bunch of other variables we will be using below
-            scalar_vector_type Q, S; 
+            scalar_vector_type Q, S;
             scalar_matrix_type sigma;
             
             matrix<scalar_type,1,0,mem_manager_type> tempv2, tempv3;
@@ -765,12 +765,12 @@ namespace dlib
 
             while (true)
             {
-                // Compute optimal weights and sigma for current alpha using equation 6. 
+                // Compute optimal weights and sigma for current alpha using equation 6.
                 sigma = trans(phi)*phi/var;
                 for (long r = 0; r < alpha.nr(); ++r)
                     sigma(r,r) += alpha(r);
                 sigma = inv(sigma);
-                weights = sigma*trans(phi)*t/var;  
+                weights = sigma*trans(phi)*t/var;
 
 
 
@@ -795,7 +795,7 @@ namespace dlib
                 ++ticker;
 
                 // compute S and Q using equations 24 and 25 (tempv = phi*sigma*trans(phi)*B*t)
-                tempv = phi*tmp(sigma*tmp(trans(phi)*t/var)); 
+                tempv = phi*tmp(sigma*tmp(trans(phi)*t/var));
                 for (long i = 0; i < S.size(); ++i)
                 {
                     // if we are currently limiting the search for the next alpha to update
@@ -803,8 +803,8 @@ namespace dlib
                     if (search_all_alphas == false && active_bases(i) == -1)
                         continue;
 
-                    // get the column for this sample out of the kernel matrix.  If it is 
-                    // something in the active set then just get it right out of phi, otherwise 
+                    // get the column for this sample out of the kernel matrix.  If it is
+                    // something in the active set then just get it right out of phi, otherwise
                     // we have to calculate it.
                     if (active_bases(i) != -1)
                         K_col = colm(phi,active_bases(i));
@@ -812,10 +812,10 @@ namespace dlib
                         get_kernel_colum(i, x, K_col);
 
                     // tempv2 = trans(phi_m)*B
-                    tempv2 = trans(K_col)/var;  
+                    tempv2 = trans(K_col)/var;
                     tempv3 = tempv2*phi;
                     S(i) = tempv2*K_col - tempv3*sigma*trans(tempv3);
-                    Q(i) = tempv2*t - tempv2*tempv; 
+                    Q(i) = tempv2*t - tempv2*tempv;
                 }
 
                 const long selected_idx = rvm_helpers::find_next_best_alpha_to_update(S,Q,alpha,active_bases, search_all_alphas, eps);
@@ -854,10 +854,10 @@ namespace dlib
                         alpha(idx) = s*s/(q*q-s);
 
                     }
-                    else 
+                    else
                     {
                         // the new alpha value is infinite so remove the selected alpha from our model
-                        active_bases(selected_idx) = -1; 
+                        active_bases(selected_idx) = -1;
                         phi = remove_col(phi, idx);
                         weights = remove_row(weights, idx);
                         alpha = remove_row(alpha, idx);
@@ -889,7 +889,7 @@ namespace dlib
                         tempv(phi.nc()) = s*s/(q*q-s);
                         tempv.swap(alpha);
 
-                        // update weights 
+                        // update weights
                         tempv.set_size(weights.size()+1);
                         set_subm(tempv, get_rect(weights)) = weights;
                         tempv(phi.nc()) = 0;
@@ -923,7 +923,7 @@ namespace dlib
             }
 
             return decision_function<kernel_type> ( mat(final_weights),
-                                                    -sum(mat(final_weights))*tau, 
+                                                    -sum(mat(final_weights))*tau,
                                                     kernel,
                                                     mat(dictionary));
 
@@ -996,7 +996,7 @@ namespace dlib
 
         const static scalar_type tau;
 
-    }; // end of class rvm_regression_trainer 
+    }; // end of class rvm_regression_trainer
 
     template <typename kernel_type>
     const typename kernel_type::scalar_type rvm_regression_trainer<kernel_type>::tau = static_cast<typename kernel_type::scalar_type>(0.001);

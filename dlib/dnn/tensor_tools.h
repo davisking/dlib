@@ -53,7 +53,7 @@ namespace dlib { namespace tt
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is a tool for filling a tensor with random numbers.  
+                This is a tool for filling a tensor with random numbers.
 
                 Note that the sequence of random numbers output by this object is different
                 when dlib is compiled with DLIB_USE_CUDA.  So you should not write code
@@ -143,13 +143,13 @@ namespace dlib { namespace tt
                 - src2.nc() == 1
                 - src2.k() == src1.k()
             - else
-                - have_same_dimensions(src1, src2) == true) 
+                - have_same_dimensions(src1, src2) == true)
                 - dest.num_samples() == 1
                 - dest.nr() == 1
                 - dest.nc() == 1
                 - dest.k() == src1.k()
         ensures
-            - Performs #dest == src1*src2 
+            - Performs #dest == src1*src2
               In particular, if the elements of dest, src1, and src2 were indexed by (n,k,r,c) then
               we would have:
                 - if (have_same_dimensions(dest,src1)) then
@@ -184,7 +184,7 @@ namespace dlib { namespace tt
         requires
             - dest.size()==src.size()
         ensures
-            - #dest == A*src 
+            - #dest == A*src
     !*/
 
     void affine_transform(
@@ -261,7 +261,7 @@ namespace dlib { namespace tt
                     (done for each sample in src)
             - else
                 - for all valid i:
-                    - #dest.host()[i] == A.host()[i]*src.host()[i] + B.host()[i]  
+                    - #dest.host()[i] == A.host()[i]*src.host()[i] + B.host()[i]
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -324,24 +324,24 @@ namespace dlib { namespace tt
     void batch_normalize_inference (
         resizable_tensor& dest,
         const tensor& src,
-        const tensor& gamma, 
+        const tensor& gamma,
         const tensor& beta,
         const tensor& running_means,
         const tensor& running_variances
     );
     /*!
         requires
-            - gamma.num_samples() == 1 
-            - gamma.nr() == src.nr() 
-            - gamma.nc() == src.nc() 
+            - gamma.num_samples() == 1
+            - gamma.nr() == src.nr()
+            - gamma.nc() == src.nc()
             - gamma.k()  == src.k()
-            - have_same_dimensions(gamma, beta) 
-            - have_same_dimensions(gamma, running_means) 
+            - have_same_dimensions(gamma, beta)
+            - have_same_dimensions(gamma, running_means)
             - have_same_dimensions(gamma, running_variances)
         ensures
             - Linearly transforms src as a call to batch_normalize() would if src had means
               and variances as given by running_means and running_variances.  That is, this
-              function performs: 
+              function performs:
                 dest = gamma*(src-running_means)/sqrt(running_variances+BATCH_NORM_EPS) + beta
               Note that it does it in a pointwise fashion over the samples in src.
     !*/
@@ -354,8 +354,8 @@ namespace dlib { namespace tt
         resizable_tensor& running_means,
         resizable_tensor& running_variances,
         const tensor& src,
-        const tensor& gamma, 
-        const tensor& beta 
+        const tensor& gamma,
+        const tensor& beta
     );
     /*!
         requires
@@ -390,8 +390,8 @@ namespace dlib { namespace tt
         const tensor& src,
         const tensor& gamma,
         tensor& src_grad,
-        tensor& gamma_grad, 
-        tensor& beta_grad 
+        tensor& gamma_grad,
+        tensor& beta_grad
     );
     /*!
         requires
@@ -421,24 +421,24 @@ namespace dlib { namespace tt
     void batch_normalize_conv_inference (
         resizable_tensor& dest,
         const tensor& src,
-        const tensor& gamma, 
+        const tensor& gamma,
         const tensor& beta,
         const tensor& running_means,
         const tensor& running_variances
     );
     /*!
         requires
-            - gamma.num_samples() == 1 
-            - gamma.nr() == 1 
-            - gamma.nc() == 1 
+            - gamma.num_samples() == 1
+            - gamma.nr() == 1
+            - gamma.nc() == 1
             - gamma.k()  == src.k()
-            - have_same_dimensions(gamma, beta) 
-            - have_same_dimensions(gamma, running_means) 
+            - have_same_dimensions(gamma, beta)
+            - have_same_dimensions(gamma, running_means)
             - have_same_dimensions(gamma, running_variances)
         ensures
             - Linearly transforms src as a call to batch_normalize_conv() would if src had
               means and variances as given by running_means and running_variances.  That
-              is, this function performs: 
+              is, this function performs:
                 dest = gamma*(src-running_means)/sqrt(running_variances+BATCH_NORM_EPS) + beta
               Note that it does this in a pointwise fashion over the samples, rows, and
               columns in src.
@@ -452,8 +452,8 @@ namespace dlib { namespace tt
         resizable_tensor& running_means,
         resizable_tensor& running_variances,
         const tensor& src,
-        const tensor& gamma, 
-        const tensor& beta 
+        const tensor& gamma,
+        const tensor& beta
     );
     /*!
         requires
@@ -484,8 +484,8 @@ namespace dlib { namespace tt
             const tensor& src,
             const tensor& gamma,
             tensor& src_grad,
-            tensor& gamma_grad, 
-            tensor& beta_grad 
+            tensor& gamma_grad,
+            tensor& beta_grad
     );
     /*!
         requires
@@ -552,7 +552,7 @@ namespace dlib { namespace tt
     );
     /*!
         requires
-            - One of the following is true: 
+            - One of the following is true:
                 - have_same_dimensions(src, dest)
                 - src.num_samples()==1 && src.k()==dest.k() && src.nr()==1 && src.nc()==1
                 - src.num_samples()==1 && src.k()==dest.k() && src.nr()==dest.nr() && src.nc()==dest.nc()
@@ -661,8 +661,8 @@ namespace dlib { namespace tt
                 - filters.nr() <= src.nr() + 2*padding_y
                 - filters.nc() <= src.nc() + 2*padding_x
             ensures
-                - convolves filters over data.  
-                - filters contains filters.num_samples() filters. 
+                - convolves filters over data.
+                - filters contains filters.num_samples() filters.
                 - #output.num_samples() == data.num_samples()
                 - #output.k() == filters.num_samples()
                 - #output.nr() == 1+(data.nr() + 2*padding_y - filters.nr())/stride_y
@@ -670,7 +670,7 @@ namespace dlib { namespace tt
         !*/
 
         void get_gradient_for_data (
-            const tensor& gradient_input, 
+            const tensor& gradient_input,
             const tensor& filters,
             tensor& data_gradient
         ) { impl.get_gradient_for_data(gradient_input,filters,data_gradient); }
@@ -691,7 +691,7 @@ namespace dlib { namespace tt
         !*/
 
         void get_gradient_for_filters (
-            const tensor& gradient_input, 
+            const tensor& gradient_input,
             const tensor& data,
             tensor& filters_gradient
         ) { impl.get_gradient_for_filters(gradient_input,data,filters_gradient); }
@@ -707,7 +707,7 @@ namespace dlib { namespace tt
             ensures
                 - let OUT be the output of (*this)(OUT,data,filters,sx,sy).
                 - let f(data,filters) == dot(OUT, gradient_input)
-                - This function finds the gradient of f() with respect to filters and assigns 
+                - This function finds the gradient of f() with respect to filters and assigns
                   this gradient to filters_gradient.
         !*/
 
@@ -812,10 +812,10 @@ namespace dlib { namespace tt
         !*/
 
         void get_gradient(
-            const tensor& gradient_input, 
+            const tensor& gradient_input,
             const tensor& dest,
             const tensor& src,
-            tensor& grad 
+            tensor& grad
         ) { impl.get_gradient(gradient_input, dest, src, grad); }
         /*!
             requires
@@ -850,8 +850,8 @@ namespace dlib { namespace tt
         requires
             - have_same_dimensions(dest, src) == true
         ensures
-            - Note that the softmax function is a vector valued function: 
-                s(x) == exp(x)/sum(exp(x)) 
+            - Note that the softmax function is a vector valued function:
+                s(x) == exp(x)/sum(exp(x))
             - Computes the softmax function on src and writes the results to dest.  The
               softmax is computed per spatial location across the different channels at
               each location.  That is, softmax() outputs a new tensor, #dest, where each of
@@ -869,8 +869,8 @@ namespace dlib { namespace tt
     );
     /*!
         requires
-            - have_same_dimensions(dest,gradient_input) == true 
-            - have_same_dimensions(dest,grad) == true 
+            - have_same_dimensions(dest,gradient_input) == true
+            - have_same_dimensions(dest,grad) == true
         ensures
             - We interpret dest as the output of softmax(dest,SRC) for some SRC tensor.
               Then let f(SRC) == dot(gradient_input,dest).  Then this function computes the
@@ -893,7 +893,7 @@ namespace dlib { namespace tt
             - have_same_dimensions(dest, src) == true
         ensures
             - for all valid i:
-                - #dest.host()[i] == 1/(1+std::exp(-src.host()[i])) 
+                - #dest.host()[i] == 1/(1+std::exp(-src.host()[i]))
             - This function supports in-place operation, i.e. having
               is_same_object(dest, src)==true
     !*/
@@ -905,8 +905,8 @@ namespace dlib { namespace tt
     );
     /*!
         requires
-            - have_same_dimensions(dest,gradient_input) == true 
-            - have_same_dimensions(dest,grad) == true 
+            - have_same_dimensions(dest,gradient_input) == true
+            - have_same_dimensions(dest,grad) == true
         ensures
             - Recalling that dest is the output of sigmoid(dest,SRC) for some SRC tensor,
               let f(SRC) == dot(gradient_input,dest).  Then this function computes the
@@ -929,7 +929,7 @@ namespace dlib { namespace tt
             - have_same_dimensions(dest, src) == true
         ensures
             - for all valid i:
-                - #dest.host()[i] == std::max(0,src.host()[i]) 
+                - #dest.host()[i] == std::max(0,src.host()[i])
             - This function supports in-place operation, i.e. having
               is_same_object(dest, src)==true
     !*/
@@ -941,8 +941,8 @@ namespace dlib { namespace tt
     );
     /*!
         requires
-            - have_same_dimensions(dest,gradient_input) == true 
-            - have_same_dimensions(dest,grad) == true 
+            - have_same_dimensions(dest,gradient_input) == true
+            - have_same_dimensions(dest,grad) == true
         ensures
             - Recalling that dest is the output of relu(dest,SRC) for some SRC tensor,
               let f(SRC) == dot(gradient_input,dest).  Then this function computes the
@@ -980,17 +980,17 @@ namespace dlib { namespace tt
         const tensor& src,
         const tensor& gradient_input,
         const tensor& param,
-        tensor& params_grad 
+        tensor& params_grad
     );
     /*!
         requires
-            - have_same_dimensions(grad,src) == true 
-            - have_same_dimensions(grad,gradient_input) == true 
+            - have_same_dimensions(grad,src) == true
+            - have_same_dimensions(grad,gradient_input) == true
             - param.size() == 1
             - params_grad.size() == 1
             - is_same_object(grad, gradient_input) == false
         ensures
-            - Recalling that dest is the output of prelu(dest,src,param) let 
+            - Recalling that dest is the output of prelu(dest,src,param) let
               f(src,param) == dot(gradient_input,dest)
             - Then this function computes the gradient of f() with respect to src and
               param.  It assigns the gradient with respect to param to #params_grad and
@@ -1008,7 +1008,7 @@ namespace dlib { namespace tt
             - have_same_dimensions(dest, src) == true
         ensures
             - for all valid i:
-                - #dest.host()[i] == std::tanh(src.host()[i]) 
+                - #dest.host()[i] == std::tanh(src.host()[i])
             - This function supports in-place operation, i.e. having
               is_same_object(dest, src)==true
     !*/
@@ -1020,8 +1020,8 @@ namespace dlib { namespace tt
     );
     /*!
         requires
-            - have_same_dimensions(dest,gradient_input) == true 
-            - have_same_dimensions(dest,grad) == true 
+            - have_same_dimensions(dest,gradient_input) == true
+            - have_same_dimensions(dest,grad) == true
         ensures
             - Recalling that dest is the output of tanh(dest,SRC) for some SRC tensor,
               let f(SRC) == dot(gradient_input,dest).  Then this function computes the
@@ -1059,7 +1059,7 @@ namespace dlib { namespace tt
                 - When you call average() we will average the tensors in items.
                 - It's important that the tensors already be allocated to their devices
                   before you call set().  This is because set() will setup the types of
-                  between device transfers now and use them when you call average().  
+                  between device transfers now and use them when you call average().
         !*/
         {
             using namespace ::dlib::cuda;
@@ -1126,7 +1126,7 @@ namespace dlib { namespace tt
                 raii_set_device set_dev(*g[0]);
                 if (g.size() == 1)
                     tt::affine_transform(*g[0], *g[0], scale);
-                else 
+                else
                     tt::affine_transform(*g[0], *g[0], *g[1], scale, scale);
 
                 for (size_t i = 2; i < g.size(); ++i)
@@ -1160,7 +1160,7 @@ namespace dlib { namespace tt
             {
                 raii_set_device set_dev(*g[0]);
                 for (size_t i = 1; i < g.size(); ++i)
-                    memcpy(*g[i], *g[0]); 
+                    memcpy(*g[i], *g[0]);
             }
         }
 

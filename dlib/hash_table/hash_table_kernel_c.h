@@ -8,11 +8,11 @@
 #include "../interfaces/map_pair.h"
 #include "../assert.h"
 
-namespace dlib 
+namespace dlib
 {
 
     template <
-        typename ht_base        
+        typename ht_base
         >
     class hash_table_kernel_c : public ht_base
     {
@@ -30,7 +30,7 @@ namespace dlib
                     << "\n\tyou can't set expnum >= 32"
                     << "\n\tthis:       " << this
                     << "\n\texpnum:     " << expnum
-                    );                   
+                    );
             }
 
             void remove (
@@ -82,11 +82,11 @@ namespace dlib
 
 
     template <
-        typename ht_base        
+        typename ht_base
         >
     inline void swap (
-        hash_table_kernel_c<ht_base>& a, 
-        hash_table_kernel_c<ht_base>& b 
+        hash_table_kernel_c<ht_base>& a,
+        hash_table_kernel_c<ht_base>& b
     ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename ht_base        
+        typename ht_base
         >
     void hash_table_kernel_c<ht_base>::
     remove (
@@ -112,7 +112,7 @@ namespace dlib
             "\tvoid binary_search_tree::remove"
             << "\n\tthe element must be in the table for it to be removed"
             << "\n\tthis:       " << this
-            << "\n\t&d:         " << &d 
+            << "\n\t&d:         " << &d
             << "\n\t&d_copy:    " << &d_copy
             << "\n\t&r:         " << &r
             );
@@ -123,7 +123,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename ht_base        
+        typename ht_base
         >
     void hash_table_kernel_c<ht_base>::
     add(
@@ -146,7 +146,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename ht_base        
+        typename ht_base
         >
     void hash_table_kernel_c<ht_base>::
     destroy(
@@ -157,7 +157,7 @@ namespace dlib
             "\tvoid hash_table::destroy"
             << "\n\tthe element must be in the table for it to be destroyed"
             << "\n\tthis:  " << this
-            << "\n\t&d:    " << &d 
+            << "\n\t&d:    " << &d
             );
 
         ht_base::destroy(d);
@@ -166,7 +166,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename ht_base        
+        typename ht_base
         >
     void hash_table_kernel_c<ht_base>::
     remove_any(
@@ -174,7 +174,7 @@ namespace dlib
         range& r
     )
     {
-        DLIB_CASSERT(this->size() != 0 && 
+        DLIB_CASSERT(this->size() != 0 &&
             (static_cast<const void*>(&d) != static_cast<void*>(&r)),
             "\tvoid hash_table::remove_any"
             << "\n\ttable must not be empty if something is going to be removed"

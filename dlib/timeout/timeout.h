@@ -13,7 +13,7 @@
 #ifdef _MSC_VER
 // this is to disable the "'this' : used in base member initializer list"
 // warning you get from some of the GUI objects since all the objects
-// require that their parent class be passed into their constructor. 
+// require that their parent class be passed into their constructor.
 // In this case though it is totally safe so it is ok to disable this warning.
 #pragma warning(disable : 4355)
 #endif // _MSC_VER
@@ -23,7 +23,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class timeout 
+    class timeout
     {
         /*!
             INITIAL VALUE
@@ -91,11 +91,11 @@ namespace dlib
         template <
             typename T
             >
-        timeout (  
+        timeout (
             T& object,
             void (T::*callback_function)(),
             unsigned long ms_to_timeout
-        ): 
+        ):
             t(*this,&timeout::trigger_timeout)
         {
             zero<T,void>* B = new zero<T,void>;
@@ -110,17 +110,17 @@ namespace dlib
             typename T,
             typename U
             >
-        timeout (  
+        timeout (
             T& object,
             void (T::*callback_function)(U callback_function_argument),
             unsigned long ms_to_timeout,
             U callback_function_argument
-        ): 
+        ):
             t(*this,&timeout::trigger_timeout)
         {
             one<T,void,U>* B = new one<T,void,U>;
             b = B;
-            B->object = &object; 
+            B->object = &object;
             B->callback_function = callback_function;
             B->val = callback_function_argument;
             t.set_delay_time(ms_to_timeout);
@@ -130,11 +130,11 @@ namespace dlib
         template <
             typename T
             >
-        timeout (  
+        timeout (
             T& object,
             int (T::*callback_function)(),
             unsigned long ms_to_timeout
-        ): 
+        ):
             t(*this,&timeout::trigger_timeout)
         {
             zero<T,int>* B = new zero<T,int>;
@@ -149,17 +149,17 @@ namespace dlib
             typename T,
             typename U
             >
-        timeout (  
+        timeout (
             T& object,
             int (T::*callback_function)(U callback_function_argument),
             unsigned long ms_to_timeout,
             U callback_function_argument
-        ): 
+        ):
             t(*this,&timeout::trigger_timeout)
         {
             one<T,int,U>* B = new one<T,int,U>;
             b = B;
-            B->object = &object; 
+            B->object = &object;
             B->callback_function = callback_function;
             B->val = callback_function_argument;
             t.set_delay_time(ms_to_timeout);
@@ -188,7 +188,7 @@ namespace dlib
         timeout(const timeout&);        // copy constructor
         timeout& operator=(const timeout&);    // assignment operator
 
-    };    
+    };
 
 // ----------------------------------------------------------------------------------------
 

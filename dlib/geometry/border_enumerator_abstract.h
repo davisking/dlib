@@ -23,12 +23,12 @@ namespace dlib
     public:
 
         border_enumerator(
-        ); 
+        );
         /*!
             ensures
                 - #move_next() == false
                   (i.e. this object is "empty" and won't enumerate anything)
-                - current_element_valid() == false 
+                - current_element_valid() == false
                 - at_start() == true
                 - size() == 0
         !*/
@@ -43,7 +43,7 @@ namespace dlib
                   but within border_size of the edge.  For example, if border_size == 1
                   then it enumerates over the single point wide strip of points all around
                   the interior edge of rect.
-                - current_element_valid() == false 
+                - current_element_valid() == false
                 - at_start() == true
                 - size() == rect.area() - shrink_rect(rect,border_size).area()
                   (i.e. the number of points in the border area of rect)
@@ -56,25 +56,25 @@ namespace dlib
         /*!
             ensures
                 - This object will enumerate over all points which are in rect but
-                  not in non_border_region.  
-                - current_element_valid() == false 
+                  not in non_border_region.
+                - current_element_valid() == false
                 - at_start() == true
-                - size() == rect.area() - rect.intersect(non_border_region).area() 
+                - size() == rect.area() - rect.intersect(non_border_region).area()
         !*/
 
         bool at_start (
         ) const;
         /*!
             ensures
-                - returns true if *this represents one position before the first point 
-                  (this would also make the current element invalid) else returns false                
+                - returns true if *this represents one position before the first point
+                  (this would also make the current element invalid) else returns false
         !*/
 
         void reset (
-        ); 
+        );
         /*!
             ensures
-                - #current_element_valid() == false 
+                - #current_element_valid() == false
                 - #at_start() == true
         !*/
 
@@ -83,19 +83,19 @@ namespace dlib
         /*!
             ensures
                 - returns true if we are currently at a valid element else
-                  returns false 
+                  returns false
         !*/
 
         bool move_next(
         );
         /*!
             ensures
-                - moves to the next element.  i.e. #element() will now 
-                  return the next border point. 
-                - the return value will be equal to #current_element_valid() 
-                - #at_start() == false 
+                - moves to the next element.  i.e. #element() will now
+                  return the next border point.
+                - the return value will be equal to #current_element_valid()
+                - #at_start() == false
 
-                - returns true if there is another element 
+                - returns true if there is another element
                 - returns false if there are no more elements in the container
         !*/
 

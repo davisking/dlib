@@ -19,16 +19,16 @@ namespace dlib
     template <
         typename K
         >
-    struct decision_function 
+    struct decision_function
     {
         /*!
             REQUIREMENTS ON K
                 K must be a kernel function object type as defined at the
                 top of dlib/svm/kernel_abstract.h
 
-            WHAT THIS OBJECT REPRESENTS 
-                This object represents a classification or regression function that was 
-                learned by a kernel based learning algorithm.   Therefore, it is a function 
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a classification or regression function that was
+                learned by a kernel based learning algorithm.   Therefore, it is a function
                 object that takes a sample object and returns a scalar value.
 
             THREAD SAFETY
@@ -117,7 +117,7 @@ namespace dlib
         >
     void deserialize (
         decision_function<K>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides serialization support for decision_function
@@ -126,19 +126,19 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename function_type 
+        typename function_type
         >
-    struct probabilistic_function 
+    struct probabilistic_function
     {
         /*!
-            REQUIREMENTS ON function_type 
+            REQUIREMENTS ON function_type
                 - function_type must be a function object with an overloaded
                   operator() similar to the other function objects defined in
                   this file.  The operator() should return a scalar type such as
                   double or float.
 
-            WHAT THIS OBJECT REPRESENTS 
-                This object represents a binary decision function that returns an 
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a binary decision function that returns an
                 estimate of the probability that a given sample is in the +1 class.
 
             THREAD SAFETY
@@ -180,11 +180,11 @@ namespace dlib
         probabilistic_function (
             const scalar_type a,
             const scalar_type b,
-            const function_type& decision_funct_ 
+            const function_type& decision_funct_
         ) : alpha(a), beta(b), decision_funct(decision_funct_) {}
         /*!
             ensures
-                - populates the probabilistic decision function with the given alpha, beta, 
+                - populates the probabilistic decision function with the given alpha, beta,
                   and decision function.
         !*/
 
@@ -195,7 +195,7 @@ namespace dlib
             ensures
                 - returns a number P such that:
                     - 0 <= P <= 1
-                    - P represents the probability that sample x is from 
+                    - P represents the probability that sample x is from
                       the class +1
         !*/
         {
@@ -224,7 +224,7 @@ namespace dlib
         >
     void deserialize (
         probabilistic_function<function_type>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides serialization support for probabilistic_function
@@ -235,19 +235,19 @@ namespace dlib
     template <
         typename K
         >
-    struct probabilistic_decision_function 
+    struct probabilistic_decision_function
     {
         /*!
             REQUIREMENTS ON K
                 K must be a kernel function object type as defined at the
                 top of dlib/svm/kernel_abstract.h
 
-            WHAT THIS OBJECT REPRESENTS 
-                This object represents a binary decision function that returns an 
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a binary decision function that returns an
                 estimate of the probability that a given sample is in the +1 class.
 
-                Note that this object is essentially just a copy of 
-                probabilistic_function but with the template argument 
+                Note that this object is essentially just a copy of
+                probabilistic_function but with the template argument
                 changed from being a function type to a kernel type.  Therefore, this
                 type is just a convenient version of probabilistic_function
                 for the case where the decision function is a dlib::decision_function<K>.
@@ -300,11 +300,11 @@ namespace dlib
         probabilistic_decision_function (
             const scalar_type a,
             const scalar_type b,
-            const decision_function<K>& decision_funct_ 
+            const decision_function<K>& decision_funct_
         ) : alpha(a), beta(b), decision_funct(decision_funct_) {}
         /*!
             ensures
-                - populates the probabilistic decision function with the given alpha, beta, 
+                - populates the probabilistic decision function with the given alpha, beta,
                   and decision_function.
         !*/
 
@@ -315,7 +315,7 @@ namespace dlib
             ensures
                 - returns a number P such that:
                     - 0 <= P <= 1
-                    - P represents the probability that sample x is from 
+                    - P represents the probability that sample x is from
                       the class +1
         !*/
         {
@@ -344,7 +344,7 @@ namespace dlib
         >
     void deserialize (
         probabilistic_decision_function<K>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides serialization support for probabilistic_decision_function
@@ -355,25 +355,25 @@ namespace dlib
     template <
         typename K
         >
-    class distance_function 
+    class distance_function
     {
         /*!
             REQUIREMENTS ON K
                 K must be a kernel function object type as defined at the
                 top of dlib/svm/kernel_abstract.h
 
-            WHAT THIS OBJECT REPRESENTS 
-                This object represents a point in kernel induced feature space. 
-                You may use this object to find the distance from the point it 
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a point in kernel induced feature space.
+                You may use this object to find the distance from the point it
                 represents to points in input space as well as other points
                 represented by distance_functions.
 
                 Specifically, if O() is the feature mapping associated with
                 the kernel used by this object.  Then this object represents
-                the point:  
+                the point:
                     sum alpha(i)*O(basis_vectors(i))
 
-                I.e.  It represents a linear combination of the basis vectors where 
+                I.e.  It represents a linear combination of the basis vectors where
                 the weights of the linear combination are stored in the alpha vector.
 
             THREAD SAFETY
@@ -414,7 +414,7 @@ namespace dlib
                 - #get_squared_norm() == 0
                 - #get_alpha().size() == 0
                 - #get_basis_vectors().size() == 0
-                - #get_kernel() == kern 
+                - #get_kernel() == kern
         !*/
 
         distance_function (
@@ -427,7 +427,7 @@ namespace dlib
                   corresponds directly to the given sample.  In particular this means
                   that:
                     - #get_kernel() == kern
-                    - #get_alpha() == a vector of length 1 which contains the value 1 
+                    - #get_alpha() == a vector of length 1 which contains the value 1
                     - #get_basis_vectors() == a vector of length 1 which contains samp
         !*/
 
@@ -437,8 +437,8 @@ namespace dlib
         /*!
             ensures
                 - Every decision_function represents a point in kernel feature space along
-                  with a bias value.  This constructor discards the bias value and creates 
-                  a distance_function which represents the point associated with the given 
+                  with a bias value.  This constructor discards the bias value and creates
+                  a distance_function which represents the point associated with the given
                   decision_function f.  In particular, this means:
                     - #get_alpha() == f.alpha
                     - #get_kernel() == f.kernel_function
@@ -461,20 +461,20 @@ namespace dlib
             const scalar_type& squared_norm,
             const K& kernel_function,
             const sample_vector_type& basis_vectors
-        ); 
+        );
         /*!
             requires
                 - alpha.size() == basis_vectors.size()
                 - squared_norm == trans(alpha)*kernel_matrix(kernel_function,basis_vectors)*alpha
-                  (Basically, squared_norm needs to be set properly for this object to make sense.  
-                  You should prefer to use the following constructor which computes squared_norm for 
-                  you.  This version is provided just in case you already know squared_norm and 
+                  (Basically, squared_norm needs to be set properly for this object to make sense.
+                  You should prefer to use the following constructor which computes squared_norm for
+                  you.  This version is provided just in case you already know squared_norm and
                   don't want to spend CPU cycles to recompute it.)
             ensures
                 - populates the distance function with the given basis vectors, weights(i.e. alphas),
                   squared_norm value, and kernel function. I.e.
                     - #get_alpha() == alpha
-                    - #get_squared_norm() == squared_norm 
+                    - #get_squared_norm() == squared_norm
                     - #get_kernel() == kernel_function
                     - #get_basis_vectors() == basis_vectors
         !*/
@@ -488,7 +488,7 @@ namespace dlib
             requires
                 - alpha.size() == basis_vectors.size()
             ensures
-                - populates the distance function with the given basis vectors, weights(i.e. alphas), 
+                - populates the distance function with the given basis vectors, weights(i.e. alphas),
                   and kernel function.  The correct b value is computed automatically.  I.e.
                     - #get_alpha() == alpha
                     - #get_squared_norm() == trans(alpha)*kernel_matrix(kernel_function,basis_vectors)*alpha
@@ -498,7 +498,7 @@ namespace dlib
         !*/
 
         const scalar_vector_type& get_alpha (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the set of weights on each basis vector in this object
@@ -536,7 +536,7 @@ namespace dlib
                 - let c == sum_over_i get_alpha()(i)*O(get_basis_vectors()(i)) == the point in kernel space that
                   this object represents.  That is, c is the weighted sum of basis vectors.
                 - Then this object returns the distance between the point O(x) and c in kernel
-                  space. 
+                  space.
         !*/
 
         result_type operator() (
@@ -557,7 +557,7 @@ namespace dlib
                 - multiplies the point represented by *this by val and returns the result.  In
                   particular, this function returns a decision_function DF such that:
                     - DF.get_basis_vectors() == get_basis_vectors()
-                    - DF.get_kernel() == get_kernel() 
+                    - DF.get_kernel() == get_kernel()
                     - DF.get_alpha() == get_alpha() * val
         !*/
 
@@ -569,7 +569,7 @@ namespace dlib
                 - divides the point represented by *this by val and returns the result.  In
                   particular, this function returns a decision_function DF such that:
                     - DF.get_basis_vectors() == get_basis_vectors()
-                    - DF.get_kernel() == get_kernel() 
+                    - DF.get_kernel() == get_kernel()
                     - DF.get_alpha() == get_alpha() / val
         !*/
 
@@ -584,7 +584,7 @@ namespace dlib
                     - DF represents the sum of the point represented by *this and rhs
                     - DF.get_basis_vectors().size() == get_basis_vectors().size() + rhs.get_basis_vectors().size()
                     - DF.get_basis_vectors() contains all the basis vectors in both *this and rhs.
-                    - DF.get_kernel() == get_kernel() 
+                    - DF.get_kernel() == get_kernel()
                     - DF.alpha == join_cols(get_alpha(), rhs.get_alpha())
         !*/
 
@@ -599,7 +599,7 @@ namespace dlib
                     - DF represents the difference of the point represented by *this and rhs (i.e. *this - rhs)
                     - DF.get_basis_vectors().size() == get_basis_vectors().size() + rhs.get_basis_vectors().size()
                     - DF.get_basis_vectors() contains all the basis vectors in both *this and rhs.
-                    - DF.get_kernel() == get_kernel() 
+                    - DF.get_kernel() == get_kernel()
                     - DF.alpha == join_cols(get_alpha(), -1 * rhs.get_alpha())
         !*/
     };
@@ -633,7 +633,7 @@ namespace dlib
         >
     void deserialize (
         distance_function<K>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides serialization support for distance_function
@@ -645,10 +645,10 @@ namespace dlib
         typename function_type,
         typename normalizer_type = vector_normalizer<typename function_type::sample_type>
         >
-    struct normalized_function 
+    struct normalized_function
     {
         /*!
-            REQUIREMENTS ON function_type 
+            REQUIREMENTS ON function_type
                 - function_type must be a function object with an overloaded
                   operator() similar to the other function objects defined in
                   this file.
@@ -657,9 +657,9 @@ namespace dlib
                 - normalizer_type must be a function object with an overloaded
                   operator() that takes a sample_type and returns a sample_type.
 
-            WHAT THIS OBJECT REPRESENTS 
+            WHAT THIS OBJECT REPRESENTS
                 This object represents a container for another function
-                object and an instance of a normalizer function.  
+                object and an instance of a normalizer function.
 
                 It automatically normalizes all inputs before passing them
                 off to the contained function object.
@@ -689,11 +689,11 @@ namespace dlib
 
         normalized_function (
             const vector_normalizer<sample_type>& normalizer_,
-            const function_type& funct 
+            const function_type& funct
         ) : normalizer(normalizer_), function(funct) {}
         /*!
             ensures
-                - populates this object with the vector_normalizer and function object 
+                - populates this object with the vector_normalizer and function object
         !*/
 
         const std::vector<result_type> get_labels(
@@ -721,7 +721,7 @@ namespace dlib
 
     template <
         typename function_type,
-        typename normalizer_type 
+        typename normalizer_type
         >
     void serialize (
         const normalized_function<function_type, normalizer_type>& item,
@@ -733,11 +733,11 @@ namespace dlib
 
     template <
         typename function_type,
-        typename normalizer_type 
+        typename normalizer_type
         >
     void deserialize (
         normalized_function<function_type, normalizer_type>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides serialization support for normalized_function
@@ -748,16 +748,16 @@ namespace dlib
     template <
         typename K
         >
-    struct projection_function 
+    struct projection_function
     {
         /*!
             REQUIREMENTS ON K
                 K must be a kernel function object type as defined at the
                 top of dlib/svm/kernel_abstract.h
 
-            WHAT THIS OBJECT REPRESENTS 
+            WHAT THIS OBJECT REPRESENTS
                 This object represents a function that takes a data sample and projects
-                it into kernel feature space.  The result is a real valued column vector that 
+                it into kernel feature space.  The result is a real valued column vector that
                 represents a point in a kernel feature space.
 
             THREAD SAFETY
@@ -826,8 +826,8 @@ namespace dlib
                 - weights.nc() == basis_vectors.size()
                 - out_vector_size() > 0
             ensures
-                - Takes the given x sample and projects it onto part of the kernel feature 
-                  space spanned by the basis_vectors.  The exact projection arithmetic is 
+                - Takes the given x sample and projects it onto part of the kernel feature
+                  space spanned by the basis_vectors.  The exact projection arithmetic is
                   defined below.
         !*/
         {
@@ -860,7 +860,7 @@ namespace dlib
         >
     void deserialize (
         projection_function<K>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides serialization support for projection_function
@@ -870,19 +870,19 @@ namespace dlib
 
     template <
         typename K,
-        typename result_type_ = typename K::scalar_type 
+        typename result_type_ = typename K::scalar_type
         >
     struct multiclass_linear_decision_function
     {
         /*!
             REQUIREMENTS ON K
-                K must be either linear_kernel or sparse_linear_kernel.  
+                K must be either linear_kernel or sparse_linear_kernel.
 
-            WHAT THIS OBJECT REPRESENTS 
-                This object represents a multiclass classifier built out of a set of 
-                binary classifiers.  Each binary classifier is used to vote for the 
-                correct multiclass label using a one vs. all strategy.  Therefore, 
-                if you have N classes then there will be N binary classifiers inside 
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a multiclass classifier built out of a set of
+                binary classifiers.  Each binary classifier is used to vote for the
+                correct multiclass label using a one vs. all strategy.  Therefore,
+                if you have N classes then there will be N binary classifiers inside
                 this object.  Additionally, this object is linear in the sense that
                 each of these binary classifiers is a simple linear plane.
 
@@ -908,7 +908,7 @@ namespace dlib
 
         scalar_matrix_type       weights;
         scalar_vector_type       b;
-        std::vector<result_type> labels; 
+        std::vector<result_type> labels;
 
         const std::vector<result_type>& get_labels(
         ) const { return labels; }
@@ -939,7 +939,7 @@ namespace dlib
                     - x.size() == weights.nc()
                       (i.e. it must be legal to multiply weights with x)
             ensures
-                - Returns the predicted label for the x sample and also it's score.  
+                - Returns the predicted label for the x sample and also it's score.
                   In particular, it returns the following:
                     std::make_pair(labels[index_of_max(weights*x-b)],  max(weights*x-b))
         !*/
@@ -981,7 +981,7 @@ namespace dlib
         >
     void deserialize (
         multiclass_linear_decision_function<K,result_type_>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides serialization support for multiclass_linear_decision_function

@@ -85,8 +85,8 @@ namespace dlib
                         1 < folds && folds <= static_cast<long>(samples.size()),
                 "\t double cross_validate_assignment_trainer()"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t samples.size(): " << samples.size() 
-                << "\n\t folds:  " << folds 
+                << "\n\t samples.size(): " << samples.size()
+                << "\n\t folds:  " << folds
                 << "\n\t is_forced_assignment_problem(samples,labels): " << is_forced_assignment_problem(samples,labels)
                 << "\n\t is_assignment_problem(samples,labels):        " << is_assignment_problem(samples,labels)
                 << "\n\t is_learning_problem(samples,labels):          " << is_learning_problem(samples,labels)
@@ -98,8 +98,8 @@ namespace dlib
                         1 < folds && folds <= static_cast<long>(samples.size()),
                 "\t double cross_validate_assignment_trainer()"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t samples.size(): " << samples.size() 
-                << "\n\t folds:  " << folds 
+                << "\n\t samples.size(): " << samples.size()
+                << "\n\t folds:  " << folds
                 << "\n\t is_assignment_problem(samples,labels): " << is_assignment_problem(samples,labels)
                 << "\n\t is_learning_problem(samples,labels):   " << is_learning_problem(samples,labels)
                 );

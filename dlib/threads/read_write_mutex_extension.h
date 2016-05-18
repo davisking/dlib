@@ -15,7 +15,7 @@ namespace dlib
     {
         /*!
             INITIAL VALUE
-                - max_locks == defined by constructor 
+                - max_locks == defined by constructor
                 - available_locks == max_locks
                 - write_lock_in_progress == false
                 - write_lock_active == false
@@ -23,7 +23,7 @@ namespace dlib
             CONVENTION
                 - Each time someone gets a read only lock they take one of the "available locks"
                   and each write lock takes all possible locks (i.e. max_locks).  The number of
-                  available locks is recorded in available_locks.  Any time you try to lock this 
+                  available locks is recorded in available_locks.  Any time you try to lock this
                   object and there aren't available locks you have to wait.
 
                 - max_locks == max_readonly_locks()
@@ -75,7 +75,7 @@ namespace dlib
             m.lock();
 
             // If another write lock is already in progress then wait for it to finish
-            // before we start trying to grab all the available locks.  This way we 
+            // before we start trying to grab all the available locks.  This way we
             // don't end up fighting over the locks.
             while (write_lock_in_progress)
                 s.wait();
@@ -160,7 +160,7 @@ namespace dlib
         signaler s;
         const unsigned long max_locks;
         mutable unsigned long available_locks;
-        mutable bool write_lock_in_progress; 
+        mutable bool write_lock_in_progress;
         mutable bool write_lock_active;
 
         // restricted functions

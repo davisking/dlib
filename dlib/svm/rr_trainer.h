@@ -16,7 +16,7 @@
 namespace dlib
 {
     template <
-        typename K 
+        typename K
         >
     class rr_trainer
     {
@@ -28,7 +28,7 @@ namespace dlib
         typedef typename kernel_type::mem_manager_type mem_manager_type;
         typedef decision_function<kernel_type> trained_function_type;
 
-        // You are getting a compiler error on this line because you supplied a non-linear or 
+        // You are getting a compiler error on this line because you supplied a non-linear or
         // sparse kernel to the rr_trainer object.  You have to use dlib::linear_kernel with this trainer.
         COMPILE_TIME_ASSERT((is_same_type<K, linear_kernel<sample_type> >::value));
 
@@ -39,7 +39,7 @@ namespace dlib
             lambda(0)
         {
             // default lambda search list
-            lams = matrix_cast<scalar_type>(logspace(-9, 2, 50)); 
+            lams = matrix_cast<scalar_type>(logspace(-9, 2, 50));
         }
 
         void be_verbose (
@@ -79,14 +79,14 @@ namespace dlib
         }
 
         void set_lambda (
-            scalar_type lambda_ 
+            scalar_type lambda_
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(lambda_ >= 0,
                 "\t void rr_trainer::set_lambda()"
                 << "\n\t lambda must be greater than or equal to 0"
-                << "\n\t lambda: " << lambda 
+                << "\n\t lambda: " << lambda
                 << "\n\t this:   " << this
                 );
 
@@ -108,9 +108,9 @@ namespace dlib
             DLIB_ASSERT(is_vector(lambdas) && lambdas.size() > 0 && min(lambdas) > 0,
                 "\t void rr_trainer::set_search_lambdas()"
                 << "\n\t lambdas must be a non-empty vector of values"
-                << "\n\t is_vector(lambdas): " << is_vector(lambdas) 
+                << "\n\t is_vector(lambdas): " << is_vector(lambdas)
                 << "\n\t lambdas.size():     " << lambdas.size()
-                << "\n\t min(lambdas):       " << min(lambdas) 
+                << "\n\t min(lambdas):       " << min(lambdas)
                 << "\n\t this:   " << this
                 );
 
@@ -133,7 +133,7 @@ namespace dlib
             const in_scalar_vector_type& y
         ) const
         {
-            std::vector<scalar_type> temp; 
+            std::vector<scalar_type> temp;
             scalar_type temp2;
             return do_train(mat(x), mat(y), false, temp, temp2);
         }
@@ -160,7 +160,7 @@ namespace dlib
             const in_sample_vector_type& x,
             const in_scalar_vector_type& y,
             std::vector<scalar_type>& loo_values,
-            scalar_type& lambda_used 
+            scalar_type& lambda_used
         ) const
         {
             return do_train(mat(x), mat(y), true, loo_values, lambda_used);
@@ -187,8 +187,8 @@ namespace dlib
                 << "\n\t invalid inputs were given to this function"
                 << "\n\t is_vector(x): " << is_vector(x)
                 << "\n\t is_vector(y): " << is_vector(y)
-                << "\n\t x.size():     " << x.size() 
-                << "\n\t y.size():     " << y.size() 
+                << "\n\t x.size():     " << x.size()
+                << "\n\t y.size():     " << y.size()
                 );
 
 #ifdef ENABLE_ASSERTS
@@ -208,7 +208,7 @@ namespace dlib
             const long dims = x(0).size();
 
             /*
-                Notes on the solution of ridge regression 
+                Notes on the solution of ridge regression
 
                 Let A = an x.size() by dims matrix which contains all the data samples.
 
@@ -218,7 +218,7 @@ namespace dlib
                 Let L = trans(A)*y
 
                 Then the optimal w is given by:
-                    w = inv(C + lambda*I) * L 
+                    w = inv(C + lambda*I) * L
 
 
                 There is a trick to compute leave one out cross validation results for many different
@@ -235,9 +235,9 @@ namespace dlib
                     values in an efficient way by using an eigen decomposition of C.  So we use
                     the fact that:
                         inv(C + lambda*I) == V*inv(D + lambda*I)*trans(V)
-                        where V*D*trans(V) == C 
+                        where V*D*trans(V) == C
 
-                    Also, via some simple linear algebra the above paper works out that the leave one out 
+                    Also, via some simple linear algebra the above paper works out that the leave one out
                     value for a sample x(i) is equal to the following:
                         Let G = inv(C + lambda*I)
                         let val = trans(x(i))*G*x(i);
@@ -251,7 +251,7 @@ namespace dlib
 
                 Finally, note that we will pretend there was a 1 appended to the end of each
                 vector in x.  We won't actually do that though because we don't want to
-                have to make a copy of all the samples.  So throughout the following code 
+                have to make a copy of all the samples.  So throughout the following code
                 I have explicitly dealt with this.
             */
 
@@ -269,7 +269,7 @@ namespace dlib
             // Account for the extra 1 that we pretend is appended to x
             // Make C = [C      tempv
             //           tempv' x.size()]
-            C = join_cols(join_rows(C, tempv), 
+            C = join_cols(join_rows(C, tempv),
                           join_rows(trans(tempv), uniform_matrix<scalar_type>(1,1, x.size())));
             L = join_cols(L, uniform_matrix<scalar_type>(1,1, sum(y)));
 
@@ -362,7 +362,7 @@ namespace dlib
             w = colm(w,0,dims);
 
 
-            // If we haven't done this already and we are supposed to then compute the LOO error rate for 
+            // If we haven't done this already and we are supposed to then compute the LOO error rate for
             // the current lambda and store the result in best_looe.
             if (output_loo_values)
             {
@@ -436,7 +436,7 @@ namespace dlib
         /*!
             CONVENTION
                 - get_lambda() == lambda
-                - get_kernel() == kernel_type() 
+                - get_kernel() == kernel_type()
                 - will_use_regression_loss_for_loo_cv() == use_regression_loss
                 - get_search_lambdas() == lams
         !*/
@@ -446,8 +446,8 @@ namespace dlib
 
         scalar_type lambda;
 
-        matrix<scalar_type,0,0,mem_manager_type> lams; 
-    }; 
+        matrix<scalar_type,0,0,mem_manager_type> lams;
+    };
 
 }
 

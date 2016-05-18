@@ -25,7 +25,7 @@ namespace dlib
         const static unsigned long horizon = horizon_;
 
         mpc(
-        ) 
+        )
         {
             A = 0;
             B = 0;
@@ -66,9 +66,9 @@ namespace dlib
                 << "\n\t B.nc(): " <<  B.nc()
                 );
 
-            DLIB_ASSERT(A.nr() == A.nc() && 
-                        A.nr() == B.nr() && 
-                        A.nr() == C.nr() && 
+            DLIB_ASSERT(A.nr() == A.nc() &&
+                        A.nr() == B.nr() &&
+                        A.nr() == C.nr() &&
                         A.nr() == Q.nr(),
                 "\t mpc::mpc()"
                 << "\n\t invalid inputs were given to this function"
@@ -79,8 +79,8 @@ namespace dlib
                 << "\n\t Q.nr(): " <<  Q.nr()
                 );
             DLIB_ASSERT(
-                        B.nc() == R.nr() && 
-                        B.nc() == lower.nr() && 
+                        B.nc() == R.nr() &&
+                        B.nc() == lower.nr() &&
                         B.nc() == upper.nr() ,
                 "\t mpc::mpc()"
                 << "\n\t invalid inputs were given to this function"
@@ -94,9 +94,9 @@ namespace dlib
                         min(upper-lower) >= 0,
                 "\t mpc::mpc()"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t min(Q): " << min(Q) 
-                << "\n\t min(R): " << min(R) 
-                << "\n\t min(upper-lower): " << min(upper-lower) 
+                << "\n\t min(Q): " << min(Q)
+                << "\n\t min(R): " << min(R)
+                << "\n\t min(upper-lower): " << min(upper-lower)
                 );
 
 
@@ -112,7 +112,7 @@ namespace dlib
             }
 
             // Bound the maximum eigenvalue of the hessian by computing the trace of the
-            // hessian matrix. 
+            // hessian matrix.
             lambda = sum(R)*horizon;
             matrix<double,S,S> temp = diagm(Q);
             for (unsigned long c = 0; c < horizon; ++c)
@@ -147,8 +147,8 @@ namespace dlib
             DLIB_ASSERT(time < horizon,
                 "\t void mpc::set_target(eps_)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t time: " << time 
-                << "\n\t horizon: " << horizon 
+                << "\n\t time: " << time
+                << "\n\t horizon: " << horizon
                 );
 
             target[time] = val;
@@ -177,8 +177,8 @@ namespace dlib
             DLIB_ASSERT(time < horizon,
                 "\t matrix mpc::get_target(eps_)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t time: " << time 
-                << "\n\t horizon: " << horizon 
+                << "\n\t time: " << time
+                << "\n\t horizon: " << horizon
                 );
 
             return target[time];
@@ -189,7 +189,7 @@ namespace dlib
 
         void set_max_iterations (
             unsigned long max_iter
-        ) 
+        )
         {
             max_iterations = max_iter;
         }
@@ -202,14 +202,14 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\t void mpc::set_epsilon(eps_)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 );
             eps = eps_;
         }
 
         double get_epsilon (
         ) const
-        { 
+        {
             return eps;
         }
 
@@ -221,9 +221,9 @@ namespace dlib
             DLIB_ASSERT(min(R) > 0 && A.nr() == current_state.size(),
                 "\t matrix mpc::operator(current_state)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t min(R): " << min(R) 
-                << "\n\t A.nr(): " << A.nr() 
-                << "\n\t current_state.size(): " << current_state.size() 
+                << "\n\t min(R): " << min(R)
+                << "\n\t A.nr(): " << A.nr()
+                << "\n\t current_state.size(): " << current_state.size()
                 );
 
             // Shift the inputs over by one time step so we can use them to warm start the
@@ -246,9 +246,9 @@ namespace dlib
         // operator().
         matrix<double,S,1> M[horizon];
         matrix<double,I,1> MM[horizon];
-        matrix<double,I,1> df[horizon]; 
-        matrix<double,I,1> v[horizon]; 
-        matrix<double,I,1> v_old[horizon]; 
+        matrix<double,I,1> df[horizon];
+        matrix<double,I,1> v[horizon];
+        matrix<double,I,1> v_old[horizon];
 
         void solve_linear_mpc (
             const matrix<double,S,1>& initial_state
@@ -295,7 +295,7 @@ namespace dlib
                     {
                         // if this variable isn't an active constraint then we care about it's
                         // derivative.
-                        if (!((controls[i](j) <= lower(j) && df[i](j) > 0) || 
+                        if (!((controls[i](j) <= lower(j) && df[i](j) > 0) ||
                               (controls[i](j) >= upper(j) && df[i](j) < 0)))
                         {
                             if (std::abs(df[i](j)) > max_df)
@@ -356,11 +356,11 @@ namespace dlib
         matrix<double,I,1> R;
         matrix<double,I,1> lower;
         matrix<double,I,1> upper;
-        matrix<double,S,1> target[horizon]; 
+        matrix<double,S,1> target[horizon];
 
         double lambda; // abound on the largest eigenvalue of the hessian matrix.
-        matrix<double,I,1> Q_diag[horizon]; 
-        matrix<double,I,1> controls[horizon]; 
+        matrix<double,I,1> Q_diag[horizon];
+        matrix<double,I,1> controls[horizon];
 
     };
 

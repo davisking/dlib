@@ -57,8 +57,8 @@ namespace dlib
         typename base
         >
     inline void swap (
-        sync_extension_kernel_1<base>& a, 
-        sync_extension_kernel_1<base>& b 
+        sync_extension_kernel_1<base>& a,
+        sync_extension_kernel_1<base>& b
     ) { a.swap(b); }
 
 }

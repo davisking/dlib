@@ -13,7 +13,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is the exception thrown if any calls to the NVIDIA CUDA runtime
-                returns an error.  
+                returns an error.
         !*/
 
         cuda_error(const std::string& message): error(message) {}
@@ -25,7 +25,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is the exception thrown if any calls to the NVIDIA cuDNN library
-                returns an error.  
+                returns an error.
         !*/
 
         cudnn_error(const std::string& message): cuda_error(message) {}
@@ -36,7 +36,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is the exception thrown if any calls to the NVIDIA cuRAND library
-                returns an error.  
+                returns an error.
         !*/
 
         curand_error(const std::string& message): cuda_error(message) {}
@@ -47,7 +47,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is the exception thrown if any calls to the NVIDIA cuBLAS library
-                returns an error.  
+                returns an error.
         !*/
 
         cublas_error(const std::string& message): cuda_error(message) {}

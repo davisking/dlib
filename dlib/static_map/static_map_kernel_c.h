@@ -33,9 +33,9 @@ namespace dlib
         typename map_base
         >
     inline void swap (
-        static_map_kernel_c<map_base>& a, 
-        static_map_kernel_c<map_base>& b 
-    ) { a.swap(b); }  
+        static_map_kernel_c<map_base>& a,
+        static_map_kernel_c<map_base>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ namespace dlib
         >
     map_pair<typename map_base::domain_type,typename map_base::range_type>& static_map_kernel_c<map_base>::
     element (
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_CASSERT(this->current_element_valid() == true,

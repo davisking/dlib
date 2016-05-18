@@ -104,7 +104,7 @@ namespace dlib
 
         template <
             typename T,
-            typename U 
+            typename U
             >
         svm_struct_processing_node (
             const structural_svm_problem<T,U>& problem,
@@ -117,9 +117,9 @@ namespace dlib
                         problem.get_num_dimensions() != 0,
                 "\t svm_struct_processing_node()"
                 << "\n\t Invalid arguments were given to this function"
-                << "\n\t port: " << port 
-                << "\n\t problem.get_num_samples():    " << problem.get_num_samples() 
-                << "\n\t problem.get_num_dimensions(): " << problem.get_num_dimensions() 
+                << "\n\t port: " << port
+                << "\n\t problem.get_num_samples():    " << problem.get_num_samples()
+                << "\n\t problem.get_num_dimensions(): " << problem.get_num_dimensions()
                 << "\n\t this: " << this
                 );
 
@@ -135,7 +135,7 @@ namespace dlib
 
         template <
             typename matrix_type,
-            typename feature_vector_type 
+            typename feature_vector_type
             >
         class node_type : public base, threaded_object
         {
@@ -165,7 +165,7 @@ namespace dlib
             void thread()
             {
                 using namespace impl;
-                tsu_in msg; 
+                tsu_in msg;
                 tsu_out temp;
 
                 timestamper ts;
@@ -196,7 +196,7 @@ namespace dlib
                     }
 
 
-                    if (msg.template contains<bridge_status>() && 
+                    if (msg.template contains<bridge_status>() &&
                         msg.template get<bridge_status>().is_connected)
                     {
                         temp = problem.get_num_dimensions();
@@ -222,7 +222,7 @@ namespace dlib
                         bool buffer_subgradients_locally = with_buffer_time.mean() < without_buffer_time.mean();
 
                         // every 50 iterations we should try to flip the buffering scheme to see if
-                        // doing it the other way might be better.  
+                        // doing it the other way might be better.
                         if ((num_iterations_executed%50) == 0)
                         {
                             buffer_subgradients_locally = !buffer_subgradients_locally;
@@ -255,7 +255,7 @@ namespace dlib
                 void call_oracle (
                     long begin,
                     long end
-                ) 
+                )
                 {
                     // If we are only going to call the separation oracle once then don't
                     // run the slightly more complex for loop version of this code.  Or if
@@ -270,8 +270,8 @@ namespace dlib
                         feature_vector_type ftemp;
                         for (long i = begin; i < end; ++i)
                         {
-                            self.cache[i].separation_oracle_cached(req.converged, 
-                                                                   req.skip_cache, 
+                            self.cache[i].separation_oracle_cached(req.converged,
+                                                                   req.skip_cache,
                                                                    req.saved_current_risk_gap,
                                                                    req.current_solution,
                                                                    loss,
@@ -294,7 +294,7 @@ namespace dlib
                         {
                             scalar_type loss_temp;
                             self.cache[i].separation_oracle_cached(req.converged,
-                                                                   req.skip_cache, 
+                                                                   req.skip_cache,
                                                                    req.saved_current_risk_gap,
                                                                    req.current_solution,
                                                                    loss_temp,
@@ -365,7 +365,7 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\t void svm_struct_controller_node::set_cache_based_epsilon()"
                 << "\n\t eps_ must be greater than 0"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 << "\n\t this: " << this
                 );
 
@@ -380,7 +380,7 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\t void svm_struct_controller_node::set_epsilon()"
                 << "\n\t eps_ must be greater than 0"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 << "\n\t this: " << this
                 );
 
@@ -395,13 +395,13 @@ namespace dlib
 
         void set_max_iterations (
             unsigned long max_iter
-        ) 
+        )
         {
             max_iterations = max_iter;
         }
 
         void be_verbose (
-        ) 
+        )
         {
             verbose = true;
         }
@@ -421,14 +421,14 @@ namespace dlib
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(0 <= first_dimension  &&
-                0 <= rows && 0 <= cols && 
+                0 <= rows && 0 <= cols &&
                 0 < regularization_strength,
                 "\t void svm_struct_controller_node::add_nuclear_norm_regularizer()"
                 << "\n\t Invalid arguments were given to this function."
-                << "\n\t first_dimension:         " << first_dimension 
-                << "\n\t rows:                    " << rows 
-                << "\n\t cols:                    " << cols 
-                << "\n\t regularization_strength: " << regularization_strength 
+                << "\n\t first_dimension:         " << first_dimension
+                << "\n\t rows:                    " << rows
+                << "\n\t cols:                    " << cols
+                << "\n\t regularization_strength: " << regularization_strength
                 << "\n\t this: " << this
                 );
 
@@ -452,17 +452,17 @@ namespace dlib
 
         void set_c (
             double C_
-        ) 
-        { 
+        )
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(C_ > 0,
                 "\t void svm_struct_controller_node::set_c()"
                 << "\n\t C_ must be greater than 0"
-                << "\n\t C_:    " << C_ 
+                << "\n\t C_:    " << C_
                 << "\n\t this: " << this
                 );
 
-            C = C_; 
+            C = C_;
         }
 
         void add_processing_node (
@@ -473,7 +473,7 @@ namespace dlib
             DLIB_ASSERT(addr.port != 0,
                 "\t void svm_struct_controller_node::add_processing_node()"
                 << "\n\t Invalid inputs were given to this function"
-                << "\n\t addr.host_address:   " << addr.host_address 
+                << "\n\t addr.host_address:   " << addr.host_address
                 << "\n\t addr.port: " << addr.port
                 << "\n\t this: " << this
                 );
@@ -505,7 +505,7 @@ namespace dlib
         }
 
         void remove_processing_nodes (
-        ) 
+        )
         {
             nodes.clear();
         }
@@ -579,7 +579,7 @@ namespace dlib
                 bridges.resize(nodes.size());
                 for (unsigned long i = 0; i< bridges.size(); ++i)
                 {
-                    bridges[i].reset(new bridge(connect_to(nodes[i]), 
+                    bridges[i].reset(new bridge(connect_to(nodes[i]),
                                                 receive(in), transmit(*out_pipes[i])));
                 }
 
@@ -624,7 +624,7 @@ namespace dlib
                 matrix_type& w,
                 scalar_type& risk,
                 matrix_type& subgradient
-            ) const 
+            ) const
             {
                 using namespace impl;
                 subgradient.set_size(w.size(),1);
@@ -641,7 +641,7 @@ namespace dlib
                     out_pipes[i]->enqueue(temp_out);
                 }
 
-                // collect all the oracle responses  
+                // collect all the oracle responses
                 long num = 0;
                 scalar_type total_loss = 0;
                 tsu_in temp_in;
@@ -653,7 +653,7 @@ namespace dlib
                     {
                         ++responses;
                         const oracle_response<matrix_type>& data = temp_in.template get<oracle_response<matrix_type> >();
-                        subgradient += data.subgradient; 
+                        subgradient += data.subgradient;
                         total_loss += data.loss;
                         num += data.num;
                     }
@@ -665,7 +665,7 @@ namespace dlib
 
                 if (this->nuclear_norm_regularizers.size() != 0)
                 {
-                    matrix_type grad; 
+                    matrix_type grad;
                     double obj;
                     this->compute_nuclear_norm_parts(w, grad, obj);
                     risk += obj;

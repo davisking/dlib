@@ -14,7 +14,7 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This is a tool that allows you to effectively put an object you just
                 deserialized from a stream back into the stream.  Its use is best
-                illustrated via an example.  
+                illustrated via an example.
 
                 void example(std::istream& in)
                 {
@@ -41,11 +41,11 @@ namespace dlib
         template <typename T>
         unserialize (
             const T& item,
-            std::istream& in 
+            std::istream& in
         );
         /*!
             requires
-                - T must be serializable 
+                - T must be serializable
             ensures
                 - The bytes in this stream begin with a serialized copy of item followed
                   immediately by the bytes in the given istream.

@@ -8,7 +8,7 @@
 #include <dlib/tokenizer.h>
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace std;
@@ -25,9 +25,9 @@ namespace
         requires
             - tok is an implementation of tokenizer_kernel_abstract.h
         ensures
-            - runs tests on tok for compliance with the specs 
+            - runs tests on tok for compliance with the specs
     !*/
-    {        
+    {
 
         print_spinner();
 
@@ -68,7 +68,7 @@ namespace
         test2.get_token(type,token);
         DLIB_TEST(type == tok::END_OF_FILE);
         test2.get_token(type,token);
-        DLIB_TEST(type == tok::END_OF_FILE);            
+        DLIB_TEST(type == tok::END_OF_FILE);
 
 
         sin.clear();
@@ -79,10 +79,10 @@ namespace
         DLIB_TEST(token == "  ");
 
         DLIB_TEST(test2.peek_type() == tok::IDENTIFIER);
-        DLIB_TEST(test2.peek_token() == "The"); 
+        DLIB_TEST(test2.peek_token() == "The");
         test2.get_token(type,token);
         DLIB_TEST(type == tok::IDENTIFIER);
-        DLIB_TEST(token == "The");            
+        DLIB_TEST(token == "The");
 
         test2.get_token(type,token);
         DLIB_TEST(type == tok::WHITE_SPACE);
@@ -90,7 +90,7 @@ namespace
 
         test2.get_token(type,token);
         DLIB_TEST(type == tok::IDENTIFIER);
-        DLIB_TEST(token == "cat");            
+        DLIB_TEST(token == "cat");
 
         test2.get_token(type,token);
         DLIB_TEST(type == tok::WHITE_SPACE);
@@ -183,7 +183,7 @@ namespace
 
         test2.get_token(type,token);
         DLIB_TEST(type == tok::IDENTIFIER);
-        DLIB_TEST(token == "The");            
+        DLIB_TEST(token == "The");
 
         test2.get_token(type,token);
         DLIB_TEST(type == tok::WHITE_SPACE);
@@ -191,7 +191,7 @@ namespace
 
         test2.get_token(type,token);
         DLIB_TEST(type == tok::IDENTIFIER);
-        DLIB_TEST(token == "cat");            
+        DLIB_TEST(token == "cat");
 
         test2.get_token(type,token);
         DLIB_TEST(type == tok::WHITE_SPACE);
@@ -274,7 +274,7 @@ namespace
 
         test2.get_token(type,token);
         DLIB_TEST(type == tok::IDENTIFIER);
-        DLIB_TEST(token == "The");            
+        DLIB_TEST(token == "The");
 
         test2.get_token(type,token);
         DLIB_TEST(type == tok::WHITE_SPACE);
@@ -282,7 +282,7 @@ namespace
 
         test2.get_token(type,token);
         DLIB_TEST(type == tok::IDENTIFIER);
-        DLIB_TEST(token == "cat");            
+        DLIB_TEST(token == "cat");
 
         test2.get_token(type,token);
         DLIB_TEST(type == tok::WHITE_SPACE);

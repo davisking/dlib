@@ -23,11 +23,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M1, typename M2, bool flip_m2 = false>
-    struct op_conv 
+    struct op_conv
     {
-        op_conv( const M1& m1_, const M2& m2_) : 
+        op_conv( const M1& m1_, const M2& m2_) :
             m1(m1_),
-            m2(m2_), 
+            m2(m2_),
             nr_(m1.nr()+m2.nr()-1),
             nc_(m1.nc()+m2.nc()-1)
         {
@@ -39,7 +39,7 @@ namespace dlib
 
         const M1& m1;
         const M2& m2;
-        long nr_; 
+        long nr_;
         long nc_;
 
         const static long cost = (M1::cost+M2::cost)*10;
@@ -50,8 +50,8 @@ namespace dlib
         typedef typename M1::mem_manager_type mem_manager_type;
         typedef typename M1::layout_type layout_type;
 
-        const_ret_type apply (long r, long c) const 
-        { 
+        const_ret_type apply (long r, long c) const
+        {
             type temp = 0;
 
             const long min_rr = std::max<long>(r-m2.nr()+1, 0);
@@ -71,7 +71,7 @@ namespace dlib
                 }
             }
 
-            return temp; 
+            return temp;
         }
 
         long nr () const { return nr_; }
@@ -80,7 +80,7 @@ namespace dlib
         template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return m1.aliases(item) || m2.aliases(item); }
         template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return m1.aliases(item) || m2.aliases(item); }
 
-    }; 
+    };
 
     template <
         typename M1,
@@ -116,7 +116,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M1, typename M2, bool flip_m2 = false>
-    struct op_conv_same 
+    struct op_conv_same
     {
         op_conv_same( const M1& m1_, const M2& m2_) : m1(m1_),m2(m2_),nr_(m1.nr()),nc_(m1.nc())
         {
@@ -139,8 +139,8 @@ namespace dlib
         typedef typename M1::mem_manager_type mem_manager_type;
         typedef typename M1::layout_type layout_type;
 
-        const_ret_type apply (long r, long c) const 
-        { 
+        const_ret_type apply (long r, long c) const
+        {
             r += m2.nr()/2;
             c += m2.nc()/2;
 
@@ -163,7 +163,7 @@ namespace dlib
                 }
             }
 
-            return temp; 
+            return temp;
         }
 
         long nr () const { return nr_; }
@@ -172,7 +172,7 @@ namespace dlib
         template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return m1.aliases(item) || m2.aliases(item); }
         template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return m1.aliases(item) || m2.aliases(item); }
 
-    }; 
+    };
 
     template <
         typename M1,
@@ -208,9 +208,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M1, typename M2, bool flip_m2 = false>
-    struct op_conv_valid 
+    struct op_conv_valid
     {
-        op_conv_valid( const M1& m1_, const M2& m2_) : 
+        op_conv_valid( const M1& m1_, const M2& m2_) :
             m1(m1_),m2(m2_),
             nr_(m1.nr()-m2.nr()+1),
             nc_(m1.nc()-m2.nc()+1)
@@ -223,7 +223,7 @@ namespace dlib
 
         const M1& m1;
         const M2& m2;
-        long nr_; 
+        long nr_;
         long nc_;
 
         const static long cost = (M1::cost+M2::cost)*10;
@@ -234,8 +234,8 @@ namespace dlib
         typedef typename M1::mem_manager_type mem_manager_type;
         typedef typename M1::layout_type layout_type;
 
-        const_ret_type apply (long r, long c) const 
-        { 
+        const_ret_type apply (long r, long c) const
+        {
             r += m2.nr()-1;
             c += m2.nc()-1;
 
@@ -258,7 +258,7 @@ namespace dlib
                 }
             }
 
-            return temp; 
+            return temp;
         }
 
         long nr () const { return nr_; }
@@ -267,7 +267,7 @@ namespace dlib
         template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return m1.aliases(item) || m2.aliases(item); }
         template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return m1.aliases(item) || m2.aliases(item); }
 
-    }; 
+    };
 
     template <
         typename M1,

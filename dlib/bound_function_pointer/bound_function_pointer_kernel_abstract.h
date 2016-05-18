@@ -15,15 +15,15 @@ namespace dlib
                 is_set() == false
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a function with all its arguments bound to 
+                This object represents a function with all its arguments bound to
                 specific objects.  For example:
 
                     void test(int& var) { var = var+1; }
 
                     bound_function_pointer funct;
 
-                    int a = 4; 
-                    funct.set(test,a); // bind the variable a to the first argument of the test() function 
+                    int a = 4;
+                    funct.set(test,a); // bind the variable a to the first argument of the test() function
 
                     // at this point a == 4
                     funct();
@@ -32,10 +32,10 @@ namespace dlib
 
     public:
 
-        bound_function_pointer (  
+        bound_function_pointer (
         );
         /*!
-            ensures                
+            ensures
                 - #*this is properly initialized
         !*/
 
@@ -102,13 +102,13 @@ namespace dlib
             requires
                 - is_set() == true
             ensures
-                - calls the bound function on the object(s) specified by the last 
+                - calls the bound function on the object(s) specified by the last
                   call to this->set()
             throws
                 - any exception thrown by the function specified by
                   the previous call to this->set().
-                    If any of these exceptions are thrown then the call to this 
-                    function will have no effect on *this.                  
+                    If any of these exceptions are thrown then the call to this
+                    function will have no effect on *this.
         !*/
 
         void swap (
@@ -117,7 +117,7 @@ namespace dlib
         /*!
             ensures
                 - swaps *this and item
-        !*/ 
+        !*/
 
         // ----------------------
 
@@ -127,7 +127,7 @@ namespace dlib
         );
         /*!
             requires
-                - function_object() is a valid expression 
+                - function_object() is a valid expression
             ensures
                 - #is_set() == true
                 - calls to this->operator() will call function_object()
@@ -165,7 +165,7 @@ namespace dlib
         );
         /*!
             requires
-                - funct == a valid function pointer 
+                - funct == a valid function pointer
             ensures
                 - #is_set() == true
                 - calls to this->operator() will call funct()
@@ -180,7 +180,7 @@ namespace dlib
         );
         /*!
             requires
-                - function_object(arg1) is a valid expression 
+                - function_object(arg1) is a valid expression
             ensures
                 - #is_set() == true
                 - calls to this->operator() will call function_object(arg1)
@@ -221,7 +221,7 @@ namespace dlib
         );
         /*!
             requires
-                - funct == a valid function pointer 
+                - funct == a valid function pointer
             ensures
                 - #is_set() == true
                 - calls to this->operator() will call funct(arg1)
@@ -236,7 +236,7 @@ namespace dlib
         );
         /*!
             requires
-                - function_object(arg1,arg2) is a valid expression 
+                - function_object(arg1,arg2) is a valid expression
             ensures
                 - #is_set() == true
                 - calls to this->operator() will call function_object(arg1,arg2)
@@ -258,7 +258,7 @@ namespace dlib
                 - calls to this->operator() will call (object.*funct)(arg1,arg2)
         !*/
 
-        template < typename T, typename T1, typename A1, 
+        template < typename T, typename T1, typename A1,
                                typename T2, typename A2>
         void set (
             const T& object,
@@ -283,7 +283,7 @@ namespace dlib
         );
         /*!
             requires
-                - funct == a valid function pointer 
+                - funct == a valid function pointer
             ensures
                 - #is_set() == true
                 - calls to this->operator() will call funct(arg1,arg2)
@@ -300,7 +300,7 @@ namespace dlib
         );
         /*!
             requires
-                - function_object(arg1,arg2,arg3) is a valid expression 
+                - function_object(arg1,arg2,arg3) is a valid expression
             ensures
                 - #is_set() == true
                 - calls to this->operator() will call function_object(arg1,arg2,arg3)
@@ -353,7 +353,7 @@ namespace dlib
         );
         /*!
             requires
-                - funct == a valid function pointer 
+                - funct == a valid function pointer
             ensures
                 - #is_set() == true
                 - calls to this->operator() will call funct(arg1,arg2,arg3)
@@ -371,7 +371,7 @@ namespace dlib
         );
         /*!
             requires
-                - function_object(arg1,arg2,arg3,arg4) is a valid expression 
+                - function_object(arg1,arg2,arg3,arg4) is a valid expression
             ensures
                 - #is_set() == true
                 - calls to this->operator() will call function_object(arg1,arg2,arg3,arg4)
@@ -430,13 +430,13 @@ namespace dlib
         );
         /*!
             requires
-                - funct == a valid function pointer 
+                - funct == a valid function pointer
             ensures
                 - #is_set() == true
                 - calls to this->operator() will call funct(arg1,arg2,arg3,arg4)
         !*/
 
-    };    
+    };
 
 // ----------------------------------------------------------------------------------------
 

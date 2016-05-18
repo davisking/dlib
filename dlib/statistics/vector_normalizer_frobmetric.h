@@ -15,7 +15,7 @@ namespace dlib
     template <
         typename matrix_type
         >
-    struct frobmetric_training_sample 
+    struct frobmetric_training_sample
     {
         matrix_type anchor_vect;
         std::vector<matrix_type> near_vects;
@@ -71,7 +71,7 @@ namespace dlib
         typedef matrix_type result_type;
 
     private:
-        struct compact_frobmetric_training_sample 
+        struct compact_frobmetric_training_sample
         {
             std::vector<matrix_type> near_vects;
             std::vector<matrix_type> far_vects;
@@ -82,7 +82,7 @@ namespace dlib
             objective (
                 const std::vector<compact_frobmetric_training_sample>& samples_,
                 matrix<double,0,0,mem_manager_type>& Aminus_,
-                const matrix<double,0,1,mem_manager_type>& bias_ 
+                const matrix<double,0,1,mem_manager_type>& bias_
             ) : samples(samples_), Aminus(Aminus_), bias(bias_) {}
             
             double operator()(const matrix<double,0,1,mem_manager_type>& u) const
@@ -90,7 +90,7 @@ namespace dlib
                 long idx = 0;
                 const long dims = samples[0].far_vects[0].size();
                 // Here we compute \hat A from the paper, which we refer to as just A in
-                // the code.  
+                // the code.
                 matrix<double,0,0,mem_manager_type> A(dims,dims);
                 A = 0;
                 std::vector<double> ufar, unear;
@@ -134,7 +134,7 @@ namespace dlib
                 unsigned long num_triples_,
                 const std::vector<compact_frobmetric_training_sample>& samples_,
                 matrix<double,0,0,mem_manager_type>& Aminus_,
-                const matrix<double,0,1,mem_manager_type>& bias_ 
+                const matrix<double,0,1,mem_manager_type>& bias_
             ) : num_triples(num_triples_), samples(samples_), Aminus(Aminus_), bias(bias_) {}
             
             matrix<double,0,1,mem_manager_type> operator()(const matrix<double,0,1,mem_manager_type>& ) const
@@ -186,7 +186,7 @@ namespace dlib
                 double eps_,
                 bool be_verbose_,
                 unsigned long max_iter_
-            ) 
+            )
             {
                 _c = C_;
 
@@ -201,7 +201,7 @@ namespace dlib
                 const T& u,
                 const double ,
                 const T& grad
-            ) 
+            )
             {
                 ++_cur_iter;
 
@@ -224,7 +224,7 @@ namespace dlib
                 if (max_gradient < _gradient_thresh)
                     return false;
 
-                // Check if we have hit the max allowable number of iterations.  
+                // Check if we have hit the max allowable number of iterations.
                 if (_cur_iter > _max_iter)
                 {
                     return false;
@@ -280,26 +280,26 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\t void vector_normalizer_frobmetric::set_epsilon(eps_)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t eps: " << eps_ 
+                << "\n\t eps: " << eps_
                 );
             eps = eps_;
         }
 
         double get_epsilon (
-        ) const 
+        ) const
         {
             return eps;
         }
 
         void set_c (
-            double C_ 
+            double C_
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C_ > 0,
                 "\t void vector_normalizer_frobmetric::set_c()"
                 << "\n\t C_ must be greater than 0"
-                << "\n\t C_:    " << C_ 
+                << "\n\t C_:    " << C_
                 << "\n\t this: " << this
                 );
 
@@ -349,12 +349,12 @@ namespace dlib
                     );
                 for (unsigned long i = 0; i < samples.size(); ++i)
                 {
-                    DLIB_ASSERT(is_col_vector(samples[i].anchor_vect), 
+                    DLIB_ASSERT(is_col_vector(samples[i].anchor_vect),
                         "\tvoid vector_normalizer_frobmetric::train()"
                         << "\n\t Invalid inputs were given to this function."
                         << "\n\t i: " << i
                         );
-                    DLIB_ASSERT(samples[i].anchor_vect.size() == dims, 
+                    DLIB_ASSERT(samples[i].anchor_vect.size() == dims,
                         "\tvoid vector_normalizer_frobmetric::train()"
                         << "\n\t Invalid inputs were given to this function."
                         << "\n\t i:    " << i
@@ -369,13 +369,13 @@ namespace dlib
                     );
                     for (unsigned long j = 0; j < samples[i].near_vects.size(); ++j)
                     {
-                        DLIB_ASSERT(is_col_vector(samples[i].near_vects[j]), 
+                        DLIB_ASSERT(is_col_vector(samples[i].near_vects[j]),
                             "\tvoid vector_normalizer_frobmetric::train()"
                             << "\n\t Invalid inputs were given to this function."
                             << "\n\t i: " << i
                             << "\n\t j: " << j
                             );
-                        DLIB_ASSERT(samples[i].near_vects[j].size() == dims, 
+                        DLIB_ASSERT(samples[i].near_vects[j].size() == dims,
                             "\tvoid vector_normalizer_frobmetric::train()"
                             << "\n\t Invalid inputs were given to this function."
                             << "\n\t i:    " << i
@@ -386,13 +386,13 @@ namespace dlib
                     }
                     for (unsigned long j = 0; j < samples[i].far_vects.size(); ++j)
                     {
-                        DLIB_ASSERT(is_col_vector(samples[i].far_vects[j]), 
+                        DLIB_ASSERT(is_col_vector(samples[i].far_vects[j]),
                             "\tvoid vector_normalizer_frobmetric::train()"
                             << "\n\t Invalid inputs were given to this function."
                             << "\n\t i: " << i
                             << "\n\t j: " << j
                             );
-                        DLIB_ASSERT(samples[i].far_vects[j].size() == dims, 
+                        DLIB_ASSERT(samples[i].far_vects[j].size() == dims,
                             "\tvoid vector_normalizer_frobmetric::train()"
                             << "\n\t Invalid inputs were given to this function."
                             << "\n\t i:    " << i
@@ -518,7 +518,7 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(in_vector_size() != 0 && in_vector_size() == x.size() && 
+            DLIB_ASSERT(in_vector_size() != 0 && in_vector_size() == x.size() &&
                 is_col_vector(x) == true,
                 "\tmatrix vector_normalizer_frobmetric::operator()"
                 << "\n\t you have given invalid arguments to this function"
@@ -534,14 +534,14 @@ namespace dlib
 
         template <typename mt>
         friend void deserialize (
-            vector_normalizer_frobmetric<mt>& item, 
+            vector_normalizer_frobmetric<mt>& item,
             std::istream& in
-        ); 
+        );
 
         template <typename mt>
         friend void serialize (
-            const vector_normalizer_frobmetric<mt>& item, 
-            std::ostream& out 
+            const vector_normalizer_frobmetric<mt>& item,
+            std::ostream& out
         );
 
     private:
@@ -567,8 +567,8 @@ namespace dlib
         typename matrix_type
         >
     void serialize (
-        const vector_normalizer_frobmetric<matrix_type>& item, 
-        std::ostream& out 
+        const vector_normalizer_frobmetric<matrix_type>& item,
+        std::ostream& out
     )
     {
         const int version = 2;
@@ -589,9 +589,9 @@ namespace dlib
         typename matrix_type
         >
     void deserialize (
-        vector_normalizer_frobmetric<matrix_type>& item, 
+        vector_normalizer_frobmetric<matrix_type>& item,
         std::istream& in
-    )   
+    )
     {
         int version = 0;
         deserialize(version, in);

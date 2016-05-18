@@ -15,12 +15,12 @@ namespace dlib
     {
         template <
             typename sequence_segmenter_type,
-            typename sequence_type 
+            typename sequence_type
             >
         const matrix<double,1,3> raw_metrics_test_sequence_segmenter (
             const sequence_segmenter_type& segmenter,
             const std::vector<sequence_type>& samples,
-            const std::vector<std::vector<std::pair<unsigned long,unsigned long> > >& segments 
+            const std::vector<std::vector<std::pair<unsigned long,unsigned long> > >& segments
         )
         {
             std::vector<std::pair<unsigned long,unsigned long> > truth;
@@ -44,7 +44,7 @@ namespace dlib
                 unsigned long j=0,k=0;
                 while (j < pred.size() && k < truth.size())
                 {
-                    if (pred[j].first == truth[k].first && 
+                    if (pred[j].first == truth[k].first &&
                         pred[j].second == truth[k].second)
                     {
                         ++true_hits;
@@ -72,19 +72,19 @@ namespace dlib
 
     template <
         typename sequence_segmenter_type,
-        typename sequence_type 
+        typename sequence_type
         >
     const matrix<double,1,3> test_sequence_segmenter (
         const sequence_segmenter_type& segmenter,
         const std::vector<sequence_type>& samples,
-        const std::vector<std::vector<std::pair<unsigned long,unsigned long> > >& segments 
+        const std::vector<std::vector<std::pair<unsigned long,unsigned long> > >& segments
     )
     {
         // make sure requires clause is not broken
         DLIB_ASSERT( is_sequence_segmentation_problem(samples, segments) == true,
                     "\tmatrix test_sequence_segmenter()"
                     << "\n\t invalid inputs were given to this function"
-                    << "\n\t is_sequence_segmentation_problem(samples, segments): " 
+                    << "\n\t is_sequence_segmentation_problem(samples, segments): "
                     << is_sequence_segmentation_problem(samples, segments));
 
         const matrix<double,1,3> metrics = impl::raw_metrics_test_sequence_segmenter(segmenter, samples, segments);
@@ -106,7 +106,7 @@ namespace dlib
 
     template <
         typename trainer_type,
-        typename sequence_type 
+        typename sequence_type
         >
     const matrix<double,1,3> cross_validate_sequence_segmenter (
         const trainer_type& trainer,
@@ -120,8 +120,8 @@ namespace dlib
                     1 < folds && folds <= static_cast<long>(samples.size()),
                     "\tmatrix cross_validate_sequence_segmenter()"
                     << "\n\t invalid inputs were given to this function"
-                    << "\n\t folds:  " << folds 
-                    << "\n\t is_sequence_segmentation_problem(samples, segments): " 
+                    << "\n\t folds:  " << folds
+                    << "\n\t is_sequence_segmentation_problem(samples, segments): "
                     << is_sequence_segmentation_problem(samples, segments));
 
 

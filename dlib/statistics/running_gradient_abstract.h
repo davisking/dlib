@@ -6,7 +6,7 @@
 
 namespace dlib
 {
-    class running_gradient 
+    class running_gradient
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -38,7 +38,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the number of values given to this object by add(). 
+                - returns the number of values given to this object by add().
         !*/
 
         void add(
@@ -78,13 +78,13 @@ namespace dlib
                   intercept() + current_n()*gradient().
         !*/
 
-        double standard_error ( 
+        double standard_error (
         ) const;
         /*!
             requires
                 - current_n() > 2
             ensures
-                - returns the standard deviation of the estimate of gradient(). 
+                - returns the standard deviation of the estimate of gradient().
         !*/
 
         double probability_gradient_less_than (
@@ -115,19 +115,19 @@ namespace dlib
     };
 
     void serialize (
-        const running_gradient& item, 
-        std::ostream& out 
+        const running_gradient& item,
+        std::ostream& out
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     void deserialize (
-        running_gradient& item, 
+        running_gradient& item,
         std::istream& in
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -146,7 +146,7 @@ namespace dlib
             - The container must contain more than 2 elements.
         ensures
             - Puts all the elements of container into a running_gradient object, R, and
-              then returns R.probability_gradient_less_than(thresh). 
+              then returns R.probability_gradient_less_than(thresh).
     !*/
 
     template <
@@ -170,7 +170,7 @@ namespace dlib
 
     template <
         typename T
-        > 
+        >
     size_t count_steps_without_decrease (
         const T& container,
         double probability_of_decrease = 0.51
@@ -187,7 +187,7 @@ namespace dlib
               elements into a running_gradient object and counting how many elements,
               starting with container.back(), that you need to examine before you are
               confident that the series has been decreasing in value.  Here, "confident of
-              decrease" means that the probability of decrease is >= probability_of_decrease.  
+              decrease" means that the probability of decrease is >= probability_of_decrease.
             - Setting probability_of_decrease to 0.51 means we count until we see even a
               small hint of decrease, whereas a larger value of 0.99 would return a larger
               count since it keeps going until it is nearly certain the time series is
@@ -197,7 +197,7 @@ namespace dlib
 
     template <
         typename T
-        > 
+        >
     size_t count_steps_without_increase (
         const T& container,
         double probability_of_increase = 0.51
@@ -214,7 +214,7 @@ namespace dlib
               elements into a running_gradient object and counting how many elements,
               starting with container.back(), that you need to examine before you are
               confident that the series has been increasing in value.  Here, "confident of
-              increase" means that the probability of increase is >= probability_of_increase.  
+              increase" means that the probability of increase is >= probability_of_increase.
             - Setting probability_of_increase to 0.51 means we count until we see even a
               small hint of increase, whereas a larger value of 0.99 would return a larger
               count since it keeps going until it is nearly certain the time series is

@@ -16,7 +16,7 @@ namespace dlib
         typename cc,
         typename ccbig
         >
-    class entropy_decoder_model_kernel_2 
+    class entropy_decoder_model_kernel_2
     {
         /*!
             REQUIREMENTS ON cc
@@ -40,7 +40,7 @@ namespace dlib
 
 
                 This is an order-1-0 model. The last symbol in the order-0 and order-1
-                context is an escape into the lower context.        
+                context is an escape into the lower context.
 
                 previous_symbol == the last symbol seen
         !*/
@@ -83,7 +83,7 @@ namespace dlib
         entropy_decoder_model_kernel_2(entropy_decoder_model_kernel_2<alphabet_size,entropy_decoder,cc,ccbig>&);        // copy constructor
         entropy_decoder_model_kernel_2<alphabet_size,entropy_decoder,cc,ccbig>& operator=(entropy_decoder_model_kernel_2<alphabet_size,entropy_decoder,cc,ccbig>&);    // assignment operator
 
-    };   
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ namespace dlib
     entropy_decoder_model_kernel_2<alphabet_size,entropy_decoder,cc,ccbig>::
     entropy_decoder_model_kernel_2 (
         entropy_decoder& coder_
-    ) : 
+    ) :
         coder(coder_),
         order_0(gs),
         previous_symbol(0)
@@ -210,7 +210,7 @@ namespace dlib
         // if current_symbol is not an escape from the order-0 context
         if (current_symbol != alphabet_size)
         {
-            // update the count for this symbol            
+            // update the count for this symbol
             order_1[previous_symbol]->increment_count(current_symbol,2);
             order_0.increment_count(current_symbol,2);
 
@@ -228,7 +228,7 @@ namespace dlib
         coder.decode(target,target+1);
 
 
-        // update the count for this symbol             
+        // update the count for this symbol
         order_1[previous_symbol]->increment_count(target,2);
         order_0.increment_count(target,2);
 

@@ -14,7 +14,7 @@
 #include <functional>
 
 
-namespace dlib 
+namespace dlib
 {
 
     template <
@@ -79,7 +79,7 @@ namespace dlib
             const domain* d;
             range* r;
 
-            const domain& key( 
+            const domain& key(
             ) const { return *d; }
 
             const range& value(
@@ -102,7 +102,7 @@ namespace dlib
             );
 
             virtual ~hash_table_kernel_1(
-            ); 
+            );
 
             void clear(
             );
@@ -169,8 +169,8 @@ namespace dlib
         private:
 
             // data members
-            typename mem_manager::template rebind<node>::other pool;         
-            typename mem_manager::template rebind<node*>::other ppool;         
+            typename mem_manager::template rebind<node>::other pool;
+            typename mem_manager::template rebind<node*>::other ppool;
             unsigned long hash_size;
             node** table;
             general_hash<domain> hash;
@@ -185,7 +185,7 @@ namespace dlib
             compare comp;
 
             // restricted functions
-            hash_table_kernel_1(hash_table_kernel_1&);      
+            hash_table_kernel_1(hash_table_kernel_1&);
             hash_table_kernel_1& operator=(hash_table_kernel_1&);
 
     };
@@ -197,8 +197,8 @@ namespace dlib
         typename compare
         >
     inline void swap (
-        hash_table_kernel_1<domain,range,mem_manager,compare>& a, 
-        hash_table_kernel_1<domain,range,mem_manager,compare>& b 
+        hash_table_kernel_1<domain,range,mem_manager,compare>& a,
+        hash_table_kernel_1<domain,range,mem_manager,compare>& b
     ) { a.swap(b); }
 
     template <
@@ -208,7 +208,7 @@ namespace dlib
         typename compare
         >
     void deserialize (
-        hash_table_kernel_1<domain,range,mem_manager,compare>& item, 
+        hash_table_kernel_1<domain,range,mem_manager,compare>& item,
         std::istream& in
     )
     {
@@ -227,9 +227,9 @@ namespace dlib
             }
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type hash_table_kernel_1"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type hash_table_kernel_1");
         }
     }
 
@@ -258,7 +258,7 @@ namespace dlib
         while (expnum != 0)
         {
             --expnum;
-            num_of_buckets <<= 1;            
+            num_of_buckets <<= 1;
         }
         mask = num_of_buckets-1;
 
@@ -289,7 +289,7 @@ namespace dlib
             {
                 node* t = temp;
                 temp = temp->next;
-                pool.deallocate(t);                    
+                pool.deallocate(t);
             }
             table[i] = 0;
         }
@@ -318,10 +318,10 @@ namespace dlib
                 {
                     node* t = temp;
                     temp = temp->next;
-                    pool.deallocate(t);                    
+                    pool.deallocate(t);
                 }
                 table[i] = 0;
-            }            
+            }
             hash_size = 0;
         }
         // reset the enumerator
@@ -364,10 +364,10 @@ namespace dlib
             // look for an element equivalent to d
             if ( !(comp(temp->d , d) || comp(d , temp->d)) )
             {
-                ++items_found;                
+                ++items_found;
             }
             temp = temp->next;
-        }      
+        }
 
         return items_found;
     }
@@ -561,7 +561,7 @@ namespace dlib
         exchange(temp.r,r);
         table[i] = temp.next;
         
-        pool.deallocate(&temp);        
+        pool.deallocate(&temp);
 
         --hash_size;
 
@@ -581,17 +581,17 @@ namespace dlib
     operator[](
         const domain& d
     ) const
-    {        
+    {
         node* temp = table[hash(d)&mask];
 
         while (temp != 0)
         {
             // look for an element equivalent to item
             if ( !(comp(temp->d , d) || comp(d , temp->d)) )
-                return &(temp->r);             
+                return &(temp->r);
 
             temp = temp->next;
-        }      
+        }
 
         return 0;
     }
@@ -615,10 +615,10 @@ namespace dlib
         {
             // look for an element equivalent to item
             if ( !(comp(temp->d , d) || comp(d , temp->d)) )
-                return &(temp->r);             
+                return &(temp->r);
 
             temp = temp->next;
-        }      
+        }
 
         return 0;
     }

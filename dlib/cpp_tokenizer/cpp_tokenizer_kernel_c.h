@@ -38,9 +38,9 @@ namespace dlib
         typename tokenizer
         >
     inline void swap (
-        cpp_tokenizer_kernel_c<tokenizer>& a, 
-        cpp_tokenizer_kernel_c<tokenizer>& b 
-    ) { a.swap(b); }  
+        cpp_tokenizer_kernel_c<tokenizer>& a,
+        cpp_tokenizer_kernel_c<tokenizer>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------

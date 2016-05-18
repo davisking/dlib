@@ -17,7 +17,7 @@
 #include <dlib/image_processing.h>
 #include <dlib/image_transforms.h>
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -92,7 +92,7 @@ namespace
 
 
             Note that this object also implements the interface defined in dlib/image_keypoint/hashed_feature_image_abstract.h.
-            This means all the member functions in this object are supposed to behave as 
+            This means all the member functions in this object are supposed to behave as
             described in the hashed_feature_image specification.  So when you define your own
             feature extractor objects you should probably refer yourself to that documentation
             in addition to reading this example program.
@@ -173,8 +173,8 @@ namespace
                     - 0 <= row < nr()
             - 0 <= col < nc()
                 ensures
-                    - returns a sparse vector which describes the image at the given row and column.  
-                      In particular, this is a vector that is 0 everywhere except for one element. 
+                    - returns a sparse vector which describes the image at the given row and column.
+                      In particular, this is a vector that is 0 everywhere except for one element.
             !*/
         {
             feat.clear();
@@ -184,13 +184,13 @@ namespace
         }
 
         // This block of functions is meant to provide a way to map between the row/col space taken by
-        // this object's operator() function and the images supplied to load().  In this example it's trivial.  
-        // However, in general, you might create feature extractors which don't perform extraction at every 
-        // possible image location (e.g. the hog_image) and thus result in some more complex mapping.  
+        // this object's operator() function and the images supplied to load().  In this example it's trivial.
+        // However, in general, you might create feature extractors which don't perform extraction at every
+        // possible image location (e.g. the hog_image) and thus result in some more complex mapping.
         inline const rectangle get_block_rect       ( long row, long col) const { return centered_rect(col,row,3,3); }
-        inline const point image_to_feat_space      ( const point& p) const { return p; } 
-        inline const rectangle image_to_feat_space  ( const rectangle& rect) const { return rect; } 
-        inline const point feat_to_image_space      ( const point& p) const { return p; } 
+        inline const point image_to_feat_space      ( const point& p) const { return p; }
+        inline const rectangle image_to_feat_space  ( const rectangle& rect) const { return rect; }
+        inline const point feat_to_image_space      ( const point& p) const { return p; }
         inline const rectangle feat_to_image_space  ( const rectangle& rect) const { return rect; }
 
         inline friend void serialize   ( const very_simple_feature_extractor& item, std::ostream& out)  { serialize(item.feat_image, out); }
@@ -233,7 +233,7 @@ namespace
         // squares will be 70 pixels wide and tall.
 
         std::vector<rectangle> temp;
-        temp.push_back(centered_rect(point(100,100), 70,70)); 
+        temp.push_back(centered_rect(point(100,100), 70,70));
         fill_rect(images[0],temp.back(),255); // Paint the square white
         temp.push_back(centered_rect(point(200,300), 70,70));
         fill_rect(images[0],temp.back(),255); // Paint the square white
@@ -251,8 +251,8 @@ namespace
         fill_rect(images[2],temp.back(),255); // Paint the square white
         object_locations.push_back(temp);
 
-        // corrupt each image with random noise just to make this a little more 
-        // challenging 
+        // corrupt each image with random noise just to make this a little more
+        // challenging
         dlib::rand rnd;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
@@ -301,7 +301,7 @@ namespace
         movable_parts.push_back(shrink_rect(rect,shrink).tr_corner());
         movable_parts.push_back(shrink_rect(rect,shrink).bl_corner());
         movable_parts.push_back(shrink_rect(rect,shrink).br_corner());
-        temp.push_back(full_object_detection(rect, movable_parts)); 
+        temp.push_back(full_object_detection(rect, movable_parts));
         fill_rect(images[0],rect,255); // Paint the square white
 
         rect = centered_rect(point(200,200), 70,71);
@@ -310,7 +310,7 @@ namespace
         movable_parts.push_back(shrink_rect(rect,shrink).tr_corner());
         movable_parts.push_back(shrink_rect(rect,shrink).bl_corner());
         movable_parts.push_back(shrink_rect(rect,shrink).br_corner());
-        temp.push_back(full_object_detection(rect, movable_parts)); 
+        temp.push_back(full_object_detection(rect, movable_parts));
         fill_rect(images[0],rect,255); // Paint the square white
 
         object_locations.push_back(temp);
@@ -323,7 +323,7 @@ namespace
         movable_parts.push_back(shrink_rect(rect,shrink).tr_corner());
         movable_parts.push_back(shrink_rect(rect,shrink).bl_corner());
         movable_parts.push_back(shrink_rect(rect,shrink).br_corner());
-        temp.push_back(full_object_detection(rect, movable_parts)); 
+        temp.push_back(full_object_detection(rect, movable_parts));
         fill_rect(images[1],rect,255); // Paint the square white
 
 
@@ -333,7 +333,7 @@ namespace
         movable_parts.push_back(shrink_rect(rect,shrink).tr_corner());
         movable_parts.push_back(shrink_rect(rect,shrink).bl_corner());
         movable_parts.push_back(shrink_rect(rect,shrink).br_corner());
-        temp.push_back(full_object_detection(rect, movable_parts)); 
+        temp.push_back(full_object_detection(rect, movable_parts));
         fill_rect(images[1],rect,255); // Paint the square white
 
         object_locations.push_back(temp);
@@ -346,13 +346,13 @@ namespace
         movable_parts.push_back(shrink_rect(rect,shrink).tr_corner());
         movable_parts.push_back(shrink_rect(rect,shrink).bl_corner());
         movable_parts.push_back(shrink_rect(rect,shrink).br_corner());
-        temp.push_back(full_object_detection(rect, movable_parts)); 
+        temp.push_back(full_object_detection(rect, movable_parts));
         fill_rect(images[2],rect,255); // Paint the square white
 
         object_locations.push_back(temp);
 
-        // corrupt each image with random noise just to make this a little more 
-        // challenging 
+        // corrupt each image with random noise just to make this a little more
+        // challenging
         dlib::rand rnd;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
@@ -372,7 +372,7 @@ namespace
 
     void test_fhog_pyramid (
     )
-    {        
+    {
         print_spinner();
         dlog << LINFO << "test_fhog_pyramid()";
 
@@ -385,7 +385,7 @@ namespace
         image_scanner_type scanner;
         scanner.set_detection_window_size(35,35);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
-        trainer.set_num_threads(4);  
+        trainer.set_num_threads(4);
         trainer.set_overlap_tester(test_box_overlap(0,0));
         object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
 
@@ -436,7 +436,7 @@ namespace
 
     void test_1 (
     )
-    {        
+    {
         print_spinner();
         dlog << LINFO << "test_1()";
 
@@ -453,7 +453,7 @@ namespace
         setup_hashed_features(scanner, images, 9);
         use_uniform_feature_weights(scanner);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
-        trainer.set_num_threads(4);  
+        trainer.set_num_threads(4);
         trainer.set_overlap_tester(test_box_overlap(0,0));
         object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
 
@@ -479,7 +479,7 @@ namespace
 
     void test_1_boxes (
     )
-    {        
+    {
         print_spinner();
         dlog << LINFO << "test_1_boxes()";
 
@@ -494,7 +494,7 @@ namespace
         setup_hashed_features(scanner, images, 9);
         use_uniform_feature_weights(scanner);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
-        trainer.set_num_threads(4);  
+        trainer.set_num_threads(4);
         trainer.set_overlap_tester(test_box_overlap(0,0));
         object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
 
@@ -520,7 +520,7 @@ namespace
 
     void test_1m (
     )
-    {        
+    {
         print_spinner();
         dlog << LINFO << "test_1m()";
 
@@ -543,7 +543,7 @@ namespace
         setup_hashed_features(scanner, images, 9);
         use_uniform_feature_weights(scanner);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
-        trainer.set_num_threads(4);  
+        trainer.set_num_threads(4);
         trainer.set_overlap_tester(test_box_overlap(0,0));
         object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
 
@@ -569,7 +569,7 @@ namespace
 
     void test_1_fine_hog (
     )
-    {        
+    {
         print_spinner();
         dlog << LINFO << "test_1_fine_hog()";
 
@@ -586,7 +586,7 @@ namespace
         setup_hashed_features(scanner, images, 9);
         use_uniform_feature_weights(scanner);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
-        trainer.set_num_threads(4);  
+        trainer.set_num_threads(4);
         trainer.set_overlap_tester(test_box_overlap(0,0));
         object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
 
@@ -612,7 +612,7 @@ namespace
 
     void test_1_poly (
     )
-    {        
+    {
         print_spinner();
         dlog << LINFO << "test_1_poly()";
 
@@ -629,7 +629,7 @@ namespace
         setup_hashed_features(scanner, images, 9);
         use_uniform_feature_weights(scanner);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
-        trainer.set_num_threads(4);  
+        trainer.set_num_threads(4);
         trainer.set_overlap_tester(test_box_overlap(0,0));
         object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
 
@@ -655,7 +655,7 @@ namespace
 
     void test_1m_poly (
     )
-    {        
+    {
         print_spinner();
         dlog << LINFO << "test_1_poly()";
 
@@ -678,7 +678,7 @@ namespace
         setup_hashed_features(scanner, images, 9);
         use_uniform_feature_weights(scanner);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
-        trainer.set_num_threads(4);  
+        trainer.set_num_threads(4);
         trainer.set_overlap_tester(test_box_overlap(0,0));
         object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
 
@@ -704,7 +704,7 @@ namespace
 
     void test_1_poly_nn (
     )
-    {        
+    {
         print_spinner();
         dlog << LINFO << "test_1_poly_nn()";
 
@@ -725,7 +725,7 @@ namespace
         scanner.copy_configuration(nnfe);
 
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
-        trainer.set_num_threads(4);  
+        trainer.set_num_threads(4);
         object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
 
         matrix<double> res = test_object_detection_function(detector, images, object_locations);
@@ -750,7 +750,7 @@ namespace
 
     void test_1_poly_nn_boxes (
     )
-    {        
+    {
         print_spinner();
         dlog << LINFO << "test_1_poly_nn_boxes()";
 
@@ -770,7 +770,7 @@ namespace
         scanner.copy_configuration(nnfe);
 
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
-        trainer.set_num_threads(4);  
+        trainer.set_num_threads(4);
         object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
 
         matrix<double> res = test_object_detection_function(detector, images, object_locations);
@@ -795,7 +795,7 @@ namespace
 
     void test_2 (
     )
-    {        
+    {
         print_spinner();
         dlog << LINFO << "test_2()";
 
@@ -810,7 +810,7 @@ namespace
         scanner.add_detection_template(object_box, create_grid_detection_template(object_box,2,2));
         scanner.set_max_pyramid_levels(1);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
-        trainer.set_num_threads(0);  
+        trainer.set_num_threads(0);
         object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
 
         matrix<double> res = test_object_detection_function(detector, images, object_locations);
@@ -879,7 +879,7 @@ namespace
     // So test with funny_image.
     void test_3 (
     )
-    {        
+    {
         print_spinner();
         dlog << LINFO << "test_3()";
 
@@ -902,7 +902,7 @@ namespace
         scanner.add_detection_template(object_box, create_grid_detection_template(object_box,2,2));
         scanner.set_max_pyramid_levels(1);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
-        trainer.set_num_threads(4);  
+        trainer.set_num_threads(4);
         object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
 
         matrix<double> res = test_object_detection_function(detector, images, object_locations);
@@ -950,7 +950,7 @@ namespace
     // So test with funny_image.
     void test_3_boxes (
     )
-    {        
+    {
         print_spinner();
         dlog << LINFO << "test_3_boxes()";
 
@@ -970,7 +970,7 @@ namespace
         typedef scan_image_boxes<very_simple_feature_extractor, funny_box_generator> image_scanner_type;
         image_scanner_type scanner;
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
-        trainer.set_num_threads(4);  
+        trainer.set_num_threads(4);
         object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
 
         matrix<double> res = test_object_detection_function(detector, images, object_locations);

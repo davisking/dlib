@@ -13,7 +13,7 @@
 #include "../windows_magic.h"
 #include <windows.h>
 
-// tell visual studio to link to the library needed to call timeGetTime() 
+// tell visual studio to link to the library needed to call timeGetTime()
 #ifdef _MSC_VER
 #pragma comment (lib, "winmm.lib")
 #endif
@@ -43,7 +43,7 @@ namespace dlib
             static mutex m;
             return m;
         }
-        // Make sure the above mutex gets constructed before main() 
+        // Make sure the above mutex gets constructed before main()
         // starts.  This way we can be pretty sure it will be constructed
         // before any threads could possibly call set_current_dir() or
         // get_current_dir() simultaneously.
@@ -96,7 +96,7 @@ namespace dlib
     {
         unsigned long temp = timeGetTime();
         if (temp >= last_time)
-        {            
+        {
             last_time = temp;
             return (offset + temp)*1000;
         }
@@ -108,7 +108,7 @@ namespace dlib
             // bigger to account for that
             offset += dword_max;
             return (offset + temp)*1000;
-        }        
+        }
     }
 
 // ----------------------------------------------------------------------------------------

@@ -19,8 +19,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename matrix_type, 
-        typename sample_type 
+        typename matrix_type,
+        typename sample_type
         >
     class oca_problem_ranking_svm : public oca_problem<matrix_type >
     {
@@ -50,13 +50,13 @@ namespace dlib
         }
 
         virtual scalar_type get_c (
-        ) const 
+        ) const
         {
             return C;
         }
 
         virtual long get_num_dimensions (
-        ) const 
+        ) const
         {
             return dims;
         }
@@ -68,7 +68,7 @@ namespace dlib
             scalar_type current_risk_gap,
             unsigned long num_cutting_planes,
             unsigned long num_iterations
-        ) const 
+        ) const
         {
             if (be_verbose)
             {
@@ -93,17 +93,17 @@ namespace dlib
 
         virtual bool risk_has_lower_bound (
             scalar_type& lower_bound
-        ) const 
-        { 
+        ) const
+        {
             lower_bound = 0;
-            return true; 
+            return true;
         }
 
         virtual void get_risk (
             matrix_type& w,
             scalar_type& risk,
             matrix_type& subgradient
-        ) const 
+        ) const
         {
             subgradient.set_size(w.size(),1);
             subgradient = 0;
@@ -142,7 +142,7 @@ namespace dlib
                     if (rel_counts[k] != 0)
                     {
                         risk -= rel_counts[k]*rel_scores[k];
-                        subtract_from(subgradient, samples[i].relevant[k], rel_counts[k]); 
+                        subtract_from(subgradient, samples[i].relevant[k], rel_counts[k]);
                     }
                 }
 
@@ -151,7 +151,7 @@ namespace dlib
                     if (nonrel_counts[k] != 0)
                     {
                         risk += nonrel_counts[k]*nonrel_scores[k];
-                        add_to(subgradient, samples[i].nonrelevant[k], nonrel_counts[k]); 
+                        add_to(subgradient, samples[i].nonrelevant[k], nonrel_counts[k]);
                     }
                 }
 
@@ -181,7 +181,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename matrix_type, 
+        typename matrix_type,
         typename sample_type,
         typename scalar_type
         >
@@ -201,7 +201,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename K 
+        typename K
         >
     class svm_rank_trainer
     {
@@ -231,14 +231,14 @@ namespace dlib
         }
 
         explicit svm_rank_trainer (
-            const scalar_type& C_ 
+            const scalar_type& C_
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C_ > 0,
                 "\t svm_rank_trainer::svm_rank_trainer()"
                 << "\n\t C_ must be greater than 0"
-                << "\n\t C_:    " << C_ 
+                << "\n\t C_:    " << C_
                 << "\n\t this: " << this
                 );
 
@@ -258,7 +258,7 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\t void svm_rank_trainer::set_epsilon()"
                 << "\n\t eps_ must be greater than 0"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 << "\n\t this: " << this
                 );
 
@@ -273,7 +273,7 @@ namespace dlib
 
         void set_max_iterations (
             unsigned long max_iter
-        ) 
+        )
         {
             max_iterations = max_iter;
         }
@@ -333,7 +333,7 @@ namespace dlib
         {
             learn_nonnegative_weights = value;
             if (learn_nonnegative_weights)
-                prior.set_size(0); 
+                prior.set_size(0);
         }
 
         void set_prior (
@@ -345,8 +345,8 @@ namespace dlib
                         prior_.alpha(0) == 1,
                 "\t void svm_rank_trainer::set_prior()"
                 << "\n\t The supplied prior could not have been created by this object's train() method."
-                << "\n\t prior_.basis_vectors.size(): " << prior_.basis_vectors.size() 
-                << "\n\t prior_.alpha(0):             " << prior_.alpha(0) 
+                << "\n\t prior_.basis_vectors.size(): " << prior_.basis_vectors.size()
+                << "\n\t prior_.alpha(0):             " << prior_.alpha(0)
                 << "\n\t this: " << this
                 );
 
@@ -362,14 +362,14 @@ namespace dlib
         }
 
         void set_c (
-            scalar_type C_ 
+            scalar_type C_
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C_ > 0,
                 "\t void svm_rank_trainer::set_c()"
                 << "\n\t C_ must be greater than 0"
-                << "\n\t C_:    " << C_ 
+                << "\n\t C_:    " << C_
                 << "\n\t this: " << this
                 );
 
@@ -390,7 +390,7 @@ namespace dlib
             DLIB_CASSERT(is_ranking_problem(samples) == true,
                 "\t decision_function svm_rank_trainer::train(samples)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t samples.size(): " << samples.size() 
+                << "\n\t samples.size(): " << samples.size()
                 << "\n\t is_ranking_problem(samples): " << is_ranking_problem(samples)
                 );
 
@@ -406,7 +406,7 @@ namespace dlib
                 num_nonnegative = num_dims;
             }
 
-            unsigned long force_weight_1_idx = std::numeric_limits<unsigned long>::max(); 
+            unsigned long force_weight_1_idx = std::numeric_limits<unsigned long>::max();
             if (last_weight_1)
             {
                 force_weight_1_idx = num_dims-1;
@@ -421,8 +421,8 @@ namespace dlib
                         "\t decision_function svm_rank_trainer::train(samples)"
                         << "\n\t The dimension of the training vectors must match the dimension of\n"
                         << "\n\t those used to create the prior."
-                        << "\n\t num_dims:     " << num_dims 
-                        << "\n\t prior.size(): " << prior.size() 
+                        << "\n\t num_dims:     " << num_dims
+                        << "\n\t prior.size(): " << prior.size()
                     );
                 }
                 const unsigned long dims = std::max(num_dims, (unsigned long)prior.size());
@@ -433,22 +433,22 @@ namespace dlib
                 if ((unsigned long)prior.size() < dims)
                 {
                     matrix<scalar_type,0,1> prior_temp = join_cols(prior, zeros_matrix<scalar_type>(dims-prior.size(),1));
-                    solver( make_oca_problem_ranking_svm<w_type>(C, samples, verbose, eps, max_iterations, dims), 
-                        w, 
+                    solver( make_oca_problem_ranking_svm<w_type>(C, samples, verbose, eps, max_iterations, dims),
+                        w,
                         prior_temp);
                 }
                 else
                 {
-                    solver( make_oca_problem_ranking_svm<w_type>(C, samples, verbose, eps, max_iterations, dims), 
-                        w, 
+                    solver( make_oca_problem_ranking_svm<w_type>(C, samples, verbose, eps, max_iterations, dims),
+                        w,
                         prior);
                 }
 
             }
             else
             {
-                solver( make_oca_problem_ranking_svm<w_type>(C, samples, verbose, eps, max_iterations, num_dims), 
-                    w, 
+                solver( make_oca_problem_ranking_svm<w_type>(C, samples, verbose, eps, max_iterations, num_dims),
+                    w,
                     num_nonnegative,
                     force_weight_1_idx);
             }
@@ -485,7 +485,7 @@ namespace dlib
         bool learn_nonnegative_weights;
         bool last_weight_1;
         matrix<scalar_type,0,1> prior;
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 

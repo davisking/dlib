@@ -20,7 +20,7 @@ namespace dlib
         public:
         lz77_buffer_kernel_c (
             unsigned long total_limit,
-            unsigned long lookahead_limit            
+            unsigned long lookahead_limit
         );
 
         unsigned char lookahead_buffer (
@@ -43,8 +43,8 @@ namespace dlib
         )
         /*!
             ensures
-                - if ( 6 < total_limit < 32 && 
-                       15 < lookahead_limit <= 2^(total_limit-2) 
+                - if ( 6 < total_limit < 32 &&
+                       15 < lookahead_limit <= 2^(total_limit-2)
                        ) then
                     - returns total_limit
                 - else
@@ -56,7 +56,7 @@ namespace dlib
             while (exp_size != 0)
             {
                 --exp_size;
-                two_pow_total_limit_minus_2 <<= 1;            
+                two_pow_total_limit_minus_2 <<= 1;
             }
 
             // make sure requires clause is not broken
@@ -86,7 +86,7 @@ namespace dlib
     void lz77_buffer_kernel_c<lz77_base>::
     shift_buffers (
             unsigned long N
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_CASSERT( N <= this->get_lookahead_buffer_size(),
@@ -155,7 +155,7 @@ namespace dlib
     lz77_buffer_kernel_c<lz77_base>::
     lz77_buffer_kernel_c (
         unsigned long total_limit,
-        unsigned long lookahead_limit  
+        unsigned long lookahead_limit
     ) :
         lz77_base(make_safe(total_limit,lookahead_limit),lookahead_limit)
     {

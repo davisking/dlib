@@ -14,13 +14,13 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class impossible_labeling_error : public dlib::error 
-    { 
+    class impossible_labeling_error : public dlib::error
+    {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is the exception thrown by the structural_svm_object_detection_problem
                 when it detects that the image_scanner_type it is working with is incapable
-                of representing the truth rectangles it has been asked to predict.  
+                of representing the truth rectangles it has been asked to predict.
 
                 This kind of problem can happen when the test_box_overlap object indicates
                 that two ground truth rectangles overlap and are therefore not allowed to
@@ -33,30 +33,30 @@ namespace dlib
 
     template <
         typename image_scanner_type,
-        typename image_array_type 
+        typename image_array_type
         >
     class structural_svm_object_detection_problem : public structural_svm_problem_threaded<matrix<double,0,1> >,
                                                     noncopyable
     {
         /*!
             REQUIREMENTS ON image_scanner_type
-                image_scanner_type must be an implementation of 
+                image_scanner_type must be an implementation of
                 dlib/image_processing/scan_fhog_pyramid_abstract.h or
                 dlib/image_processing/scan_image_custom_abstract.h or
                 dlib/image_processing/scan_image_pyramid_abstract.h or
                 dlib/image_processing/scan_image_boxes_abstract.h
 
             REQUIREMENTS ON image_array_type
-                image_array_type must be an implementation of dlib/array/array_kernel_abstract.h 
+                image_array_type must be an implementation of dlib/array/array_kernel_abstract.h
                 and it must contain objects which can be accepted by image_scanner_type::load().
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for learning the parameter vector needed to use a
                 scan_image_pyramid, scan_fhog_pyramid, scan_image_custom, or
-                scan_image_boxes object.  
+                scan_image_boxes object.
 
-                It learns the parameter vector by formulating the problem as a structural 
-                SVM problem.  The exact details of the method are described in the paper 
+                It learns the parameter vector by formulating the problem as a structural
+                SVM problem.  The exact details of the method are described in the paper
                 Max-Margin Object Detection by Davis E. King (http://arxiv.org/abs/1502.00046).
 
 
@@ -81,7 +81,7 @@ namespace dlib
                 - scanner.get_num_detection_templates() > 0
                 - scanner.load(images[0]) must be a valid expression.
                 - for all valid i, j:
-                    - truth_object_detections[i][j].num_parts() == scanner.get_num_movable_components_per_detection_template() 
+                    - truth_object_detections[i][j].num_parts() == scanner.get_num_movable_components_per_detection_template()
                     - all_parts_in_rect(truth_object_detections[i][j]) == true
             ensures
                 - This object attempts to learn a mapping from the given images to the
@@ -98,12 +98,12 @@ namespace dlib
                 - if (auto_overlap_tester == true) then
                     - #get_overlap_tester() == a test_box_overlap object that is configured
                       using the find_tight_overlap_tester() routine and the contents of
-                      truth_object_detections. 
+                      truth_object_detections.
                 - else
                     - #get_overlap_tester() == overlap_tester
                 - #get_match_eps() == 0.5
-                - This object will use num_threads threads during the optimization 
-                  procedure.  You should set this parameter equal to the number of 
+                - This object will use num_threads threads during the optimization
+                  procedure.  You should set this parameter equal to the number of
                   available processing cores on your machine.
                 - #get_loss_per_missed_target() == 1
                 - #get_loss_per_false_alarm() == 1
@@ -115,14 +115,14 @@ namespace dlib
                       detection for an ignore rectangle.  Therefore, if there are objects
                       in your dataset that you are unsure you want to detect or otherwise
                       don't care if the detector gets or doesn't then you can mark them
-                      with ignore rectangles and the optimizer will simply ignore them. 
+                      with ignore rectangles and the optimizer will simply ignore them.
         !*/
 
         test_box_overlap get_overlap_tester (
         ) const;
         /*!
             ensures
-                - returns the overlap tester used by this object.  
+                - returns the overlap tester used by this object.
         !*/
 
         void set_match_eps (
@@ -141,7 +141,7 @@ namespace dlib
             ensures
                 - returns the amount of alignment necessary for a detection to be considered
                   as matching with a ground truth rectangle.  The precise formula for determining
-                  if two rectangles match each other is the following, rectangles A and B match 
+                  if two rectangles match each other is the following, rectangles A and B match
                   if and only if:
                     A.intersect(B).area()/(A+B).area() > get_match_eps()
         !*/
@@ -169,7 +169,7 @@ namespace dlib
         /*!
             ensures
                 - returns the amount of loss experienced for emitting a false alarm detection.
-                  Or in other words, the loss for generating a detection that doesn't correspond 
+                  Or in other words, the loss for generating a detection that doesn't correspond
                   to one of the truth rectangles.
         !*/
 

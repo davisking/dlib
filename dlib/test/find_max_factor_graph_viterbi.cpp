@@ -9,7 +9,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -27,7 +27,7 @@ namespace
         unsigned long O,
         unsigned long NS,
         unsigned long num_nodes,
-        bool all_negative 
+        bool all_negative
         >
     class map_problem
     {
@@ -49,7 +49,7 @@ namespace
         }
 
         template <
-            typename EXP 
+            typename EXP
             >
         double factor_value (
             unsigned long node_id,
@@ -62,7 +62,7 @@ namespace
                 return data(node_id, node_states(0) + node_states(1)*NS);
             else if (node_states.size() == 3)
                 return data(node_id, (node_states(0) + node_states(1)*NS)*NS + node_states(2));
-            else 
+            else
                 return data(node_id, ((node_states(0) + node_states(1)*NS)*NS + node_states(2))*NS + node_states(3));
         }
 
@@ -118,7 +118,7 @@ namespace
         >
     void do_test_()
     {
-        dlog << LINFO << "order: "<< order 
+        dlog << LINFO << "order: "<< order
                       << "  num_states:   " << num_states
                       << "  num_nodes:    " << num_nodes
                       << "  all_negative: " << all_negative;

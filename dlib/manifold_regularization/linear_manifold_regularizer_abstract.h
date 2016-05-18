@@ -26,35 +26,35 @@ namespace dlib
                 - dimensionality() == 0
 
             WHAT THIS OBJECT REPRESENTS
-                Many learning algorithms attempt to minimize a function that, at a high 
-                level, looks like this:   
+                Many learning algorithms attempt to minimize a function that, at a high
+                level, looks like this:
                     f(w) == complexity + training_set_error
 
-                The idea is to find the set of parameters, w, that gives low error on 
+                The idea is to find the set of parameters, w, that gives low error on
                 your training data but also is not "complex" according to some particular
-                measure of complexity.  This strategy of penalizing complexity is 
+                measure of complexity.  This strategy of penalizing complexity is
                 usually called regularization.
 
-                In the above setting, all the training data consists of labeled samples.  
-                However, it would be nice to be able to benefit from unlabeled data.  
-                The idea of manifold regularization is to extract useful information from 
-                unlabeled data by first defining which data samples are "close" to each other 
-                (perhaps by using their 3 nearest neighbors) and then adding a term to 
-                the above function that penalizes any decision rule which produces 
+                In the above setting, all the training data consists of labeled samples.
+                However, it would be nice to be able to benefit from unlabeled data.
+                The idea of manifold regularization is to extract useful information from
+                unlabeled data by first defining which data samples are "close" to each other
+                (perhaps by using their 3 nearest neighbors) and then adding a term to
+                the above function that penalizes any decision rule which produces
                 different outputs on data samples which we have designated as being close.
                 
-                It turns out that it is possible to transform these manifold regularized 
-                learning problems into the normal form shown above by applying a certain kind 
-                of preprocessing to all our data samples.  Once this is done we can use a 
+                It turns out that it is possible to transform these manifold regularized
+                learning problems into the normal form shown above by applying a certain kind
+                of preprocessing to all our data samples.  Once this is done we can use a
                 normal learning algorithm, such as the svm_c_linear_trainer, on just the
                 labeled data samples and obtain the same output as the manifold regularized
-                learner would have produced.  
+                learner would have produced.
                 
-                The linear_manifold_regularizer is a tool for creating this preprocessing 
-                transformation.  In particular, the transformation is linear.  That is, it 
-                is just a matrix you multiply with all your samples.  For a more detailed 
-                discussion of this topic you should consult the following paper.  In 
-                particular, see section 4.2.  This object computes the inverse T matrix 
+                The linear_manifold_regularizer is a tool for creating this preprocessing
+                transformation.  In particular, the transformation is linear.  That is, it
+                is just a matrix you multiply with all your samples.  For a more detailed
+                discussion of this topic you should consult the following paper.  In
+                particular, see section 4.2.  This object computes the inverse T matrix
                 described in that section.
 
                     Linear Manifold Regularization for Large Scale Semi-supervised Learning
@@ -68,8 +68,8 @@ namespace dlib
         typedef matrix<scalar_type,0,0,mem_manager_type,layout_type> general_matrix;
 
         template <
-            typename vector_type1, 
-            typename vector_type2, 
+            typename vector_type1,
+            typename vector_type2,
             typename weight_function_type
             >
         void build (
@@ -81,7 +81,7 @@ namespace dlib
             requires
                 - vector_type1 == a type with an interface compatible with std::vector and it must
                   in turn contain dlib::matrix objects.
-                - vector_type2 == a type with an interface compatible with std::vector and 
+                - vector_type2 == a type with an interface compatible with std::vector and
                   it must in turn contain objects with an interface compatible with dlib::sample_pair
                 - edges.size() > 0
                 - contains_duplicate_pairs(edges) == false
@@ -91,7 +91,7 @@ namespace dlib
             ensures
                 - #dimensionality() == samples[0].size()
                 - This function sets up the transformation matrix describe above.  The manifold
-                  regularization is done assuming that the samples are meant to be "close" 
+                  regularization is done assuming that the samples are meant to be "close"
                   according to the graph defined by the given edges.  I.e:
                     - for all valid i:  samples[edges[i].index1()] is close to samples[edges[i].index2()].
                       How much we care about these two samples having similar outputs according
@@ -117,11 +117,11 @@ namespace dlib
                 - returns a matrix that represents the preprocessing transformation described above.
                 - You must choose how important the manifold regularizer is relative to the basic
                   "don't be complex" regularizer described above.  The intrinsic_regularization_strength
-                  is the parameter that controls this trade-off.  A large value of 
+                  is the parameter that controls this trade-off.  A large value of
                   intrinsic_regularization_strength means that more emphasis should be placed on
-                  finding decision rules which produce the same output on similar samples.  On 
-                  the other hand, a small value would mean that we don't care much about the 
-                  manifold regularizer.  For example, using 0 will cause this function to return the 
+                  finding decision rules which produce the same output on similar samples.  On
+                  the other hand, a small value would mean that we don't care much about the
+                  manifold regularizer.  For example, using 0 will cause this function to return the
                   identity matrix.
                 - The returned matrix will have dimensionality() rows and columns.
         !*/

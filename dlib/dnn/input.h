@@ -17,9 +17,9 @@ namespace dlib
     template <typename T>
     class input
     {
-        const static bool always_false = sizeof(T)!=sizeof(T); 
+        const static bool always_false = sizeof(T)!=sizeof(T);
         static_assert(always_false, "Unsupported type given to input<>.  input<> only supports "
-            "dlib::matrix and dlib::array2d objects."); 
+            "dlib::matrix and dlib::array2d objects.");
     };
 
 // ----------------------------------------------------------------------------------------
@@ -31,10 +31,10 @@ namespace dlib
         const static unsigned int sample_expansion_factor = 1;
 
         input_rgb_image (
-        ) : 
-            avg_red(122.782), 
+        ) :
+            avg_red(122.782),
             avg_green(117.001),
-            avg_blue(104.298) 
+            avg_blue(104.298)
         {
         }
 
@@ -42,7 +42,7 @@ namespace dlib
             float avg_red_,
             float avg_green_,
             float avg_blue_
-        ) : avg_red(avg_red_), avg_green(avg_green_), avg_blue(avg_blue_) 
+        ) : avg_red(avg_red_), avg_green(avg_green_), avg_blue(avg_blue_)
         {}
 
         float get_avg_red()   const { return avg_red; }
@@ -87,11 +87,11 @@ namespace dlib
                     {
                         rgb_pixel temp = (*i)(r,c);
                         auto p = ptr++;
-                        *p = (temp.red-avg_red)/256.0; 
+                        *p = (temp.red-avg_red)/256.0;
                         p += offset;
-                        *p = (temp.green-avg_green)/256.0; 
+                        *p = (temp.green-avg_green)/256.0;
                         p += offset;
-                        *p = (temp.blue-avg_blue)/256.0; 
+                        *p = (temp.blue-avg_blue)/256.0;
                         p += offset;
                     }
                 }
@@ -134,7 +134,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T, long NR, long NC, typename MM, typename L>
-    class input<matrix<T,NR,NC,MM,L>> 
+    class input<matrix<T,NR,NC,MM,L>>
     {
     public:
         typedef matrix<T,NR,NC,MM,L> input_type;
@@ -218,7 +218,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T, typename MM>
-    class input<array2d<T,MM>> 
+    class input<array2d<T,MM>>
     {
     public:
         typedef array2d<T,MM> input_type;

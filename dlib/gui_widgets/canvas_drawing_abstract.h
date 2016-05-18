@@ -1,7 +1,7 @@
 // Copyright (C) 2005  Davis E. King (davis@dlib.net), and Nils Labugt
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_GUI_CANVAS_DRAWINg_ABSTRACT_
-#ifdef DLIB_GUI_CANVAS_DRAWINg_ABSTRACT_ 
+#ifdef DLIB_GUI_CANVAS_DRAWINg_ABSTRACT_
 
 #include "../gui_core.h"
 #include "../pixel.h"
@@ -26,7 +26,7 @@ namespace dlib
             - pixel_traits<pixel_type> is defined
         ensures
             - draws the part of the line from p1 to p1 that overlaps with
-              the canvas and area onto the canvas.  
+              the canvas and area onto the canvas.
             - Uses the given pixel color.
     !*/
 
@@ -46,7 +46,7 @@ namespace dlib
             - pixel_traits<pixel_type> is defined
         ensures
             - Draws the part of the rectangle that overlaps with
-              the canvas and area onto the canvas.  
+              the canvas and area onto the canvas.
             - Uses the given pixel color.
     !*/
 
@@ -66,8 +66,8 @@ namespace dlib
         requires
             - pixel_traits<pixel_type> is defined
         ensures
-            - draws the part of the circle centered at center_point with the given radius 
-              that overlaps with the canvas and area onto the canvas.  
+            - draws the part of the circle centered at center_point with the given radius
+              that overlaps with the canvas and area onto the canvas.
             - Uses the given pixel color.
     !*/
 
@@ -79,14 +79,14 @@ namespace dlib
     void draw_pixel (
         const canvas& c,
         const point& p,
-        const pixel_type& pixel 
+        const pixel_type& pixel
     );
     /*!
         requires
             - pixel_traits<pixel_type> is defined
         ensures
             - if (c.contains(p)) then
-                - sets the pixel in c that represents the point p to the 
+                - sets the pixel in c that represents the point p to the
                   given pixel color.
     !*/
 
@@ -106,8 +106,8 @@ namespace dlib
         requires
             - pixel_traits<pixel_type> is defined
         ensures
-            - draws the part of the solid circle centered at center_point with the given 
-              radius that overlaps with the canvas and area onto the canvas.  
+            - draws the part of the solid circle centered at center_point with the given
+              radius that overlaps with the canvas and area onto the canvas.
               ("solid" means that the interior is also filled in with the given
               pixel color)
             - Uses the given pixel color.
@@ -155,7 +155,7 @@ namespace dlib
                   will be drawn.
                 - the border will be for the button whose area is defined by the
                   rectangle btn.
-            - performs alpha blending such that the button is drawn with full opacity 
+            - performs alpha blending such that the button is drawn with full opacity
               when alpha is 255 and fully transparent when alpha is 0.
     !*/
 
@@ -173,7 +173,7 @@ namespace dlib
             - draws a sunken rectangle around the given border.
               (This is the type of border used for text_fields and
               check_boxes and the like).
-            - performs alpha blending such that the rectangle is drawn with full opacity 
+            - performs alpha blending such that the rectangle is drawn with full opacity
               when alpha is 255 and fully transparent when alpha is 0.
     !*/
 
@@ -194,7 +194,7 @@ namespace dlib
                   will be drawn.
                 - the border will be for the button whose area is defined by the
                   rectangle btn.
-            - performs alpha blending such that the button is drawn with full opacity 
+            - performs alpha blending such that the button is drawn with full opacity
               when alpha is 255 and fully transparent when alpha is 0.
     !*/
 
@@ -213,14 +213,14 @@ namespace dlib
         requires
             - pixel_traits<pixel_type> is defined
         ensures
-            - fills the area on the given canvas defined by the rectangle area with a checkers 
+            - fills the area on the given canvas defined by the rectangle area with a checkers
               board pattern where every other pixel gets assigned either pixel1 or pixel2.
     !*/
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type 
+        typename image_type
         >
     void draw_image (
         const canvas& c
@@ -243,7 +243,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type 
+        typename image_type
         >
     void draw_image (
         const canvas& c,
@@ -300,8 +300,8 @@ namespace dlib
         requires
             - pixel_traits<pixel_type> is defined
         ensures
-            - fills the rectangle defined by rect in the given canvas with the given colors.  
-              The top of the area will have the pixel_top color and will slowly fade 
+            - fills the rectangle defined by rect in the given canvas with the given colors.
+              The top of the area will have the pixel_top color and will slowly fade
               towards the pixel_bottom color towards the bottom of rect.
             - only draws the part of the image that overlaps with the area rectangle
     !*/
@@ -323,10 +323,10 @@ namespace dlib
         requires
             - pixel_traits<pixel_type> is defined
         ensures
-            - Fills the region defined by rect in the given canvas with the given colors.  
-              The top of the region will have the top_color color and will slowly fade 
+            - Fills the region defined by rect in the given canvas with the given colors.
+              The top of the region will have the top_color color and will slowly fade
               towards the bottom_color color towards the bottom of rect.
-            - The drawn rectangle will have rounded corners and with the amount of 
+            - The drawn rectangle will have rounded corners and with the amount of
             - rounding given by the radius argument.
             - only the part of this object that overlaps with area and the canvas
               will be drawn on the canvas
@@ -349,8 +349,8 @@ namespace dlib
             - pixel_traits<pixel_type> is defined
         ensures
             - Draws the part of the rectangle that overlaps with
-              the canvas onto the canvas.  
-            - The drawn rectangle will have rounded corners and with the amount of 
+              the canvas onto the canvas.
+            - The drawn rectangle will have rounded corners and with the amount of
               rounding given by the radius argument.
             - Uses the given pixel color.
             - only draws the part of the image that overlaps with the area rectangle

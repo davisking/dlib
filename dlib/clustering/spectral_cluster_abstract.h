@@ -23,7 +23,7 @@ namespace dlib
                 k(samples[i], samples[j])
             - num_clusters > 0
         ensures
-            - Performs the spectral clustering algorithm described in the paper: 
+            - Performs the spectral clustering algorithm described in the paper:
               On spectral clustering: Analysis and an algorithm by Ng, Jordan, and Weiss.
               and returns the results.
             - This function clusters the input data samples into num_clusters clusters and
@@ -31,7 +31,7 @@ namespace dlib
               particular, we return an array A such that:
                 - A.size() == samples.size()
                 - A[i] == the cluster assignment of samples[i].
-                - for all valid i: 0 <= A[i] < num_clusters 
+                - for all valid i: 0 <= A[i] < num_clusters
             - The "similarity" of samples[i] with samples[j] is given by
               k(samples[i],samples[j]).  This means that k() should output a number >= 0
               and the number should be larger for samples that are more similar.

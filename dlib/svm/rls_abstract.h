@@ -15,17 +15,17 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the linear version of the recursive least 
-                squares algorithm.  It accepts training points incrementally and, at 
+                This is an implementation of the linear version of the recursive least
+                squares algorithm.  It accepts training points incrementally and, at
                 each step, maintains the solution to the following optimization problem:
                     find w minimizing: 0.5*dot(w,w) + C*sum_i(y_i - trans(x_i)*w)^2
                 Where (x_i,y_i) are training pairs.  x_i is some vector and y_i is a target
                 scalar value.
 
                 This object can also be configured to use exponential forgetting.  This is
-                where each training example is weighted by pow(forget_factor, i), where i 
-                indicates the sample's age.  So older samples are weighted less in the 
-                least squares solution and therefore become forgotten after some time.  
+                where each training example is weighted by pow(forget_factor, i), where i
+                indicates the sample's age.  So older samples are weighted less in the
+                least squares solution and therefore become forgotten after some time.
                 Therefore, with forgetting, this object solves the following optimization
                 problem at each step:
                     find w minimizing: 0.5*dot(w,w) + C*sum_i pow(forget_factor, i)*(y_i - trans(x_i)*w)^2
@@ -62,11 +62,11 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the regularization parameter.  It is the parameter 
-                  that determines the trade-off between trying to fit the training 
-                  data or allowing more errors but hopefully improving the generalization 
-                  of the resulting regression.  Larger values encourage exact fitting while 
-                  smaller values of C may encourage better generalization. 
+                - returns the regularization parameter.  It is the parameter
+                  that determines the trade-off between trying to fit the training
+                  data or allowing more errors but hopefully improving the generalization
+                  of the resulting regression.  Larger values encourage exact fitting while
+                  smaller values of C may encourage better generalization.
         !*/
 
         double get_forget_factor(
@@ -74,8 +74,8 @@ namespace dlib
         /*!
             ensures
                 - returns the exponential forgetting factor.  A value of 1 disables forgetting
-                  and results in normal least squares regression.  On the other hand, a smaller 
-                  value causes the regression to forget about old training examples and prefer 
+                  and results in normal least squares regression.  On the other hand, a smaller
+                  value causes the regression to forget about old training examples and prefer
                   instead to fit more recent examples.  The closer the forget factor is to
                   zero the faster old examples are forgotten.
         !*/
@@ -136,19 +136,19 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void serialize (
-        const rls& item, 
-        std::ostream& out 
-    );   
+        const rls& item,
+        std::ostream& out
+    );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     void deserialize (
-        rls& item, 
+        rls& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

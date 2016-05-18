@@ -1,7 +1,7 @@
 // Copyright (C) 2009  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_MATRIx_CONJ_TRANS_FUNCTIONS
-#define DLIB_MATRIx_CONJ_TRANS_FUNCTIONS 
+#define DLIB_MATRIx_CONJ_TRANS_FUNCTIONS
 
 #include "matrix_utilities.h"
 #include "matrix_math_functions.h"
@@ -23,7 +23,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M>
-    struct op_conj_trans 
+    struct op_conj_trans
     {
         op_conj_trans( const M& m_) : m(m_){}
         const M& m;
@@ -42,7 +42,7 @@ namespace dlib
 
         template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return m.aliases(item); }
         template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return m.aliases(item); }
-    }; 
+    };
 
     template <typename EXP>
     const matrix_op<op_conj_trans<EXP> > trans (

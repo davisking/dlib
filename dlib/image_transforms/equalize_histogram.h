@@ -41,7 +41,7 @@ namespace dlib
         set_all_elements(hist,0);
 
         const_image_view<in_image_type> in_img(in_img_);
-        // compute the histogram 
+        // compute the histogram
         for (long r = 0; r < in_img.nr(); ++r)
         {
             for (long c = 0; c < in_img.nc(); ++c)
@@ -56,7 +56,7 @@ namespace dlib
 
     template <
         typename in_image_type,
-        typename out_image_type 
+        typename out_image_type
         >
     void equalize_histogram (
         const in_image_type& in_img_,
@@ -124,7 +124,7 @@ namespace dlib
     }
 
     template <
-        typename image_type 
+        typename image_type
         >
     void equalize_histogram (
         image_type& img

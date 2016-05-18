@@ -19,7 +19,7 @@ namespace dlib
     class rand
     {
 
-        /*!       
+        /*!
             INITIAL VALUE
                 - seed == ""
 
@@ -35,7 +35,7 @@ namespace dlib
             typedef rand float_1a;
 
             rand(
-            ) 
+            )
             {
                 init();
             }
@@ -203,7 +203,7 @@ namespace dlib
                 const double rndmax = std::numeric_limits<dlib::uint32>::max();
 
                 // Generate a pair of Gaussian random numbers using the Box-Muller transformation.
-                do 
+                do
                 {
                     const double rnd1 = get_random_32bit_number()/rndmax;
                     const double rnd2 = get_random_32bit_number()/rndmax;
@@ -230,13 +230,13 @@ namespace dlib
             }
     
             friend void serialize(
-                const rand& item, 
+                const rand& item,
                 std::ostream& out
             );
 
             friend void deserialize(
-                rand& item, 
-                std::istream& in 
+                rand& item,
+                std::istream& in
             );
 
         private:
@@ -269,19 +269,19 @@ namespace dlib
 
 
     inline void swap (
-        rand& a, 
-        rand& b 
-    ) { a.swap(b); }   
+        rand& a,
+        rand& b
+    ) { a.swap(b); }
 
 
     template <>
     struct is_rand<rand>
     {
-        static const bool value = true; 
+        static const bool value = true;
     };
 
     inline void serialize(
-        const rand& item, 
+        const rand& item,
         std::ostream& out
     )
     {
@@ -295,14 +295,14 @@ namespace dlib
     }
 
     inline void deserialize(
-        rand& item, 
-        std::istream& in 
+        rand& item,
+        std::istream& in
     )
     {
         int version;
         deserialize(version, in);
         if (version != 1)
-            throw serialization_error("Error deserializing object of type rand: unexpected version."); 
+            throw serialization_error("Error deserializing object of type rand: unexpected version.");
 
         deserialize(item.mt, in);
         deserialize(item.seed, in);

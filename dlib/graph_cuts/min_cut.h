@@ -30,7 +30,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename flow_graph>
-    typename disable_if<is_directed_graph<flow_graph>,typename flow_graph::edge_type>::type 
+    typename disable_if<is_directed_graph<flow_graph>,typename flow_graph::edge_type>::type
     graph_cut_score (
         const flow_graph& g
     )
@@ -56,7 +56,7 @@ namespace dlib
     }
 
     template <typename directed_graph>
-    typename enable_if<is_directed_graph<directed_graph>,typename directed_graph::edge_type>::type 
+    typename enable_if<is_directed_graph<directed_graph>,typename directed_graph::edge_type>::type
     graph_cut_score (
         const directed_graph& g
     )
@@ -80,7 +80,7 @@ namespace dlib
             // Intentionally left empty since all the member variables
             // don't logically contribute to the state of this object.
             // This copy constructor is here to explicitly avoid the overhead
-            // of copying these transient variables.  
+            // of copying these transient variables.
         }
 
         template <
@@ -120,9 +120,9 @@ namespace dlib
                         sink_node < g.number_of_nodes(),
                     "\t void min_cut::operator()"
                     << "\n\t Invalid arguments were given to this function."
-                    << "\n\t g.number_of_nodes(): " << g.number_of_nodes() 
-                    << "\n\t source_node: " << source_node 
-                    << "\n\t sink_node:   " << sink_node 
+                    << "\n\t g.number_of_nodes(): " << g.number_of_nodes()
+                    << "\n\t source_node: " << source_node
+                    << "\n\t sink_node:   " << sink_node
                     << "\n\t this:   " << this
             );
 
@@ -134,8 +134,8 @@ namespace dlib
                     const unsigned long jj = g.node_id(j);
                     DLIB_ASSERT(g.get_flow(i,jj) >= 0,
                                 "\t void min_cut::operator()"
-                                << "\n\t Invalid inputs were given to this function." 
-                                << "\n\t i: "<< i 
+                                << "\n\t Invalid inputs were given to this function."
+                                << "\n\t i: "<< i
                                 << "\n\t jj: "<< jj
                                 << "\n\t g.get_flow(i,jj): "<< g.get_flow(i,jj)
                                 << "\n\t this: "<< this
@@ -196,7 +196,7 @@ namespace dlib
         unsigned long distance_to_origin (
             const unsigned long nil,
             unsigned long p,
-            unsigned long 
+            unsigned long
         ) const
         {
             unsigned long start = p;
@@ -359,7 +359,7 @@ namespace dlib
             flow_graph& g,
             const unsigned long& source,
             const unsigned long& sink,
-            const unsigned long& source_side, 
+            const unsigned long& source_side,
             const unsigned long& sink_side
         ) const
         {
@@ -421,7 +421,7 @@ namespace dlib
                 t = s;
             }
 
-            // trace back towards the sink 
+            // trace back towards the sink
             s = sink_side;
             while (s != sink)
             {
@@ -439,14 +439,14 @@ namespace dlib
         template <typename flow_graph>
         bool grow (
             flow_graph& g,
-            unsigned long& source_side, 
+            unsigned long& source_side,
             unsigned long& sink_side,
             typename flow_graph::in_edge_iterator& in_begin,
             typename flow_graph::out_edge_iterator& out_begin
         ) const
         /*!
             ensures
-                - if (an augmenting path was found) then 
+                - if (an augmenting path was found) then
                     - returns true
                     - (#source_side, #sink_side) == the point where the two trees meet.
                       #source_side is part of the source tree and #sink_side is part of
@@ -475,7 +475,7 @@ namespace dlib
                         if (g.get_flow(i) > 0)
                         {
                             const unsigned long id = g.node_id(i);
-                            const unsigned char label_i = g.get_label(id); 
+                            const unsigned char label_i = g.get_label(id);
                             if (label_i == FREE_NODE)
                             {
                                 active.push_back(id);
@@ -507,7 +507,7 @@ namespace dlib
                         if (g.get_flow(i) > 0)
                         {
                             const unsigned long id = g.node_id(i);
-                            const unsigned char label_i = g.get_label(id); 
+                            const unsigned char label_i = g.get_label(id);
                             if (label_i == FREE_NODE)
                             {
                                 active.push_back(id);

@@ -7,7 +7,7 @@
 #include <string>
 #include "hash.h"
 
-namespace dlib 
+namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
@@ -33,10 +33,10 @@ namespace dlib
         REQUIREMENTS ON general_hash
             - must have a default constructor
             - must be a function object which overloads operator() as follows:
-              unsigned long operator()(const T& item)             
-            - must take item, compute a hash number and return it 
+              unsigned long operator()(const T& item)
+            - must take item, compute a hash number and return it
             - must not throw
-            - must define the hash in such a way that all equivalent objects have 
+            - must define the hash in such a way that all equivalent objects have
               the same hash.  where equivalent means the following:
                   definition of equivalent:
                   a is equivalent to b if
@@ -49,12 +49,12 @@ namespace dlib
     template <
         typename T
         >
-    unsigned long general_hash<T>:: 
+    unsigned long general_hash<T>::
     operator() (
         const T& item
     ) const
     {
-        // hash any types that have a conversion to uint64 
+        // hash any types that have a conversion to uint64
         return hash(static_cast<uint64>(item));
     }
 
@@ -63,7 +63,7 @@ namespace dlib
 
     // std::string hash
     template <>
-    inline unsigned long general_hash<std::string>:: 
+    inline unsigned long general_hash<std::string>::
     operator() (
         const std::string& item
     ) const

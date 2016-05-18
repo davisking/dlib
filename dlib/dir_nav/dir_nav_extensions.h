@@ -69,7 +69,7 @@ namespace dlib
     {
 
     public:
-        match_ending ( 
+        match_ending (
             const std::string& ending_
         ) : ending(ending_) {}
 
@@ -81,7 +81,7 @@ namespace dlib
             if (ending.size() > f.name().size())
                 return false;
 
-            // now check if the actual characters that make up the end of the file name 
+            // now check if the actual characters that make up the end of the file name
             // matches what is in ending.
             return std::equal(ending.begin(), ending.end(), f.name().end()-ending.size());
         }
@@ -96,9 +96,9 @@ namespace dlib
     {
 
     public:
-        match_endings ( 
+        match_endings (
             const std::string& endings_
-        ) 
+        )
         {
             const std::vector<std::string>& s = split(endings_);
             for (unsigned long i = 0; i < s.size(); ++i)
@@ -130,7 +130,7 @@ namespace dlib
     {
     public:
         bool operator() (
-            const file& 
+            const file&
         ) const { return true; }
     };
 

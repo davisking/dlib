@@ -28,7 +28,7 @@ namespace dlib
 
     template <typename label_type, typename U>
     std::vector<unordered_pair<label_type> > find_missing_pairs (
-        const std::map<unordered_pair<label_type>,U>& bdfs 
+        const std::map<unordered_pair<label_type>,U>& bdfs
     )
     {
         typedef std::map<unordered_pair<label_type>,U> map_type;

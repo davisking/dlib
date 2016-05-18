@@ -34,10 +34,10 @@ namespace dlib
     !*/
 
     template <
-        typename... T 
+        typename... T
         >
     auto tuple_tail(
-        const std::tuple<T...>& item 
+        const std::tuple<T...>& item
     );
     /*!
         ensures
@@ -50,7 +50,7 @@ namespace dlib
     template <typename... T>
     auto tuple_head (
         const std::tuple<T...>& item
-    ); 
+    );
     /*!
         ensures
             - returns a copy of the first thing in the tuple that isn't a std::tuple.
@@ -89,7 +89,7 @@ namespace dlib
     );
     /*!
         ensures
-            - #dnn_prefer_fastest_algorithms() == false 
+            - #dnn_prefer_fastest_algorithms() == false
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -137,26 +137,26 @@ namespace dlib
             requires
                 - size() != 0
             ensures
-                - returns the top element of the stack.  
+                - returns the top element of the stack.
         !*/
 
         size_t size(
         ) const;
         /*!
             ensures
-                - returns the number of elements in this stack.  
+                - returns the number of elements in this stack.
         !*/
 
         sstack pop(
             size_t num = 1
-        ); 
+        );
         /*!
             requires
                 - num < size()
             ensures
                 - returns a reference to the sub-stack S such that:
                     - S.size() == size()-num.
-                    - S.top() is num elements down the stack. 
+                    - S.top() is num elements down the stack.
         !*/
     };
 
@@ -174,7 +174,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename LAYER_DETAILS, 
+        typename LAYER_DETAILS,
         typename SUBNET
         >
     class add_layer
@@ -210,7 +210,7 @@ namespace dlib
         // EXAMPLE_COMPUTATIONAL_LAYER_ interface).  This is all the layers except for
         // loss, tag, and skip layers.
         const static size_t num_computational_layers = subnet_type::num_computational_layers + 1;
-        // num_layers counts all the layers in the network regardless of their type.  
+        // num_layers counts all the layers in the network regardless of their type.
         const static size_t num_layers = subnet_type::num_layers + 1;
 
         add_layer(
@@ -244,7 +244,7 @@ namespace dlib
 
         template <typename ...T, typename LD, typename ...U>
         add_layer(
-            const std::tuple<LD,U...>& layer_det, 
+            const std::tuple<LD,U...>& layer_det,
             T&& ...args
         );
         /*!
@@ -255,7 +255,7 @@ namespace dlib
 
         template <typename ...T>
         add_layer(
-            const layer_details_type& layer_det, 
+            const layer_details_type& layer_det,
             T&& ...args
         );
         /*!
@@ -279,7 +279,7 @@ namespace dlib
 
         template <typename ...T>
         add_layer(
-            layer_details_type&& layer_det, 
+            layer_details_type&& layer_det,
             T&& ...args
         );
         /*!
@@ -300,31 +300,31 @@ namespace dlib
                 - std::distance(ibegin,iend) > 0
             ensures
                 - Converts the iterator range into a tensor and stores it into #data.
-                - #data.num_samples() == distance(ibegin,iend)*sample_expansion_factor. 
+                - #data.num_samples() == distance(ibegin,iend)*sample_expansion_factor.
                 - The data in the ith sample of #data corresponds to the input_type object
                   *(ibegin+i/sample_expansion_factor).
                 - Invokes data.async_copy_to_device() so that the data begins transferring
                   to the GPU device, if present.
                 - This function is implemented by calling the to_tensor() routine defined
-                  at the input layer of this network.  
+                  at the input layer of this network.
         !*/
 
         const subnet_type& subnet(
-        ) const; 
+        ) const;
         /*!
             ensures
-                - returns the immediate subnetwork of *this network.  
+                - returns the immediate subnetwork of *this network.
         !*/
 
         subnet_type& subnet(
         );
         /*!
             ensures
-                - returns the immediate subnetwork of *this network.  
+                - returns the immediate subnetwork of *this network.
         !*/
 
         const layer_details_type& layer_details(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the layer_details_type instance that defines the behavior of the
@@ -360,7 +360,7 @@ namespace dlib
                 - The return value from this function is also available in #get_output().
                   i.e. this function returns #get_output().
                 - have_same_dimensions(#get_gradient_input(), #get_output()) == true.
-                - All elements of #get_gradient_input() are set to 0. 
+                - All elements of #get_gradient_input() are set to 0.
                   i.e. calling this function clears out #get_gradient_input() and ensures
                   it has the same dimensions as the most recent output.
         !*/
@@ -391,7 +391,7 @@ namespace dlib
                 - The return value from this function is also available in #get_output().
                   i.e. this function returns #get_output().
                 - have_same_dimensions(#get_gradient_input(), #get_output()) == true
-                - All elements of #get_gradient_input() are set to 0. 
+                - All elements of #get_gradient_input() are set to 0.
                   i.e. calling this function clears out #get_gradient_input() and ensures
                   it has the same dimensions as the most recent output.
         !*/
@@ -402,7 +402,7 @@ namespace dlib
             ensures
                 - returns the output for the last tensor that was run through the network.
                   If nothing has been run through the network yet then returns an empty
-                  tensor. 
+                  tensor.
         !*/
 
         tensor& get_gradient_input(
@@ -419,7 +419,7 @@ namespace dlib
                   the result into their subnetwork's get_gradient_input().
 
                   This means you should consider get_gradient_input() as an input to the
-                  back_propagate_error() method.  
+                  back_propagate_error() method.
         !*/
 
         const tensor& get_final_data_gradient(
@@ -435,7 +435,7 @@ namespace dlib
         !*/
 
         const tensor& get_parameter_gradient(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - if back_propagate_error() has been called then you can call
@@ -447,7 +447,7 @@ namespace dlib
         !*/
 
         tensor& get_parameter_gradient (
-        ); 
+        );
         /*!
             ensures
                 - returns a non-const reference to the tensor returned by the above
@@ -470,7 +470,7 @@ namespace dlib
                   network and computes parameter and data gradients, via backpropagation.
                   Specifically, this function populates get_final_data_gradient() and also,
                   for each layer, the tensor returned by get_parameter_gradient().
-                - All elements of #get_gradient_input() are set to 0. 
+                - All elements of #get_gradient_input() are set to 0.
                 - have_same_dimensions(#get_final_data_gradient(), x) == true.
                 - have_same_dimensions(#get_parameter_gradient(), layer_details().get_layer_params()) == true.
                 - #get_final_data_gradient() contains the gradient of the network with
@@ -478,7 +478,7 @@ namespace dlib
         !*/
 
         void back_propagate_error(
-            const tensor& x, 
+            const tensor& x,
             const tensor& gradient_input
         );
         /*!
@@ -496,7 +496,7 @@ namespace dlib
                     back_propagate_error(x);
                   Except that calling back_propagate_error(x,gradient_input) avoids the
                   copy and is therefore slightly more efficient.
-                - All elements of #get_gradient_input() are set to 0. 
+                - All elements of #get_gradient_input() are set to 0.
                 - have_same_dimensions(#get_final_data_gradient(), x) == true.
                 - have_same_dimensions(#get_parameter_gradient(), layer_details().get_layer_params()) == true.
                 - #get_final_data_gradient() contains the gradient of the network with
@@ -505,7 +505,7 @@ namespace dlib
 
         template <typename solver_type>
         void update_parameters(
-            sstack<solver_type> solvers, 
+            sstack<solver_type> solvers,
             double learning_rate
         );
         /*!
@@ -531,7 +531,7 @@ namespace dlib
         );
         /*!
             ensures
-                - Causes the network to forget about everything but its parameters.  
+                - Causes the network to forget about everything but its parameters.
                   That is, for each layer we will have:
                     - get_output().num_samples() == 0
                     - get_gradient_input().num_samples() == 0
@@ -544,18 +544,18 @@ namespace dlib
 
     };
 
-    template <typename T, typename U> 
+    template <typename T, typename U>
     std::ostream& operator<<(std::ostream& out, const add_layer<T,U>& item);
     /*!
         prints the network architecture to the given output stream.
     !*/
 
-    template <typename T, typename U> 
+    template <typename T, typename U>
     void serialize(const add_layer<T,U>& item, std::ostream& out);
-    template <typename T, typename U> 
+    template <typename T, typename U>
     void deserialize(add_layer<T,U>& item, std::istream& in);
     /*!
-        provides serialization support  
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -565,13 +565,13 @@ namespace dlib
     class no_label_type;
 
     template <
-        typename LOSS_DETAILS, 
+        typename LOSS_DETAILS,
         typename SUBNET
         >
     class add_loss_layer
     {
         /*!
-            REQUIREMENTS ON LOSS_DETAILS 
+            REQUIREMENTS ON LOSS_DETAILS
                 - Must be a type that implements the EXAMPLE_LOSS_LAYER_ interface defined
                   in loss_abstract.h
                 - LOSS_DETAILS::sample_expansion_factor == SUBNET::sample_expansion_factor
@@ -636,9 +636,9 @@ namespace dlib
 
         template <typename ...T>
         add_loss_layer(
-            const LOSS_DETAILS& layer_det, 
+            const LOSS_DETAILS& layer_det,
             T&& ...args
-        ); 
+        );
         /*!
             ensures
                 - #loss_details() == layer_det
@@ -647,7 +647,7 @@ namespace dlib
 
         template <typename ...T>
         add_loss_layer(
-            LOSS_DETAILS&& layer_det, 
+            LOSS_DETAILS&& layer_det,
             T&& ...args
         );
         /*!
@@ -659,7 +659,7 @@ namespace dlib
         template <typename ...T>
         add_loss_layer(
             T ...args
-        ); 
+        );
         /*!
             ensures
                 - #loss_details() == loss_details_type()
@@ -667,21 +667,21 @@ namespace dlib
         !*/
 
         const subnet_type& subnet(
-        ) const; 
+        ) const;
         /*!
             ensures
-                - returns the immediate subnetwork of *this network.  
+                - returns the immediate subnetwork of *this network.
         !*/
 
         subnet_type& subnet(
-        ); 
+        );
         /*!
             ensures
-                - returns the immediate subnetwork of *this network.  
+                - returns the immediate subnetwork of *this network.
         !*/
 
         const loss_details_type& loss_details(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the loss_details_type instance that defines the behavior of the
@@ -689,7 +689,7 @@ namespace dlib
         !*/
 
         loss_details_type& loss_details(
-        ); 
+        );
         /*!
             ensures
                 - returns the loss_details_type instance that defines the behavior of the
@@ -708,20 +708,20 @@ namespace dlib
                 - std::distance(ibegin,iend) > 0
             ensures
                 - Converts the iterator range into a tensor and stores it into #data.
-                - #data.num_samples() == distance(ibegin,iend)*sample_expansion_factor. 
+                - #data.num_samples() == distance(ibegin,iend)*sample_expansion_factor.
                 - The data in the ith sample of #data corresponds to the input_type object
                   *(ibegin+i/sample_expansion_factor).
                 - Invokes data.async_copy_to_device() so that the data begins transferring
                   to the GPU device, if present.
                 - This function is implemented by calling the to_tensor() routine defined
-                  at the input layer of this network.  
+                  at the input layer of this network.
         !*/
 
     // -------------
 
         template <typename output_iterator>
         void operator() (
-            const tensor& x, 
+            const tensor& x,
             output_iterator obegin
         );
         /*!
@@ -795,7 +795,7 @@ namespace dlib
         template <typename label_iterator>
         double compute_loss (
             const tensor& x,
-            label_iterator lbegin 
+            label_iterator lbegin
         );
         /*!
             requires
@@ -805,7 +805,7 @@ namespace dlib
                   x.num_samples()/sample_expansion_factor label_type elements.
             ensures
                 - runs x through the network, compares the output to the expected output
-                  pointed to by lbegin, and returns the resulting loss. 
+                  pointed to by lbegin, and returns the resulting loss.
                 - for all valid k:
                     - the expected label of the kth sample in x is *(lbegin+k/sample_expansion_factor).
                 - This function does not update the network parameters.
@@ -815,7 +815,7 @@ namespace dlib
         double compute_loss (
             input_iterator ibegin,
             input_iterator iend,
-            label_iterator lbegin 
+            label_iterator lbegin
         );
         /*!
             requires
@@ -825,7 +825,7 @@ namespace dlib
                   std::distance(ibegin,iend) label_type elements.
             ensures
                 - runs [ibegin,iend) through the network, compares the output to the
-                  expected output pointed to by lbegin, and returns the resulting loss. 
+                  expected output pointed to by lbegin, and returns the resulting loss.
                 - for all valid k:
                     - the expected label of *(ibegin+k) is *(lbegin+k).
                 - This function does not update the network parameters.
@@ -842,7 +842,7 @@ namespace dlib
                 - x.num_samples()%sample_expansion_factor == 0
                 - x.num_samples() > 0
             ensures
-                - runs x through the network and returns the resulting loss. 
+                - runs x through the network and returns the resulting loss.
                 - This function does not update the network parameters.
         !*/
 
@@ -857,7 +857,7 @@ namespace dlib
                 - [ibegin, iend) is an iterator range over input_type objects.
                 - std::distance(ibegin,iend) > 0
             ensures
-                - runs [ibegin,iend) through the network and returns the resulting loss. 
+                - runs [ibegin,iend) through the network and returns the resulting loss.
                 - This function does not update the network parameters.
         !*/
 
@@ -972,23 +972,23 @@ namespace dlib
         );
         /*!
             ensures
-                - Causes the network to forget about everything but its parameters.  
+                - Causes the network to forget about everything but its parameters.
                 - invokes subnet().clean()
         !*/
     };
 
-    template <typename T, typename U> 
+    template <typename T, typename U>
     std::ostream& operator<<(std::ostream& out, const add_loss_layer<T,U>& item);
     /*!
         prints the network architecture to the given output stream.
     !*/
 
-    template <typename T, typename U> 
+    template <typename T, typename U>
     void serialize(const add_loss_layer<T,U>& item, std::ostream& out);
-    template <typename T, typename U> 
+    template <typename T, typename U>
     void deserialize(add_loss_layer<T,U>& item, std::istream& in);
     /*!
-        provides serialization support  
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -1008,10 +1008,10 @@ namespace dlib
 
     template <
         size_t num,
-        template<typename> class REPEATED_LAYER, 
+        template<typename> class REPEATED_LAYER,
         typename SUBNET
         >
-    class repeat 
+    class repeat
     {
         /*!
             REQUIREMENTS ON num
@@ -1061,7 +1061,7 @@ namespace dlib
                   this object.  That is, all the REPEATED_LAYER elements are initialized identically
                   by being given copies of arg1.
                 - The rest of the arguments to the constructor, i.e. args2, are passed to
-                  SUBNET's constructor.  
+                  SUBNET's constructor.
         !*/
 
         template <typename ...T, typename ...U>
@@ -1075,18 +1075,18 @@ namespace dlib
                   this object.  That is, all the REPEATED_LAYER elements are initialized identically
                   by being given copies of an undecorated arg1.
                 - The rest of the arguments to the constructor, i.e. args2, are passed to
-                  SUBNET's constructor.  
+                  SUBNET's constructor.
         !*/
 
         size_t num_repetitions (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns num (i.e. the number of times REPEATED_LAYER was stacked on top of SUBNET)
         !*/
 
         const repeated_layer_type& get_repeated_layer (
-            size_t i 
+            size_t i
         ) const;
         /*!
             requires
@@ -1099,7 +1099,7 @@ namespace dlib
         !*/
 
         repeated_layer_type& get_repeated_layer (
-            size_t i 
+            size_t i
         );
         /*!
             requires
@@ -1112,19 +1112,19 @@ namespace dlib
         !*/
 
         const subnet_type& subnet(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the SUBNET base network that repeat sits on top of.  If you want
-                  to access the REPEATED_LAYER components then you must use get_repeated_layer(). 
+                  to access the REPEATED_LAYER components then you must use get_repeated_layer().
         !*/
 
         subnet_type& subnet(
-        ); 
+        );
         /*!
             ensures
                 - returns the SUBNET base network that repeat sits on top of.  If you want
-                  to access the REPEATED_LAYER components then you must use get_repeated_layer(). 
+                  to access the REPEATED_LAYER components then you must use get_repeated_layer().
         !*/
     };
 
@@ -1139,13 +1139,13 @@ namespace dlib
     template < size_t num, template<typename> class T, typename U >
     void deserialize(repeat<num,T,U>& item, std::istream& in);
     /*!
-        provides serialization support  
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        unsigned long ID, 
+        unsigned long ID,
         typename SUBNET
         >
     class add_tag_layer
@@ -1171,18 +1171,18 @@ namespace dlib
         !*/
     };
 
-    template <unsigned long ID, typename U> 
+    template <unsigned long ID, typename U>
     std::ostream& operator<<(std::ostream& out, const add_tag_layer<ID,U>& item);
     /*!
         prints the network architecture to the given output stream.
     !*/
 
-    template <unsigned long ID, typename U> 
+    template <unsigned long ID, typename U>
     void serialize(const add_tag_layer<ID,U>& item, std::ostream& out);
-    template <unsigned long ID, typename U> 
+    template <unsigned long ID, typename U>
     void deserialize(add_tag_layer<ID,U>& item, std::istream& in);
     /*!
-        provides serialization support  
+        provides serialization support
     !*/
 
     template <typename SUBNET> using tag1  = add_tag_layer< 1, SUBNET>;
@@ -1199,7 +1199,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        template<typename> class TAG_TYPE, 
+        template<typename> class TAG_TYPE,
         typename SUBNET
         >
     class add_skip_layer
@@ -1232,7 +1232,7 @@ namespace dlib
     template <template<typename> class T, typename U>
     void deserialize(add_skip_layer<T,U>& item, std::istream& in);
     /*!
-        provides serialization support  
+        provides serialization support
     !*/
 
     template <typename SUBNET> using skip1  = add_skip_layer< tag1, SUBNET>;
@@ -1249,7 +1249,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        unsigned int i, 
+        unsigned int i,
         typename net_type
         >
     auto& layer (
@@ -1285,8 +1285,8 @@ namespace dlib
     !*/
 
     template <
-        template<typename> class Match, 
-        typename net_type 
+        template<typename> class Match,
+        typename net_type
         >
     auto& layer (
         net_type& n
@@ -1302,8 +1302,8 @@ namespace dlib
     !*/
 
     template <
-        template<typename> class Match, 
-        unsigned int i, 
+        template<typename> class Match,
+        unsigned int i,
         typename net_type
         >
     auto& layer (
@@ -1331,7 +1331,7 @@ namespace dlib
         requires
             - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
               add_tag_layer.
-            - v is a function object with a signature equivalent to: 
+            - v is a function object with a signature equivalent to:
                 v(size_t idx, tensor& t)
         ensures
             - Loops over all the computational layers (i.e. layers with parameters, as
@@ -1364,7 +1364,7 @@ namespace dlib
         requires
             - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
               add_tag_layer.
-            - v is a function object with a signature equivalent to: 
+            - v is a function object with a signature equivalent to:
                 v(size_t idx, tensor& t)
         ensures
             - Loops over all the computational layers (i.e. layers with parameters, as
@@ -1409,8 +1409,8 @@ namespace dlib
     /*!
         ensures
             - Checks if l correctly implements the EXAMPLE_COMPUTATIONAL_LAYER_ interface
-              defined in layers_abstract.h.  Importantly, it computes numerical approximations 
-              to the gradients and compares them to the outputs of the layer.  
+              defined in layers_abstract.h.  Importantly, it computes numerical approximations
+              to the gradients and compares them to the outputs of the layer.
             - The results of the testing are returned.  In particular, if the returned object
               is RESULT then we will have:
                 - RESULT.was_good == false if and only if the layer failed the testing.
@@ -1425,5 +1425,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_DNn_CORE_ABSTRACT_H_ 
+#endif // DLIB_DNn_CORE_ABSTRACT_H_
 

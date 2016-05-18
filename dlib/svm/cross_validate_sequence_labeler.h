@@ -16,7 +16,7 @@ namespace dlib
 
     template <
         typename sequence_labeler_type,
-        typename sequence_type 
+        typename sequence_type
         >
     const matrix<double> test_sequence_labeler (
         const sequence_labeler_type& labeler,
@@ -28,7 +28,7 @@ namespace dlib
         DLIB_ASSERT( is_sequence_labeling_problem(samples, labels) == true,
                     "\tmatrix test_sequence_labeler()"
                     << "\n\t invalid inputs were given to this function"
-                    << "\n\t is_sequence_labeling_problem(samples, labels): " 
+                    << "\n\t is_sequence_labeling_problem(samples, labels): "
                     << is_sequence_labeling_problem(samples, labels));
 
         matrix<double> res(labeler.num_labels(), labeler.num_labels());
@@ -73,8 +73,8 @@ namespace dlib
                     1 < folds && folds <= static_cast<long>(samples.size()),
             "\tmatrix cross_validate_sequence_labeler()"
             << "\n\t invalid inputs were given to this function"
-            << "\n\t samples.size(): " << samples.size() 
-            << "\n\t folds:  " << folds 
+            << "\n\t samples.size(): " << samples.size()
+            << "\n\t folds:  " << folds
             << "\n\t is_sequence_labeling_problem(samples,labels): " << is_sequence_labeling_problem(samples,labels)
             );
 
@@ -87,10 +87,10 @@ namespace dlib
                 DLIB_ASSERT(labels[i][j] < trainer.num_labels(),
                             "\t matrix cross_validate_sequence_labeler()"
                             << "\n\t The labels are invalid."
-                            << "\n\t labels[i][j]: " << labels[i][j] 
+                            << "\n\t labels[i][j]: " << labels[i][j]
                             << "\n\t trainer.num_labels(): " << trainer.num_labels()
-                            << "\n\t i: " << i 
-                            << "\n\t j: " << j 
+                            << "\n\t i: " << i
+                            << "\n\t j: " << j
                 );
             }
         }

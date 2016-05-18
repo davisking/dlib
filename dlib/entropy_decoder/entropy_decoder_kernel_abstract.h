@@ -10,7 +10,7 @@
 namespace dlib
 {
 
-    class entropy_decoder 
+    class entropy_decoder
     {
         /*!
             INITIAL VALUE
@@ -19,12 +19,12 @@ namespace dlib
 
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents an entropy decoder (could be implemented as an 
-                arithmetic decoder for example).    
+                This object represents an entropy decoder (could be implemented as an
+                arithmetic decoder for example).
                 
-                Note that all implementations of entropy_encoder and entropy_decoder 
-                are paired. This means that if you use entropy_encoder_kernel_n to 
-                encode something then you must use the corresponding 
+                Note that all implementations of entropy_encoder and entropy_decoder
+                are paired. This means that if you use entropy_encoder_kernel_n to
+                encode something then you must use the corresponding
                 entropy_decoder_kernel_n to decode it.
 
 
@@ -37,20 +37,20 @@ namespace dlib
                 Another important thing to know is that decode() must be called
                 exactly the same number of times as encode() and with the same values
                 supplied for TOTAL, high_count, and low_count.  Doing this ensures
-                that the decoder consumes exactly all the bytes from the input 
+                that the decoder consumes exactly all the bytes from the input
                 stream that were written by the entropy_encoder.
 
-            NOTATION:              
-                At any moment each symbol has a certain probability of appearing in 
-                the input stream.  These probabilities may change as each symbol is 
+            NOTATION:
+                At any moment each symbol has a certain probability of appearing in
+                the input stream.  These probabilities may change as each symbol is
                 decoded and the probability model is updated accordingly.
 
 
                 - Before considering current symbol:
 
-                let P(i) be a function which gives the probability of seeing the ith  
-                symbol of an N symbol alphabet. Note that P(i) refers to the probability 
-                of seeing the ith symbol WITHOUT considering the symbol currently given 
+                let P(i) be a function which gives the probability of seeing the ith
+                symbol of an N symbol alphabet. Note that P(i) refers to the probability
+                of seeing the ith symbol WITHOUT considering the symbol currently given
                 by get_target(TOTAL).  ( The domain of P(i) is from 0 to N-1. )
                 
                 for each i: P(i) == COUNT/TOTAL where COUNT and TOTAL are integers
@@ -67,7 +67,7 @@ namespace dlib
                 symbol after we have updated our probability model to take the symbol
                 given by get_target(TOTAL) into account.
 
-                for each i: #P(i) == #COUNT/#TOTAL where #COUNT and #TOTAL are integers 
+                for each i: #P(i) == #COUNT/#TOTAL where #COUNT and #TOTAL are integers
                 and #TOTAL is the same number for all #P(i) but #COUNT may vary.
         !*/
 
@@ -95,11 +95,11 @@ namespace dlib
             ensures
                 - #*this has its initial value
                 - if (stream_is_set())
-                    - clears any state accumulated in *this from decoding data from 
+                    - clears any state accumulated in *this from decoding data from
                       the stream get_stream()
             throws
                 - any exception
-                    if this exception is thrown then #*this is unusable 
+                    if this exception is thrown then #*this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -113,11 +113,11 @@ namespace dlib
                 - #get_target() == a number representing the first symbol from in
                 - #get_target_called() == false
                 - if (stream_is_set())
-                    - clears any state accumulated in *this from decoding data from 
+                    - clears any state accumulated in *this from decoding data from
                       the stream get_stream()
             throws
                 - any exception
-                    if this exception is thrown then #*this is unusable 
+                    if this exception is thrown then #*this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -135,7 +135,7 @@ namespace dlib
             requires
                 - stream_is_set() == true
             ensures
-                - returns a reference to the istream object that *this is reading 
+                - returns a reference to the istream object that *this is reading
                   encoded data from
         !*/
 
@@ -148,17 +148,17 @@ namespace dlib
             requires
                 - get_target_called() == true
                 - stream_is_set()     == true
-                - low_count  == LOW_COUNT(S) where S is the symbol represented 
+                - low_count  == LOW_COUNT(S) where S is the symbol represented
                   by get_target(TOTAL)
-                - high_count == HIGH_COUNT(S) where S is the symbol represented 
+                - high_count == HIGH_COUNT(S) where S is the symbol represented
                   by get_target(TOTAL)
-                - low_count  <= get_target(TOTAL) < high_count <= TOTAL                      
+                - low_count  <= get_target(TOTAL) < high_count <= TOTAL
             ensures
                 - #get_target(#TOTAL) == a number which represents the next symbol
                 - #get_target_called() == false
             throws
                 - any exception
-                    if this exception is thrown then #*this is unusable 
+                    if this exception is thrown then #*this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -175,8 +175,8 @@ namespace dlib
             uint32 total
         );
         /*!
-            requires 
-                - 0 < total < 65536 (2^16)     
+            requires
+                - 0 < total < 65536 (2^16)
                 - total == TOTAL
                 - stream_is_set() == true
             ensures
@@ -189,7 +189,7 @@ namespace dlib
                       LOW_COUNT(S) <= N < HIGH_COUNT(S)
             throws
                 - any exception
-                    if this exception is thrown then #*this is unusable 
+                    if this exception is thrown then #*this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -199,7 +199,7 @@ namespace dlib
         entropy_decoder(entropy_decoder&);        // copy constructor
         entropy_decoder& operator=(entropy_decoder&);    // assignment operator
 
-    };   
+    };
    
 }
 

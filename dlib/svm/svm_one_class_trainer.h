@@ -1,6 +1,6 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SVm_ONE_CLASS_TRAINER_Hh_ 
+#ifndef DLIB_SVm_ONE_CLASS_TRAINER_Hh_
 #define DLIB_SVm_ONE_CLASS_TRAINER_Hh_
 
 #include "svm_one_class_trainer_abstract.h"
@@ -14,13 +14,13 @@
 #include "kernel.h"
 #include "../optimization/optimization_solve_qp3_using_smo.h"
 
-namespace dlib 
+namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename K 
+        typename K
         >
     class svm_one_class_trainer
     {
@@ -40,7 +40,7 @@ namespace dlib
         }
 
         svm_one_class_trainer (
-            const kernel_type& kernel_, 
+            const kernel_type& kernel_,
             const scalar_type& nu_
         ) :
             kernel_function(kernel_),
@@ -52,7 +52,7 @@ namespace dlib
             DLIB_ASSERT(0 < nu && nu <= 1,
                 "\tsvm_one_class_trainer::svm_one_class_trainer(kernel,nu)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t nu: " << nu 
+                << "\n\t nu: " << nu
                 );
         }
 
@@ -64,7 +64,7 @@ namespace dlib
             DLIB_ASSERT(cache_size_ > 0,
                 "\tvoid svm_one_class_trainer::set_cache_size(cache_size_)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t cache_size: " << cache_size_ 
+                << "\n\t cache_size: " << cache_size_
                 );
             cache_size = cache_size_;
         }
@@ -83,14 +83,14 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\tvoid svm_one_class_trainer::set_epsilon(eps_)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t eps: " << eps_ 
+                << "\n\t eps: " << eps_
                 );
             eps = eps_;
         }
 
         const scalar_type get_epsilon (
         ) const
-        { 
+        {
             return eps;
         }
 
@@ -115,7 +115,7 @@ namespace dlib
             DLIB_ASSERT(0 < nu_ && nu_ <= 1,
                 "\tvoid svm_one_class_trainer::set_nu(nu_)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t nu: " << nu_ 
+                << "\n\t nu: " << nu_
                 );
             nu = nu_;
         }
@@ -165,8 +165,8 @@ namespace dlib
             DLIB_ASSERT(is_col_vector(x) && x.size() > 0,
                 "\tdecision_function svm_one_class_trainer::train(x)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t x.nr(): " << x.nr() 
-                << "\n\t x.nc(): " << x.nc() 
+                << "\n\t x.nr(): " << x.nr()
+                << "\n\t x.nc(): " << x.nc()
                 );
 
 
@@ -174,9 +174,9 @@ namespace dlib
 
             solve_qp3_using_smo<scalar_vector_type> solver;
 
-            solver(symmetric_matrix_cache<float>(kernel_matrix(kernel_function,x), cache_size), 
+            solver(symmetric_matrix_cache<float>(kernel_matrix(kernel_function,x), cache_size),
                    zeros_matrix<scalar_type>(x.size(),1),
-                   ones_matrix<scalar_type>(x.size(),1), 
+                   ones_matrix<scalar_type>(x.size(),1),
                    nu*x.size(),
                    1,
                    1,
@@ -260,7 +260,7 @@ namespace dlib
                 r1 = (upper_bound_p+lower_bound_p)/2;
 
             rho = r1;
-        } 
+        }
 
         kernel_type kernel_function;
         scalar_type nu;

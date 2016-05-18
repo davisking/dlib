@@ -22,13 +22,13 @@ namespace dlib
             This object represents a weighted sum of sample points in a kernel induced
             feature space.  It can be used to kernelize any algorithm that requires only
             the ability to perform vector addition, subtraction, scalar multiplication,
-            and inner products.  It uses the sparsification technique described in the 
+            and inner products.  It uses the sparsification technique described in the
             paper The Kernel Recursive Least Squares Algorithm by Yaakov Engel.
 
-            To understand the code it would also be useful to consult page 114 of the book 
-            Kernel Methods for Pattern Analysis by Taylor and Cristianini as well as page 554 
-            (particularly equation 18.31) of the book Learning with Kernels by Scholkopf and 
-            Smola.  Everything you really need to know is in the Engel paper.  But the other 
+            To understand the code it would also be useful to consult page 114 of the book
+            Kernel Methods for Pattern Analysis by Taylor and Cristianini as well as page 554
+            (particularly equation 18.31) of the book Learning with Kernels by Scholkopf and
+            Smola.  Everything you really need to know is in the Engel paper.  But the other
             books help give more perspective on the issues involved.
 
 
@@ -53,8 +53,8 @@ namespace dlib
 
                 - if (dictionary.size() == my_max_dictionary_size && my_remove_oldest_first == false) then
                     - for all valid 0 < i < dictionary.size():
-                        - Let STRENGTHS[i] == the delta you would get for dictionary[i] (i.e. Approximately 
-                          Linearly Dependent value) if you removed dictionary[i] from this object and then 
+                        - Let STRENGTHS[i] == the delta you would get for dictionary[i] (i.e. Approximately
+                          Linearly Dependent value) if you removed dictionary[i] from this object and then
                           tried to add it back in.
                         - min_strength == the minimum value from STRENGTHS
                         - min_vect_idx == the index of the element in STRENGTHS with the smallest value
@@ -67,7 +67,7 @@ namespace dlib
         typedef typename kernel_type::mem_manager_type mem_manager_type;
 
         kcentroid (
-        ) : 
+        ) :
             my_remove_oldest_first(false),
             my_tolerance(0.001),
             my_max_dictionary_size(1000000),
@@ -78,13 +78,13 @@ namespace dlib
         }
 
         explicit kcentroid (
-            const kernel_type& kernel_, 
+            const kernel_type& kernel_,
             scalar_type tolerance_ = 0.001,
             unsigned long max_dictionary_size_ = 1000000,
-            bool remove_oldest_first_ = false 
-        ) : 
+            bool remove_oldest_first_ = false
+        ) :
             my_remove_oldest_first(remove_oldest_first_),
-            kernel(kernel_), 
+            kernel(kernel_),
             my_tolerance(tolerance_),
             my_max_dictionary_size(max_dictionary_size_),
             bias(0),
@@ -95,8 +95,8 @@ namespace dlib
                 "\tkcentroid::kcentroid()"
                 << "\n\t You have to give a positive tolerance"
                 << "\n\t this:                 " << this
-                << "\n\t tolerance_:           " << tolerance_ 
-                << "\n\t max_dictionary_size_: " << max_dictionary_size_ 
+                << "\n\t tolerance_:           " << tolerance_
+                << "\n\t max_dictionary_size_: " << max_dictionary_size_
                 );
 
             clear_dictionary();
@@ -165,7 +165,7 @@ namespace dlib
             const sample_type& x
         ) const
         {
-            scalar_type temp = 0; 
+            scalar_type temp = 0;
             for (unsigned long i = 0; i < alpha.size(); ++i)
                 temp += alpha[i]*kernel(dictionary[i], x);
             return temp;
@@ -182,7 +182,7 @@ namespace dlib
                 << "\n\tthis: " << this
                 );
 
-            scalar_type temp = 0; 
+            scalar_type temp = 0;
             for (unsigned long i = 0; i < alpha.size(); ++i)
             {
                 for (unsigned long j = 0; j < x.alpha.size(); ++j)
@@ -338,15 +338,15 @@ namespace dlib
         {
             refresh_bias();
             return distance_function<kernel_type>(mat(alpha),
-                                                  bias, 
-                                                  kernel, 
+                                                  bias,
+                                                  kernel,
                                                   mat(dictionary));
         }
 
     private:
 
         void refresh_bias (
-        ) const 
+        ) const
         {
             if (bias_is_stale)
             {
@@ -412,7 +412,7 @@ namespace dlib
                     if (dictionary.size() >= my_max_dictionary_size)
                     {
                         // We need to remove one of the old members of the dictionary before
-                        // we proceed with adding a new one.  
+                        // we proceed with adding a new one.
                         long idx_to_remove;
                         if (my_remove_oldest_first)
                         {
@@ -421,7 +421,7 @@ namespace dlib
                         }
                         else
                         {
-                            // if we have never computed the min_strength then we should compute it 
+                            // if we have never computed the min_strength then we should compute it
                             if (min_strength == 0)
                                 recompute_min_strength();
 
@@ -470,7 +470,7 @@ namespace dlib
                     temp.swap(K);
 
 
-                    // now update the alpha vector 
+                    // now update the alpha vector
                     for (unsigned long i = 0; i < alpha.size(); ++i)
                     {
                         alpha[i] *= cscale;
@@ -513,17 +513,17 @@ namespace dlib
                   kernel matrix
                 - also removes the necessary row and column from the K matrix
                 - uses the this->a variable so after this function runs that variable
-                  will contain a different value.  
+                  will contain a different value.
         !*/
         {
-            // remove the dictionary vector 
+            // remove the dictionary vector
             dictionary.erase(dictionary.begin()+i);
 
             // remove the i'th vector from the inverse kernel matrix.  This formula is basically
             // just the reverse of the way K_inv is updated by equation 3.14 during normal training.
             K_inv = removerc(K_inv,i,i) - remove_row(colm(K_inv,i)/K_inv(i,i),i)*remove_col(rowm(K_inv,i),i);
 
-            // now compute the updated alpha values to take account that we just removed one of 
+            // now compute the updated alpha values to take account that we just removed one of
             // our dictionary vectors
             a = (K_inv*remove_row(K,i)*mat(alpha));
 
@@ -545,7 +545,7 @@ namespace dlib
                 - recomputes the min_strength and min_vect_idx values
                   so that they are correct with respect to the CONVENTION
                 - uses the this->a variable so after this function runs that variable
-                  will contain a different value.  
+                  will contain a different value.
         !*/
         {
             min_strength = std::numeric_limits<scalar_type>::max();
@@ -593,7 +593,7 @@ namespace dlib
         mutable bool bias_is_stale;
 
 
-        // temp variables here just so we don't have to reconstruct them over and over.  Thus, 
+        // temp variables here just so we don't have to reconstruct them over and over.  Thus,
         // they aren't really part of the state of this object.
         matrix<scalar_type,0,1,mem_manager_type> a;
         matrix<scalar_type,0,1,mem_manager_type> k;

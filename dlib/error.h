@@ -1,7 +1,7 @@
 // Copyright (C) 2003  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_ERROr_ 
-#define DLIB_ERROr_ 
+#ifndef DLIB_ERROr_
+#define DLIB_ERROr_
 
 #include <string>
 #include <new>          // for std::bad_alloc
@@ -20,20 +20,20 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     enum error_type
-    {       
-        EPORT_IN_USE,  
-        ETIMEOUT,     
-        ECONNECTION, 
-        ELISTENER, 
-        ERESOLVE,     
-        EMONITOR,   
-        ECREATE_THREAD,    
-        ECREATE_MUTEX,    
+    {
+        EPORT_IN_USE,
+        ETIMEOUT,
+        ECONNECTION,
+        ELISTENER,
+        ERESOLVE,
+        EMONITOR,
+        ECREATE_THREAD,
+        ECREATE_MUTEX,
         ECREATE_SIGNALER,
-        EUNSPECIFIED,   
+        EUNSPECIFIED,
         EGENERAL_TYPE1,
-        EGENERAL_TYPE2,  
-        EGENERAL_TYPE3,  
+        EGENERAL_TYPE2,
+        EGENERAL_TYPE3,
         EINVALID_OPTION,
         ETOO_FEW_ARGS,
         ETOO_MANY_ARGS,
@@ -63,7 +63,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is the base exception class for the dlib library.  i.e. all 
+                This is the base exception class for the dlib library.  i.e. all
                 exceptions in this library inherit from this class.
         !*/
 
@@ -122,7 +122,7 @@ namespace dlib
         !*/
         {
             if (info.size() > 0)
-                return info.c_str(); 
+                return info.c_str();
             else
                 return type_to_string();
         }
@@ -136,17 +136,17 @@ namespace dlib
         {
             if ( type == EPORT_IN_USE) return "EPORT_IN_USE";
             else if ( type == ETIMEOUT) return "ETIMEOUT";
-            else if ( type == ECONNECTION) return "ECONNECTION"; 
-            else if ( type == ELISTENER) return "ELISTENER"; 
-            else if ( type == ERESOLVE) return "ERESOLVE";     
-            else if ( type == EMONITOR) return "EMONITOR";   
-            else if ( type == ECREATE_THREAD) return "ECREATE_THREAD";    
-            else if ( type == ECREATE_MUTEX) return "ECREATE_MUTEX";    
+            else if ( type == ECONNECTION) return "ECONNECTION";
+            else if ( type == ELISTENER) return "ELISTENER";
+            else if ( type == ERESOLVE) return "ERESOLVE";
+            else if ( type == EMONITOR) return "EMONITOR";
+            else if ( type == ECREATE_THREAD) return "ECREATE_THREAD";
+            else if ( type == ECREATE_MUTEX) return "ECREATE_MUTEX";
             else if ( type == ECREATE_SIGNALER) return "ECREATE_SIGNALER";
-            else if ( type == EUNSPECIFIED) return "EUNSPECIFIED";   
+            else if ( type == EUNSPECIFIED) return "EUNSPECIFIED";
             else if ( type == EGENERAL_TYPE1) return "EGENERAL_TYPE1";
-            else if ( type == EGENERAL_TYPE2) return "EGENERAL_TYPE2";  
-            else if ( type == EGENERAL_TYPE3) return "EGENERAL_TYPE3";  
+            else if ( type == EGENERAL_TYPE2) return "EGENERAL_TYPE2";
+            else if ( type == EGENERAL_TYPE3) return "EGENERAL_TYPE3";
             else if ( type == EINVALID_OPTION) return "EINVALID_OPTION";
             else if ( type == ETOO_FEW_ARGS) return "ETOO_FEW_ARGS";
             else if ( type == ETOO_MANY_ARGS) return "ETOO_MANY_ARGS";
@@ -183,16 +183,16 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                As the name says, this object represents some kind of fatal error.  
+                As the name says, this object represents some kind of fatal error.
                 That is, it represents an unrecoverable error and any program that
                 throws this exception is, by definition, buggy and needs to be fixed.
 
                 Note that a fatal_error exception can only be thrown once.  The second
-                time an application attempts to construct a fatal_error it will be 
-                immediately aborted and an error message will be printed to std::cerr. 
+                time an application attempts to construct a fatal_error it will be
+                immediately aborted and an error message will be printed to std::cerr.
                 The reason for this is because the first fatal_error was apparently ignored
-                so the second fatal_error is going to make itself impossible to ignore 
-                by calling abort.  The lesson here is that you should not try to ignore 
+                so the second fatal_error is going to make itself impossible to ignore
+                by calling abort.  The lesson here is that you should not try to ignore
                 fatal errors.
 
                 This is also the exception thrown by the DLIB_ASSERT and DLIB_CASSERT macros.
@@ -238,7 +238,7 @@ namespace dlib
     private:
 
         static inline char* message ()
-        { 
+        {
             static char buf[2000];
             buf[1999] = '\0'; // just to be extra safe
             return buf;
@@ -324,7 +324,7 @@ namespace dlib
         ): error(EGUI,a) {}
         /*!
             ensures
-                - #type == EGUI 
+                - #type == EGUI
                 - #info == a
         !*/
 

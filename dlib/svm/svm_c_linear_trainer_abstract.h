@@ -12,25 +12,25 @@
 namespace dlib
 {
     template <
-        typename K 
+        typename K
         >
     class svm_c_linear_trainer
     {
         /*!
-            REQUIREMENTS ON K 
-                Is either linear_kernel or sparse_linear_kernel.  
+            REQUIREMENTS ON K
+                Is either linear_kernel or sparse_linear_kernel.
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a tool for training the C formulation of 
+                This object represents a tool for training the C formulation of
                 a support vector machine.  It is optimized for the case where
-                linear kernels are used.  
+                linear kernels are used.
 
 
                 In particular, it is implemented using the OCAS algorithm
                 described in the following paper:
                     Optimized Cutting Plane Algorithm for Large-Scale Risk Minimization
-                        Vojtech Franc, Soren Sonnenburg; Journal of Machine Learning 
-                        Research, 10(Oct):2157--2192, 2009. 
+                        Vojtech Franc, Soren Sonnenburg; Journal of Machine Learning
+                        Research, 10(Oct):2157--2192, 2009.
         !*/
 
     public:
@@ -46,7 +46,7 @@ namespace dlib
             ensures
                 - This object is properly initialized and ready to be used
                   to train a support vector machine.
-                - #get_oca() == oca() (i.e. an instance of oca with default parameters) 
+                - #get_oca() == oca() (i.e. an instance of oca with default parameters)
                 - #get_c_class1() == 1
                 - #get_c_class2() == 1
                 - #get_epsilon() == 0.001
@@ -58,7 +58,7 @@ namespace dlib
         !*/
 
         explicit svm_c_linear_trainer (
-            const scalar_type& C 
+            const scalar_type& C
         );
         /*!
             requires
@@ -66,7 +66,7 @@ namespace dlib
             ensures
                 - This object is properly initialized and ready to be used
                   to train a support vector machine.
-                - #get_oca() == oca() (i.e. an instance of oca with default parameters) 
+                - #get_oca() == oca() (i.e. an instance of oca with default parameters)
                 - #get_c_class1() == C
                 - #get_c_class2() == C
                 - #get_epsilon() == 0.001
@@ -84,7 +84,7 @@ namespace dlib
             requires
                 - eps > 0
             ensures
-                - #get_epsilon() == eps 
+                - #get_epsilon() == eps
         !*/
 
         const scalar_type get_epsilon (
@@ -95,7 +95,7 @@ namespace dlib
                   Smaller values may result in a more accurate solution but take longer to
                   train.  You can think of this epsilon value as saying "solve the
                   optimization problem until the probability of misclassification is within
-                  epsilon of its optimal value".  
+                  epsilon of its optimal value".
         !*/
 
         void set_max_iterations (
@@ -107,7 +107,7 @@ namespace dlib
         !*/
 
         unsigned long get_max_iterations (
-        ); 
+        );
         /*!
             ensures
                 - returns the maximum number of iterations the SVM optimizer is allowed to
@@ -118,7 +118,7 @@ namespace dlib
         );
         /*!
             ensures
-                - This object will print status messages to standard out so that a 
+                - This object will print status messages to standard out so that a
                   user can observe the progress of the algorithm.
         !*/
 
@@ -134,14 +134,14 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_oca() == item 
+                - #get_oca() == item
         !*/
 
         const oca get_oca (
         ) const;
         /*!
             ensures
-                - returns a copy of the optimizer used to solve the SVM problem.  
+                - returns a copy of the optimizer used to solve the SVM problem.
         !*/
 
         const kernel_type get_kernel (
@@ -160,7 +160,7 @@ namespace dlib
                 - The output of training is a weight vector and a bias value.  These
                   two things define the resulting decision function.  That is, the
                   decision function simply takes the dot product between the learned
-                  weight vector and a test sample, then subtracts the bias value.  
+                  weight vector and a test sample, then subtracts the bias value.
                   Therefore, if learns_nonnegative_weights() == true then the resulting
                   learned weight vector will always have non-negative entries.  The
                   bias value may still be negative though.
@@ -181,7 +181,7 @@ namespace dlib
         );
         /*!
             requires
-                - prior == a function produced by a call to this class's train() function.  
+                - prior == a function produced by a call to this class's train() function.
                   Therefore, it must be the case that:
                     - prior.basis_vectors.size() == 1
                     - prior.alpha(0) == 1
@@ -213,7 +213,7 @@ namespace dlib
             ensures
                 - returns true if this trainer has the constraint that the last weight in
                   the learned parameter vector must be 1.  This is the weight corresponding
-                  to the feature in the training vectors with the highest dimension.  
+                  to the feature in the training vectors with the highest dimension.
                 - Forcing the last weight to 1 also disables the bias and therefore the b
                   field of the learned decision_function will be 0 when forces_last_weight_to_1() == true.
         !*/
@@ -229,38 +229,38 @@ namespace dlib
         !*/
 
         void set_c (
-            scalar_type C 
+            scalar_type C
         );
         /*!
             requires
                 - C > 0
             ensures
-                - #get_c_class1() == C 
-                - #get_c_class2() == C 
+                - #get_c_class1() == C
+                - #get_c_class2() == C
         !*/
 
         const scalar_type get_c_class1 (
         ) const;
         /*!
             ensures
-                - returns the SVM regularization parameter for the +1 class.  
+                - returns the SVM regularization parameter for the +1 class.
                   It is the parameter that determines the trade off between
-                  trying to fit the +1 training data exactly or allowing more errors 
-                  but hopefully improving the generalization of the resulting 
-                  classifier.  Larger values encourage exact fitting while 
-                  smaller values of C may encourage better generalization. 
+                  trying to fit the +1 training data exactly or allowing more errors
+                  but hopefully improving the generalization of the resulting
+                  classifier.  Larger values encourage exact fitting while
+                  smaller values of C may encourage better generalization.
         !*/
 
         const scalar_type get_c_class2 (
         ) const;
         /*!
             ensures
-                - returns the SVM regularization parameter for the -1 class.  
+                - returns the SVM regularization parameter for the -1 class.
                   It is the parameter that determines the trade off between
-                  trying to fit the -1 training data exactly or allowing more errors 
-                  but hopefully improving the generalization of the resulting 
-                  classifier.  Larger values encourage exact fitting while 
-                  smaller values of C may encourage better generalization. 
+                  trying to fit the -1 training data exactly or allowing more errors
+                  but hopefully improving the generalization of the resulting
+                  classifier.  Larger values encourage exact fitting while
+                  smaller values of C may encourage better generalization.
         !*/
 
         void set_c_class1 (
@@ -302,10 +302,10 @@ namespace dlib
                   Also, y should contain scalar_type objects.
                 - if (has_prior()) then
                     - The vectors in x must have the same dimensionality as the vectors
-                      used to train the prior given to set_prior().  
+                      used to train the prior given to set_prior().
             ensures
-                - trains a C support vector classifier given the training samples in x and 
-                  labels in y.  
+                - trains a C support vector classifier given the training samples in x and
+                  labels in y.
                 - returns a decision function F with the following properties:
                     - F.alpha.size() == 1
                     - F.basis_vectors.size() == 1
@@ -336,10 +336,10 @@ namespace dlib
                   Also, y should contain scalar_type objects.
                 - if (has_prior()) then
                     - The vectors in x must have the same dimensionality as the vectors
-                      used to train the prior given to set_prior().  
+                      used to train the prior given to set_prior().
             ensures
-                - trains a C support vector classifier given the training samples in x and 
-                  labels in y.  
+                - trains a C support vector classifier given the training samples in x and
+                  labels in y.
                 - #svm_objective == the final value of the SVM objective function
                 - returns a decision function F with the following properties:
                     - F.alpha.size() == 1
@@ -351,7 +351,7 @@ namespace dlib
                         - F(new_x) < 0
         !*/
 
-    }; 
+    };
 
 }
 

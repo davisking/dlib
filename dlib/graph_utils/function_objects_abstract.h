@@ -17,7 +17,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is a simple function object that computes squared euclidean distance
-                between two dlib::matrix objects. 
+                between two dlib::matrix objects.
 
             THREAD SAFETY
                 This object has no mutable members.  Therefore, it is safe to call
@@ -40,7 +40,7 @@ namespace dlib
         /*!
             ensures
                 - #lower == l
-                - #upper == u  
+                - #upper == u
         !*/
 
         const double lower;
@@ -53,7 +53,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - sample_type should be a kind of dlib::matrix 
+                - sample_type should be a kind of dlib::matrix
             ensures
                 - let LEN = length_squared(a-b)
                 - if (lower <= LEN <= upper) then
@@ -65,7 +65,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct cosine_distance 
+    struct cosine_distance
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -89,7 +89,7 @@ namespace dlib
                 - sample_type is a dense vector (e.g. a dlib::matrix) or a sparse
                   vector as defined at the top of dlib/svm/sparse_vector_abstract.h
             ensures
-                - let theta = the angle between a and b.  
+                - let theta = the angle between a and b.
                 - returns 1 - cos(theta)
                   (e.g. this function returns 0 when a and b have an angle of 0 between
                   each other, 1 if they have a 90 degree angle, and a maximum of 2 if the
@@ -101,7 +101,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct negative_dot_product_distance 
+    struct negative_dot_product_distance
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -131,12 +131,12 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct use_weights_of_one 
+    struct use_weights_of_one
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is a simple function object that takes a single argument
-                and always returns 1 
+                and always returns 1
 
             THREAD SAFETY
                 This object has no mutable members.  Therefore, it is safe to call
@@ -156,12 +156,12 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct use_gaussian_weights 
+    struct use_gaussian_weights
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is a simple function object that takes a single argument
-                which should be an object similar to dlib::sample_pair.  
+                which should be an object similar to dlib::sample_pair.
 
             THREAD SAFETY
                 This object has no mutable members.  Therefore, it is safe to call

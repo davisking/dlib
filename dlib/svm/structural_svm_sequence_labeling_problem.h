@@ -20,7 +20,7 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        struct get_feats_functor 
+        struct get_feats_functor
         {
             get_feats_functor(std::vector<std::pair<unsigned long, double> >& feats_) : feats(feats_) {}
 
@@ -44,7 +44,7 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        template <typename feature_extractor, typename sequence_type, typename EXP2> 
+        template <typename feature_extractor, typename sequence_type, typename EXP2>
         void get_feature_vector(
             std::vector<std::pair<unsigned long, double> >& feats,
             const feature_extractor& fe,
@@ -89,7 +89,7 @@ namespace dlib
                         contains_invalid_labeling(fe, samples, labels) == false,
                         "\t structural_svm_sequence_labeling_problem::structural_svm_sequence_labeling_problem()"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t samples.size(): " << samples.size() 
+                        << "\n\t samples.size(): " << samples.size()
                         << "\n\t is_sequence_labeling_problem(samples,labels): " << is_sequence_labeling_problem(samples,labels)
                         << "\n\t contains_invalid_labeling(fe,samples,labels): " << contains_invalid_labeling(fe,samples,labels)
                         << "\n\t this: " << this
@@ -104,10 +104,10 @@ namespace dlib
                     DLIB_ASSERT(labels[i][j] < fe.num_labels(),
                                 "\t structural_svm_sequence_labeling_problem::structural_svm_sequence_labeling_problem()"
                                 << "\n\t The given labels in labels are invalid."
-                                << "\n\t labels[i][j]: " << labels[i][j] 
+                                << "\n\t labels[i][j]: " << labels[i][j]
                                 << "\n\t fe.num_labels(): " << fe.num_labels()
-                                << "\n\t i: " << i 
-                                << "\n\t j: " << j 
+                                << "\n\t i: " << i
+                                << "\n\t j: " << j
                                 << "\n\t this: " << this
                                 );
                 }
@@ -123,32 +123,32 @@ namespace dlib
 
         double get_loss (
             unsigned long label
-        ) const 
-        { 
+        ) const
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(label < num_labels(),
                         "\t void structural_svm_sequence_labeling_problem::get_loss()"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t label:        " << label 
-                        << "\n\t num_labels(): " << num_labels() 
+                        << "\n\t label:        " << label
+                        << "\n\t num_labels(): " << num_labels()
                         << "\n\t this:         " << this
                         );
 
-            return loss_values[label]; 
+            return loss_values[label];
         }
 
         void set_loss (
             unsigned long label,
             double value
-        )  
-        { 
+        )
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(label < num_labels() && value >= 0,
                         "\t void structural_svm_sequence_labeling_problem::set_loss()"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t label:        " << label 
-                        << "\n\t num_labels(): " << num_labels() 
-                        << "\n\t value:        " << value 
+                        << "\n\t label:        " << label
+                        << "\n\t num_labels(): " << num_labels()
+                        << "\n\t value:        " << value
                         << "\n\t this:         " << this
                         );
 
@@ -157,28 +157,28 @@ namespace dlib
 
     private:
         virtual long get_num_dimensions (
-        ) const 
+        ) const
         {
             return fe.num_features();
         }
 
         virtual long get_num_samples (
-        ) const 
+        ) const
         {
             return samples.size();
         }
 
         void get_joint_feature_vector (
-            const sequence_type& sample, 
+            const sequence_type& sample,
             const std::vector<unsigned long>& label,
             feature_vector_type& psi
-        ) const 
+        ) const
         {
             psi.clear();
 
             const int order = fe.order();
 
-            matrix<unsigned long,0,1> candidate_labeling; 
+            matrix<unsigned long,0,1> candidate_labeling;
             for (unsigned long i = 0; i < sample.size(); ++i)
             {
                 candidate_labeling = rowm(mat(label), range(i, std::max((int)i-order,0)));
@@ -189,8 +189,8 @@ namespace dlib
 
         virtual void get_truth_joint_feature_vector (
             long idx,
-            feature_vector_type& psi 
-        ) const 
+            feature_vector_type& psi
+        ) const
         {
             get_joint_feature_vector(samples[idx], labels[idx], psi);
         }
@@ -223,7 +223,7 @@ namespace dlib
             }
 
             template <
-                typename EXP 
+                typename EXP
                 >
             double factor_value (
                 unsigned long node_id,

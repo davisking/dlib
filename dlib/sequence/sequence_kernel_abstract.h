@@ -26,11 +26,11 @@ namespace dlib
             REQUIREMENTS ON mem_manager
                 must be an implementation of memory_manager/memory_manager_kernel_abstract.h or
                 must be an implementation of memory_manager_global/memory_manager_global_kernel_abstract.h or
-                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h
                 mem_manager::type can be set to anything.
 
             POINTERS AND REFERENCES TO INTERNAL DATA
-                swap() and operator[] functions do not invalidate pointers or 
+                swap() and operator[] functions do not invalidate pointers or
                 references to internal data.
                 All other functions have no such guarantees.
 
@@ -39,13 +39,13 @@ namespace dlib
                 the 0th element to the (size()-1)th element.
 
             INITIAL VALUE
-                size() == 0   
+                size() == 0
              
             WHAT THIS OBJECT REPRESENTS
                 sequence contains items of type T
 
-                This object represents an ordered sequence of items, each item is 
-                associated with an integer value.   
+                This object represents an ordered sequence of items, each item is
+                associated with an integer value.
                 The items are numbered from 0 to size()-1
 
                 Also note that unless specified otherwise, no member functions
@@ -60,14 +60,14 @@ namespace dlib
             sequence (
             );
             /*!
-                ensures 
+                ensures
                     - #*this is properly initialized
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor
             !*/
 
             virtual ~sequence (
-            ); 
+            );
             /*!
                 ensures
                     - all memory associated with *this has been released
@@ -80,7 +80,7 @@ namespace dlib
                     - #*this has its initial value
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor
-                        if this exception is thrown then *this is unusable 
+                        if this exception is thrown then *this is unusable
                         until clear() is called and succeeds
             !*/
 
@@ -112,7 +112,7 @@ namespace dlib
                     - pos < size()
                 ensures
                     - #size() == size() - 1
-                    - the element at the position pos in *this has been removed and 
+                    - the element at the position pos in *this has been removed and
                       swapped into #item
                     - #at_start() == true
             !*/
@@ -124,11 +124,11 @@ namespace dlib
                 requires
                     - &item != this  (i.e. you can't concatenate a sequence onto itself)
                 ensures
-                    - item has been concatenated onto the end of *this 
-                      i.e. item[0] becomes (#*this)[size()], item[1] 
+                    - item has been concatenated onto the end of *this
+                      i.e. item[0] becomes (#*this)[size()], item[1]
                       becomes (#*this)[size()+1], etc.
-                    - #size() == size() + item.size() 
-                    - #item has its initial value 
+                    - #size() == size() + item.size()
+                    - #item has its initial value
                     - #at_start() == true
             !*/
 
@@ -158,14 +158,14 @@ namespace dlib
             /*!
                 ensures
                     - swaps *this and item
-            !*/ 
+            !*/
 
 
         private:
 
             // restricted functions
             sequence(sequence&);        // copy constructor
-            sequence& operator=(sequence&);    // assignment operator        
+            sequence& operator=(sequence&);    // assignment operator
 
     };
 
@@ -175,9 +175,9 @@ namespace dlib
         typename mem_manager
         >
     inline void swap (
-        sequence<T,mem_manager>& a, 
-        sequence<T,mem_manager>& b 
-    ) { a.swap(b); }  
+        sequence<T,mem_manager>& a,
+        sequence<T,mem_manager>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
@@ -187,11 +187,11 @@ namespace dlib
         typename mem_manager
         >
     void deserialize (
-        sequence<T,mem_manager>& item, 
+        sequence<T,mem_manager>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 }
 

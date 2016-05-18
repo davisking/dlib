@@ -12,7 +12,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -33,7 +33,7 @@ namespace
             const std::string& ,
             unsigned short ,
             unsigned short ,
-            uint64 
+            uint64
         )
         {
             try
@@ -71,7 +71,7 @@ namespace
             const std::string& ,
             unsigned short ,
             unsigned short ,
-            uint64 
+            uint64
         )
         {
             try
@@ -102,7 +102,7 @@ namespace
         theserv.set_listening_port(12345);
         theserv.start_async();
 
-        // wait a little bit to make sure the server has started listening before we try 
+        // wait a little bit to make sure the server has started listening before we try
         // to connect to it.
         dlib::sleep(500);
 
@@ -138,7 +138,7 @@ namespace
         theserv.set_listening_port(12345);
         theserv.start_async();
 
-        // wait a little bit to make sure the server has started listening before we try 
+        // wait a little bit to make sure the server has started listening before we try
         // to connect to it.
         dlib::sleep(500);
 

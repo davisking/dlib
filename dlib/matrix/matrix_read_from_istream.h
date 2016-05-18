@@ -19,8 +19,8 @@ namespace dlib
         )
         {
             return in.peek() == '\n' ||
-                in.peek() == ' ' || 
-                in.peek() == ',' || 
+                in.peek() == ' ' ||
+                in.peek() == ',' ||
                 in.peek() == '\t' ||
                 in.peek() == '\r';
         }
@@ -58,7 +58,7 @@ namespace dlib
             }
 
             // Eat next block of whitespace but also note if we hit the start of the next
-            // line. 
+            // line.
             while (next_is_whitespace(in))
             {
                 if (at_start_of_line && in.peek() == '\n')

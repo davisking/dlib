@@ -21,7 +21,7 @@ namespace dlib
         unsigned long milliseconds
     )
     {
-        // in HP-UX you can only usleep for less than a second 
+        // in HP-UX you can only usleep for less than a second
 #ifdef HPUX
         if (milliseconds >= 1000)
         {
@@ -75,7 +75,7 @@ namespace dlib
     {
         uint64 ts;
         timeval curtime;
-        gettimeofday(&curtime,0);       
+        gettimeofday(&curtime,0);
 
         ts = curtime.tv_sec;
         ts *= 1000000;

@@ -28,7 +28,7 @@ namespace dlib
             UNKNOWN
         };
 
-        inline type read_type(const std::string& file_name) 
+        inline type read_type(const std::string& file_name)
         {
             std::ifstream file(file_name.c_str(), std::ios::in|std::ios::binary);
             if (!file)
@@ -41,15 +41,15 @@ namespace dlib
             // Determine the true image type using link:
             // http://en.wikipedia.org/wiki/List_of_file_signatures
 
-            if (strcmp(buffer, "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A") == 0) 
+            if (strcmp(buffer, "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A") == 0)
                 return PNG;
-            else if(buffer[0]=='\xff' && buffer[1]=='\xd8' && buffer[2]=='\xff') 
+            else if(buffer[0]=='\xff' && buffer[1]=='\xd8' && buffer[2]=='\xff')
                 return JPG;
-            else if(buffer[0]=='B' && buffer[1]=='M') 
+            else if(buffer[0]=='B' && buffer[1]=='M')
                 return BMP;
-            else if(buffer[0]=='D' && buffer[1]=='N' && buffer[2] == 'G') 
+            else if(buffer[0]=='D' && buffer[1]=='N' && buffer[2] == 'G')
                 return DNG;
-            else if(buffer[0]=='G' && buffer[1]=='I' && buffer[2] == 'F') 
+            else if(buffer[0]=='G' && buffer[1]=='I' && buffer[2] == 'F')
                 return GIF;
 
             return UNKNOWN;
@@ -62,7 +62,7 @@ namespace dlib
 #if defined(GIFLIB_MAJOR) && GIFLIB_MAJOR >= 5
 #define DLIB_GIFLIB_HANDLE_DIFF_VERSIONS ,0
 #else
-#define DLIB_GIFLIB_HANDLE_DIFF_VERSIONS 
+#define DLIB_GIFLIB_HANDLE_DIFF_VERSIONS
 #endif
 
     template <typename image_type>
@@ -83,7 +83,7 @@ namespace dlib
             case image_file_type::JPG: load_jpeg(image, file_name); return;
 #endif
 #ifdef DLIB_GIF_SUPPORT
-            case image_file_type::GIF: 
+            case image_file_type::GIF:
             {
                 image_view<image_type> img(image);
                 GifFileType* gif = DGifOpenFileName(file_name.c_str() DLIB_GIFLIB_HANDLE_DIFF_VERSIONS);
@@ -109,13 +109,13 @@ namespace dlib
                     img.set_size(gif->SHeight, gif->SWidth);
                     unsigned char* raster = gif->SavedImages->RasterBits;
                     GifColorType* colormap = cmo->Colors;
-                    if (gif->Image.Interlace) 
+                    if (gif->Image.Interlace)
                     {
-                        const long interlaced_offset[] = { 0, 4, 2, 1 }; 
-                        const long interlaced_jumps[] = { 8, 8, 4, 2 }; 
+                        const long interlaced_offset[] = { 0, 4, 2, 1 };
+                        const long interlaced_jumps[] = { 8, 8, 4, 2 };
                         for (int i = 0; i < 4; ++i)
                         {
-                            for (long r = interlaced_offset[i]; r < img.nr(); r += interlaced_jumps[i]) 
+                            for (long r = interlaced_offset[i]; r < img.nr(); r += interlaced_jumps[i])
                             {
                                 for (long c = 0; c < img.nc(); ++c)
                                 {
@@ -131,7 +131,7 @@ namespace dlib
                             }
                         }
                     }
-                    else 
+                    else
                     {
                         for (long r = 0; r < img.nr(); ++r)
                         {
@@ -222,5 +222,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_LOAd_IMAGE_Hh_ 
+#endif // DLIB_LOAd_IMAGE_Hh_
 

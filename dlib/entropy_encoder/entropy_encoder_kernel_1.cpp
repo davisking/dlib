@@ -108,7 +108,7 @@ namespace dlib
     {
         // note that we must add one because of the convention that
         // high == the real upper range minus 1
-        uint32 r = (high-low+1)/total;                 
+        uint32 r = (high-low+1)/total;
 
         // note that we must subtract 1 to preserve the convention that
         // high == the real upper range - 1
@@ -121,7 +121,7 @@ namespace dlib
 
             // if the highest order bit in high and low is the same
             if ( low >= 0x80000000 || high < 0x80000000)
-            {              
+            {
                 // if buf is full then write it out
                 if (buf_used == 8)
                 {
@@ -131,18 +131,18 @@ namespace dlib
                     }
                     buf = 0;
                     buf_used = 0;
-                }   
+                }
 
 
                 // write the high order bit from low into buf
                 buf <<= 1;
-                ++buf_used;                
+                ++buf_used;
                 if (low&0x80000000)
                     buf |= 0x1;
 
                 // roll off the bit we just wrote to buf
-                low <<= 1;                
-                high <<= 1;  
+                low <<= 1;
+                high <<= 1;
                 high |= 1;     // note that it is ok to add one to high here because
                             // of the convention that high == real upper range - 1.
                             // so that means that if we want to shift the upper range
@@ -177,14 +177,14 @@ namespace dlib
     )
     {
         // flush the next 4 or 5 bytes that are buffered
-        // thats whatever is contained in buf and then all of low plus any extra 
+        // thats whatever is contained in buf and then all of low plus any extra
         // bits needed to pad that to be an even 4 or 5 bytes
 
 
         if (buf_used != 8)
         {
-            buf <<= (8-buf_used);   
-            buf |= static_cast<unsigned char>(low>>(24+buf_used));         
+            buf <<= (8-buf_used);
+            buf |= static_cast<unsigned char>(low>>(24+buf_used));
             low <<= (8-buf_used);
         }
 

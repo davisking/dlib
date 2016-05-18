@@ -39,7 +39,7 @@ namespace dlib
               this function finds matrices Z and M such that:
                 - Given an input vector x, Z*x-M, is the transformed version of x.  That is,
                   Z*x-M maps x into a space where x vectors that share the same class label
-                  are near each other. 
+                  are near each other.
                 - Z*x-M results in the transformed vectors having zero expected mean.
                 - Z.nr() <= lda_dims
                   (it might be less than lda_dims if there are not enough distinct class
@@ -56,7 +56,7 @@ namespace dlib
 
     std::pair<double,double> equal_error_rate (
         const std::vector<double>& low_vals,
-        const std::vector<double>& high_vals 
+        const std::vector<double>& high_vals
     );
     /*!
         ensures
@@ -71,7 +71,7 @@ namespace dlib
               same as the fraction of high_vals < T.
             - Let ERR == the equal error rate.  I.e. the fraction of times low_vals >= T
               and high_vals < T.  Note that 0 <= ERR <= 1.
-            - returns make_pair(ERR,T) 
+            - returns make_pair(ERR,T)
     !*/
 
 // ----------------------------------------------------------------------------------------

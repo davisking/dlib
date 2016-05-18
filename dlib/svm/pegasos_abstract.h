@@ -20,28 +20,28 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON kern_type
-                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h
 
             WHAT THIS OBJECT REPRESENTS
-                This object implements an online algorithm for training a support 
-                vector machine for solving binary classification problems.  
+                This object implements an online algorithm for training a support
+                vector machine for solving binary classification problems.
 
                 The implementation of the Pegasos algorithm used by this object is based
                 on the following excellent paper:
                     Pegasos: Primal estimated sub-gradient solver for SVM (2007)
-                    by Shai Shalev-Shwartz, Yoram Singer, Nathan Srebro 
-                    In ICML 
+                    by Shai Shalev-Shwartz, Yoram Singer, Nathan Srebro
+                    In ICML
 
-                This SVM training algorithm has two interesting properties.  First, the 
+                This SVM training algorithm has two interesting properties.  First, the
                 pegasos algorithm itself converges to the solution in an amount of time
                 unrelated to the size of the training set (in addition to being quite fast
                 to begin with).  This makes it an appropriate algorithm for learning from
-                very large datasets.  Second, this object uses the dlib::kcentroid object 
-                to maintain a sparse approximation of the learned decision function.  
-                This means that the number of support vectors in the resulting decision 
+                very large datasets.  Second, this object uses the dlib::kcentroid object
+                to maintain a sparse approximation of the learned decision function.
+                This means that the number of support vectors in the resulting decision
                 function is also unrelated to the size of the dataset (in normal SVM
-                training algorithms, the number of support vectors grows approximately 
-                linearly with the size of the training set).  
+                training algorithms, the number of support vectors grows approximately
+                linearly with the size of the training set).
         !*/
 
     public:
@@ -60,7 +60,7 @@ namespace dlib
         );
         /*!
             ensures
-                - this object is properly initialized 
+                - this object is properly initialized
                 - #get_lambda_class1() == 0.0001
                 - #get_lambda_class2() == 0.0001
                 - #get_tolerance() == 0.01
@@ -69,7 +69,7 @@ namespace dlib
         !*/
 
         svm_pegasos (
-            const kernel_type& kernel_, 
+            const kernel_type& kernel_,
             const scalar_type& lambda_,
             const scalar_type& tolerance_,
             unsigned long max_num_sv
@@ -80,9 +80,9 @@ namespace dlib
                 - tolerance_ > 0
                 - max_num_sv > 0
             ensures
-                - this object is properly initialized 
-                - #get_lambda_class1() == lambda_ 
-                - #get_lambda_class2() == lambda_ 
+                - this object is properly initialized
+                - #get_lambda_class1() == lambda_
+                - #get_lambda_class2() == lambda_
                 - #get_tolerance() == tolerance_
                 - #get_kernel() == kernel_
                 - #get_train_count() == 0
@@ -107,15 +107,15 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the SVM regularization term for the +1 class.  It is the 
-                  parameter that determines the trade off between trying to fit the 
-                  +1 training data exactly or allowing more errors but hopefully 
-                  improving the generalization ability of the resulting classifier.  
-                  Smaller values encourage exact fitting while larger values may 
-                  encourage better generalization. It is also worth noting that the 
-                  number of iterations it takes for this algorithm to converge is 
-                  proportional to 1/lambda.  So smaller values of this term cause 
-                  the running time of this algorithm to increase.  For more 
+                - returns the SVM regularization term for the +1 class.  It is the
+                  parameter that determines the trade off between trying to fit the
+                  +1 training data exactly or allowing more errors but hopefully
+                  improving the generalization ability of the resulting classifier.
+                  Smaller values encourage exact fitting while larger values may
+                  encourage better generalization. It is also worth noting that the
+                  number of iterations it takes for this algorithm to converge is
+                  proportional to 1/lambda.  So smaller values of this term cause
+                  the running time of this algorithm to increase.  For more
                   information you should consult the paper referenced above.
         !*/
 
@@ -132,11 +132,11 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the tolerance used by the internal kcentroid object to 
-                  represent the learned decision function.  Smaller values of this 
-                  tolerance will result in a more accurate representation of the 
+                - returns the tolerance used by the internal kcentroid object to
+                  represent the learned decision function.  Smaller values of this
+                  tolerance will result in a more accurate representation of the
                   decision function but will use more support vectors (up to
-                  a max of get_max_num_sv()).  
+                  a max of get_max_num_sv()).
         !*/
 
         unsigned long get_max_num_sv (
@@ -183,7 +183,7 @@ namespace dlib
             requires
                 - max_num_sv > 0
             ensures
-                - #get_max_num_sv() == max_num_sv 
+                - #get_max_num_sv() == max_num_sv
                 - #get_train_count() == 0
                   (i.e. clears any memory of previous training)
         !*/
@@ -208,7 +208,7 @@ namespace dlib
             requires
                 - lambda_ > 0
             ensures
-                - #get_lambda_class1() == lambda_ 
+                - #get_lambda_class1() == lambda_
                   #get_train_count() == 0
                   (i.e. clears any memory of previous training)
         !*/
@@ -220,7 +220,7 @@ namespace dlib
             requires
                 - lambda_ > 0
             ensures
-                - #get_lambda_class2() == lambda_ 
+                - #get_lambda_class2() == lambda_
                   #get_train_count() == 0
                   (i.e. clears any memory of previous training)
         !*/
@@ -230,7 +230,7 @@ namespace dlib
         /*!
             ensures
                 - returns how many times this->train() has been called
-                  since this object was constructed or last cleared.  
+                  since this object was constructed or last cleared.
         !*/
 
         scalar_type train (
@@ -253,9 +253,9 @@ namespace dlib
         /*!
             ensures
                 - classifies the given x sample using the decision function
-                  this object has learned so far.  
+                  this object has learned so far.
                 - if (x is a sample predicted have +1 label) then
-                    - returns a number >= 0 
+                    - returns a number >= 0
                 - else
                     - returns a number < 0
         !*/
@@ -264,7 +264,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns a decision function F that represents the function learned 
+                - returns a decision function F that represents the function learned
                   by this object so far.  I.e. it is the case that:
                     - for all x: F(x) == (*this)(x)
         !*/
@@ -277,15 +277,15 @@ namespace dlib
                 - swaps *this and item
         !*/
 
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename kern_type 
+        typename kern_type
         >
     void swap(
-        svm_pegasos<kern_type>& a, 
+        svm_pegasos<kern_type>& a,
         svm_pegasos<kern_type>& b
     ) { a.swap(b); }
     /*!
@@ -304,11 +304,11 @@ namespace dlib
     !*/
 
     template <
-        typename kern_type 
+        typename kern_type
         >
     void deserialize (
         svm_pegasos<kern_type>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides serialization support for svm_pegasos objects
@@ -340,7 +340,7 @@ namespace dlib
     template <
         typename trainer_type
         >
-    class batch_trainer 
+    class batch_trainer
     {
         /*!
             REQUIREMENTS ON trainer_type
@@ -348,10 +348,10 @@ namespace dlib
                   replicate_settings() must also be defined for the type.
 
             WHAT THIS OBJECT REPRESENTS
-                This is a trainer object that is meant to wrap online trainer objects 
-                that create decision_functions. It turns an online learning algorithm 
-                such as svm_pegasos into a batch learning object.  This allows you to 
-                use objects like svm_pegasos with functions (e.g. cross_validate_trainer) 
+                This is a trainer object that is meant to wrap online trainer objects
+                that create decision_functions. It turns an online learning algorithm
+                such as svm_pegasos into a batch learning object.  This allows you to
+                use objects like svm_pegasos with functions (e.g. cross_validate_trainer)
                 that expect batch mode training objects.
         !*/
 
@@ -373,7 +373,7 @@ namespace dlib
         !*/
 
         batch_trainer (
-            const trainer_type& online_trainer, 
+            const trainer_type& online_trainer,
             const scalar_type min_learning_rate_,
             bool verbose_,
             bool use_cache_,
@@ -391,7 +391,7 @@ namespace dlib
                     - this object will output status messages to standard out while
                       training is under way.
                 - if (use_cache_ == true) then
-                    - this object will cache up to cache_size_ columns of the kernel 
+                    - this object will cache up to cache_size_ columns of the kernel
                       matrix during the training process.
         !*/
 
@@ -413,7 +413,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - trains and returns a decision_function using the trainer that was 
+                - trains and returns a decision_function using the trainer that was
                   supplied to this object's constructor.
                 - training continues until the online training object indicates that
                   its learning rate has dropped below get_min_learning_rate().
@@ -422,7 +422,7 @@ namespace dlib
                 - any exceptions thrown by the trainer_type object
         !*/
 
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -439,7 +439,7 @@ namespace dlib
             - trainer_type == some kind of online trainer object that creates decision_function
               objects (e.g. svm_pegasos).  replicate_settings() must also be defined for the type.
         ensures
-            - returns a batch_trainer object that has been instantiated with the 
+            - returns a batch_trainer object that has been instantiated with the
               given arguments.
     !*/
 
@@ -458,7 +458,7 @@ namespace dlib
             - trainer_type == some kind of online trainer object that creates decision_function
               objects (e.g. svm_pegasos).  replicate_settings() must also be defined for the type.
         ensures
-            - returns a batch_trainer object that has been instantiated with the 
+            - returns a batch_trainer object that has been instantiated with the
               given arguments (and is verbose).
     !*/
 
@@ -479,7 +479,7 @@ namespace dlib
             - trainer_type == some kind of online trainer object that creates decision_function
               objects (e.g. svm_pegasos).  replicate_settings() must also be defined for the type.
         ensures
-            - returns a batch_trainer object that has been instantiated with the 
+            - returns a batch_trainer object that has been instantiated with the
               given arguments (uses a kernel cache).
     !*/
 
@@ -500,7 +500,7 @@ namespace dlib
             - trainer_type == some kind of online trainer object that creates decision_function
               objects (e.g. svm_pegasos).  replicate_settings() must also be defined for the type.
         ensures
-            - returns a batch_trainer object that has been instantiated with the 
+            - returns a batch_trainer object that has been instantiated with the
               given arguments (is verbose and uses a kernel cache).
     !*/
 

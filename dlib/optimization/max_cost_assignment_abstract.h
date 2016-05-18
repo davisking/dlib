@@ -22,8 +22,8 @@ namespace dlib
             - for all valid i:
                 - 0 <= assignment[i] < cost.nr()
         ensures
-            - Interprets cost as a cost assignment matrix. That is, cost(i,j) 
-              represents the cost of assigning i to j.  
+            - Interprets cost as a cost assignment matrix. That is, cost(i,j)
+              represents the cost of assigning i to j.
             - Interprets assignment as a particular set of assignments. That is,
               i is assigned to assignment[i].
             - returns the cost of the given assignment. That is, returns
@@ -47,11 +47,11 @@ namespace dlib
 
                 Maximize: f(A) == assignment_cost(cost, A)
                 Subject to the following constraints:
-                    - The elements of A are unique. That is, there aren't any 
-                      elements of A which are equal.  
+                    - The elements of A are unique. That is, there aren't any
+                      elements of A which are equal.
                     - A.size() == cost.nr()
 
-            - This function implements the O(N^3) version of the Hungarian algorithm 
+            - This function implements the O(N^3) version of the Hungarian algorithm
               where N is the number of rows in the cost matrix.
     !*/
 

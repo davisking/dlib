@@ -14,15 +14,15 @@ namespace dlib
         {
             extern "C"
             {
-                void DLIB_FORTRAN_ID(dgetrf) (integer* m, integer *n, double *a, 
+                void DLIB_FORTRAN_ID(dgetrf) (integer* m, integer *n, double *a,
                                              integer* lda, integer *ipiv, integer *info);
 
-                void DLIB_FORTRAN_ID(sgetrf) (integer* m, integer *n, float *a, 
+                void DLIB_FORTRAN_ID(sgetrf) (integer* m, integer *n, float *a,
                                              integer* lda, integer *ipiv, integer *info);
 
             }
 
-            inline int getrf (integer m, integer n, double *a, 
+            inline int getrf (integer m, integer n, double *a,
                               integer lda, integer *ipiv)
             {
                 integer info = 0;
@@ -30,7 +30,7 @@ namespace dlib
                 return info;
             }
 
-            inline int getrf (integer m, integer n, float *a, 
+            inline int getrf (integer m, integer n, float *a,
                               integer lda, integer *ipiv)
             {
                 integer info = 0;
@@ -100,15 +100,15 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <
-            typename T, 
+            typename T,
             long NR1, long NR2,
-            long NC1, long NC2, 
+            long NC1, long NC2,
             typename MM,
             typename layout
             >
         int getrf (
             matrix<T,NR1,NC1,MM,column_major_layout>& a,
-            matrix<integer,NR2,NC2,MM,layout>& ipiv 
+            matrix<integer,NR2,NC2,MM,layout>& ipiv
         )
         {
             const long m = a.nr();
@@ -116,7 +116,7 @@ namespace dlib
 
             ipiv.set_size(std::min(m,n), 1);
 
-            // compute the actual decomposition 
+            // compute the actual decomposition
             return binding::getrf(m, n, &a(0,0), a.nr(), &ipiv(0,0));
         }
 

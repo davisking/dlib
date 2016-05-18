@@ -23,8 +23,8 @@ namespace dlib
             - #x.size() == y.size() == num_samples
             - is_binary_classification_problem(#x,#y) == true
             - #x will contain points and #y labels that were
-              sampled randomly from a checkers board that has 
-              board_dimension squares on each side. 
+              sampled randomly from a checkers board that has
+              board_dimension squares on each side.
     !*/
     {
         static dlib::rand rnd;

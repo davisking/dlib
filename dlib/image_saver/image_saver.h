@@ -25,7 +25,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class image_save_error : public dlib::error { 
+    class image_save_error : public dlib::error {
     public: image_save_error(const std::string& str) : error(EIMAGE_SAVE,str){}
     };
 
@@ -43,7 +43,7 @@ namespace dlib
     {
         static void save_bmp (
             const image_type& image_,
-            std::ostream& out 
+            std::ostream& out
         )
         {
             const_image_view<image_type> image(image_);
@@ -231,7 +231,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type 
+        typename image_type
         >
     inline typename disable_if<is_matrix<image_type> >::type save_bmp (
         const image_type& image,
@@ -242,7 +242,7 @@ namespace dlib
     }
 
     template <
-        typename EXP 
+        typename EXP
         >
     inline void save_bmp (
         const matrix_exp<EXP>& image,
@@ -265,16 +265,16 @@ namespace dlib
         struct save_dng_helper;
 
         typedef entropy_encoder::kernel_2a encoder_type;
-        typedef entropy_encoder_model<256,encoder_type>::kernel_5a eem_type; 
+        typedef entropy_encoder_model<256,encoder_type>::kernel_5a eem_type;
 
-        typedef entropy_encoder_model<256,encoder_type>::kernel_4a eem_exp_type; 
+        typedef entropy_encoder_model<256,encoder_type>::kernel_4a eem_exp_type;
 
         template <typename image_type >
         struct save_dng_helper<image_type, typename enable_if<is_float_type<typename image_traits<image_type>::pixel_type> >::type >
         {
             static void save_dng (
                 const image_type& image_,
-                std::ostream& out 
+                std::ostream& out
             )
             {
                 const_image_view<image_type> image(image_);
@@ -330,8 +330,8 @@ namespace dlib
         struct is_non_float_non8bit_grayscale
         {
             typedef typename image_traits<image_type>::pixel_type pixel_type;
-            const static bool value = pixel_traits<pixel_type>::grayscale && 
-                                      sizeof(pixel_type) != 1 && 
+            const static bool value = pixel_traits<pixel_type>::grayscale &&
+                                      sizeof(pixel_type) != 1 &&
                                       !is_float_type<pixel_type>::value;
         };
 
@@ -340,7 +340,7 @@ namespace dlib
         {
             static void save_dng (
                 const image_type& image_,
-                std::ostream& out 
+                std::ostream& out
             )
             {
                 const_image_view<image_type> image(image_);
@@ -389,7 +389,7 @@ namespace dlib
         {
             static void save_dng (
                 const image_type& image_,
-                std::ostream& out 
+                std::ostream& out
             )
             {
                 const_image_view<image_type> image(image_);
@@ -624,7 +624,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type 
+        typename image_type
         >
     inline typename disable_if<is_matrix<image_type> >::type save_dng (
         const image_type& image,
@@ -636,7 +636,7 @@ namespace dlib
     }
 
     template <
-        typename EXP 
+        typename EXP
         >
     inline void save_dng (
         const matrix_exp<EXP>& image,

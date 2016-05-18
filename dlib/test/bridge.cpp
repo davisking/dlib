@@ -10,7 +10,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -232,7 +232,7 @@ namespace
         void perform_test (
         )
         {
-            dlog << LINFO << "testing bridge, using local port number of " << testing_port; 
+            dlog << LINFO << "testing bridge, using local port number of " << testing_port;
 
             print_spinner();
             do_test1();

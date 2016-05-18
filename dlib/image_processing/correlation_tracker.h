@@ -19,18 +19,18 @@ namespace dlib
     {
     public:
 
-        explicit correlation_tracker (unsigned long filter_size = 6, 
-            unsigned long num_scale_levels = 5, 
+        explicit correlation_tracker (unsigned long filter_size = 6,
+            unsigned long num_scale_levels = 5,
             unsigned long scale_window_size = 23,
             double regularizer_space = 0.001,
             double nu_space = 0.025,
             double regularizer_scale = 0.001,
             double nu_scale = 0.025,
             double scale_pyramid_alpha = 1.020
-        ) 
+        )
             : filter_size(1 << filter_size), num_scale_levels(1 << num_scale_levels),
             scale_window_size(scale_window_size),
-            regularizer_space(regularizer_space), nu_space(nu_space), 
+            regularizer_space(regularizer_space), nu_space(nu_space),
             regularizer_scale(regularizer_scale), nu_scale(nu_scale),
             scale_pyramid_alpha(scale_pyramid_alpha)
         {
@@ -90,10 +90,10 @@ namespace dlib
 
 
         unsigned long get_filter_size (
-        ) const { return filter_size; } 
+        ) const { return filter_size; }
 
         unsigned long get_num_scale_levels(
-        ) const { return num_scale_levels; }  
+        ) const { return num_scale_levels; }
 
         unsigned long get_scale_window_size (
         ) const { return scale_window_size; }
@@ -109,8 +109,8 @@ namespace dlib
         ) const { return nu_scale;}
 
         drectangle get_position (
-        ) const 
-        { 
+        ) const
+        {
             return position;
         }
 
@@ -272,7 +272,7 @@ namespace dlib
             // Now copy the hog features into the Fs outputs and also apply the cosine
             // windowing.
             Fs.resize(hogs[0].size()*hogs[0][0].size());
-            unsigned long i = 0; 
+            unsigned long i = 0;
             for (long r = 0; r < hogs[0][0].nr(); ++r)
             {
                 for (long c = 0; c < hogs[0][0].nc(); ++c)
@@ -287,7 +287,7 @@ namespace dlib
                         ++i;
                     }
                 }
-            } 
+            }
         }
 
         template <typename image_type>

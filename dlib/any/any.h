@@ -12,7 +12,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class bad_any_cast : public std::bad_cast 
+    class bad_any_cast : public std::bad_cast
     {
     public:
           virtual const char * what() const throw()
@@ -73,7 +73,7 @@ namespace dlib
 
         template <typename T>
         T& cast_to(
-        ) 
+        )
         {
             typedef typename basic_type<T>::type U;
             derived<U>* d = dynamic_cast<derived<U>*>(data.get());
@@ -101,7 +101,7 @@ namespace dlib
 
         template <typename T>
         T& get(
-        ) 
+        )
         {
             typedef typename basic_type<T>::type U;
             derived<U>* d = dynamic_cast<derived<U>*>(data.get());

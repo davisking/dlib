@@ -15,7 +15,7 @@ namespace dlib
         /*!
             INITIAL VALUE
                 write_mode          == false
-                read_mode           == false    
+                read_mode           == false
 
             CONVENTION
                 write_mode          == is_in_write_mode()
@@ -24,9 +24,9 @@ namespace dlib
                 if (write_mode)
                 {
                     osp             == pointer to an ostream object
-                    buffer          == the low order bits of buffer are the bits to be 
+                    buffer          == the low order bits of buffer are the bits to be
                                        written
-                    buffer_size     == the number of low order bits in buffer that are 
+                    buffer_size     == the number of low order bits in buffer that are
                                        bits that should be written
                     the lowest order bit is the last bit entered by the user
                 }
@@ -34,9 +34,9 @@ namespace dlib
                 if (read_mode)
                 {
                     isp             == pointer to an istream object
-                    buffer          == the high order bits of buffer are the bits 
+                    buffer          == the high order bits of buffer are the bits
                                        waiting to be read by the user
-                    buffer_size     == the number of high order bits in buffer that 
+                    buffer_size     == the number of high order bits in buffer that
                                        are bits that are waiting to be read
                     the highest order bit is the next bit to give to the user
                 }
@@ -104,7 +104,7 @@ namespace dlib
     };
 
     inline void swap (
-        bit_stream_kernel_1& a, 
+        bit_stream_kernel_1& a,
         bit_stream_kernel_1& b
     );
 

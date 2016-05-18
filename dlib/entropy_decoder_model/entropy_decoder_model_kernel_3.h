@@ -16,7 +16,7 @@ namespace dlib
         typename cc,
         typename cc_high
         >
-    class entropy_decoder_model_kernel_3 
+    class entropy_decoder_model_kernel_3
     {
         /*!
             REQUIREMENTS ON cc
@@ -43,7 +43,7 @@ namespace dlib
                 if (order_2[i] != 0) then
                     &order_2[i]->get_global_state() == &gs_high
 
-                This is an order-2-1-0 model. The last symbol in the order-2, order-1 and 
+                This is an order-2-1-0 model. The last symbol in the order-2, order-1 and
                 order-0 contexts is an escape into the lower context.
 
                 previous_symbol == the last symbol seen
@@ -89,7 +89,7 @@ namespace dlib
         entropy_decoder_model_kernel_3(entropy_decoder_model_kernel_3&);        // copy constructor
         entropy_decoder_model_kernel_3& operator=(entropy_decoder_model_kernel_3&);    // assignment operator
 
-    };   
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ namespace dlib
     entropy_decoder_model_kernel_3<alphabet_size,entropy_decoder,cc,cc_high>::
     entropy_decoder_model_kernel_3 (
         entropy_decoder& coder_
-    ) : 
+    ) :
         coder(coder_),
         order_0(gs),
         order_1(0),
@@ -225,7 +225,7 @@ namespace dlib
         unsigned long current_symbol, low_count, high_count, target;
 
 
-        // look in the order-2 context        
+        // look in the order-2 context
         unsigned long temp = previous_symbol + (previous_symbol2 * alphabet_size);
         if (order_2[temp] != 0)
         {
@@ -271,7 +271,7 @@ namespace dlib
         {
             symbol = current_symbol;
             order_2[temp]->increment_count(current_symbol,2);
-            order_1[previous_symbol]->increment_count(current_symbol,2);            
+            order_1[previous_symbol]->increment_count(current_symbol,2);
             previous_symbol2 = previous_symbol;
             previous_symbol = current_symbol;
             return;
@@ -294,7 +294,7 @@ namespace dlib
         if (current_symbol != alphabet_size)
         {
             // update the count for this symbol
-            order_2[temp]->increment_count(current_symbol,2);            
+            order_2[temp]->increment_count(current_symbol,2);
             order_1[previous_symbol]->increment_count(current_symbol,2);
             order_0.increment_count(current_symbol,2);
             
@@ -314,8 +314,8 @@ namespace dlib
         coder.decode(target,target+1);
 
 
-        // update the count for this symbol 
-        order_2[temp]->increment_count(target,2);            
+        // update the count for this symbol
+        order_2[temp]->increment_count(target,2);
         order_1[previous_symbol]->increment_count(target,2);
         order_0.increment_count(target,2);
         

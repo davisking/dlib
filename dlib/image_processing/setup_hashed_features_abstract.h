@@ -53,7 +53,7 @@ namespace dlib
             - image_scanner should be either scan_image_pyramid or scan_image_boxes and
               should use the hashed_feature_image as its local feature extractor.
         ensures
-            - #scanner.get_feature_extractor().uses_uniform_feature_weights() == false 
+            - #scanner.get_feature_extractor().uses_uniform_feature_weights() == false
               (i.e. Make the scanner's feature extractor use the relative feature weighting
               scheme)
     !*/
@@ -87,7 +87,7 @@ namespace dlib
               fe and then configures scanner to use this hash function.
             - The hash function will map vectors into integers in the range [0, pow(2,bits))
             - The hash function will be setup so that it hashes a random sample of num_samples
-              vectors from fe such that each bin ends up with roughly the same number of 
+              vectors from fe such that each bin ends up with roughly the same number of
               elements in it.
         throws
             - image_hash_construction_failure
@@ -160,7 +160,7 @@ namespace dlib
               fe and then configures scanner to use this hash function.
             - The hash function will map vectors into integers in the range [0, pow(2,bits))
             - The hash function will be setup so that it hashes a random sample of num_samples
-              vectors from fe such that each bin ends up with roughly the same number of 
+              vectors from fe such that each bin ends up with roughly the same number of
               elements in it.
         throws
             - image_hash_construction_failure

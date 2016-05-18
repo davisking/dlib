@@ -12,7 +12,7 @@ namespace dlib
 
     namespace dng_helpers_namespace
     {
-        enum 
+        enum
         {
             grayscale = 1,
             rgb,
@@ -39,17 +39,17 @@ namespace dlib
             const long c1 = col-1;
             const long r1 = row-1;
 
-            if (c1 >= 0)            
+            if (c1 >= 0)
                 assign_pixel(a, img[row][c1]);
             else
                 assign_pixel(a,(unsigned char)0);
 
-            if (c1 >= 0 && r1 >= 0) 
+            if (c1 >= 0 && r1 >= 0)
                 assign_pixel(c, img[r1][c1]);
             else
                 assign_pixel(c,(unsigned char)0);
 
-            if (r1 >= 0)            
+            if (r1 >= 0)
                 assign_pixel(b, img[r1][col]);
             else
                 assign_pixel(b,(unsigned char)0);
@@ -70,11 +70,11 @@ namespace dlib
                        std::abs((short)p.green - (short)c.green) +
                        std::abs((short)p.blue - (short)c.blue);
 
-            if (pa <= pb && pa <= pc) 
+            if (pa <= pb && pa <= pc)
                 return a;
-            else if (pb <= pc) 
+            else if (pb <= pc)
                 return b;
-            else 
+            else
                 return c;
         }
 
@@ -89,17 +89,17 @@ namespace dlib
             const long c1 = col-1;
             const long r1 = row-1;
 
-            if (c1 >= 0)            
+            if (c1 >= 0)
                 assign_pixel(a, img[row][c1]);
             else
                 assign_pixel(a,(unsigned char)0);
 
-            if (c1 >= 0 && r1 >= 0) 
+            if (c1 >= 0 && r1 >= 0)
                 assign_pixel(c, img[r1][c1]);
             else
                 assign_pixel(c,(unsigned char)0);
 
-            if (r1 >= 0)            
+            if (r1 >= 0)
                 assign_pixel(b, img[r1][col]);
             else
                 assign_pixel(b,(unsigned char)0);
@@ -125,17 +125,17 @@ namespace dlib
             const long c1 = col-1;
             const long r1 = row-1;
 
-            if (c1 >= 0)            
+            if (c1 >= 0)
                 assign_pixel(a, img[row][c1]);
             else
                 assign_pixel(a,(unsigned char)0);
 
-            if (c1 >= 0 && r1 >= 0) 
+            if (c1 >= 0 && r1 >= 0)
                 assign_pixel(c, img[r1][c1]);
             else
                 assign_pixel(c,(unsigned char)0);
 
-            if (r1 >= 0)            
+            if (r1 >= 0)
                 assign_pixel(b, img[r1][col]);
             else
                 assign_pixel(b,(unsigned char)0);
@@ -156,11 +156,11 @@ namespace dlib
                        std::abs((short)p.green - (short)c.green) +
                        std::abs((short)p.blue - (short)c.blue);
 
-            if (pa <= pb && pa <= pc) 
+            if (pa <= pb && pa <= pc)
                 return a;
-            else if (pb <= pc) 
+            else if (pb <= pc)
                 return b;
-            else 
+            else
                 return c;
         }
 
@@ -175,17 +175,17 @@ namespace dlib
             const long c1 = col-1;
             const long r1 = row-1;
 
-            if (c1 >= 0)            
+            if (c1 >= 0)
                 assign_pixel(a, img[row][c1]);
             else
                 assign_pixel(a,(unsigned char)0);
 
-            if (c1 >= 0 && r1 >= 0) 
+            if (c1 >= 0 && r1 >= 0)
                 assign_pixel(c, img[r1][c1]);
             else
                 assign_pixel(c,(unsigned char)0);
 
-            if (r1 >= 0)            
+            if (r1 >= 0)
                 assign_pixel(b, img[r1][col]);
             else
                 assign_pixel(b,(unsigned char)0);
@@ -210,17 +210,17 @@ namespace dlib
             const long c1 = col-1;
             const long r1 = row-1;
 
-            if (c1 >= 0)            
+            if (c1 >= 0)
                 assign_pixel(a, img[row][c1]);
             else
                 assign_pixel(a,(unsigned char)0);
 
-            if (c1 >= 0 && r1 >= 0) 
+            if (c1 >= 0 && r1 >= 0)
                 assign_pixel(c, img[r1][c1]);
             else
                 assign_pixel(c,(unsigned char)0);
 
-            if (r1 >= 0)            
+            if (r1 >= 0)
                 assign_pixel(b, img[r1][col]);
             else
                 assign_pixel(b,(unsigned char)0);
@@ -237,19 +237,19 @@ namespace dlib
         unsigned char predictor_grayscale (const T& img, long row, long col)
         {
             // a = left, b = above, c = upper left
-            unsigned char a = 0, b = 0, c = 0; 
+            unsigned char a = 0, b = 0, c = 0;
 
 
             const long c1 = col-1;
             const long r1 = row-1;
 
-            if (c1 >= 0)            
+            if (c1 >= 0)
                 assign_pixel(a, img[row][c1]);
 
-            if (c1 >= 0 && r1 >= 0) 
+            if (c1 >= 0 && r1 >= 0)
                 assign_pixel(c, img[r1][c1]);
 
-            if (r1 >= 0)            
+            if (r1 >= 0)
                 assign_pixel(b, img[r1][col]);
 
 
@@ -261,19 +261,19 @@ namespace dlib
         uint16 predictor_grayscale_16 (const T& img, long row, long col)
         {
             // a = left, b = above, c = upper left
-            uint16 a = 0, b = 0, c = 0; 
+            uint16 a = 0, b = 0, c = 0;
 
 
             const long c1 = col-1;
             const long r1 = row-1;
 
-            if (c1 >= 0)            
+            if (c1 >= 0)
                 assign_pixel(a, img[row][c1]);
 
-            if (c1 >= 0 && r1 >= 0) 
+            if (c1 >= 0 && r1 >= 0)
                 assign_pixel(c, img[r1][c1]);
 
-            if (r1 >= 0)            
+            if (r1 >= 0)
                 assign_pixel(b, img[r1][col]);
 
 

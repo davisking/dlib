@@ -105,7 +105,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename sample_type, typename alloc>
-    typename enable_if<is_const_type<typename sample_type::value_type::first_type> >::type 
+    typename enable_if<is_const_type<typename sample_type::value_type::first_type> >::type
     fix_nonzero_indexing (
         std::vector<sample_type,alloc>& samples
     )
@@ -143,10 +143,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-// If the "first" values in the std::pair objects are not const then we can modify them 
+// If the "first" values in the std::pair objects are not const then we can modify them
 // directly and that is what this version of fix_nonzero_indexing() does.
     template <typename sample_type, typename alloc>
-    typename disable_if<is_const_type<typename sample_type::value_type::first_type> >::type 
+    typename disable_if<is_const_type<typename sample_type::value_type::first_type> >::type
     fix_nonzero_indexing (
         std::vector<sample_type,alloc>& samples
     )

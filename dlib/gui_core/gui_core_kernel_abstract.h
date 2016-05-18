@@ -14,32 +14,32 @@ namespace dlib
     /*!
         OVERVIEW:
             This is a set of objects and functions which provide a very basic
-            framework for manipulating windows.  It is intended to provide a 
-            portable interface which can be used to build a more complex windowing 
+            framework for manipulating windows.  It is intended to provide a
+            portable interface which can be used to build a more complex windowing
             toolkit.
 
         EXCEPTIONS
-            Do not let an exception leave any of the base_window event handlers. 
+            Do not let an exception leave any of the base_window event handlers.
             The results of doing so are undefined.
 
         THREAD SAFETY
             Event Handlers
-                All event handlers are executed in a special event handling thread. 
+                All event handlers are executed in a special event handling thread.
                 This means that you must not do anything that will take a long time or
-                block while in an event handler.  Doing so will freeze all event 
-                processing.  
+                block while in an event handler.  Doing so will freeze all event
+                processing.
                 
                 Also, don't rely on get_thread_id() always returning the same ID from
                 inside event handlers.
 
             canvas
                 Never access a canvas object outside of the paint() callback
-                that supplied it.  Only access a canvas object from the event 
-                handling thread.  After the paint() event handler has returned do 
+                that supplied it.  Only access a canvas object from the event
+                handling thread.  After the paint() event handler has returned do
                 not access that canvas object again.
 
             base_window
-                All methods for this class are thread safe.  You may call them 
+                All methods for this class are thread safe.  You may call them
                 from any thread and do not need to serialize access.
     !*/
 
@@ -90,23 +90,23 @@ namespace dlib
         /*!
             POINTERS AND REFERENCES TO INTERNAL DATA
                 All functions of this object may invalidate pointers and references
-                to internal data.  
+                to internal data.
 
             INITIAL VALUE
-                The initial value of each pixel is undefined.  
+                The initial value of each pixel is undefined.
                 is_empty() == false
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a rectangular area of a window that you 
-                can draw on. 
+                This object represents a rectangular area of a window that you
+                can draw on.
 
                 Each pixel can be accessed with the following syntax:
                     canvas_instance[y][x].red   == the red value for this pixel
                     canvas_instance[y][x].blue  == the blue value for this pixel
                     canvas_instance[y][x].green == the green value for this pixel
 
-                The origin, i.e. (0,0), of the x,y coordinate plane of the canvas is in 
-                the upper left corner of the canvas.  Note that the upper left corner 
+                The origin, i.e. (0,0), of the x,y coordinate plane of the canvas is in
+                the upper left corner of the canvas.  Note that the upper left corner
                 of the canvas appears at the point (left(),top()) in its window.
         !*/
 
@@ -121,10 +121,10 @@ namespace dlib
                     present in the pixel at all and 255 indicating that the color
                     is present in the pixel with maximum intensity.
 
-                    Note that the structure, order, and size of of this struct are 
-                    implementation dependent.  It will always contain fields called 
-                    red, green, and blue but they may not be in that order and there 
-                    may be padding.  
+                    Note that the structure, order, and size of of this struct are
+                    implementation dependent.  It will always contain fields called
+                    red, green, and blue but they may not be in that order and there
+                    may be padding.
 
                     Also note that pixel_traits<> is defined for this pixel type,
                     thus you can use it in assign_pixel() calls.
@@ -143,7 +143,7 @@ namespace dlib
                 - row < height()
             ensures
                 - returns an array of width() pixel structs that represents the given
-                  row of pixels in the canvas.  
+                  row of pixels in the canvas.
         !*/
 
         void fill (
@@ -164,7 +164,7 @@ namespace dlib
         // restricted functions
         canvas();        // normal constructor
         canvas(canvas&);        // copy constructor
-        canvas& operator=(canvas&);    // assignment operator    
+        canvas& operator=(canvas&);    // assignment operator
     };
 
 // ----------------------------------------------------------------------------------------
@@ -174,9 +174,9 @@ namespace dlib
 
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object represents a window on the desktop.  A window has a "client 
-                area" that is a region of the screen that you can draw whatever you like 
-                on.  You implement the paint() callback and use the canvas object to do 
+                This object represents a window on the desktop.  A window has a "client
+                area" that is a region of the screen that you can draw whatever you like
+                on.  You implement the paint() callback and use the canvas object to do
                 this drawing.
 
             INITIAL STATE
@@ -191,13 +191,13 @@ namespace dlib
             mouse events:
                 It is important to note a few things about the mouse events.  First,
                 the on_mouse_move() event is not triggered for each pixel the mouse crosses
-                but rather its frequency and precision is implementation dependent.  
+                but rather its frequency and precision is implementation dependent.
                 
-                Second, it is possible that a mouse button may be depressed but the 
-                corresponding button release event does not go to the window.  For instance, 
-                if the mouse is outside the window and some other application jumps to the 
-                top it is possible that the new application will receive any mouse button 
-                release events rather than the original window.  But the point is that 
+                Second, it is possible that a mouse button may be depressed but the
+                corresponding button release event does not go to the window.  For instance,
+                if the mouse is outside the window and some other application jumps to the
+                top it is possible that the new application will receive any mouse button
+                release events rather than the original window.  But the point is that
                 you should not rely on always getting a button up event for every button
                 down event.
 
@@ -205,12 +205,12 @@ namespace dlib
                 Note that the existence of a typematic action (holding down a key
                 and having it start to repeat itself after a moment) for each key is
                 totally implementation dependent.  So don't rely on it for any key
-                and conversely don't assume it isn't present either.  
+                and conversely don't assume it isn't present either.
 
             The base_window::wm mutex
                 This is a reference to a global rmutex.  All instances of base_window make
-                reference to the same global rmutex.  It is used to synchronize access to 
-                the base_window to make it thread safe.  It is also always locked before 
+                reference to the same global rmutex.  It is used to synchronize access to
+                the base_window to make it thread safe.  It is also always locked before
                 an event handler is called.
         !*/
 
@@ -297,10 +297,10 @@ namespace dlib
                 - if (undecorated == true) then
                     - resizable == false
             ensures
-                - #*this has been properly initialized 
-                - if (resizable == true) then 
+                - #*this has been properly initialized
+                - if (resizable == true) then
                     - this window will be resizable by the user
-                - else 
+                - else
                     - this window will not be resizable by the user
                 - if (undecorated == true) then
                     - this window will not have any graphical elements outside
@@ -311,7 +311,7 @@ namespace dlib
                 - std::bad_alloc
                 - dlib::thread_error
                 - dlib::gui_error
-                    This exception is thrown if there is an error while 
+                    This exception is thrown if there is an error while
                     creating this window.
         !*/
 
@@ -320,7 +320,7 @@ namespace dlib
         /*!
             ensures
                 - does NOT trigger the on_window_close() event
-                - all resources associated with *this have been released                
+                - all resources associated with *this have been released
                 - closes this window
         !*/
 
@@ -329,7 +329,7 @@ namespace dlib
         /*!
             ensures
                 - #is_closed() == true
-                  (i.e. permanently closes this window.  The window is removed from the 
+                  (i.e. permanently closes this window.  The window is removed from the
                   screen and no more events will be dispatched to this window. )
                 - does NOT trigger the on_window_close() event
         !*/
@@ -338,7 +338,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - blocks until is_closed() == true 
+                - blocks until is_closed() == true
         !*/
 
         bool is_closed (
@@ -413,9 +413,9 @@ namespace dlib
             long y
         );
         /*!
-            ensures 
+            ensures
                 - if (is_closed() == false) then
-                    - sets the upper left corner of this window to the position (x,y) 
+                    - sets the upper left corner of this window to the position (x,y)
                       on the desktop.  Note that the origin (0,0) is at the upper left
                       corner of the desktop.
         !*/
@@ -459,8 +459,8 @@ namespace dlib
         /*!
             ensures
                 - if (is_closed() == false) then
-                    - #width == the width in pixels of the display device that contains this window 
-                    - #height == the height in pixels of the display device that contains this window 
+                    - #width == the width in pixels of the display device that contains this window
+                    - #height == the height in pixels of the display device that contains this window
                 - else
                     - #width == 0
                     - #height == 0
@@ -474,7 +474,7 @@ namespace dlib
                 - if (is_closed() == false) then
                     - causes the area of this window defined by rect to become invalid.
                       This means that a paint() message will be dispatched to repaint
-                      this area of the window.  Note that it is possible that the 
+                      this area of the window.  Note that it is possible that the
                       resulting paint() message may include a bigger rectangle than
                       the one defined by rect.
         !*/
@@ -488,7 +488,7 @@ namespace dlib
                 - will never block (even if some other thread has a lock on the
                   global mutex referenced by wm.)
                 - if (is_closed() == false) then
-                    - causes the on_user_event() event to be called with 
+                    - causes the on_user_event() event to be called with
                       the given arguments.
         !*/
 
@@ -516,12 +516,12 @@ namespace dlib
                 - is called when the user attempts to close this window
                 - if (this function returns CLOSE_WINDOW) then
                     - #is_closed() == true  (i.e. this window will be closed)
-                    - it is safe to call "delete this;" inside on_window_close() 
-                      if *this was allocated on the heap and no one will try to 
+                    - it is safe to call "delete this;" inside on_window_close()
+                      if *this was allocated on the heap and no one will try to
                       access *this anymore.
                 - else
                     - this window will not be closed and the attempt to close it
-                      by the user will have no effect. 
+                      by the user will have no effect.
                     - #is_closed() == false
             ensures
                 - does not change the state of mutex wm
@@ -560,12 +560,12 @@ namespace dlib
             requires
                 - is_closed() == false
                 - mutex wm is locked
-                - is called when this window's position changes 
+                - is called when this window's position changes
             ensures
                 - does not change the state of mutex wm
         !*/
              
-        // do nothing by default  
+        // do nothing by default
         virtual void on_mouse_down (
             unsigned long btn,
             unsigned long state,
@@ -579,8 +579,8 @@ namespace dlib
                 - mutex wm is locked
                 - is called when the user depresses one of the mouse buttons
                 - btn == the button that was depressed. (either LEFT, MIDDLE, or RIGHT)
-                - state == the bitwise OR of the buttons that are currently depressed 
-                  excluding the button given by btn. (from the mouse_state_masks enum) 
+                - state == the bitwise OR of the buttons that are currently depressed
+                  excluding the button given by btn. (from the mouse_state_masks enum)
                 - (x,y) == the position of the mouse (relative to the upper left corner
                   of the window) when this event occurred.  Note that the mouse may be
                   outside the window.
@@ -628,7 +628,7 @@ namespace dlib
                 - state == the bitwise OR of the buttons that are currently depressed
                   (from the mouse_state_masks enum)
                 - (x,y) == the position of the mouse (relative to the upper left corner
-                  of the window) when this event occurred. 
+                  of the window) when this event occurred.
                 - if (the user is holding down one or more of the mouse buttons) then
                     - the mouse move events will continue to track the mouse even if
                       it goes out of the window.  This will continue until the user
@@ -668,7 +668,7 @@ namespace dlib
             requires
                 - is_closed() == false
                 - mutex wm is locked
-                - is called when this window gains input focus 
+                - is called when this window gains input focus
             ensures
                 - does not change the state of mutex wm
         !*/
@@ -680,7 +680,7 @@ namespace dlib
             requires
                 - is_closed() == false
                 - mutex wm is locked
-                - is called when this window loses input focus 
+                - is called when this window loses input focus
             ensures
                 - does not change the state of mutex wm
         !*/
@@ -694,8 +694,8 @@ namespace dlib
                 - is_closed() == false
                 - mutex wm is locked
                 - is called every time the mouse wheel is scrolled up one notch
-                - state == the bitwise OR of the buttons that are currently depressed 
-                  (from the mouse_state_masks enum) 
+                - state == the bitwise OR of the buttons that are currently depressed
+                  (from the mouse_state_masks enum)
             ensures
                 - does not change the state of mutex wm
         !*/
@@ -709,8 +709,8 @@ namespace dlib
                 - is_closed() == false
                 - mutex wm is locked
                 - is called every time the mouse wheel is scrolled down one notch
-                - state == the bitwise OR of the buttons that are currently depressed 
-                  (from the mouse_state_masks enum) 
+                - state == the bitwise OR of the buttons that are currently depressed
+                  (from the mouse_state_masks enum)
             ensures
                 - does not change the state of mutex wm
         !*/
@@ -727,21 +727,21 @@ namespace dlib
                 - mutex wm is locked
                 - is called when a keyboard key is pressed or if a key is held
                   down then this is called repeatedly at a certain rate once the
-                  typematic action begins (note that some keys might not have any 
+                  typematic action begins (note that some keys might not have any
                   typematic action on some platforms).
                 - if (is_printable) then
                     - key == the character that was pressed. (e.g. 'a', 'b', '1' etc.)
-                    - this is a printable character.  Note that ' ', '\t', and 
+                    - this is a printable character.  Note that ' ', '\t', and
                       '\n' (this is the return/enter key) are all considered printable.
                 - else
-                    - key == one of the non_printable_keyboard_keys enums.  
+                    - key == one of the non_printable_keyboard_keys enums.
                 - state == the bitwise OR of the keyboard modifiers that are currently
-                  depressed (taken from keyboard_state_masks).  
+                  depressed (taken from keyboard_state_masks).
                 - if (key is not in the range 'a' to 'z' or 'A' to 'Z') then
-                    - if (the shift key was down when this key was pressed) then                    
-                        - (state & KBD_MOD_SHIFT) != 0 
+                    - if (the shift key was down when this key was pressed) then
+                        - (state & KBD_MOD_SHIFT) != 0
                     - else
-                        - (state & KBD_MOD_SHIFT) == 0 
+                        - (state & KBD_MOD_SHIFT) == 0
                 - else
                     - the state of the shift key is implementation defined
             ensures
@@ -771,7 +771,7 @@ namespace dlib
             requires
                 - is_closed() == false
                 - mutex wm is locked
-                - is called when part of the window needs to be repainted for 
+                - is called when part of the window needs to be repainted for
                   any reason.
                 - c == a canvas object that represents the invalid area of this
                   window which needs to be painted.

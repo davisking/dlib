@@ -19,7 +19,7 @@ namespace dlib
     /*!
         ensures
             - Determines all distinct values present in labels and stores them
-              into a sorted vector and returns it.  They are sorted in ascending 
+              into a sorted vector and returns it.  They are sorted in ascending
               order.
     !*/
 
@@ -27,7 +27,7 @@ namespace dlib
 
     template <typename label_type, typename U>
     std::vector<unordered_pair<label_type> > find_missing_pairs (
-        const std::map<unordered_pair<label_type>,U>& binary_decision_functions 
+        const std::map<unordered_pair<label_type>,U>& binary_decision_functions
     );
     /*!
         ensures

@@ -14,7 +14,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
+        typename T,
         typename alloc
         >
     double mean_sign_agreement (
@@ -33,7 +33,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
+        typename T,
         typename alloc
         >
     double correlation (
@@ -52,7 +52,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
+        typename T,
         typename alloc
         >
     double covariance (
@@ -71,7 +71,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
+        typename T,
         typename alloc
         >
     double r_squared (
@@ -90,7 +90,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
+        typename T,
         typename alloc
         >
     double mean_squared_error (
@@ -121,8 +121,8 @@ namespace dlib
                 - current_n() == 0
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents something that can compute the running mean, 
-                variance, skewness, and excess kurtosis of a stream of real numbers.  
+                This object represents something that can compute the running mean,
+                variance, skewness, and excess kurtosis of a stream of real numbers.
         !*/
     public:
 
@@ -145,7 +145,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the number of points given to this object so far. 
+                - returns the number of points given to this object so far.
         !*/
 
         void add (
@@ -167,7 +167,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the mean of all the values presented to this object 
+                - returns the mean of all the values presented to this object
                   so far.
         !*/
 
@@ -197,7 +197,7 @@ namespace dlib
             requires
                 - current_n() > 2
             ensures
-                - returns the unbiased sample skewness of all the values presented 
+                - returns the unbiased sample skewness of all the values presented
                   to this object so far.
         !*/
 
@@ -207,7 +207,7 @@ namespace dlib
             requires
                 - current_n() > 3
             ensures
-                - returns the unbiased sample kurtosis of all the values presented 
+                - returns the unbiased sample kurtosis of all the values presented
                   to this object so far.
         !*/
 
@@ -253,20 +253,20 @@ namespace dlib
 
     template <typename T>
     void serialize (
-        const running_stats<T>& item, 
-        std::ostream& out 
+        const running_stats<T>& item,
+        std::ostream& out
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     template <typename T>
     void deserialize (
-        running_stats<T>& item, 
+        running_stats<T>& item,
         std::istream& in
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -286,7 +286,7 @@ namespace dlib
                 - current_n() == 0
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents something that can compute the running covariance 
+                This object represents something that can compute the running covariance
                 of a stream of real number pairs.
         !*/
 
@@ -322,7 +322,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the number of points given to this object so far. 
+                - returns the number of points given to this object so far.
         !*/
 
         T mean_x (
@@ -357,7 +357,7 @@ namespace dlib
             requires
                 - current_n() > 1
             ensures
-                - returns the correlation coefficient between all the x and y samples 
+                - returns the correlation coefficient between all the x and y samples
                   presented to this object via add()
         !*/
 
@@ -367,7 +367,7 @@ namespace dlib
             requires
                 - current_n() > 1
             ensures
-                - returns the unbiased sample variance value of all x samples presented 
+                - returns the unbiased sample variance value of all x samples presented
                   to this object via add().
         !*/
 
@@ -377,7 +377,7 @@ namespace dlib
             requires
                 - current_n() > 1
             ensures
-                - returns the unbiased sample variance value of all y samples presented 
+                - returns the unbiased sample variance value of all y samples presented
                   to this object via add().
         !*/
 
@@ -431,7 +431,7 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a simple tool for computing the mean and
-                covariance of a sequence of vectors.  
+                covariance of a sequence of vectors.
         !*/
     public:
 
@@ -497,11 +497,11 @@ namespace dlib
                 - val must have a number of dimensions which is compatible with the current
                   setting of in_vector_size().  In particular, this means that the
                   following must hold:
-                    - if (val is a dlib::matrix) then 
+                    - if (val is a dlib::matrix) then
                         - in_vector_size() == 0 || val.size() == val_vector_size()
                     - else
                         - max_index_plus_one(val) <= in_vector_size()
-                        - in_vector_size() > 0 
+                        - in_vector_size() > 0
                           (i.e. you must call set_dimension() prior to calling add() if
                           you want to use sparse vectors.)
             ensures
@@ -515,9 +515,9 @@ namespace dlib
         ) const;
         /*!
             requires
-                - in_vector_size() != 0 
+                - in_vector_size() != 0
             ensures
-                - returns the mean of all the vectors presented to this object 
+                - returns the mean of all the vectors presented to this object
                   so far.
         !*/
 
@@ -525,10 +525,10 @@ namespace dlib
         ) const;
         /*!
             requires
-                - in_vector_size() != 0 
+                - in_vector_size() != 0
                 - current_n() > 1
             ensures
-                - returns the unbiased sample covariance matrix for all the vectors 
+                - returns the unbiased sample covariance matrix for all the vectors
                   presented to this object so far.
         !*/
 
@@ -540,7 +540,7 @@ namespace dlib
                 - in_vector_size() == 0 || item.in_vector_size() == 0 || in_vector_size() == item.in_vector_size()
                   (i.e. the in_vector_size() of *this and item must match or one must be zero)
             ensures
-                - returns a new running_covariance object that represents the combination of all 
+                - returns a new running_covariance object that represents the combination of all
                   the vectors given to *this and item.  That is, this function returns a
                   running_covariance object, R, that is equivalent to what you would obtain if all
                   calls to this->add() and item.add() had instead been done to R.
@@ -565,7 +565,7 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a simple tool for computing the mean and cross-covariance
-                matrices of a sequence of pairs of vectors.  
+                matrices of a sequence of pairs of vectors.
         !*/
 
     public:
@@ -651,11 +651,11 @@ namespace dlib
                         - x_vector_size() > 0 && y_vector_size() > 0
                           (i.e. you must call set_dimensions() prior to calling add() if
                           you want to use sparse vectors.)
-                    - if (x is a dlib::matrix) then 
+                    - if (x is a dlib::matrix) then
                         - x_vector_size() == 0 || x.size() == x_vector_size()
                     - else
                         - max_index_plus_one(x) <= x_vector_size()
-                    - if (y is a dlib::matrix) then 
+                    - if (y is a dlib::matrix) then
                         - y_vector_size() == 0 || y.size() == y_vector_size()
                     - else
                         - max_index_plus_one(y) <= y_vector_size()
@@ -672,7 +672,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - current_n() != 0 
+                - current_n() != 0
             ensures
                 - returns the mean of all the x vectors presented to this object so far.
                 - The returned vector will have x_vector_size() dimensions.
@@ -682,7 +682,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - current_n() != 0 
+                - current_n() != 0
             ensures
                 - returns the mean of all the y vectors presented to this object so far.
                 - The returned vector will have y_vector_size() dimensions.
@@ -729,7 +729,7 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON matrix_type
-                - must be a dlib::matrix object capable of representing column 
+                - must be a dlib::matrix object capable of representing column
                   vectors
 
             INITIAL VALUE
@@ -739,20 +739,20 @@ namespace dlib
                 - std_devs().size() == 0
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents something that can learn to normalize a set 
-                of column vectors.  In particular, normalized column vectors should 
-                have zero mean and a variance of one.  
+                This object represents something that can learn to normalize a set
+                of column vectors.  In particular, normalized column vectors should
+                have zero mean and a variance of one.
 
-                Also, if desired, this object can use principal component 
-                analysis for the purposes of reducing the number of elements in a 
-                vector.  
+                Also, if desired, this object can use principal component
+                analysis for the purposes of reducing the number of elements in a
+                vector.
 
             THREAD SAFETY
-                Note that this object contains a cached matrix object it uses 
+                Note that this object contains a cached matrix object it uses
                 to store intermediate results for normalization.  This avoids
                 needing to reallocate it every time this object performs normalization
                 but also makes it non-thread safe.  So make sure you don't share
-                instances of this object between threads. 
+                instances of this object between threads.
         !*/
 
     public:
@@ -767,15 +767,15 @@ namespace dlib
         /*!
             requires
                 - samples.size() > 0
-                - samples == a column matrix or something convertible to a column 
-                  matrix via mat().  Also, x should contain 
+                - samples == a column matrix or something convertible to a column
+                  matrix via mat().  Also, x should contain
                   matrix_type objects that represent nonempty column vectors.
                 - samples does not contain any infinite or NaN values
             ensures
                 - #in_vector_size() == samples(0).nr()
                 - #out_vector_size() == samples(0).nr()
                 - This object has learned how to normalize vectors that look like
-                  vectors in the given set of samples.  
+                  vectors in the given set of samples.
                 - #means() == mean(samples)
                 - #std_devs() == reciprocal(sqrt(variance(samples)));
         !*/
@@ -800,7 +800,7 @@ namespace dlib
         const matrix_type& means (
         ) const;
         /*!
-            ensures               
+            ensures
                 - returns a matrix M such that:
                     - M.nc() == 1
                     - M.nr() == in_vector_size()
@@ -810,12 +810,12 @@ namespace dlib
         const matrix_type& std_devs (
         ) const;
         /*!
-            ensures               
+            ensures
                 - returns a matrix SD such that:
                     - SD.nc() == 1
                     - SD.nr() == in_vector_size()
-                    - SD(i) == the reciprocal of the standard deviation of the ith 
-                      input feature shown to train() 
+                    - SD(i) == the reciprocal of the standard deviation of the ith
+                      input feature shown to train()
         !*/
  
         const result_type& operator() (
@@ -826,11 +826,11 @@ namespace dlib
                 - x.nr() == in_vector_size()
                 - x.nc() == 1
             ensures
-                - returns a normalized version of x, call it Z, that has the 
-                  following properties: 
+                - returns a normalized version of x, call it Z, that has the
+                  following properties:
                     - Z.nr() == out_vector_size()
                     - Z.nc() == 1
-                    - the mean of each element of Z is 0 
+                    - the mean of each element of Z is 0
                     - the variance of each element of Z is 1
                     - Z == pointwise_multiply(x-means(), std_devs());
         !*/
@@ -848,9 +848,9 @@ namespace dlib
         typename matrix_type
         >
     inline void swap (
-        vector_normalizer<matrix_type>& a, 
-        vector_normalizer<matrix_type>& b 
-    ) { a.swap(b); }   
+        vector_normalizer<matrix_type>& a,
+        vector_normalizer<matrix_type>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
@@ -859,22 +859,22 @@ namespace dlib
         typename matrix_type,
         >
     void deserialize (
-        vector_normalizer<matrix_type>& item, 
+        vector_normalizer<matrix_type>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
     template <
         typename matrix_type,
         >
     void serialize (
-        const vector_normalizer<matrix_type>& item, 
-        std::ostream& out 
-    );   
+        const vector_normalizer<matrix_type>& item,
+        std::ostream& out
+    );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -886,7 +886,7 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON matrix_type
-                - must be a dlib::matrix object capable of representing column 
+                - must be a dlib::matrix object capable of representing column
                   vectors
 
             INITIAL VALUE
@@ -897,19 +897,19 @@ namespace dlib
                 - pca_matrix().size() == 0
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents something that can learn to normalize a set 
-                of column vectors.  In particular, normalized column vectors should 
-                have zero mean and a variance of one.  
+                This object represents something that can learn to normalize a set
+                of column vectors.  In particular, normalized column vectors should
+                have zero mean and a variance of one.
 
-                Also, this object uses principal component analysis for the purposes 
-                of reducing the number of elements in a vector.  
+                Also, this object uses principal component analysis for the purposes
+                of reducing the number of elements in a vector.
 
             THREAD SAFETY
-                Note that this object contains a cached matrix object it uses 
+                Note that this object contains a cached matrix object it uses
                 to store intermediate results for normalization.  This avoids
                 needing to reallocate it every time this object performs normalization
                 but also makes it non-thread safe.  So make sure you don't share
-                instances of this object between threads. 
+                instances of this object between threads.
         !*/
 
     public:
@@ -926,20 +926,20 @@ namespace dlib
             requires
                 - 0 < eps <= 1
                 - samples.size() > 0
-                - samples == a column matrix or something convertible to a column 
-                  matrix via mat().  Also, x should contain 
+                - samples == a column matrix or something convertible to a column
+                  matrix via mat().  Also, x should contain
                   matrix_type objects that represent nonempty column vectors.
                 - samples does not contain any infinite or NaN values
             ensures
                 - This object has learned how to normalize vectors that look like
-                  vectors in the given set of samples.  
-                - Principal component analysis is performed to find a transform 
-                  that might reduce the number of output features. 
+                  vectors in the given set of samples.
+                - Principal component analysis is performed to find a transform
+                  that might reduce the number of output features.
                 - #in_vector_size() == samples(0).nr()
                 - 0 < #out_vector_size() <= samples(0).nr()
                 - eps is a number that controls how "lossy" the pca transform will be.
                   Large values of eps result in #out_vector_size() being larger and
-                  smaller values of eps result in #out_vector_size() being smaller. 
+                  smaller values of eps result in #out_vector_size() being smaller.
                 - #means() == mean(samples)
                 - #std_devs() == reciprocal(sqrt(variance(samples)));
                 - #pca_matrix() == the PCA transform matrix that is out_vector_size()
@@ -966,7 +966,7 @@ namespace dlib
         const matrix<scalar_type,0,1,mem_manager_type>& means (
         ) const;
         /*!
-            ensures               
+            ensures
                 - returns a matrix M such that:
                     - M.nc() == 1
                     - M.nr() == in_vector_size()
@@ -976,12 +976,12 @@ namespace dlib
         const matrix<scalar_type,0,1,mem_manager_type>& std_devs (
         ) const;
         /*!
-            ensures               
+            ensures
                 - returns a matrix SD such that:
                     - SD.nc() == 1
                     - SD.nr() == in_vector_size()
-                    - SD(i) == the reciprocal of the standard deviation of the ith 
-                      input feature shown to train() 
+                    - SD(i) == the reciprocal of the standard deviation of the ith
+                      input feature shown to train()
         !*/
  
         const matrix<scalar_type,0,0,mem_manager_type>& pca_matrix (
@@ -991,8 +991,8 @@ namespace dlib
                 - returns a matrix PCA such that:
                     - PCA.nr() == out_vector_size()
                     - PCA.nc() == in_vector_size()
-                    - PCA == the principal component analysis transformation 
-                      matrix 
+                    - PCA == the principal component analysis transformation
+                      matrix
         !*/
 
         const result_type& operator() (
@@ -1003,11 +1003,11 @@ namespace dlib
                 - x.nr() == in_vector_size()
                 - x.nc() == 1
             ensures
-                - returns a normalized version of x, call it Z, that has the 
-                  following properties: 
+                - returns a normalized version of x, call it Z, that has the
+                  following properties:
                     - Z.nr() == out_vector_size()
                     - Z.nc() == 1
-                    - the mean of each element of Z is 0 
+                    - the mean of each element of Z is 0
                     - the variance of each element of Z is 1
                     - Z == pca_matrix()*pointwise_multiply(x-means(), std_devs());
         !*/
@@ -1025,9 +1025,9 @@ namespace dlib
         typename matrix_type
         >
     inline void swap (
-        vector_normalizer_pca<matrix_type>& a, 
-        vector_normalizer_pca<matrix_type>& b 
-    ) { a.swap(b); }   
+        vector_normalizer_pca<matrix_type>& a,
+        vector_normalizer_pca<matrix_type>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
@@ -1036,22 +1036,22 @@ namespace dlib
         typename matrix_type,
         >
     void deserialize (
-        vector_normalizer_pca<matrix_type>& item, 
+        vector_normalizer_pca<matrix_type>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
     template <
         typename matrix_type,
         >
     void serialize (
-        const vector_normalizer_pca<matrix_type>& item, 
-        std::ostream& out 
-    );   
+        const vector_normalizer_pca<matrix_type>& item,
+        std::ostream& out
+    );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

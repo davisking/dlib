@@ -12,16 +12,16 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
-    using namespace test; 
+    using namespace test;
     using namespace std;
     using namespace dlib;
 
     logger dlog("test.entropy_coder");
 
-    namespace entropy_coder_kernel_test_helpers 
+    namespace entropy_coder_kernel_test_helpers
     {
         template <
             typename encoder,
@@ -216,9 +216,9 @@ namespace
             - encoder is an implementation of entropy_encoder/entropy_encoder_kernel_abstract.h
             - decoder is an implementation of entropy_decoder/entropy_decoder_kernel_abstract.h
         ensures
-            - runs tests on encoder and decoder for compliance with the specs 
+            - runs tests on encoder and decoder for compliance with the specs
     !*/
-    {        
+    {
         using namespace entropy_coder_kernel_test_helpers;
 
         dlog << LTRACE << 1;
@@ -263,7 +263,7 @@ namespace
 
             for (int i = 0; i < num; ++i)
             {
-                unsigned long N = d.get_target(total[i]);                
+                unsigned long N = d.get_target(total[i]);
                 DLIB_TEST(low_count[i] <= N && N < high_count[i]);
                 d.decode(low_count[i],high_count[i]);
             }
@@ -346,7 +346,7 @@ namespace
                 }
             }
 
-            // test with 3 random strings of length 10000 
+            // test with 3 random strings of length 10000
             // but use the above array to bias the random numbers
             for (int j = 0; j < 3; ++j)
             {
@@ -357,10 +357,10 @@ namespace
                 for ( int i = 0; i < 10000; ++i)
                 {
                     int a = array[::rand()%65536];
-                    temp += (unsigned char)a;                
-                }               
+                    temp += (unsigned char)a;
+                }
                 string temp2;
-                temp2 = test<encoder,decoder>(temp);  
+                temp2 = test<encoder,decoder>(temp);
                 if (temp2 != "")
                 {
 
@@ -388,9 +388,9 @@ namespace
         {
             temp = temp + temp;
         }
-        temp = test<encoder,decoder>(temp); 
+        temp = test<encoder,decoder>(temp);
         if (temp != "")
-        {   
+        {
             // crop off all the e's until we find the part that is messed up
             string::size_type pos = temp.find_first_not_of("e");
             temp = temp.substr(pos);
@@ -413,7 +413,7 @@ namespace
             {
                 temp = (unsigned char)i;
                 temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"");
-            } 
+            }
 
         dlog << LTRACE << 6;
 
@@ -427,7 +427,7 @@ namespace
 
             dlog << LTRACE << 7;
 
-        // test with 10 random strings of length 1000 
+        // test with 10 random strings of length 1000
         for (int j = 0; j < 10; ++j)
         {
             temp = "";
@@ -435,9 +435,9 @@ namespace
             for ( int i = 0; i < 1000; ++i)
             {
                 int a = ::rand()%256;
-                temp += (unsigned char)a;                
-            } 
-            temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\""); 
+                temp += (unsigned char)a;
+            }
+            temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"");
         }
 
 
@@ -445,7 +445,7 @@ namespace
 
         print_spinner();
 
-        // test with 15 random strings of length 30000 
+        // test with 15 random strings of length 30000
         for (int j = 0; j < 15; ++j)
         {
             print_spinner();
@@ -455,9 +455,9 @@ namespace
             for ( int i = 0; i < 30000; ++i)
             {
                 int a = ::rand()%256;
-                temp += (unsigned char)a;                
-            }               
-            temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","seed: " << seed);  
+                temp += (unsigned char)a;
+            }
+            temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","seed: " << seed);
         }
 
 
@@ -471,9 +471,9 @@ namespace
         {
             temp = temp + temp;
         }
-        temp = test<encoder,decoder>(temp); 
+        temp = test<encoder,decoder>(temp);
         if (temp != "")
-        {   
+        {
             // crop off all the spacess until we find the part that is messed up
             string::size_type pos = temp.find_first_not_of(" ");
             temp = temp.substr(pos);
@@ -503,7 +503,7 @@ namespace
         }
         temp += temp2;
         print_spinner();
-        temp = test<encoder,decoder>(temp); 
+        temp = test<encoder,decoder>(temp);
         DLIB_TEST(temp == "");
 
 

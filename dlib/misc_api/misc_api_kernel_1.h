@@ -43,7 +43,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class timestamper 
+    class timestamper
     {
         /*!
             INITIAL VALUE
@@ -56,8 +56,8 @@ namespace dlib
                   called it.
                 - offset == the number of microseconds we should add to the result of
                   GetTickCount() so that it is correct.
-                - dword_max == 2^32.  
-                  This is the number of values representable by a DWORD.  
+                - dword_max == 2^32.
+                  This is the number of values representable by a DWORD.
         !*/
 
         mutable unsigned long last_time;
@@ -80,19 +80,19 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class dir_create_error : public error 
+    class dir_create_error : public error
     {
     public:
         dir_create_error(
             const std::string& dir_name
-        ) : 
+        ) :
             error(EDIR_CREATE,"Error creating directory '" + dir_name + "'."),
             name(dir_name)
         {}
 
         ~dir_create_error() throw() {}
         const std::string name;
-    }; 
+    };
 
     void create_directory (
         const std::string& dir

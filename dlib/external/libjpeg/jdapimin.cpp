@@ -36,7 +36,7 @@ jpeg_CreateDecompress (j_decompress_ptr cinfo, int version, size_t structsize)
   if (version != JPEG_LIB_VERSION)
     ERREXIT2(cinfo, JERR_BAD_LIB_VERSION, JPEG_LIB_VERSION, version);
   if (structsize != SIZEOF(struct jpeg_decompress_struct))
-    ERREXIT2(cinfo, JERR_BAD_STRUCT_SIZE, 
+    ERREXIT2(cinfo, JERR_BAD_STRUCT_SIZE,
 	     (int) SIZEOF(struct jpeg_decompress_struct), (int) structsize);
 
   /* For debugging purposes, we zero the whole master structure.

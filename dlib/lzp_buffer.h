@@ -26,14 +26,14 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1a        
-        typedef     lzp_buffer_kernel_1<sb1>   
+        // kernel_1a
+        typedef     lzp_buffer_kernel_1<sb1>
                     kernel_1a;
         typedef     lzp_buffer_kernel_c<kernel_1a>
                     kernel_1a_c;
 
-        // kernel_2a        
-        typedef     lzp_buffer_kernel_2<sb1>   
+        // kernel_2a
+        typedef     lzp_buffer_kernel_2<sb1>
                     kernel_2a;
         typedef     lzp_buffer_kernel_c<kernel_2a>
                     kernel_2a_c;

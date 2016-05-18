@@ -15,7 +15,7 @@ namespace dlib
         typename EXP2,
         typename T, long NR, long NC, typename MM, typename L
         >
-    unsigned long solve_qp_using_smo ( 
+    unsigned long solve_qp_using_smo (
         const matrix_exp<EXP1>& Q,
         const matrix_exp<EXP2>& b,
         matrix<T,NR,NC,MM,L>& alpha,
@@ -33,7 +33,7 @@ namespace dlib
             - eps > 0
             - max_iter > 0
         ensures
-            - Let C == sum(alpha) (i.e. C is the sum of the alpha values you 
+            - Let C == sum(alpha) (i.e. C is the sum of the alpha values you
               supply to this function)
             - This function solves the following quadratic program:
                 Minimize: f(alpha) == 0.5*trans(alpha)*Q*alpha - trans(alpha)*b
@@ -45,9 +45,9 @@ namespace dlib
             - This function uses a simple implementation of the sequential minimal
               optimization algorithm.  It starts the algorithm with the given alpha
               and it works on the problem until the duality gap (i.e. how far away
-              we are from the optimum solution) is less than eps.  So eps controls 
+              we are from the optimum solution) is less than eps.  So eps controls
               how accurate the solution is and smaller values result in better solutions.
-            - At most max_iter iterations of optimization will be performed.  
+            - At most max_iter iterations of optimization will be performed.
             - returns the number of iterations performed.  If this method fails to
               converge to eps accuracy then the number returned will be max_iter+1.
     !*/
@@ -61,7 +61,7 @@ namespace dlib
         typename T, long NR, long NC, typename MM, typename L,
         long NR2, long NC2
         >
-    unsigned long solve_qp4_using_smo ( 
+    unsigned long solve_qp4_using_smo (
         const matrix_exp<EXP1>& A,
         const matrix_exp<EXP2>& Q,
         const matrix_exp<EXP3>& b,
@@ -87,10 +87,10 @@ namespace dlib
             - max_iter > 0
             - max_lambda >= 0
         ensures
-            - Let C == sum(alpha) (i.e. C is the sum of the alpha values you 
+            - Let C == sum(alpha) (i.e. C is the sum of the alpha values you
               supply to this function)
             - This function solves the following quadratic program:
-                Minimize: f(alpha,lambda) == 0.5*trans(alpha)*Q*alpha - trans(alpha)*b + 
+                Minimize: f(alpha,lambda) == 0.5*trans(alpha)*Q*alpha - trans(alpha)*b +
                                              0.5*trans(lambda)*lambda - trans(lambda)*A*alpha - trans(lambda)*d
                 subject to the following constraints:
                     - sum(alpha)  == C (i.e. the sum of alpha values doesn't change)
@@ -100,15 +100,15 @@ namespace dlib
                 Where f is convex.  This means that Q should be positive-semidefinite.
             - If you don't want an upper limit on lambda then max_lambda can be set to
               infinity.
-            - The solution to the above QP will be stored in #alpha and #lambda.  
+            - The solution to the above QP will be stored in #alpha and #lambda.
             - This function uses a simple implementation of the sequential minimal
               optimization algorithm.  It starts the algorithm with the given alpha
               and it works on the problem until the duality gap (i.e. how far away
-              we are from the optimum solution) is less than eps.  So eps controls 
+              we are from the optimum solution) is less than eps.  So eps controls
               how accurate the solution is and smaller values result in better solutions.
               The initial value of lambda is ignored since the optimal lambda can be
               obtained via a simple closed form expression given alpha.
-            - At most max_iter iterations of optimization will be performed.  
+            - At most max_iter iterations of optimization will be performed.
             - returns the number of iterations performed.  If this method fails to
               converge to eps accuracy then the number returned will be max_iter+1.
     !*/
@@ -120,7 +120,7 @@ namespace dlib
         typename EXP2,
         typename T, long NR, long NC, typename MM, typename L
         >
-    unsigned long solve_qp_box_constrained ( 
+    unsigned long solve_qp_box_constrained (
         const matrix_exp<EXP1>& Q,
         const matrix_exp<EXP2>& b,
         matrix<T,NR,NC,MM,L>& alpha,
@@ -145,7 +145,7 @@ namespace dlib
             - max_iter > 0
         ensures
             - This function solves the following quadratic program:
-                Minimize: f(alpha) == 0.5*trans(alpha)*Q*alpha + trans(b)*alpha 
+                Minimize: f(alpha) == 0.5*trans(alpha)*Q*alpha + trans(b)*alpha
                 subject to the following box constraints on alpha:
                     - 0 <= min(alpha-lower)
                     - 0 <= max(upper-alpha)
@@ -157,7 +157,7 @@ namespace dlib
               smaller than eps for each element of alpha or the alpha value is at a box
               constraint.  So eps controls how accurate the solution is and smaller values
               result in better solutions.
-            - At most max_iter iterations of optimization will be performed.  
+            - At most max_iter iterations of optimization will be performed.
             - returns the number of iterations performed.  If this method fails to
               converge to eps accuracy then the number returned will be max_iter+1.
     !*/

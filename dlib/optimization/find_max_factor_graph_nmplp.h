@@ -22,7 +22,7 @@ namespace dlib
         public:
 
             simple_hash_map(
-            ) : 
+            ) :
                 scan_dist(6)
             {
                 data.resize(5000);
@@ -32,7 +32,7 @@ namespace dlib
                 const unsigned long a,
                 const unsigned long b,
                 const unsigned long value
-            ) 
+            )
             /*!
                 requires
                     - a != std::numeric_limits<unsigned long>::max()
@@ -138,23 +138,23 @@ namespace dlib
         DLIB_ASSERT( eps > 0,
                      "\t void find_max_factor_graph_nmplp()"
                      << "\n\t eps must be greater than zero"
-                     << "\n\t eps:  " << eps 
+                     << "\n\t eps:  " << eps
                 );
 
         /*
-            This function is an implementation of the NMPLP algorithm introduced in the 
+            This function is an implementation of the NMPLP algorithm introduced in the
             following papers:
                 Fixing Max-Product: Convergent Message Passing Algorithms for MAP LP-Relaxations (2008)
                 by Amir Globerson and Tommi Jaakkola
 
                 Introduction to dual decomposition for inference (2011)
-                by David Sontag, Amir Globerson, and Tommi Jaakkola 
+                by David Sontag, Amir Globerson, and Tommi Jaakkola
 
             In particular, this function implements the star MPLP update equations shown as
             equation 1.20 from the paper Introduction to dual decomposition for inference
             (the method was called NMPLP in the first paper).  It should also be noted that
             the original description of the NMPLP in the first paper had an error in the
-            equations and the second paper contains corrected equations, which is what this 
+            equations and the second paper contains corrected equations, which is what this
             function uses.
         */
 
@@ -204,8 +204,8 @@ namespace dlib
         delta_to_j_no_i.reserve(10000);
 
 
-        double max_change = eps + 1; 
-        // Now do the main body of the optimization. 
+        double max_change = eps + 1;
+        // Now do the main body of the optimization.
         unsigned long iter;
         for (iter = 0; iter < max_iter && max_change > eps; ++iter)
         {
@@ -238,7 +238,7 @@ namespace dlib
                     gamma_ji[jcnt].assign(num_states_xi, -std::numeric_limits<double>::infinity());
                     delta_to_j_no_i[jcnt].assign(num_states_xj, 0);
 
-                    // compute delta_j^{-i} and store it in delta_to_j_no_i[jcnt]  
+                    // compute delta_j^{-i} and store it in delta_to_j_no_i[jcnt]
                     for (neighbor_iterator k = prob.begin(j); k != prob.end(j); ++k)
                     {
                         const unsigned long id_k = prob.node_id(k);

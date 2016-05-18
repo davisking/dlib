@@ -26,7 +26,7 @@ namespace dlib
     /*!
         requires
             - in_image_type and out_image_type are image objects that implement the
-              interface defined in dlib/image_processing/generic_image.h 
+              interface defined in dlib/image_processing/generic_image.h
             - in_img must contain a grayscale pixel type.
             - both in_img and out_img must contain pixels with no alpha channel.
               (i.e. pixel_traits::has_alpha==false for their pixels)
@@ -38,7 +38,7 @@ namespace dlib
             - all pixels in structuring_element are set to either on_pixel or off_pixel
               (i.e. it must be a binary image)
         ensures
-            - Does a binary dilation of in_img using the given structuring element and 
+            - Does a binary dilation of in_img using the given structuring element and
               stores the result in out_img.
             - #out_img.nc() == in_img.nc()
             - #out_img.nr() == in_img.nr()
@@ -60,7 +60,7 @@ namespace dlib
     /*!
         requires
             - in_image_type and out_image_type are image objects that implement the
-              interface defined in dlib/image_processing/generic_image.h 
+              interface defined in dlib/image_processing/generic_image.h
             - in_img must contain a grayscale pixel type.
             - both in_img and out_img must contain pixels with no alpha channel.
               (i.e. pixel_traits::has_alpha==false for their pixels)
@@ -72,7 +72,7 @@ namespace dlib
             - all pixels in structuring_element are set to either on_pixel or off_pixel
               (i.e. it must be a binary image)
         ensures
-            - Does a binary erosion of in_img using the given structuring element and 
+            - Does a binary erosion of in_img using the given structuring element and
               stores the result in out_img.
             - #out_img.nc() == in_img.nc()
             - #out_img.nr() == in_img.nr()
@@ -95,7 +95,7 @@ namespace dlib
     /*!
         requires
             - in_image_type and out_image_type are image objects that implement the
-              interface defined in dlib/image_processing/generic_image.h 
+              interface defined in dlib/image_processing/generic_image.h
             - in_img must contain a grayscale pixel type.
             - both in_img and out_img must contain pixels with no alpha channel.
               (i.e. pixel_traits::has_alpha==false for their pixels)
@@ -107,8 +107,8 @@ namespace dlib
             - all pixels in structuring_element are set to either on_pixel or off_pixel
               (i.e. it must be a binary image)
         ensures
-            - Does a binary open of in_img using the given structuring element and 
-              stores the result in out_img.  Specifically, iter iterations of binary 
+            - Does a binary open of in_img using the given structuring element and
+              stores the result in out_img.  Specifically, iter iterations of binary
               erosion are applied and then iter iterations of binary dilation.
             - #out_img.nc() == in_img.nc()
             - #out_img.nr() == in_img.nr()
@@ -131,7 +131,7 @@ namespace dlib
     /*!
         requires
             - in_image_type and out_image_type are image objects that implement the
-              interface defined in dlib/image_processing/generic_image.h 
+              interface defined in dlib/image_processing/generic_image.h
             - in_img must contain a grayscale pixel type.
             - both in_img and out_img must contain pixels with no alpha channel.
               (i.e. pixel_traits::has_alpha==false for their pixels)
@@ -143,8 +143,8 @@ namespace dlib
             - all pixels in structuring_element are set to either on_pixel or off_pixel
               (i.e. it must be a binary image)
         ensures
-            - Does a binary close of in_img using the given structuring element and 
-              stores the result in out_img.  Specifically, iter iterations of binary 
+            - Does a binary close of in_img using the given structuring element and
+              stores the result in out_img.  Specifically, iter iterations of binary
               dilation are applied and then iter iterations of binary erosion.
             - #out_img.nc() == in_img.nc()
             - #out_img.nr() == in_img.nr()
@@ -165,7 +165,7 @@ namespace dlib
     /*!
         requires
             - in_image_type1, in_image_type2, and out_image_type are image objects that
-              implement the interface defined in dlib/image_processing/generic_image.h 
+              implement the interface defined in dlib/image_processing/generic_image.h
             - in_img1 and in_img2 must contain grayscale pixel types.
             - in_img1, in_img2, and out_img must contain pixels with no alpha channel.
               (i.e. pixel_traits::has_alpha==false for their pixels)
@@ -196,7 +196,7 @@ namespace dlib
     /*!
         requires
             - in_image_type1, in_image_type2, and out_image_type are image objects that
-              implement the interface defined in dlib/image_processing/generic_image.h 
+              implement the interface defined in dlib/image_processing/generic_image.h
             - in_img1 and in_img2 must contain grayscale pixel types.
             - in_img1, in_img2, and out_img must contain pixels with no alpha channel.
               (i.e. pixel_traits::has_alpha==false for their pixels)
@@ -227,7 +227,7 @@ namespace dlib
     /*!
         requires
             - in_image_type1, in_image_type2, and out_image_type are image objects that
-              implement the interface defined in dlib/image_processing/generic_image.h 
+              implement the interface defined in dlib/image_processing/generic_image.h
             - in_img1 and in_img2 must contain grayscale pixel types.
             - in_img1, in_img2, and out_img must contain pixels with no alpha channel.
               (i.e. pixel_traits::has_alpha==false for their pixels)
@@ -237,7 +237,7 @@ namespace dlib
             - in_img1.nr() == in_img2.nr()
         ensures
             - #out_img == the binary difference of in_img1 and in_img2.  (i.e. #out_img
-              will be a copy of in_img1 except that any pixels in in_img2 that are set to 
+              will be a copy of in_img1 except that any pixels in in_img2 that are set to
               on_pixel will be set to off_pixel)
             - #out_img.nc() == in_img.nc()
             - #out_img.nr() == in_img.nr()
@@ -256,7 +256,7 @@ namespace dlib
     /*!
         requires
             - in_image_type and out_image_type are image objects that implement the
-              interface defined in dlib/image_processing/generic_image.h 
+              interface defined in dlib/image_processing/generic_image.h
             - in_img must contain a grayscale pixel type.
             - both in_img and out_img must contain pixels with no alpha channel.
               (i.e. pixel_traits::has_alpha==false for their pixels)
@@ -294,7 +294,7 @@ namespace dlib
     /*!
         requires
             - image_type is an object that implement the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - img must contain a grayscale pixel type.
             - all pixels in img are set to either on_pixel or off_pixel.
               (i.e. it must be a binary image)

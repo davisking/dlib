@@ -27,12 +27,12 @@ namespace dlib
 
 
             POINTERS AND REFERENCES TO INTERNAL DATA
-                operator== and operator< do not invalidate pointers or references to 
+                operator== and operator< do not invalidate pointers or references to
                 data members
 
             WHAT THIS EXTENSION DOES FOR sequence
-                This gives a sequence the ability to compare itself to other 
-                sequences using the < and == operators. 
+                This gives a sequence the ability to compare itself to other
+                sequences using the < and == operators.
         !*/
 
     public:
@@ -42,9 +42,9 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns true if there exists an integer j such that 0 <= j < size() 
+                - returns true if there exists an integer j such that 0 <= j < size()
                   and for all integers i such that 0 <= i < j where it is true that
-                  (*this)[i] <= rhs[i] and (*this)[j] < rhs[j] 
+                  (*this)[i] <= rhs[i] and (*this)[j] < rhs[j]
                 - returns false if there is no j that will satisfy the above conditions
         !*/
 
@@ -53,7 +53,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns true if for all i: (*this)[i] == rhs[i] else returns false                   
+                - returns true if for all i: (*this)[i] == rhs[i] else returns false
         !*/
 
     };
@@ -62,9 +62,9 @@ namespace dlib
         typename seq_base
         >
     inline void swap (
-        sequence_compare<seq_base>& a, 
-        sequence_compare<seq_base>& b 
-    ) { a.swap(b); } 
+        sequence_compare<seq_base>& a,
+        sequence_compare<seq_base>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/

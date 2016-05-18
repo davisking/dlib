@@ -20,19 +20,19 @@ namespace dlib
 
         /*!
             INITIAL VALUE
-                - nc_ == 0 
-                - nr_ == 0 
-                - data == 0 
+                - nc_ == 0
+                - nr_ == 0
+                - data == 0
                 - at_start_ == true
                 - cur == 0
                 - last == 0
 
             CONVENTION
-                - nc_ == nc() 
-                - nr_ == nc() 
+                - nc_ == nc()
+                - nr_ == nc()
                 - if (data != 0) then
                     - last == a pointer to the last element in the data array
-                    - data == pointer to an array of nc_*nr_ T objects 
+                    - data == pointer to an array of nc_*nr_ T objects
                 - else
                     - nc_ == 0
                     - nr_ == 0
@@ -43,11 +43,11 @@ namespace dlib
                 - nr_ * nc_ == size()
                 - if (cur == 0) then
                     - current_element_valid() == false
-                - else 
+                - else
                     - current_element_valid() == true
                     - *cur == element()
 
-                - at_start_ == at_start()      
+                - at_start_ == at_start()
         !*/
 
 
@@ -63,7 +63,7 @@ namespace dlib
 
         // -----------------------------------
 
-        class row 
+        class row
         {
             /*!
                 CONVENTION
@@ -81,41 +81,41 @@ namespace dlib
 
             const T& operator[] (
                 long column
-            ) const 
-            { 
+            ) const
+            {
                 // make sure requires clause is not broken
                 DLIB_ASSERT(column < nc() && column >= 0,
                     "\tconst T& array2d::operator[](long column) const"
                     << "\n\tThe column index given must be less than the number of columns."
                     << "\n\tthis:    " << this
-                    << "\n\tcolumn:  " << column 
+                    << "\n\tcolumn:  " << column
                     << "\n\tnc(): " << nc()
                 );
 
-                return data[column]; 
+                return data[column];
             }
 
             T& operator[] (
                 long column
-            ) 
-            { 
+            )
+            {
                 // make sure requires clause is not broken
                 DLIB_ASSERT(column < nc() && column >= 0,
                     "\tT& array2d::operator[](long column)"
                     << "\n\tThe column index given must be less than the number of columns."
                     << "\n\tthis:    " << this
-                    << "\n\tcolumn:  " << column 
+                    << "\n\tcolumn:  " << column
                     << "\n\tnc(): " << nc()
                 );
 
-                return data[column]; 
+                return data[column];
             }
 
         private:
 
             row(T* data_, long cols) : data(data_), nc_(cols) {}
 
-            T* data; 
+            T* data;
             long nc_;
 
 
@@ -127,7 +127,7 @@ namespace dlib
         // -----------------------------------
 
         array2d (
-        ) : 
+        ) :
             data(0),
             nc_(0),
             nr_(0),
@@ -140,7 +140,7 @@ namespace dlib
         array2d(
             long rows,
             long cols
-        ) : 
+        ) :
             data(0),
             nc_(0),
             nr_(0),
@@ -153,8 +153,8 @@ namespace dlib
                         "\t array2d::array2d(long rows, long cols)"
                         << "\n\t The array2d can't have negative rows or columns."
                         << "\n\t this: " << this
-                        << "\n\t cols: " << cols 
-                        << "\n\t rows: " << rows 
+                        << "\n\t cols: " << cols
+                        << "\n\t rows: " << rows
             );
 
             set_size(rows,cols);
@@ -186,14 +186,14 @@ namespace dlib
 
         row operator[] (
             long row_
-        ) 
-        { 
+        )
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(row_ < nr() && row_ >= 0,
                 "\trow array2d::operator[](long row_)"
                 << "\n\tThe row index given must be less than the number of rows."
                 << "\n\tthis:     " << this
-                << "\n\trow_:      " << row_ 
+                << "\n\trow_:      " << row_
                 << "\n\tnr(): " << nr()
                 );
 
@@ -202,14 +202,14 @@ namespace dlib
 
         const row operator[] (
             long row_
-        ) const 
-        { 
+        ) const
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(row_ < nr() && row_ >= 0,
                 "\tconst row array2d::operator[](long row_) const"
                 << "\n\tThe row index given must be less than the number of rows."
                 << "\n\tthis:     " << this
-                << "\n\trow_:      " << row_ 
+                << "\n\trow_:      " << row_
                 << "\n\tnr(): " << nr()
             );
 
@@ -259,8 +259,8 @@ namespace dlib
         ) const { return (cur != 0); }
 
         const T& element (
-        ) const 
-        { 
+        ) const
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(current_element_valid() == true,
                 "\tconst T& array2d::element()()"
@@ -268,12 +268,12 @@ namespace dlib
                 << "\n\tthis:    " << this
             );
 
-            return *cur; 
+            return *cur;
         }
 
         T& element (
-        ) 
-        { 
+        )
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(current_element_valid() == true,
                          "\tT& array2d::element()()"
@@ -281,7 +281,7 @@ namespace dlib
                          << "\n\tthis:    " << this
             );
 
-            return *cur; 
+            return *cur;
         }
 
         bool move_next (
@@ -343,9 +343,9 @@ namespace dlib
         typename mem_manager
         >
     inline void swap (
-        array2d<T,mem_manager>& a, 
-        array2d<T,mem_manager>& b 
-    ) { a.swap(b); }   
+        array2d<T,mem_manager>& a,
+        array2d<T,mem_manager>& b
+    ) { a.swap(b); }
 
 
     template <
@@ -353,9 +353,9 @@ namespace dlib
         typename mem_manager
         >
     void serialize (
-        const array2d<T,mem_manager>& item, 
-        std::ostream& out 
-    )   
+        const array2d<T,mem_manager>& item,
+        std::ostream& out
+    )
     {
         try
         {
@@ -372,8 +372,8 @@ namespace dlib
             item.reset();
         }
         catch (serialization_error e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type array2d"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type array2d");
         }
     }
 
@@ -382,9 +382,9 @@ namespace dlib
         typename mem_manager
         >
     void deserialize (
-        array2d<T,mem_manager>& item, 
+        array2d<T,mem_manager>& item,
         std::istream& in
-    )   
+    )
     {
         try
         {
@@ -406,13 +406,13 @@ namespace dlib
             item.set_size(nr,nc);
 
             while (item.move_next())
-                deserialize(item.element(),in); 
+                deserialize(item.element(),in);
             item.reset();
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type array2d"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type array2d");
         }
     }
 
@@ -437,8 +437,8 @@ namespace dlib
                "\tvoid array2d::set_size(long rows, long cols)"
                << "\n\tThe array2d can't have negative rows or columns."
                << "\n\tthis: " << this
-               << "\n\tcols: " << cols 
-               << "\n\trows: " << rows 
+               << "\n\tcols: " << cols
+               << "\n\trows: " << rows
         );
 
         // set the enumerator back at the start
@@ -486,7 +486,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T, typename MM>
-    struct is_array2d <array2d<T,MM> >  
+    struct is_array2d <array2d<T,MM> >
     {
         const static bool value = true;
     };
@@ -495,5 +495,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_ARRAY2D_KERNEl_1_ 
+#endif // DLIB_ARRAY2D_KERNEl_1_
 

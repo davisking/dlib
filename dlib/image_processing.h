@@ -6,7 +6,7 @@
 #endif
 
 #ifndef DLIB_IMAGE_PROCESSInG_H_h_
-#define DLIB_IMAGE_PROCESSInG_H_h_ 
+#define DLIB_IMAGE_PROCESSInG_H_h_
 
 #include "image_processing/scan_image.h"
 #include "image_processing/scan_image_pyramid.h"

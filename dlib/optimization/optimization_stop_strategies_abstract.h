@@ -19,8 +19,8 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object represents a strategy for deciding if an optimization
-                algorithm should terminate.   This particular object looks at the 
-                change in the objective function from one iteration to the next and 
+                algorithm should terminate.   This particular object looks at the
+                change in the objective function from one iteration to the next and
                 bases its decision on how large this change is.  If the change
                 is below a user given threshold then the search stops.
         !*/
@@ -28,7 +28,7 @@ namespace dlib
     public:
         explicit objective_delta_stop_strategy (
             double min_delta = 1e-7
-        ); 
+        );
         /*!
             requires
                 - min_delta >= 0
@@ -53,11 +53,11 @@ namespace dlib
                   executed.
         !*/
 
-        objective_delta_stop_strategy& be_verbose( 
+        objective_delta_stop_strategy& be_verbose(
         );
         /*!
             ensures
-                - causes this object to print status messages to standard out 
+                - causes this object to print status messages to standard out
                   every time should_continue_search() is called.
                 - returns *this
         !*/
@@ -89,15 +89,15 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object represents a strategy for deciding if an optimization
-                algorithm should terminate.   This particular object looks at the 
-                norm (i.e. the length) of the current gradient vector and stops 
-                if it is smaller than a user given threshold.  
+                algorithm should terminate.   This particular object looks at the
+                norm (i.e. the length) of the current gradient vector and stops
+                if it is smaller than a user given threshold.
         !*/
 
     public:
         explicit gradient_norm_stop_strategy (
             double min_norm = 1e-7
-        ); 
+        );
         /*!
             requires
                 - min_norm >= 0
@@ -116,15 +116,15 @@ namespace dlib
                 - max_iter > 0
             ensures
                 - This stop strategy object will only consider a search to be complete
-                  if the current gradient norm is less than min_norm or more than 
+                  if the current gradient norm is less than min_norm or more than
                   max_iter iterations has been executed.
         !*/
 
-        gradient_norm_stop_strategy& be_verbose( 
+        gradient_norm_stop_strategy& be_verbose(
         );
         /*!
             ensures
-                - causes this object to print status messages to standard out 
+                - causes this object to print status messages to standard out
                   every time should_continue_search() is called.
                 - returns *this
         !*/

@@ -18,14 +18,14 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename matrix_type, 
-        typename sample_type 
+        typename matrix_type,
+        typename sample_type
         >
     class oca_problem_linear_svr : public oca_problem<matrix_type >
     {
     public:
         /*
-            This class is used as part of the implementation of the svr_linear_trainer 
+            This class is used as part of the implementation of the svr_linear_trainer
             defined towards the end of this file.
         */
 
@@ -51,13 +51,13 @@ namespace dlib
         }
 
         virtual scalar_type get_c (
-        ) const 
+        ) const
         {
             return C;
         }
 
         virtual long get_num_dimensions (
-        ) const 
+        ) const
         {
             // plus one for the bias term
             return max_index_plus_one(samples) + 1;
@@ -70,7 +70,7 @@ namespace dlib
             scalar_type current_risk_gap,
             unsigned long num_cutting_planes,
             unsigned long num_iterations
-        ) const 
+        ) const
         {
             current_risk_value /= samples.size();
             current_risk_gap /= samples.size();
@@ -97,17 +97,17 @@ namespace dlib
 
         virtual bool risk_has_lower_bound (
             scalar_type& lower_bound
-        ) const 
-        { 
+        ) const
+        {
             lower_bound = 0;
-            return true; 
+            return true;
         }
 
         virtual void get_risk (
             matrix_type& w,
             scalar_type& risk,
             matrix_type& subgradient
-        ) const 
+        ) const
         {
             subgradient.set_size(w.size(),1);
             subgradient = 0;
@@ -123,12 +123,12 @@ namespace dlib
                 {
                     if (prediction < targets[i])
                     {
-                        subtract_from(subgradient, samples[i]); 
+                        subtract_from(subgradient, samples[i]);
                         subgradient(w_size_m1) += 1;
                     }
                     else
                     {
-                        add_to(subgradient, samples[i]); 
+                        add_to(subgradient, samples[i]);
                         subgradient(w_size_m1) -= 1;
                     }
 
@@ -156,7 +156,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename matrix_type, 
+        typename matrix_type,
         typename sample_type,
         typename scalar_type
         >
@@ -177,7 +177,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename K 
+        typename K
         >
     class svr_linear_trainer
     {
@@ -208,14 +208,14 @@ namespace dlib
         }
 
         explicit svr_linear_trainer (
-            const scalar_type& C_ 
+            const scalar_type& C_
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C_ > 0,
                 "\t svr_linear_trainer::svr_linear_trainer()"
                 << "\n\t C_ must be greater than 0"
-                << "\n\t C_:    " << C_ 
+                << "\n\t C_:    " << C_
                 << "\n\t this: " << this
                 );
 
@@ -236,7 +236,7 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\t void svr_linear_trainer::set_epsilon()"
                 << "\n\t eps_ must be greater than 0"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 << "\n\t this: " << this
                 );
 
@@ -254,14 +254,14 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\tvoid svr_linear_trainer::set_epsilon_insensitivity(eps_)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 );
             eps_insensitivity = eps_;
         }
 
         const scalar_type get_epsilon_insensitivity (
         ) const
-        { 
+        {
             return eps_insensitivity;
         }
 
@@ -270,7 +270,7 @@ namespace dlib
 
         void set_max_iterations (
             unsigned long max_iter
-        ) 
+        )
         {
             max_iterations = max_iter;
         }
@@ -330,14 +330,14 @@ namespace dlib
         }
 
         void set_c (
-            scalar_type C_ 
+            scalar_type C_
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C_ > 0,
                 "\t void svr_linear_trainer::set_c()"
                 << "\n\t C_ must be greater than 0"
-                << "\n\t C_:    " << C_ 
+                << "\n\t C_:    " << C_
                 << "\n\t this: " << this
                 );
 
@@ -359,8 +359,8 @@ namespace dlib
             DLIB_CASSERT(is_learning_problem(samples, targets) == true,
                 "\t decision_function svr_linear_trainer::train(samples, targets)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t samples.size(): " << samples.size() 
-                << "\n\t targets.size(): " << targets.size() 
+                << "\n\t samples.size(): " << samples.size()
+                << "\n\t targets.size(): " << targets.size()
                 << "\n\t is_learning_problem(samples,targets): " << is_learning_problem(samples,targets)
                 );
 
@@ -376,14 +376,14 @@ namespace dlib
                 num_nonnegative = num_dims;
             }
 
-            unsigned long force_weight_1_idx = std::numeric_limits<unsigned long>::max(); 
+            unsigned long force_weight_1_idx = std::numeric_limits<unsigned long>::max();
             if (last_weight_1)
             {
                 force_weight_1_idx = num_dims-1;
             }
 
-            solver( make_oca_problem_linear_svr<w_type>(C, samples, targets, verbose, eps, eps_insensitivity, max_iterations), 
-                    w, 
+            solver( make_oca_problem_linear_svr<w_type>(C, samples, targets, verbose, eps, eps_insensitivity, max_iterations),
+                    w,
                     num_nonnegative,
                     force_weight_1_idx);
 
@@ -414,7 +414,7 @@ namespace dlib
         bool learn_nonnegative_weights;
         bool last_weight_1;
         scalar_type eps_insensitivity;
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 

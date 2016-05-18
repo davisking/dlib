@@ -35,21 +35,21 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1a        
-        typedef     hash_table_kernel_1<domain,range,mem_manager,compare>    
+        // kernel_1a
+        typedef     hash_table_kernel_1<domain,range,mem_manager,compare>
                     kernel_1a;
         typedef     hash_table_kernel_c<kernel_1a>
                     kernel_1a_c;
 
 
-        // kernel_2a        
-        typedef     hash_table_kernel_2<domain,range,bst_1,mem_manager,compare>    
+        // kernel_2a
+        typedef     hash_table_kernel_2<domain,range,bst_1,mem_manager,compare>
                     kernel_2a;
         typedef     hash_table_kernel_c<kernel_2a>
                     kernel_2a_c;
 
         // kernel_2b
-        typedef     hash_table_kernel_2<domain,range,bst_2,mem_manager,compare>    
+        typedef     hash_table_kernel_2<domain,range,bst_2,mem_manager,compare>
                     kernel_2b;
         typedef     hash_table_kernel_c<kernel_2b>
                     kernel_2b_c;

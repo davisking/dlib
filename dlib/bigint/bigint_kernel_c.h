@@ -16,7 +16,7 @@ namespace dlib
     template <
         typename bigint_base
         >
-    class bigint_kernel_c 
+    class bigint_kernel_c
     {
         bigint_base data;
 
@@ -248,34 +248,34 @@ namespace dlib
         typename bigint_base
         >
     inline void serialize (
-        const bigint_kernel_c<bigint_base>& item, 
+        const bigint_kernel_c<bigint_base>& item,
         std::ostream& out
     )
-    { 
-        std::ios::fmtflags oldflags = out.flags();  
-        out.flags(); 
-        out << item << ' '; 
-        out.flags(oldflags); 
-        if (!out) throw serialization_error("Error serializing object of type bigint_kernel_c"); 
-    }   
+    {
+        std::ios::fmtflags oldflags = out.flags();
+        out.flags();
+        out << item << ' ';
+        out.flags(oldflags);
+        if (!out) throw serialization_error("Error serializing object of type bigint_kernel_c");
+    }
 
     template <
         typename bigint_base
         >
     inline void deserialize (
-        bigint_kernel_c<bigint_base>& item, 
+        bigint_kernel_c<bigint_base>& item,
         std::istream& in
-    ) 
-    { 
-        std::ios::fmtflags oldflags = in.flags();  
-        in.flags(); 
-        in >> item; in.flags(oldflags); 
-        if (in.get() != ' ') 
+    )
+    {
+        std::ios::fmtflags oldflags = in.flags();
+        in.flags();
+        in >> item; in.flags(oldflags);
+        if (in.get() != ' ')
         {
             item = 0;
-            throw serialization_error("Error deserializing object of type bigint_kernel_c"); 
+            throw serialization_error("Error deserializing object of type bigint_kernel_c");
         }
-    }   
+    }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -299,7 +299,7 @@ namespace dlib
     bigint_kernel_c<bigint_base>::
     bigint_kernel_c (
         uint32 value
-    ) : 
+    ) :
         data(value)
     {
         // make sure requires clause is not broken
@@ -308,7 +308,7 @@ namespace dlib
             << "\n\t value must be <= (2^32)-1"
             << "\n\tthis:  " << this
             << "\n\tvalue:   " << value
-            );        
+            );
     }
 
 // ----------------------------------------------------------------------------------------
@@ -375,7 +375,7 @@ namespace dlib
             "\tconst bigint bigint::operator-(const bigint&)"
             << "\n\t *this should not be less than rhs"
             << "\n\tthis:  " << this
-            << "\n\t*this: " << *this 
+            << "\n\t*this: " << *this
             << "\n\trhs:   " << rhs
             );
 
@@ -398,7 +398,7 @@ namespace dlib
             "\tbigint& bigint::operator-=(const bigint&)"
             << "\n\t *this should not be less than rhs"
             << "\n\tthis:  " << this
-            << "\n\t*this: " << *this 
+            << "\n\t*this: " << *this
             << "\n\trhs:   " << rhs
             );
 
@@ -716,7 +716,7 @@ namespace dlib
             "\tbigint& bigint::operator+=(uint16)"
             << "\n\t rhs must be <= 65535"
             << "\n\tthis:  " << this
-            << "\n\t*this: " << *this 
+            << "\n\t*this: " << *this
             << "\n\trhs:   " << rhs
             );
 
@@ -859,7 +859,7 @@ namespace dlib
             "\t bigint bigint::operator*=(uint16)"
             << "\n\t rhs must be <= 65535"
             << "\n\tthis:  " << this
-            << "\n\t*this: " << *this 
+            << "\n\t*this: " << *this
             << "\n\trhs:   " << rhs
             );
 

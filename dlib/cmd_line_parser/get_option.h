@@ -43,7 +43,7 @@ namespace dlib
             std::string block_name = option_name.substr(0,pos);
             if (cr.is_block_defined(block_name))
             {
-                return impl_config_reader_get_option(cr.block(block_name), 
+                return impl_config_reader_get_option(cr.block(block_name),
                                                      option_name.substr(pos+1),
                                                      full_option_name,
                                                      default_value);
@@ -87,11 +87,11 @@ namespace dlib
         {
             try
             {
-                default_value = string_cast<T>(parser.option(option_name).argument()); 
+                default_value = string_cast<T>(parser.option(option_name).argument());
             }
-            catch (string_cast_error&) 
-            { 
-                throw option_parse_error(option_name, parser.option(option_name).argument()); 
+            catch (string_cast_error&)
+            {
+                throw option_parse_error(option_name, parser.option(option_name).argument());
             }
         }
         return default_value;
@@ -117,7 +117,7 @@ namespace dlib
             );
 
         if (parser.option(option_name))
-            return get_option(parser, option_name, default_value); 
+            return get_option(parser, option_name, default_value);
         else
             return get_option(cr, option_name, default_value);
     }
@@ -142,7 +142,7 @@ namespace dlib
             );
 
         if (parser.option(option_name))
-            return get_option(parser, option_name, default_value); 
+            return get_option(parser, option_name, default_value);
         else
             return get_option(cr, option_name, default_value);
     }

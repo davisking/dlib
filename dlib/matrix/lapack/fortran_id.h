@@ -5,7 +5,7 @@
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-//       FORTRAN BINDING STUFF FROM BOOST 
+//       FORTRAN BINDING STUFF FROM BOOST
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -13,7 +13,7 @@
 //  distribute this software is granted provided this copyright notice appears
 //  in all copies. This software is provided "as is" without express or implied
 //  warranty, and with no claim as to its suitability for any purpose.
-//  Copyright (C) 2002, 2003 Si-Lab b.v.b.a., Toon Knapen and Kresimir Fresl 
+//  Copyright (C) 2002, 2003 Si-Lab b.v.b.a., Toon Knapen and Kresimir Fresl
 
 
 // First we need to know what the conventions for linking
@@ -26,7 +26,7 @@
 #error do not know how to link with fortran for the given platform
 #endif
 
-// Next we define macros to convert our symbols to 
+// Next we define macros to convert our symbols to
 // the current convention
 #if defined(DLIB_BIND_FORTRAN_LOWERCASE_UNDERSCORE)
 #define DLIB_FORTRAN_ID( id ) id##_

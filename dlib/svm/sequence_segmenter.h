@@ -60,12 +60,12 @@ namespace dlib
                 }
             }
 
-            friend void serialize(const feature_extractor& item, std::ostream& out) 
+            friend void serialize(const feature_extractor& item, std::ostream& out)
             {
                 serialize(item.fe, out);
             }
 
-            friend void deserialize(feature_extractor& item, std::istream& in) 
+            friend void deserialize(feature_extractor& item, std::istream& in)
             {
                 deserialize(item.fe, in);
             }
@@ -79,13 +79,13 @@ namespace dlib
                     return NL + NL*NL + NL*fe.num_features()*fe.window_size();
             }
 
-            unsigned long order() const 
-            { 
-                return 1; 
+            unsigned long order() const
+            {
+                return 1;
             }
 
-            unsigned long num_labels() const 
-            { 
+            unsigned long num_labels() const
+            {
                 if (ss_feature_extractor::use_BIO_model)
                     return 3;
                 else
@@ -103,7 +103,7 @@ namespace dlib
                         and turns it into the kind needed by a sequence_segmenter.
                 !*/
 
-                dot_functor(feature_setter& set_feature_, unsigned long offset_) : 
+                dot_functor(feature_setter& set_feature_, unsigned long offset_) :
                     set_feature(set_feature_), offset(offset_) {}
 
                 feature_setter& set_feature;
@@ -137,7 +137,7 @@ namespace dlib
                 if (ss_feature_extractor::use_BIO_model)
                 {
                     // Don't allow BIO label patterns that don't correspond to a sensical
-                    // segmentation. 
+                    // segmentation.
                     if (y.size() > 1 && y(0) == INSIDE && y(1) == OUTSIDE)
                         return true;
                     if (y.size() == 1 && y(0) == INSIDE)
@@ -146,7 +146,7 @@ namespace dlib
                 else
                 {
                     // Don't allow BILOU label patterns that don't correspond to a sensical
-                    // segmentation. 
+                    // segmentation.
                     if (y.size() > 1)
                     {
                         if (y(1) == BEGIN && y(0) == OUTSIDE)
@@ -290,8 +290,8 @@ namespace dlib
             DLIB_ASSERT(fe.window_size() >= 1 && fe.num_features() >= 1,
                 "\t sequence_segmenter::sequence_segmenter()"
                 << "\n\t An invalid feature extractor was supplied."
-                << "\n\t fe.window_size():  " << fe.window_size() 
-                << "\n\t fe.num_features(): " << fe.num_features() 
+                << "\n\t fe.window_size():  " << fe.window_size()
+                << "\n\t fe.num_features(): " << fe.num_features()
                 << "\n\t this: " << this
             );
 #endif
@@ -299,7 +299,7 @@ namespace dlib
 
         explicit sequence_segmenter(
             const matrix<double,0,1>& weights
-        ) : 
+        ) :
             labeler(weights)
         {
 #ifdef ENABLE_ASSERTS
@@ -308,15 +308,15 @@ namespace dlib
             DLIB_ASSERT(total_feature_vector_size(fe) == (unsigned long)weights.size(),
                 "\t sequence_segmenter::sequence_segmenter(weights)"
                 << "\n\t These sizes should match"
-                << "\n\t total_feature_vector_size(fe):  " << total_feature_vector_size(fe) 
-                << "\n\t weights.size(): " << weights.size() 
+                << "\n\t total_feature_vector_size(fe):  " << total_feature_vector_size(fe)
+                << "\n\t weights.size(): " << weights.size()
                 << "\n\t this: " << this
                 );
             DLIB_ASSERT(fe.window_size() >= 1 && fe.num_features() >= 1,
                 "\t sequence_segmenter::sequence_segmenter()"
                 << "\n\t An invalid feature extractor was supplied."
-                << "\n\t fe.window_size():  " << fe.window_size() 
-                << "\n\t fe.num_features(): " << fe.num_features() 
+                << "\n\t fe.window_size():  " << fe.window_size()
+                << "\n\t fe.num_features(): " << fe.num_features()
                 << "\n\t this: " << this
             );
 #endif
@@ -332,15 +332,15 @@ namespace dlib
             DLIB_ASSERT(total_feature_vector_size(fe) == (unsigned long)weights.size(),
                 "\t sequence_segmenter::sequence_segmenter(weights,fe)"
                 << "\n\t These sizes should match"
-                << "\n\t total_feature_vector_size(fe):  " << total_feature_vector_size(fe) 
-                << "\n\t weights.size(): " << weights.size() 
+                << "\n\t total_feature_vector_size(fe):  " << total_feature_vector_size(fe)
+                << "\n\t weights.size(): " << weights.size()
                 << "\n\t this: " << this
                 );
             DLIB_ASSERT(fe.window_size() >= 1 && fe.num_features() >= 1,
                 "\t sequence_segmenter::sequence_segmenter()"
                 << "\n\t An invalid feature extractor was supplied."
-                << "\n\t fe.window_size():  " << fe.window_size() 
-                << "\n\t fe.num_features(): " << fe.num_features() 
+                << "\n\t fe.window_size():  " << fe.window_size()
+                << "\n\t fe.num_features(): " << fe.num_features()
                 << "\n\t this: " << this
             );
         }

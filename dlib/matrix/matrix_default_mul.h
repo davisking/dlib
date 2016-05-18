@@ -23,7 +23,7 @@ namespace dlib
 
 // ------------------------------------------------------------------------------------
 
-    /*!  This file defines the default_matrix_multiply() function.  It is a function 
+    /*!  This file defines the default_matrix_multiply() function.  It is a function
          that conforms to the following definition:
 
         template <
@@ -51,7 +51,7 @@ namespace dlib
         typename EXP1,
         typename EXP2
         >
-    typename enable_if_c<ma::matrix_is_vector<EXP1>::value == true || ma::matrix_is_vector<EXP2>::value == true>::type 
+    typename enable_if_c<ma::matrix_is_vector<EXP1>::value == true || ma::matrix_is_vector<EXP2>::value == true>::type
     default_matrix_multiply (
         matrix_dest_type& dest,
         const EXP1& lhs,
@@ -68,7 +68,7 @@ namespace dlib
         typename EXP1,
         typename EXP2
         >
-    typename enable_if_c<ma::matrix_is_vector<EXP1>::value == false && ma::matrix_is_vector<EXP2>::value == false>::type 
+    typename enable_if_c<ma::matrix_is_vector<EXP1>::value == false && ma::matrix_is_vector<EXP2>::value == false>::type
     default_matrix_multiply (
         matrix_dest_type& dest,
         const EXP1& lhs,
@@ -85,7 +85,7 @@ namespace dlib
         else
         {
             // if the lhs and rhs matrices are big enough we should use a cache friendly
-            // algorithm that computes the matrix multiply in blocks.  
+            // algorithm that computes the matrix multiply in blocks.
 
 
             // Loop over all the blocks in the lhs matrix
@@ -93,19 +93,19 @@ namespace dlib
             {
                 for (long c = 0; c < lhs.nc(); c+=bs)
                 {
-                    // make a rect for the block from lhs 
+                    // make a rect for the block from lhs
                     rectangle lhs_block(c, r, std::min(c+bs-1,lhs.nc()-1), std::min(r+bs-1,lhs.nr()-1));
 
                     // now loop over all the rhs blocks we have to multiply with the current lhs block
                     for (long i = 0; i < rhs.nc(); i += bs)
                     {
-                        // make a rect for the block from rhs 
+                        // make a rect for the block from rhs
                         rectangle rhs_block(i, c, std::min(i+bs-1,rhs.nc()-1), std::min(c+bs-1,rhs.nr()-1));
 
                         // make a target rect in res
                         rectangle res_block(rhs_block.left(),lhs_block.top(), rhs_block.right(), lhs_block.bottom());
 
-                        // This loop is optimized assuming that the data is laid out in 
+                        // This loop is optimized assuming that the data is laid out in
                         // row major order in memory.
                         for (long r = lhs_block.top(); r <= lhs_block.bottom(); ++r)
                         {

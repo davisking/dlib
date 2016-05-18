@@ -13,7 +13,7 @@
 #include <dlib/entropy_decoder.h>
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace std;
@@ -29,15 +29,15 @@ namespace
     )
     /*!
         requires
-            - ee is an implementation of entropy_encoder_model/entropy_encoder_model_kernel_abstract.h            
+            - ee is an implementation of entropy_encoder_model/entropy_encoder_model_kernel_abstract.h
               the alphabet_size for ee is 256
-            - ed is an implementation of entropy_decoder_model/entropy_decoder_model_kernel_abstract.h            
+            - ed is an implementation of entropy_decoder_model/entropy_decoder_model_kernel_abstract.h
               the alphabet_size for ed is 256
             - ee and ed must share the same kernel number
         ensures
-            - runs tests on ee and ed for compliance with the specs 
+            - runs tests on ee and ed for compliance with the specs
     !*/
-    {        
+    {
 
         print_spinner();
         srand(static_cast<unsigned int>(time(0)));

@@ -24,7 +24,7 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1        
+        // kernel_1
         typedef      memory_manager_kernel_1<T,0>
                      kernel_1a;
         typedef      memory_manager_kernel_1<T,10>
@@ -38,7 +38,7 @@ namespace dlib
         typedef      memory_manager_kernel_1<T,100000>
                      kernel_1f;
       
-        // kernel_2        
+        // kernel_2
         typedef      memory_manager_kernel_2<T,10>
                      kernel_2a;
         typedef      memory_manager_kernel_2<T,100>
@@ -51,7 +51,7 @@ namespace dlib
                      kernel_2e;
       
       
-        // kernel_3        
+        // kernel_3
         typedef      memory_manager_kernel_3<T,10>
                      kernel_3a;
         typedef      memory_manager_kernel_3<T,100>

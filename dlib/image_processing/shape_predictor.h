@@ -146,12 +146,12 @@ namespace dlib
         inline void create_shape_relative_encoding (
             const matrix<float,0,1>& shape,
             const std::vector<dlib::vector<float,2> >& pixel_coordinates,
-            std::vector<unsigned long>& anchor_idx, 
+            std::vector<unsigned long>& anchor_idx,
             std::vector<dlib::vector<float,2> >& deltas
         )
         /*!
             requires
-                - shape.size()%2 == 0 
+                - shape.size()%2 == 0
                 - shape.size() > 0
             ensures
                 - #anchor_idx.size() == pixel_coordinates.size()
@@ -248,7 +248,7 @@ namespace dlib
         /*!
             requires
                 - image_type == an image object that implements the interface defined in
-                  dlib/image_processing/generic_image.h 
+                  dlib/image_processing/generic_image.h
                 - reference_pixel_anchor_idx.size() == reference_pixel_deltas.size()
                 - current_shape.size() == reference_shape.size()
                 - reference_shape.size()%2 == 0
@@ -291,7 +291,7 @@ namespace dlib
 
 
         shape_predictor (
-        ) 
+        )
         {}
 
         shape_predictor (
@@ -305,7 +305,7 @@ namespace dlib
                 - forests.size() == pixel_coordinates.size() == the number of cascades
                 - for all valid i:
                     - all the index values in forests[i] are less than pixel_coordinates[i].size()
-                - for all valid i and j: 
+                - for all valid i and j:
                     - forests[i][j].leaf_values.size() is a power of 2.
                       (i.e. we require a tree with all the levels fully filled out.
                     - forests[i][j].leaf_values.size() == forests[i][j].splits.size()+1
@@ -422,7 +422,7 @@ namespace dlib
     private:
         matrix<float,0,1> initial_shape;
         std::vector<std::vector<impl::regression_tree> > forests;
-        std::vector<std::vector<unsigned long> > anchor_idx; 
+        std::vector<std::vector<unsigned long> > anchor_idx;
         std::vector<std::vector<dlib::vector<float,2> > > deltas;
     };
 
@@ -431,7 +431,7 @@ namespace dlib
     class shape_predictor_trainer
     {
         /*!
-            This thing really only works with unsigned char or rgb_pixel images (since we assume the threshold 
+            This thing really only works with unsigned char or rgb_pixel images (since we assume the threshold
             should be in the range [-128,128]).
         !*/
     public:
@@ -458,7 +458,7 @@ namespace dlib
             unsigned long depth
         )
         {
-            DLIB_CASSERT(depth > 0, 
+            DLIB_CASSERT(depth > 0,
                 "\t void shape_predictor_trainer::set_cascade_depth()"
                 << "\n\t Invalid inputs were given to this function. "
                 << "\n\t depth:  " << depth
@@ -474,7 +474,7 @@ namespace dlib
             unsigned long depth
         )
         {
-            DLIB_CASSERT(depth > 0, 
+            DLIB_CASSERT(depth > 0,
                 "\t void shape_predictor_trainer::set_tree_depth()"
                 << "\n\t Invalid inputs were given to this function. "
                 << "\n\t depth:  " << depth
@@ -499,7 +499,7 @@ namespace dlib
         }
 
         double get_nu (
-        ) const { return _nu; } 
+        ) const { return _nu; }
         void set_nu (
             double nu
         )
@@ -507,7 +507,7 @@ namespace dlib
             DLIB_CASSERT(0 < nu && nu <= 1,
                 "\t void shape_predictor_trainer::set_nu()"
                 << "\n\t Invalid inputs were given to this function. "
-                << "\n\t nu:  " << nu 
+                << "\n\t nu:  " << nu
             );
 
             _nu = nu;
@@ -525,10 +525,10 @@ namespace dlib
             unsigned long amount
         )
         {
-            DLIB_CASSERT(amount > 0, 
+            DLIB_CASSERT(amount > 0,
                 "\t void shape_predictor_trainer::set_oversampling_amount()"
                 << "\n\t Invalid inputs were given to this function. "
-                << "\n\t amount: " << amount 
+                << "\n\t amount: " << amount
             );
 
             _oversampling_amount = amount;
@@ -538,12 +538,12 @@ namespace dlib
         ) const { return _feature_pool_size; }
         void set_feature_pool_size (
             unsigned long size
-        ) 
+        )
         {
-            DLIB_CASSERT(size > 1, 
+            DLIB_CASSERT(size > 1,
                 "\t void shape_predictor_trainer::set_feature_pool_size()"
                 << "\n\t Invalid inputs were given to this function. "
-                << "\n\t size: " << size 
+                << "\n\t size: " << size
             );
 
             _feature_pool_size = size;
@@ -558,7 +558,7 @@ namespace dlib
             DLIB_CASSERT(lambda > 0,
                 "\t void shape_predictor_trainer::set_lambda()"
                 << "\n\t Invalid inputs were given to this function. "
-                << "\n\t lambda: " << lambda 
+                << "\n\t lambda: " << lambda
             );
 
             _lambda = lambda;
@@ -570,10 +570,10 @@ namespace dlib
             unsigned long num
         )
         {
-            DLIB_CASSERT(num > 0, 
+            DLIB_CASSERT(num > 0,
                 "\t void shape_predictor_trainer::set_num_test_splits()"
                 << "\n\t Invalid inputs were given to this function. "
-                << "\n\t num: " << num 
+                << "\n\t num: " << num
             );
 
             _num_test_splits = num;
@@ -583,7 +583,7 @@ namespace dlib
         double get_feature_pool_region_padding (
         ) const { return _feature_pool_region_padding; }
         void set_feature_pool_region_padding (
-            double padding 
+            double padding
         )
         {
             _feature_pool_region_padding = padding;
@@ -611,11 +611,11 @@ namespace dlib
             DLIB_CASSERT(images.size() == objects.size() && images.size() > 0,
                 "\t shape_predictor shape_predictor_trainer::train()"
                 << "\n\t Invalid inputs were given to this function. "
-                << "\n\t images.size():  " << images.size() 
-                << "\n\t objects.size(): " << objects.size() 
+                << "\n\t images.size():  " << images.size()
+                << "\n\t objects.size(): " << objects.size()
             );
             // make sure the objects agree on the number of parts and that there is at
-            // least one full_object_detection. 
+            // least one full_object_detection.
             unsigned long num_parts = 0;
             std::vector<int> part_present;
             for (unsigned long i = 0; i < objects.size(); ++i)
@@ -637,7 +637,7 @@ namespace dlib
                             "\t shape_predictor shape_predictor_trainer::train()"
                             << "\n\t All the objects must agree on the number of parts. "
                             << "\n\t objects["<<i<<"]["<<j<<"].num_parts(): " << objects[i][j].num_parts()
-                            << "\n\t num_parts:  " << num_parts 
+                            << "\n\t num_parts:  " << num_parts
                         );
                     }
                     for (unsigned long p = 0; p < objects[i][j].num_parts(); ++p)
@@ -678,7 +678,7 @@ namespace dlib
             {
                 // Each cascade uses a different set of pixels for its features.  We compute
                 // their representations relative to the initial shape first.
-                std::vector<unsigned long> anchor_idx; 
+                std::vector<unsigned long> anchor_idx;
                 std::vector<dlib::vector<float,2> > deltas;
                 create_shape_relative_encoding(initial_shape, pixel_coordinates[cascade], anchor_idx, deltas);
 
@@ -741,7 +741,7 @@ namespace dlib
             }
         }
 
-        struct training_sample 
+        struct training_sample
         {
             /*!
 
@@ -760,10 +760,10 @@ namespace dlib
 
             unsigned long image_idx;
             rectangle rect;
-            matrix<float,0,1> target_shape; 
-            matrix<float,0,1> present; 
+            matrix<float,0,1> target_shape;
+            matrix<float,0,1> present;
 
-            matrix<float,0,1> current_shape;  
+            matrix<float,0,1> current_shape;
             std::vector<float> feature_pixel_values;
 
             void swap(training_sample& item)
@@ -794,7 +794,7 @@ namespace dlib
             for (unsigned long i = 0; i < samples.size(); ++i)
                 sums[0] += samples[i].target_shape - samples[i].current_shape;
 
-            for (unsigned long i = 0; i < num_split_nodes; ++i) 
+            for (unsigned long i = 0; i < num_split_nodes; ++i)
             {
                 std::pair<unsigned long,unsigned long> range = parts.front();
                 parts.pop_front();
@@ -803,7 +803,7 @@ namespace dlib
                     range.second, pixel_coordinates, sums[i], sums[left_child(i)],
                     sums[right_child(i)]);
                 tree.splits.push_back(split);
-                const unsigned long mid = partition_samples(split, samples, range.first, range.second); 
+                const unsigned long mid = partition_samples(split, samples, range.first, range.second);
 
                 parts.push_back(std::make_pair(range.first, mid));
                 parts.push_back(std::make_pair(mid, range.second));
@@ -817,7 +817,7 @@ namespace dlib
             {
                 // Get the present counts for each dimension so we can divide each
                 // dimension by the number of observations we have on it to find the mean
-                // displacement in each leaf. 
+                // displacement in each leaf.
                 present_counts = 0;
                 for (unsigned long j = parts[i].first; j < parts[i].second; ++j)
                     present_counts += samples[j].present;
@@ -852,10 +852,10 @@ namespace dlib
             const std::vector<dlib::vector<float,2> >& pixel_coordinates
         ) const
         {
-            const double lambda = get_lambda(); 
+            const double lambda = get_lambda();
             impl::split_feature feat;
             double accept_prob;
-            do 
+            do
             {
                 feat.idx1   = rnd.get_random_32bit_number()%get_feature_pool_size();
                 feat.idx2   = rnd.get_random_32bit_number()%get_feature_pool_size();
@@ -876,12 +876,12 @@ namespace dlib
             const std::vector<dlib::vector<float,2> >& pixel_coordinates,
             const matrix<float,0,1>& sum,
             matrix<float,0,1>& left_sum,
-            matrix<float,0,1>& right_sum 
+            matrix<float,0,1>& right_sum
         ) const
         {
             // generate a bunch of random splits and test them and return the best one.
 
-            const unsigned long num_test_splits = get_num_test_splits();  
+            const unsigned long num_test_splits = get_num_test_splits();
 
             // sample the random features we test in this function
             std::vector<impl::split_feature> feats;
@@ -1048,7 +1048,7 @@ namespace dlib
         ) const
         /*!
             ensures
-                - #pixel_coordinates.size() == get_feature_pool_size() 
+                - #pixel_coordinates.size() == get_feature_pool_size()
                 - for all valid i:
                     - pixel_coordinates[i] == a point in the box defined by the min/max x/y arguments.
         !*/
@@ -1117,14 +1117,14 @@ namespace dlib
         DLIB_CASSERT( images.size() == objects.size() ,
             "\t double test_shape_predictor()"
             << "\n\t Invalid inputs were given to this function. "
-            << "\n\t images.size():  " << images.size() 
-            << "\n\t objects.size(): " << objects.size() 
+            << "\n\t images.size():  " << images.size()
+            << "\n\t objects.size(): " << objects.size()
         );
         for (unsigned long i = 0; i < objects.size(); ++i)
         {
             for (unsigned long j = 0; j < objects[i].size(); ++j)
             {
-                DLIB_CASSERT(objects[i][j].num_parts() == sp.num_parts(), 
+                DLIB_CASSERT(objects[i][j].num_parts() == sp.num_parts(),
                     "\t double test_shape_predictor()"
                     << "\n\t Invalid inputs were given to this function. "
                     << "\n\t objects["<<i<<"]["<<j<<"].num_parts(): " << objects[i][j].num_parts()
@@ -1133,7 +1133,7 @@ namespace dlib
             }
             if (scales.size() != 0)
             {
-                DLIB_CASSERT(objects[i].size() == scales[i].size(), 
+                DLIB_CASSERT(objects[i].size() == scales[i].size(),
                     "\t double test_shape_predictor()"
                     << "\n\t Invalid inputs were given to this function. "
                     << "\n\t objects["<<i<<"].size(): " << objects[i].size()
@@ -1151,7 +1151,7 @@ namespace dlib
             {
                 // Just use a scale of 1 (i.e. no scale at all) if the caller didn't supply
                 // any scales.
-                const double scale = scales.size()==0 ? 1 : scales[i][j]; 
+                const double scale = scales.size()==0 ? 1 : scales[i][j];
 
                 full_object_detection det = sp(images[i], objects[i][j].get_rect());
 

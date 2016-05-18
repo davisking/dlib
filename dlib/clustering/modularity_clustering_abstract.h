@@ -80,15 +80,15 @@ namespace dlib
                 - 0 <= edges[i].distance() < std::numeric_limits<double>::infinity()
         ensures
             - This function performs the clustering algorithm described in the paper
-              Modularity and community structure in networks by M. E. J. Newman.  
+              Modularity and community structure in networks by M. E. J. Newman.
             - This function interprets edges as a graph and attempts to find the labeling
-              that maximizes modularity(edges, #labels).   
+              that maximizes modularity(edges, #labels).
             - returns the number of clusters found.
             - #labels.size() == max_index_plus_one(edges)
             - for all valid i:
-                - #labels[i] == the cluster ID of the node with index i in the graph.  
+                - #labels[i] == the cluster ID of the node with index i in the graph.
                 - 0 <= #labels[i] < the number of clusters found
-                  (i.e. cluster IDs are assigned contiguously and start at 0) 
+                  (i.e. cluster IDs are assigned contiguously and start at 0)
             - The main computation of the algorithm is involved in finding an eigenvector
               of a certain matrix.  To do this, we use the power iteration.  In particular,
               each time we try to find an eigenvector we will let the power iteration loop
@@ -114,7 +114,7 @@ namespace dlib
               ordered_sample_pairs.  Therefore, this is simply a convenience routine.  In
               particular, it is implemented by transforming the given edges into
               ordered_sample_pairs and then calling the newman_cluster() routine defined
-              above.  
+              above.
     !*/
 
 // ----------------------------------------------------------------------------------------

@@ -32,7 +32,7 @@ namespace dlib
     // ----------------------------------------
 
         template <typename T, typename enabled = void>
-        struct edge_diff_funct 
+        struct edge_diff_funct
         {
             typedef double diff_type;
 
@@ -48,30 +48,30 @@ namespace dlib
 
         template <>
         struct edge_diff_funct<uint8,void>
-        { 
-            typedef uint8 diff_type; 
-            uint8 operator()( const uint8& a, const uint8& b) const { return edge_diff_uint(a,b); } 
+        {
+            typedef uint8 diff_type;
+            uint8 operator()( const uint8& a, const uint8& b) const { return edge_diff_uint(a,b); }
         };
 
         template <>
         struct edge_diff_funct<uint16,void>
-        { 
-            typedef uint16 diff_type; 
-            uint16 operator()( const uint16& a, const uint16& b) const { return edge_diff_uint(a,b); } 
+        {
+            typedef uint16 diff_type;
+            uint16 operator()( const uint16& a, const uint16& b) const { return edge_diff_uint(a,b); }
         };
 
         template <>
         struct edge_diff_funct<uint32,void>
-        { 
-            typedef uint32 diff_type; 
-            uint32 operator()( const uint32& a, const uint32& b) const { return edge_diff_uint(a,b); } 
+        {
+            typedef uint32 diff_type;
+            uint32 operator()( const uint32& a, const uint32& b) const { return edge_diff_uint(a,b); }
         };
 
         template <>
         struct edge_diff_funct<double,void>
-        { 
-            typedef double diff_type; 
-            double operator()( const double& a, const double& b) const { return std::abs(a-b); } 
+        {
+            typedef double diff_type;
+            double operator()( const double& a, const double& b) const { return std::abs(a-b); }
         };
 
         template <typename T>
@@ -137,7 +137,7 @@ namespace dlib
         // with 8bit or 16bit  pixels very quickly.  We do this by using a radix sort
         // instead of quicksort.
         template <typename in_image_type, typename T>
-        typename enable_if<uint8_or_uint16_pixels<in_image_type> >::type 
+        typename enable_if<uint8_or_uint16_pixels<in_image_type> >::type
         get_pixel_edges (
             const in_image_type& in_img,
             std::vector<segment_image_edge_data_T<T> >& sorted_edges
@@ -250,12 +250,12 @@ namespace dlib
 
         // This is the general purpose version of get_pixel_edges().  It handles all pixel types.
         template <typename in_image_type, typename T>
-        typename disable_if<uint8_or_uint16_pixels<in_image_type> >::type 
+        typename disable_if<uint8_or_uint16_pixels<in_image_type> >::type
         get_pixel_edges (
             const in_image_type& in_img,
             std::vector<segment_image_edge_data_T<T> >& sorted_edges
         )
-        {   
+        {
             const rectangle area = get_rect(in_img);
             sorted_edges.reserve(area.area()*4);
 
@@ -384,7 +384,7 @@ namespace dlib
                 const diff_type tau1 = static_cast<diff_type>(k/data[set1].component_size);
                 const diff_type tau2 = static_cast<diff_type>(k/data[set2].component_size);
 
-                const diff_type mint = std::min(data[set1].internal_diff + tau1, 
+                const diff_type mint = std::min(data[set1].internal_diff + tau1,
                                                 data[set2].internal_diff + tau2);
                 if (diff <= mint)
                 {
@@ -435,7 +435,7 @@ namespace dlib
         struct edge_data
         {
             double edge_diff;
-            unsigned long set1;  
+            unsigned long set1;
             unsigned long set2;
             bool operator<(const edge_data& item) const
             {
@@ -453,7 +453,7 @@ namespace dlib
             std::vector<rectangle>& out_rects,
             std::vector<edge_data>& edges,
             const double k,
-            const unsigned long min_size 
+            const unsigned long min_size
         )
         {
             using namespace dlib::impl;
@@ -494,7 +494,7 @@ namespace dlib
                     const diff_type tau1 = static_cast<diff_type>(k/data[set1].component_size);
                     const diff_type tau2 = static_cast<diff_type>(k/data[set2].component_size);
 
-                    const diff_type mint = std::min(data[set1].internal_diff + tau1, 
+                    const diff_type mint = std::min(data[set1].internal_diff + tau1,
                         data[set2].internal_diff + tau2);
                     if (diff <= mint)
                     {
@@ -560,7 +560,7 @@ namespace dlib
                 out_rects[box_id_map[i->first]] = i->second;
             }
 
-            // Now find the edges between the boxes 
+            // Now find the edges between the boxes
             typedef dlib::memory_manager<char>::kernel_2c mm_type;
             dlib::set<std::pair<unsigned long, unsigned long>, mm_type>::kernel_1a neighbors_final;
             for (unsigned long i = 0; i < rejected_edges.size(); ++i)
@@ -578,7 +578,7 @@ namespace dlib
                         neighbors_final.add(p);
 
                         edge_data temp;
-                        const diff_type mint = std::min(data[set1].internal_diff , 
+                        const diff_type mint = std::min(data[set1].internal_diff ,
                                                         data[set2].internal_diff );
                         temp.edge_diff = rejected_edges[i].diff - mint;
                         temp.set1 = box_id_map[set1];
@@ -665,7 +665,7 @@ namespace dlib
 
 
             // Now iteratively merge all the rectangles we have and record the results.
-            // Note that, unlike what is described in the paper 
+            // Note that, unlike what is described in the paper
             //    Segmentation as Selective Search for Object Recognition" by Koen E. A. van de Sande, et al.
             // we don't use any kind of histogram/SIFT like thing to order the edges
             // between the blobs.  Here we simply order by the pixel difference value.
@@ -674,7 +674,7 @@ namespace dlib
             // paper.
             set_of_rects detected_rects;
             bool did_merge = true;
-            for (unsigned long iter = 0; did_merge && iter < max_merging_iterations; ++iter) 
+            for (unsigned long iter = 0; did_merge && iter < max_merging_iterations; ++iter)
             {
                 did_merge = false;
                 sets.clear();

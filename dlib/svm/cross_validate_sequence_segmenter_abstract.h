@@ -13,12 +13,12 @@ namespace dlib
 
     template <
         typename sequence_segmenter_type,
-        typename sequence_type 
+        typename sequence_type
         >
     const matrix<double,1,3> test_sequence_segmenter (
         const sequence_segmenter_type& segmenter,
         const std::vector<sequence_type>& samples,
-        const std::vector<std::vector<std::pair<unsigned long,unsigned long> > >& segments 
+        const std::vector<std::vector<std::pair<unsigned long,unsigned long> > >& segments
     );
     /*!
         requires
@@ -39,7 +39,7 @@ namespace dlib
                 - M(1) == The recall of the segmenter measured against the task of
                   detecting the segments of each sample.  This is a number in the range 0
                   to 1 and represents the fraction of the true segments found by the
-                  segmenter. 
+                  segmenter.
                 - M(2) == The F1-score for the segmenter.  This is the harmonic mean of
                   M(0) and M(1).
     !*/
@@ -48,7 +48,7 @@ namespace dlib
 
     template <
         typename trainer_type,
-        typename sequence_type 
+        typename sequence_type
         >
     const matrix<double,1,3> cross_validate_sequence_segmenter (
         const trainer_type& trainer,
@@ -66,7 +66,7 @@ namespace dlib
             - Performs k-fold cross validation by using the given trainer to solve the
               given sequence segmentation problem for the given number of folds.  Each fold
               is tested using the output of the trainer and the results from all folds are
-              summarized and returned. 
+              summarized and returned.
             - This function returns the precision, recall, and F1-score for the trainer.
               In particular, the output is the same as the output from the
               test_sequence_segmenter() routine defined above.

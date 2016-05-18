@@ -25,20 +25,20 @@ namespace dlib
         std::ostringstream sout;
         std::istringstream sin;
 
-        /* 
-            SOURCE BDF FILE (helvR12.bdf) COMMENTS 
+        /*
+            SOURCE BDF FILE (helvR12.bdf) COMMENTS
             COMMENT $XConsortium: helvR12.bdf,v 1.15 95/01/26 18:02:58 gildea Exp $
             COMMENT $Id: helvR12.bdf,v 1.26 2004-11-28 20:08:46+00 mgk25 Rel $
-            COMMENT 
+            COMMENT
             COMMENT +
             COMMENT  Copyright 1984-1989, 1994 Adobe Systems Incorporated.
             COMMENT  Copyright 1988, 1994 Digital Equipment Corporation.
-            COMMENT 
+            COMMENT
             COMMENT  Adobe is a trademark of Adobe Systems Incorporated which may be
             COMMENT  registered in certain jurisdictions.
             COMMENT  Permission to use these trademarks is hereby granted only in
             COMMENT  association with the images described in this file.
-            COMMENT 
+            COMMENT
             COMMENT  Permission to use, copy, modify, distribute and sell this software
             COMMENT  and its documentation for any purpose and without fee is hereby
             COMMENT  granted, provided that the above copyright notices appear in all
@@ -106,7 +106,7 @@ namespace dlib
 
     default_font::
     default_font (
-    ) 
+    )
     {
         using namespace std;
         l = new letter[256];
@@ -131,9 +131,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void serialize (
-        const letter& item, 
-        std::ostream& out 
-    )   
+        const letter& item,
+        std::ostream& out
+    )
     {
         try
         {
@@ -147,13 +147,13 @@ namespace dlib
             }
         }
         catch (serialization_error e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type letter"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type letter");
         }
     }
 
     void deserialize (
-        letter& item, 
+        letter& item,
         std::istream& in
     )
     {
@@ -177,11 +177,11 @@ namespace dlib
             }
         }
         catch (serialization_error e)
-        { 
+        {
             item.w = 0;
             item.count = 0;
             item.points = 0;
-            throw serialization_error(e.info + "\n   while deserializing object of type letter"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type letter");
         }
     }
 
@@ -434,8 +434,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    bdf_font::bdf_font( 
-        long default_char_ 
+    bdf_font::bdf_font(
+        long default_char_
     ) :
         default_char(0),
         is_initialized( false ),
@@ -491,10 +491,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     long bdf_font::
-    read_bdf_file( 
-        std::istream& in, 
-        unichar max_enc, 
-        unichar min_enc 
+    read_bdf_file(
+        std::istream& in,
+        unichar max_enc,
+        unichar min_enc
     )
     {
         using namespace bdf_font_helpers;
@@ -577,7 +577,7 @@ namespace dlib
         if ( specified_default_char >= 0 )
             default_char = specified_default_char;
         // no default char specified, try find something sane.
-        else 
+        else
             default_char = 0;
 
         return nr_letters_added;
@@ -586,12 +586,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     bool bdf_font::
-    bitmap_to_letter( 
-        array2d<char>& bitmap, 
-        unichar enc, 
-        unsigned long width, 
+    bitmap_to_letter(
+        array2d<char>& bitmap,
+        unichar enc,
+        unsigned long width,
         int x_offset,
-        int y_offset 
+        int y_offset
     )
     {
         unsigned nr_points = 0;

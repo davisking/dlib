@@ -43,7 +43,7 @@ namespace dlib
               expression.  Therefore, it is capable of converting objects like dlib::array2d
               of dlib::cv_image.
             - returns a matrix R such that:
-                - R.nr() == array.nr() 
+                - R.nr() == array.nr()
                 - R.nc() == array.nc()
                 - for all valid r and c:
                   R(r, c) == array[r][c]
@@ -56,12 +56,12 @@ namespace dlib
         typename MM
         >
     const matrix_exp mat (
-        const array<T,MM>& m 
+        const array<T,MM>& m
     );
     /*!
         ensures
             - returns a matrix R such that:
-                - is_col_vector(R) == true 
+                - is_col_vector(R) == true
                 - R.size() == m.size()
                 - for all valid r:
                   R(r) == m[r]
@@ -79,7 +79,7 @@ namespace dlib
     /*!
         ensures
             - returns a matrix R such that:
-                - is_col_vector(R) == true 
+                - is_col_vector(R) == true
                 - R.size() == vector.size()
                 - for all valid r:
                   R(r) == vector[r]
@@ -97,7 +97,7 @@ namespace dlib
     /*!
         ensures
             - returns a matrix R such that:
-                - is_col_vector(R) == true 
+                - is_col_vector(R) == true
                 - R.size() == vector.size()
                 - for all valid r:
                   R(r) == vector[r]
@@ -144,7 +144,7 @@ namespace dlib
         ensures
             - returns a matrix M such that:
                 - M.nr() == nr
-                - m.nc() == nc 
+                - m.nc() == nc
                 - for all valid r and c:
                   M(r,c) == ptr[r*nc + c]
                   (i.e. the pointer is interpreted as a matrix laid out in memory
@@ -165,7 +165,7 @@ namespace dlib
         ensures
             - Converts a matrix from the Armadillo library into a dlib matrix.
             - returns a matrix R such that:
-                - R.nr() == m.n_rows 
+                - R.nr() == m.n_rows
                 - R.nc() == m.n_cols
                 - for all valid r:
                   R(r,c) == m(r,c)
@@ -174,11 +174,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename _Scalar, 
-        int _Rows, 
-        int _Cols, 
-        int _Options, 
-        int _MaxRows, 
+        typename _Scalar,
+        int _Rows,
+        int _Cols,
+        int _Options,
+        int _MaxRows,
         int _MaxCols
         >
     const matrix_exp mat (

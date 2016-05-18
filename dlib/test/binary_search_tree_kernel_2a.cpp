@@ -15,7 +15,7 @@
 #include "tester.h"
 #include "binary_search_tree.h"
 
-namespace  
+namespace
 {
 
     class binary_search_tree_tester : public tester

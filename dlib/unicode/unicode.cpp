@@ -24,7 +24,7 @@ namespace dlib
 
     template <typename T> bool is_surrogate(T ch)
     {
-        return (zero_extend_cast<unichar>(ch) >= SURROGATE_TOP && 
+        return (zero_extend_cast<unichar>(ch) >= SURROGATE_TOP &&
                 zero_extend_cast<unichar>(ch) < SURROGATE_END);
     }
 

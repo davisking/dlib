@@ -22,7 +22,7 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON any_trainer
-                must be an instantiation of the dlib::any_trainer template.   
+                must be an instantiation of the dlib::any_trainer template.
 
             REQUIREMENTS ON label_type_
                 label_type_ must be default constructable, copyable, and comparable using
@@ -30,14 +30,14 @@ namespace dlib
                 using operator<<.
 
             WHAT THIS OBJECT REPRESENTS
-                This object is a tool for turning a bunch of binary classifiers into a 
-                multiclass classifier.  It does this by training the binary classifiers 
-                in a one vs. all fashion.  That is, if you have N possible classes then 
-                it trains N binary classifiers which are then used to vote on the identity 
+                This object is a tool for turning a bunch of binary classifiers into a
+                multiclass classifier.  It does this by training the binary classifiers
+                in a one vs. all fashion.  That is, if you have N possible classes then
+                it trains N binary classifiers which are then used to vote on the identity
                 of a test sample.
 
                 This object works with any kind of binary classification trainer object
-                capable of being assigned to an any_trainer object.  (e.g. the svm_nu_trainer) 
+                capable of being assigned to an any_trainer object.  (e.g. the svm_nu_trainer)
         !*/
 
     public:
@@ -67,9 +67,9 @@ namespace dlib
         );
         /*!
             ensures
-                - sets the trainer used for all binary subproblems.  Any previous 
+                - sets the trainer used for all binary subproblems.  Any previous
                   calls to set_trainer() are overridden by this function.  Even the
-                  more specific set_trainer(trainer, l) form. 
+                  more specific set_trainer(trainer, l) form.
         !*/
 
         void set_trainer (
@@ -86,7 +86,7 @@ namespace dlib
         );
         /*!
             ensures
-                - This object will print status messages to standard out so that a 
+                - This object will print status messages to standard out so that a
                   user can observe the progress of the algorithm.
         !*/
 
@@ -109,13 +109,13 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the number of threads used during training.  You should 
+                - returns the number of threads used during training.  You should
                   usually set this equal to the number of processing cores on your
                   machine.
         !*/
 
-        struct invalid_label : public dlib::error 
-        { 
+        struct invalid_label : public dlib::error
+        {
             /*!
                 This is the exception thrown by the train() function below.
             !*/
@@ -130,8 +130,8 @@ namespace dlib
             requires
                 - is_learning_problem(all_samples, all_labels)
             ensures
-                - trains a bunch of binary classifiers in a one vs all fashion to solve the given 
-                  multiclass classification problem.  
+                - trains a bunch of binary classifiers in a one vs all fashion to solve the given
+                  multiclass classification problem.
                 - returns a one_vs_all_decision_function F with the following properties:
                     - F contains all the learned binary classifiers and can be used to predict
                       the labels of new samples.
@@ -146,8 +146,8 @@ namespace dlib
                   has been called.  However, if only the set_trainer(trainer,l) form has been
                   used then this exception is thrown if not all labels have been given a trainer.
 
-                  invalid_label::l will contain the label which is missing a trainer object.  
-                  Additionally, the exception will contain an informative error message available 
+                  invalid_label::l will contain the label which is missing a trainer object.
+                  Additionally, the exception will contain an informative error message available
                   via invalid_label::what().
         !*/
 

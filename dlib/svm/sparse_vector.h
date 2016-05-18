@@ -46,7 +46,7 @@ namespace dlib
                 temp = ai->second;
                 ++ai;
             }
-            else 
+            else
             {
                 temp = bi->second;
                 ++bi;
@@ -101,7 +101,7 @@ namespace dlib
                 temp = a_scale*ai->second;
                 ++ai;
             }
-            else 
+            else
             {
                 temp = b_scale*bi->second;
                 ++bi;
@@ -242,7 +242,7 @@ namespace dlib
                 {
                     ++ai;
                 }
-                else 
+                else
                 {
                     ++bi;
                 }
@@ -266,7 +266,7 @@ namespace dlib
             const std::vector<std::pair<T,U>,alloc>& b
         )
         {
-            // You are getting this error because you are attempting to use sparse sample vectors 
+            // You are getting this error because you are attempting to use sparse sample vectors
             // but you aren't using an unsigned integer as your key type in the sparse vectors.
             COMPILE_TIME_ASSERT(is_unsigned_type<T>::value);
 
@@ -342,15 +342,15 @@ namespace dlib
         // make sure requires clause is not broken
         DLIB_ASSERT(is_vector(b),
                     "\t scalar_type dot(sparse_vector a, dense_vector b)"
-                    << "\n\t 'b' must be a vector to be used in a dot product." 
+                    << "\n\t 'b' must be a vector to be used in a dot product."
         );
 
         typedef typename T::value_type::second_type scalar_type;
         typedef typename T::value_type::first_type first_type;
 
         scalar_type sum = 0;
-        for (typename T::const_iterator ai = a.begin(); 
-             (ai != a.end()) && (ai->first < static_cast<first_type>(b.size())); 
+        for (typename T::const_iterator ai = a.begin();
+             (ai != a.end()) && (ai->first < static_cast<first_type>(b.size()));
              ++ai)
         {
             sum += ai->second * b(ai->first);
@@ -542,7 +542,7 @@ namespace dlib
         template <typename T>
         typename enable_if<is_matrix<typename T::type>,unsigned long>::type max_index_plus_one (
             const T& samples
-        ) 
+        )
         {
             if (samples.size() > 0)
                 return samples(0).size();
@@ -553,20 +553,20 @@ namespace dlib
         template <typename T>
         typename enable_if<is_built_in_scalar_type<typename T::type>,unsigned long>::type max_index_plus_one (
             const T& sample
-        ) 
+        )
         {
             return sample.size();
         }
 
         // This !is_built_in_scalar_type<typename T::type>::value is here to avoid an inexplicable bug in Vistual Studio 2005
         template <typename T>
-        typename enable_if_c<(!is_built_in_scalar_type<typename T::type>::value) && (is_pair<typename T::type::value_type>::value) ,unsigned long>::type 
+        typename enable_if_c<(!is_built_in_scalar_type<typename T::type>::value) && (is_pair<typename T::type::value_type>::value) ,unsigned long>::type
         max_index_plus_one (
             const T& samples
-        ) 
+        )
         {
             typedef typename T::type sample_type;
-            // You are getting this error because you are attempting to use sparse sample vectors 
+            // You are getting this error because you are attempting to use sparse sample vectors
             // but you aren't using an unsigned integer as your key type in the sparse vectors.
             COMPILE_TIME_ASSERT(has_unsigned_keys<sample_type>::value);
 
@@ -586,7 +586,7 @@ namespace dlib
     template <typename T>
     typename enable_if<is_pair<typename T::value_type>,unsigned long>::type max_index_plus_one (
         const T& sample
-    ) 
+    )
     {
         if (sample.size() > 0)
             return (--sample.end())->first + 1;
@@ -596,10 +596,10 @@ namespace dlib
     template <typename T>
     typename disable_if_c<is_pair<typename T::value_type>::value ||
                           is_same_type<typename T::value_type,sample_pair>::value ||
-                          is_same_type<typename T::value_type,ordered_sample_pair>::value , unsigned long>::type 
+                          is_same_type<typename T::value_type,ordered_sample_pair>::value , unsigned long>::type
     max_index_plus_one (
         const T& samples
-    ) 
+    )
     {
         return impl::max_index_plus_one(mat(samples));
     }
@@ -609,8 +609,8 @@ namespace dlib
     template <typename T, long NR, long NC, typename MM, typename L, typename EXP>
     inline void add_to (
         matrix<T,NR,NC,MM,L>& dest,
-        const matrix_exp<EXP>& src 
-    ) 
+        const matrix_exp<EXP>& src
+    )
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(is_vector(dest) && max_index_plus_one(src) <= static_cast<unsigned long>(dest.size()),
@@ -618,7 +618,7 @@ namespace dlib
                     << "\n\t dest must be a vector large enough to hold the src vector."
                     << "\n\t is_vector(dest):         " << is_vector(dest)
                     << "\n\t max_index_plus_one(src): " << max_index_plus_one(src)
-                    << "\n\t dest.size():             " << dest.size() 
+                    << "\n\t dest.size():             " << dest.size()
         );
 
         for (long r = 0; r < src.size(); ++r)
@@ -629,7 +629,7 @@ namespace dlib
     inline typename disable_if<is_matrix<EXP> >::type add_to (
         matrix<T,NR,NC,MM,L>& dest,
         const EXP& src
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(is_vector(dest) && max_index_plus_one(src) <= static_cast<unsigned long>(dest.size()),
@@ -637,7 +637,7 @@ namespace dlib
                     << "\n\t dest must be a vector large enough to hold the src vector."
                     << "\n\t is_vector(dest):         " << is_vector(dest)
                     << "\n\t max_index_plus_one(src): " << max_index_plus_one(src)
-                    << "\n\t dest.size():             " << dest.size() 
+                    << "\n\t dest.size():             " << dest.size()
         );
 
         for (typename EXP::const_iterator i = src.begin(); i != src.end(); ++i)
@@ -651,7 +651,7 @@ namespace dlib
         matrix<T,NR,NC,MM,L>& dest,
         const matrix_exp<EXP>& src,
         const U& C
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(is_vector(dest) && max_index_plus_one(src) <= static_cast<unsigned long>(dest.size()),
@@ -659,7 +659,7 @@ namespace dlib
                     << "\n\t dest must be a vector large enough to hold the src vector."
                     << "\n\t is_vector(dest):         " << is_vector(dest)
                     << "\n\t max_index_plus_one(src): " << max_index_plus_one(src)
-                    << "\n\t dest.size():             " << dest.size() 
+                    << "\n\t dest.size():             " << dest.size()
         );
 
         for (long r = 0; r < src.size(); ++r)
@@ -671,7 +671,7 @@ namespace dlib
         matrix<T,NR,NC,MM,L>& dest,
         const EXP& src,
         const U& C
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(is_vector(dest) && max_index_plus_one(src) <= static_cast<unsigned long>(dest.size()),
@@ -679,7 +679,7 @@ namespace dlib
                     << "\n\t dest must be a vector large enough to hold the src vector."
                     << "\n\t is_vector(dest):         " << is_vector(dest)
                     << "\n\t max_index_plus_one(src): " << max_index_plus_one(src)
-                    << "\n\t dest.size():             " << dest.size() 
+                    << "\n\t dest.size():             " << dest.size()
         );
 
         for (typename EXP::const_iterator i = src.begin(); i != src.end(); ++i)
@@ -691,8 +691,8 @@ namespace dlib
     template <typename T, long NR, long NC, typename MM, typename L, typename EXP>
     inline void subtract_from (
         matrix<T,NR,NC,MM,L>& dest,
-        const matrix_exp<EXP>& src 
-    ) 
+        const matrix_exp<EXP>& src
+    )
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(is_vector(dest) && max_index_plus_one(src) <= static_cast<unsigned long>(dest.size()),
@@ -700,7 +700,7 @@ namespace dlib
                     << "\n\t dest must be a vector large enough to hold the src vector."
                     << "\n\t is_vector(dest):         " << is_vector(dest)
                     << "\n\t max_index_plus_one(src): " << max_index_plus_one(src)
-                    << "\n\t dest.size():             " << dest.size() 
+                    << "\n\t dest.size():             " << dest.size()
         );
 
         for (long r = 0; r < src.size(); ++r)
@@ -711,7 +711,7 @@ namespace dlib
     inline typename disable_if<is_matrix<EXP> >::type subtract_from (
         matrix<T,NR,NC,MM,L>& dest,
         const EXP& src
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(is_vector(dest) && max_index_plus_one(src) <= static_cast<unsigned long>(dest.size()),
@@ -719,7 +719,7 @@ namespace dlib
                     << "\n\t dest must be a vector large enough to hold the src vector."
                     << "\n\t is_vector(dest):         " << is_vector(dest)
                     << "\n\t max_index_plus_one(src): " << max_index_plus_one(src)
-                    << "\n\t dest.size():             " << dest.size() 
+                    << "\n\t dest.size():             " << dest.size()
         );
 
         for (typename EXP::const_iterator i = src.begin(); i != src.end(); ++i)
@@ -733,7 +733,7 @@ namespace dlib
         matrix<T,NR,NC,MM,L>& dest,
         const matrix_exp<EXP>& src,
         const U& C
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(is_vector(dest) && max_index_plus_one(src) <= static_cast<unsigned long>(dest.size()),
@@ -741,7 +741,7 @@ namespace dlib
                     << "\n\t dest must be a vector large enough to hold the src vector."
                     << "\n\t is_vector(dest):         " << is_vector(dest)
                     << "\n\t max_index_plus_one(src): " << max_index_plus_one(src)
-                    << "\n\t dest.size():             " << dest.size() 
+                    << "\n\t dest.size():             " << dest.size()
         );
 
         for (long r = 0; r < src.size(); ++r)
@@ -753,7 +753,7 @@ namespace dlib
         matrix<T,NR,NC,MM,L>& dest,
         const EXP& src,
         const U& C
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(is_vector(dest) && max_index_plus_one(src) <= static_cast<unsigned long>(dest.size()),
@@ -761,7 +761,7 @@ namespace dlib
                     << "\n\t dest must be a vector large enough to hold the src vector."
                     << "\n\t is_vector(dest):         " << is_vector(dest)
                     << "\n\t max_index_plus_one(src): " << max_index_plus_one(src)
-                    << "\n\t dest.size():             " << dest.size() 
+                    << "\n\t dest.size():             " << dest.size()
         );
 
         for (typename EXP::const_iterator i = src.begin(); i != src.end(); ++i)
@@ -811,7 +811,7 @@ namespace dlib
         template <typename sparse_vector_type>
         inline matrix<typename sparse_vector_type::value_type::second_type,0,1> sparse_to_dense (
             const sparse_vector_type& vect,
-            unsigned long num_dimensions 
+            unsigned long num_dimensions
         )
         {
             // You must use unsigned integral key types in your sparse vectors
@@ -844,7 +844,7 @@ namespace dlib
     template <typename idx_type, typename value_type, typename alloc>
     matrix<value_type,0,1> sparse_to_dense (
         const std::vector<std::pair<idx_type,value_type>,alloc>& vect,
-        unsigned long num_dimensions 
+        unsigned long num_dimensions
     )
     {
         return impl::sparse_to_dense(vect,num_dimensions);
@@ -865,7 +865,7 @@ namespace dlib
     template <typename T1, typename T2, typename T3, typename T4>
     matrix<T2,0,1> sparse_to_dense (
         const std::map<T1,T2,T3,T4>& vect,
-        unsigned long num_dimensions 
+        unsigned long num_dimensions
     )
     {
         return impl::sparse_to_dense(vect,num_dimensions);
@@ -892,11 +892,11 @@ namespace dlib
     matrix<typename EXP::type,0,1> sparse_to_dense(
         const matrix_exp<EXP>& item,
         unsigned long num
-    ) 
-    { 
+    )
+    {
         typedef typename EXP::type type;
         if (item.size() == (long)num)
-            return item; 
+            return item;
         else if (item.size() < (long)num)
             return join_cols(item, zeros_matrix<type>((long)num-item.size(),1));
         else
@@ -1031,8 +1031,8 @@ namespace dlib
                     "\t void sparse_matrix_vector_multiply()"
                     << "\n\t Invalid inputs were given to this function"
                     << "\n\t max_index_plus_one(edges): " << max_index_plus_one(edges)
-                    << "\n\t v.size():                  " << v.size() 
-                    << "\n\t is_col_vector(v):          " << is_col_vector(v) 
+                    << "\n\t v.size():                  " << v.size()
+                    << "\n\t is_col_vector(v):          " << is_col_vector(v)
         );
 
         result.set_size(v.nr(),v.nc());
@@ -1078,8 +1078,8 @@ namespace dlib
                     "\t void sparse_matrix_vector_multiply()"
                     << "\n\t Invalid inputs were given to this function"
                     << "\n\t max_index_plus_one(edges): " << max_index_plus_one(edges)
-                    << "\n\t v.size():                  " << v.size() 
-                    << "\n\t is_col_vector(v):          " << is_col_vector(v) 
+                    << "\n\t v.size():                  " << v.size()
+                    << "\n\t is_col_vector(v):          " << is_col_vector(v)
         );
 
 
@@ -1112,7 +1112,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename EXP, 
+        typename EXP,
         typename sparse_vector_type,
         typename T,
         long NR,
@@ -1131,7 +1131,7 @@ namespace dlib
                     "\t void sparse_matrix_vector_multiply()"
                     << "\n\t Invalid inputs were given to this function"
                     << "\n\t max_index_plus_one(v): " << max_index_plus_one(v)
-                    << "\n\t m.size():              " << m.size() 
+                    << "\n\t m.size():              " << m.size()
         );
 
         result.set_size(m.nr(),1);
@@ -1149,7 +1149,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename EXP, 
+        typename EXP,
         typename sparse_vector_type
         >
     matrix<typename EXP::type,0,1> sparse_matrix_vector_multiply (

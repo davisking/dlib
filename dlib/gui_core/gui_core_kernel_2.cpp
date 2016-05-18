@@ -44,7 +44,7 @@ namespace dlib
 
         typedef sync_extension<queue<user_event_type,memory_manager<char>::kernel_1b>::kernel_2a_c>::kernel_1a queue_of_user_events;
 
-        typedef sync_extension<binary_search_tree<Window,base_window*>::kernel_1a>::kernel_1a 
+        typedef sync_extension<binary_search_tree<Window,base_window*>::kernel_1a>::kernel_1a
             window_table_type;
 
     // ----------------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ namespace dlib
             {
                 uninitialized,
                 initialized,
-                failure_to_init 
+                failure_to_init
             };
 
             et_state status;
@@ -76,7 +76,7 @@ namespace dlib
             XIMStyle xim_style;
             Screen* screen;
 
-            Atom delete_window; 
+            Atom delete_window;
             Window exit_window;
             std::wstring clipboard;
 
@@ -147,7 +147,7 @@ namespace dlib
                         XPutBackEvent(disp,reinterpret_cast<XEvent*>(&event));
                         XFlush(disp);
 
-                        // This should cause XNextEvent() to unblock so that it will see 
+                        // This should cause XNextEvent() to unblock so that it will see
                         // this ConfigureNotify event we are putting onto the event queue.
                         XSendEvent(disp,exit_window,False,0,reinterpret_cast<XEvent*>(&event));
                         XFlush(disp);
@@ -184,8 +184,8 @@ namespace dlib
                 {
 
                     // You are supposed to call this if using XLib in a threaded program.  Note
-                    // however that at one point I noticed that calling this causes a dead-lock 
-                    // when using XIM.  But I can't reproduce that anymore and not calling it 
+                    // however that at one point I noticed that calling this causes a dead-lock
+                    // when using XIM.  But I can't reproduce that anymore and not calling it
                     // sometimes causes XCloseDisplay() to hang.
                     if (XInitThreads() == 0)
                     {
@@ -221,13 +221,13 @@ namespace dlib
                     window_table.get_mutex().lock();
                     screen = DefaultScreenOfDisplay(disp);
                     depth = DefaultDepthOfScreen(screen);
-                    delete_window = XInternAtom(disp,"WM_DELETE_WINDOW",1); 
+                    delete_window = XInternAtom(disp,"WM_DELETE_WINDOW",1);
                     window_table.get_mutex().unlock();
 
                     xim = NULL;
                     // I'm disabling XIM usage all together because calling XSetICValues()
                     // in set_im_pos() randomly hangs the application (on Ubuntu 13.10 at
-                    // least).    
+                    // least).
                     /*
                     window_table.get_mutex().lock();
                     std::string saved_locale(setlocale (LC_CTYPE, NULL));
@@ -383,13 +383,13 @@ namespace dlib
                 - else
                     - returns true
                     - #is_printable == true if result is a printable ascii character
-                    - #result == the keycode converted into the proper number to tbe 
+                    - #result == the keycode converted into the proper number to tbe
                       returned by the event handler.
         !*/
         {
             is_printable = true;
-            if ((keycode <= 'z' && keycode >= 'a') || 
-                (keycode <= 'Z' && keycode >= 'A') || 
+            if ((keycode <= 'z' && keycode >= 'a') ||
+                (keycode <= 'Z' && keycode >= 'A') ||
                 (keycode <= '9' && keycode >= '0'))
             {
                 result = keycode;
@@ -447,162 +447,162 @@ namespace dlib
 
 
 
-                case XK_exclam:    
+                case XK_exclam:
                     is_printable = true;
                     result = '!'; break;
-                case XK_quotedbl:    
+                case XK_quotedbl:
                     is_printable = true;
                     result = '"'; break;
-                case XK_numbersign:    
+                case XK_numbersign:
                     is_printable = true;
                     result = '#'; break;
-                case XK_dollar:    
+                case XK_dollar:
                     is_printable = true;
                     result = '$'; break;
-                case XK_percent:    
+                case XK_percent:
                     is_printable = true;
                     result = '%'; break;
-                case XK_ampersand:    
+                case XK_ampersand:
                     is_printable = true;
                     result = '&'; break;
-                case XK_apostrophe:    
+                case XK_apostrophe:
                     is_printable = true;
                     result = '\''; break;
-                case XK_parenleft:    
+                case XK_parenleft:
                     is_printable = true;
                     result = '('; break;
-                case XK_parenright:    
+                case XK_parenright:
                     is_printable = true;
                     result = ')'; break;
-                case XK_asterisk:    
+                case XK_asterisk:
                     is_printable = true;
                     result = '*'; break;
-                case XK_plus:    
+                case XK_plus:
                     is_printable = true;
                     result = '+'; break;
-                case XK_comma:    
+                case XK_comma:
                     is_printable = true;
                     result = ','; break;
-                case XK_minus:    
+                case XK_minus:
                     is_printable = true;
                     result = '-'; break;
-                case XK_period:    
+                case XK_period:
                     is_printable = true;
                     result = '.'; break;
-                case XK_slash:    
+                case XK_slash:
                     is_printable = true;
                     result = '/'; break;
-                case XK_colon:    
+                case XK_colon:
                     is_printable = true;
                     result = ':'; break;
-                case XK_semicolon:    
+                case XK_semicolon:
                     is_printable = true;
                     result = ';'; break;
-                case XK_less:    
+                case XK_less:
                     is_printable = true;
                     result = '<'; break;
-                case XK_equal:    
+                case XK_equal:
                     is_printable = true;
                     result = '='; break;
-                case XK_greater:    
+                case XK_greater:
                     is_printable = true;
                     result = '>'; break;
-                case XK_question:    
+                case XK_question:
                     is_printable = true;
                     result = '?'; break;
-                case XK_at:    
+                case XK_at:
                     is_printable = true;
                     result = '@'; break;
-                case XK_grave:    
+                case XK_grave:
                     is_printable = true;
                     result = '`'; break;
-                case XK_underscore:    
+                case XK_underscore:
                     is_printable = true;
                     result = '_'; break;
-                case XK_asciicircum:    
+                case XK_asciicircum:
                     is_printable = true;
                     result = '^'; break;
-                case XK_bracketleft:    
+                case XK_bracketleft:
                     is_printable = true;
                     result = '['; break;
-                case XK_backslash:    
+                case XK_backslash:
                     is_printable = true;
                     result = '\\'; break;
-                case XK_bracketright:    
+                case XK_bracketright:
                     is_printable = true;
                     result = ']'; break;
-                case XK_asciitilde:    
+                case XK_asciitilde:
                     is_printable = true;
                     result = '~'; break;
-                case XK_braceleft:    
+                case XK_braceleft:
                     is_printable = true;
                     result = '{'; break;
-                case XK_bar:    
+                case XK_bar:
                     is_printable = true;
                     result = '|'; break;
-                case XK_braceright:    
+                case XK_braceright:
                     is_printable = true;
                     result = '}'; break;
             
 
 
 
-                case XK_space:    
+                case XK_space:
                     is_printable = true;
                     result = ' '; break;
-                case XK_Return:    
+                case XK_Return:
                     is_printable = true;
                     result = '\n'; break;
-                case XK_Tab:    
+                case XK_Tab:
                     is_printable = true;
                     result = '\t'; break;
-                case XK_KP_Divide: 
+                case XK_KP_Divide:
                     is_printable = true;
                     result = '/'; break;
-                case XK_KP_Decimal: 
+                case XK_KP_Decimal:
                     is_printable = true;
                     result = '.'; break;
-                case XK_KP_Subtract: 
+                case XK_KP_Subtract:
                     is_printable = true;
                     result = '-'; break;
-                case XK_KP_Add: 
+                case XK_KP_Add:
                     is_printable = true;
                     result = '+'; break;
-                case XK_KP_Multiply: 
+                case XK_KP_Multiply:
                     is_printable = true;
                     result = '*'; break;
-                case XK_KP_Equal: 
+                case XK_KP_Equal:
                     is_printable = true;
                     result = '='; break;
 
-                case XK_KP_0: 
+                case XK_KP_0:
                     is_printable = true;
                     result = '0'; break;
-                case XK_KP_1: 
+                case XK_KP_1:
                     is_printable = true;
                     result = '1'; break;
-                case XK_KP_2: 
+                case XK_KP_2:
                     is_printable = true;
                     result = '2'; break;
-                case XK_KP_3: 
+                case XK_KP_3:
                     is_printable = true;
                     result = '3'; break;
-                case XK_KP_4: 
+                case XK_KP_4:
                     is_printable = true;
                     result = '4'; break;
-                case XK_KP_5: 
+                case XK_KP_5:
                     is_printable = true;
                     result = '5'; break;
-                case XK_KP_6: 
+                case XK_KP_6:
                     is_printable = true;
                     result = '6'; break;
-                case XK_KP_7: 
+                case XK_KP_7:
                     is_printable = true;
                     result = '7'; break;
-                case XK_KP_8: 
+                case XK_KP_8:
                     is_printable = true;
                     result = '8'; break;
-                case XK_KP_9: 
+                case XK_KP_9:
                     is_printable = true;
                     result = '9'; break;
 
@@ -621,9 +621,9 @@ namespace dlib
         )
         /*!
             ensures
-                - will handle all events and event dispatching            
+                - will handle all events and event dispatching
         !*/
-        {       
+        {
             try
             {
                 std::vector<unsigned char> bitmap_buffer;
@@ -633,7 +633,7 @@ namespace dlib
                     // get a lock on the window_table's mutex
                     auto_mutex window_table_locker(window_table.get_mutex());
 
-                    XEvent ev;                
+                    XEvent ev;
                     memset(&ev, 0, sizeof(ev));
                     while (XPending(disp) == 0){
                         window_table.get_mutex().unlock();
@@ -641,7 +641,7 @@ namespace dlib
                         struct pollfd pfd;
                         pfd.fd = ConnectionNumber(disp);
                         pfd.events = POLLIN | POLLPRI;
-                        poll(&pfd, 1, -1);  
+                        poll(&pfd, 1, -1);
                         
                         window_table.get_mutex().lock();
                     }
@@ -663,7 +663,7 @@ namespace dlib
 
 
                     // ignore messages for unmapped windows
-                    if (ev.type != MapNotify && win != 0) 
+                    if (ev.type != MapNotify && win != 0)
                     {
                         if (win->is_mapped == false)
                            continue;
@@ -703,7 +703,7 @@ namespace dlib
                                                  clipboard.size()+1);
                                 respond.xselection.property=req->property;
                             }
-                            else 
+                            else
                             {
                                 respond.xselection.property= None;
                             }
@@ -731,8 +731,8 @@ namespace dlib
                                 hints->flags = PMinSize|PMaxSize;
                                 hints->min_width = win->width;
                                 hints->max_width = win->width;
-                                hints->max_height = win->height; 
-                                hints->min_height = win->height; 
+                                hints->max_height = win->height;
+                                hints->min_height = win->height;
                                 XSetNormalHints(disp,win->x11_stuff.hwnd,hints);
                                 XFree(hints);
                             }
@@ -823,7 +823,7 @@ namespace dlib
                             if (win == 0)
                                 break;
 
-                            // signal the focus event 
+                            // signal the focus event
                             win->on_focus_gained();
                         } break;
 
@@ -832,7 +832,7 @@ namespace dlib
                             if (win == 0)
                                 break;
 
-                            // signal the focus event 
+                            // signal the focus event
                             win->on_focus_lost();
                         } break;
 
@@ -1002,15 +1002,15 @@ namespace dlib
                                 if (win->on_window_close() == base_window::DO_NOT_CLOSE_WINDOW)
                                 {
                                     DLIB_ASSERT(win->has_been_destroyed == false,
-                                        "\tYou called close_window() inside the on_window_close() event but" 
+                                        "\tYou called close_window() inside the on_window_close() event but"
                                         << "\n\tthen returned DO_NOT_CLOSE_WINDOW.  You can do one or the other but not both."
-                                        << "\n\tthis:     " << win 
+                                        << "\n\tthis:     " << win
                                         );
                                     // the client has decided not to close the window
                                     // after all
                                 }
                                 else
-                                {                                
+                                {
                                     if (window_table[e->window])
                                     {
                                         window_table.destroy(e->window);
@@ -1039,20 +1039,20 @@ namespace dlib
                             int x = e->x;
                             int y = e->y;
                             int width = e->width;
-                            int height = e->height;  
+                            int height = e->height;
 
 
 
                             // What we are doing here with this loop is we are combining
-                            // all of the Expose events for this window that are 
-                            // currently in the queue.  
+                            // all of the Expose events for this window that are
+                            // currently in the queue.
                             while (XCheckIfEvent(disp,&etemp,XCheckIfEventPredicate,reinterpret_cast<XPointer>(&(e->window))))
                             {
                                 XExposeEvent* e2 = reinterpret_cast<XExposeEvent*>(&etemp);
                                 if (e2->x < x)
                                 {
                                     width += x - e2->x;
-                                    x = e2->x;                                
+                                    x = e2->x;
                                 }
                                 if (e2->y < y)
                                 {
@@ -1066,7 +1066,7 @@ namespace dlib
                                 if (e2->height + e2->y > height + y)
                                 {
                                     height = e2->height + e2->y - y;
-                                }                                
+                                }
                             }
 
                             // I'm not sure if this sort of thing can happen but
@@ -1125,8 +1125,8 @@ namespace dlib
                                     blue_bits = 5;
                                 }
 
-                                if (depth == 16) 
-                                { 
+                                if (depth == 16)
+                                {
                                     temp = bitmap;
                                     unsigned char *red, *green, *blue;
                                     while (temp != end)
@@ -1369,7 +1369,7 @@ namespace dlib
     Bool clip_peek_helper (
         Display*,
         XEvent* event,
-        XPointer 
+        XPointer
     )
     {
         if ( event->type == SelectionNotify)
@@ -1429,7 +1429,7 @@ namespace dlib
             else if (sown != None)
             {
                 // request that the selection be copied into the XA_PRIMARY property
-                // of the exit_window.  It doesn't matter what window we put it in 
+                // of the exit_window.  It doesn't matter what window we put it in
                 // so long as it is one under the control of this process and exit_window
                 // is easy to use here so that is what I'm using.
                 XConvertSelection (globals->disp, XA_PRIMARY, atom_ct, XA_PRIMARY,
@@ -1440,15 +1440,15 @@ namespace dlib
                 XPeekIfEvent(globals->disp,&e,clip_peek_helper,0);
 
                 // See how much data we got
-                XGetWindowProperty (globals->disp, globals->exit_window, 
+                XGetWindowProperty (globals->disp, globals->exit_window,
                                     XA_PRIMARY,    // Tricky..
                                     0, 0,         // offset - len
                                     0,        // Delete 0==FALSE
                                     AnyPropertyType,  //flag
                                     &type,        // return type
                                     &format,      // return format
-                                    &len, &bytes_left,  //that 
-                                    &data);             
+                                    &len, &bytes_left,  //that
+                                    &data);
                 if (data)
                 {
                     XFree(data);
@@ -1457,7 +1457,7 @@ namespace dlib
                 if (bytes_left > 0 && type == atom_ct)
                 {
                     XTextProperty p;
-                    result = XGetWindowProperty (globals->disp, globals->exit_window, 
+                    result = XGetWindowProperty (globals->disp, globals->exit_window,
                                                  XA_PRIMARY, 0,bytes_left,0,
                                                  AnyPropertyType, &p.encoding,&p.format,
                                                  &p.nitems, &dummy, &p.value);
@@ -1477,7 +1477,7 @@ namespace dlib
         }
         catch (...)
         {
-            if (data) 
+            if (data)
                 XFree(data);
             if (plist)
             {
@@ -1668,8 +1668,8 @@ namespace dlib
             hints->flags = PMinSize|PMaxSize;
             hints->min_width = width;
             hints->max_width = width;
-            hints->max_height = height; 
-            hints->min_height = height; 
+            hints->max_height = height;
+            hints->min_height = height;
             XSetNormalHints(x11_stuff.globals->disp,x11_stuff.hwnd,hints);
             XFree(hints);
         }
@@ -1706,12 +1706,12 @@ namespace dlib
         {
             has_been_destroyed = true;
 
-            x11_stuff.globals->window_table.destroy(x11_stuff.hwnd);           
+            x11_stuff.globals->window_table.destroy(x11_stuff.hwnd);
 
             XDestroyWindow(x11_stuff.globals->disp,x11_stuff.hwnd);
             x11_stuff.hwnd = 0;
             x11_stuff.globals->window_close_signaler.broadcast();
-        }   
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1766,7 +1766,7 @@ namespace dlib
 
     void base_window::
     show (
-    )    
+    )
     {
         using namespace gui_core_kernel_2_globals;
         auto_mutex M(wm);
@@ -1793,7 +1793,7 @@ namespace dlib
 
     void base_window::
     hide (
-    )    
+    )
     {
         using namespace gui_core_kernel_2_globals;
         auto_mutex M(wm);
@@ -1834,8 +1834,8 @@ namespace dlib
             hints->flags = PMinSize|PMaxSize;
             hints->min_width = width;
             hints->max_width = width;
-            hints->max_height = height; 
-            hints->min_height = height; 
+            hints->max_height = height;
+            hints->min_height = height;
             XSetNormalHints(x11_stuff.globals->disp,x11_stuff.hwnd,hints);
             XFree(hints);
         }
@@ -1885,7 +1885,7 @@ namespace dlib
 
         // we can't really trust the values we have for x and y because some window managers
         // will have reported bogus values back in the ConfigureNotify event.  So just to be
-        // on the safe side we will use XTranslateCoordinates() 
+        // on the safe side we will use XTranslateCoordinates()
         int rx, ry;
         Window desktop_window = DefaultRootWindow(x11_stuff.globals->disp);
         Window junk;

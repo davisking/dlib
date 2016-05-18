@@ -30,7 +30,7 @@ namespace dlib
         );
         /*!
             requires
-                - 0 <= gamma_magnitude 
+                - 0 <= gamma_magnitude
                 - 0 <= color_magnitude <= 1
             ensures
                 - This constructor generates a random color transform which can be applied
@@ -46,7 +46,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the color transformed version of p. 
+                - returns the color transformed version of p.
         !*/
     };
 
@@ -62,7 +62,7 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
         ensures
             - Applies a random color transform to the given image.  This is done by
               creating a random_color_transform with the given parameters and then

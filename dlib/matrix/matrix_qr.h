@@ -1,11 +1,11 @@
 // Copyright (C) 2009  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 // This code was adapted from code from the JAMA part of NIST's TNT library.
-//    See: http://math.nist.gov/tnt/ 
+//    See: http://math.nist.gov/tnt/
 #ifndef DLIB_MATRIX_QR_DECOMPOSITION_H
 #define DLIB_MATRIX_QR_DECOMPOSITION_H
 
-#include "matrix.h" 
+#include "matrix.h"
 #include "matrix_utilities.h"
 #include "matrix_subexp.h"
 
@@ -16,13 +16,13 @@
 
 #include "matrix_trsm.h"
 
-namespace dlib 
+namespace dlib
 {
 
     template <
         typename matrix_exp_type
         >
-    class qr_decomposition 
+    class qr_decomposition
     {
 
     public:
@@ -37,7 +37,7 @@ namespace dlib
 
         // You have supplied an invalid type of matrix_exp_type.  You have
         // to use this object with matrices that contain float or double type data.
-        COMPILE_TIME_ASSERT((is_same_type<float, type>::value || 
+        COMPILE_TIME_ASSERT((is_same_type<float, type>::value ||
                              is_same_type<double, type>::value ));
 
 
@@ -119,7 +119,7 @@ namespace dlib
     qr_decomposition<matrix_exp_type>::
     qr_decomposition(
         const matrix_exp<EXP>& A
-    )		
+    )
     {
         COMPILE_TIME_ASSERT((is_same_type<type, typename EXP::type>::value));
 
@@ -148,38 +148,38 @@ namespace dlib
         long i=0, j=0, k=0;
 
         // Main loop.
-        for (k = 0; k < n; k++) 
+        for (k = 0; k < n; k++)
         {
             // Compute 2-norm of k-th column without under/overflow.
             type nrm = 0;
-            for (i = k; i < m; i++) 
+            for (i = k; i < m; i++)
             {
                 nrm = hypot(nrm,QR_(i,k));
             }
 
-            if (nrm != 0.0) 
+            if (nrm != 0.0)
             {
                 // Form k-th Householder vector.
-                if (QR_(k,k) < 0) 
+                if (QR_(k,k) < 0)
                 {
                     nrm = -nrm;
                 }
-                for (i = k; i < m; i++) 
+                for (i = k; i < m; i++)
                 {
                     QR_(i,k) /= nrm;
                 }
                 QR_(k,k) += 1.0;
 
                 // Apply transformation to remaining columns.
-                for (j = k+1; j < n; j++) 
+                for (j = k+1; j < n; j++)
                 {
-                    type s = 0.0; 
-                    for (i = k; i < m; i++) 
+                    type s = 0.0;
+                    for (i = k; i < m; i++)
                     {
                         s += QR_(i,k)*QR_(i,j);
                     }
                     s = -s/QR_(k,k);
-                    for (i = k; i < m; i++) 
+                    for (i = k; i < m; i++)
                     {
                         QR_(i,j) += s*QR_(i,k);
                     }
@@ -215,7 +215,7 @@ namespace dlib
     template <typename matrix_exp_type>
     bool qr_decomposition<matrix_exp_type>::
     is_full_rank(
-    ) const		
+    ) const
     {
         type eps = max(abs(Rdiag));
         if (eps != 0)
@@ -235,19 +235,19 @@ namespace dlib
     ) const
     {
         matrix_type R(n,n);
-        for (long i = 0; i < n; i++) 
+        for (long i = 0; i < n; i++)
         {
-            for (long j = 0; j < n; j++) 
+            for (long j = 0; j < n; j++)
             {
-                if (i < j) 
+                if (i < j)
                 {
                     R(i,j) = QR_(i,j);
-                } 
-                else if (i == j) 
+                }
+                else if (i == j)
                 {
                     R(i,j) = Rdiag(i);
-                } 
-                else 
+                }
+                else
                 {
                     R(i,j) = 0.0;
                 }
@@ -282,31 +282,31 @@ namespace dlib
         // X ends up being an m by n matrix.
         X = colm(identity_matrix<type>(m), range(0,n-1));
 
-        // Compute Y = Q*X 
+        // Compute Y = Q*X
         lapack::ormqr('L','N', QR_, tau, X);
 
 #else
         long i=0, j=0, k=0;
 
         X.set_size(m,n);
-        for (k = n-1; k >= 0; k--) 
+        for (k = n-1; k >= 0; k--)
         {
-            for (i = 0; i < m; i++) 
+            for (i = 0; i < m; i++)
             {
                 X(i,k) = 0.0;
             }
             X(k,k) = 1.0;
-            for (j = k; j < n; j++) 
+            for (j = k; j < n; j++)
             {
-                if (QR_(k,k) != 0) 
+                if (QR_(k,k) != 0)
                 {
                     type s = 0.0;
-                    for (i = k; i < m; i++) 
+                    for (i = k; i < m; i++)
                     {
                         s += QR_(i,k)*X(i,j);
                     }
                     s = -s/QR_(k,k);
-                    for (i = k; i < m; i++) 
+                    for (i = k; i < m; i++)
                     {
                         X(i,j) += s*QR_(i,k);
                     }
@@ -376,24 +376,24 @@ namespace dlib
         column_vector_type x(B);
 
         // Compute Y = transpose(Q)*B
-        for (long k = 0; k < n; k++) 
+        for (long k = 0; k < n; k++)
         {
-            type s = 0.0; 
-            for (long i = k; i < m; i++) 
+            type s = 0.0;
+            for (long i = k; i < m; i++)
             {
                 s += QR_(i,k)*x(i);
             }
             s = -s/QR_(k,k);
-            for (long i = k; i < m; i++) 
+            for (long i = k; i < m; i++)
             {
                 x(i) += s*QR_(i,k);
             }
         }
         // Solve R*X = Y;
-        for (long k = n-1; k >= 0; k--) 
+        for (long k = n-1; k >= 0; k--)
         {
             x(k) /= Rdiag(k);
-            for (long i = 0; i < k; i++) 
+            for (long i = 0; i < k; i++)
             {
                 x(i) -= x(k)*QR_(i,k);
             }
@@ -413,37 +413,37 @@ namespace dlib
         const matrix_exp<EXP>& B
     ) const
     {
-        const long nx = B.nc(); 
+        const long nx = B.nc();
         matrix_type X(B);
         long i=0, j=0, k=0;
 
         // Compute Y = transpose(Q)*B
-        for (k = 0; k < n; k++) 
+        for (k = 0; k < n; k++)
         {
-            for (j = 0; j < nx; j++) 
+            for (j = 0; j < nx; j++)
             {
-                type s = 0.0; 
-                for (i = k; i < m; i++) 
+                type s = 0.0;
+                for (i = k; i < m; i++)
                 {
                     s += QR_(i,k)*X(i,j);
                 }
                 s = -s/QR_(k,k);
-                for (i = k; i < m; i++) 
+                for (i = k; i < m; i++)
                 {
                     X(i,j) += s*QR_(i,k);
                 }
             }
         }
         // Solve R*X = Y;
-        for (k = n-1; k >= 0; k--) 
+        for (k = n-1; k >= 0; k--)
         {
-            for (j = 0; j < nx; j++) 
+            for (j = 0; j < nx; j++)
             {
                 X(k,j) /= Rdiag(k);
             }
-            for (i = 0; i < k; i++) 
+            for (i = 0; i < k; i++)
             {
-                for (j = 0; j < nx; j++) 
+                for (j = 0; j < nx; j++)
                 {
                     X(i,j) -= X(k,j)*QR_(i,k);
                 }
@@ -458,9 +458,9 @@ namespace dlib
 
 #endif // DLIB_USE_LAPACK not defined
 
-} 
+}
 
-#endif // DLIB_MATRIX_QR_DECOMPOSITION_H 
+#endif // DLIB_MATRIX_QR_DECOMPOSITION_H
 
 
 

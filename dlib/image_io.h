@@ -5,7 +5,7 @@
 #include "dlib_basic_cpp_build_tutorial.txt"
 #endif
 
-#ifndef DLIB_IMAGe_IO_ 
+#ifndef DLIB_IMAGe_IO_
 #define DLIB_IMAGe_IO_
 
 #include "image_loader/image_loader.h"
@@ -16,5 +16,5 @@
 #include "image_saver/save_png.h"
 #include "image_saver/save_jpeg.h"
 
-#endif // DLIB_IMAGe_IO_ 
+#endif // DLIB_IMAGe_IO_
 

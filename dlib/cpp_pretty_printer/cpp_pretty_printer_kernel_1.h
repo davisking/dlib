@@ -16,7 +16,7 @@ namespace dlib
         typename stack,
         typename tok
         >
-    class cpp_pretty_printer_kernel_1 
+    class cpp_pretty_printer_kernel_1
     {
         /*!
             REQUIREMENTS ON stack
@@ -27,14 +27,14 @@ namespace dlib
                 must be an implementation of tokenizer/tokenizer_kernel_abstract.h
 
             INFO
-                This implementation applies a color scheme, turns include directives 
-                such as #include "file.h" into links to file.h.html, and it also puts 
+                This implementation applies a color scheme, turns include directives
+                such as #include "file.h" into links to file.h.html, and it also puts
                 HTML anchor points on function and class declarations.
         !*/
 
     public:
 
-        cpp_pretty_printer_kernel_1 (        
+        cpp_pretty_printer_kernel_1 (
         );
 
         virtual ~cpp_pretty_printer_kernel_1 (
@@ -79,7 +79,7 @@ namespace dlib
         cpp_pretty_printer_kernel_1(const cpp_pretty_printer_kernel_1&);        // copy constructor
         cpp_pretty_printer_kernel_1& operator=(const cpp_pretty_printer_kernel_1&);    // assignment operator
 
-    };    
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ namespace dlib
         typename tok
         >
     cpp_pretty_printer_kernel_1<stack,tok>::
-    cpp_pretty_printer_kernel_1 (        
+    cpp_pretty_printer_kernel_1 (
     )
     {
     }
@@ -129,13 +129,13 @@ namespace dlib
 
         t.set_stream(in);
 
-        out << "<html><!-- " 
-            << "Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates." 
+        out << "<html><!-- "
+            << "Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates."
             << " --><head><title>" << title << "</title></head><body bgcolor='white'><pre>\n";
         if (!out)
             throw std::ios::failure("error occurred in cpp_pretty_printer_kernel_1::print");
 
-        unsigned long scope = 0; // counts the number of new scopes we have entered 
+        unsigned long scope = 0; // counts the number of new scopes we have entered
                         // since we were at a scope where functions can be declared
 
         bool recently_seen_class_keyword = false;
@@ -146,7 +146,7 @@ namespace dlib
             // true if we have seen the #include keyword and have not seen double
             // quoted text or >
 
-        bool recently_seen_new_scope = false;  
+        bool recently_seen_new_scope = false;
             // true if we have seen the keywords class, namespace, or struct and
             // we have not seen the characters {, ), or ; since then
 
@@ -155,17 +155,17 @@ namespace dlib
 
         bool in_initialization_list = false;
             // true if we have seen a ) followed by any white space or comments and then
-            // followed by a : (in scope==0 with recently_seen_preprocessor==false) and we 
+            // followed by a : (in scope==0 with recently_seen_preprocessor==false) and we
             // have not yet seen the character { or ;
 
         bool recently_seen_preprocessor = false;
-            // true if we have seen the #pragma or #if or #define or #elif keywords and have 
+            // true if we have seen the #pragma or #if or #define or #elif keywords and have
             // not seen an end of line.
 
         bool recently_seen_extern = false;
             // true if we have seen the extern keyword and haven't seen a ; or { yet.
 
-        unsigned long paren_count = 0; 
+        unsigned long paren_count = 0;
             // this is the number of ( we have seen minus the number of ) we have
             // seen.
             
@@ -181,7 +181,7 @@ namespace dlib
             case tok::IDENTIFIER: // ------------------------------------------
                 if ( recently_seen_class_keyword)
                 {
-                    // this might be a class name so check if there is a 
+                    // this might be a class name so check if there is a
                     // ; or identifier or * or & coming up.
                     type = t.peek_type();
                     temp.clear();
@@ -206,7 +206,7 @@ namespace dlib
                 else if ( !in_initialization_list &&
                      !recently_seen_preprocessor )
                 {
-                    // this might be a function name so check if there is a 
+                    // this might be a function name so check if there is a
                     // ( coming up.
                     type = t.peek_type();
                     temp.clear();
@@ -224,7 +224,7 @@ namespace dlib
                         }
                         else
                         {
-                            // this is a function call (probably) 
+                            // this is a function call (probably)
                             out << "<font color='#BB00BB'>" << token << "</font>" << temp;
                         }
                     }
@@ -257,11 +257,11 @@ namespace dlib
                     // color 'true' and 'false' the same way we color numbers
                     out << "<font color='#979000'>" << token << "</font>";
                 }
-                else if (!recently_seen_include) 
+                else if (!recently_seen_include)
                 {
                     // This is a normal keyword
                     if (token == "char" || token == "unsigned" || token == "signed" ||
-                        token == "short" || token == "int" || token == "long" || 
+                        token == "short" || token == "int" || token == "long" ||
                         token == "float" || token == "double" || token == "bool" ||
                         token == "void" || token == "size_t" || token == "wchar_t")
                     {
@@ -277,7 +277,7 @@ namespace dlib
                     out << token;
                 }
 
-                if (token == "#include") 
+                if (token == "#include")
                 {
                     recently_seen_include = true;
                 }
@@ -362,7 +362,7 @@ namespace dlib
                     {
                         // this is the name of an included file
                         recently_seen_include = false;
-                        out << "<a style='text-decoration:none' href='" << htmlify(token) << ".html'>" << htmlify(token) << "</a>";                
+                        out << "<a style='text-decoration:none' href='" << htmlify(token) << ".html'>" << htmlify(token) << "</a>";
                     }
                     else
                     {
@@ -373,11 +373,11 @@ namespace dlib
                 }
                 break;
 
-            case tok::OTHER: // -----------------------------------------------               
+            case tok::OTHER: // -----------------------------------------------
                 switch (token[0])
                 {
                 case '{':
-                    out << "<b>{</b>";  
+                    out << "<b>{</b>";
                     // if we are entering a new scope
                     if (recently_seen_new_scope || recently_seen_extern)
                     {
@@ -409,7 +409,7 @@ namespace dlib
 
                 case ':':
                     out << ':';
-                    if (recently_seen_paren && scope == 0 && 
+                    if (recently_seen_paren && scope == 0 &&
                         recently_seen_preprocessor == false)
                     {
                         in_initialization_list = true;
@@ -417,7 +417,7 @@ namespace dlib
                     recently_seen_paren = false;
                     break;
 
-                case ';': 
+                case ';':
                     out << ';';
                     recently_seen_new_scope = false;
                     recently_seen_paren = false;
@@ -530,7 +530,7 @@ namespace dlib
         {
             if (ch != '\n')
             {
-                out << (char)ch;    
+                out << (char)ch;
             }
             else
             {
@@ -541,7 +541,7 @@ namespace dlib
                 if (count == 100)
                     space = "&nbsp;";
                 if (count == 1000)
-                    space = "";            
+                    space = "";
             }
         }
         if (!out)

@@ -14,8 +14,8 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is a type used to represent an unused field in the list of template 
-                arguments of the one_vs_one_decision_function and one_vs_all_decision_function 
+                This is a type used to represent an unused field in the list of template
+                arguments of the one_vs_one_decision_function and one_vs_all_decision_function
                 templates.  As such, null_df doesn't actually do anything.
         !*/
         template <typename T>

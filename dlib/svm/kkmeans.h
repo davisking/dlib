@@ -29,7 +29,7 @@ namespace dlib
         typedef typename kernel_type::mem_manager_type mem_manager_type;
 
         kkmeans (
-            const kcentroid<kernel_type>& kc_ 
+            const kcentroid<kernel_type>& kc_
         ):
             kc(kc_),
             min_change(0.01)
@@ -63,8 +63,8 @@ namespace dlib
             DLIB_ASSERT(i < number_of_centers(),
                 "\tkcentroid kkmeans::get_kcentroid(i)"
                 << "\n\tYou have given an invalid value for i"
-                << "\n\ti:                   " << i 
-                << "\n\tnumber_of_centers(): " << number_of_centers() 
+                << "\n\ti:                   " << i
+                << "\n\tnumber_of_centers(): " << number_of_centers()
                 << "\n\tthis:                " << this
                 );
 
@@ -137,7 +137,7 @@ namespace dlib
                 "\tvoid kkmeans::set_min_change()"
                 << "\n\tInvalid arguments to this function"
                 << "\n\tthis: " << this
-                << "\n\tmin_change_: " << min_change_ 
+                << "\n\tmin_change_: " << min_change_
                 );
             min_change = min_change_;
         }
@@ -203,9 +203,9 @@ namespace dlib
                 "\tvoid kkmeans::train()"
                 << "\n\tInvalid arguments to this function"
                 << "\n\tthis: " << this
-                << "\n\tsamples.nc(): " << samples.nc() 
-                << "\n\tinitial_centers.nc(): " << initial_centers.nc() 
-                << "\n\tinitial_centers.nr(): " << initial_centers.nr() 
+                << "\n\tsamples.nc(): " << samples.nc()
+                << "\n\tinitial_centers.nc(): " << initial_centers.nc()
+                << "\n\tinitial_centers.nr(): " << initial_centers.nr()
                 );
 
             // clear out the old data and initialize the centers
@@ -219,7 +219,7 @@ namespace dlib
 
             bool assignment_changed = true;
 
-            // loop until the centers stabilize 
+            // loop until the centers stabilize
             long count = 0;
             const unsigned long min_num_change = static_cast<unsigned long>(min_change*samples.size());
             unsigned long num_changed = min_num_change;
@@ -256,11 +256,11 @@ namespace dlib
 
                 if (assignment_changed)
                 {
-                    // now clear out the old data 
+                    // now clear out the old data
                     for (unsigned long i = 0; i < centers.size(); ++i)
                         centers[i]->clear_dictionary();
 
-                    // recalculate the cluster centers 
+                    // recalculate the cluster centers
                     for (unsigned long i = 0; i < assignments.size(); ++i)
                         centers[assignments[i]]->train(samples(i));
                 }
@@ -295,15 +295,15 @@ namespace dlib
     };
 
     template <
-        typename vector_type1, 
-        typename vector_type2, 
+        typename vector_type1,
+        typename vector_type2,
         typename kernel_type
         >
     void pick_initial_centers(
-        long num_centers, 
-        vector_type1& centers, 
-        const vector_type2& samples, 
-        const kernel_type& k, 
+        long num_centers,
+        vector_type1& centers,
+        const vector_type2& samples,
+        const kernel_type& k,
         double percentile = 0.01
     )
     {
@@ -319,9 +319,9 @@ namespace dlib
         DLIB_ASSERT(num_centers > 1 && 0 <= percentile && percentile < 1 && samples.size() > 1,
             "\tvoid pick_initial_centers()"
             << "\n\tYou passed invalid arguments to this function"
-            << "\n\tnum_centers: " << num_centers 
-            << "\n\tpercentile: " << percentile 
-            << "\n\tsamples.size(): " << samples.size() 
+            << "\n\tnum_centers: " << num_centers
+            << "\n\tpercentile: " << percentile
+            << "\n\tsamples.size(): " << samples.size()
             );
 
         std::vector<dlib_pick_initial_centers_data> scores(samples.size());
@@ -353,7 +353,7 @@ namespace dlib
 
             scores_sorted = scores;
 
-            // now find the winning center and add it to centers.  It is the one that is 
+            // now find the winning center and add it to centers.  It is the one that is
             // far away from all the other centers.
             sort(scores_sorted.begin(), scores_sorted.end());
             centers.push_back(samples[scores_sorted[best_idx].idx]);
@@ -364,13 +364,13 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename vector_type1, 
+        typename vector_type1,
         typename vector_type2
         >
     void pick_initial_centers(
-        long num_centers, 
-        vector_type1& centers, 
-        const vector_type2& samples, 
+        long num_centers,
+        vector_type1& centers,
+        const vector_type2& samples,
         double percentile = 0.01
     )
     {
@@ -382,7 +382,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename array_type, 
+        typename array_type,
         typename sample_type,
         typename alloc
         >
@@ -396,8 +396,8 @@ namespace dlib
         DLIB_ASSERT(samples.size() > 0 && centers.size() > 0,
             "\tvoid find_clusters_using_kmeans()"
             << "\n\tYou passed invalid arguments to this function"
-            << "\n\t samples.size(): " << samples.size() 
-            << "\n\t centers.size(): " << centers.size() 
+            << "\n\t samples.size(): " << samples.size()
+            << "\n\t centers.size(): " << centers.size()
             );
 
 #ifdef ENABLE_ASSERTS
@@ -483,7 +483,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename array_type, 
+        typename array_type,
         typename sample_type,
         typename alloc
         >
@@ -497,8 +497,8 @@ namespace dlib
         DLIB_ASSERT(samples.size() > 0 && centers.size() > 0,
             "\tvoid find_clusters_using_angular_kmeans()"
             << "\n\tYou passed invalid arguments to this function"
-            << "\n\t samples.size(): " << samples.size() 
-            << "\n\t centers.size(): " << centers.size() 
+            << "\n\t samples.size(): " << samples.size()
+            << "\n\t centers.size(): " << centers.size()
             );
 
 #ifdef ENABLE_ASSERTS
@@ -614,8 +614,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename array_type, 
-        typename EXP 
+        typename array_type,
+        typename EXP
         >
     unsigned long nearest_center (
         const array_type& centers,
@@ -626,9 +626,9 @@ namespace dlib
         DLIB_ASSERT(centers.size() > 0 && sample.size() > 0 && is_vector(sample),
             "\t unsigned long nearest_center()"
             << "\n\t You have given invalid inputs to this function."
-            << "\n\t centers.size():    " << centers.size() 
-            << "\n\t sample.size():     " << sample.size() 
-            << "\n\t is_vector(sample): " << is_vector(sample) 
+            << "\n\t centers.size():    " << centers.size()
+            << "\n\t sample.size():     " << sample.size()
+            << "\n\t is_vector(sample): " << is_vector(sample)
             );
 
         double best_dist = length_squared(centers[0] - sample);

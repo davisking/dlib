@@ -24,7 +24,7 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
         ensures
             - #img.nr() == img.nr() && #img.nc() == img.nc()
               (i.e. the dimensions of the input image are not changed)
@@ -50,7 +50,7 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
         ensures
             - performs draw_line(img, point(x1,y1), point(x2,y2), val)
     !*/
@@ -70,11 +70,11 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - pixel_traits<pixel_type> is defined
         ensures
             - Draws the given rectangle onto the image img.  It does this by calling
-              draw_line() four times to draw the four sides of the rectangle.  
+              draw_line() four times to draw the four sides of the rectangle.
             - The rectangle is drawn with the color given by val.
             - The drawn rectangle will have edges that are thickness pixels wide.
     !*/
@@ -94,7 +94,7 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - pixel_traits<pixel_type> is defined
         ensures
             - Draws a fully filled in circle onto image that is centered at center_point
@@ -116,7 +116,7 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - pixel_traits<pixel_type> is defined
         ensures
             - fills the area defined by rect in the given image with the given pixel value.
@@ -133,7 +133,7 @@ namespace dlib
     /*!
         requires
             - image_array_type is a dlib::array of image objects where each image object
-              implements the interface defined in dlib/image_processing/generic_image.h 
+              implements the interface defined in dlib/image_processing/generic_image.h
         ensures
             - This function takes the given images and tiles them into a single large
               square image and returns this new big tiled image.  Therefore, it is a useful

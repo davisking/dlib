@@ -15,7 +15,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -41,7 +41,7 @@ namespace
         {
             for (long col = 0; col < m.nc(); ++col)
             {
-                m(row,col) = static_cast<type>(rnd.get_random_double()); 
+                m(row,col) = static_cast<type>(rnd.get_random_double());
             }
         }
 
@@ -56,7 +56,7 @@ namespace
         {
             for (long col = 0; col < m.nc(); ++col)
             {
-                m(row,col) = static_cast<type>(rnd.get_random_double()); 
+                m(row,col) = static_cast<type>(rnd.get_random_double());
             }
         }
 
@@ -88,7 +88,7 @@ namespace
 
         if (test.is_square())
         {
-            // none of the matrices we should be passing in to test_lu() should be singular.  
+            // none of the matrices we should be passing in to test_lu() should be singular.
             DLIB_TEST_MSG (abs(test.det()) > eps/100, "det: " << test.det() );
             dlog << LDEBUG << "big det: " << test.det();
 

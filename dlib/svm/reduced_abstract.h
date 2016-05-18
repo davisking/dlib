@@ -17,7 +17,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename trainer_type 
+        typename trainer_type
         >
     class reduced_decision_function_trainer
     {
@@ -26,11 +26,11 @@ namespace dlib
                 - trainer_type == some kind of batch trainer object (e.g. svm_nu_trainer)
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents an implementation of a reduced set algorithm.  
-                This object acts as a post processor for anything that creates 
-                decision_function objects.  It wraps another trainer object and 
-                performs this reduced set post processing with the goal of 
-                representing the original decision function in a form that 
+                This object represents an implementation of a reduced set algorithm.
+                This object acts as a post processor for anything that creates
+                decision_function objects.  It wraps another trainer object and
+                performs this reduced set post processing with the goal of
+                representing the original decision function in a form that
                 involves fewer basis vectors.
         !*/
 
@@ -52,7 +52,7 @@ namespace dlib
 
         reduced_decision_function_trainer (
             const trainer_type& trainer,
-            const unsigned long num_bv 
+            const unsigned long num_bv
         );
         /*!
             requires
@@ -77,13 +77,13 @@ namespace dlib
             ensures
                 - trains a decision_function using the trainer that was supplied to
                   this object's constructor and then finds a reduced representation
-                  for it and returns the reduced version.  
+                  for it and returns the reduced version.
             throws
                 - std::bad_alloc
                 - any exceptions thrown by the trainer_type object
         !*/
 
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -120,7 +120,7 @@ namespace dlib
     );
     /*!
         requires
-            - stop_strategy == an object that defines a stop strategy such as one of 
+            - stop_strategy == an object that defines a stop strategy such as one of
               the objects from dlib/optimization/optimization_stop_strategies_abstract.h
             - requirements on starting_basis
                 - T must be a dlib::matrix type or something convertible to a matrix via mat()
@@ -128,7 +128,7 @@ namespace dlib
                   objects which can be supplied to the kernel function used by target.
                 - is_vector(starting_basis) == true
                 - starting_basis.size() > 0
-            - target.get_basis_vectors().size() > 0 
+            - target.get_basis_vectors().size() > 0
             - kernel_derivative<K> is defined
               (i.e. The analytic derivative for the given kernel must be defined)
             - K::sample_type must be a dlib::matrix object and the basis_vectors inside target
@@ -137,21 +137,21 @@ namespace dlib
             - This routine attempts to find a distance_function object which is close
               to the given target.  That is, it searches for an X such that target(X) is
               minimized.  The optimization begins with an X in the span of the elements
-              of starting_basis and searches for an X which locally minimizes target(X).  
-              Since this problem can have many local minima, the quality of the starting 
-              basis can significantly influence the results.   
+              of starting_basis and searches for an X which locally minimizes target(X).
+              Since this problem can have many local minima, the quality of the starting
+              basis can significantly influence the results.
             - The optimization is over all variables in a distance_function, however,
               the size of the basis set is constrained to no more than starting_basis.size().
-              That is, in the returned distance_function DF, we will have: 
+              That is, in the returned distance_function DF, we will have:
                 - DF.get_basis_vectors().size() <= starting_basis.size()
-            - The optimization is carried out until the stop_strategy indicates it 
+            - The optimization is carried out until the stop_strategy indicates it
               should stop.
     !*/
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename trainer_type 
+        typename trainer_type
         >
     class reduced_decision_function_trainer2
     {
@@ -162,18 +162,18 @@ namespace dlib
                 - kernel_derivative<trainer_type::kernel_type> must be defined
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents an implementation of a reduced set algorithm.  
-                This object acts as a post processor for anything that creates 
-                decision_function objects.  It wraps another trainer object and 
-                performs this reduced set post processing with the goal of 
-                representing the original decision function in a form that 
+                This object represents an implementation of a reduced set algorithm.
+                This object acts as a post processor for anything that creates
+                decision_function objects.  It wraps another trainer object and
+                performs this reduced set post processing with the goal of
+                representing the original decision function in a form that
                 involves fewer basis vectors.
 
                 This object's implementation is the same as that in the above
-                reduced_decision_function_trainer object except it also performs 
+                reduced_decision_function_trainer object except it also performs
                 a global gradient based optimization at the end to further
                 improve the approximation to the original decision function
-                object. 
+                object.
         !*/
 
     public:
@@ -222,18 +222,18 @@ namespace dlib
         ) const;
         /*!
             requires
-                - x must be a list of objects which are each some kind of dlib::matrix 
+                - x must be a list of objects which are each some kind of dlib::matrix
                   which represents column or row vectors.
             ensures
                 - trains a decision_function using the trainer that was supplied to
                   this object's constructor and then finds a reduced representation
-                  for it and returns the reduced version.  
+                  for it and returns the reduced version.
             throws
                 - std::bad_alloc
                 - any exceptions thrown by the trainer_type object
         !*/
 
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 

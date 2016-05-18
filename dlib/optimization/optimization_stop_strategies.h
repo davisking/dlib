@@ -20,7 +20,7 @@ namespace dlib
     public:
         explicit objective_delta_stop_strategy (
             double min_delta = 1e-7
-        ) : _verbose(false), _been_used(false), _min_delta(min_delta), _max_iter(0), _cur_iter(0), _prev_funct_value(0) 
+        ) : _verbose(false), _been_used(false), _min_delta(min_delta), _max_iter(0), _cur_iter(0), _prev_funct_value(0)
         {
             DLIB_ASSERT (
                 min_delta >= 0,
@@ -33,19 +33,19 @@ namespace dlib
         objective_delta_stop_strategy (
             double min_delta,
             unsigned long max_iter
-        ) : _verbose(false), _been_used(false), _min_delta(min_delta), _max_iter(max_iter), _cur_iter(0), _prev_funct_value(0) 
+        ) : _verbose(false), _been_used(false), _min_delta(min_delta), _max_iter(max_iter), _cur_iter(0), _prev_funct_value(0)
         {
             DLIB_ASSERT (
                 min_delta >= 0 && max_iter > 0,
                 "\t objective_delta_stop_strategy(min_delta, max_iter)"
                 << "\n\t min_delta can't be negative and max_iter can't be 0"
                 << "\n\t min_delta: " << min_delta
-                << "\n\t max_iter:  " << max_iter 
+                << "\n\t max_iter:  " << max_iter
             );
         }
 
-        objective_delta_stop_strategy& be_verbose( 
-        ) 
+        objective_delta_stop_strategy& be_verbose(
+        )
         {
             _verbose = true;
             return *this;
@@ -55,8 +55,8 @@ namespace dlib
         bool should_continue_search (
             const T& ,
             const double funct_value,
-            const T& 
-        ) 
+            const T&
+        )
         {
             if (_verbose)
             {
@@ -99,7 +99,7 @@ namespace dlib
     public:
         explicit gradient_norm_stop_strategy (
             double min_norm = 1e-7
-        ) : _verbose(false), _min_norm(min_norm), _max_iter(0), _cur_iter(0) 
+        ) : _verbose(false), _min_norm(min_norm), _max_iter(0), _cur_iter(0)
         {
             DLIB_ASSERT (
                 min_norm >= 0,
@@ -112,19 +112,19 @@ namespace dlib
         gradient_norm_stop_strategy (
             double min_norm,
             unsigned long max_iter
-        ) : _verbose(false), _min_norm(min_norm), _max_iter(max_iter), _cur_iter(0) 
+        ) : _verbose(false), _min_norm(min_norm), _max_iter(max_iter), _cur_iter(0)
         {
             DLIB_ASSERT (
                 min_norm >= 0 && max_iter > 0,
                 "\t gradient_norm_stop_strategy(min_norm, max_iter)"
                 << "\n\t min_norm can't be negative and max_iter can't be 0"
                 << "\n\t min_norm: " << min_norm
-                << "\n\t max_iter:  " << max_iter 
+                << "\n\t max_iter:  " << max_iter
             );
         }
 
-        gradient_norm_stop_strategy& be_verbose( 
-        ) 
+        gradient_norm_stop_strategy& be_verbose(
+        )
         {
             _verbose = true;
             return *this;
@@ -135,7 +135,7 @@ namespace dlib
             const T& ,
             const double funct_value,
             const T& funct_derivative
-        ) 
+        )
         {
             if (_verbose)
             {
@@ -150,7 +150,7 @@ namespace dlib
             if (_max_iter != 0 && _cur_iter > _max_iter)
                 return false;
 
-            // check if the gradient norm is too small 
+            // check if the gradient norm is too small
             if (length(funct_derivative) < _min_norm)
                 return false;
 

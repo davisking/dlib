@@ -11,7 +11,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -176,7 +176,7 @@ namespace
 
         projs = s(projs,num_dims);
 
-        DLIB_TEST(length(projs[0] - projs[1]) > 1e-5); 
+        DLIB_TEST(length(projs[0] - projs[1]) > 1e-5);
     }
 
     class sammon_tester : public tester

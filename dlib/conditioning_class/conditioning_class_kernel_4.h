@@ -14,7 +14,7 @@ namespace dlib
         unsigned long pool_size,
         typename mem_manager
         >
-    class conditioning_class_kernel_4 
+    class conditioning_class_kernel_4
     {
         /*!
             REQUIREMENTS ON pool_size
@@ -29,7 +29,7 @@ namespace dlib
                 escapes == 1
                 next == 0
                 
-            CONVENTION                
+            CONVENTION
                 get_total() == total
                 get_count(alphabet_size-1) == escapes
 
@@ -37,7 +37,7 @@ namespace dlib
                     next == pointer to the start of a linked list and the linked list
                             is terminated by a node with a next pointer of 0.
 
-                get_count(symbol) == node::count for the node where node::symbol==symbol 
+                get_count(symbol) == node::count for the node where node::symbol==symbol
                                      or 0 if no such node currently exists.
 
                 if (there is a node for the symbol) then
@@ -61,7 +61,7 @@ namespace dlib
         {
         public:
             global_state_type (
-            ) : 
+            ) :
                 memory_usage(pool_size*sizeof(node)+sizeof(global_state_type))
                 {}
         private:
@@ -103,7 +103,7 @@ namespace dlib
 
         void get_symbol (
             unsigned long target,
-            unsigned long& symbol,            
+            unsigned long& symbol,
             unsigned long& low_count,
             unsigned long& high_count
         ) const;
@@ -137,7 +137,7 @@ namespace dlib
         node* next;
         global_state_type& global_state;
 
-    };   
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -242,11 +242,11 @@ namespace dlib
         unsigned long symbol,
         unsigned short amount
     )
-    {        
+    {
         if (symbol == alphabet_size-1)
         {
             // make sure we won't cause any overflow
-            if (total >= 65536 - amount )                        
+            if (total >= 65536 - amount )
                 half_counts();
 
             escapes += amount;
@@ -265,7 +265,7 @@ namespace dlib
                 if (temp->symbol == static_cast<unsigned short>(symbol))
                 {
                     // make sure we won't cause any overflow
-                    if (total >= 65536 - amount )                        
+                    if (total >= 65536 - amount )
                         half_counts();
                     
                     // we have found the symbol
@@ -287,7 +287,7 @@ namespace dlib
                     if (global_state.pool.get_number_of_allocations() < pool_size)
                     {
                         // make sure we won't cause any overflow
-                        if (total >= 65536 - amount )                        
+                        if (total >= 65536 - amount )
                             half_counts();
 
                         node* t = global_state.pool.allocate();
@@ -335,7 +335,7 @@ namespace dlib
             if (global_state.pool.get_number_of_allocations() < pool_size)
             {
                 // make sure we won't cause any overflow
-                if (total >= 65536 - amount )                        
+                if (total >= 65536 - amount )
                     half_counts();
 
                 next = global_state.pool.allocate();
@@ -366,7 +366,7 @@ namespace dlib
     ) const
     {
         if (symbol == alphabet_size-1)
-        { 
+        {
             return escapes;
         }
         else
@@ -379,7 +379,7 @@ namespace dlib
                 temp = temp->next;
             }
             return 0;
-        }        
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -390,8 +390,8 @@ namespace dlib
         typename mem_manager
         >
     unsigned long conditioning_class_kernel_4<alphabet_size,pool_size,mem_manager>::
-    get_alphabet_size (        
-    ) 
+    get_alphabet_size (
+    )
     {
         return alphabet_size;
     }
@@ -424,7 +424,7 @@ namespace dlib
         unsigned long& high_count,
         unsigned long& total_count
     ) const
-    {   
+    {
         if (symbol != alphabet_size-1)
         {
             node* temp = next;
@@ -434,7 +434,7 @@ namespace dlib
                 if (temp->symbol == static_cast<unsigned short>(symbol))
                 {
                     high_count = temp->count + low;
-                    low_count = low;                
+                    low_count = low;
                     total_count = total;
                     return temp->count;
                 }
@@ -462,7 +462,7 @@ namespace dlib
     void conditioning_class_kernel_4<alphabet_size,pool_size,mem_manager>::
     get_symbol (
         unsigned long target,
-        unsigned long& symbol,            
+        unsigned long& symbol,
         unsigned long& low_count,
         unsigned long& high_count
     ) const
@@ -490,7 +490,7 @@ namespace dlib
                 low_count = total-escapes;
                 high_count = total;
                 return;
-            }            
+            }
         }
     }
 
@@ -508,7 +508,7 @@ namespace dlib
         >
     void conditioning_class_kernel_4<alphabet_size,pool_size,mem_manager>::
     half_counts (
-    ) 
+    )
     {
         total = 0;
         if (escapes > 1)

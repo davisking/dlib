@@ -43,9 +43,9 @@ namespace dlib
 
     public:
 
-        class decompression_error : public dlib::error 
-        { 
-            public: 
+        class decompression_error : public dlib::error
+        {
+            public:
                 decompression_error(
                     const char* i
                 ) :
@@ -87,16 +87,16 @@ namespace dlib
         inline void write (
             unsigned char symbol
         ) const
-        { 
+        {
             if (out->sputn(reinterpret_cast<char*>(&symbol),1)==0)
-                throw std::ios_base::failure("error writing to output stream in compress_stream_kernel_3");        
+                throw std::ios_base::failure("error writing to output stream in compress_stream_kernel_3");
         }
 
         inline void decode (
             unsigned char& symbol,
             unsigned char& flag
         ) const
-        { 
+        {
             if (count == 0)
             {
                 if (((size_t)in->sgetn(reinterpret_cast<char*>(buffer),sizeof(buffer)))!=sizeof(buffer))
@@ -105,7 +105,7 @@ namespace dlib
             }
             --count;
             symbol = buffer[8-count];
-            flag = buffer[0] >> 7; 
+            flag = buffer[0] >> 7;
             buffer[0] <<= 1;
         }
 
@@ -119,8 +119,8 @@ namespace dlib
             ensures
                 - writes symbol with the given one bit flag
         !*/
-        { 
-            // add this symbol and flag to the buffer            
+        {
+            // add this symbol and flag to the buffer
             ++count;
             buffer[0] <<= 1;
             buffer[count] = symbol;
@@ -129,7 +129,7 @@ namespace dlib
             if (count == 8)
             {
                 if (((size_t)out->sputn(reinterpret_cast<char*>(buffer),sizeof(buffer)))!=sizeof(buffer))
-                    throw std::ios_base::failure("error writing to output stream in compress_stream_kernel_3");        
+                    throw std::ios_base::failure("error writing to output stream in compress_stream_kernel_3");
                 count = 0;
                 buffer[0] = 0;
             }
@@ -156,14 +156,14 @@ namespace dlib
             {
                 buffer[0] <<= (8-count);
                 if (((size_t)out->sputn(reinterpret_cast<char*>(buffer),sizeof(buffer)))!=sizeof(buffer))
-                    throw std::ios_base::failure("error writing to output stream in compress_stream_kernel_3");        
+                    throw std::ios_base::failure("error writing to output stream in compress_stream_kernel_3");
             }
         }
 
         mutable unsigned int count;
         // count tells us how many bytes are buffered in buffer and how many flag
         // bit are currently in buffer[0]
-        mutable unsigned char buffer[9];  
+        mutable unsigned char buffer[9];
         // buffer[0] holds the flag bits to be writen.
         // the rest of the buffer holds the bytes to be writen.
 
@@ -223,7 +223,7 @@ namespace dlib
                     while (length < 255)
                     {
                         if (temp == EOF)
-                        {                          
+                        {
                             break;
                         }
                         else if (static_cast<unsigned long>(length) >= index)
@@ -241,7 +241,7 @@ namespace dlib
                         {
                             break;
                         }
-                    }                        
+                    }
 
                     encode(length,1);
                 }
@@ -298,7 +298,7 @@ namespace dlib
         std::istream& in_,
         std::ostream& out_
     ) const
-    { 
+    {
         in = in_.rdbuf();
         out = out_.rdbuf();
         clear();
@@ -321,13 +321,13 @@ namespace dlib
             if (flag == 1)
             {
                 length = symbol;
-                do 
+                do
                 {
                     --length;
                     symbol = buffer[index];
                     write(symbol);
-                    buffer.add(symbol);   
-                    crc.add(symbol);                    
+                    buffer.add(symbol);
+                    crc.add(symbol);
                 } while (length != 0);
             }
             else

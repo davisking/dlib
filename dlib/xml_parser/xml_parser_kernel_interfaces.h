@@ -17,7 +17,7 @@ namespace dlib
     class attribute_list : public enumerable<map_pair<std::string,std::string> >
     {
 
-        /*!                
+        /*!
             WHAT THIS OBJECT REPRESENTS
                 this object represents a list of the attributes found in
                 an XML element.  each attribute is associated with a value.
@@ -35,7 +35,7 @@ namespace dlib
         ) const =0;
         /*!
             ensures
-                - returns true if there is an attribute named key in the list 
+                - returns true if there is an attribute named key in the list
                 - returns false
         !*/
 
@@ -46,7 +46,7 @@ namespace dlib
             requires
                 - is_in_list(key) == true
             ensures
-                - returns a const reference to the value associated with the 
+                - returns a const reference to the value associated with the
                   attribute named key.
         !*/
 
@@ -62,7 +62,7 @@ namespace dlib
 
     class document_handler
     {
-        /*!                
+        /*!
             EXCEPTIONS
                 a document_handler is allowed to throw any exception
 
@@ -93,7 +93,7 @@ namespace dlib
                   is always called, even if an error occurs.
         !*/
 
-        virtual void start_element ( 
+        virtual void start_element (
             const unsigned long line_number,
             const std::string& name,
             const dlib::attribute_list& atts
@@ -101,14 +101,14 @@ namespace dlib
         /*!
             requires
                 - is called when an opening element tag is encountered.
-                - line_number == the line number where the opening tag for this element 
+                - line_number == the line number where the opening tag for this element
                   was encountered.
-                - name == the name of the element encountered 
-                - atts == a list containing all the attributes in this element and their 
+                - name == the name of the element encountered
+                - atts == a list containing all the attributes in this element and their
                   associated values
         !*/
 
-        virtual void end_element ( 
+        virtual void end_element (
             const unsigned long line_number,
             const std::string& name
         )=0;
@@ -117,22 +117,22 @@ namespace dlib
                 - is called when a closing element tag is encountered. (note that this
                   includes tags such as <example_tag/>.  I.e. the previous tag would
                   trigger a start_element() callback as well as an end_element() callback)
-                - line_number == the line number where the closing tag for this 
+                - line_number == the line number where the closing tag for this
                   element was encountered and
                 - name == the name of the element encountered
         !*/
 
-        virtual void characters ( 
+        virtual void characters (
             const std::string& data
         )=0;
         /*!
             requires
-                - is called just before we encounter a start_element, end_element, or 
-                  processing_instruction tag but only if there was data between the 
-                  last and next tag.  
+                - is called just before we encounter a start_element, end_element, or
+                  processing_instruction tag but only if there was data between the
+                  last and next tag.
                   (i.e. data will never be "")
                 - data == all the normal non-markup data and CDATA between the next and
-                  last tag in the document.  
+                  last tag in the document.
         !*/
 
         virtual void processing_instruction (
@@ -144,8 +144,8 @@ namespace dlib
             requires
                 - is called when a processing instruction is encountered
                 - line_number == the line number where this processing instruction
-                  was encountered 
-                - target == the target value for this processing instruction 
+                  was encountered
+                - target == the target value for this processing instruction
                 - data == the data value for this processing instruction
         !*/
 
@@ -162,7 +162,7 @@ namespace dlib
 
     class error_handler
     {
-        /*!                
+        /*!
             EXCEPTIONS
                 an error_handler is allowed to throw any exception
 
@@ -196,12 +196,12 @@ namespace dlib
         /*!
             requires
                 - is called when an error that requires the parser to abort its parsing
-                  is encountered (i.e. fatal errors in the input) 
+                  is encountered (i.e. fatal errors in the input)
                 - line_number == the line number where this fatal error was encountered
 
             the following events trigger a fatal_error:
-                Everything other than the events listed above for error. 
-                Also note that encountering an entity reference other than the 
+                Everything other than the events listed above for error.
+                Also note that encountering an entity reference other than the
                 predefined ones listed in xml_parser_kernel_abstract is a fatal_error.
                 Hitting EOF before the closing tag for the document is also a fatal_error.
         !*/
